@@ -10,7 +10,40 @@
     <string name="login_have_account">Already have an account?</string>
     <string name="login_sign_in">Sign in</string>
 
-    <!--SignUpFragment-->
+    <!--SigninFragment-->
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_in_forgot_password">Forgot Password?</string>
+
+    <!--SignUpFragment-->
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="member_information">Member Information</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_up_error_default">Error signing up, please try again later</string>
+    <string name="sign_up_error_weak_password">Your password is too weak, please try again</string>
+    <string name="sign_up_error_invalid_credentials">The credentials provided don\'t match our records, please try again</string>
+    <string name="sign_up_error_duplicate_credentials">A user already exists with the credentials provided, please try again</string>
+
+    <!--Main Activity Navigation Menu-->
+    <string name="home">Home</string>
+    <string name="events">Events</string>
+    <string name="messages">Messages</string>
+    <string name="media">Media</string>
+    <string name="team">Team</string>
+
+    <!--Main Activity Options Menu-->
+    <string name="settings">Settings</string>
+
+    <!--HomeFragment-->
+    <string name="home_greeting">Good %1$s, %2$s</string>
+
+    <!--SettingsFragment-->
+    <string name="sign_out">Sign Out</string>
+    <string name="join_team">Join Team</string>
+
+    <!--ForgotPasswordFragment-->
+    <string name="email_sent">Email sent!</string>
+
 </resources>

@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    android:layout_height="match_parent">
 
     <View
         android:id="@+id/border"
@@ -25,6 +24,7 @@
         android:text="@string/app_name"
         android:textColor="@color/white"
         android:textSize="@dimen/large_text"
+        android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="@+id/border"
         app:layout_constraintRight_toRightOf="@+id/border"
         app:layout_constraintTop_toTopOf="@+id/border"
@@ -47,16 +47,30 @@
         app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <TextView
-        android:id="@+id/options_text"
+        android:id="@+id/facebook_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/single_and_half_margin"
         android:gravity="center"
+        android:text="@string/login_facebook"
         android:textColor="@color/white"
         android:textSize="@dimen/medium_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sub_title" />
+
+    <TextView
+        android:id="@+id/email_sign_up"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/single_and_half_margin"
+        android:gravity="center"
+        android:text="@string/login_email"
+        android:textColor="@color/white"
+        android:textSize="@dimen/medium_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/facebook_login" />
 
     <TextView
         android:id="@+id/login"
@@ -65,7 +79,7 @@
         android:layout_marginBottom="@dimen/single_and_half_margin"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="@dimen/small_text"
+        android:textSize="@dimen/regular_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
