@@ -10,10 +10,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.transition.Fade;
 import android.transition.Transition;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,7 +37,9 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
  */
 
 public class SignUpFragment extends RegistrationActivityFragment
-        implements View.OnClickListener,
+        implements
+        View.OnClickListener,
+        TextView.OnEditorActionListener,
         OnCompleteListener<AuthResult> {
 
     private EditText firstNameInput;
@@ -68,7 +73,9 @@ public class SignUpFragment extends RegistrationActivityFragment
         emailInput = rootView.findViewById(R.id.email);
         passwordInput = rootView.findViewById(R.id.password);
 
+        passwordInput.setOnEditorActionListener(this);
         ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND);
+        ViewCompat.setTransitionName(rootView.findViewById(R.id.member_info), SplashFragment.TRANSITION_TITLE);
 
         return rootView;
     }
@@ -96,16 +103,19 @@ public class SignUpFragment extends RegistrationActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (validator.isValidName(firstNameInput)
-                        && validator.isValidEmail(emailInput)
-                        && validator.isValidPassword(passwordInput)) {
-                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                    auth.createUserWithEmailAndPassword(emailInput.getText().toString(),
-                            passwordInput.getText().toString())
-                            .addOnCompleteListener(this);
-                }
+                signUp();
                 break;
         }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+        if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
+                && (event.getAction() == KeyEvent.ACTION_DOWN))) {
+            signUp();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -135,6 +145,17 @@ public class SignUpFragment extends RegistrationActivityFragment
                 errorMessage = R.string.sign_up_error_default;
             }
             Snackbar.make(emailInput, errorMessage, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void signUp(){
+        if (validator.isValidName(firstNameInput)
+                && validator.isValidEmail(emailInput)
+                && validator.isValidPassword(passwordInput)) {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            auth.createUserWithEmailAndPassword(emailInput.getText().toString(),
+                    passwordInput.getText().toString())
+                    .addOnCompleteListener(this);
         }
     }
 }

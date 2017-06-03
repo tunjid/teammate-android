@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.baseclasses;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -7,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
@@ -33,6 +35,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private FloatingActionButton fab;
     private ViewHider toolbarHider;
     private ViewHider fabHider;
+    private Pair<? extends View, ? extends View> progressPair;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -56,6 +59,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    @SuppressLint("WrongViewCast")
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -63,6 +67,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         insetView = findViewById(R.id.inset_view);
         toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
         fabHider = new ViewHider(fab, ViewHider.BOTTOM);
+        progressPair = new Pair<>(findViewById(R.id.background), findViewById(R.id.progress_bar));
 
         setSupportActionBar(toolbar);
 
@@ -72,6 +77,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.content_view), this);
         }
+    }
+
+    public void toggleProgress(boolean show) {
+        int visibility = show ? View.VISIBLE : View.GONE;
+        progressPair.first.setVisibility(visibility);
+        progressPair.second.setVisibility(visibility);
     }
 
     public void toggleToolbar(boolean show) {

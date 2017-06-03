@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    android:layout_height="match_parent">
 
     <View
         android:id="@+id/border"
@@ -80,7 +79,7 @@
         android:layout_marginBottom="@dimen/single_and_half_margin"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="@dimen/small_text"
+        android:textSize="@dimen/regular_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

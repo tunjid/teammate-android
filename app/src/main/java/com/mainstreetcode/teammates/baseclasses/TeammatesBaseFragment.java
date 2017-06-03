@@ -26,6 +26,9 @@ public class TeammatesBaseFragment extends BaseFragment {
     // Needed because of the transparent status bar
     private KeyboardUtils keyboardUtils = new KeyboardUtils(this);
 
+    public void toggleProgress(boolean show){
+        ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
+    }
     public void toggleToolbar(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
     }

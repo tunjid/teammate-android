@@ -9,10 +9,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.transition.Fade;
 import android.transition.Transition;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,6 +37,7 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 public final class SignInFragment extends RegistrationActivityFragment
         implements
         View.OnClickListener,
+        TextView.OnEditorActionListener,
         OnCompleteListener<AuthResult> {
 
     private EditText emailInput;
@@ -64,6 +68,7 @@ public final class SignInFragment extends RegistrationActivityFragment
         emailInput = rootView.findViewById(R.id.email);
         passwordInput = rootView.findViewById(R.id.password);
 
+        passwordInput.setOnEditorActionListener(this);
         ViewCompat.setTransitionName(emailInput, SplashFragment.TRANSITION_TITLE);
         ViewCompat.setTransitionName(passwordInput, SplashFragment.TRANSITION_SUBTITLE);
         ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND);
@@ -93,12 +98,7 @@ public final class SignInFragment extends RegistrationActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (validator.isValidEmail(emailInput) && validator.isValidPassword(passwordInput)) {
-                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                    auth.signInWithEmailAndPassword(emailInput.getText().toString(),
-                            passwordInput.getText().toString())
-                            .addOnCompleteListener(this);
-                }
+                signIn();
                 break;
         }
     }
@@ -107,6 +107,7 @@ public final class SignInFragment extends RegistrationActivityFragment
     @Override
     public void onComplete(@NonNull Task<AuthResult> task) {
         if (getView() == null) return;
+        toggleProgress(false);
         if (task.isSuccessful()) RegistrationActivity.startMainActivity(getActivity());
         else {
             Exception exception = task.getException();
@@ -124,6 +125,26 @@ public final class SignInFragment extends RegistrationActivityFragment
                 message = "Error signing in, please try agin later";
             }
             Snackbar.make(emailInput, message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+        if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
+                && (event.getAction() == KeyEvent.ACTION_DOWN))) {
+            signIn();
+            return true;
+        }
+        return false;
+    }
+
+    private void signIn(){
+        if (validator.isValidEmail(emailInput) && validator.isValidPassword(passwordInput)) {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            auth.signInWithEmailAndPassword(emailInput.getText().toString(),
+                    passwordInput.getText().toString())
+                    .addOnCompleteListener(this);
+            toggleProgress(true);
         }
     }
 }
