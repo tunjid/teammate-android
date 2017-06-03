@@ -26,6 +26,9 @@ android {
 }
 
 dependencies {
+    provided 'org.projectlombok:lombok:1.14.4'
+    annotationProcessor 'org.projectlombok:lombok:1.14.4'
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

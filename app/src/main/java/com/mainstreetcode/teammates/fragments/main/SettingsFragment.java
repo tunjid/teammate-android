@@ -17,7 +17,6 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.SettingsItem;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ import java.util.List;
  */
 
 public final class SettingsFragment extends MainActivityFragment
-implements SettingsAdapter.SettingsAdapterListener{
+        implements SettingsAdapter.SettingsAdapterListener {
 
     private static final List<SettingsItem> items = Arrays.asList(
             new SettingsItem(R.string.join_team),
@@ -45,7 +44,7 @@ implements SettingsAdapter.SettingsAdapterListener{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-        RecyclerView recyclerView= rootView.findViewById(R.id.settings_list);
+        RecyclerView recyclerView = rootView.findViewById(R.id.settings_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new SettingsAdapter(items, this));
@@ -69,18 +68,15 @@ implements SettingsAdapter.SettingsAdapterListener{
 
     }
 
-    private static String getTimeofDay() {
-        int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        if (hourOfDay > 0 && hourOfDay < 12) return "morning";
-        else return "evening";
-    }
-
     @Override
     public void onSettingsItemClicked(SettingsItem item) {
-        switch (item.getStringResorce()){
+        switch (item.getStringResorce()) {
             case R.string.sign_out:
                 FirebaseAuth.getInstance().signOut();
                 MainActivity.startRegistrationActivity(getActivity());
+                break;
+            case R.string.join_team:
+                showFragment(TeamSearchFragment.newInstance());
                 break;
         }
 

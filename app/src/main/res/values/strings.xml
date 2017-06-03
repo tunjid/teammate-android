@@ -46,4 +46,8 @@
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
 
+    <!--TeamSearchFragment-->
+    <string name="team_search">Team Search</string>
+    <string name="team_search_hint">Search</string>
+    <string name="team_logo">Team logo</string>
 </resources>
