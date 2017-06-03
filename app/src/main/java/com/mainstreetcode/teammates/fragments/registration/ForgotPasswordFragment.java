@@ -24,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.activities.RegistrationActivity;
 import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 
 /**
@@ -108,7 +107,9 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     public void onComplete(@NonNull Task<Void> task) {
         if (getView() == null) return;
         toggleProgress(false);
-        if (task.isSuccessful()) RegistrationActivity.startMainActivity(getActivity());
+        if (task.isSuccessful()) {
+            Snackbar.make(emailInput, R.string.email_sent, Snackbar.LENGTH_LONG).show();
+        }
         else {
             Exception exception = task.getException();
             String message;
@@ -138,7 +139,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
         return false;
     }
 
-    private void sendForgotEmail(){
+    private void sendForgotEmail() {
         if (validator.isValidEmail(emailInput)) {
             FirebaseAuth auth = FirebaseAuth.getInstance();
             auth.sendPasswordResetEmail(emailInput.getText().toString())

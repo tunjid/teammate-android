@@ -27,12 +27,12 @@
             android:id="@+id/member_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:height="@dimen/triple_margin"
             android:background="@color/colorPrimary"
             android:gravity="center_vertical"
             android:padding="@dimen/single_margin"
             android:text="@string/member_information"
             android:textColor="@color/white"
+            android:textSize="@dimen/regular_text"
             app:layout_constraintLeft_toLeftOf="@+id/card_view_wrapper"
             app:layout_constraintRight_toRightOf="@+id/card_view_wrapper"
             app:layout_constraintTop_toTopOf="@+id/card_view_wrapper" />
