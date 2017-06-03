@@ -6,23 +6,45 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark">
 
+    <View
+        android:id="@+id/border"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/sub_title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
         android:gravity="center"
-        android:lineSpacingMultiplier="1.2"
-        android:paddingBottom="@dimen/single_margin"
-        android:paddingLeft="@dimen/single_margin"
-        android:paddingRight="@dimen/single_margin"
         android:paddingTop="@dimen/quadruple_margin"
+        android:text="@string/app_name"
         android:textColor="@color/white"
         android:textSize="@dimen/large_text"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/border"
+        app:layout_constraintRight_toRightOf="@+id/border"
+        app:layout_constraintTop_toTopOf="@+id/border"
         tools:text="Teammates" />
+
+    <TextView
+        android:id="@+id/sub_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/single_margin"
+        android:layout_marginRight="@dimen/single_margin"
+        android:layout_marginTop="@dimen/single_and_half_margin"
+        android:gravity="center"
+        android:paddingBottom="@dimen/single_margin"
+        android:text="@string/splash_subtitle"
+        android:textColor="@color/white"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintLeft_toLeftOf="@+id/border"
+        app:layout_constraintRight_toRightOf="@+id/border"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <TextView
         android:id="@+id/options_text"
@@ -34,7 +56,7 @@
         android:textSize="@dimen/medium_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@+id/sub_title" />
 
     <TextView
         android:id="@+id/login"

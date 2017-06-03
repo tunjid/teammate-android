@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Teammates</string>
     <string name="teammates">Teammates</string>
-    <string name="title_message">Sign up to connect, coordinate, and collaborate with your team</string>
+    <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
 
     <!--Splash Fragment-->
     <string name="login_email">Sign up with email</string>

@@ -57,7 +57,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         insetView = findViewById(R.id.inset_view);
         toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getDecorView().setSystemUiVisibility(
