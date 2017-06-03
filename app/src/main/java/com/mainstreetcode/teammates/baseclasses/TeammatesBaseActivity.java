@@ -3,12 +3,14 @@ package com.mainstreetcode.teammates.baseclasses;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +30,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     private boolean insetsApplied;
     private View insetView;
+    private FloatingActionButton fab;
     private ViewHider toolbarHider;
+    private ViewHider fabHider;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -55,9 +59,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        fab = findViewById(R.id.fab);
         insetView = findViewById(R.id.inset_view);
         toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
-        //setSupportActionBar(toolbar);
+        fabHider = new ViewHider(fab, ViewHider.BOTTOM);
+
+        setSupportActionBar(toolbar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getDecorView().setSystemUiVisibility(
@@ -70,6 +77,20 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void toggleToolbar(boolean show) {
         if (show) toolbarHider.show();
         else toolbarHider.hide();
+    }
+
+    public void toggleFab(boolean show) {
+        if (show) fabHider.show();
+        else fabHider.hide();
+    }
+
+    public void setToolbarTitle(CharSequence charSequence) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle(charSequence);
+    }
+
+    public FloatingActionButton getFab() {
+        return fab;
     }
 
     @Override

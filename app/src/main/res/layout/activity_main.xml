@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     tools:context="com.mainstreetcode.teammates.activities.MainActivity">
 
     <android.support.constraint.ConstraintLayout
@@ -45,4 +46,20 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/single_margin" />
     -->
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        app:itemBackground="@color/white"
+        app:itemIconTint="@color/dark_grey"
+        app:itemTextColor="@color/dark_grey"
+        app:menu="@menu/main_navigation" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/single_margin" />
 </android.support.design.widget.CoordinatorLayout>
