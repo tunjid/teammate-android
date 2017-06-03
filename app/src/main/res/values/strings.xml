@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Teammates</string>
+    <string name="teammates">Teammates</string>
+    <string name="title_message">Sign up to connect, coordinate, and collaborate with your team</string>
+
+    <!--Splash Fragment-->
+    <string name="login_email">Sign up with email</string>
+    <string name="login_or">or</string>
+    <string name="login_facebook">Log in with Facebook</string>
+    <string name="login_have_account">Already have an account?</string>
+    <string name="login_sign_in">Sign in</string>
+
+    <!--SignUpFragment-->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+</resources>
