@@ -2,6 +2,8 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.transition.AutoTransition;
+import android.support.transition.TransitionManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -36,9 +38,11 @@ import java.util.Map;
 
 public final class TeamSearchFragment extends MainActivityFragment
         implements
+        View.OnClickListener,
         SearchView.OnQueryTextListener,
         TeamSearchAdapter.TeamAdapterListener {
 
+    private View createTeam;
     private RecyclerView recyclerView;
     private DatabaseReference teamDbReference;
     private final List<Team> items = new ArrayList<>();
@@ -46,6 +50,11 @@ public final class TeamSearchFragment extends MainActivityFragment
     private final ValueEventListener teamListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            if (items.isEmpty()) {
+                TransitionManager.beginDelayedTransition((ViewGroup) createTeam.getParent(), new AutoTransition());
+                createTeam.setVisibility(View.VISIBLE);
+            }
+
             items.clear();
             Map<String, Team> teamMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Team>>() {
             });
@@ -78,11 +87,15 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-        recyclerView = rootView.findViewById(R.id.settings_list);
+        View rootView = inflater.inflate(R.layout.fragment_team_search, container, false);
+        createTeam = rootView.findViewById(R.id.create_team);
+        recyclerView = rootView.findViewById(R.id.team_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new TeamSearchAdapter(items, this));
+
+        createTeam.setOnClickListener(this);
+
         return rootView;
     }
 
@@ -110,12 +123,22 @@ public final class TeamSearchFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         teamDbReference.removeEventListener(teamListener);
+        createTeam = null;
         recyclerView = null;
     }
 
     @Override
-    public void onTeamClicked(Team item) {
+    public void onTeamClicked(Team team) {
+        showFragment(TeamDetailFragment.newInstance(team));
+    }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.create_team:
+                showFragment(TeamDetailFragment.newInstance());
+                break;
+        }
     }
 
     @Override

@@ -1,6 +1,10 @@
 package com.mainstreetcode.teammates.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -11,13 +15,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Team {
+@NoArgsConstructor
+public class Team implements Parcelable {
 
     public static final String DB_NAME = "teams";
     public static final String SEARCH_INDEX_KEY = "nameLowercased";
 
     String uid;
     String name;
+    String zip;
     String city;
     String state;
 
@@ -37,4 +43,38 @@ public class Team {
         //return uid.hashCode();
         return name.hashCode();
     }
+
+    private Team(Parcel in) {
+        uid = in.readString();
+        name = in.readString();
+        zip = in.readString();
+        city = in.readString();
+        state = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uid);
+        dest.writeString(name);
+        dest.writeString(zip);
+        dest.writeString(city);
+        dest.writeString(state);
+    }
+
+    public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {
+        @Override
+        public Team createFromParcel(Parcel in) {
+            return new Team(in);
+        }
+
+        @Override
+        public Team[] newArray(int size) {
+            return new Team[size];
+        }
+    };
 }
