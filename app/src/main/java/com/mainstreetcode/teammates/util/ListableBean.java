@@ -6,7 +6,10 @@ package com.mainstreetcode.teammates.util;
  * Created by Shemanigans on 6/4/17.
  */
 
-public interface SimpleList<T> {
-    T get(int position);
+public interface ListableBean<Source, Item> {
     int size();
+
+    Item get(int position);
+
+    Source toSource();
 }

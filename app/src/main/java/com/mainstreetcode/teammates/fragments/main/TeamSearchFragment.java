@@ -19,7 +19,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamSearchAdapter;
@@ -28,7 +27,6 @@ import com.mainstreetcode.teammates.model.Team;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Searches for teams
@@ -50,18 +48,19 @@ public final class TeamSearchFragment extends MainActivityFragment
     private final ValueEventListener teamListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            if (dataSnapshot == null) return;
+
             if (items.isEmpty()) {
                 TransitionManager.beginDelayedTransition((ViewGroup) createTeam.getParent(), new AutoTransition());
                 createTeam.setVisibility(View.VISIBLE);
             }
 
             items.clear();
-            Map<String, Team> teamMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Team>>() {
-            });
-            if (teamMap != null) {
-                items.addAll(teamMap.values());
-                recyclerView.getAdapter().notifyDataSetChanged();
+
+            for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                items.add(new Team(childSnapshot.getKey(), childSnapshot));
             }
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
 
         @Override
@@ -129,14 +128,14 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public void onTeamClicked(Team team) {
-        showFragment(TeamDetailFragment.newInstance(team));
+        showFragment(TeamDetailFragment.newInstance(team, false));
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.create_team:
-                showFragment(TeamDetailFragment.newInstance());
+                showFragment(TeamDetailFragment.newInstance(new Team(), true));
                 break;
         }
     }
@@ -148,6 +147,7 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public boolean onQueryTextChange(String queryText) {
+        if (getView() == null) return true;
         if (TextUtils.isEmpty(queryText)) {
             items.clear();
             recyclerView.getAdapter().notifyDataSetChanged();
