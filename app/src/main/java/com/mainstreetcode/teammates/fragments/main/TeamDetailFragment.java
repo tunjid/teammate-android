@@ -1,13 +1,10 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Fade;
-import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,16 +36,6 @@ public class TeamDetailFragment extends RegistrationActivityFragment
         args.putParcelable(ARG_TEAM, team);
         args.putBoolean(ARG_EDITABLE, isEditable);
         fragment.setArguments(args);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
-
-            fragment.setEnterTransition(baseTransition);
-            fragment.setExitTransition(baseTransition);
-            fragment.setSharedElementEnterTransition(baseSharedTransition);
-            fragment.setSharedElementReturnTransition(baseSharedTransition);
-        }
         return fragment;
     }
 

@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammates.fragments.registration;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,8 +8,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewCompat;
-import android.transition.Fade;
-import android.transition.Transition;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,16 +48,7 @@ public final class SignInFragment extends RegistrationActivityFragment
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
-
-            fragment.setEnterTransition(baseTransition);
-            fragment.setExitTransition(baseTransition);
-            fragment.setSharedElementEnterTransition(baseSharedTransition);
-            fragment.setSharedElementReturnTransition(baseSharedTransition);
-        }
+        fragment.setDefaultSharedTransitions();
         return fragment;
     }
 

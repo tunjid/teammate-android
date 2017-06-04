@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
+import android.transition.Fade;
+import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.view.View;
 
@@ -26,9 +28,10 @@ public class TeammatesBaseFragment extends BaseFragment {
     // Needed because of the transparent status bar
     private KeyboardUtils keyboardUtils = new KeyboardUtils(this);
 
-    public void toggleProgress(boolean show){
+    public void toggleProgress(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
     }
+
     public void toggleToolbar(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
     }
@@ -66,6 +69,18 @@ public class TeammatesBaseFragment extends BaseFragment {
                 .beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    protected void setDefaultSharedTransitions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Transition baseTransition = new Fade();
+            Transition baseSharedTransition = getTransition();
+
+            setEnterTransition(baseTransition);
+            setExitTransition(baseTransition);
+            setSharedElementEnterTransition(baseSharedTransition);
+            setSharedElementReturnTransition(baseSharedTransition);
+        }
     }
 
     public static android.transition.Transition getTransition() {
