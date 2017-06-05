@@ -1,11 +1,8 @@
 package com.mainstreetcode.teammates.fragments.registration;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -15,17 +12,13 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.RegistrationActivity;
 import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 /**
  * Splash screen
@@ -36,12 +29,13 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 public class SignUpFragment extends RegistrationActivityFragment
         implements
         View.OnClickListener,
-        TextView.OnEditorActionListener,
-        OnCompleteListener<AuthResult> {
+        TextView.OnEditorActionListener {
 
     private EditText firstNameInput;
+    private EditText lastNameInput;
     private EditText emailInput;
     private EditText passwordInput;
+
 
     public static SignUpFragment newInstance() {
         SignUpFragment fragment = new SignUpFragment();
@@ -52,12 +46,18 @@ public class SignUpFragment extends RegistrationActivityFragment
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_sign_up, container, false);
         View border = rootView.findViewById(R.id.card_view_wrapper);
         firstNameInput = rootView.findViewById(R.id.first_name);
+        lastNameInput = rootView.findViewById(R.id.last_name);
         emailInput = rootView.findViewById(R.id.email);
         passwordInput = rootView.findViewById(R.id.password);
 
@@ -83,6 +83,7 @@ public class SignUpFragment extends RegistrationActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         firstNameInput = null;
+        lastNameInput = null;
         emailInput = null;
         passwordInput = null;
     }
@@ -106,44 +107,47 @@ public class SignUpFragment extends RegistrationActivityFragment
         return false;
     }
 
-    @Override
-    public void onComplete(@NonNull Task<AuthResult> task) {
-        if (getView() == null) return;
-        if (task.isSuccessful()) {
-            UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(firstNameInput.getText().toString())
-                    .build();
-            task.getResult().getUser().updateProfile(request)
-                    .addOnCompleteListener(success -> RegistrationActivity.startMainActivity(getActivity()))
-                    .addOnFailureListener(fail -> Snackbar.make(emailInput, R.string.sign_up_error_default, Snackbar.LENGTH_LONG).show());
-        }
-        else {
-            Exception exception = task.getException();
-            @StringRes int errorMessage;
-            if (exception instanceof FirebaseAuthWeakPasswordException) {
-                errorMessage = R.string.sign_up_error_weak_password;
-            }
-            else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-                errorMessage = R.string.sign_up_error_invalid_credentials;
-            }
-            else if (exception instanceof FirebaseAuthUserCollisionException) {
-                errorMessage = R.string.sign_up_error_duplicate_credentials;
-            }
-            else {
-                errorMessage = R.string.sign_up_error_default;
-            }
-            Snackbar.make(emailInput, errorMessage, Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    private void signUp(){
+    private void signUp() {
         if (validator.isValidName(firstNameInput)
                 && validator.isValidEmail(emailInput)
                 && validator.isValidPassword(passwordInput)) {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            auth.createUserWithEmailAndPassword(emailInput.getText().toString(),
-                    passwordInput.getText().toString())
-                    .addOnCompleteListener(this);
+
+            String firstName = firstNameInput.getText().toString();
+            String lastname = lastNameInput.getText().toString();
+            String email = emailInput.getText().toString();
+            String password = passwordInput.getText().toString();
+
+            toggleProgress(true);
+
+            disposables.add(viewModel.signUp(firstName, lastname, email, password)
+                    .subscribe(
+                            (user) -> RegistrationActivity.startMainActivity(getActivity()),
+                            ErrorHandler.builder()
+                                    .defaultMessage(getString(R.string.sign_up_error_default))
+                                    .add(getString(R.string.sign_up_error_weak_password), FirebaseAuthWeakPasswordException.class)
+                                    .add(getString(R.string.sign_up_error_invalid_credentials), FirebaseAuthInvalidCredentialsException.class)
+                                    .add(getString(R.string.sign_up_error_duplicate_credentials), FirebaseAuthUserCollisionException.class)
+                                    .add(this::showErrorSnackbar)
+                                    .build()
+                    )
+            );
         }
     }
 }
+
+// (exception) -> {
+//@StringRes int errorMessage;
+//        if (exception instanceof FirebaseAuthWeakPasswordException) {
+//        errorMessage = R.string.sign_up_error_weak_password;
+//        }
+//        else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+//        errorMessage = R.string.sign_up_error_invalid_credentials;
+//        }
+//        else if (exception instanceof FirebaseAuthUserCollisionException) {
+//        errorMessage = R.string.sign_up_error_duplicate_credentials;
+//        }
+//        else {
+//        errorMessage = R.string.sign_up_error_default;
+//        }
+//        Snackbar.make(emailInput, errorMessage, Snackbar.LENGTH_LONG).show();
+//        }

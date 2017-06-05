@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
@@ -17,6 +18,8 @@ import android.view.View;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.components.KeyboardUtils;
 
+import io.reactivex.disposables.CompositeDisposable;
+
 /**
  * Base Fragment for this app
  * <p>
@@ -27,25 +30,32 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     // Needed because of the transparent status bar
     private KeyboardUtils keyboardUtils = new KeyboardUtils(this);
+    protected CompositeDisposable disposables = new CompositeDisposable();
 
-    public void toggleProgress(boolean show) {
+    protected void toggleProgress(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
     }
 
-    public void toggleToolbar(boolean show) {
+    protected void toggleToolbar(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
     }
 
-    public void toggleFab(boolean show) {
+    protected void toggleFab(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleFab(show);
     }
 
-    public void setToolbarTitle(CharSequence charSequence) {
+    protected void setToolbarTitle(CharSequence charSequence) {
         ((TeammatesBaseActivity) getActivity()).setToolbarTitle(charSequence);
     }
 
-    public FloatingActionButton getFab() {
+    protected FloatingActionButton getFab() {
         return ((TeammatesBaseActivity) getActivity()).getFab();
+    }
+
+    protected void showErrorSnackbar(String message) {
+        toggleProgress(false);
+        View root = getView();
+        if (root != null) Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -59,6 +69,7 @@ public class TeammatesBaseFragment extends BaseFragment {
         super.onDestroyView();
         getFab().setOnClickListener(null);
         keyboardUtils.stop();
+        disposables.clear();
     }
 
     @Nullable
@@ -96,4 +107,5 @@ public class TeammatesBaseFragment extends BaseFragment {
         }
         return result;
     }
+
 }

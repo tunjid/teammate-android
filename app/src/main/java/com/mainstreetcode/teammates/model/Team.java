@@ -59,6 +59,7 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
     String state;
     String zip;
 
+    List<String> memberIds;
     final List<Item> items;
 
     public Team() {

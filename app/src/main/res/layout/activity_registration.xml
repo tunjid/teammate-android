@@ -8,21 +8,6 @@
     android:background="@color/colorPrimaryDark"
     tools:context="com.mainstreetcode.teammates.activities.RegistrationActivity">
 
-    <View
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#80000000"
-        android:visibility="gone" />
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
-
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -60,4 +45,19 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/single_margin" />
+
+    <View
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 </android.support.design.widget.CoordinatorLayout>
