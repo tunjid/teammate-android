@@ -48,23 +48,22 @@ public final class HomeFragment extends MainActivityFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         toggleFab(false);
-        if (user != null) {
-            setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getDisplayName()));
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (firebaseUser != null) {
+            disposables.add(userViewModel.getUser(firebaseUser.getEmail()).subscribe(
+                    (user) -> setToolbarTitle(getString(R.string.home_greeting,
+                            getTimeofDay(),
+                            user.getFirstName()))
+            ));
         }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_home, menu);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
     }
 
     private static String getTimeofDay() {
