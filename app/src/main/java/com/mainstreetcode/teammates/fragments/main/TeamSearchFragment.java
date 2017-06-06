@@ -105,7 +105,6 @@ public final class TeamSearchFragment extends MainActivityFragment
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchItem.expandActionView();
         searchView.setOnQueryTextListener(this);
-
     }
 
     @Override

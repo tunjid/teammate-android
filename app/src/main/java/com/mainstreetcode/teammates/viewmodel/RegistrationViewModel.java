@@ -8,6 +8,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mainstreetcode.teammates.model.User;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -20,6 +22,8 @@ import io.reactivex.subjects.ReplaySubject;
  */
 
 public class RegistrationViewModel extends ViewModel {
+
+    private static final int TIME_OUT = 4;
 
     // Used to save values of last call
     private ReplaySubject<User> signUpSubject;
@@ -37,7 +41,11 @@ public class RegistrationViewModel extends ViewModel {
                 .build();
 
         signUpSubject = ReplaySubject.createWithSize(1);
-        Observable.create(new SignUpCall(user, password)).subscribe(signUpSubject);
+
+        Observable.create(new SignUpCall(user, password))
+                .timeout(TIME_OUT, TimeUnit.SECONDS)
+                .subscribe(signUpSubject);
+
         return signUpSubject;
     }
 
@@ -47,12 +55,16 @@ public class RegistrationViewModel extends ViewModel {
         }
 
         signInSubject = ReplaySubject.createWithSize(1);
-        Observable.create(new SignInCall(email, password)).subscribe(signInSubject);
+
+        Observable.create(new SignInCall(email, password))
+                .timeout(TIME_OUT, TimeUnit.SECONDS)
+                .subscribe(signInSubject);
+
         return signInSubject;
     }
 
     public Observable<Void> forgotPassword(String email) {
-        return Observable.create(new ForgotPasswordCall(email));
+        return Observable.create(new ForgotPasswordCall(email)).timeout(TIME_OUT, TimeUnit.SECONDS);
     }
 
     static class SignUpCall implements ObservableOnSubscribe<User> {
@@ -75,7 +87,10 @@ public class RegistrationViewModel extends ViewModel {
 
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(user.getPrimaryEmail(), password)
                     .addOnSuccessListener((fireBaseUser) -> userDb.setValue(user)
-                            .addOnSuccessListener((Void) -> emitter.onNext(user))
+                            .addOnSuccessListener((Void) -> {
+                                emitter.onNext(user);
+                                emitter.onComplete();
+                            })
                             .addOnFailureListener(emitter::onError))
                     .addOnFailureListener(emitter::onError);
         }
@@ -94,7 +109,10 @@ public class RegistrationViewModel extends ViewModel {
         @Override
         public void subscribe(ObservableEmitter<AuthResult> emitter) throws Exception {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(emitter::onNext)
+                    .addOnSuccessListener((authResult) -> {
+                        emitter.onNext(authResult);
+                        emitter.onComplete();
+                    })
                     .addOnFailureListener(emitter::onError);
         }
     }
@@ -110,7 +128,10 @@ public class RegistrationViewModel extends ViewModel {
         @Override
         public void subscribe(ObservableEmitter<Void> emitter) throws Exception {
             FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                    .addOnSuccessListener(emitter::onNext)
+                    .addOnSuccessListener((Void) -> {
+                        emitter.onNext(Void);
+                        emitter.onComplete();
+                    })
                     .addOnFailureListener(emitter::onError);
         }
     }
