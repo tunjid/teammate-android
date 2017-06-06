@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.transition.AutoTransition;
@@ -15,18 +16,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * Searches for teams
@@ -42,31 +41,18 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     private View createTeam;
     private RecyclerView recyclerView;
-    private DatabaseReference teamDbReference;
-    private final List<Team> items = new ArrayList<>();
+    private final List<Team> teams = new ArrayList<>();
 
-    private final ValueEventListener teamListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            if (dataSnapshot == null) return;
+    TeamViewModel viewModel;
 
-            if (items.isEmpty()) {
-                TransitionManager.beginDelayedTransition((ViewGroup) createTeam.getParent(), new AutoTransition());
-                createTeam.setVisibility(View.VISIBLE);
-            }
+    private final Consumer<List<Team>> teamConsumer = (teams) -> {
+        ViewGroup parent = (ViewGroup) createTeam.getParent();
+        TransitionManager.beginDelayedTransition(parent, new AutoTransition());
+        createTeam.setVisibility(View.VISIBLE);
 
-            items.clear();
-
-            for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                items.add(new Team(childSnapshot.getKey(), childSnapshot));
-            }
-            recyclerView.getAdapter().notifyDataSetChanged();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            databaseError.toException().printStackTrace();
-        }
+        this.teams.clear();
+        this.teams.addAll(teams);
+        recyclerView.getAdapter().notifyDataSetChanged();
     };
 
     public static TeamSearchFragment newInstance() {
@@ -81,7 +67,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        teamDbReference = FirebaseDatabase.getInstance().getReference().child(Team.DB_NAME);
+        viewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
     }
 
     @Override
@@ -91,7 +77,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         recyclerView = rootView.findViewById(R.id.team_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamSearchAdapter(items, this));
+        recyclerView.setAdapter(new TeamSearchAdapter(teams, this));
 
         createTeam.setOnClickListener(this);
 
@@ -113,14 +99,12 @@ public final class TeamSearchFragment extends MainActivityFragment
         toggleFab(false);
         setToolbarTitle(getString(R.string.team_search));
 
-        teamDbReference.limitToFirst(5)
-                .addListenerForSingleValueEvent(teamListener);
+        viewModel.getTeam("").subscribe(teamConsumer);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        teamDbReference.removeEventListener(teamListener);
         createTeam = null;
         recyclerView = null;
     }
@@ -146,18 +130,9 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public boolean onQueryTextChange(String queryText) {
-        if (getView() == null) return true;
-        if (TextUtils.isEmpty(queryText)) {
-            items.clear();
-            recyclerView.getAdapter().notifyDataSetChanged();
-            return true;
-        }
-        teamDbReference.removeEventListener(teamListener);
-        teamDbReference.orderByChild(Team.SEARCH_INDEX_KEY)
-                .startAt(queryText)
-                .endAt(queryText + "\uf8ff")
-                .limitToFirst(10)
-                .addListenerForSingleValueEvent(teamListener);
+        if (getView() == null || TextUtils.isEmpty(queryText)) return true;
+        viewModel.getTeam(queryText).subscribe(teamConsumer);
+
         return true;
     }
 }

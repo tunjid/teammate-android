@@ -15,7 +15,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * ViewModel for signed in team
@@ -25,11 +24,8 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class TeamViewModel extends ViewModel {
 
-    private BehaviorSubject<Team> teamSubject = BehaviorSubject.create();
-
-    public Observable<Team> getTeam(String queryText) {
-       // Observable.create(new TeamCall(queryText)).subscribe(teamSubject);
-        return teamSubject;
+    public Observable<List<Team>> getTeam(String queryText) {
+        return Observable.create(new TeamCall(queryText));
     }
 
     static class TeamCall implements ObservableOnSubscribe<List<Team>> {
