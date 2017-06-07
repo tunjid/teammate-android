@@ -15,6 +15,8 @@ import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 public class MainActivityFragment extends TeammatesBaseFragment {
 
+    private boolean hasPrefetchedRoles;
+
     protected UserViewModel userViewModel;
     protected RoleViewModel roleViewModel;
 
@@ -30,6 +32,9 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         roleViewModel = ViewModelProviders.of(getActivity()).get(RoleViewModel.class);
 
         // Prefetch all roles
-        roleViewModel.getRoles();
+        if (!hasPrefetchedRoles) {
+            roleViewModel.getRoles();
+            hasPrefetchedRoles = true;
+        }
     }
 }

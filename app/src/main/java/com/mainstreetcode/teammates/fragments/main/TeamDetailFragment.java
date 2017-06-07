@@ -66,6 +66,7 @@ public class TeamDetailFragment extends MainActivityFragment
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (Math.abs(dy) < 3) return;
                 toggleFab(dy < 0);
             }
         });
@@ -85,6 +86,7 @@ public class TeamDetailFragment extends MainActivityFragment
         toggleFab(true);
 
         disposables.add(roleViewModel.getRoles().subscribe((currentRoles) -> {
+                    System.out.println("Received roles: " + currentRoles);
                     roles.clear();
                     roles.addAll(currentRoles);
                 })
@@ -95,6 +97,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+        toggleFab(false);
     }
 
     @Override

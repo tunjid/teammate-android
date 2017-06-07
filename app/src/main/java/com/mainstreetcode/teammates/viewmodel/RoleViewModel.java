@@ -28,6 +28,8 @@ public class RoleViewModel extends ViewModel {
     private BehaviorSubject<List<Role>> roleSubject = BehaviorSubject.create();
 
     public Observable<List<Role>> getRoles() {
+        // Use new subject if previous call errored out for whatever reason.
+        if (roleSubject.hasThrowable()) roleSubject = BehaviorSubject.create();
         Observable.create(new RoleCall()).subscribe(roleSubject);
         return roleSubject;
     }
@@ -57,7 +59,7 @@ public class RoleViewModel extends ViewModel {
 
                     emitter.onNext(result);
 
-                    // Do not complete, as observers will onlsy see completion because of prefetch
+                    // Do not complete, as observers will only see completion because of prefetch
                     //emitter.onComplete();
                 }
 
