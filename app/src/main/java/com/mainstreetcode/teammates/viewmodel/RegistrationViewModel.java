@@ -34,15 +34,9 @@ public class RegistrationViewModel extends ViewModel {
             return Observable.just(signUpSubject.getValue());
         }
 
-        User user = User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .primaryEmail(email)
-                .build();
-
         signUpSubject = ReplaySubject.createWithSize(1);
 
-        Observable.create(new SignUpCall(user, password))
+        Observable.create(new SignUpCall(firstName, lastName, email, password))
                 .timeout(TIME_OUT, TimeUnit.SECONDS)
                 .subscribe(signUpSubject);
 
@@ -69,16 +63,24 @@ public class RegistrationViewModel extends ViewModel {
 
     static class SignUpCall implements ObservableOnSubscribe<User> {
 
-        private DatabaseReference userDb = FirebaseDatabase.getInstance()
-                .getReference()
-                .child(User.DB_NAME)
-                .push();
+        private final DatabaseReference userDb;
 
         private final String password;
         private final User user;
 
-        private SignUpCall(User user, String password) {
-            this.user = user;
+        private SignUpCall(String firstName, String lastName, String email, String password) {
+            userDb = FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child(User.DB_NAME)
+                    .push();
+
+            this.user = User.builder()
+                    .uid(userDb.getKey())
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .primaryEmail(email)
+                    .build();
+
             this.password = password;
         }
 

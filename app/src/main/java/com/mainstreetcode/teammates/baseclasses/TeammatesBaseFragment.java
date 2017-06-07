@@ -52,10 +52,14 @@ public class TeammatesBaseFragment extends BaseFragment {
         return ((TeammatesBaseActivity) getActivity()).getFab();
     }
 
-    protected void showErrorSnackbar(String message) {
-        toggleProgress(false);
+    protected void showSnackbar(String message) {
         View root = getView();
         if (root != null) Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    protected void showErrorSnackbar(String message) {
+        toggleProgress(false);
+        showSnackbar(message);
     }
 
     @Override

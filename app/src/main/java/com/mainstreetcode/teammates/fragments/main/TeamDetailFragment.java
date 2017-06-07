@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -9,14 +10,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Splash screen
@@ -85,7 +93,7 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(isEditable ? R.string.create_team : R.string.join_team));
         toggleFab(true);
 
-        disposables.add(roleViewModel.getRoles().subscribe((currentRoles) -> {
+        disposables.add(roleViewModel.getRoles().subscribe(currentRoles -> {
                     System.out.println("Received roles: " + currentRoles);
                     roles.clear();
                     roles.addAll(currentRoles);
@@ -104,6 +112,39 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
+                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
+                AtomicReference<User> userRef = new AtomicReference<>();
+                if (firebaseUser != null) {
+                    disposables.add(userViewModel.getUser(firebaseUser.getEmail())
+                            .take(1)
+                            .flatMap(user -> {
+                                userRef.set(user);
+                                return teamViewModel.hasJoinRequest(user, team);
+                            })
+                            .subscribe(hasJoinRequest -> {
+                                if (hasJoinRequest) {
+                                    showErrorSnackbar(getString(R.string.team_error_duplicate_join_request));
+                                }
+                                else {
+                                    JoinRequest request = JoinRequest.builder()
+                                            .isTeamApproved(false)
+                                            .isMemberApproved(true)
+                                            .memberId(userRef.get().getUid())
+                                            .teamId(team.getUid())
+                                            .roleId(team.get(7).getValue())
+                                            .build();
+
+                                    teamViewModel.requestTeamJoin(request)
+                                            .subscribe(
+                                                    success -> showSnackbar(getString(R.string.team_submitted_join_request)),
+                                                    error -> ErrorHandler.builder()
+                                                            .defaultMessage(getString(R.string.default_error))
+                                                            .add(this::showErrorSnackbar)
+                                            );
+                                }
+                            }));
+                }
                 break;
         }
     }
