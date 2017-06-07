@@ -53,13 +53,9 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     protected void showSnackbar(String message) {
+        toggleProgress(false);
         View root = getView();
         if (root != null) Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
-    }
-
-    protected void showErrorSnackbar(String message) {
-        toggleProgress(false);
-        showSnackbar(message);
     }
 
     @Override

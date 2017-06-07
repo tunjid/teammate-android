@@ -35,6 +35,7 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
     private static final int CITY_POSITION = 3;
     private static final int STATE_POSITION = 4;
     private static final int ZIP_POSITION = 5;
+    public static final int ROLE_POSITION = 5;
 
     private static final String NAME_KEY = "name";
     private static final String CITY_KEY = "city";

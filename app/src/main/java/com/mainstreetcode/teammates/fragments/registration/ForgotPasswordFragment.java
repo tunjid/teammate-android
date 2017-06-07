@@ -104,7 +104,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
                     .subscribe((Void) -> RegistrationActivity.startMainActivity(getActivity()),
                             ErrorHandler.builder()
                                     .defaultMessage(getString(R.string.default_error))
-                                    .add(this::showErrorSnackbar)
+                                    .add(this::showSnackbar)
                                     .add(getString(R.string.sign_in_error_invalid_email), FirebaseAuthInvalidUserException.class)
                                     .build())
             );

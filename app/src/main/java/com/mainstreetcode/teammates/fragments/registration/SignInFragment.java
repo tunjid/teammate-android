@@ -126,7 +126,7 @@ public final class SignInFragment extends RegistrationActivityFragment
                     .subscribe((authResult) -> RegistrationActivity.startMainActivity(getActivity()),
                             ErrorHandler.builder()
                                     .defaultMessage(getString(R.string.sign_in_error_default))
-                                    .add(this::showErrorSnackbar)
+                                    .add(this::showSnackbar)
                                     .add(getString(R.string.sign_in_error_invalid_password), FirebaseAuthInvalidCredentialsException.class)
                                     .add(getString(R.string.sign_in_error_invalid_email), FirebaseAuthInvalidUserException.class)
                                     .build())

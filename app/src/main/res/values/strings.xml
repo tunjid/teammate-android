@@ -48,7 +48,7 @@
 
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
-    <string name="default_error">Sorry, and error occurred</string>
+    <string name="default_error">Sorry, an error occurred</string>
 
     <!--TeamSearchFragment-->
     <string name="team_search">Team Search</string>

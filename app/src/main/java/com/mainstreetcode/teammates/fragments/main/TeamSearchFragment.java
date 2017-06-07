@@ -99,7 +99,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         toggleFab(false);
         setToolbarTitle(getString(R.string.team_search));
 
-        viewModel.getTeam("").subscribe(teamConsumer);
+        viewModel.findTeams("").subscribe(teamConsumer);
     }
 
     @Override
@@ -131,7 +131,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public boolean onQueryTextChange(String queryText) {
         if (getView() == null || TextUtils.isEmpty(queryText)) return true;
-        viewModel.getTeam(queryText).subscribe(teamConsumer);
+        viewModel.findTeams(queryText).subscribe(teamConsumer);
 
         return true;
     }

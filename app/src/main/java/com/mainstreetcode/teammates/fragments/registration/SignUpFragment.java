@@ -127,7 +127,7 @@ public class SignUpFragment extends RegistrationActivityFragment
                                     .add(getString(R.string.sign_up_error_weak_password), FirebaseAuthWeakPasswordException.class)
                                     .add(getString(R.string.sign_up_error_invalid_credentials), FirebaseAuthInvalidCredentialsException.class)
                                     .add(getString(R.string.sign_up_error_duplicate_credentials), FirebaseAuthUserCollisionException.class)
-                                    .add(this::showErrorSnackbar)
+                                    .add(this::showSnackbar)
                                     .build()
                     )
             );

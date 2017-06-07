@@ -14,6 +14,7 @@ import com.mainstreetcode.teammates.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -27,17 +28,20 @@ import io.reactivex.ObservableOnSubscribe;
 
 public class TeamViewModel extends ViewModel {
 
-    public Observable<List<Team>> getTeam(String queryText) {
+    private static final int TIMEOUT = 4;
+
+    public Observable<List<Team>> findTeams(String queryText) {
         return Observable.create(new TeamCall(queryText));
     }
 
-    public Observable<Boolean> hasJoinRequest(User user, Team team) {
-        return Observable.create(new JoinRequestCheckCall(user, team));
+    public Observable<Boolean> joinTeam(User user, Team team) {
+        return Observable.create(new JoinValidationCall(user, team))
+                .flatMap(success -> success
+                        ? Observable.create(new JoinRequestCall(user, team))
+                        : Observable.just(false))
+                .timeout(TIMEOUT, TimeUnit.SECONDS);
     }
 
-    public Observable<Boolean> requestTeamJoin(JoinRequest joinRequest) {
-        return Observable.create(new JoinRequestCall(joinRequest));
-    }
 
     static class TeamCall implements ObservableOnSubscribe<List<Team>> {
 
@@ -77,7 +81,7 @@ public class TeamViewModel extends ViewModel {
         }
     }
 
-    static class JoinRequestCheckCall implements ObservableOnSubscribe<Boolean> {
+    static class JoinValidationCall implements ObservableOnSubscribe<Boolean> {
 
         private final User user;
         private final Team team;
@@ -87,7 +91,7 @@ public class TeamViewModel extends ViewModel {
                 .child(JoinRequest.DB_NAME)
                 .orderByChild(JoinRequest.USER_KEY);
 
-        private JoinRequestCheckCall(User user, Team team) {
+        private JoinValidationCall(User user, Team team) {
             this.user = user;
             this.team = team;
         }
@@ -99,17 +103,17 @@ public class TeamViewModel extends ViewModel {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot == null) return;
-                            boolean hasTeam = false;
+                            boolean canJoinTeam = true;
 
                             if (dataSnapshot.hasChildren()) {
                                 for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                                     if (JoinRequest.fromSnapshot(childSnapshot).getTeamId().equals(team.getUid())) {
-                                        hasTeam = true;
+                                        canJoinTeam = false;
                                         break;
                                     }
                                 }
                             }
-                            emitter.onNext(hasTeam);
+                            emitter.onNext(canJoinTeam);
                             emitter.onComplete();
                         }
 
@@ -130,8 +134,14 @@ public class TeamViewModel extends ViewModel {
                 .child(JoinRequest.DB_NAME)
                 .push();
 
-        private JoinRequestCall(JoinRequest joinRequest) {
-            this.joinRequest = joinRequest;
+        private JoinRequestCall(User user, Team team) {
+            this.joinRequest = JoinRequest.builder()
+                    .isTeamApproved(false)
+                    .isMemberApproved(true)
+                    .memberId(user.getUid())
+                    .teamId(team.getUid())
+                    .roleId(team.get(7).getValue())
+                    .build();
         }
 
         @Override
