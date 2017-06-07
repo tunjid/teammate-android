@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 /**
@@ -15,6 +16,7 @@ import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 public class MainActivityFragment extends TeammatesBaseFragment {
 
     protected UserViewModel userViewModel;
+    protected RoleViewModel roleViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,5 +27,9 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
+        roleViewModel = ViewModelProviders.of(getActivity()).get(RoleViewModel.class);
+
+        // Prefetch all roles
+        roleViewModel.getRoles();
     }
 }

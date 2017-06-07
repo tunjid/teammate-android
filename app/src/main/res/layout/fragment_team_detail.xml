@@ -7,6 +7,6 @@
     android:descendantFocusability="beforeDescendants"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:paddingBottom="@dimen/half_margin"
+    android:paddingBottom="@dimen/single_margin"
     android:paddingLeft="@dimen/single_margin"
     android:paddingRight="@dimen/single_margin" />

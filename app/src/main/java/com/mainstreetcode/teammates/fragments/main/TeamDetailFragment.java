@@ -11,8 +11,12 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
-import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
+import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Splash screen
@@ -20,7 +24,7 @@ import com.mainstreetcode.teammates.model.Team;
  * Created by Shemanigans on 6/1/17.
  */
 
-public class TeamDetailFragment extends RegistrationActivityFragment
+public class TeamDetailFragment extends MainActivityFragment
         implements
         View.OnClickListener {
 
@@ -28,6 +32,9 @@ public class TeamDetailFragment extends RegistrationActivityFragment
     private static final String ARG_EDITABLE = "editable";
 
     private Team team;
+    private List<Role> roles = new ArrayList<>();
+
+    private RecyclerView recyclerView;
 
     public static TeamDetailFragment newInstance(Team team, boolean isEditable) {
         TeamDetailFragment fragment = new TeamDetailFragment();
@@ -50,13 +57,12 @@ public class TeamDetailFragment extends RegistrationActivityFragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
-        RecyclerView recyclerView = rootView.findViewById(R.id.team_detail);
+        recyclerView = rootView.findViewById(R.id.team_detail);
 
         boolean isEditable = getArguments().getBoolean(ARG_EDITABLE);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamDetailAdapter(team, isEditable, (team) -> {
-        }));
+        recyclerView.setAdapter(new TeamDetailAdapter(team, roles, isEditable));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -71,19 +77,24 @@ public class TeamDetailFragment extends RegistrationActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
         FloatingActionButton fab = getFab();
-        fab.setImageResource(R.drawable.ic_check_white_24dp);
         fab.setOnClickListener(this);
-
+        fab.setImageResource(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
+        setToolbarTitle(getString(isEditable ? R.string.create_team : R.string.join_team));
         toggleFab(true);
-        setToolbarTitle(getString(getArguments().getBoolean(ARG_EDITABLE, false)
-                ? R.string.create_team
-                : R.string.join_team));
+
+        disposables.add(roleViewModel.getRoles().subscribe((currentRoles) -> {
+                    roles.clear();
+                    roles.addAll(currentRoles);
+                })
+        );
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        recyclerView = null;
     }
 
     @Override
@@ -93,56 +104,4 @@ public class TeamDetailFragment extends RegistrationActivityFragment
                 break;
         }
     }
-
-//    @Override
-//    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-//        if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
-//                && (event.getAction() == KeyEvent.ACTION_DOWN))) {
-//            signUp();
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public void onComplete(@NonNull Task<AuthResult> task) {
-//        if (getView() == null) return;
-//        if (task.isSuccessful()) {
-//            UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-//                    .setDisplayName(nameInput.getText().toString())
-//                    .build();
-//            task.getResult().getUser().updateProfile(request)
-//                    .addOnCompleteListener(success -> RegistrationActivity.startMainActivity(getActivity()))
-//                    .addOnFailureListener(fail -> Snackbar.make(cityInput, R.string.sign_up_error_default, Snackbar.LENGTH_LONG).show());
-//        }
-//        else {
-//            Exception exception = task.getException();
-//            @StringRes int errorMessage;
-//            if (exception instanceof FirebaseAuthWeakPasswordException) {
-//                errorMessage = R.string.sign_up_error_weak_password;
-//            }
-//            else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-//                errorMessage = R.string.sign_up_error_invalid_credentials;
-//            }
-//            else if (exception instanceof FirebaseAuthUserCollisionException) {
-//                errorMessage = R.string.sign_up_error_duplicate_credentials;
-//            }
-//            else {
-//                errorMessage = R.string.sign_up_error_default;
-//            }
-//            Snackbar.make(cityInput, errorMessage, Snackbar.LENGTH_LONG).show();
-//        }
-//    }
-//
-//    private void signUp() {
-//        if (validator.isValidName(nameInput)
-//                && validator.isValidEmail(cityInput)
-//                && validator.isValidPassword(stateInput)) {
-//            FirebaseAuth auth = FirebaseAuth.getInstance();
-//            auth.createUserWithEmailAndPassword(cityInput.getText().toString(),
-//                    stateInput.getText().toString())
-//                    .addOnCompleteListener(this);
-//        }
-//    }
-
 }

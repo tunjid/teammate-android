@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.adapters;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -12,9 +13,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+
+import java.util.List;
 
 /**
  * Adapter for {@link Team}
@@ -22,14 +26,15 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter.BaseTeamViewHolder, TeamDetailAdapter.TeamAdapterListener> {
+public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter.BaseTeamViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
 
     private final Team team;
+    private final List<Role> roles;
     private final boolean isEditable;
 
-    public TeamDetailAdapter(Team team, boolean isEditable, TeamAdapterListener listener) {
-        super(listener);
+    public TeamDetailAdapter(Team team, List<Role> roles, boolean isEditable) {
         this.team = team;
+        this.roles = roles;
         this.isEditable = isEditable;
     }
 
@@ -39,7 +44,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
         @LayoutRes int layoutRes = viewType == Team.HEADING
                 ? R.layout.viewholder_team_header
-                : viewType == Team.INPUT
+                : viewType == Team.INPUT || viewType == Team.ROLE
                 ? R.layout.viewholder_team_input
                 : R.layout.viewholder_team_image;
 
@@ -47,11 +52,13 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
         switch (viewType) {
             case Team.HEADING:
-                return new HeaderViewHolder(itemView, adapterListener);
+                return new HeaderViewHolder(itemView);
             case Team.INPUT:
-                return new InputViewHolder(itemView, adapterListener, isEditable);
+                return new InputViewHolder(itemView, isEditable);
+            case Team.ROLE:
+                return new RoleViewHolder(itemView, roles);
             case Team.IMAGE:
-                return new ImageViewHolder(itemView, adapterListener);
+                return new ImageViewHolder(itemView);
             default:
                 throw new IllegalStateException("Unknown ViewHolder type");
         }
@@ -72,16 +79,11 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         return team.get(position).getItemType();
     }
 
-    public interface TeamAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        void onTeamImageClicked(Team team);
-    }
-
-    static abstract class BaseTeamViewHolder extends BaseViewHolder<TeamAdapterListener> {
-
+    static abstract class BaseTeamViewHolder extends BaseViewHolder {
         Team.Item item;
 
-        BaseTeamViewHolder(View itemView, TeamAdapterListener adapterListener) {
-            super(itemView, adapterListener);
+        BaseTeamViewHolder(View itemView) {
+            super(itemView);
         }
 
         void bind(Team.Item item) {
@@ -92,8 +94,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
     static class HeaderViewHolder extends BaseTeamViewHolder {
         TextView heading;
 
-        HeaderViewHolder(View itemView, TeamAdapterListener adapterListener) {
-            super(itemView, adapterListener);
+        HeaderViewHolder(View itemView) {
+            super(itemView);
             heading = itemView.findViewById(R.id.header_name);
         }
 
@@ -110,8 +112,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
         TextInputLayout inputLayout;
 
-        InputViewHolder(View itemView, TeamAdapterListener adapterListener, boolean isEditable) {
-            super(itemView, adapterListener);
+        InputViewHolder(View itemView, boolean isEditable) {
+            super(itemView);
             inputLayout = itemView.findViewById(R.id.input_layout);
             inputLayout.setEnabled(isEditable);
         }
@@ -143,9 +145,38 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
     static class ImageViewHolder extends BaseTeamViewHolder {
 
-        ImageViewHolder(View itemView, TeamAdapterListener adapterListener) {
-            super(itemView, adapterListener);
+        ImageViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    static class RoleViewHolder extends InputViewHolder
+            implements View.OnClickListener {
+
+        private final List<Role> roles;
+
+        RoleViewHolder(View itemView, List<Role> roles) {
+            super(itemView, false);
+            this.roles = roles;
+            itemView.findViewById(R.id.click_view).setOnClickListener(this);
         }
 
+        @Override
+        public void onClick(View view) {
+
+            int size = roles.size();
+            final CharSequence[] roleNames = new CharSequence[size];
+            for (int i = 0; i < size; i++) roleNames[i] = roles.get(i).getName();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+            builder.setTitle(R.string.choose_role);
+            builder.setItems(roleNames, (dialog, position) -> {
+                Role role = roles.get(position);
+                item.setValue(role.getName());
+                if (inputLayout.getEditText() != null)
+                    inputLayout.getEditText().setText(role.getName());
+            });
+            builder.create().show();
+        }
     }
 }

@@ -42,13 +42,13 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
     private static final String ZIP_KEY = "zip";
 
     @Retention(SOURCE)
-    @IntDef({HEADING, INPUT, IMAGE})
-    @interface ItemType {
-    }
+    @IntDef({HEADING, INPUT, IMAGE, ROLE})
+    @interface ItemType {}
 
-    public static final int HEADING = 3;
-    public static final int INPUT = 7;
-    public static final int IMAGE = 11;
+    public static final int HEADING = 1;
+    public static final int INPUT = 2;
+    public static final int IMAGE = 3;
+    public static final int ROLE = 4;
 
     public static final String DB_NAME = "teams";
     public static final String SEARCH_INDEX_KEY = "nameLowercased";
@@ -97,13 +97,14 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
                 new Item(INPUT, R.string.city, team == null ? "" : team.city),
                 new Item(INPUT, R.string.state, team == null ? "" : team.state),
                 new Item(INPUT, R.string.zip, team == null ? "" : team.zip),
-                new Item(HEADING, R.string.team_logo, "")
+                new Item(HEADING, R.string.team_role, ""),
+                new Item(ROLE, R.string.team_role, "")
         );
     }
 
     @Override
     public int size() {
-        return 6;
+        return 8;
     }
 
     @Override

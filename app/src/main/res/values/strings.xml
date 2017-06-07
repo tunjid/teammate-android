@@ -60,7 +60,10 @@
     <string name="city">City</string>
     <string name="state">State</string>
     <string name="zip">Zip</string>
+
+    <!--TeamDetailFragment-->
     <string name="team_role">Team Role</string>
     <string name="create_team">Create Team</string>
     <string name="edit_team">Edit Team</string>
+    <string name="choose_role">Pick your Role</string>
 </resources>
