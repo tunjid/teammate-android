@@ -40,6 +40,5 @@ public class JoinRequest {
                 .memberId((String) data.get(USER_KEY))
                 .roleId((String) data.get(ROLE_KEY))
                 .build();
-
     }
 }

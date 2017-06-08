@@ -61,10 +61,11 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
     String zip;
 
     List<String> memberIds;
+
     final List<Item> items;
 
     public Team() {
-        items = itemsFromTeam(null);
+        items = itemsFromTeam(this);
     }
 
     public Team(String key, DataSnapshot snapshot) {
@@ -90,16 +91,17 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
         items = itemsFromTeam(source);
     }
 
-    private static List<Item> itemsFromTeam(@Nullable Team team) {
+    private static List<Item> itemsFromTeam(Team team) {
+
         return Arrays.asList(
-                new Item(IMAGE, R.string.team_logo, ""),
-                new Item(HEADING, R.string.team_info, ""),
-                new Item(INPUT, R.string.team_name, team == null ? "" : team.name),
-                new Item(INPUT, R.string.city, team == null ? "" : team.city),
-                new Item(INPUT, R.string.state, team == null ? "" : team.state),
-                new Item(INPUT, R.string.zip, team == null ? "" : team.zip),
-                new Item(HEADING, R.string.team_role, ""),
-                new Item(ROLE, R.string.team_role, "")
+                new Item(IMAGE, R.string.team_logo, "", null),
+                new Item(HEADING, R.string.team_info, "", null),
+                new Item(INPUT, R.string.team_name, team.name == null ? "" : team.name, team::setName),
+                new Item(INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity),
+                new Item(INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
+                new Item(INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip),
+                new Item(HEADING, R.string.team_role, "", null),
+                new Item(ROLE, R.string.team_role, "", null)
         );
     }
 
@@ -173,20 +175,27 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
 
     @Getter
     public static class Item {
-        @ItemType
-        int itemType;
-        @StringRes
-        int stringRes;
+        @ItemType final int itemType;
+        @StringRes final int stringRes;
+        @Nullable final ValueChangeCallBack changeCallBack;
+
         String value;
 
-        Item(int itemType, int stringRes, String value) {
+        Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack) {
             this.itemType = itemType;
             this.stringRes = stringRes;
             this.value = value;
+            this.changeCallBack = changeCallBack;
         }
 
         public void setValue(String value) {
             this.value = value;
+            if (changeCallBack != null) changeCallBack.onValueChanged(value);
         }
+    }
+
+    // Used to change the value of the Team's fields
+    interface ValueChangeCallBack {
+        void onValueChanged(String value);
     }
 }
