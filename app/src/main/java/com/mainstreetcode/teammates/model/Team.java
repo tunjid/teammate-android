@@ -12,7 +12,9 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.annotation.Retention;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,18 +31,23 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 @Getter
 @Setter
-public class Team implements Parcelable, ListableBean<Team, Team.Item> {
+public class Team implements
+        Parcelable,
+        ListableBean<Team, Team.Item> {
 
     private static final int NAME_POSITION = 2;
     private static final int CITY_POSITION = 3;
     private static final int STATE_POSITION = 4;
-    private static final int ZIP_POSITION = 5;
+    public static final int ZIP_POSITION = 5;
     public static final int ROLE_POSITION = 5;
 
+    private static final String UID_KEY = "uid";
     private static final String NAME_KEY = "name";
     private static final String CITY_KEY = "city";
     private static final String STATE_KEY = "state";
     private static final String ZIP_KEY = "zip";
+    private static final String MEMBER_IDS_KEY = "memberIds";
+    public static final String NAME_LOWERCASED_KEY = "nameLowercased";
 
     @Retention(SOURCE)
     @IntDef({HEADING, INPUT, IMAGE, ROLE})
@@ -60,15 +67,23 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
     String state;
     String zip;
 
-    List<String> memberIds;
-
     final List<Item> items;
+    List<String> memberIds = new ArrayList<>();
 
-    public Team() {
+    public static Team empty() {
+        return new Team();
+    }
+
+    public static Team fromSnapshot(String key, DataSnapshot snapshot) {
+        return new Team(key, snapshot);
+    }
+
+
+    private Team() {
         items = itemsFromTeam(this);
     }
 
-    public Team(String key, DataSnapshot snapshot) {
+    private Team(String key, DataSnapshot snapshot) {
         this.uid = key;
         Map<String, Object> data = snapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {
         });
@@ -77,6 +92,10 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
         this.city = (String) data.get(CITY_KEY);
         this.state = (String) data.get(STATE_KEY);
         this.zip = (String) data.get(ZIP_KEY);
+
+        @SuppressWarnings("unchecked")
+        List<String> memberIdList = (List<String>) data.get(MEMBER_IDS_KEY);
+        if (memberIdList != null) memberIds.addAll(memberIdList);
 
         items = itemsFromTeam(this);
     }
@@ -88,7 +107,8 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
         this.state = source.get(STATE_POSITION).value;
         this.zip = source.get(ZIP_POSITION).value;
 
-        items = itemsFromTeam(source);
+        this.items = itemsFromTeam(source);
+        this.memberIds.addAll(source.memberIds);
     }
 
     private static List<Item> itemsFromTeam(Team team) {
@@ -103,6 +123,19 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
                 new Item(HEADING, R.string.team_role, "", null),
                 new Item(ROLE, R.string.team_role, "", null)
         );
+    }
+
+    public Map toMap() {
+        Map<String, Object> result = new HashMap<>();
+        result.put(UID_KEY, uid);
+        result.put(NAME_KEY, name);
+        result.put(NAME_LOWERCASED_KEY, name.toLowerCase());
+        result.put(CITY_KEY, city);
+        result.put(STATE_KEY, state);
+        result.put(ZIP_KEY, zip);
+        result.put(MEMBER_IDS_KEY, memberIds);
+
+        return result;
     }
 
     @Override
@@ -143,6 +176,7 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
         zip = in.readString();
         city = in.readString();
         state = in.readString();
+        in.readList(memberIds, String.class.getClassLoader());
 
         items = itemsFromTeam(this);
     }
@@ -159,6 +193,7 @@ public class Team implements Parcelable, ListableBean<Team, Team.Item> {
         dest.writeString(zip);
         dest.writeString(city);
         dest.writeString(state);
+        dest.writeList(memberIds);
     }
 
     public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {

@@ -68,4 +68,5 @@
     <string name="choose_role">Pick your Role</string>
     <string name="team_error_duplicate_join_request">You\'ve already asked to join this team</string>
     <string name="team_submitted_join_request">Join request submitted</string>
+    <string name="team_invalid_empty_field">Field must not be empty</string>
 </resources>

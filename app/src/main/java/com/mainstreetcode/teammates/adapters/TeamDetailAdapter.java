@@ -5,6 +5,8 @@ import android.support.annotation.LayoutRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,8 @@ import java.util.List;
 
 public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter.BaseTeamViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
 
+    private static final int PADDING = 11;
+
     private final Team team;
     private final List<Role> roles;
     private final boolean isEditable;
@@ -46,7 +50,9 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
                 ? R.layout.viewholder_team_header
                 : viewType == Team.INPUT || viewType == Team.ROLE
                 ? R.layout.viewholder_team_input
-                : R.layout.viewholder_team_image;
+                : viewType == Team.IMAGE
+                ? R.layout.viewholder_team_image
+                : R.layout.view_holder_padding;
 
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
 
@@ -60,26 +66,27 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
             case Team.IMAGE:
                 return new ImageViewHolder(itemView);
             default:
-                throw new IllegalStateException("Unknown ViewHolder type");
+                return new BaseTeamViewHolder(itemView);
         }
     }
 
     @Override
     public void onBindViewHolder(BaseTeamViewHolder baseTeamViewHolder, int i) {
+        if (i == team.size()) return;
         baseTeamViewHolder.bind(team.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return team.size();
+        return team.size() + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return team.get(position).getItemType();
+        return position == team.size() ? PADDING : team.get(position).getItemType();
     }
 
-    static abstract class BaseTeamViewHolder extends BaseViewHolder {
+    static  class BaseTeamViewHolder extends BaseViewHolder {
         Team.Item item;
 
         BaseTeamViewHolder(View itemView) {
@@ -111,20 +118,27 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
             TextWatcher {
 
         TextInputLayout inputLayout;
+        EditText editText;
 
         InputViewHolder(View itemView, boolean isEditable) {
             super(itemView);
             inputLayout = itemView.findViewById(R.id.input_layout);
+            editText = inputLayout.getEditText();
+
             inputLayout.setEnabled(isEditable);
+            editText.addTextChangedListener(this);
         }
 
         @Override
         void bind(Team.Item item) {
             super.bind(item);
-            EditText editText = inputLayout.getEditText();
             inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
-            if (editText != null) editText.setText(item.getValue());
+            editText.setText(item.getValue());
+            editText.setInputType(getAdapterPosition() == Team.ZIP_POSITION
+                    ? InputType.TYPE_CLASS_NUMBER
+                    : InputType.TYPE_CLASS_TEXT);
 
+            checkForErrors();
         }
 
         @Override
@@ -140,6 +154,13 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         @Override
         public void afterTextChanged(Editable editable) {
             item.setValue(editable.toString());
+            checkForErrors();
+        }
+
+        private void checkForErrors() {
+            if (TextUtils.isEmpty(editText.getText())) {
+                editText.setError(editText.getContext().getString(R.string.team_invalid_empty_field));
+            }
         }
     }
 
@@ -161,6 +182,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
             itemView.findViewById(R.id.click_view).setOnClickListener(this);
         }
 
+
         @Override
         public void onClick(View view) {
 
@@ -173,8 +195,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
             builder.setItems(roleNames, (dialog, position) -> {
                 Role role = roles.get(position);
                 item.setValue(role.getName());
-                if (inputLayout.getEditText() != null)
-                    inputLayout.getEditText().setText(role.getName());
+                editText.setText(role.getName());
+                editText.setError(null);
             });
             builder.create().show();
         }

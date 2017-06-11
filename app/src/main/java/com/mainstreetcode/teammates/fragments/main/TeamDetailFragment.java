@@ -18,11 +18,14 @@ import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Observable;
 
 /**
  * Splash screen
@@ -117,9 +120,13 @@ public class TeamDetailFragment extends MainActivityFragment
                 FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
 
-                if (firebaseUser != null) {
-                    disposables.add(userViewModel.getUser(firebaseUser.getEmail())
-                            .take(1) // Don't need all cached user emmisions
+                if (firebaseUser == null) return;
+
+                // Don't need all cached user emmisions
+                Observable<User> userObservable = userViewModel.getUser(firebaseUser.getEmail()).take(1);
+
+                if (team.getUid() != null) {
+                    disposables.add(userObservable
                             .flatMap(user -> teamViewModel.joinTeam(user, team))
                             .subscribe(success -> showSnackbar(getString(success
                                             ? R.string.team_submitted_join_request
@@ -128,6 +135,18 @@ public class TeamDetailFragment extends MainActivityFragment
                                             .defaultMessage(getString(R.string.default_error))
                                             .add(this::showSnackbar)
                                             .build()));
+                }
+                else {
+                    disposables.add(userObservable.flatMap(user -> teamViewModel.createTeam(user, team))
+                            .subscribe(createdTeam -> {
+                                        team.setUid(createdTeam.getUid());
+                                        showSnackbar("Created team " + createdTeam.getName());
+                                    },
+                                    ErrorHandler.builder()
+                                            .defaultMessage(getString(R.string.default_error))
+                                            .add(this::showSnackbar)
+                                            .build())
+                    );
                 }
                 break;
         }

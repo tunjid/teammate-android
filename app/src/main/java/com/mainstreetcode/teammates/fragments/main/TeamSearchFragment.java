@@ -118,7 +118,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.create_team:
-                showFragment(TeamDetailFragment.newInstance(new Team(), true));
+                showFragment(TeamDetailFragment.newInstance(Team.empty(), true));
                 break;
         }
     }

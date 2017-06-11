@@ -31,7 +31,7 @@ public class TeamViewModel extends ViewModel {
     private static final int TIMEOUT = 4;
 
     public Observable<List<Team>> findTeams(String queryText) {
-        return Observable.create(new TeamCall(queryText));
+        return Observable.create(new TeamCall(queryText.toLowerCase()));
     }
 
     public Observable<Boolean> joinTeam(User user, Team team) {
@@ -42,6 +42,9 @@ public class TeamViewModel extends ViewModel {
                 .timeout(TIMEOUT, TimeUnit.SECONDS);
     }
 
+    public Observable<Team> createTeam(User user, Team team){
+        return Observable.create(new CreateTeamCall(user, team));
+    }
 
     static class TeamCall implements ObservableOnSubscribe<List<Team>> {
 
@@ -66,7 +69,7 @@ public class TeamViewModel extends ViewModel {
                     List<Team> result = new ArrayList<>((int) dataSnapshot.getChildrenCount());
 
                     for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                        result.add(new Team(childSnapshot.getKey(), childSnapshot));
+                        result.add(Team.fromSnapshot(childSnapshot.getKey(), childSnapshot));
                     }
 
                     emitter.onNext(result);
@@ -148,6 +151,30 @@ public class TeamViewModel extends ViewModel {
         public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
             db.setValue(joinRequest).addOnSuccessListener(Void -> {
                 emitter.onNext(true);
+                emitter.onComplete();
+            }).addOnFailureListener(emitter::onError);
+        }
+    }
+
+    static class CreateTeamCall implements ObservableOnSubscribe<Team> {
+
+        private final Team team;
+
+        DatabaseReference db = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(Team.DB_NAME)
+                .push();
+
+        private CreateTeamCall(User user, Team source) {
+            this.team = source.toSource();
+            team.setUid(db.getKey());
+            team.getMemberIds().add(user.getUid());
+        }
+
+        @Override
+        public void subscribe(ObservableEmitter<Team> emitter) throws Exception {
+            db.setValue(team.toMap()).addOnSuccessListener(Void -> {
+                emitter.onNext(team);
                 emitter.onComplete();
             }).addOnFailureListener(emitter::onError);
         }
