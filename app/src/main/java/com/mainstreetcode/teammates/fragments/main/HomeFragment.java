@@ -8,8 +8,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 
@@ -50,15 +48,11 @@ public final class HomeFragment extends MainActivityFragment {
         super.onActivityCreated(savedInstanceState);
 
         toggleFab(false);
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (firebaseUser != null) {
-            disposables.add(userViewModel.getUser(firebaseUser.getEmail()).subscribe(
-                    (user) -> setToolbarTitle(getString(R.string.home_greeting,
-                            getTimeofDay(),
-                            user.getFirstName()))
-            ));
-        }
+        disposables.add(userViewModel.getUser().subscribe(
+                (user) -> setToolbarTitle(getString(R.string.home_greeting,
+                        getTimeofDay(),
+                        user.getFirstName()))
+        ));
     }
 
     @Override

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammates.util.Validator;
-import com.mainstreetcode.teammates.viewmodel.RegistrationViewModel;
+import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 /**
  * Base Fragment for registration
@@ -16,12 +16,12 @@ import com.mainstreetcode.teammates.viewmodel.RegistrationViewModel;
 public abstract class RegistrationActivityFragment extends TeammatesBaseFragment {
 
     protected static final Validator validator = new Validator();
-    protected RegistrationViewModel viewModel;
+    protected UserViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this).get(RegistrationViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
     }
 }

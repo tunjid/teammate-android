@@ -4,8 +4,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
+import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
 
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammates.activities.MainActivity}

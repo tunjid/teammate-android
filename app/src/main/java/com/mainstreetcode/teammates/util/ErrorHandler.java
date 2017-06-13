@@ -1,9 +1,16 @@
 package com.mainstreetcode.teammates.util;
 
+import android.text.TextUtils;
+
+import com.mainstreetcode.teammates.model.Message;
+import com.mainstreetcode.teammates.rest.TeammateService;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.functions.Consumer;
+import okhttp3.ResponseBody;
+import retrofit2.HttpException;
 
 /**
  * An Error handler
@@ -32,7 +39,24 @@ public class ErrorHandler implements Consumer<Throwable> {
     @Override
     public void accept(Throwable throwable) throws Exception {
         String key = throwable.getClass().getName();
-        String message = messageMap.containsKey(key) ? messageMap.get(key) : errorMessage;
+        String message = null;
+
+        if (messageMap.containsKey(key)) message = messageMap.get(key);
+        else if (throwable instanceof HttpException) {
+            HttpException httpException = (HttpException) throwable;
+            try {
+                ResponseBody errorBody = httpException.response().errorBody();
+                if (errorBody != null) {
+                    String json = errorBody.string();
+                    message = TeammateService.getGson().fromJson(json, Message.class).getMessage();
+                }
+            }
+            catch (Exception e) {
+                message = errorMessage;
+            }
+        }
+
+        if (TextUtils.isEmpty(message)) message = errorMessage;
         messageConsumer.accept(message);
     }
 

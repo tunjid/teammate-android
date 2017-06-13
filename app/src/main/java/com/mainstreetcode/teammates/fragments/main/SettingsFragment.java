@@ -72,8 +72,7 @@ public final class SettingsFragment extends MainActivityFragment
     public void onSettingsItemClicked(SettingsItem item) {
         switch (item.getStringResorce()) {
             case R.string.sign_out:
-                FirebaseAuth.getInstance().signOut();
-                MainActivity.startRegistrationActivity(getActivity());
+                userViewModel.signOut().subscribe((success)->MainActivity.startRegistrationActivity(getActivity()));
                 break;
             case R.string.join_team:
                 showFragment(TeamSearchFragment.newInstance());

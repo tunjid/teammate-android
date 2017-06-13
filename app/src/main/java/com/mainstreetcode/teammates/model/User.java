@@ -1,14 +1,17 @@
 package com.mainstreetcode.teammates.model;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.GenericTypeIndicator;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 
-import java.util.Iterator;
-import java.util.Map;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
+import java.lang.reflect.Type;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Builder;
 
 /**
  * Users that may be part of a {@link Team}
@@ -16,9 +19,9 @@ import lombok.experimental.Builder;
  * Created by Shemanigans on 6/4/17.
  */
 
+@Entity
 @Getter
 @Setter
-@Builder
 public class User {
 
     public static final String DB_NAME = "users";
@@ -27,29 +30,73 @@ public class User {
     public static final String LAST_NAME_KEY = "lastName";
     public static final String PRIMARY_EMAIL_KEY = "primaryEmail";
 
-    String uid;
-    String firstName;
-    String lastName;
-    String primaryEmail;
+    @PrimaryKey
+    public String id;
+    public String firstName;
+    public String lastName;
+    public String primaryEmail;
+    public String password;
 
-    public static User fromSnapshot(DataSnapshot snapshot) {
-        UserBuilder builder = builder();
+    public User(String id, String firstName, String lastName, String primaryEmail, String password) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.primaryEmail = primaryEmail;
+        this.password = password;
+    }
 
-        if (!snapshot.hasChildren()) return builder.build();
+    public static UserBuilder builder() {return new UserBuilder();}
 
-        Iterator<DataSnapshot> snapshotIterator = snapshot.getChildren().iterator();
+    public static class JsonDeserializer implements com.google.gson.JsonDeserializer<User> {
+        @Override
+        public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject userObject = json.getAsJsonObject();
 
-        if (snapshotIterator.hasNext()) {
-            snapshot = snapshotIterator.next();
-
-            Map<String, Object> data = snapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {
-            });
-
-            builder.uid((String) data.get(UID_KEY))
-                    .firstName((String) data.get(FIRST_NAME_KEY))
-                    .lastName((String) data.get(LAST_NAME_KEY))
-                    .primaryEmail((String) data.get(PRIMARY_EMAIL_KEY));
+            return builder().firstName(userObject.get(FIRST_NAME_KEY).getAsString())
+                    .lastName(userObject.get(LAST_NAME_KEY).getAsString())
+                    .primaryEmail(userObject.get(PRIMARY_EMAIL_KEY).getAsString())
+                    .build();
         }
-        return builder.build();
+    }
+
+    public static class UserBuilder {
+        private String id;
+        private String firstName;
+        private String lastName;
+        private String primaryEmail;
+        private String password;
+
+        UserBuilder() {}
+
+        public User.UserBuilder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public User.UserBuilder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public User.UserBuilder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public User.UserBuilder primaryEmail(String primaryEmail) {
+            this.primaryEmail = primaryEmail;
+            return this;
+        }
+
+        public User.UserBuilder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public User build() {
+            return new User(id, firstName, lastName, primaryEmail, password);
+        }
+
+        public String toString() {return "com.mainstreetcode.teammates.model.User.UserBuilder(id=" + this.id + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", primaryEmail=" + this.primaryEmail + ", password=" + this.password + ")";}
     }
 }

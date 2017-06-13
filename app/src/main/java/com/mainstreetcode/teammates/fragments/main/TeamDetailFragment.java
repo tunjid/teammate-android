@@ -11,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
@@ -117,13 +115,10 @@ public class TeamDetailFragment extends MainActivityFragment
                     return;
                 }
 
-                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
 
-                if (firebaseUser == null) return;
-
                 // Don't need all cached user emmisions
-                Observable<User> userObservable = userViewModel.getUser(firebaseUser.getEmail()).take(1);
+                Observable<User> userObservable = userViewModel.getUser().take(1);
 
                 if (team.getUid() != null) {
                     disposables.add(userObservable

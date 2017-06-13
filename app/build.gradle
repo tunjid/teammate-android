@@ -38,12 +38,20 @@ dependencies {
 
     compile "android.arch.lifecycle:runtime:1.0.0-alpha1"
     compile "android.arch.lifecycle:extensions:1.0.0-alpha1"
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha1"
+    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha1"
 
     compile 'com.google.firebase:firebase-database:10.2.6'
     compile 'com.google.firebase:firebase-auth:10.2.6'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.0"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
     //compile 'com.tunjid.android-bootstrap:core:1.0.0-SNAPSHOT'
     compile group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.0-SNAPSHOT", changing: true

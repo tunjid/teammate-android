@@ -101,7 +101,7 @@ public class TeamViewModel extends ViewModel {
 
         @Override
         public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
-            query.equalTo(user.getUid())
+            query.equalTo(user.getId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -141,7 +141,7 @@ public class TeamViewModel extends ViewModel {
             this.joinRequest = JoinRequest.builder()
                     .isTeamApproved(false)
                     .isMemberApproved(true)
-                    .memberId(user.getUid())
+                    .memberId(user.getId())
                     .teamId(team.getUid())
                     .roleId(team.get(7).getValue())
                     .build();
@@ -168,7 +168,7 @@ public class TeamViewModel extends ViewModel {
         private CreateTeamCall(User user, Team source) {
             this.team = source.toSource();
             team.setUid(db.getKey());
-            team.getMemberIds().add(user.getUid());
+            team.getMemberIds().add(user.getId());
         }
 
         @Override
