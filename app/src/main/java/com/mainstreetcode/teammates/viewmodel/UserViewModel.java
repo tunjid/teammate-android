@@ -91,27 +91,18 @@ public class UserViewModel extends AndroidViewModel {
 
     public Observable<Boolean> signOut() {
         return teammateApi.signOut()
-                .flatMap((result) -> {
-                    String email = getPrimaryEmail();
-                    if (email == null) return Observable.just(false);
-
-                    User user = userDao.findByEmail(email);
-                    userDao.delete(user);
-
-                    getApplication().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                            .edit()
-                            .remove(EMAIL_KEY)
-                            .apply();
-
-                    return Observable.just(true);
-                })
+                .flatMap(result -> clearUser())
+                .onErrorResumeNext(throwable -> {return clearUser();})
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<User> getUser() {
-        return Observable.defer(() -> Observable.just(userDao.findByEmail(getPrimaryEmail())))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+    public Observable<User> getMe() {
+
+        Observable<User> databaseUser = Observable.defer(() -> Observable.just(userDao.findByEmail(getPrimaryEmail())))
+                .subscribeOn(Schedulers.io());
+        Observable<User> apiUser = teammateApi.getMe().flatMap(this::saveUser);
+
+        return Observable.concat(databaseUser, apiUser).observeOn(AndroidSchedulers.mainThread());
     }
 
     private Observable<User> saveUser(User user) {
@@ -133,6 +124,22 @@ public class UserViewModel extends AndroidViewModel {
     public Observable<Void> forgotPassword(String email) {
         return Observable.create(new ForgotPasswordCall(email)).timeout(TIME_OUT, TimeUnit.SECONDS);
     }
+
+    private Observable<Boolean> clearUser() {
+        String email = getPrimaryEmail();
+        if (email == null) return Observable.just(false);
+
+        User user = userDao.findByEmail(email);
+        userDao.delete(user);
+
+        getApplication().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit()
+                .remove(EMAIL_KEY)
+                .apply();
+
+        return Observable.just(true);
+    }
+
 
     static class ForgotPasswordCall implements ObservableOnSubscribe<Void> {
 

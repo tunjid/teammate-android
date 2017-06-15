@@ -110,7 +110,9 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (TextUtils.isEmpty(team.get(Team.ROLE_POSITION).getValue())) {
+                String role = team.get(Team.ROLE_POSITION).getValue();
+
+                if (TextUtils.isEmpty(role)) {
                     showSnackbar("Please select a role");
                     return;
                 }
@@ -118,29 +120,22 @@ public class TeamDetailFragment extends MainActivityFragment
                 TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
 
                 // Don't need all cached user emmisions
-                Observable<User> userObservable = userViewModel.getUser().take(1);
+                Observable<User> userObservable = userViewModel.getMe().take(1);
+                ErrorHandler errorHandler = ErrorHandler.builder()
+                        .defaultMessage(getString(R.string.default_error))
+                        .add(this::showSnackbar)
+                        .build();
 
-                if (team.getUid() != null) {
+                if (team.getId() != null) {
                     disposables.add(userObservable
-                            .flatMap(user -> teamViewModel.joinTeam(user, team))
-                            .subscribe(success -> showSnackbar(getString(success
-                                            ? R.string.team_submitted_join_request
-                                            : R.string.team_error_duplicate_join_request)),
-                                    ErrorHandler.builder()
-                                            .defaultMessage(getString(R.string.default_error))
-                                            .add(this::showSnackbar)
-                                            .build()));
+                            .flatMap(user -> teamViewModel.joinTeam(team, role))
+                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
+                                    errorHandler));
                 }
                 else {
-                    disposables.add(userObservable.flatMap(user -> teamViewModel.createTeam(user, team))
-                            .subscribe(createdTeam -> {
-                                        team.setUid(createdTeam.getUid());
-                                        showSnackbar("Created team " + createdTeam.getName());
-                                    },
-                                    ErrorHandler.builder()
-                                            .defaultMessage(getString(R.string.default_error))
-                                            .add(this::showSnackbar)
-                                            .build())
+                    disposables.add(userObservable.flatMap(user -> teamViewModel.createTeam(team))
+                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())),
+                                    errorHandler)
                     );
                 }
                 break;

@@ -1,22 +1,27 @@
 package com.mainstreetcode.teammates.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.GenericTypeIndicator;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.annotation.Retention;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +34,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * Created by Shemanigans on 6/3/17.
  */
 
+@Entity(tableName = "teams")
 @Getter
 @Setter
 public class Team implements
@@ -39,15 +45,7 @@ public class Team implements
     private static final int CITY_POSITION = 3;
     private static final int STATE_POSITION = 4;
     public static final int ZIP_POSITION = 5;
-    public static final int ROLE_POSITION = 5;
-
-    private static final String UID_KEY = "uid";
-    private static final String NAME_KEY = "name";
-    private static final String CITY_KEY = "city";
-    private static final String STATE_KEY = "state";
-    private static final String ZIP_KEY = "zip";
-    private static final String MEMBER_IDS_KEY = "memberIds";
-    public static final String NAME_LOWERCASED_KEY = "nameLowercased";
+    public static final int ROLE_POSITION = 7;
 
     @Retention(SOURCE)
     @IntDef({HEADING, INPUT, IMAGE, ROLE})
@@ -61,54 +59,43 @@ public class Team implements
     public static final String DB_NAME = "teams";
     public static final String SEARCH_INDEX_KEY = "nameLowercased";
 
-    String uid;
+    @PrimaryKey
+    String id;
     String name;
     String city;
     String state;
     String zip;
 
-    final List<Item> items;
-    List<String> memberIds = new ArrayList<>();
+    // Cannot be flattened in SQL
+    @Ignore List<User> users = new ArrayList<>();
+    @Ignore final List<Item> items;
 
     public static Team empty() {
         return new Team();
     }
 
-    public static Team fromSnapshot(String key, DataSnapshot snapshot) {
-        return new Team(key, snapshot);
-    }
-
-
     private Team() {
         items = itemsFromTeam(this);
     }
 
-    private Team(String key, DataSnapshot snapshot) {
-        this.uid = key;
-        Map<String, Object> data = snapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {
-        });
-
-        this.name = (String) data.get(NAME_KEY);
-        this.city = (String) data.get(CITY_KEY);
-        this.state = (String) data.get(STATE_KEY);
-        this.zip = (String) data.get(ZIP_KEY);
-
-        @SuppressWarnings("unchecked")
-        List<String> memberIdList = (List<String>) data.get(MEMBER_IDS_KEY);
-        if (memberIdList != null) memberIds.addAll(memberIdList);
-
+    public Team(String id, String name, String city, String state, String zip) {
+        this.id = id;
+        this.name = name;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
         items = itemsFromTeam(this);
     }
 
     private Team(Team source) {
-        this.uid = source.uid;
+        this.id = source.id;
         this.name = source.get(NAME_POSITION).value;
         this.city = source.get(CITY_POSITION).value;
         this.state = source.get(STATE_POSITION).value;
         this.zip = source.get(ZIP_POSITION).value;
 
         this.items = itemsFromTeam(source);
-        this.memberIds.addAll(source.memberIds);
+        this.users.addAll(source.users);
     }
 
     private static List<Item> itemsFromTeam(Team team) {
@@ -123,19 +110,6 @@ public class Team implements
                 new Item(HEADING, R.string.team_role, "", null),
                 new Item(ROLE, R.string.team_role, "", null)
         );
-    }
-
-    public Map toMap() {
-        Map<String, Object> result = new HashMap<>();
-        result.put(UID_KEY, uid);
-        result.put(NAME_KEY, name);
-        result.put(NAME_LOWERCASED_KEY, name.toLowerCase());
-        result.put(CITY_KEY, city);
-        result.put(STATE_KEY, state);
-        result.put(ZIP_KEY, zip);
-        result.put(MEMBER_IDS_KEY, memberIds);
-
-        return result;
     }
 
     @Override
@@ -153,6 +127,48 @@ public class Team implements
         return new Team(this);
     }
 
+
+    public static class JsonDeserializer implements com.google.gson.JsonDeserializer<Team> {
+
+        private static final String UID_KEY = "_id";
+        private static final String NAME_KEY = "name";
+        private static final String CITY_KEY = "city";
+        private static final String STATE_KEY = "state";
+        private static final String ZIP_KEY = "zip";
+        private static final String USERS_KEY = "users";
+
+        @Override
+        public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
+            JsonObject teamJson = json.getAsJsonObject();
+
+            String id = asString(UID_KEY, teamJson);
+            String name = asString(NAME_KEY, teamJson);
+            String city = asString(CITY_KEY, teamJson);
+            String state = asString(STATE_KEY, teamJson);
+            String zip = asString(ZIP_KEY, teamJson);
+
+            Team team = new Team(id, name, city, state, zip);
+
+            JsonElement usersElement = teamJson.get(USERS_KEY);
+
+            if (usersElement != null && usersElement.isJsonArray()) {
+                JsonArray usersArray = usersElement.getAsJsonArray();
+
+                for (JsonElement userElement : usersArray) {
+                    team.users.add(context.deserialize(userElement, User.class));
+                }
+            }
+
+            return team;
+        }
+
+        private String asString(String key, JsonObject jsonObject) {
+            JsonElement element = jsonObject.get(key);
+            return element != null && element.isJsonPrimitive() ? element.getAsString() : null;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -161,7 +177,7 @@ public class Team implements
         Team team = (Team) o;
 
         //return uid.equals(team.uid);
-        return uid.equals(team.name);
+        return id.equals(team.name);
     }
 
     @Override
@@ -171,12 +187,12 @@ public class Team implements
     }
 
     private Team(Parcel in) {
-        uid = in.readString();
+        id = in.readString();
         name = in.readString();
         zip = in.readString();
         city = in.readString();
         state = in.readString();
-        in.readList(memberIds, String.class.getClassLoader());
+        in.readList(users, String.class.getClassLoader());
 
         items = itemsFromTeam(this);
     }
@@ -188,12 +204,12 @@ public class Team implements
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
+        dest.writeString(id);
         dest.writeString(name);
         dest.writeString(zip);
         dest.writeString(city);
         dest.writeString(state);
-        dest.writeList(memberIds);
+        dest.writeList(users);
     }
 
     public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {

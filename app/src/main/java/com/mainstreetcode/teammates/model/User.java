@@ -19,7 +19,7 @@ import lombok.Setter;
  * Created by Shemanigans on 6/4/17.
  */
 
-@Entity
+@Entity(tableName = "users")
 @Getter
 @Setter
 public class User {

@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.adapters.SettingsAdapter;
@@ -54,12 +52,9 @@ public final class SettingsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         toggleFab(false);
-        if (user != null) {
-            setToolbarTitle(getString(R.string.settings));
-        }
+        setToolbarTitle(getString(R.string.settings));
     }
 
     @Override
@@ -72,7 +67,10 @@ public final class SettingsFragment extends MainActivityFragment
     public void onSettingsItemClicked(SettingsItem item) {
         switch (item.getStringResorce()) {
             case R.string.sign_out:
-                userViewModel.signOut().subscribe((success)->MainActivity.startRegistrationActivity(getActivity()));
+                userViewModel.signOut().subscribe(
+                        success -> MainActivity.startRegistrationActivity(getActivity()),
+                        throwable -> MainActivity.startRegistrationActivity(getActivity())
+                );
                 break;
             case R.string.join_team:
                 showFragment(TeamSearchFragment.newInstance());

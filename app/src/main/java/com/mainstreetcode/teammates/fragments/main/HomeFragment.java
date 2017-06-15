@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.Calendar;
 
@@ -48,10 +49,9 @@ public final class HomeFragment extends MainActivityFragment {
         super.onActivityCreated(savedInstanceState);
 
         toggleFab(false);
-        disposables.add(userViewModel.getUser().subscribe(
-                (user) -> setToolbarTitle(getString(R.string.home_greeting,
-                        getTimeofDay(),
-                        user.getFirstName()))
+        disposables.add(userViewModel.getMe().subscribe(
+                (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getFirstName())),
+                ErrorHandler.builder().defaultMessage(getString(R.string.default_error)).add(this::showSnackbar).build()
         ));
     }
 

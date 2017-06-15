@@ -16,10 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
@@ -54,6 +56,10 @@ public final class TeamSearchFragment extends MainActivityFragment
         this.teams.addAll(teams);
         recyclerView.getAdapter().notifyDataSetChanged();
     };
+    private final ErrorHandler searchErroHandler = ErrorHandler.builder()
+            .defaultMessage(Application.getInstance().getString(R.string.default_error))
+            .add(this::showSnackbar)
+            .build();
 
     public static TeamSearchFragment newInstance() {
         TeamSearchFragment fragment = new TeamSearchFragment();
@@ -99,7 +105,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         toggleFab(false);
         setToolbarTitle(getString(R.string.team_search));
 
-        viewModel.findTeams("").subscribe(teamConsumer);
+        disposables.add(viewModel.findTeams("").subscribe(teamConsumer, searchErroHandler));
     }
 
     @Override
@@ -131,8 +137,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public boolean onQueryTextChange(String queryText) {
         if (getView() == null || TextUtils.isEmpty(queryText)) return true;
-        viewModel.findTeams(queryText).subscribe(teamConsumer);
-
+        disposables.add(viewModel.findTeams(queryText).subscribe(teamConsumer, searchErroHandler));
         return true;
     }
 }

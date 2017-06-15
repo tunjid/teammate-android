@@ -28,8 +28,7 @@ public class RegistrationActivity extends TeammatesBaseActivity {
         if (savedInstanceState == null) {
             UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
-            if (userViewModel.getPrimaryEmail() == null)
-                showFragment(SplashFragment.newInstance());
+            if (userViewModel.getPrimaryEmail() == null) showFragment(SplashFragment.newInstance());
             else startMainActivity(this);
         }
     }
