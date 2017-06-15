@@ -24,6 +24,10 @@ public class TeamViewModel extends ViewModel {
 
     private static final TeammateApi api = TeammateService.getApiInstance();
 
+    public Observable<List<Team>> getMyTeams() {
+        return api.getMyTeams().observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Observable<List<Team>> findTeams(String queryText) {
         return api.findTeam(queryText).observeOn(AndroidSchedulers.mainThread());
     }

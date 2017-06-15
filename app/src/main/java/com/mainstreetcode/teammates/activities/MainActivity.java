@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
+import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 public class MainActivity extends TeammatesBaseActivity {
@@ -40,6 +41,9 @@ public class MainActivity extends TeammatesBaseActivity {
                 return true;
             case R.id.action_settings:
                 showFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_team:
+                showFragment(TeamsFragment.newInstance());
                 return true;
         }
         return super.onOptionsItemSelected(item);
