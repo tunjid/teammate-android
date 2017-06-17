@@ -13,6 +13,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.ListableBean;
 
@@ -40,7 +42,7 @@ public class Team implements
     private static final int CITY_POSITION = 3;
     private static final int STATE_POSITION = 4;
     public static final int ZIP_POSITION = 5;
-    public static final int ROLE_POSITION = 7;
+    private static final int ROLE_POSITION = 7;
 
     @Retention(SOURCE)
     @IntDef({HEADING, INPUT, IMAGE, ROLE})
@@ -61,6 +63,8 @@ public class Team implements
     // Cannot be flattened in SQL
     @Ignore List<User> users = new ArrayList<>();
     @Ignore List<User> pendingUsers = new ArrayList<>();
+
+    @Ignore private String role;
 
     @Ignore private final List<Item> items;
 
@@ -98,7 +102,7 @@ public class Team implements
                 new Item(INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
                 new Item(INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip),
                 new Item(HEADING, R.string.team_role, "", null),
-                new Item(ROLE, R.string.team_role, "", null)
+                new Item(ROLE, R.string.team_role, team.role == null ? "" : team.role, team::setRole)
         );
     }
 
@@ -118,13 +122,17 @@ public class Team implements
     }
 
 
-    public static class JsonDeserializer implements com.google.gson.JsonDeserializer<Team> {
+    public static class JsonDeserializer
+            implements
+            com.google.gson.JsonDeserializer<Team>,
+            JsonSerializer<Team> {
 
         private static final String UID_KEY = "_id";
         private static final String NAME_KEY = "name";
         private static final String CITY_KEY = "city";
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
+        private static final String ROLE_KEY = "role";
         private static final String USERS_KEY = "users";
         private static final String PENDING_USERS_KEY = "pendingUsers";
 
@@ -138,8 +146,11 @@ public class Team implements
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
+            String role = ModelUtils.asString(ROLE_KEY, teamJson);
 
             Team team = new Team(id, name, city, state, zip);
+            team.setRole(role);
+            team.get(ROLE_POSITION).setValue(role);
 
             ModelUtils.deserializeList(context, teamJson.get(USERS_KEY), team.users, User.class);
             ModelUtils.deserializeList(context, teamJson.get(PENDING_USERS_KEY), team.pendingUsers, User.class);
@@ -147,6 +158,29 @@ public class Team implements
             return team;
         }
 
+        @Override
+        public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject team = new JsonObject();
+            team.addProperty(UID_KEY, src.id);
+            team.addProperty(NAME_KEY, src.name);
+            team.addProperty(CITY_KEY, src.city);
+            team.addProperty(STATE_KEY, src.state);
+            team.addProperty(ZIP_KEY, src.zip);
+            team.addProperty(ROLE_KEY, src.role);
+
+            return team;
+        }
+    }
+
+    public void update(Team updatedTeam) {
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
+
+        users.clear();
+        pendingUsers.clear();
+
+        users.addAll(updatedTeam.getUsers());
+        pendingUsers.addAll(updatedTeam.getPendingUsers());
     }
 
     @Override
@@ -182,6 +216,10 @@ public class Team implements
         return zip;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     private void setName(String name) {this.name = name; }
 
     private void setCity(String city) {this.city = city; }
@@ -189,6 +227,10 @@ public class Team implements
     private void setState(String state) {this.state = state; }
 
     private void setZip(String zip) {this.zip = zip; }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public List<User> getUsers() {
         return users;

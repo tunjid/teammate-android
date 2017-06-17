@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammates.baseclasses;
 
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
+import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
+import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammates.activities.MainActivity}
@@ -15,10 +17,11 @@ import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
 
 public class MainActivityFragment extends TeammatesBaseFragment {
 
-    private boolean hasPrefetchedRoles;
+    //private boolean hasPrefetchedRoles;
 
-    protected UserViewModel userViewModel;
     protected RoleViewModel roleViewModel;
+    protected UserViewModel userViewModel;
+    protected TeamViewModel teamViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,8 +31,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
-        roleViewModel = ViewModelProviders.of(getActivity()).get(RoleViewModel.class);
+        ViewModelProvider provider = ViewModelProviders.of(getActivity());
+        roleViewModel = provider.get(RoleViewModel.class);
+        userViewModel = provider.get(UserViewModel.class);
+        teamViewModel = provider.get(TeamViewModel.class);
 
         // Prefetch all roles
 //        if (!hasPrefetchedRoles) {

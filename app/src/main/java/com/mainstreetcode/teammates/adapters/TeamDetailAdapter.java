@@ -26,7 +26,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
     private final Team team;
 
-    public TeamDetailAdapter(Team team) {
+    public TeamDetailAdapter(Team team, UserAdapterListener listener) {
+        super(listener);
         this.team = team;
     }
 

@@ -8,8 +8,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
@@ -18,8 +22,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
-
-import java.util.List;
 
 import io.reactivex.Observable;
 
@@ -31,7 +33,8 @@ import io.reactivex.Observable;
 
 public class TeamDetailFragment extends MainActivityFragment
         implements
-        View.OnClickListener {
+        View.OnClickListener ,
+TeamDetailAdapter.UserAdapterListener{
 
     private static final String ARG_TEAM = "team";
 
@@ -59,6 +62,7 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         team = getArguments().getParcelable(ARG_TEAM);
     }
@@ -67,11 +71,13 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
+        EditText editText = rootView.findViewById(R.id.team_name);
         recyclerView = rootView.findViewById(R.id.team_detail);
 
+        editText.setText(team.getName());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamDetailAdapter(team));
+        recyclerView.setAdapter(new TeamDetailAdapter(team, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -88,21 +94,12 @@ public class TeamDetailFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        setToolbarTitle(team.getName());
+        setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         toggleFab(false);
 
-        TeamViewModel viewModel = ViewModelProviders.of(getActivity()).get(TeamViewModel.class);
-        disposables.add(viewModel.getTeam(team).subscribe(
+        disposables.add(teamViewModel.getTeam(team).subscribe(
                 updatedTeam -> {
-                    List<User> users = team.getUsers();
-                    List<User> pendingUsers = team.getPendingUsers();
-
-                    users.clear();
-                    pendingUsers.clear();
-
-                    users.addAll(updatedTeam.getUsers());
-                    pendingUsers.addAll(updatedTeam.getPendingUsers());
-
+                    team.update(updatedTeam);
                     recyclerView.getAdapter().notifyDataSetChanged();
                 },
                 ErrorHandler.builder()
@@ -113,6 +110,21 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_team_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                showFragment(TeamEditFragment.newInstance(team, true));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
@@ -120,10 +132,15 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
+    public void onUserClicked(User user) {
+
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String role = team.get(Team.ROLE_POSITION).getValue();
+                String role = team.getRole();
 
                 if (TextUtils.isEmpty(role)) {
                     showSnackbar("Please select a role");

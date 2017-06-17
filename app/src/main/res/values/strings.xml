@@ -73,9 +73,9 @@
 
     <!--TeamsFragment-->
     <string name="my_teams">My Teams</string>
+    <string name="team_name_prefix">Team: %1$s</string>
+
+    <!--TeamDetailFragment-->
     <string name="user_invited">Has been invited</string>
     <string name="user_requests_join">Has requested to join</string>
-    <!--TeamDetailFragment-->
-
-
 </resources>

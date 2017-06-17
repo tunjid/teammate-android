@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +14,6 @@ import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +33,6 @@ public final class TeamsFragment extends MainActivityFragment
 
     private RecyclerView recyclerView;
     private final List<Team> teams = new ArrayList<>();
-
-    TeamViewModel viewModel;
 
     private final Consumer<List<Team>> teamConsumer = (teams) -> {
         this.teams.clear();
@@ -60,7 +56,6 @@ public final class TeamsFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        viewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
     }
 
     @Override
@@ -79,7 +74,7 @@ public final class TeamsFragment extends MainActivityFragment
         toggleFab(false);
         setToolbarTitle(getString(R.string.my_teams));
 
-        disposables.add(viewModel.getMyTeams().subscribe(teamConsumer, searchErroHandler));
+        disposables.add(teamViewModel.getMyTeams().subscribe(teamConsumer, searchErroHandler));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.transition.AutoTransition;
@@ -22,7 +21,6 @@ import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +42,6 @@ public final class TeamSearchFragment extends MainActivityFragment
     private View createTeam;
     private RecyclerView recyclerView;
     private final List<Team> teams = new ArrayList<>();
-
-    TeamViewModel viewModel;
 
     private final Consumer<List<Team>> teamConsumer = (teams) -> {
         ViewGroup parent = (ViewGroup) createTeam.getParent();
@@ -73,7 +69,6 @@ public final class TeamSearchFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        viewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
     }
 
     @Override
@@ -105,7 +100,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         toggleFab(false);
         setToolbarTitle(getString(R.string.team_search));
 
-        disposables.add(viewModel.findTeams("").subscribe(teamConsumer, searchErroHandler));
+        disposables.add(teamViewModel.findTeams("").subscribe(teamConsumer, searchErroHandler));
     }
 
     @Override
@@ -137,7 +132,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public boolean onQueryTextChange(String queryText) {
         if (getView() == null || TextUtils.isEmpty(queryText)) return true;
-        disposables.add(viewModel.findTeams(queryText).subscribe(teamConsumer, searchErroHandler));
+        disposables.add(teamViewModel.findTeams(queryText).subscribe(teamConsumer, searchErroHandler));
         return true;
     }
 }
