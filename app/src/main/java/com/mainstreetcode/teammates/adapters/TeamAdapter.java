@@ -19,11 +19,11 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamSearchAdapter extends BaseRecyclerViewAdapter<TeamSearchAdapter.TeamViewHolder, TeamSearchAdapter.TeamAdapterListener> {
+public class TeamAdapter extends BaseRecyclerViewAdapter<TeamAdapter.TeamViewHolder, TeamAdapter.TeamAdapterListener> {
 
     private final List<Team> items;
 
-    public TeamSearchAdapter(List<Team> items, TeamAdapterListener listener) {
+    public TeamAdapter(List<Team> items, TeamAdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);

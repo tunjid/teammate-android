@@ -61,7 +61,7 @@
     <string name="state">State</string>
     <string name="zip">Zip</string>
 
-    <!--TeamDetailFragment-->
+    <!--TeamEditFragment-->
     <string name="team_role">Team Role</string>
     <string name="create_team">Create Team</string>
     <string name="edit_team">Edit Team</string>
@@ -73,5 +73,9 @@
 
     <!--TeamsFragment-->
     <string name="my_teams">My Teams</string>
+    <string name="user_invited">Has been invited</string>
+    <string name="user_requests_join">Has requested to join</string>
+    <!--TeamDetailFragment-->
+
 
 </resources>

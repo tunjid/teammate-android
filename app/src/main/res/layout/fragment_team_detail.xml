@@ -1,11 +1,29 @@
-<android.support.v7.widget.RecyclerView android:id="@+id/team_detail"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/action_bar_height"
-    android:descendantFocusability="beforeDescendants"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:paddingBottom="@dimen/single_margin"
-    android:paddingLeft="@dimen/single_margin"
-    android:paddingRight="@dimen/single_margin" />
+    android:layout_marginTop="@dimen/action_bar_height">
+
+    <TextView
+        android:id="@+id/create_team"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/single_margin"
+        android:text="@string/create_team_prompt"
+        android:textColor="@color/white"
+        android:textSize="@dimen/small_text"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/team_detail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_team" />
+</android.support.constraint.ConstraintLayout>

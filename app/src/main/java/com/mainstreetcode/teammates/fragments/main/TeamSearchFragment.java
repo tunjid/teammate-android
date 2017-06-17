@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.TeamSearchAdapter;
+import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -39,7 +39,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         implements
         View.OnClickListener,
         SearchView.OnQueryTextListener,
-        TeamSearchAdapter.TeamAdapterListener {
+        TeamAdapter.TeamAdapterListener {
 
     private View createTeam;
     private RecyclerView recyclerView;
@@ -83,7 +83,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         recyclerView = rootView.findViewById(R.id.team_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamSearchAdapter(teams, this));
+        recyclerView.setAdapter(new TeamAdapter(teams, this));
 
         createTeam.setOnClickListener(this);
 

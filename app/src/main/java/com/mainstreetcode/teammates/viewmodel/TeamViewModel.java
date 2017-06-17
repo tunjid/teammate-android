@@ -26,27 +26,30 @@ import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamViewModel extends ViewModel {
 
-
     private static final TeammateApi api = TeammateService.getApiInstance();
     private final TeamDao teamDao = AppDatabase.getInstance().teamDao();
 
-    public Observable<List<Team>> getMyTeams() {
-        Observable<List<Team>> local = fromCallable(teamDao::getTeams).subscribeOn(io());
-        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveTeams);
-
-        return Observable.concat(local, remote).observeOn(mainThread());
+    public Observable<Team> createTeam(Team team) {
+        return api.createTeam(team).observeOn(mainThread());
     }
 
-    public Observable<List<Team>> findTeams(String queryText) {
-        return api.findTeam(queryText).observeOn(mainThread());
+    public Observable<Team> getTeam(Team team) {
+        return api.getTeam(team.getId()).observeOn(mainThread());
     }
 
     public Observable<JoinRequest> joinTeam(Team team, String role) {
         return api.joinTeam(team.getId(), role).observeOn(mainThread());
     }
 
-    public Observable<Team> createTeam(Team team) {
-        return api.createTeam(team).observeOn(mainThread());
+    public Observable<List<Team>> findTeams(String queryText) {
+        return api.findTeam(queryText).observeOn(mainThread());
+    }
+
+    public Observable<List<Team>> getMyTeams() {
+        Observable<List<Team>> local = fromCallable(teamDao::getTeams).subscribeOn(io());
+        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveTeams);
+
+        return Observable.concat(local, remote).observeOn(mainThread());
     }
 
     private Observable<List<Team>> saveTeams(List<Team> teams) {

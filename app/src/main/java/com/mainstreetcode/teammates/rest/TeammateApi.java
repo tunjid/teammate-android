@@ -33,11 +33,17 @@ public interface TeammateApi {
     @GET("api/signOut")
     Observable<JsonObject> signOut();
 
-    @GET("api/teams")
-    Observable<List<Team>> findTeam(@Query("name") String teamName);
+    @POST("api/teams")
+    Observable<Team> createTeam(@Body Team team);
+
+    @GET("api/teams/{id}")
+    Observable<Team> getTeam(@Path("id") String teamId);
 
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();
+
+    @GET("api/teams")
+    Observable<List<Team>> findTeam(@Query("name") String teamName);
 
     @GET("api/roles/values")
     Observable<List<String>> getRoleValues();
@@ -45,6 +51,4 @@ public interface TeammateApi {
     @GET("api/teams/{id}/join")
     Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
 
-    @POST("api/teams")
-    Observable<Team> createTeam(@Body Team team);
 }

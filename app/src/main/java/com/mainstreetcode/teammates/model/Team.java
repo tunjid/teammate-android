@@ -9,7 +9,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -60,6 +59,8 @@ public class Team implements
 
     // Cannot be flattened in SQL
     @Ignore List<User> users = new ArrayList<>();
+    @Ignore List<User> pendingUsers = new ArrayList<>();
+
     @Ignore private final List<Item> items;
 
     public static Team empty() {
@@ -128,37 +129,27 @@ public class Team implements
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
         private static final String USERS_KEY = "users";
+        private static final String PENDING_USERS_KEY = "pendingUsers";
 
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
             JsonObject teamJson = json.getAsJsonObject();
 
-            String id = asString(UID_KEY, teamJson);
-            String name = asString(NAME_KEY, teamJson);
-            String city = asString(CITY_KEY, teamJson);
-            String state = asString(STATE_KEY, teamJson);
-            String zip = asString(ZIP_KEY, teamJson);
+            String id = ModelUtils.asString(UID_KEY, teamJson);
+            String name = ModelUtils.asString(NAME_KEY, teamJson);
+            String city = ModelUtils.asString(CITY_KEY, teamJson);
+            String state = ModelUtils.asString(STATE_KEY, teamJson);
+            String zip = ModelUtils.asString(ZIP_KEY, teamJson);
 
             Team team = new Team(id, name, city, state, zip);
 
-            JsonElement usersElement = teamJson.get(USERS_KEY);
-
-            if (usersElement != null && usersElement.isJsonArray()) {
-                JsonArray usersArray = usersElement.getAsJsonArray();
-
-                for (JsonElement userElement : usersArray) {
-                    team.users.add(context.deserialize(userElement, User.class));
-                }
-            }
+            ModelUtils.deserializeList(context, teamJson.get(USERS_KEY), team.users, User.class);
+            ModelUtils.deserializeList(context, teamJson.get(PENDING_USERS_KEY), team.pendingUsers, User.class);
 
             return team;
         }
 
-         static String asString(String key, JsonObject jsonObject) {
-            JsonElement element = jsonObject.get(key);
-            return element != null && element.isJsonPrimitive() ? element.getAsString() : null;
-        }
     }
 
     @Override
@@ -202,6 +193,13 @@ public class Team implements
 
     private void setZip(String zip) {this.zip = zip; }
 
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public List<User> getPendingUsers() {
+        return pendingUsers;
+    }
 
     private Team(Parcel in) {
         id = in.readString();

@@ -12,14 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
+import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -30,24 +29,21 @@ import io.reactivex.Observable;
  * Created by Shemanigans on 6/1/17.
  */
 
-public class TeamEditFragment extends MainActivityFragment
+public class TeamDetailFragment extends MainActivityFragment
         implements
         View.OnClickListener {
 
     private static final String ARG_TEAM = "team";
-    private static final String ARG_EDITABLE = "editable";
 
     private Team team;
-    private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
-    public static TeamEditFragment newInstance(Team team, boolean isEditable) {
-        TeamEditFragment fragment = new TeamEditFragment();
+    public static TeamDetailFragment newInstance(Team team) {
+        TeamDetailFragment fragment = new TeamDetailFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
-        args.putBoolean(ARG_EDITABLE, isEditable);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,13 +58,12 @@ public class TeamEditFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_team_edit, container, false);
-        recyclerView = rootView.findViewById(R.id.team_edit);
+        View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
+        recyclerView = rootView.findViewById(R.id.team_detail);
 
-        boolean isEditable = getArguments().getBoolean(ARG_EDITABLE);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamEditAdapter(team, roles, isEditable));
+        recyclerView.setAdapter(new TeamDetailAdapter(team));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -77,24 +72,35 @@ public class TeamEditFragment extends MainActivityFragment
             }
         });
 
-        recyclerView.requestFocus();
         return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        fab.setImageResource(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
-        setToolbarTitle(getString(isEditable ? R.string.create_team : R.string.join_team));
-        toggleFab(true);
+        setToolbarTitle(team.getName());
+        toggleFab(false);
 
-        disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
-                    roles.clear();
-                    roles.addAll(currentRoles);
-                })
+        TeamViewModel viewModel = ViewModelProviders.of(getActivity()).get(TeamViewModel.class);
+        disposables.add(viewModel.getTeam(team).subscribe(
+                updatedTeam -> {
+                    List<User> users = team.getUsers();
+                    List<User> pendingUsers = team.getPendingUsers();
+
+                    users.clear();
+                    pendingUsers.clear();
+
+                    users.addAll(updatedTeam.getUsers());
+                    pendingUsers.addAll(updatedTeam.getPendingUsers());
+
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                },
+                ErrorHandler.builder()
+                        .defaultMessage(getString(R.string.default_error))
+                        .add(this::showSnackbar)
+                        .build())
         );
     }
 

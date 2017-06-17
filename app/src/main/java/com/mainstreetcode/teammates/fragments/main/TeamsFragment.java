@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.TeamSearchAdapter;
+import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -31,7 +31,7 @@ import io.reactivex.functions.Consumer;
 public final class TeamsFragment extends MainActivityFragment
         implements
         View.OnClickListener,
-        TeamSearchAdapter.TeamAdapterListener {
+        TeamAdapter.TeamAdapterListener {
 
     private RecyclerView recyclerView;
     private final List<Team> teams = new ArrayList<>();
@@ -68,7 +68,7 @@ public final class TeamsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
         recyclerView = rootView.findViewById(R.id.team_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamSearchAdapter(teams, this));
+        recyclerView.setAdapter(new TeamAdapter(teams, this));
 
         return rootView;
     }
@@ -90,7 +90,7 @@ public final class TeamsFragment extends MainActivityFragment
 
     @Override
     public void onTeamClicked(Team team) {
-        //showFragment(TeamDetailFragment.newInstance(team, false));
+        showFragment(TeamDetailFragment.newInstance(team));
     }
 
     @Override

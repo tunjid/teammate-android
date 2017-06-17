@@ -11,7 +11,8 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-import static com.mainstreetcode.teammates.model.Team.JsonDeserializer.asString;
+import static com.mainstreetcode.teammates.model.ModelUtils.asBoolean;
+import static com.mainstreetcode.teammates.model.ModelUtils.asString;
 
 /**
  * Users that may be part of a {@link Team}
@@ -23,13 +24,18 @@ import static com.mainstreetcode.teammates.model.Team.JsonDeserializer.asString;
 public class User {
 
     @PrimaryKey
-    public String id;
-    public String firstName;
-    public String lastName;
-    public String primaryEmail;
+    private String id;
+    private String firstName;
+    private String lastName;
+    private String primaryEmail;
 
-    @Ignore
-    public String password;
+    @Ignore private transient String role;
+    @Ignore private transient String password;
+    @Ignore private transient boolean isTeamApproved;
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public User(String id, String firstName, String lastName, String primaryEmail) {
         this.id = id;
@@ -38,17 +44,14 @@ public class User {
         this.primaryEmail = primaryEmail;
     }
 
-    public User(String id, String firstName, String lastName, String primaryEmail, String password) {
-        this(id, firstName, lastName, primaryEmail);
-        this.password = password;
-    }
-
     public static class JsonDeserializer implements com.google.gson.JsonDeserializer<User> {
 
         private static final String UID_KEY = "_id";
-        private static final String FIRST_NAME_KEY = "firstName";
+        private static final String ROLE_KEY = "role";
         private static final String LAST_NAME_KEY = "lastName";
+        private static final String FIRST_NAME_KEY = "firstName";
         private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
+        private static final String TEAM_APPROVED_KEY = "isTeamApproved";
 
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -59,7 +62,12 @@ public class User {
             String lastName = asString(LAST_NAME_KEY, userObject);
             String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
 
-            return new User(id, firstName, lastName, primaryEmail, "*");
+            User user = new User(id, firstName, lastName, primaryEmail);
+
+            user.setRole(asString(ROLE_KEY, userObject));
+            user.setTeamApproved(asBoolean(TEAM_APPROVED_KEY, userObject));
+
+            return user;
         }
     }
 
@@ -75,5 +83,19 @@ public class User {
 
     public String getPrimaryEmail() {return this.primaryEmail;}
 
-    public String getPassword() {return this.password;}
+    public String getRole() {
+        return role;
+    }
+
+    private void setRole(String role) {
+        this.role = role;
+    }
+
+    public boolean isTeamApproved() {
+        return isTeamApproved;
+    }
+
+    private void setTeamApproved(boolean teamApproved) {
+        isTeamApproved = teamApproved;
+    }
 }

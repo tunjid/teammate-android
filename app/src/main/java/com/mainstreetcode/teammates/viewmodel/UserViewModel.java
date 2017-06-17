@@ -59,8 +59,9 @@ public class UserViewModel extends AndroidViewModel {
         }
 
         signUpSubject = ReplaySubject.createWithSize(1);
-        User newUser = new User("*", firstName, lastName, primaryEmail, password);
+        User newUser = new User("*", firstName, lastName, primaryEmail);
 
+        newUser.setPassword(password);
         teammateApi.signUp(newUser)
                 .flatMap(this::saveUser)
                 .observeOn(mainThread())
