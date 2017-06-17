@@ -20,6 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -64,11 +65,7 @@ public class Team implements
     @Ignore private final List<Item> items;
 
     public static Team empty() {
-        return new Team();
-    }
-
-    private Team() {
-        items = itemsFromTeam(this);
+        return new Team(new Date().toString(), "", "", "", "");
     }
 
     public Team(String id, String name, String city, String state, String zip) {
@@ -160,13 +157,13 @@ public class Team implements
         Team team = (Team) o;
 
         //return uid.equals(team.uid);
-        return id.equals(team.name);
+        return id.equals(team.id);
     }
 
     @Override
     public int hashCode() {
         //return uid.hashCode();
-        return name.hashCode();
+        return id.hashCode();
     }
 
     public String getId() {return this.id;}

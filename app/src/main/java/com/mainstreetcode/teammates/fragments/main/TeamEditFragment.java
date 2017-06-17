@@ -53,6 +53,14 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
+    public String getStableTag() {
+        String superResult = super.getStableTag();
+        Team tempTeam = getArguments().getParcelable(ARG_TEAM);
+
+        return tempTeam == null ? superResult : superResult + "-" + tempTeam.hashCode();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
