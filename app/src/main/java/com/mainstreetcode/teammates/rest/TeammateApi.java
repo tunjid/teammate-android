@@ -39,6 +39,9 @@ public interface TeammateApi {
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();
 
+    @GET("api/roles/values")
+    Observable<List<String>> getRoleValues();
+
     @GET("api/teams/{id}/join")
     Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
 

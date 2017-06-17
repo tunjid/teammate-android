@@ -3,10 +3,12 @@ package com.mainstreetcode.teammates.persistence;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.User;
+
+import java.util.List;
 
 /**
  * DAO for {@link Team}
@@ -16,11 +18,11 @@ import com.mainstreetcode.teammates.model.User;
 
 @Dao
 public interface TeamDao {
-    @Query("SELECT * FROM user WHERE primaryEmail LIKE :primaryEmail LIMIT 1")
-    User findByEmail(String primaryEmail);
+    @Query("SELECT * FROM teams")
+    List<Team> getTeams();
 
-    @Insert
-    void insert(Team user);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(List<Team> teams);
 
     @Delete
     void delete(Team user);

@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
@@ -35,8 +32,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 
 @Entity(tableName = "teams")
-@Getter
-@Setter
 public class Team implements
         Parcelable,
         ListableBean<Team, Team.Item> {
@@ -56,19 +51,16 @@ public class Team implements
     public static final int IMAGE = 3;
     public static final int ROLE = 4;
 
-    public static final String DB_NAME = "teams";
-    public static final String SEARCH_INDEX_KEY = "nameLowercased";
-
     @PrimaryKey
-    String id;
-    String name;
-    String city;
-    String state;
-    String zip;
+    private String id;
+    private String name;
+    private String city;
+    private String state;
+    private String zip;
 
     // Cannot be flattened in SQL
     @Ignore List<User> users = new ArrayList<>();
-    @Ignore final List<Item> items;
+    @Ignore private final List<Item> items;
 
     public static Team empty() {
         return new Team();
@@ -163,7 +155,7 @@ public class Team implements
             return team;
         }
 
-        private String asString(String key, JsonObject jsonObject) {
+         static String asString(String key, JsonObject jsonObject) {
             JsonElement element = jsonObject.get(key);
             return element != null && element.isJsonPrimitive() ? element.getAsString() : null;
         }
@@ -185,6 +177,31 @@ public class Team implements
         //return uid.hashCode();
         return name.hashCode();
     }
+
+    public String getId() {return this.id;}
+
+    public String getName() {return this.name;}
+
+    public String getCity() {return this.city;}
+
+    @SuppressWarnings("unused")
+    public String getState() {
+        return state;
+    }
+
+    @SuppressWarnings("unused")
+    public String getZip() {
+        return zip;
+    }
+
+    private void setName(String name) {this.name = name; }
+
+    private void setCity(String city) {this.city = city; }
+
+    private void setState(String state) {this.state = state; }
+
+    private void setZip(String zip) {this.zip = zip; }
+
 
     private Team(Parcel in) {
         id = in.readString();
@@ -224,7 +241,6 @@ public class Team implements
         }
     };
 
-    @Getter
     public static class Item {
         @ItemType final int itemType;
         @StringRes final int stringRes;
@@ -243,6 +259,12 @@ public class Team implements
             this.value = value;
             if (changeCallBack != null) changeCallBack.onValueChanged(value);
         }
+
+        public int getItemType() {return this.itemType;}
+
+        public int getStringRes() {return this.stringRes;}
+
+        public String getValue() {return this.value;}
     }
 
     // Used to change the value of the Team's fields

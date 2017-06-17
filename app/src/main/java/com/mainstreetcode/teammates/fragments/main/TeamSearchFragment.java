@@ -117,14 +117,14 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public void onTeamClicked(Team team) {
-        showFragment(TeamDetailFragment.newInstance(team, false));
+        showFragment(TeamEditFragment.newInstance(team, false));
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.create_team:
-                showFragment(TeamDetailFragment.newInstance(Team.empty(), true));
+                showFragment(TeamEditFragment.newInstance(Team.empty(), true));
                 break;
         }
     }

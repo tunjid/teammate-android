@@ -1,12 +1,8 @@
 package com.mainstreetcode.teammates.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.GenericTypeIndicator;
-
-import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +12,8 @@ import lombok.Setter;
  * <p>
  * Created by Shemanigans on 6/6/17.
  */
-@Entity(tableName = "roles")
+@Entity(tableName = "roles",
+        foreignKeys = @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "user"))
 @Getter
 @Setter
 public class Role {
@@ -29,10 +26,14 @@ public class Role {
     @PrimaryKey
     String id;
     String name;
+    String team;
 
-    public Role(String id, DataSnapshot snapshot) {
-        Map<String, Object> data = snapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {});
+    public Role(String id, String name, String team, String user) {
         this.id = id;
-        this.name = (String) data.get("name");
+        this.name = name;
+        this.team = team;
+        this.user = user;
     }
+
+    String user;
 }

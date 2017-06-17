@@ -32,9 +32,9 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         roleViewModel = ViewModelProviders.of(getActivity()).get(RoleViewModel.class);
 
         // Prefetch all roles
-        if (!hasPrefetchedRoles) {
-            roleViewModel.getRoles();
-            hasPrefetchedRoles = true;
-        }
+//        if (!hasPrefetchedRoles) {
+//            roleViewModel.getRoles();
+//            hasPrefetchedRoles = true;
+//        }
     }
 }

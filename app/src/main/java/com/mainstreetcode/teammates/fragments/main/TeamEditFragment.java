@@ -31,7 +31,7 @@ import io.reactivex.Observable;
  * Created by Shemanigans on 6/1/17.
  */
 
-public class TeamDetailFragment extends MainActivityFragment
+public class TeamEditFragment extends MainActivityFragment
         implements
         View.OnClickListener {
 
@@ -39,12 +39,12 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_EDITABLE = "editable";
 
     private Team team;
-    private List<Role> roles = new ArrayList<>();
+    private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
-    public static TeamDetailFragment newInstance(Team team, boolean isEditable) {
-        TeamDetailFragment fragment = new TeamDetailFragment();
+    public static TeamEditFragment newInstance(Team team, boolean isEditable) {
+        TeamEditFragment fragment = new TeamEditFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
@@ -92,7 +92,7 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(isEditable ? R.string.create_team : R.string.join_team));
         toggleFab(true);
 
-        disposables.add(roleViewModel.getRoles().subscribe(currentRoles -> {
+        disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
                     roles.clear();
                     roles.addAll(currentRoles);
                 })

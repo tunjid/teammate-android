@@ -18,9 +18,14 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.ReplaySubject;
+
+import static io.reactivex.Observable.concat;
+import static io.reactivex.Observable.create;
+import static io.reactivex.Observable.fromCallable;
+import static io.reactivex.Observable.just;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 /**
  * View model for registration
@@ -44,27 +49,21 @@ public class UserViewModel extends AndroidViewModel {
     public UserViewModel(Application application) {
         super(application);
         teammateApi = TeammateService.getApiInstance();
-        userDao = AppDatabase.getInstance(application).userDao();
+        userDao = AppDatabase.getInstance().userDao();
     }
 
-    public Observable<User> signUp(String firstName, String lastName, String email, String password) {
-
-        User newUser = User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .primaryEmail(email)
-                .password(password)
-                .build();
+    public Observable<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
 
         if (signUpSubject != null && signUpSubject.hasComplete() && !signUpSubject.hasThrowable()) {
-            return Observable.just(signUpSubject.getValue());
+            return just(signUpSubject.getValue());
         }
 
         signUpSubject = ReplaySubject.createWithSize(1);
+        User newUser = new User("*", firstName, lastName, primaryEmail, password);
 
         teammateApi.signUp(newUser)
                 .flatMap(this::saveUser)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(mainThread())
                 .subscribe(signUpSubject);
 
         return signUpSubject;
@@ -72,7 +71,7 @@ public class UserViewModel extends AndroidViewModel {
 
     public Observable<User> signIn(String email, String password) {
         if (signInSubject != null && signInSubject.hasComplete() && !signInSubject.hasThrowable()) {
-            return Observable.just(signInSubject.getValue());
+            return just(signInSubject.getValue());
         }
 
         signInSubject = ReplaySubject.createWithSize(1);
@@ -83,7 +82,7 @@ public class UserViewModel extends AndroidViewModel {
 
         teammateApi.signIn(request)
                 .flatMap(this::saveUser)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(mainThread())
                 .subscribe(signInSubject);
 
         return signInSubject;
@@ -93,16 +92,14 @@ public class UserViewModel extends AndroidViewModel {
         return teammateApi.signOut()
                 .flatMap(result -> clearUser())
                 .onErrorResumeNext(throwable -> {return clearUser();})
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(mainThread());
     }
 
     public Observable<User> getMe() {
+        Observable<User> local = fromCallable(() -> userDao.findByEmail(getPrimaryEmail())).subscribeOn(io());
+        Observable<User> remote = teammateApi.getMe().flatMap(this::saveUser);
 
-        Observable<User> databaseUser = Observable.defer(() -> Observable.just(userDao.findByEmail(getPrimaryEmail())))
-                .subscribeOn(Schedulers.io());
-        Observable<User> apiUser = teammateApi.getMe().flatMap(this::saveUser);
-
-        return Observable.concat(databaseUser, apiUser).observeOn(AndroidSchedulers.mainThread());
+        return concat(local, remote).observeOn(mainThread());
     }
 
     private Observable<User> saveUser(User user) {
@@ -112,7 +109,7 @@ public class UserViewModel extends AndroidViewModel {
                 .apply();
 
         userDao.insert(user);
-        return Observable.just(user);
+        return just(user);
     }
 
     @Nullable
@@ -122,22 +119,25 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     public Observable<Void> forgotPassword(String email) {
-        return Observable.create(new ForgotPasswordCall(email)).timeout(TIME_OUT, TimeUnit.SECONDS);
+        return create(new ForgotPasswordCall(email)).timeout(TIME_OUT, TimeUnit.SECONDS);
     }
 
     private Observable<Boolean> clearUser() {
         String email = getPrimaryEmail();
-        if (email == null) return Observable.just(false);
-
-        User user = userDao.findByEmail(email);
-        userDao.delete(user);
+        if (email == null) return just(false);
 
         getApplication().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .edit()
                 .remove(EMAIL_KEY)
                 .apply();
 
-        return Observable.just(true);
+        User user = userDao.findByEmail(email);
+
+        if (user == null) return just(false);
+
+        userDao.delete(user);
+
+        return just(true);
     }
 
 

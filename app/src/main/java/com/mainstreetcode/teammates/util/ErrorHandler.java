@@ -58,6 +58,8 @@ public class ErrorHandler implements Consumer<Throwable> {
 
         if (TextUtils.isEmpty(message)) message = errorMessage;
         messageConsumer.accept(message);
+
+        throwable.printStackTrace();
     }
 
     public static class Builder {

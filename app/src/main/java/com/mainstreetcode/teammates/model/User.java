@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.JsonDeserializationContext;
@@ -10,8 +11,7 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-import lombok.Getter;
-import lombok.Setter;
+import static com.mainstreetcode.teammates.model.Team.JsonDeserializer.asString;
 
 /**
  * Users that may be part of a {@link Team}
@@ -20,83 +20,60 @@ import lombok.Setter;
  */
 
 @Entity(tableName = "users")
-@Getter
-@Setter
 public class User {
-
-    public static final String DB_NAME = "users";
-    public static final String UID_KEY = "uid";
-    public static final String FIRST_NAME_KEY = "firstName";
-    public static final String LAST_NAME_KEY = "lastName";
-    public static final String PRIMARY_EMAIL_KEY = "primaryEmail";
 
     @PrimaryKey
     public String id;
     public String firstName;
     public String lastName;
     public String primaryEmail;
+
+    @Ignore
     public String password;
 
-    public User(String id, String firstName, String lastName, String primaryEmail, String password) {
+    public User(String id, String firstName, String lastName, String primaryEmail) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.primaryEmail = primaryEmail;
+    }
+
+    public User(String id, String firstName, String lastName, String primaryEmail, String password) {
+        this(id, firstName, lastName, primaryEmail);
         this.password = password;
     }
 
-    public static UserBuilder builder() {return new UserBuilder();}
-
     public static class JsonDeserializer implements com.google.gson.JsonDeserializer<User> {
+
+        private static final String UID_KEY = "_id";
+        private static final String FIRST_NAME_KEY = "firstName";
+        private static final String LAST_NAME_KEY = "lastName";
+        private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
+
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject userObject = json.getAsJsonObject();
 
-            return builder().firstName(userObject.get(FIRST_NAME_KEY).getAsString())
-                    .lastName(userObject.get(LAST_NAME_KEY).getAsString())
-                    .primaryEmail(userObject.get(PRIMARY_EMAIL_KEY).getAsString())
-                    .build();
+            String id = asString(UID_KEY, userObject);
+            String firstName = asString(FIRST_NAME_KEY, userObject);
+            String lastName = asString(LAST_NAME_KEY, userObject);
+            String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
+
+            return new User(id, firstName, lastName, primaryEmail, "*");
         }
     }
 
-    public static class UserBuilder {
-        private String id;
-        private String firstName;
-        private String lastName;
-        private String primaryEmail;
-        private String password;
+    @Override
+    public String toString() {return "com.mainstreetcode.teammates.model.User(id=" + this.id + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", primaryEmail=" + this.primaryEmail + ")";}
 
-        UserBuilder() {}
+    public String getId() {return this.id;}
 
-        public User.UserBuilder id(String id) {
-            this.id = id;
-            return this;
-        }
+    public String getFirstName() {return this.firstName;}
 
-        public User.UserBuilder firstName(String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
+    @SuppressWarnings("unused")
+    public String getLastName() {return this.lastName;}
 
-        public User.UserBuilder lastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
+    public String getPrimaryEmail() {return this.primaryEmail;}
 
-        public User.UserBuilder primaryEmail(String primaryEmail) {
-            this.primaryEmail = primaryEmail;
-            return this;
-        }
-
-        public User.UserBuilder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public User build() {
-            return new User(id, firstName, lastName, primaryEmail, password);
-        }
-
-        public String toString() {return "com.mainstreetcode.teammates.model.User.UserBuilder(id=" + this.id + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", primaryEmail=" + this.primaryEmail + ", password=" + this.password + ")";}
-    }
+    public String getPassword() {return this.password;}
 }

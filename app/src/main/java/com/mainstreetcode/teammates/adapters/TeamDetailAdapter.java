@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -33,10 +32,10 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
     private static final int PADDING = 11;
 
     private final Team team;
-    private final List<Role> roles;
+    private final List<String> roles;
     private final boolean isEditable;
 
-    public TeamDetailAdapter(Team team, List<Role> roles, boolean isEditable) {
+    public TeamDetailAdapter(Team team, List<String> roles, boolean isEditable) {
         this.team = team;
         this.roles = roles;
         this.isEditable = isEditable;
@@ -86,7 +85,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         return position == team.size() ? PADDING : team.get(position).getItemType();
     }
 
-    static  class BaseTeamViewHolder extends BaseViewHolder {
+    static class BaseTeamViewHolder extends BaseViewHolder {
         Team.Item item;
 
         BaseTeamViewHolder(View itemView) {
@@ -174,9 +173,9 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
     static class RoleViewHolder extends InputViewHolder
             implements View.OnClickListener {
 
-        private final List<Role> roles;
+        private final List<String> roles;
 
-        RoleViewHolder(View itemView, List<Role> roles) {
+        RoleViewHolder(View itemView, List<String> roles) {
             super(itemView, false);
             this.roles = roles;
             itemView.findViewById(R.id.click_view).setOnClickListener(this);
@@ -185,17 +184,12 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
         @Override
         public void onClick(View view) {
-
-            int size = roles.size();
-            final CharSequence[] roleNames = new CharSequence[size];
-            for (int i = 0; i < size; i++) roleNames[i] = roles.get(i).getName();
-
             AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
             builder.setTitle(R.string.choose_role);
-            builder.setItems(roleNames, (dialog, position) -> {
-                Role role = roles.get(position);
-                item.setValue(role.getName());
-                editText.setText(role.getName());
+            builder.setItems(roles.toArray(new String[roles.size()]), (dialog, position) -> {
+                String role = roles.get(position);
+                item.setValue(role);
+                editText.setText(role);
                 editText.setError(null);
             });
             builder.create().show();
