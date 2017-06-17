@@ -19,11 +19,11 @@ import io.reactivex.subjects.ReplaySubject;
 public class RoleViewModel extends ViewModel {
 
     private TeammateApi api = TeammateService.getApiInstance();
-    private ReplaySubject<List<String>> roleSubject = ReplaySubject.createWithSize(1);
+    private ReplaySubject<List<String>> roleSubject;
 
     public Observable<List<String>> getRoleValues() {
         // Use new subject if previous call errored out for whatever reason.
-        if (roleSubject.hasThrowable()) {
+        if (roleSubject == null || roleSubject.hasThrowable()) {
             roleSubject = ReplaySubject.createWithSize(1);
             api.getRoleValues().subscribe(roleSubject);
         }
