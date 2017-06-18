@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,12 +16,12 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Splash screen
@@ -96,8 +95,12 @@ public class TeamEditFragment extends MainActivityFragment
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
         fab.setImageResource(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
-        setToolbarTitle(getString(isEditable ? R.string.create_team : R.string.join_team));
         toggleFab(true);
+        setToolbarTitle(getString(!isEditable
+                ? R.string.join_team
+                : team.isNewTeam()
+                ? R.string.create_team
+                : R.string.edit_team));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
                     roles.clear();
@@ -124,8 +127,6 @@ public class TeamEditFragment extends MainActivityFragment
                     return;
                 }
 
-                TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
-
                 // Don't need all cached user emmisions
                 Observable<User> userObservable = userViewModel.getMe().take(1);
                 ErrorHandler errorHandler = ErrorHandler.builder()
@@ -133,18 +134,28 @@ public class TeamEditFragment extends MainActivityFragment
                         .add(this::showSnackbar)
                         .build();
 
-                if (team.getId() != null) {
-                    disposables.add(userObservable
-                            .flatMap(user -> teamViewModel.joinTeam(team, role))
-                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
-                                    errorHandler));
+                boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
+                Disposable disposable;
+
+                // Join a team
+                if (!isEditable) {
+                    disposable = userObservable.flatMap(user -> teamViewModel.joinTeam(team, role))
+                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)), errorHandler);
                 }
+                // Create a team
+                else if (team.isNewTeam()) {
+                    disposable = userObservable.flatMap(user -> teamViewModel.createTeam(team))
+                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), errorHandler);
+                }
+                // Update a team
                 else {
-                    disposables.add(userObservable.flatMap(user -> teamViewModel.createTeam(team))
-                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())),
-                                    errorHandler)
-                    );
+                    disposable = userObservable.flatMap(user -> teamViewModel.updateTeam(team))
+                            .subscribe(updatedTeam -> {
+                                team.update(updatedTeam);
+                                showSnackbar(getString(R.string.updated_team));
+                            }, errorHandler);
                 }
+                disposables.add(disposable);
                 break;
         }
     }

@@ -11,6 +11,7 @@ import io.reactivex.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -39,6 +40,12 @@ public interface TeammateApi {
     @GET("api/teams/{id}")
     Observable<Team> getTeam(@Path("id") String teamId);
 
+    @PUT("api/teams/{id}")
+    Observable<Team> updateTeam(@Path("id") String teamId, @Body Team team);
+
+    @GET("api/teams/{id}/join")
+    Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
+
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();
 
@@ -47,8 +54,4 @@ public interface TeammateApi {
 
     @GET("api/roles/values")
     Observable<List<String>> getRoleValues();
-
-    @GET("api/teams/{id}/join")
-    Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
-
 }

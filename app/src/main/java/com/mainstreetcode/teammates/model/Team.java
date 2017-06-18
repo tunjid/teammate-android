@@ -22,7 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -53,6 +52,8 @@ public class Team implements
     public static final int IMAGE = 3;
     public static final int ROLE = 4;
 
+    private static final String NEW_TEAM = "new.team";
+
     @PrimaryKey
     private String id;
     private String name;
@@ -69,7 +70,7 @@ public class Team implements
     @Ignore private final List<Item> items;
 
     public static Team empty() {
-        return new Team(new Date().toString(), "", "", "", "");
+        return new Team(NEW_TEAM, "", "", "", "");
     }
 
     public Team(String id, String name, String city, String state, String zip) {
@@ -181,6 +182,10 @@ public class Team implements
 
         users.addAll(updatedTeam.getUsers());
         pendingUsers.addAll(updatedTeam.getPendingUsers());
+    }
+
+    public boolean isNewTeam() {
+        return NEW_TEAM.equals(id);
     }
 
     @Override

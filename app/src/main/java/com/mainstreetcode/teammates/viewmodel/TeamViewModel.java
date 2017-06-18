@@ -9,6 +9,7 @@ import com.mainstreetcode.teammates.persistence.TeamDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -37,6 +38,12 @@ public class TeamViewModel extends ViewModel {
         return api.getTeam(team.getId()).observeOn(mainThread());
     }
 
+    public Observable<Team> updateTeam(Team team) {
+        return api.updateTeam(team.getId(), team)
+                .flatMap(this::saveTeam)
+                .observeOn(mainThread());
+    }
+
     public Observable<JoinRequest> joinTeam(Team team, String role) {
         return api.joinTeam(team.getId(), role).observeOn(mainThread());
     }
@@ -55,5 +62,10 @@ public class TeamViewModel extends ViewModel {
     private Observable<List<Team>> saveTeams(List<Team> teams) {
         teamDao.insert(teams);
         return Observable.just(teams);
+    }
+
+    private Observable<Team> saveTeam(Team team) {
+        teamDao.insert(Collections.singletonList(team));
+        return Observable.just(team);
     }
 }
