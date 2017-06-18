@@ -8,6 +8,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
 
@@ -21,7 +22,7 @@ import static com.mainstreetcode.teammates.model.ModelUtils.asString;
  */
 
 @Entity(tableName = "users")
-public class User {
+public class User implements ListableBean<User, Item> {
 
     @PrimaryKey
     private String id;
@@ -42,6 +43,21 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.primaryEmail = primaryEmail;
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public Item get(int position) {
+        return null;
+    }
+
+    @Override
+    public User toSource() {
+        return null;
     }
 
     public static class JsonDeserializer implements com.google.gson.JsonDeserializer<User> {

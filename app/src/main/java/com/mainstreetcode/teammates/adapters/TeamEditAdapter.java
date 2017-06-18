@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -45,24 +46,20 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
     public BaseTeamViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
 
-        @LayoutRes int layoutRes = viewType == Team.HEADING
-                ? R.layout.viewholder_team_header
-                : viewType == Team.INPUT || viewType == Team.ROLE
+        @LayoutRes int layoutRes = viewType == Item.INPUT || viewType == Item.ROLE
                 ? R.layout.viewholder_team_input
-                : viewType == Team.IMAGE
+                : viewType == Item.IMAGE
                 ? R.layout.viewholder_team_image
                 : R.layout.view_holder_padding;
 
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
 
         switch (viewType) {
-            case Team.HEADING:
-                return new HeaderViewHolder(itemView);
-            case Team.INPUT:
+            case Item.INPUT:
                 return new InputViewHolder(itemView, isEditable);
-            case Team.ROLE:
+            case Item.ROLE:
                 return new RoleViewHolder(itemView, roles);
-            case Team.IMAGE:
+            case Item.IMAGE:
                 return new ImageViewHolder(itemView);
             default:
                 return new BaseTeamViewHolder(itemView);
@@ -86,29 +83,14 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
     }
 
     static class BaseTeamViewHolder extends BaseViewHolder {
-        Team.Item item;
+        Item item;
 
         BaseTeamViewHolder(View itemView) {
             super(itemView);
         }
 
-        void bind(Team.Item item) {
+        void bind(Item item) {
             this.item = item;
-        }
-    }
-
-    static class HeaderViewHolder extends BaseTeamViewHolder {
-        TextView heading;
-
-        HeaderViewHolder(View itemView) {
-            super(itemView);
-            heading = itemView.findViewById(R.id.header_name);
-        }
-
-        @Override
-        void bind(Team.Item item) {
-            super.bind(item);
-            heading.setText(item.getStringRes());
         }
     }
 
@@ -118,24 +100,34 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
 
         TextInputLayout inputLayout;
         EditText editText;
+        TextView headerText;
 
         InputViewHolder(View itemView, boolean isEditable) {
             super(itemView);
             inputLayout = itemView.findViewById(R.id.input_layout);
             editText = inputLayout.getEditText();
+            headerText = itemView.findViewById(R.id.header_name);
 
             inputLayout.setEnabled(isEditable);
             editText.addTextChangedListener(this);
         }
 
         @Override
-        void bind(Team.Item item) {
+        void bind(Item item) {
             super.bind(item);
             inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
             editText.setText(item.getValue());
             editText.setInputType(getAdapterPosition() == Team.ZIP_POSITION
                     ? InputType.TYPE_CLASS_NUMBER
                     : InputType.TYPE_CLASS_TEXT);
+
+            if (item.getHeaderStringRes() != 0) {
+                headerText.setText(item.getHeaderStringRes());
+                headerText.setVisibility(View.VISIBLE);
+            }
+            else {
+                headerText.setVisibility(View.GONE);
+            }
 
             checkForErrors();
         }

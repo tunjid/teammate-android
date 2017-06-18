@@ -3,19 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:paddingBottom="@dimen/half_margin"
-    android:paddingLeft="@dimen/single_margin"
-    android:paddingRight="@dimen/single_margin"
-    android:paddingTop="@dimen/half_margin">
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/header_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:background="@color/colorPrimary"
+        android:paddingBottom="@dimen/half_margin"
+        android:paddingLeft="@dimen/single_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:paddingTop="@dimen/half_margin"
+        android:textColor="@color/white"
+        android:textSize="@dimen/regular_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/half_margin"
+        android:paddingLeft="@dimen/single_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:paddingTop="@dimen/half_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/header_name">
 
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"

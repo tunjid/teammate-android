@@ -5,9 +5,6 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -18,13 +15,10 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.ListableBean;
 
-import java.lang.annotation.Retention;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Teams
@@ -35,22 +29,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Entity(tableName = "teams")
 public class Team implements
         Parcelable,
-        ListableBean<Team, Team.Item> {
+        ListableBean<Team, Item> {
 
-    private static final int NAME_POSITION = 2;
-    private static final int CITY_POSITION = 3;
-    private static final int STATE_POSITION = 4;
-    public static final int ZIP_POSITION = 5;
-    private static final int ROLE_POSITION = 7;
-
-    @Retention(SOURCE)
-    @IntDef({HEADING, INPUT, IMAGE, ROLE})
-    @interface ItemType {}
-
-    public static final int HEADING = 1;
-    public static final int INPUT = 2;
-    public static final int IMAGE = 3;
-    public static final int ROLE = 4;
+    private static final int NAME_POSITION = 1;
+    private static final int CITY_POSITION = 2;
+    private static final int STATE_POSITION = 3;
+    public static final int ZIP_POSITION = 4;
+    private static final int ROLE_POSITION = 5;
 
     private static final String NEW_TEAM = "new.team";
 
@@ -96,20 +81,18 @@ public class Team implements
     private static List<Item> itemsFromTeam(Team team) {
 
         return Arrays.asList(
-                new Item(IMAGE, R.string.team_logo, "", null),
-                new Item(HEADING, R.string.team_info, "", null),
-                new Item(INPUT, R.string.team_name, team.name == null ? "" : team.name, team::setName),
-                new Item(INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity),
-                new Item(INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
-                new Item(INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip),
-                new Item(HEADING, R.string.team_role, "", null),
-                new Item(ROLE, R.string.team_role, team.role == null ? "" : team.role, team::setRole)
+                new Item(Item.IMAGE, R.string.team_logo, "", null),
+                new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName),
+                new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity),
+                new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
+                new Item(Item.INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, team.role == null ? "" : team.role, team::setRole)
         );
     }
 
     @Override
     public int size() {
-        return 8;
+        return items.size();
     }
 
     @Override
@@ -282,32 +265,6 @@ public class Team implements
             return new Team[size];
         }
     };
-
-    public static class Item {
-        @ItemType final int itemType;
-        @StringRes final int stringRes;
-        @Nullable final ValueChangeCallBack changeCallBack;
-
-        String value;
-
-        Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack) {
-            this.itemType = itemType;
-            this.stringRes = stringRes;
-            this.value = value;
-            this.changeCallBack = changeCallBack;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-            if (changeCallBack != null) changeCallBack.onValueChanged(value);
-        }
-
-        public int getItemType() {return this.itemType;}
-
-        public int getStringRes() {return this.stringRes;}
-
-        public String getValue() {return this.value;}
-    }
 
     // Used to change the value of the Team's fields
     interface ValueChangeCallBack {
