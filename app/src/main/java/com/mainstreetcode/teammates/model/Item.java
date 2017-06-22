@@ -26,16 +26,16 @@ public class Item {
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
     private @StringRes final int headerStringRes;
-    private @Nullable final Team.ValueChangeCallBack changeCallBack;
+    private @Nullable final ValueChangeCallBack changeCallBack;
 
     String value;
 
-    Item(int itemType, int stringRes, String value, @Nullable Team.ValueChangeCallBack changeCallBack) {
+    Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack) {
         this(itemType, stringRes, 0, value, changeCallBack);
     }
 
     Item(int itemType, int stringRes, int headerStringRes,
-         String value, @Nullable Team.ValueChangeCallBack changeCallBack) {
+         String value, @Nullable ValueChangeCallBack changeCallBack) {
         this.itemType = itemType;
         this.stringRes = stringRes;
         this.headerStringRes = headerStringRes;
@@ -58,5 +58,8 @@ public class Item {
 
     public String getValue() {return this.value;}
 
-
+    // Used to change the value of the Team's fields
+    interface ValueChangeCallBack {
+        void onValueChanged(String value);
+    }
 }

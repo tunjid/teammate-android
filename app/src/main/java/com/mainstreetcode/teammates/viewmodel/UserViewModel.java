@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.ReplaySubject;
 
 import static io.reactivex.Observable.concat;
@@ -42,14 +43,22 @@ public class UserViewModel extends AndroidViewModel {
     private final UserDao userDao;
     private final TeammateApi teammateApi;
 
+    private User currentUser;
+
     // Used to save values of last call
     private ReplaySubject<User> signUpSubject;
     private ReplaySubject<User> signInSubject;
+
+    private Consumer<User> userThrowableBiConsumer = (updatedUser) -> currentUser = updatedUser;
 
     public UserViewModel(Application application) {
         super(application);
         teammateApi = TeammateService.getApiInstance();
         userDao = AppDatabase.getInstance().userDao();
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
     }
 
     public Observable<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
@@ -64,10 +73,9 @@ public class UserViewModel extends AndroidViewModel {
         newUser.setPassword(password);
         teammateApi.signUp(newUser)
                 .flatMap(this::saveUser)
-                .observeOn(mainThread())
                 .subscribe(signUpSubject);
 
-        return signUpSubject;
+        return updateCurrent(signUpSubject);
     }
 
     public Observable<User> signIn(String email, String password) {
@@ -83,10 +91,21 @@ public class UserViewModel extends AndroidViewModel {
 
         teammateApi.signIn(request)
                 .flatMap(this::saveUser)
-                .observeOn(mainThread())
                 .subscribe(signInSubject);
 
-        return signInSubject;
+        return updateCurrent(signInSubject);
+    }
+
+//    public Observable<User> updateUser(User user) {
+//        Observable<User> update = teammateApi.updateUser(user.getId(), user).flatMap(this::saveUser);
+//        return user.equals(currentUser) ? updateCurrent(update) : update;
+//    }
+
+    public Observable<User> getMe() {
+        Observable<User> local = fromCallable(() -> userDao.findByEmail(getPrimaryEmail())).subscribeOn(io());
+        Observable<User> remote = teammateApi.getMe().flatMap(this::saveUser);
+
+        return updateCurrent(concat(local, remote));
     }
 
     public Observable<Boolean> signOut() {
@@ -94,13 +113,6 @@ public class UserViewModel extends AndroidViewModel {
                 .flatMap(result -> clearUser())
                 .onErrorResumeNext(throwable -> {return clearUser();})
                 .observeOn(mainThread());
-    }
-
-    public Observable<User> getMe() {
-        Observable<User> local = fromCallable(() -> userDao.findByEmail(getPrimaryEmail())).subscribeOn(io());
-        Observable<User> remote = teammateApi.getMe().flatMap(this::saveUser);
-
-        return concat(local, remote).observeOn(mainThread());
     }
 
     private Observable<User> saveUser(User user) {
@@ -137,10 +149,17 @@ public class UserViewModel extends AndroidViewModel {
         if (user == null) return just(false);
 
         userDao.delete(user);
+        currentUser = null;
 
         return just(true);
     }
 
+    private Observable<User> updateCurrent(Observable<User> source) {
+        Observable<User> result = source.publish().autoConnect(2)
+                .observeOn(mainThread());
+        result.subscribe(userThrowableBiConsumer, (throwable -> {}));
+        return result;
+    }
 
     static class ForgotPasswordCall implements ObservableOnSubscribe<Void> {
 

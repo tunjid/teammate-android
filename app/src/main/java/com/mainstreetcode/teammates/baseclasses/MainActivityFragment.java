@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.baseclasses;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -29,8 +30,8 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         ViewModelProvider provider = ViewModelProviders.of(getActivity());
         roleViewModel = provider.get(RoleViewModel.class);
         userViewModel = provider.get(UserViewModel.class);

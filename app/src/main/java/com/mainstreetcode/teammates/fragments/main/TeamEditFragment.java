@@ -14,13 +14,11 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -128,7 +126,6 @@ public class TeamEditFragment extends MainActivityFragment
                 }
 
                 // Don't need all cached user emmisions
-                Observable<User> userObservable = userViewModel.getMe().take(1);
                 ErrorHandler errorHandler = ErrorHandler.builder()
                         .defaultMessage(getString(R.string.default_error))
                         .add(this::showSnackbar)
@@ -139,21 +136,21 @@ public class TeamEditFragment extends MainActivityFragment
 
                 // Join a team
                 if (!isEditable) {
-                    disposable = userObservable.flatMap(user -> teamViewModel.joinTeam(team, role))
+                    disposable = teamViewModel.joinTeam(team, role)
                             .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)), errorHandler);
                 }
                 // Create a team
                 else if (team.isNewTeam()) {
-                    disposable = userObservable.flatMap(user -> teamViewModel.createTeam(team))
+                    disposable = teamViewModel.createTeam(team)
                             .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), errorHandler);
                 }
                 // Update a team
                 else {
-                    disposable = userObservable.flatMap(user -> teamViewModel.updateTeam(team))
-                            .subscribe(updatedTeam -> {
-                                team.update(updatedTeam);
-                                showSnackbar(getString(R.string.updated_team));
-                            }, errorHandler);
+                    disposable = teamViewModel.updateTeam(team).subscribe(updatedTeam -> {
+                        team.update(updatedTeam);
+                        showSnackbar(getString(R.string.updated_team));
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                    }, errorHandler);
                 }
                 disposables.add(disposable);
                 break;

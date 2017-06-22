@@ -79,7 +79,6 @@ public class Team implements
     }
 
     private static List<Item> itemsFromTeam(Team team) {
-
         return Arrays.asList(
                 new Item(Item.IMAGE, R.string.team_logo, "", null),
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName),
@@ -145,7 +144,7 @@ public class Team implements
         @Override
         public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject team = new JsonObject();
-            team.addProperty(UID_KEY, src.id);
+            //team.addProperty(UID_KEY, src.id);
             team.addProperty(NAME_KEY, src.name);
             team.addProperty(CITY_KEY, src.city);
             team.addProperty(STATE_KEY, src.state);
@@ -266,8 +265,4 @@ public class Team implements
         }
     };
 
-    // Used to change the value of the Team's fields
-    interface ValueChangeCallBack {
-        void onValueChanged(String value);
-    }
 }

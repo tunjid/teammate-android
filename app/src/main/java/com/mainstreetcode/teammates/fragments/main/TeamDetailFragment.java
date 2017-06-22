@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -33,14 +34,19 @@ import io.reactivex.Observable;
 
 public class TeamDetailFragment extends MainActivityFragment
         implements
-        View.OnClickListener ,
-TeamDetailAdapter.UserAdapterListener{
+        View.OnClickListener,
+        TeamDetailAdapter.UserAdapterListener {
 
     private static final String ARG_TEAM = "team";
 
     private Team team;
 
     private RecyclerView recyclerView;
+
+    ErrorHandler errorHandler = ErrorHandler.builder()
+            .defaultMessage(getString(R.string.default_error))
+            .add(this::showSnackbar)
+            .build();
 
     public static TeamDetailFragment newInstance(Team team) {
         TeamDetailFragment fragment = new TeamDetailFragment();
@@ -102,10 +108,7 @@ TeamDetailAdapter.UserAdapterListener{
                     team.update(updatedTeam);
                     recyclerView.getAdapter().notifyDataSetChanged();
                 },
-                ErrorHandler.builder()
-                        .defaultMessage(getString(R.string.default_error))
-                        .add(this::showSnackbar)
-                        .build())
+                errorHandler)
         );
     }
 
@@ -133,7 +136,27 @@ TeamDetailAdapter.UserAdapterListener{
 
     @Override
     public void onUserClicked(User user) {
+        View rootView = getView();
+        if (rootView == null) return;
 
+        User currentUser = userViewModel.getCurrentUser();
+        int i = team.getUsers().indexOf(currentUser);
+
+        if (i != -1) currentUser = team.getUsers().get(i);
+
+        if (user.isUserApproved() && !user.isTeamApproved() && "Admin".equals(currentUser.getRole())) {
+
+            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, user.getFirstName()))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(user, true))
+                    .setNegativeButton(R.string.no, (dialog, which) -> approveUser(user, false))
+                    .show();
+        }
+//        else if (user.isUserApproved() && !user.isTeamApproved()) {
+//
+//        }
+        else if (team.getUsers().contains(user)) {
+            showFragment(UserEditFragment.newInstance(user));
+        }
     }
 
     @Override
@@ -151,10 +174,6 @@ TeamDetailAdapter.UserAdapterListener{
 
                 // Don't need all cached user emmisions
                 Observable<User> userObservable = userViewModel.getMe().take(1);
-                ErrorHandler errorHandler = ErrorHandler.builder()
-                        .defaultMessage(getString(R.string.default_error))
-                        .add(this::showSnackbar)
-                        .build();
 
                 if (team.getId() != null) {
                     disposables.add(userObservable
@@ -170,5 +189,11 @@ TeamDetailAdapter.UserAdapterListener{
                 }
                 break;
         }
+    }
+
+    private void approveUser(User user, boolean approve) {
+        disposables.add(
+                teamViewModel.approveUser(team, user, approve).subscribe((joinRequest) -> {}, errorHandler)
+        );
     }
 }

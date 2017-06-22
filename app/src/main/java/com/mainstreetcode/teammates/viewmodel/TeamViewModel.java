@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel;
 
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.TeamDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
@@ -44,10 +45,6 @@ public class TeamViewModel extends ViewModel {
                 .observeOn(mainThread());
     }
 
-    public Observable<JoinRequest> joinTeam(Team team, String role) {
-        return api.joinTeam(team.getId(), role).observeOn(mainThread());
-    }
-
     public Observable<List<Team>> findTeams(String queryText) {
         return api.findTeam(queryText).observeOn(mainThread());
     }
@@ -67,5 +64,13 @@ public class TeamViewModel extends ViewModel {
     private Observable<Team> saveTeam(Team team) {
         teamDao.insert(Collections.singletonList(team));
         return Observable.just(team);
+    }
+
+    public Observable<JoinRequest> joinTeam(Team team, String role) {
+        return api.joinTeam(team.getId(), role).observeOn(mainThread());
+    }
+
+    public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
+        return api.approveUser(team.getId(), user.getId(), String.valueOf(approve)).observeOn(mainThread());
     }
 }

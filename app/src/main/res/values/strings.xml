@@ -79,4 +79,12 @@
     <!--TeamDetailFragment-->
     <string name="user_invited">Has been invited</string>
     <string name="user_requests_join">Has requested to join</string>
+
+    <!--UserEditFragment-->
+    <string name="profile_picture">Profile Picture</string>
+    <string name="user_info">User Info</string>
+    <string name="edit_user">Edit User</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="add_user_to_team">Add %1$s to team?</string>
 </resources>

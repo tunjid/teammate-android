@@ -2,7 +2,6 @@ package com.mainstreetcode.teammates.adapters;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,11 +78,11 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
             Context context = itemView.getContext();
 
             userName.setText(item.getFirstName());
-            userStatus.setText(!TextUtils.isEmpty(item.getRole())
-                    ? item.getRole()
-                    : item.isTeamApproved()
+            userStatus.setText(item.isTeamApproved() && !item.isUserApproved()
                     ? context.getString(R.string.user_invited)
-                    : context.getString(R.string.user_requests_join));
+                    : !item.isTeamApproved() && item.isUserApproved()
+                    ? context.getString(R.string.user_requests_join)
+                    : item.getRole());
         }
 
         @Override
