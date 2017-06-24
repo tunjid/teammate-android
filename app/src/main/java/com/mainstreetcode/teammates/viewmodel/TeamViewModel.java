@@ -66,6 +66,12 @@ public class TeamViewModel extends ViewModel {
         return Observable.just(team);
     }
 
+    public Observable<User> updateTeamUser(Team team, User user) {
+        return api.updateTeamUser(team.getId(), user.getId(), user)
+                //.flatMap(this::saveTeam)
+                .observeOn(mainThread());
+    }
+
     public Observable<JoinRequest> joinTeam(Team team, String role) {
         return api.joinTeam(team.getId(), role).observeOn(mainThread());
     }

@@ -13,7 +13,9 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.UserEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +30,20 @@ public class UserEditFragment extends MainActivityFragment
         implements
         View.OnClickListener {
 
+    private static final String ARG_TEAM = "team";
     private static final String ARG_USER = "user";
 
+    private Team team;
     private User user;
     private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
-    public static UserEditFragment newInstance(User user) {
+    public static UserEditFragment newInstance(Team team, User user) {
         UserEditFragment fragment = new UserEditFragment();
         Bundle args = new Bundle();
 
+        args.putParcelable(ARG_TEAM, team);
         args.putParcelable(ARG_USER, user);
         fragment.setArguments(args);
         return fragment;
@@ -47,14 +52,18 @@ public class UserEditFragment extends MainActivityFragment
     @Override
     public String getStableTag() {
         String superResult = super.getStableTag();
+        Team tempTeam = getArguments().getParcelable(ARG_TEAM);
         User tempUser = getArguments().getParcelable(ARG_USER);
 
-        return tempUser == null ? superResult : superResult + "-" + tempUser.hashCode();
+        return (tempTeam != null && tempUser != null)
+                ? superResult + "-" + tempTeam.hashCode() + "-" + tempUser.hashCode()
+                :superResult;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        team = getArguments().getParcelable(ARG_TEAM);
         user = getArguments().getParcelable(ARG_USER);
     }
 
@@ -114,18 +123,18 @@ public class UserEditFragment extends MainActivityFragment
                 }
 
                 // Don't need all cached user emmisions
-//                ErrorHandler errorHandler = ErrorHandler.builder()
-//                        .defaultMessage(getString(R.string.default_error))
-//                        .add(this::showSnackbar)
-//                        .build();
-//
-//                disposables.add(
-//                        userViewModel.updateUser(user).subscribe(updatedUser -> {
-                // user.update(updatedUser);
-//                            showSnackbar("");
-//                            recyclerView.getAdapter().notifyDataSetChanged();
-//                        }, errorHandler)
-//                );
+                ErrorHandler errorHandler = ErrorHandler.builder()
+                        .defaultMessage(getString(R.string.default_error))
+                        .add(this::showSnackbar)
+                        .build();
+
+                disposables.add(
+                        teamViewModel.updateTeamUser(team, user).subscribe(updatedUser -> {
+                            user.update(updatedUser);
+                            showSnackbar(getString(R.string.updated_user, user.getFirstName()));
+                            recyclerView.getAdapter().notifyDataSetChanged();
+                        }, errorHandler)
+                );
                 break;
         }
     }

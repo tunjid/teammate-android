@@ -43,10 +43,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private RecyclerView recyclerView;
 
-    ErrorHandler errorHandler = ErrorHandler.builder()
-            .defaultMessage(getString(R.string.default_error))
-            .add(this::showSnackbar)
-            .build();
+    ErrorHandler errorHandler;
 
     public static TeamDetailFragment newInstance(Team team) {
         TeamDetailFragment fragment = new TeamDetailFragment();
@@ -103,6 +100,11 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         toggleFab(false);
 
+        errorHandler = ErrorHandler.builder()
+                .defaultMessage(getString(R.string.default_error))
+                .add(this::showSnackbar)
+                .build();
+
         disposables.add(teamViewModel.getTeam(team).subscribe(
                 updatedTeam -> {
                     team.update(updatedTeam);
@@ -155,7 +157,7 @@ public class TeamDetailFragment extends MainActivityFragment
 //
 //        }
         else if (team.getUsers().contains(user)) {
-            showFragment(UserEditFragment.newInstance(user));
+            showFragment(UserEditFragment.newInstance(team, user));
         }
     }
 
@@ -166,7 +168,7 @@ public class TeamDetailFragment extends MainActivityFragment
                 String role = team.getRole();
 
                 if (TextUtils.isEmpty(role)) {
-                    showSnackbar("Please select a role");
+                    showSnackbar(getString(R.string.select_role));
                     return;
                 }
 
@@ -191,9 +193,18 @@ public class TeamDetailFragment extends MainActivityFragment
         }
     }
 
-    private void approveUser(User user, boolean approve) {
+    private void approveUser(final User user, final boolean approve) {
         disposables.add(
-                teamViewModel.approveUser(team, user, approve).subscribe((joinRequest) -> {}, errorHandler)
+                teamViewModel.approveUser(team, user, approve).subscribe((joinRequest) -> {
+                    if (approve) team.getUsers().add(user);
+                    team.getPendingUsers().remove(user);
+                    recyclerView.getAdapter().notifyDataSetChanged();
+
+                    String name = user.getFirstName();
+                    showSnackbar(approve
+                            ? getString(R.string.added_user, name)
+                            : getString(R.string.removed_user, name));
+                }, errorHandler)
         );
     }
 }

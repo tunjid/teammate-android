@@ -5,6 +5,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -116,14 +117,16 @@ public class User implements
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
             user.addProperty(PASSWORD_KEY, src.password);
 
+            if (!TextUtils.isEmpty(src.role)) user.addProperty(ROLE_KEY, src.role);
+
             return user;
         }
     }
 
     private static List<Item> itemsFromUser(User user) {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, "", null),
-                new Item(Item.INPUT, R.string.first_name, R.string.team_info, user.firstName == null ? "" : user.firstName, user::setFirstName),
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, "", null),
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.firstName == null ? "" : user.firstName, user::setFirstName),
                 new Item(Item.INPUT, R.string.last_name, user.lastName == null ? "" : user.lastName, user::setLastName),
                 new Item(Item.INPUT, R.string.email, user.primaryEmail == null ? "" : user.primaryEmail, user::setPrimaryEmail),
                 new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role, user::setRole)
