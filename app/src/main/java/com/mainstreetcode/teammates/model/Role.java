@@ -2,38 +2,47 @@ package com.mainstreetcode.teammates.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.PrimaryKey;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Roles on a team
  * <p>
  * Created by Shemanigans on 6/6/17.
  */
-@Entity(tableName = "roles",
-        foreignKeys = @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "user"))
-@Getter
-@Setter
+@Entity(
+        tableName = "roles",
+        primaryKeys = {"userId", "teamId"},
+        foreignKeys = {
+                @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "userId"),
+                @ForeignKey(entity = Team.class, parentColumns = "id", childColumns = "teamId")
+        }
+)
 public class Role {
 
-    public static final String DB_NAME = "roles";
-    public static final String SEARCH_INDEX_KEY = "name";
+    private String name;
+    private String userId;
+    private String teamId;
 
-    boolean isEditor;
-
-    @PrimaryKey
-    String id;
-    String name;
-    String team;
-
-    public Role(String id, String name, String team, String user) {
-        this.id = id;
+    public Role(String name, String userId, String teamId) {
         this.name = name;
-        this.team = team;
-        this.user = user;
+        this.teamId = teamId;
+        this.userId = userId;
     }
 
-    String user;
+    public Role(String name, User user, Team team) {
+        this.name = name;
+        this.teamId = team.getId();
+        this.userId = user.getId();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getTeamId() {
+        return teamId;
+    }
 }

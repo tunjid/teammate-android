@@ -5,19 +5,11 @@ import android.arch.lifecycle.ViewModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
-import com.mainstreetcode.teammates.persistence.AppDatabase;
-import com.mainstreetcode.teammates.persistence.TeamDao;
-import com.mainstreetcode.teammates.rest.TeammateApi;
-import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.repository.TeamRepository;
 
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
-
-import static io.reactivex.Observable.fromCallable;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-import static io.reactivex.schedulers.Schedulers.io;
 
 
 /**
@@ -28,55 +20,41 @@ import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamViewModel extends ViewModel {
 
-    private static final TeammateApi api = TeammateService.getApiInstance();
-    private final TeamDao teamDao = AppDatabase.getInstance().teamDao();
+    private final TeamRepository repository;
+
+    public TeamViewModel() {
+        repository = TeamRepository.getInstance();
+    }
 
     public Observable<Team> createTeam(Team team) {
-        return api.createTeam(team).observeOn(mainThread());
+        return repository.createTeam(team);
     }
 
     public Observable<Team> getTeam(Team team) {
-        return api.getTeam(team.getId()).observeOn(mainThread());
+        return repository.getTeam(team);
     }
 
     public Observable<Team> updateTeam(Team team) {
-        return api.updateTeam(team.getId(), team)
-                .flatMap(this::saveTeam)
-                .observeOn(mainThread());
+        return repository.updateTeam(team);
     }
 
     public Observable<List<Team>> findTeams(String queryText) {
-        return api.findTeam(queryText).observeOn(mainThread());
+        return repository.findTeams(queryText);
     }
 
     public Observable<List<Team>> getMyTeams() {
-        Observable<List<Team>> local = fromCallable(teamDao::getTeams).subscribeOn(io());
-        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveTeams);
-
-        return Observable.concat(local, remote).observeOn(mainThread());
-    }
-
-    private Observable<List<Team>> saveTeams(List<Team> teams) {
-        teamDao.insert(teams);
-        return Observable.just(teams);
-    }
-
-    private Observable<Team> saveTeam(Team team) {
-        teamDao.insert(Collections.singletonList(team));
-        return Observable.just(team);
+        return repository.getMyTeams();
     }
 
     public Observable<User> updateTeamUser(Team team, User user) {
-        return api.updateTeamUser(team.getId(), user.getId(), user)
-                //.flatMap(this::saveTeam)
-                .observeOn(mainThread());
+        return repository.updateTeamUser(team, user);
     }
 
     public Observable<JoinRequest> joinTeam(Team team, String role) {
-        return api.joinTeam(team.getId(), role).observeOn(mainThread());
+        return repository.joinTeam(team, role);
     }
 
     public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
-        return api.approveUser(team.getId(), user.getId(), String.valueOf(approve)).observeOn(mainThread());
+        return repository.approveUser(team, user, approve);
     }
 }

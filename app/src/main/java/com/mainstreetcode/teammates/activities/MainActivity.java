@@ -23,7 +23,7 @@ public class MainActivity extends TeammatesBaseActivity {
 
         UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
-        if (userViewModel.getPrimaryEmail() == null) {
+        if (!userViewModel.isSignedIn()) {
             startRegistrationActivity(this);
             return;
         }
