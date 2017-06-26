@@ -115,11 +115,6 @@ public class UserRepository {
     }
 
     Observable<User> saveUser(User user) {
-        application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .edit()
-                .putString(EMAIL_KEY, user.getPrimaryEmail())
-                .apply();
-
         userDao.insert(Collections.singletonList(user));
         return just(user);
     }
@@ -163,6 +158,13 @@ public class UserRepository {
     private Observable<User> updateCurrent(Observable<User> source) {
         Observable<User> result = source.publish()
                 .autoConnect(2) // wait for this and the caller to subscribe
+                .flatMap(user -> {
+                    application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                            .edit()
+                            .putString(EMAIL_KEY, user.getPrimaryEmail())
+                            .apply();
+                    return just(user);
+                })
                 .observeOn(mainThread());
 
         result.subscribe(currentUserUpdater, (throwable -> {}));

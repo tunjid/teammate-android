@@ -201,7 +201,7 @@ public class User implements
         isUserApproved = userApproved;
     }
 
-    private void setTeamApproved(boolean teamApproved) {
+    public void setTeamApproved(boolean teamApproved) {
         isTeamApproved = teamApproved;
     }
 

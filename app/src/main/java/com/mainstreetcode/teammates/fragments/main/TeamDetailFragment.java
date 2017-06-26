@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -22,9 +21,6 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
-
-import io.reactivex.Observable;
 
 /**
  * Splash screen
@@ -172,19 +168,13 @@ public class TeamDetailFragment extends MainActivityFragment
                     return;
                 }
 
-                TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
-
-                // Don't need all cached user emmisions
-                Observable<User> userObservable = userViewModel.getMe().take(1);
-
                 if (team.getId() != null) {
-                    disposables.add(userObservable
-                            .flatMap(user -> teamViewModel.joinTeam(team, role))
+                    disposables.add(teamViewModel.joinTeam(team, role)
                             .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
                                     errorHandler));
                 }
                 else {
-                    disposables.add(userObservable.flatMap(user -> teamViewModel.createTeam(team))
+                    disposables.add(teamViewModel.createTeam(team)
                             .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())),
                                     errorHandler)
                     );
@@ -196,7 +186,10 @@ public class TeamDetailFragment extends MainActivityFragment
     private void approveUser(final User user, final boolean approve) {
         disposables.add(
                 teamViewModel.approveUser(team, user, approve).subscribe((joinRequest) -> {
-                    if (approve) team.getUsers().add(user);
+                    if (approve) {
+                        user.setTeamApproved(true);
+                        team.getUsers().add(user);
+                    }
                     team.getPendingUsers().remove(user);
                     recyclerView.getAdapter().notifyDataSetChanged();
 
