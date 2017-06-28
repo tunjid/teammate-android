@@ -233,7 +233,8 @@ public class Team implements
         zip = in.readString();
         city = in.readString();
         state = in.readString();
-        in.readList(users, String.class.getClassLoader());
+        in.readList(users, User.class.getClassLoader());
+        in.readList(pendingUsers, User.class.getClassLoader());
 
         items = itemsFromTeam(this);
     }
@@ -251,6 +252,7 @@ public class Team implements
         dest.writeString(city);
         dest.writeString(state);
         dest.writeList(users);
+        dest.writeList(pendingUsers);
     }
 
     public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {
