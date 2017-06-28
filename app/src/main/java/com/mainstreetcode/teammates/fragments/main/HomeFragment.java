@@ -3,13 +3,14 @@ package com.mainstreetcode.teammates.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.Calendar;
 
@@ -30,6 +31,12 @@ public final class HomeFragment extends MainActivityFragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 //
@@ -40,18 +47,17 @@ public final class HomeFragment extends MainActivityFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         toggleFab(false);
-        if (user != null) {
-            setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getDisplayName()));
-        }
+        disposables.add(userViewModel.getMe().subscribe(
+                (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getFirstName())),
+                ErrorHandler.builder().defaultMessage(getString(R.string.default_error)).add(this::showSnackbar).build()
+        ));
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_home, menu);
     }
 
     private static String getTimeofDay() {

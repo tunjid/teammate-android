@@ -1,17 +1,18 @@
 package com.mainstreetcode.teammates.activities;
 
 import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
-import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
+import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
+import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 public class MainActivity extends TeammatesBaseActivity {
 
@@ -20,7 +21,9 @@ public class MainActivity extends TeammatesBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+        UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+
+        if (!userViewModel.isSignedIn()) {
             startRegistrationActivity(this);
             return;
         }
@@ -31,12 +34,6 @@ public class MainActivity extends TeammatesBaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_options, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_home:
@@ -44,6 +41,9 @@ public class MainActivity extends TeammatesBaseActivity {
                 return true;
             case R.id.action_settings:
                 showFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_team:
+                showFragment(TeamsFragment.newInstance());
                 return true;
         }
         return super.onOptionsItemSelected(item);

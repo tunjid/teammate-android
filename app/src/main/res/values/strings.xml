@@ -15,6 +15,9 @@
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_in_forgot_password">Forgot Password?</string>
+    <string name="sign_in_error_default">Error signing in, please try again later</string>
+    <string name="sign_in_error_invalid_password">Please review your credentials</string>
+    <string name="sign_in_error_invalid_email">Sorry, this account does not exist</string>
 
     <!--SignUpFragment-->
     <string name="first_name">First Name</string>
@@ -45,5 +48,47 @@
 
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
+    <string name="default_error">Sorry, an error occurred</string>
 
+    <!--TeamSearchFragment-->
+    <string name="team_search">Team Search</string>
+    <string name="team_search_hint">Search</string>
+    <string name="team_logo">Team Logo</string>
+    <string name="create_team_prompt">Can\'t find your team? Create a new team</string>
+    <string name="team_name">Team Name</string>
+    <string name="team_info">Team Info</string>
+    <string name="city">City</string>
+    <string name="state">State</string>
+    <string name="zip">Zip</string>
+
+    <!--TeamEditFragment-->
+    <string name="team_role">Team Role</string>
+    <string name="create_team">Create Team</string>
+    <string name="edit_team">Edit Team</string>
+    <string name="choose_role">Pick your Role</string>
+    <string name="team_error_duplicate_join_request">You\'ve already asked to join this team</string>
+    <string name="team_submitted_join_request">Join request submitted</string>
+    <string name="team_invalid_empty_field">Field must not be empty</string>
+    <string name="created_team">Created team "%1$s"</string>
+    <string name="updated_team">Updated team</string>
+
+    <!--TeamsFragment-->
+    <string name="my_teams">My Teams</string>
+    <string name="team_name_prefix">Team: %1$s</string>
+
+    <!--TeamDetailFragment-->
+    <string name="user_invited">Has been invited</string>
+    <string name="user_requests_join">Has requested to join</string>
+
+    <!--UserEditFragment-->
+    <string name="profile_picture">Profile Picture</string>
+    <string name="user_info">User Info</string>
+    <string name="edit_user">Edit User</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="add_user_to_team">Add %1$s to team?</string>
+    <string name="select_role">Please select a role</string>
+    <string name="updated_user">Updated %1$s!</string>
+    <string name="added_user">Added %1$s!</string>
+    <string name="removed_user">Removed %1$s</string>
 </resources>

@@ -1,14 +1,9 @@
 package com.mainstreetcode.teammates.fragments.registration;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
-import android.transition.Fade;
-import android.transition.Transition;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,14 +12,11 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.activities.RegistrationActivity;
 import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 /**
  * Forgot password screen
@@ -35,8 +27,7 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 public final class ForgotPasswordFragment extends RegistrationActivityFragment
         implements
         View.OnClickListener,
-        TextView.OnEditorActionListener,
-        OnCompleteListener<Void> {
+        TextView.OnEditorActionListener {
 
     private static final String ARG_EMAIL = "email";
 
@@ -48,16 +39,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
 
         args.putCharSequence(ARG_EMAIL, email);
         fragment.setArguments(args);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
-
-            fragment.setEnterTransition(baseTransition);
-            fragment.setExitTransition(baseTransition);
-            fragment.setSharedElementEnterTransition(baseSharedTransition);
-            fragment.setSharedElementReturnTransition(baseSharedTransition);
-        }
+        fragment.setDefaultSharedTransitions();
         return fragment;
     }
 
@@ -102,33 +84,6 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
         }
     }
 
-
-    @Override
-    public void onComplete(@NonNull Task<Void> task) {
-        if (getView() == null) return;
-        toggleProgress(false);
-        if (task.isSuccessful()) {
-            Snackbar.make(emailInput, R.string.email_sent, Snackbar.LENGTH_LONG).show();
-        }
-        else {
-            Exception exception = task.getException();
-            String message;
-            if (exception instanceof FirebaseAuthWeakPasswordException) {
-                message = getString(R.string.sign_up_error_weak_password);
-            }
-            else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-                message = getString(R.string.sign_up_error_invalid_credentials);
-            }
-            else if (exception instanceof FirebaseAuthUserCollisionException) {
-                message = getString(R.string.sign_up_error_duplicate_credentials);
-            }
-            else {
-                message = "Error signing in, please try agin later";
-            }
-            Snackbar.make(emailInput, message, Snackbar.LENGTH_LONG).show();
-        }
-    }
-
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
@@ -141,10 +96,18 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
 
     private void sendForgotEmail() {
         if (validator.isValidEmail(emailInput)) {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            auth.sendPasswordResetEmail(emailInput.getText().toString())
-                    .addOnCompleteListener(this);
             toggleProgress(true);
+
+            String email = emailInput.getText().toString();
+
+            disposables.add(viewModel.forgotPassword(email)
+                    .subscribe((Void) -> RegistrationActivity.startMainActivity(getActivity()),
+                            ErrorHandler.builder()
+                                    .defaultMessage(getString(R.string.default_error))
+                                    .add(this::showSnackbar)
+                                    .add(getString(R.string.sign_in_error_invalid_email), FirebaseAuthInvalidUserException.class)
+                                    .build())
+            );
         }
     }
 }
