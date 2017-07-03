@@ -61,4 +61,8 @@ public class TeamViewModel extends ViewModel {
     public Observable<User> dropUser(Team team, User user) {
         return repository.dropUser(team, user);
     }
+
+    public Observable<Team> deleteTeam(Team team) {
+        return repository.deleteTeam(team);
+    }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 import io.reactivex.disposables.Disposable;
 
 /**
- * Displays a team's members
+ * Creates, edits or lets a {@link com.mainstreetcode.teammates.model.User} join a {@link Team}
  */
 
 public class TeamEditFragment extends MainActivityFragment

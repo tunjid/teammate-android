@@ -76,6 +76,21 @@ public class TeamRepository {
         return Observable.concat(local, remote).observeOn(mainThread());
     }
 
+    public Observable<Team> deleteTeam(Team team) {
+        return api.deleteTeam(team.getId())
+                .flatMap(team1 -> {
+                    List<User> users = team.getUsers();
+                    List<Role> roles = new ArrayList<>(users.size());
+
+                    for (User user : users) roles.add(new Role(user.getRole(), user, team));
+
+                    roleDao.delete(roles);
+                    teamDao.delete(team);
+
+                    return just(team);
+                });
+    }
+
     private Observable<List<Team>> saveTeams(List<Team> teams) {
         teamDao.insert(teams);
         return just(teams);
@@ -116,7 +131,7 @@ public class TeamRepository {
 
     public Observable<User> dropUser(Team team, User user) {
         return api.dropUser(team.getId(), user.getId()).flatMap(droppedUser -> {
-            roleDao.delete(new Role(user.getRole(), user, team));
+            roleDao.delete(Collections.singletonList(new Role(user.getRole(), user, team)));
             return just(user);
         });
     }

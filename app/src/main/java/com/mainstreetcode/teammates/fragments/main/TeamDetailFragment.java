@@ -22,7 +22,7 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
 /**
- * Creates or lets a user join a team
+ * Displays a {@link Team team's} {@link User members}.
  */
 
 public class TeamDetailFragment extends MainActivityFragment
@@ -94,6 +94,7 @@ public class TeamDetailFragment extends MainActivityFragment
                 updatedTeam -> {
                     team.update(updatedTeam);
                     recyclerView.getAdapter().notifyDataSetChanged();
+                    getActivity().invalidateOptionsMenu();
                 },
                 defaultErrorHandler)
         );
@@ -102,6 +103,8 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_team_detail, menu);
+        MenuItem deleteItem = menu.findItem(R.id.action_delete);
+        deleteItem.setVisible(userViewModel.isTeamAdmin(team));
     }
 
     @Override
@@ -109,6 +112,12 @@ public class TeamDetailFragment extends MainActivityFragment
         switch (item.getItemId()) {
             case R.id.action_edit:
                 showFragment(TeamEditFragment.newInstance(team, true));
+                return true;
+            case R.id.action_delete:
+                new AlertDialog.Builder(getContext()).setTitle(getString(R.string.delete_team_prompt, team.getName()))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteTeam())
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                        .show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -179,5 +188,12 @@ public class TeamDetailFragment extends MainActivityFragment
                             : getString(R.string.removed_user, name));
                 }, defaultErrorHandler)
         );
+    }
+
+    private void deleteTeam() {
+        disposables.add(teamViewModel.deleteTeam(team).subscribe(deleted -> {
+            showSnackbar(getString(R.string.deleted_team, team.getName()));
+            getActivity().onBackPressed();
+        }, defaultErrorHandler));
     }
 }

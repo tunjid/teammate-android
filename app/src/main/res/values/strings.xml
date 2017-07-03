@@ -79,6 +79,9 @@
     <!--TeamDetailFragment-->
     <string name="user_invited">Has been invited</string>
     <string name="user_requests_join">Has requested to join</string>
+    <string name="delete_team">Delete team</string>
+    <string name="delete_team_prompt">Delete %1$s?</string>
+    <string name="deleted_team">Deleted %1$s</string>
 
     <!--UserEditFragment-->
     <string name="profile_picture">Profile Picture</string>
