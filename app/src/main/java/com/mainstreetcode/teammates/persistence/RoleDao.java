@@ -22,5 +22,5 @@ public interface RoleDao {
     void insert(List<Role> roles);
 
     @Delete
-    void delete(Role role);
+    void delete(List<Role> roles);
 }

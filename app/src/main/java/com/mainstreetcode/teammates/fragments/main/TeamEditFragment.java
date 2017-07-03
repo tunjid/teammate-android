@@ -22,9 +22,7 @@ import java.util.List;
 import io.reactivex.disposables.Disposable;
 
 /**
- * Splash screen
- * <p>
- * Created by Shemanigans on 6/1/17.
+ * Creates, edits or lets a {@link com.mainstreetcode.teammates.model.User} join a {@link Team}
  */
 
 public class TeamEditFragment extends MainActivityFragment

@@ -19,6 +19,7 @@ import java.util.List;
 import io.reactivex.Observable;
 
 import static io.reactivex.Observable.fromCallable;
+import static io.reactivex.Observable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -75,9 +76,24 @@ public class TeamRepository {
         return Observable.concat(local, remote).observeOn(mainThread());
     }
 
+    public Observable<Team> deleteTeam(Team team) {
+        return api.deleteTeam(team.getId())
+                .flatMap(team1 -> {
+                    List<User> users = team.getUsers();
+                    List<Role> roles = new ArrayList<>(users.size());
+
+                    for (User user : users) roles.add(new Role(user.getRole(), user, team));
+
+                    roleDao.delete(roles);
+                    teamDao.delete(team);
+
+                    return just(team);
+                });
+    }
+
     private Observable<List<Team>> saveTeams(List<Team> teams) {
         teamDao.insert(teams);
-        return Observable.just(teams);
+        return just(teams);
     }
 
     /**
@@ -93,7 +109,7 @@ public class TeamRepository {
         userDao.insert(users);
         roleDao.insert(roles);
 
-        return Observable.just(team);
+        return just(team);
     }
 
     public Observable<User> updateTeamUser(Team team, User user) {
@@ -107,6 +123,16 @@ public class TeamRepository {
     }
 
     public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
-        return api.approveUser(team.getId(), user.getId(), String.valueOf(approve)).observeOn(mainThread());
+        Observable<JoinRequest> observable = approve
+                ? api.approveUser(team.getId(), user.getId())
+                : api.declineUser(team.getId(), user.getId());
+        return observable.observeOn(mainThread());
+    }
+
+    public Observable<User> dropUser(Team team, User user) {
+        return api.dropUser(team.getId(), user.getId()).flatMap(droppedUser -> {
+            roleDao.delete(Collections.singletonList(new Role(user.getRole(), user, team)));
+            return just(user);
+        });
     }
 }

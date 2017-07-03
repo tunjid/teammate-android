@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -43,6 +44,9 @@ public interface TeammateApi {
     @PUT("api/teams/{id}")
     Observable<Team> updateTeam(@Path("id") String teamId, @Body Team team);
 
+    @DELETE("api/teams/{id}")
+    Observable<Team> deleteTeam(@Path("id") String teamId);
+
     @GET("api/teams/{id}/join")
     Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
 
@@ -51,8 +55,13 @@ public interface TeammateApi {
                                     @Body User user);
 
     @GET("api/teams/{teamId}/user/{userId}/approve")
-    Observable<JoinRequest> approveUser(@Path("teamId") String teamId, @Path("userId") String userId,
-                                        @Query("approve") String approve);
+    Observable<JoinRequest> approveUser(@Path("teamId") String teamId, @Path("userId") String userId);
+
+    @GET("api/teams/{teamId}/user/{userId}/decline")
+    Observable<JoinRequest> declineUser(@Path("teamId") String teamId, @Path("userId") String userId);
+
+    @GET("api/teams/{teamId}/user/{userId}/drop")
+    Observable<User> dropUser(@Path("teamId") String teamId, @Path("userId") String userId);
 
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();
