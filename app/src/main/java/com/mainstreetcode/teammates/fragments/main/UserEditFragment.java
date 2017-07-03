@@ -3,10 +3,14 @@ package com.mainstreetcode.teammates.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,15 +19,12 @@ import com.mainstreetcode.teammates.adapters.UserEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Splash screen
- * <p>
- * Created by Shemanigans on 6/1/17.
+ * Edits a Team member
  */
 
 public class UserEditFragment extends MainActivityFragment
@@ -57,12 +58,13 @@ public class UserEditFragment extends MainActivityFragment
 
         return (tempTeam != null && tempUser != null)
                 ? superResult + "-" + tempTeam.hashCode() + "-" + tempUser.hashCode()
-                :superResult;
+                : superResult;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         user = getArguments().getParcelable(ARG_USER);
     }
@@ -89,6 +91,13 @@ public class UserEditFragment extends MainActivityFragment
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (userViewModel.isTeamAdmin(team) && !userViewModel.getCurrentUser().equals(user)) {
+            inflater.inflate(R.menu.fragment_user_edit, menu);
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
@@ -100,8 +109,7 @@ public class UserEditFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
                     roles.clear();
                     roles.addAll(currentRoles);
-                })
-        );
+                }));
     }
 
     @Override
@@ -122,20 +130,33 @@ public class UserEditFragment extends MainActivityFragment
                     return;
                 }
 
-                // Don't need all cached user emmisions
-                ErrorHandler errorHandler = ErrorHandler.builder()
-                        .defaultMessage(getString(R.string.default_error))
-                        .add(this::showSnackbar)
-                        .build();
-
                 disposables.add(
                         teamViewModel.updateTeamUser(team, user).subscribe(updatedUser -> {
                             user.update(updatedUser);
                             showSnackbar(getString(R.string.updated_user, user.getFirstName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
-                        }, errorHandler)
+                        }, defaultErrorHandler)
                 );
                 break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_kick:
+                final String firstName = user.getFirstName();
+                final String prompt = getString(R.string.confirm_user_drop, firstName);
+
+                Snackbar.make(recyclerView, prompt, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.yes, view ->
+                                disposables.add(teamViewModel.dropUser(team, user).subscribe(dropped -> {
+                                    showSnackbar(getString(R.string.dropped_user, firstName));
+                                    getActivity().onBackPressed();
+                                }, defaultErrorHandler)))
+                        .show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

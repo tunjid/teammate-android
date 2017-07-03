@@ -18,10 +18,13 @@ import android.arch.persistence.room.ForeignKey;
 )
 public class Role {
 
+    private static final String ADMIN = "Admin";
+
     private String name;
     private String userId;
     private String teamId;
 
+    @SuppressWarnings("unused")
     public Role(String name, String userId, String teamId) {
         this.name = name;
         this.teamId = teamId;
@@ -44,5 +47,10 @@ public class Role {
 
     public String getTeamId() {
         return teamId;
+    }
+
+    public static boolean isTeamAdmin(Team team, User user) {
+        int index = team.getUsers().indexOf(user);
+        return index != -1 && ADMIN.equals(team.getUsers().get(index).getRole());
     }
 }

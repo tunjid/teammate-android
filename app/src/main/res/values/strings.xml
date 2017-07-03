@@ -91,4 +91,7 @@
     <string name="updated_user">Updated %1$s!</string>
     <string name="added_user">Added %1$s!</string>
     <string name="removed_user">Removed %1$s</string>
+    <string name="drop_user">Drop User</string>
+    <string name="dropped_user">Dropped %1$s</string>
+    <string name="confirm_user_drop">Drop %1$s from the team?</string>
 </resources>

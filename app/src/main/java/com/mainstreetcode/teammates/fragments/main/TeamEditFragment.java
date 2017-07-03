@@ -22,9 +22,7 @@ import java.util.List;
 import io.reactivex.disposables.Disposable;
 
 /**
- * Splash screen
- * <p>
- * Created by Shemanigans on 6/1/17.
+ * Displays a team's members
  */
 
 public class TeamEditFragment extends MainActivityFragment

@@ -51,8 +51,13 @@ public interface TeammateApi {
                                     @Body User user);
 
     @GET("api/teams/{teamId}/user/{userId}/approve")
-    Observable<JoinRequest> approveUser(@Path("teamId") String teamId, @Path("userId") String userId,
-                                        @Query("approve") String approve);
+    Observable<JoinRequest> approveUser(@Path("teamId") String teamId, @Path("userId") String userId);
+
+    @GET("api/teams/{teamId}/user/{userId}/decline")
+    Observable<JoinRequest> declineUser(@Path("teamId") String teamId, @Path("userId") String userId);
+
+    @GET("api/teams/{teamId}/user/{userId}/drop")
+    Observable<User> dropUser(@Path("teamId") String teamId, @Path("userId") String userId);
 
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();

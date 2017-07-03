@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.baseclasses;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +16,8 @@ import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.view.View;
 
+import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.components.KeyboardUtils;
 
@@ -31,6 +34,8 @@ public class TeammatesBaseFragment extends BaseFragment {
     // Needed because of the transparent status bar
     private KeyboardUtils keyboardUtils = new KeyboardUtils(this);
     protected CompositeDisposable disposables = new CompositeDisposable();
+
+    protected ErrorHandler defaultErrorHandler;
 
     protected void toggleProgress(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
@@ -56,6 +61,15 @@ public class TeammatesBaseFragment extends BaseFragment {
         toggleProgress(false);
         View root = getView();
         if (root != null) Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        defaultErrorHandler = ErrorHandler.builder()
+                .defaultMessage(getString(R.string.default_error))
+                .add(this::showSnackbar)
+                .build();
     }
 
     @Override

@@ -57,4 +57,8 @@ public class TeamViewModel extends ViewModel {
     public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
         return repository.approveUser(team, user, approve);
     }
+
+    public Observable<User> dropUser(Team team, User user) {
+        return repository.dropUser(team, user);
+    }
 }

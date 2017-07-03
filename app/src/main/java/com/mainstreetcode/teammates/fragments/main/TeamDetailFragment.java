@@ -20,12 +20,9 @@ import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 /**
- * Splash screen
- * <p>
- * Created by Shemanigans on 6/1/17.
+ * Creates or lets a user join a team
  */
 
 public class TeamDetailFragment extends MainActivityFragment
@@ -36,10 +33,7 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-
     private RecyclerView recyclerView;
-
-    ErrorHandler errorHandler;
 
     public static TeamDetailFragment newInstance(Team team) {
         TeamDetailFragment fragment = new TeamDetailFragment();
@@ -96,17 +90,12 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         toggleFab(false);
 
-        errorHandler = ErrorHandler.builder()
-                .defaultMessage(getString(R.string.default_error))
-                .add(this::showSnackbar)
-                .build();
-
         disposables.add(teamViewModel.getTeam(team).subscribe(
                 updatedTeam -> {
                     team.update(updatedTeam);
                     recyclerView.getAdapter().notifyDataSetChanged();
                 },
-                errorHandler)
+                defaultErrorHandler)
         );
     }
 
@@ -137,21 +126,12 @@ public class TeamDetailFragment extends MainActivityFragment
         View rootView = getView();
         if (rootView == null) return;
 
-        User currentUser = userViewModel.getCurrentUser();
-        int i = team.getUsers().indexOf(currentUser);
-
-        if (i != -1) currentUser = team.getUsers().get(i);
-
-        if (user.isUserApproved() && !user.isTeamApproved() && "Admin".equals(currentUser.getRole())) {
-
+        if (user.isUserApproved() && !user.isTeamApproved() && userViewModel.isTeamAdmin(team)) {
             new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, user.getFirstName()))
                     .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(user, true))
                     .setNegativeButton(R.string.no, (dialog, which) -> approveUser(user, false))
                     .show();
         }
-//        else if (user.isUserApproved() && !user.isTeamApproved()) {
-//
-//        }
         else if (team.getUsers().contains(user)) {
             showFragment(UserEditFragment.newInstance(team, user));
         }
@@ -171,12 +151,12 @@ public class TeamDetailFragment extends MainActivityFragment
                 if (team.getId() != null) {
                     disposables.add(teamViewModel.joinTeam(team, role)
                             .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
-                                    errorHandler));
+                                    defaultErrorHandler));
                 }
                 else {
                     disposables.add(teamViewModel.createTeam(team)
                             .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())),
-                                    errorHandler)
+                                    defaultErrorHandler)
                     );
                 }
                 break;
@@ -197,7 +177,7 @@ public class TeamDetailFragment extends MainActivityFragment
                     showSnackbar(approve
                             ? getString(R.string.added_user, name)
                             : getString(R.string.removed_user, name));
-                }, errorHandler)
+                }, defaultErrorHandler)
         );
     }
 }
