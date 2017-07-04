@@ -58,15 +58,16 @@ public class Team implements
     @Ignore private final List<Item> items;
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "");
+        return new Team(NEW_TEAM, "", "", "", "", "");
     }
 
-    public Team(String id, String name, String city, String state, String zip) {
+    public Team(String id, String name, String city, String state, String zip, String logoUrl) {
         this.id = id;
         this.name = name;
         this.city = city;
         this.state = state;
         this.zip = zip;
+        this.logoUrl = logoUrl;
         items = itemsFromTeam(this);
     }
 
@@ -83,7 +84,7 @@ public class Team implements
 
     private static List<Item> itemsFromTeam(Team team) {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, team.logoUrl, null),
+                new Item(Item.IMAGE, R.string.team_logo, team.logoUrl, team::setLogoUrl),
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName),
                 new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity),
                 new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
@@ -136,8 +137,7 @@ public class Team implements
             String role = ModelUtils.asString(ROLE_KEY, teamJson);
             String logoUrl = TeammateService.API_BASE_URL + ModelUtils.asString(LOGO_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip);
-            team.setLogoUrl(logoUrl);
+            Team team = new Team(id, name, city, state, zip, logoUrl);
             team.setRole(role);
 
             team.get(LOGO_POSITION).setValue(logoUrl);
@@ -251,6 +251,8 @@ public class Team implements
         zip = in.readString();
         city = in.readString();
         state = in.readString();
+        logoUrl = in.readString();
+        role = in.readString();
         in.readList(users, User.class.getClassLoader());
         in.readList(pendingUsers, User.class.getClassLoader());
 
@@ -269,6 +271,8 @@ public class Team implements
         dest.writeString(zip);
         dest.writeString(city);
         dest.writeString(state);
+        dest.writeString(logoUrl);
+        dest.writeString(role);
         dest.writeList(users);
         dest.writeList(pendingUsers);
     }

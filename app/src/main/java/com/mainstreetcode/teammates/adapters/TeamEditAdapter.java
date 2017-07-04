@@ -180,12 +180,15 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
         }
 
         void bind(Item item) {
-            Picasso picasso = Picasso.with(itemView.getContext());
             String pathOrUrl = item.getValue();
-            File file = new File(pathOrUrl);
-            RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
 
-            creator.fit().centerInside().into(teamLogo);
+            if (pathOrUrl != null) {
+                File file = new File(pathOrUrl);
+                Picasso picasso = Picasso.with(itemView.getContext());
+                RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
+
+                creator.fit().centerInside().into(teamLogo);
+            }
         }
 
         @Override
