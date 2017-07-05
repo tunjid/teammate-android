@@ -12,14 +12,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -28,7 +34,7 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.BaseTeamViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.BaseTeamViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
     private static final int PADDING = 11;
 
@@ -36,7 +42,8 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
     private final List<String> roles;
     private final boolean isEditable;
 
-    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable) {
+    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable, ImageWorkerFragment.ImagePickerListener listener) {
+        super(listener);
         this.team = team;
         this.roles = roles;
         this.isEditable = isEditable;
@@ -60,7 +67,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
             case Item.ROLE:
                 return new RoleViewHolder(itemView, roles);
             case Item.IMAGE:
-                return new ImageViewHolder(itemView);
+                return new ImageViewHolder(itemView, adapterListener);
             default:
                 return new BaseTeamViewHolder(itemView);
         }
@@ -82,11 +89,15 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
         return position == team.size() ? PADDING : team.get(position).getItemType();
     }
 
-    static class BaseTeamViewHolder extends BaseViewHolder {
+    static class BaseTeamViewHolder extends BaseViewHolder<ImageWorkerFragment.ImagePickerListener> {
         Item item;
 
         BaseTeamViewHolder(View itemView) {
             super(itemView);
+        }
+
+        BaseTeamViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
+            super(itemView, listener);
         }
 
         void bind(Item item) {
@@ -155,10 +166,35 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
         }
     }
 
-    static class ImageViewHolder extends BaseTeamViewHolder {
+    static class ImageViewHolder extends BaseTeamViewHolder
+            implements View.OnClickListener {
 
-        ImageViewHolder(View itemView) {
-            super(itemView);
+        ImageView teamLogo;
+
+        ImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
+            super(itemView, listener);
+            teamLogo = itemView.findViewById(R.id.team_logo);
+            teamLogo.setOnClickListener(this);
+        }
+
+        void bind(Item item) {
+            String pathOrUrl = item.getValue();
+
+            if (!TextUtils.isEmpty(pathOrUrl)) {
+                File file = new File(pathOrUrl);
+                Picasso picasso = Picasso.with(itemView.getContext());
+                RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
+
+                creator.fit().centerInside().into(teamLogo,
+                        PicassoPalette.with(pathOrUrl, teamLogo)
+                        .use(PicassoPalette.Profile.MUTED_DARK)
+                        .intoBackground(itemView));
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            adapterListener.onImageClick();
         }
     }
 

@@ -7,12 +7,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
@@ -31,12 +33,14 @@ public class Team implements
         Parcelable,
         ListableBean<Team, Item> {
 
+    public static final int LOGO_POSITION = 0;
     private static final int NAME_POSITION = 1;
     private static final int CITY_POSITION = 2;
     private static final int STATE_POSITION = 3;
     public static final int ZIP_POSITION = 4;
     private static final int ROLE_POSITION = 5;
 
+    public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
     @PrimaryKey
@@ -45,6 +49,7 @@ public class Team implements
     private String city;
     private String state;
     private String zip;
+    private String logoUrl;
 
     // Cannot be flattened in SQL
     @Ignore List<User> users = new ArrayList<>();
@@ -55,15 +60,16 @@ public class Team implements
     @Ignore private final List<Item> items;
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "");
+        return new Team(NEW_TEAM, "", "", "", "", "");
     }
 
-    public Team(String id, String name, String city, String state, String zip) {
+    public Team(String id, String name, String city, String state, String zip, String logoUrl) {
         this.id = id;
         this.name = name;
         this.city = city;
         this.state = state;
         this.zip = zip;
+        this.logoUrl = logoUrl;
         items = itemsFromTeam(this);
     }
 
@@ -80,7 +86,7 @@ public class Team implements
 
     private static List<Item> itemsFromTeam(Team team) {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, "", null),
+                new Item(Item.IMAGE, R.string.team_logo, team.logoUrl, team::setLogoUrl),
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName),
                 new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity),
                 new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
@@ -105,10 +111,10 @@ public class Team implements
     }
 
 
-    public static class JsonDeserializer
+    public static class GsonAdapter
             implements
-            com.google.gson.JsonDeserializer<Team>,
-            JsonSerializer<Team> {
+            JsonSerializer<Team>,
+            JsonDeserializer<Team> {
 
         private static final String UID_KEY = "_id";
         private static final String NAME_KEY = "name";
@@ -117,6 +123,7 @@ public class Team implements
         private static final String ZIP_KEY = "zip";
         private static final String ROLE_KEY = "role";
         private static final String USERS_KEY = "users";
+        private static final String LOGO_KEY = "imageUrl";
         private static final String PENDING_USERS_KEY = "pendingUsers";
 
         @Override
@@ -130,9 +137,12 @@ public class Team implements
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
             String role = ModelUtils.asString(ROLE_KEY, teamJson);
+            String logoUrl = TeammateService.API_BASE_URL + ModelUtils.asString(LOGO_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip);
+            Team team = new Team(id, name, city, state, zip, logoUrl);
             team.setRole(role);
+
+            team.get(LOGO_POSITION).setValue(logoUrl);
             team.get(ROLE_POSITION).setValue(role);
 
             ModelUtils.deserializeList(context, teamJson.get(USERS_KEY), team.users, User.class);
@@ -203,6 +213,11 @@ public class Team implements
         return zip;
     }
 
+    @SuppressWarnings("unused")
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
     public String getRole() {
         return role;
     }
@@ -214,6 +229,11 @@ public class Team implements
     private void setState(String state) {this.state = state; }
 
     private void setZip(String zip) {this.zip = zip; }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
 
     public void setRole(String role) {
         this.role = role;
@@ -233,6 +253,8 @@ public class Team implements
         zip = in.readString();
         city = in.readString();
         state = in.readString();
+        logoUrl = in.readString();
+        role = in.readString();
         in.readList(users, User.class.getClassLoader());
         in.readList(pendingUsers, User.class.getClassLoader());
 
@@ -251,6 +273,8 @@ public class Team implements
         dest.writeString(zip);
         dest.writeString(city);
         dest.writeString(state);
+        dest.writeString(logoUrl);
+        dest.writeString(role);
         dest.writeList(users);
         dest.writeList(pendingUsers);
     }

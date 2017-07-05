@@ -24,7 +24,7 @@ public class Message {
         this.message = message;
     }
 
-    public static class JsonDeserializer implements com.google.gson.JsonDeserializer<Message> {
+    public static class GsonAdapter implements com.google.gson.JsonDeserializer<Message> {
         private static final String MESSAGE_KEY = "message";
 
         @Override

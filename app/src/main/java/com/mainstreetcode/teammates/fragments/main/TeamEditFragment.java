@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
@@ -27,7 +30,9 @@ import io.reactivex.disposables.Disposable;
 
 public class TeamEditFragment extends MainActivityFragment
         implements
-        View.OnClickListener {
+        View.OnClickListener,
+        ImageWorkerFragment.CropListener,
+        ImageWorkerFragment.ImagePickerListener {
 
     private static final String ARG_TEAM = "team";
     private static final String ARG_EDITABLE = "editable";
@@ -60,6 +65,9 @@ public class TeamEditFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
 
         team = getArguments().getParcelable(ARG_TEAM);
+        getChildFragmentManager().beginTransaction()
+                .add(ImageWorkerFragment.newInstance(), ImageWorkerFragment.TAG)
+                .commit();
     }
 
     @Nullable
@@ -71,7 +79,7 @@ public class TeamEditFragment extends MainActivityFragment
         boolean isEditable = getArguments().getBoolean(ARG_EDITABLE);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamEditAdapter(team, roles, isEditable));
+        recyclerView.setAdapter(new TeamEditAdapter(team, roles, isEditable, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -106,10 +114,30 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
+    public void onAttachFragment(Fragment childFragment) {
+        ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
+        if (childFragment != null) fragment.setCropListener(this);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
         toggleFab(false);
+    }
+
+    @Override
+    public void onImageClick() {
+        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getChildFragmentManager()
+                .findFragmentByTag(ImageWorkerFragment.TAG);
+
+        if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();
+    }
+
+    @Override
+    public void onImageCropped(Uri uri) {
+        team.get(Team.LOGO_POSITION).setValue(uri.getPath());
+        recyclerView.getAdapter().notifyItemChanged(Team.LOGO_POSITION);
     }
 
     @Override

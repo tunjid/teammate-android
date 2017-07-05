@@ -1,6 +1,9 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import android.support.annotation.Nullable;
+import android.webkit.MimeTypeMap;
+
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -12,11 +15,15 @@ import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 import static io.reactivex.Observable.fromCallable;
 import static io.reactivex.Observable.just;
@@ -58,9 +65,14 @@ public class TeamRepository {
     }
 
     public Observable<Team> updateTeam(Team team) {
-        return api.updateTeam(team.getId(), team)
-                .flatMap(this::saveTeam)
-                .observeOn(mainThread());
+        Observable<Team> teamObservable = api.updateTeam(team.getId(), team);
+
+        MultipartBody.Part body = getBody(team.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
+        if (body != null) {
+            teamObservable = teamObservable.flatMap(put -> api.uploadTeamLogo(team.getId(), body));
+        }
+
+        return teamObservable.flatMap(this::saveTeam).observeOn(mainThread());
     }
 
     public Observable<List<Team>> findTeams(String queryText) {
@@ -82,7 +94,7 @@ public class TeamRepository {
                     List<User> users = team.getUsers();
                     List<Role> roles = new ArrayList<>(users.size());
 
-                    for (User user : users) roles.add(new Role(user.getRole(), user, team));
+                    for (User user : users) roles.add(user.getRole());
 
                     roleDao.delete(roles);
                     teamDao.delete(team);
@@ -103,7 +115,7 @@ public class TeamRepository {
         List<User> users = team.getUsers();
         List<Role> roles = new ArrayList<>(users.size());
 
-        for (User user : users) roles.add(new Role(user.getRole(), user, team));
+        for (User user : users) roles.add(user.getRole());
 
         teamDao.insert(Collections.singletonList(team));
         userDao.insert(users);
@@ -113,9 +125,14 @@ public class TeamRepository {
     }
 
     public Observable<User> updateTeamUser(Team team, User user) {
-        return api.updateTeamUser(team.getId(), user.getId(), user)
-                .flatMap(userRepository::saveUser)
-                .observeOn(mainThread());
+        Observable<User> userObservable = api.updateTeamUser(team.getId(), user.getId(), user);
+
+        MultipartBody.Part body = getBody(user.get(User.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
+        if (body != null) {
+            userObservable = userObservable.flatMap(put -> api.uploadUserPhoto(team.getId(), user.getId(), body));
+        }
+
+        return userObservable.flatMap(userRepository::saveUser).observeOn(mainThread());
     }
 
     public Observable<JoinRequest> joinTeam(Team team, String role) {
@@ -131,8 +148,25 @@ public class TeamRepository {
 
     public Observable<User> dropUser(Team team, User user) {
         return api.dropUser(team.getId(), user.getId()).flatMap(droppedUser -> {
-            roleDao.delete(Collections.singletonList(new Role(user.getRole(), user, team)));
+            roleDao.delete(Collections.singletonList(user.getRole()));
             return just(user);
         });
+    }
+
+    @Nullable
+    private MultipartBody.Part getBody(String path, String photokey) {
+        File file = new File(path);
+
+        if (file.exists()) {
+            String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+            if (extension != null) {
+                String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                if (type != null) {
+                    RequestBody requestFile = RequestBody.create(MediaType.parse(type), file);
+                    return MultipartBody.Part.createFormData(photokey, file.getName(), requestFile);
+                }
+            }
+        }
+        return null;
     }
 }

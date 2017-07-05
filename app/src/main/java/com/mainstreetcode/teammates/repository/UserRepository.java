@@ -71,7 +71,7 @@ public class UserRepository {
         }
 
         signUpSubject = ReplaySubject.createWithSize(1);
-        User newUser = new User("*", firstName, lastName, primaryEmail);
+        User newUser = new User("*", firstName, lastName, primaryEmail, "");
 
         newUser.setPassword(password);
         teammateApi.signUp(newUser)

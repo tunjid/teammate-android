@@ -8,19 +8,20 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mainstreetcode.teammates.model.ModelUtils.asBoolean;
 import static com.mainstreetcode.teammates.model.ModelUtils.asString;
 
 /**
@@ -34,27 +35,42 @@ public class User implements
         Parcelable,
         ListableBean<User, Item> {
 
+    public static final int IMAGE_POSITION = 0;
     public static final int EMAIL_POSITION = 3;
-    private static final int ROLE_POSITION = 4;
+    //private static final int ROLE_POSITION = 4;
 
     @PrimaryKey
     private String id;
     private String firstName;
     private String lastName;
     private String primaryEmail;
+    private String imageUrl;
 
-    @Ignore private transient String role;
+    @Ignore private transient Role role;
+    @Ignore private transient JoinRequest request;
     @Ignore private transient String password;
-    @Ignore private transient boolean isTeamApproved;
-    @Ignore private transient boolean isUserApproved;
 
     @Ignore private final List<Item> items;
 
-    public User(String id, String firstName, String lastName, String primaryEmail) {
+    public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.imageUrl = imageUrl;
         this.primaryEmail = primaryEmail;
+
+        items = itemsFromUser(this);
+    }
+
+    public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl,
+                Role role, JoinRequest request) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.imageUrl = imageUrl;
+        this.primaryEmail = primaryEmail;
+        this.role = role;
+        this.request = request;
 
         items = itemsFromUser(this);
     }
@@ -74,18 +90,18 @@ public class User implements
         return null;
     }
 
-    public static class JsonDeserializer implements
+    public static class GsonAdapter implements
             JsonSerializer<User>,
-            com.google.gson.JsonDeserializer<User> {
+            JsonDeserializer<User> {
 
         private static final String UID_KEY = "_id";
-        private static final String ROLE_KEY = "role";
         private static final String PASSWORD_KEY = "password";
         private static final String LAST_NAME_KEY = "lastName";
         private static final String FIRST_NAME_KEY = "firstName";
+        private static final String IMAGE_KEY = "imageUrl";
         private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
-        private static final String TEAM_APPROVED_KEY = "isTeamApproved";
-        private static final String USER_APPROVED_KEY = "isUserApproved";
+        private static final String ROLE_KEY = "role";
+        private static final String JOIN_REQUEST_KEY = "joinRequest";
 
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -95,17 +111,15 @@ public class User implements
             String firstName = asString(FIRST_NAME_KEY, userObject);
             String lastName = asString(LAST_NAME_KEY, userObject);
             String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
-            String role = asString(ROLE_KEY, userObject);
+            String imageUrl = TeammateService.API_BASE_URL + asString(IMAGE_KEY, userObject);
 
-            User user = new User(id, firstName, lastName, primaryEmail);
+            JsonElement roleJson = userObject.get(ROLE_KEY);
+            JsonElement joinRequestJson = userObject.get(JOIN_REQUEST_KEY);
 
-            user.setRole(role);
-            user.get(ROLE_POSITION).setValue(role);
+            Role role = context.deserialize(roleJson, Role.class);
+            JoinRequest request = context.deserialize(joinRequestJson, JoinRequest.class);
 
-            user.setTeamApproved(asBoolean(TEAM_APPROVED_KEY, userObject));
-            user.setUserApproved(asBoolean(USER_APPROVED_KEY, userObject));
-
-            return user;
+            return new User(id, firstName, lastName, primaryEmail, imageUrl, role, request);
         }
 
         @Override
@@ -117,25 +131,30 @@ public class User implements
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
             user.addProperty(PASSWORD_KEY, src.password);
 
-            if (!TextUtils.isEmpty(src.role)) user.addProperty(ROLE_KEY, src.role);
+            if (src.role != null && !TextUtils.isEmpty(src.role.getName())) {
+                user.addProperty(ROLE_KEY, src.role.getName());
+            }
 
             return user;
         }
     }
 
     private static List<Item> itemsFromUser(User user) {
+        String imageUrl = user.role != null ? user.role.getImageUrl() : user.imageUrl;
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, "", null),
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null),
                 new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.firstName == null ? "" : user.firstName, user::setFirstName),
                 new Item(Item.INPUT, R.string.last_name, user.lastName == null ? "" : user.lastName, user::setLastName),
                 new Item(Item.INPUT, R.string.email, user.primaryEmail == null ? "" : user.primaryEmail, user::setPrimaryEmail),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role, user::setRole)
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName)
         );
     }
 
     public void update(User updatedUser) {
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
+        this.role = updatedUser.role;
+        this.request = updatedUser.request;
     }
 
     @Override
@@ -165,16 +184,24 @@ public class User implements
 
     public String getPrimaryEmail() {return this.primaryEmail;}
 
-    public String getRole() {
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public String getRoleName() {
+        return role == null ? "" : role.getName();
+    }
+
+    public Role getRole() {
         return role;
     }
 
     public boolean isTeamApproved() {
-        return isTeamApproved;
+        return request != null && request.isTeamApproved();
     }
 
     public boolean isUserApproved() {
-        return isUserApproved;
+        return request != null && request.isUserApproved();
     }
 
     private void setFirstName(String firstName) {
@@ -193,16 +220,12 @@ public class User implements
         this.password = password;
     }
 
-    private void setRole(String role) {
-        this.role = role;
-    }
+//    private void setImageUrl(String imageUrl) {
+//        this.imageUrl = imageUrl;
+//    }
 
-    private void setUserApproved(boolean userApproved) {
-        isUserApproved = userApproved;
-    }
-
-    public void setTeamApproved(boolean teamApproved) {
-        isTeamApproved = teamApproved;
+    private void setRoleName(String roleName) {
+        if (this.role != null) this.role.setName(roleName);
     }
 
     protected User(Parcel in) {
@@ -210,7 +233,8 @@ public class User implements
         firstName = in.readString();
         lastName = in.readString();
         primaryEmail = in.readString();
-        role = in.readString();
+        imageUrl = in.readString();
+        role = (Role) in.readValue(Role.class.getClassLoader());
         items = itemsFromUser(this);
     }
 
@@ -225,7 +249,8 @@ public class User implements
         dest.writeString(firstName);
         dest.writeString(lastName);
         dest.writeString(primaryEmail);
-        dest.writeString(role);
+        dest.writeString(imageUrl);
+        dest.writeValue(role);
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {

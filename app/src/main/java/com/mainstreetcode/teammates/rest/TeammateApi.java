@@ -8,11 +8,14 @@ import com.mainstreetcode.teammates.model.User;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -44,6 +47,10 @@ public interface TeammateApi {
     @PUT("api/teams/{id}")
     Observable<Team> updateTeam(@Path("id") String teamId, @Body Team team);
 
+    @Multipart
+    @POST("api/teams/{id}")
+    Observable<Team> uploadTeamLogo(@Path("id") String teamId, @Part MultipartBody.Part file);
+
     @DELETE("api/teams/{id}")
     Observable<Team> deleteTeam(@Path("id") String teamId);
 
@@ -62,6 +69,10 @@ public interface TeammateApi {
 
     @GET("api/teams/{teamId}/user/{userId}/drop")
     Observable<User> dropUser(@Path("teamId") String teamId, @Path("userId") String userId);
+
+    @Multipart
+    @POST("api/teams/{teamId}/user/{userId}")
+    Observable<User> uploadUserPhoto(@Path("teamId") String teamId, @Path("userId") String userId, @Part MultipartBody.Part file);
 
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();

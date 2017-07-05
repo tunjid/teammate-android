@@ -4,10 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Team;
+import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -59,11 +61,13 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<TeamAdapter.TeamViewHol
             implements View.OnClickListener {
 
         private Team item;
+        private ImageView teamLogo;
         private TextView teamName;
         private TextView teamLocation;
 
         TeamViewHolder(View itemView, TeamAdapterListener adapterListener) {
             super(itemView, adapterListener);
+            teamLogo = itemView.findViewById(R.id.thumbnail);
             teamName = itemView.findViewById(R.id.team_name);
             teamLocation = itemView.findViewById(R.id.team_location);
             itemView.setOnClickListener(this);
@@ -73,6 +77,12 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<TeamAdapter.TeamViewHol
             this.item = item;
             teamName.setText(item.getName());
             teamLocation.setText(item.getCity());
+
+            Picasso.with(itemView.getContext())
+                    .load(item.getLogoUrl())
+                    .fit()
+                    .centerInside()
+                    .into(teamLogo);
         }
 
         @Override
