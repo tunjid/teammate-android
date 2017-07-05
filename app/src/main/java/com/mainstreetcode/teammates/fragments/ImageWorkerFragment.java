@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.os.Build.VERSION.SDK_INT;
@@ -84,5 +85,9 @@ public class ImageWorkerFragment extends Fragment {
 
     public interface CropListener {
         void onImageCropped(Uri uri);
+    }
+
+    public interface ImagePickerListener extends BaseRecyclerViewAdapter.AdapterListener {
+        void onImageClick();
     }
 }

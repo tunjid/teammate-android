@@ -2,14 +2,17 @@ package com.mainstreetcode.teammates.adapters;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -65,11 +68,13 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         private User user;
         private TextView userName;
         private TextView userStatus;
+        private ImageView userPicture;
 
         UserViewHolder(View itemView, UserAdapterListener adapterListener) {
             super(itemView, adapterListener);
             userName = itemView.findViewById(R.id.user_name);
             userStatus = itemView.findViewById(R.id.user_status);
+            userPicture = itemView.findViewById(R.id.thumbnail);
             itemView.setOnClickListener(this);
         }
 
@@ -83,6 +88,16 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
                     : !item.isTeamApproved() && item.isUserApproved()
                     ? context.getString(R.string.user_requests_join)
                     : item.getRole());
+
+            String imageUrl  = user.getImageUrl();
+
+            if(!TextUtils.isEmpty(imageUrl)) {
+                Picasso.with(itemView.getContext())
+                        .load(imageUrl)
+                        .fit()
+                        .centerInside()
+                        .into(userPicture);
+            }
         }
 
         @Override

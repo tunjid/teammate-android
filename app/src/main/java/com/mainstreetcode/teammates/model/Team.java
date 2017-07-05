@@ -39,6 +39,7 @@ public class Team implements
     public static final int ZIP_POSITION = 4;
     private static final int ROLE_POSITION = 5;
 
+    public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
     @PrimaryKey
@@ -121,7 +122,7 @@ public class Team implements
         private static final String ZIP_KEY = "zip";
         private static final String ROLE_KEY = "role";
         private static final String USERS_KEY = "users";
-        private static final String LOGO_KEY = "logoUrl";
+        private static final String LOGO_KEY = "imageUrl";
         private static final String PENDING_USERS_KEY = "pendingUsers";
 
         @Override

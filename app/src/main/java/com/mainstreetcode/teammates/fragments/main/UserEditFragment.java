@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.UserEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
@@ -29,7 +32,9 @@ import java.util.List;
 
 public class UserEditFragment extends MainActivityFragment
         implements
-        View.OnClickListener {
+        View.OnClickListener,
+        ImageWorkerFragment.CropListener,
+        ImageWorkerFragment.ImagePickerListener {
 
     private static final String ARG_TEAM = "team";
     private static final String ARG_USER = "user";
@@ -67,6 +72,10 @@ public class UserEditFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         user = getArguments().getParcelable(ARG_USER);
+
+        getChildFragmentManager().beginTransaction()
+                .add(ImageWorkerFragment.newInstance(), ImageWorkerFragment.TAG)
+                .commit();
     }
 
     @Nullable
@@ -77,7 +86,7 @@ public class UserEditFragment extends MainActivityFragment
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new UserEditAdapter(user, roles, userViewModel.getCurrentUser().equals(user)));
+        recyclerView.setAdapter(new UserEditAdapter(user, roles, userViewModel.getCurrentUser().equals(user), this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -107,9 +116,15 @@ public class UserEditFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.edit_user));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
-                    roles.clear();
-                    roles.addAll(currentRoles);
-                }));
+            roles.clear();
+            roles.addAll(currentRoles);
+        }));
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
+        if (childFragment != null) fragment.setCropListener(this);
     }
 
     @Override
@@ -158,5 +173,19 @@ public class UserEditFragment extends MainActivityFragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onImageCropped(Uri uri) {
+        user.get(User.IMAGE_POSITION).setValue(uri.getPath());
+        recyclerView.getAdapter().notifyItemChanged(User.IMAGE_POSITION);
+    }
+
+    @Override
+    public void onImageClick() {
+        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getChildFragmentManager()
+                .findFragmentByTag(ImageWorkerFragment.TAG);
+
+        if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();
     }
 }

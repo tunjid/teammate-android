@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
 import com.squareup.picasso.Picasso;
@@ -32,7 +33,7 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.BaseTeamViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
+public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.BaseTeamViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
     private static final int PADDING = 11;
 
@@ -40,7 +41,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
     private final List<String> roles;
     private final boolean isEditable;
 
-    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable, TeamEditAdapterListener listener) {
+    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
         this.team = team;
         this.roles = roles;
@@ -87,18 +88,14 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
         return position == team.size() ? PADDING : team.get(position).getItemType();
     }
 
-    public interface TeamEditAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        void onTeamLogoClick();
-    }
-
-    static class BaseTeamViewHolder extends BaseViewHolder<TeamEditAdapter.TeamEditAdapterListener> {
+    static class BaseTeamViewHolder extends BaseViewHolder<ImageWorkerFragment.ImagePickerListener> {
         Item item;
 
         BaseTeamViewHolder(View itemView) {
             super(itemView);
         }
 
-        BaseTeamViewHolder(View itemView, TeamEditAdapter.TeamEditAdapterListener listener) {
+        BaseTeamViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
             super(itemView, listener);
         }
 
@@ -173,7 +170,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
 
         ImageView teamLogo;
 
-        ImageViewHolder(View itemView, TeamEditAdapter.TeamEditAdapterListener listener) {
+        ImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
             super(itemView, listener);
             teamLogo = itemView.findViewById(R.id.team_logo);
             teamLogo.setOnClickListener(this);
@@ -182,7 +179,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
         void bind(Item item) {
             String pathOrUrl = item.getValue();
 
-            if (pathOrUrl != null) {
+            if (!TextUtils.isEmpty(pathOrUrl)) {
                 File file = new File(pathOrUrl);
                 Picasso picasso = Picasso.with(itemView.getContext());
                 RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
@@ -193,7 +190,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<TeamEditAdapter.Bas
 
         @Override
         public void onClick(View view) {
-            adapterListener.onTeamLogoClick();
+            adapterListener.onImageClick();
         }
     }
 

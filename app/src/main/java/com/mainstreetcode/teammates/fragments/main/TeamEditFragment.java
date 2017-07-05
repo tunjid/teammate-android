@@ -32,7 +32,7 @@ public class TeamEditFragment extends MainActivityFragment
         implements
         View.OnClickListener,
         ImageWorkerFragment.CropListener,
-        TeamEditAdapter.TeamEditAdapterListener {
+        ImageWorkerFragment.ImagePickerListener {
 
     private static final String ARG_TEAM = "team";
     private static final String ARG_EDITABLE = "editable";
@@ -127,7 +127,7 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
-    public void onTeamLogoClick() {
+    public void onImageClick() {
         ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getChildFragmentManager()
                 .findFragmentByTag(ImageWorkerFragment.TAG);
 

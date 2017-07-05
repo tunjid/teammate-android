@@ -70,6 +70,10 @@ public interface TeammateApi {
     @GET("api/teams/{teamId}/user/{userId}/drop")
     Observable<User> dropUser(@Path("teamId") String teamId, @Path("userId") String userId);
 
+    @Multipart
+    @POST("api/teams/{teamId}/user/{userId}")
+    Observable<User> uploadUserPhoto(@Path("teamId") String teamId, @Path("userId") String userId, @Part MultipartBody.Part file);
+
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();
 

@@ -12,14 +12,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.User;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -28,7 +33,7 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.BaseUserViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.BaseUserViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
     private static final int PADDING = 11;
 
@@ -36,7 +41,8 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.Bas
     private final List<String> roles;
     private final boolean isEditable;
 
-    public UserEditAdapter(User team, List<String> roles, boolean isEditable) {
+    public UserEditAdapter(User team, List<String> roles, boolean isEditable, ImageWorkerFragment.ImagePickerListener listener) {
+        super(listener);
         this.team = team;
         this.roles = roles;
         this.isEditable = isEditable;
@@ -60,7 +66,7 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.Bas
             case Item.ROLE:
                 return new RoleViewHolder(itemView, roles);
             case Item.IMAGE:
-                return new ImageViewHolder(itemView);
+                return new ImageViewHolder(itemView, adapterListener);
             default:
                 return new BaseUserViewHolder(itemView);
         }
@@ -82,11 +88,15 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.Bas
         return position == team.size() ? PADDING : team.get(position).getItemType();
     }
 
-    static class BaseUserViewHolder extends BaseViewHolder {
+    static class BaseUserViewHolder extends BaseViewHolder<ImageWorkerFragment.ImagePickerListener> {
         Item item;
 
         BaseUserViewHolder(View itemView) {
             super(itemView);
+        }
+
+        BaseUserViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
+            super(itemView, listener);
         }
 
         void bind(Item item) {
@@ -155,10 +165,32 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.Bas
         }
     }
 
-    static class ImageViewHolder extends BaseUserViewHolder {
+    static class ImageViewHolder extends BaseUserViewHolder
+            implements View.OnClickListener {
 
-        ImageViewHolder(View itemView) {
-            super(itemView);
+        ImageView profilePicture;
+
+        ImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
+            super(itemView, listener);
+            profilePicture = itemView.findViewById(R.id.team_logo);
+            profilePicture.setOnClickListener(this);
+        }
+
+        void bind(Item item) {
+            String pathOrUrl = item.getValue();
+
+            if (!TextUtils.isEmpty(pathOrUrl)) {
+                File file = new File(pathOrUrl);
+                Picasso picasso = Picasso.with(itemView.getContext());
+                RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
+
+                creator.fit().centerInside().into(profilePicture);
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            adapterListener.onImageClick();
         }
     }
 

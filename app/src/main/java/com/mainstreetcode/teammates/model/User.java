@@ -14,6 +14,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
@@ -34,6 +35,7 @@ public class User implements
         Parcelable,
         ListableBean<User, Item> {
 
+    public static final int IMAGE_POSITION = 0;
     public static final int EMAIL_POSITION = 3;
     private static final int ROLE_POSITION = 4;
 
@@ -42,6 +44,7 @@ public class User implements
     private String firstName;
     private String lastName;
     private String primaryEmail;
+    private String imageUrl;
 
     @Ignore private transient String role;
     @Ignore private transient String password;
@@ -50,10 +53,11 @@ public class User implements
 
     @Ignore private final List<Item> items;
 
-    public User(String id, String firstName, String lastName, String primaryEmail) {
+    public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.imageUrl = imageUrl;
         this.primaryEmail = primaryEmail;
 
         items = itemsFromUser(this);
@@ -83,6 +87,7 @@ public class User implements
         private static final String PASSWORD_KEY = "password";
         private static final String LAST_NAME_KEY = "lastName";
         private static final String FIRST_NAME_KEY = "firstName";
+        private static final String IMAGE_KEY = "imageUrl";
         private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
         private static final String TEAM_APPROVED_KEY = "isTeamApproved";
         private static final String USER_APPROVED_KEY = "isUserApproved";
@@ -95,9 +100,10 @@ public class User implements
             String firstName = asString(FIRST_NAME_KEY, userObject);
             String lastName = asString(LAST_NAME_KEY, userObject);
             String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
+            String imageUrl = TeammateService.API_BASE_URL + asString(IMAGE_KEY, userObject);
             String role = asString(ROLE_KEY, userObject);
 
-            User user = new User(id, firstName, lastName, primaryEmail);
+            User user = new User(id, firstName, lastName, primaryEmail, imageUrl);
 
             user.setRole(role);
             user.get(ROLE_POSITION).setValue(role);
@@ -125,7 +131,7 @@ public class User implements
 
     private static List<Item> itemsFromUser(User user) {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, "", null),
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, user.imageUrl, user::setImageUrl),
                 new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.firstName == null ? "" : user.firstName, user::setFirstName),
                 new Item(Item.INPUT, R.string.last_name, user.lastName == null ? "" : user.lastName, user::setLastName),
                 new Item(Item.INPUT, R.string.email, user.primaryEmail == null ? "" : user.primaryEmail, user::setPrimaryEmail),
@@ -165,6 +171,10 @@ public class User implements
 
     public String getPrimaryEmail() {return this.primaryEmail;}
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     public String getRole() {
         return role;
     }
@@ -191,6 +201,10 @@ public class User implements
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    private void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     private void setRole(String role) {

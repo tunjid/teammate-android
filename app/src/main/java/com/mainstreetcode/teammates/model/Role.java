@@ -18,11 +18,13 @@ import android.arch.persistence.room.ForeignKey;
 )
 public class Role {
 
+    public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final String ADMIN = "Admin";
 
     private String name;
     private String userId;
     private String teamId;
+    private String imageUrl;
 
     @SuppressWarnings("unused")
     public Role(String name, String userId, String teamId) {
@@ -49,8 +51,14 @@ public class Role {
         return teamId;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     public static boolean isTeamAdmin(Team team, User user) {
         int index = team.getUsers().indexOf(user);
+        if(index == -1) return false;
+        User fromTeam = team.getUsers().get(index);
         return index != -1 && ADMIN.equals(team.getUsers().get(index).getRole());
     }
 }
