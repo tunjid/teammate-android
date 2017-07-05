@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.fragments.main.TeamEditFragment;
+import com.mainstreetcode.teammates.fragments.main.UserEditFragment;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
@@ -31,7 +33,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         implements OnApplyWindowInsetsListener {
 
     private boolean insetsApplied;
+    private int insetHeight;
     private View insetView;
+    private Toolbar toolbar;
     private FloatingActionButton fab;
     private ViewHider toolbarHider;
     private ViewHider fabHider;
@@ -42,6 +46,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
             boolean isFullscreenFragment = isFullscreenFragment(f.getTag());
 
+//            TransitionManager.beginDelayedTransition((ViewGroup)toolbar.getParent(), new AutoTransition());
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
+            params.topMargin = isFullscreenFragment ? insetHeight : 0;
             insetView.setVisibility(isFullscreenFragment ? View.GONE : View.VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -62,7 +69,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressLint("WrongViewCast")
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         fab = findViewById(R.id.fab);
         insetView = findViewById(R.id.inset_view);
         toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
@@ -109,13 +116,15 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (insetsApplied) return insets;
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) insetView.getLayoutParams();
-        params.height = insets.getSystemWindowInsetTop();
+        insetHeight = insets.getSystemWindowInsetTop();
+        params.height = insetHeight;
 
         insetsApplied = true;
         return insets;
     }
 
     protected boolean isFullscreenFragment(String tag) {
-        return false;
+        return tag.contains(UserEditFragment.class.getSimpleName())
+                || tag.contains(TeamEditFragment.class.getSimpleName());
     }
 }

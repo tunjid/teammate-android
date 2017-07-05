@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -66,6 +67,7 @@ public class ImageWorkerFragment extends Fragment {
                         .setAspectRatio(1, 1)
                         .setMinCropWindowSize(80, 80)
                         .setMaxCropResultSize(1000, 1000)
+                        .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
                         .start(getContext(), this);
             }
             else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
