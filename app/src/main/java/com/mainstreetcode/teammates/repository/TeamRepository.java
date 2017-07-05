@@ -94,7 +94,7 @@ public class TeamRepository {
                     List<User> users = team.getUsers();
                     List<Role> roles = new ArrayList<>(users.size());
 
-                    for (User user : users) roles.add(new Role(user.getRole(), user, team));
+                    for (User user : users) roles.add(user.getRole());
 
                     roleDao.delete(roles);
                     teamDao.delete(team);
@@ -115,7 +115,7 @@ public class TeamRepository {
         List<User> users = team.getUsers();
         List<Role> roles = new ArrayList<>(users.size());
 
-        for (User user : users) roles.add(new Role(user.getRole(), user, team));
+        for (User user : users) roles.add(user.getRole());
 
         teamDao.insert(Collections.singletonList(team));
         userDao.insert(users);
@@ -148,7 +148,7 @@ public class TeamRepository {
 
     public Observable<User> dropUser(Team team, User user) {
         return api.dropUser(team.getId(), user.getId()).flatMap(droppedUser -> {
-            roleDao.delete(Collections.singletonList(new Role(user.getRole(), user, team)));
+            roleDao.delete(Collections.singletonList(user.getRole()));
             return just(user);
         });
     }

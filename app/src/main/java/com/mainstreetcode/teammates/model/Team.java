@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -110,10 +111,10 @@ public class Team implements
     }
 
 
-    public static class JsonDeserializer
+    public static class GsonAdapter
             implements
-            com.google.gson.JsonDeserializer<Team>,
-            JsonSerializer<Team> {
+            JsonSerializer<Team>,
+            JsonDeserializer<Team> {
 
         private static final String UID_KEY = "_id";
         private static final String NAME_KEY = "name";

@@ -138,7 +138,7 @@ public class UserEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String role = user.getRole();
+                String role = user.getRoleName();
 
                 if (TextUtils.isEmpty(role)) {
                     showSnackbar("Please select a role");

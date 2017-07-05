@@ -87,11 +87,11 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
                     ? context.getString(R.string.user_invited)
                     : !item.isTeamApproved() && item.isUserApproved()
                     ? context.getString(R.string.user_requests_join)
-                    : item.getRole());
+                    : item.getRoleName());
 
-            String imageUrl  = user.getImageUrl();
+            String imageUrl = user.getRole() != null ? user.getRole().getImageUrl() : "";
 
-            if(!TextUtils.isEmpty(imageUrl)) {
+            if (!TextUtils.isEmpty(imageUrl)) {
                 Picasso.with(itemView.getContext())
                         .load(imageUrl)
                         .fit()

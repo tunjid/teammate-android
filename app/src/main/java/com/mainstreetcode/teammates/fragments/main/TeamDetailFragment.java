@@ -176,7 +176,7 @@ public class TeamDetailFragment extends MainActivityFragment
         disposables.add(
                 teamViewModel.approveUser(team, user, approve).subscribe((joinRequest) -> {
                     if (approve) {
-                        user.setTeamApproved(true);
+                        //user.setTeamApproved(true);
                         team.getUsers().add(user);
                     }
                     team.getPendingUsers().remove(user);

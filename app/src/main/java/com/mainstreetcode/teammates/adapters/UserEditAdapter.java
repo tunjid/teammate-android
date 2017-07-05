@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
@@ -184,7 +185,10 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<UserEditAdapter.Bas
                 Picasso picasso = Picasso.with(itemView.getContext());
                 RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
 
-                creator.fit().centerInside().into(profilePicture);
+                creator.fit().centerInside().into(profilePicture,
+                        PicassoPalette.with(pathOrUrl, profilePicture)
+                        .use(PicassoPalette.Profile.MUTED_DARK)
+                        .intoBackground(itemView));
             }
         }
 

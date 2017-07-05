@@ -8,7 +8,9 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Message;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
@@ -35,9 +37,11 @@ public class TeammateService {
 
     public static final String API_BASE_URL = "http://10.0.2.2:3000/";
     private static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(Team.class, new Team.JsonDeserializer())
-            .registerTypeAdapter(User.class, new User.JsonDeserializer())
-            .registerTypeAdapter(Message.class, new Message.JsonDeserializer())
+            .registerTypeAdapter(Team.class, new Team.GsonAdapter())
+            .registerTypeAdapter(User.class, new User.GsonAdapter())
+            .registerTypeAdapter(Role.class, new Role.GsonAdapter())
+            .registerTypeAdapter(Message.class, new Message.GsonAdapter())
+            .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
             .create();
 
     private static TeammateApi INSTANCE;
