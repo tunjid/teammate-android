@@ -24,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/team_logo"
+        android:id="@+id/image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:contentDescription="@string/team_logo"
@@ -38,8 +38,8 @@
         android:background="@color/black_50"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/team_logo"
-        app:layout_constraintLeft_toLeftOf="@+id/team_logo"
-        app:layout_constraintRight_toRightOf="@+id/team_logo"
-        app:layout_constraintTop_toTopOf="@+id/team_logo" />
+        app:layout_constraintBottom_toBottomOf="@+id/image"
+        app:layout_constraintLeft_toLeftOf="@+id/image"
+        app:layout_constraintRight_toRightOf="@+id/image"
+        app:layout_constraintTop_toTopOf="@+id/image" />
 </android.support.constraint.ConstraintLayout>

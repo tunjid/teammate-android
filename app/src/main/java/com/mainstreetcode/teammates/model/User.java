@@ -46,11 +46,12 @@ public class User implements
     private String primaryEmail;
     private String imageUrl;
 
-    @Ignore private transient Role role;
-    @Ignore private transient JoinRequest request;
     @Ignore private transient String password;
 
-    @Ignore private final List<Item> items;
+    @Ignore private transient Role role;
+    @Ignore private transient JoinRequest request;
+
+    @Ignore private final List<Item<User>> items;
 
     public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
         this.id = id;
@@ -139,14 +140,15 @@ public class User implements
         }
     }
 
-    private static List<Item> itemsFromUser(User user) {
+    @SuppressWarnings("unchecked")
+    private static List<Item<User>> itemsFromUser(User user) {
         String imageUrl = user.role != null ? user.role.getImageUrl() : user.imageUrl;
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null),
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.firstName == null ? "" : user.firstName, user::setFirstName),
-                new Item(Item.INPUT, R.string.last_name, user.lastName == null ? "" : user.lastName, user::setLastName),
-                new Item(Item.INPUT, R.string.email, user.primaryEmail == null ? "" : user.primaryEmail, user::setPrimaryEmail),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName)
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, User.class),
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.firstName == null ? "" : user.firstName, user::setFirstName, User.class),
+                new Item(Item.INPUT, R.string.last_name, user.lastName == null ? "" : user.lastName, user::setLastName, User.class),
+                new Item(Item.INPUT, R.string.email, user.primaryEmail == null ? "" : user.primaryEmail, user::setPrimaryEmail, User.class),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName, User.class)
         );
     }
 

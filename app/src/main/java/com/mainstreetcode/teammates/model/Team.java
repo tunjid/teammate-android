@@ -57,7 +57,7 @@ public class Team implements
 
     @Ignore private String role;
 
-    @Ignore private final List<Item> items;
+    @Ignore private final List<Item<Team>> items;
 
     public static Team empty() {
         return new Team(NEW_TEAM, "", "", "", "", "");
@@ -84,14 +84,15 @@ public class Team implements
         this.users.addAll(source.users);
     }
 
-    private static List<Item> itemsFromTeam(Team team) {
+    @SuppressWarnings("unchecked")
+    private static List<Item<Team>> itemsFromTeam(Team team) {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, team.logoUrl, team::setLogoUrl),
-                new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName),
-                new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity),
-                new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState),
-                new Item(Item.INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, team.role == null ? "" : team.role, team::setRole)
+                new Item(Item.IMAGE, R.string.team_logo, team.logoUrl, team::setLogoUrl, Team.class),
+                new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName, Team.class),
+                new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity, Team.class),
+                new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState, Team.class),
+                new Item(Item.INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip, Team.class),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, team.role == null ? "" : team.role, team::setRole, Team.class)
         );
     }
 
