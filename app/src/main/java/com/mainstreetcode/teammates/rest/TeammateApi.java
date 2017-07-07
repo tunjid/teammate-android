@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -26,6 +27,11 @@ import retrofit2.http.Query;
  */
 
 public interface TeammateApi {
+
+    // =============================================================================================
+    // User endpoints
+    // =============================================================================================
+
     @POST("api/signUp")
     Observable<User> signUp(@Body User user);
 
@@ -37,6 +43,10 @@ public interface TeammateApi {
 
     @GET("api/signOut")
     Observable<JsonObject> signOut();
+
+    // =============================================================================================
+    // Team endpoints
+    // =============================================================================================
 
     @POST("api/teams")
     Observable<Team> createTeam(@Body Team team);
@@ -80,6 +90,17 @@ public interface TeammateApi {
     @GET("api/teams")
     Observable<List<Team>> findTeam(@Query("name") String teamName);
 
+    // =============================================================================================
+    // Role endpoints
+    // =============================================================================================
+
     @GET("api/roles/values")
     Observable<List<String>> getRoleValues();
+
+    // =============================================================================================
+    // Event endpoints
+    // =============================================================================================
+
+    @GET("api/events")
+    Observable<List<Event>> getEvents();
 }

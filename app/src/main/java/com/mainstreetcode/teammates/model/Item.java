@@ -16,12 +16,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class Item<T> {
 
     @Retention(SOURCE)
-    @IntDef({INPUT, IMAGE, ROLE})
+    @IntDef({INPUT, IMAGE, ROLE, DATE})
     @interface ItemType {}
 
     public static final int INPUT = 2;
     public static final int IMAGE = 3;
     public static final int ROLE = 4;
+    public static final int DATE = 5;
 
     private @ItemType final int itemType;
     private @StringRes final int stringRes;

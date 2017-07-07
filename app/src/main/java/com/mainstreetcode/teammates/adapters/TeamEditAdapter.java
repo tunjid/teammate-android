@@ -44,7 +44,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
         Context context = viewGroup.getContext();
 
         @LayoutRes int layoutRes = viewType == Item.INPUT || viewType == Item.ROLE
-                ? R.layout.viewholder_team_input
+                ? R.layout.viewholder_simple_input
                 : viewType == Item.IMAGE
                 ? R.layout.viewholder_item_image
                 : R.layout.view_holder_padding;

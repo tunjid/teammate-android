@@ -48,7 +48,7 @@ public class InputViewHolder extends BaseItemViewHolder
                 ? InputType.TYPE_CLASS_NUMBER
                 : itemizedClass.equals(User.class) && position == User.EMAIL_POSITION
                 ? InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-                : InputType.TYPE_CLASS_TEXT);
+                : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
         if (item.getHeaderStringRes() != 0) {
             headerText.setText(item.getHeaderStringRes());
