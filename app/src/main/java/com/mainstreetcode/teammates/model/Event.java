@@ -45,9 +45,9 @@ public class Event implements
     @PrimaryKey
     private String id;
     private String name;
-    private String teamId;
     private String notes;
     private String imageUrl;
+    private Team team;
     private Date startDate;
     private Date endDate;
 
@@ -55,10 +55,15 @@ public class Event implements
     @Ignore private List<User> absentees = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
 
-    public Event(String id, String name, String teamId, String notes, String imageUrl, Date startDate, Date endDate) {
+    public static Event empty(Team team) {
+        Date now = new Date();
+        return new Event("*", "*", "*", "*", Team.empty(), now, now);
+    }
+
+    public Event(String id, String name, String notes, String imageUrl, Team team, Date startDate, Date endDate) {
         this.id = id;
         this.name = name;
-        this.teamId = teamId;
+        this.team = team;
         this.notes = notes;
         this.imageUrl = imageUrl;
         this.startDate = startDate;
@@ -101,13 +106,13 @@ public class Event implements
 
             String id = ModelUtils.asString(ID_KEY, roleJson);
             String name = ModelUtils.asString(NAME_KEY, roleJson);
-            String teamId = ModelUtils.asString(TEAM_KEY, roleJson);
             String notes = ModelUtils.asString(NOTES_KEY, roleJson);
             String imageUrl = TeammateService.API_BASE_URL + ModelUtils.asString(IMAGE_KEY, roleJson);
             String startDate = ModelUtils.asString(START_DATE_KEY, roleJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
+            Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
 
-            return new Event(id, name, teamId, notes, imageUrl, parseDate(startDate), parseDate(endDate));
+            return new Event(id, name, notes, imageUrl, team, parseDate(startDate), parseDate(endDate));
         }
     }
 
@@ -116,10 +121,25 @@ public class Event implements
         return Arrays.asList(
                 new Item(Item.IMAGE, R.string.team_logo, event.imageUrl, event::setImageUrl, Event.class),
                 new Item(Item.INPUT, R.string.event_name, event.name == null ? "" : event.name, event::setName, Event.class),
+                new Item(Item.INPUT, R.string.notes, event.notes == null ? "" : event.notes, event::setNotes, Event.class),
                 new Item(Item.DATE, R.string.start_date, prettyPrinter.format(event.startDate), event::setStartDate, Event.class),
-                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(event.endDate), event::setEndDate, Event.class),
-                new Item(Item.INPUT, R.string.notes, event.notes == null ? "" : event.notes, event::setNotes, Event.class)
+                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(event.endDate), event::setEndDate, Event.class)
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event)) return false;
+
+        Event event = (Event) o;
+
+        return id.equals(event.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     public String getName() {
@@ -130,6 +150,10 @@ public class Event implements
         String time = prettyPrinter.format(startDate) + " - ";
         time += endsSameDay() ? timePrinter.format(startDate) : prettyPrinter.format(endDate);
         return time;
+    }
+
+    public Team getTeam() {
+        return team;
     }
 
     private boolean endsSameDay() {
@@ -176,14 +200,18 @@ public class Event implements
         this.endDate = parseDate(endDate, prettyPrinter);
     }
 
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     protected Event(Parcel in) {
         id = in.readString();
         name = in.readString();
-        teamId = in.readString();
         notes = in.readString();
         imageUrl = in.readString();
         startDate = new Date(in.readLong());
         endDate = new Date(in.readLong());
+        team = (Team) in.readValue(Team.class.getClassLoader());
         in.readList(attendees, User.class.getClassLoader());
         in.readList(absentees, User.class.getClassLoader());
 
@@ -199,11 +227,11 @@ public class Event implements
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(name);
-        dest.writeString(teamId);
         dest.writeString(notes);
         dest.writeString(imageUrl);
         dest.writeLong(startDate != null ? startDate.getTime() : -1L);
         dest.writeLong(endDate != null ? endDate.getTime() : -1L);
+        dest.writeValue(team);
         dest.writeList(attendees);
         dest.writeList(absentees);
     }

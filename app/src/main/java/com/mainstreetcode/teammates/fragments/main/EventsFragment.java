@@ -84,7 +84,7 @@ public final class EventsFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.create_team:
-                //showFragment(TeamDetailFragment.newInstance(Team.empty(), true));
+                //showFragment(EventEditFragment.newInstance(Event.empty()));
                 break;
         }
     }

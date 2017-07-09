@@ -19,6 +19,7 @@ import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Team;
 
 /**
  * Edits a Team member
@@ -28,7 +29,7 @@ public class EventEditFragment extends MainActivityFragment
         implements
         View.OnClickListener,
         ImageWorkerFragment.CropListener,
-        ImageWorkerFragment.ImagePickerListener {
+        EventEditAdapter.EditAdapterListener {
 
     private static final String ARG_EVENT = "event";
 
@@ -111,8 +112,10 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onAttachFragment(Fragment childFragment) {
-        ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
-        if (childFragment != null) fragment.setCropListener(this);
+        if (childFragment instanceof ImageWorkerFragment) {
+            ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
+            fragment.setCropListener(this);
+        }
     }
 
     @Override
@@ -176,4 +179,17 @@ public class EventEditFragment extends MainActivityFragment
 
         if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();
     }
+
+    @Override
+    public void onTeamClicked(Team team) {
+        event.setTeam(team);
+    }
+
+    @Override
+    public void selectTeam() {
+        TeamsFragment teamsFragment = TeamsFragment.newInstance();
+        teamsFragment.setTargetFragment(this, R.id.request_code_team_pick);
+        showFragment(teamsFragment);
+    }
+
 }

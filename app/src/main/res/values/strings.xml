@@ -74,6 +74,7 @@
 
     <!--TeamsFragment-->
     <string name="my_teams">My Teams</string>
+    <string name="pick_team">Pick a Team</string>
     <string name="team_name_prefix">Team: %1$s</string>
 
     <!--TeamDetailFragment-->
