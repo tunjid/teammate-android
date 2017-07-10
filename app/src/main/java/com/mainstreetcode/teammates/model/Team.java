@@ -24,8 +24,6 @@ import java.util.List;
 
 /**
  * Teams
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
 @Entity(tableName = "teams")
@@ -42,6 +40,8 @@ public class Team implements
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
+
+    private static final Team EMPTY = new Team(NEW_TEAM, "", "", "", "", "");
 
     @PrimaryKey
     private String id;
@@ -60,7 +60,7 @@ public class Team implements
     @Ignore private final List<Item<Team>> items;
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "");
+        return EMPTY;
     }
 
     public Team(String id, String name, String city, String state, String zip, String logoUrl) {

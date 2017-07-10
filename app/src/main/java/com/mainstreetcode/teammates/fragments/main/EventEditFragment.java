@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -102,7 +101,7 @@ public class EventEditFragment extends MainActivityFragment
         fab.setOnClickListener(this);
         fab.setImageResource(R.drawable.ic_check_white_24dp);
         toggleFab(true);
-        setToolbarTitle(getString(R.string.edit_user));
+        setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 
 //        disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
 //            roles.clear();
@@ -129,47 +128,22 @@ public class EventEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-//                String role = user.getRoleName();
-//
-//                if (TextUtils.isEmpty(role)) {
-//                    showSnackbar("Please select a role");
-//                    return;
-//                }
-//
-//                disposables.add(
-//                        teamViewModel.updateTeamUser(event, user).subscribe(updatedUser -> {
-//                            user.update(updatedUser);
-//                            showSnackbar(getString(R.string.updated_user, user.getFirstName()));
-//                            recyclerView.getAdapter().notifyDataSetChanged();
-//                        }, defaultErrorHandler)
-//                );
+
+                disposables.add(
+                        eventViewModel.updateEvent(event).subscribe(updatedEvent -> {
+                            event.update(updatedEvent);
+                            showSnackbar(getString(R.string.updated_user, event.getName()));
+                            recyclerView.getAdapter().notifyDataSetChanged();
+                        }, defaultErrorHandler)
+                );
                 break;
         }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_kick:
-//                final String firstName = user.getFirstName();
-//                final String prompt = getString(R.string.confirm_user_drop, firstName);
-//
-//                Snackbar.make(recyclerView, prompt, Snackbar.LENGTH_INDEFINITE)
-//                        .setAction(R.string.yes, view ->
-//                                disposables.add(teamViewModel.dropUser(event, user).subscribe(dropped -> {
-//                                    showSnackbar(getString(R.string.dropped_user, firstName));
-//                                    getActivity().onBackPressed();
-//                                }, defaultErrorHandler)))
-//                        .show();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onImageCropped(Uri uri) {
-//        user.get(User.IMAGE_POSITION).setValue(uri.getPath());
-//        recyclerView.getAdapter().notifyItemChanged(User.IMAGE_POSITION);
+        event.get(Event.LOGO_POSITION).setValue(uri.getPath());
+        recyclerView.getAdapter().notifyItemChanged(Event.LOGO_POSITION);
     }
 
     @Override

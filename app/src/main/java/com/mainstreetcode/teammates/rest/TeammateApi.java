@@ -103,4 +103,20 @@ public interface TeammateApi {
 
     @GET("api/events")
     Observable<List<Event>> getEvents();
+
+    @POST("api/events")
+    Observable<Event> createEvent(@Body Event event);
+
+    @Multipart
+    @POST("api/events/{id}")
+    Observable<Event> uploadEventPhoto(@Path("id") String eventId, @Part MultipartBody.Part file);
+
+    @PUT("api/events/{id}")
+    Observable<Event> updateEvent(@Path("id") String eventId, @Body Event event);
+
+    @GET("api/events/{id}")
+    Observable<Event> getEvent(@Path("id") String eventId);
+
+    @DELETE("api/events/{id}")
+    Observable<Event> deleteEvent(@Path("id") String eventId);
 }

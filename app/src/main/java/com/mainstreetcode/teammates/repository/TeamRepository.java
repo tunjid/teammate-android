@@ -1,9 +1,6 @@
 package com.mainstreetcode.teammates.repository;
 
 
-import android.support.annotation.Nullable;
-import android.webkit.MimeTypeMap;
-
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -15,15 +12,12 @@ import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
 import static io.reactivex.Observable.fromCallable;
 import static io.reactivex.Observable.just;
@@ -67,7 +61,7 @@ public class TeamRepository {
     public Observable<Team> updateTeam(Team team) {
         Observable<Team> teamObservable = api.updateTeam(team.getId(), team);
 
-        MultipartBody.Part body = getBody(team.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = RepoUtils.getBody(team.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
             teamObservable = teamObservable.flatMap(put -> api.uploadTeamLogo(team.getId(), body));
         }
@@ -127,7 +121,7 @@ public class TeamRepository {
     public Observable<User> updateTeamUser(Team team, User user) {
         Observable<User> userObservable = api.updateTeamUser(team.getId(), user.getId(), user);
 
-        MultipartBody.Part body = getBody(user.get(User.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = RepoUtils.getBody(user.get(User.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
         if (body != null) {
             userObservable = userObservable.flatMap(put -> api.uploadUserPhoto(team.getId(), user.getId(), body));
         }
@@ -153,20 +147,4 @@ public class TeamRepository {
         });
     }
 
-    @Nullable
-    private MultipartBody.Part getBody(String path, String photokey) {
-        File file = new File(path);
-
-        if (file.exists()) {
-            String extension = MimeTypeMap.getFileExtensionFromUrl(path);
-            if (extension != null) {
-                String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-                if (type != null) {
-                    RequestBody requestFile = RequestBody.create(MediaType.parse(type), file);
-                    return MultipartBody.Part.createFormData(photokey, file.getName(), requestFile);
-                }
-            }
-        }
-        return null;
-    }
 }

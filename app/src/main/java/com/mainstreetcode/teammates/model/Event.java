@@ -12,6 +12,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
@@ -37,10 +39,15 @@ public class Event implements
         Parcelable,
         ListableBean<Event, Item> {
 
+    public static final int LOGO_POSITION = 0;
+    public static final String PHOTO_UPLOAD_KEY = "event-photo";
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US);
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
     private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
+
+    private static final Date date = new Date();
+    private static final Event EMPTY = new Event("*", "*", "*", "*", Team.empty(), date, date);
 
     @PrimaryKey
     private String id;
@@ -56,8 +63,7 @@ public class Event implements
     @Ignore private final List<Item<Event>> items;
 
     public static Event empty(Team team) {
-        Date now = new Date();
-        return new Event("*", "*", "*", "*", Team.empty(), now, now);
+        return EMPTY;
     }
 
     public Event(String id, String name, String notes, String imageUrl, Team team, Date startDate, Date endDate) {
@@ -89,6 +95,7 @@ public class Event implements
 
     public static class GsonAdapter
             implements
+            JsonSerializer<Event>,
             JsonDeserializer<Event> {
 
         private static final String ID_KEY = "_id";
@@ -98,6 +105,19 @@ public class Event implements
         private static final String IMAGE_KEY = "imageUrl";
         private static final String START_DATE_KEY = "startDate";
         private static final String END_DATE_KEY = "endDate";
+
+        @Override
+        public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject serialized = new JsonObject();
+
+            serialized.addProperty(NAME_KEY, src.name);
+            serialized.addProperty(NOTES_KEY, src.notes);
+            serialized.addProperty(TEAM_KEY, src.team.getId());
+            serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate));
+            serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate));
+
+            return serialized;
+        }
 
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -137,9 +157,31 @@ public class Event implements
         return id.equals(event.id);
     }
 
+    public boolean isEmpty() {
+        return equals(empty(Team.empty()));
+    }
+
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public void update(Event updatedEvent) {
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
+
+        attendees.clear();
+        absentees.clear();
+
+        attendees.addAll(updatedEvent.attendees);
+        absentees.addAll(updatedEvent.absentees);
+
+        team.update(updatedEvent.team);
+    }
+
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -148,7 +190,7 @@ public class Event implements
 
     public String getTime() {
         String time = prettyPrinter.format(startDate) + " - ";
-        time += endsSameDay() ? timePrinter.format(startDate) : prettyPrinter.format(endDate);
+        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
         return time;
     }
 
