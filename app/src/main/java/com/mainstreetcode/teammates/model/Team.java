@@ -54,8 +54,8 @@ public class Team extends TeamEntity implements
         return EMPTY;
     }
 
-    public Team(String id, String name, String city, String state, String zip, String logoUrl) {
-        super(id, name, city, state, zip, logoUrl);
+    public Team(String id, String name, String city, String state, String zip, String imageUrl) {
+        super(id, name, city, state, zip, imageUrl);
         items = itemsFromTeam(this);
     }
 
@@ -71,7 +71,7 @@ public class Team extends TeamEntity implements
     @SuppressWarnings("unchecked")
     private static List<Item<Team>> itemsFromTeam(Team team) {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, team.logoUrl, team::setLogoUrl, Team.class),
+                new Item(Item.IMAGE, R.string.team_logo, team.imageUrl, team::setImageUrl, Team.class),
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName, Team.class),
                 new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity, Team.class),
                 new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState, Team.class),
@@ -220,7 +220,7 @@ public class Team extends TeamEntity implements
         dest.writeString(zip);
         dest.writeString(city);
         dest.writeString(state);
-        dest.writeString(logoUrl);
+        dest.writeString(imageUrl);
         dest.writeString(role);
         dest.writeList(users);
         dest.writeList(pendingUsers);

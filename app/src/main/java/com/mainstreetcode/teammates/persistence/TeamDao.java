@@ -19,13 +19,18 @@ import java.util.List;
 
 @Dao
 public interface TeamDao {
+
+    @Query("SELECT * FROM teams" +
+            " WHERE :id = team_id")
+    Team getTeam(String id);
+
     @Query("SELECT * FROM teams")
     List<Team> getTeams();
 
-    @Query("SELECT team.id, team.name, team.city, team.state, team.zip, team.logoUrl" +
+    @Query("SELECT team.team_id, team.team_name, team.team_city, team.team_state, team.team_zip, team.team_image_url" +
             " FROM teams as team" +
             " INNER JOIN roles as role" +
-            " ON team.id = role.teamId" +
+            " ON team.team_id = role.teamId" +
             " WHERE :userId = role.userId")
     List<Team> myTeams(String userId);
 

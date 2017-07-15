@@ -35,7 +35,7 @@ public class TeamViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterListen
         teamLocation.setText(item.getCity());
 
         Picasso.with(itemView.getContext())
-                .load(item.getLogoUrl())
+                .load(item.getImageUrl())
                 .fit()
                 .centerInside()
                 .into(teamLogo);

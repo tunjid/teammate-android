@@ -1,9 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -15,48 +12,29 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Event events
  */
-@Entity(
-        tableName = "events",
-        foreignKeys = @ForeignKey(entity = Event.class, parentColumns = "id", childColumns = "teamId")
-)
-public class Event implements
-        Parcelable,
+
+public class Event extends EventEntity
+        implements
         ListableBean<Event, Item> {
 
     public static final int LOGO_POSITION = 0;
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
-    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
-
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-    private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
     private static final Date date = new Date();
     private static final Event EMPTY = new Event("*", "*", "*", "*", Team.empty(), date, date);
-
-    @PrimaryKey
-    private String id;
-    private String name;
-    private String notes;
-    private String imageUrl;
-    private Team team;
-    private Date startDate;
-    private Date endDate;
 
     @Ignore private List<User> attendees = new ArrayList<>();
     @Ignore private List<User> absentees = new ArrayList<>();
@@ -67,13 +45,7 @@ public class Event implements
     }
 
     public Event(String id, String name, String notes, String imageUrl, Team team, Date startDate, Date endDate) {
-        this.id = id;
-        this.name = name;
-        this.team = team;
-        this.notes = notes;
-        this.imageUrl = imageUrl;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        super(id, name, notes, imageUrl, startDate, endDate, team);
 
         items = itemsFromEvent(this);
     }
@@ -179,84 +151,10 @@ public class Event implements
         team.update(updatedEvent.team);
     }
 
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTime() {
-        String time = prettyPrinter.format(startDate) + " - ";
-        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
-        return time;
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    private boolean endsSameDay() {
-        Calendar start = Calendar.getInstance();
-        Calendar end = Calendar.getInstance();
-
-        start.setTime(startDate);
-        end.setTime(endDate);
-        return start.get(Calendar.YEAR) == end.get(Calendar.YEAR)
-                && start.get(Calendar.MONTH) == end.get(Calendar.MONTH)
-                && start.get(Calendar.DATE) == end.get(Calendar.DATE);
-    }
-
-    private static Date parseDate(String date) {
-        return parseDate(date, dateFormatter);
-    }
-
-    public static Date parseDate(String date, SimpleDateFormat formatter) {
-        try {
-            return formatter.parse(date);
-        }
-        catch (ParseException e) {
-            return new Date();
-        }
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = parseDate(startDate, prettyPrinter);
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = parseDate(endDate, prettyPrinter);
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
     protected Event(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        notes = in.readString();
-        imageUrl = in.readString();
-        startDate = new Date(in.readLong());
-        endDate = new Date(in.readLong());
-        team = (Team) in.readValue(Team.class.getClassLoader());
+        super(in);
         in.readList(attendees, User.class.getClassLoader());
         in.readList(absentees, User.class.getClassLoader());
-
         items = itemsFromEvent(this);
     }
 
@@ -267,18 +165,11 @@ public class Event implements
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(notes);
-        dest.writeString(imageUrl);
-        dest.writeLong(startDate != null ? startDate.getTime() : -1L);
-        dest.writeLong(endDate != null ? endDate.getTime() : -1L);
-        dest.writeValue(team);
-        dest.writeList(attendees);
-        dest.writeList(absentees);
+        super.writeToParcel(dest, flags);
+        dest.writeLong(startDate.getTime());
+        dest.writeLong(endDate.getTime());
     }
 
-    @SuppressWarnings("unused")
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
         @Override
         public Event createFromParcel(Parcel in) {

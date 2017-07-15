@@ -66,7 +66,8 @@ public final class EventsFragment extends MainActivityFragment
         toggleFab(false);
         setToolbarTitle(getString(R.string.my_events));
 
-        disposables.add(eventViewModel.getEvents().subscribe(eventConsumer, defaultErrorHandler));
+        String userId = userViewModel.getCurrentUser().getId();
+        disposables.add(eventViewModel.getEvents(userId).subscribe(eventConsumer, defaultErrorHandler));
     }
 
     @Override

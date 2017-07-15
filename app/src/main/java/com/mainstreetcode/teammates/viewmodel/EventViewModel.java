@@ -22,8 +22,8 @@ public class EventViewModel extends ViewModel {
         repository = EventRepository.getInstance();
     }
 
-    public Observable<List<Event>> getEvents() {
-        return repository.getEvents().observeOn(AndroidSchedulers.mainThread());
+    public Observable<List<Event>> getEvents(String userId) {
+        return repository.getEvents(userId).observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<Event> updateEvent(final Event event) {

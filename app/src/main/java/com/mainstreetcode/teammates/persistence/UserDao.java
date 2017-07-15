@@ -18,7 +18,7 @@ import java.util.List;
 
 @Dao
 public interface UserDao {
-    @Query("SELECT * FROM users WHERE primaryEmail LIKE :primaryEmail LIMIT 1")
+    @Query("SELECT * FROM users WHERE user_primary_email LIKE :primaryEmail LIMIT 1")
     User findByEmail(String primaryEmail );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

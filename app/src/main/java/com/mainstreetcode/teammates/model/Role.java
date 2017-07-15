@@ -25,8 +25,8 @@ import java.lang.reflect.Type;
         tableName = "roles",
         primaryKeys = {"userId", "teamId"},
         foreignKeys = {
-                @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "userId"),
-                @ForeignKey(entity = TeamEntity.class, parentColumns = "id", childColumns = "teamId")
+                @ForeignKey(entity = User.class, parentColumns = "user_id", childColumns = "userId"),
+                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "teamId")
         }
 )
 public class Role implements Parcelable {

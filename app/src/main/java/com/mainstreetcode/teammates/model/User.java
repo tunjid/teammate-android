@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -39,12 +40,11 @@ public class User implements
     public static final int EMAIL_POSITION = 3;
     //private static final int ROLE_POSITION = 4;
 
-    @PrimaryKey
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String primaryEmail;
-    private String imageUrl;
+    @PrimaryKey @ColumnInfo(name = "user_id") private String id;
+    @ColumnInfo(name = "user_first_name") private String firstName;
+    @ColumnInfo(name = "user_last_name") private String lastName;
+    @ColumnInfo(name = "user_primary_email") private String primaryEmail;
+    @ColumnInfo(name = "user_image_url") private String imageUrl;
 
     @Ignore private transient String password;
 
