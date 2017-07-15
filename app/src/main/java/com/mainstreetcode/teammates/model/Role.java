@@ -11,6 +11,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
@@ -25,7 +26,7 @@ import java.lang.reflect.Type;
         primaryKeys = {"userId", "teamId"},
         foreignKeys = {
                 @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "userId"),
-                @ForeignKey(entity = Team.class, parentColumns = "id", childColumns = "teamId")
+                @ForeignKey(entity = TeamEntity.class, parentColumns = "id", childColumns = "teamId")
         }
 )
 public class Role implements Parcelable {

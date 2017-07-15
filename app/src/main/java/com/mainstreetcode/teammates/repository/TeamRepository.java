@@ -98,7 +98,7 @@ public class TeamRepository {
     }
 
     private Observable<List<Team>> saveTeams(List<Team> teams) {
-        teamDao.insert(teams);
+        teamDao.insert(Collections.unmodifiableList(teams));
         return just(teams);
     }
 

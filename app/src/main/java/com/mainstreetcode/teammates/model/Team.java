@@ -1,8 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
-import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -14,6 +12,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
 
@@ -26,8 +25,7 @@ import java.util.List;
  * Teams
  */
 
-@Entity(tableName = "teams")
-public class Team implements
+public class Team extends TeamEntity implements
         Parcelable,
         ListableBean<Team, Item> {
 
@@ -43,19 +41,12 @@ public class Team implements
 
     private static final Team EMPTY = new Team(NEW_TEAM, "", "", "", "", "");
 
-    @PrimaryKey
-    private String id;
-    private String name;
-    private String city;
-    private String state;
-    private String zip;
-    private String logoUrl;
+    @Ignore private String role;
 
     // Cannot be flattened in SQL
+    //@Relation(parentColumn = "id", entityColumn = "teamId", entity = Role.class)
     @Ignore List<User> users = new ArrayList<>();
     @Ignore List<User> pendingUsers = new ArrayList<>();
-
-    @Ignore private String role;
 
     @Ignore private final List<Item<Team>> items;
 
@@ -64,21 +55,14 @@ public class Team implements
     }
 
     public Team(String id, String name, String city, String state, String zip, String logoUrl) {
-        this.id = id;
-        this.name = name;
-        this.city = city;
-        this.state = state;
-        this.zip = zip;
-        this.logoUrl = logoUrl;
+        super(id, name, city, state, zip, logoUrl);
         items = itemsFromTeam(this);
     }
 
     private Team(Team source) {
-        this.id = source.id;
-        this.name = source.get(NAME_POSITION).value;
-        this.city = source.get(CITY_POSITION).value;
-        this.state = source.get(STATE_POSITION).value;
-        this.zip = source.get(ZIP_POSITION).value;
+        super(source.id, source.get(NAME_POSITION).value,
+                source.get(CITY_POSITION).value, source.get(STATE_POSITION).value,
+                source.get(ZIP_POSITION).value, source.get(LOGO_POSITION).value);
 
         this.items = itemsFromTeam(source);
         this.users.addAll(source.users);
@@ -198,42 +182,8 @@ public class Team implements
         return id.hashCode();
     }
 
-    public String getId() {return this.id;}
-
-    public String getName() {return this.name;}
-
-    public String getCity() {return this.city;}
-
-    @SuppressWarnings("unused")
-    public String getState() {
-        return state;
-    }
-
-    @SuppressWarnings("unused")
-    public String getZip() {
-        return zip;
-    }
-
-    @SuppressWarnings("unused")
-    public String getLogoUrl() {
-        return logoUrl;
-    }
-
     public String getRole() {
         return role;
-    }
-
-    private void setName(String name) {this.name = name; }
-
-    private void setCity(String city) {this.city = city; }
-
-    private void setState(String state) {this.state = state; }
-
-    private void setZip(String zip) {this.zip = zip; }
-
-    @SuppressWarnings("WeakerAccess")
-    public void setLogoUrl(String logoUrl) {
-        this.logoUrl = logoUrl;
     }
 
     public void setRole(String role) {
@@ -249,12 +199,8 @@ public class Team implements
     }
 
     private Team(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        zip = in.readString();
-        city = in.readString();
-        state = in.readString();
-        logoUrl = in.readString();
+        super(in.readString(), in.readString(), in.readString(),
+                in.readString(), in.readString(), in.readString());
         role = in.readString();
         in.readList(users, User.class.getClassLoader());
         in.readList(pendingUsers, User.class.getClassLoader());

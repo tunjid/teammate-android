@@ -7,6 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ public interface TeamDao {
     List<Team> myTeams(String userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(List<Team> teams);
+    void insert(List<TeamEntity> teams);
 
     @Delete
-    void delete(Team user);
+    void delete(TeamEntity user);
 }

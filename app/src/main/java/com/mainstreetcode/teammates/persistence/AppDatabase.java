@@ -6,8 +6,8 @@ import android.arch.persistence.room.RoomDatabase;
 
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Role;
-import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 
 /**
  * App Database
@@ -15,7 +15,7 @@ import com.mainstreetcode.teammates.model.User;
  * Created by Shemanigans on 6/12/17.
  */
 
-@Database(entities = {User.class, Team.class, Role.class}, version = 1)
+@Database(entities = {User.class, TeamEntity.class, Role.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
