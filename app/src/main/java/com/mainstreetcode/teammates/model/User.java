@@ -1,9 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -16,6 +13,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
 
@@ -31,20 +29,12 @@ import static com.mainstreetcode.teammates.model.ModelUtils.asString;
  * Created by Shemanigans on 6/4/17.
  */
 
-@Entity(tableName = "users")
-public class User implements
-        Parcelable,
+public class User extends UserEntity implements
         ListableBean<User, Item> {
 
     public static final int IMAGE_POSITION = 0;
     public static final int EMAIL_POSITION = 3;
     //private static final int ROLE_POSITION = 4;
-
-    @PrimaryKey @ColumnInfo(name = "user_id") private String id;
-    @ColumnInfo(name = "user_first_name") private String firstName;
-    @ColumnInfo(name = "user_last_name") private String lastName;
-    @ColumnInfo(name = "user_primary_email") private String primaryEmail;
-    @ColumnInfo(name = "user_image_url") private String imageUrl;
 
     @Ignore private transient String password;
 
@@ -54,22 +44,14 @@ public class User implements
     @Ignore private final List<Item<User>> items;
 
     public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.imageUrl = imageUrl;
-        this.primaryEmail = primaryEmail;
+        super(id, firstName, lastName, primaryEmail, imageUrl);
 
         items = itemsFromUser(this);
     }
 
     public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl,
                 Role role, JoinRequest request) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.imageUrl = imageUrl;
-        this.primaryEmail = primaryEmail;
+        super(id, firstName, lastName, primaryEmail, imageUrl);
         this.role = role;
         this.request = request;
 
@@ -159,37 +141,6 @@ public class User implements
         this.request = updatedUser.request;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-
-        User user = (User) o;
-
-        return id.equals(user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public String toString() {return "com.mainstreetcode.teammates.model.User(id=" + this.id + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", primaryEmail=" + this.primaryEmail + ")";}
-
-    public String getId() {return this.id;}
-
-    public String getFirstName() {return this.firstName;}
-
-    @SuppressWarnings("unused")
-    public String getLastName() {return this.lastName;}
-
-    public String getPrimaryEmail() {return this.primaryEmail;}
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
     public String getRoleName() {
         return role == null ? "" : role.getName();
     }
@@ -206,18 +157,6 @@ public class User implements
         return request != null && request.isUserApproved();
     }
 
-    private void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    private void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    private void setPrimaryEmail(String primaryEmail) {
-        this.primaryEmail = primaryEmail;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -231,11 +170,7 @@ public class User implements
     }
 
     protected User(Parcel in) {
-        id = in.readString();
-        firstName = in.readString();
-        lastName = in.readString();
-        primaryEmail = in.readString();
-        imageUrl = in.readString();
+        super(in);
         role = (Role) in.readValue(Role.class.getClassLoader());
         items = itemsFromUser(this);
     }
@@ -247,11 +182,7 @@ public class User implements
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(firstName);
-        dest.writeString(lastName);
-        dest.writeString(primaryEmail);
-        dest.writeString(imageUrl);
+        super.writeToParcel(dest, flags);
         dest.writeValue(role);
     }
 

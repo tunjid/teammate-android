@@ -112,7 +112,7 @@ public class TeamRepository {
         for (User user : users) roles.add(user.getRole());
 
         teamDao.insert(Collections.singletonList(team));
-        userDao.insert(users);
+        userDao.insert(Collections.unmodifiableList(users));
         roleDao.insert(roles);
 
         return just(team);

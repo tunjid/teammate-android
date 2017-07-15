@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
+import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
@@ -25,7 +26,7 @@ import java.lang.reflect.Type;
         tableName = "roles",
         primaryKeys = {"userId", "teamId"},
         foreignKeys = {
-                @ForeignKey(entity = User.class, parentColumns = "user_id", childColumns = "userId"),
+                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "userId"),
                 @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "teamId")
         }
 )

@@ -7,6 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 
 import java.util.List;
 
@@ -22,8 +23,8 @@ public interface UserDao {
     User findByEmail(String primaryEmail );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(List<User> users);
+    void insert(List<UserEntity> users);
 
     @Delete
-    void delete(User user);
+    void delete(UserEntity user);
 }
