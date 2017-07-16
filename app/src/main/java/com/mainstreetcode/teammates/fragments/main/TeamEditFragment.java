@@ -17,7 +17,6 @@ import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,18 +143,12 @@ public class TeamEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String role = team.getRole();
+                String role = team.get(Team.ROLE_POSITION).getValue();
 
                 if (TextUtils.isEmpty(role)) {
                     showSnackbar("Please select a role");
                     return;
                 }
-
-                // Don't need all cached user emmisions
-                ErrorHandler errorHandler = ErrorHandler.builder()
-                        .defaultMessage(getString(R.string.default_error))
-                        .add(this::showSnackbar)
-                        .build();
 
                 boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
                 Disposable disposable;
@@ -163,12 +156,12 @@ public class TeamEditFragment extends MainActivityFragment
                 // Join a team
                 if (!isEditable) {
                     disposable = teamViewModel.joinTeam(team, role)
-                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)), errorHandler);
+                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
                 }
                 // Create a team
                 else if (team.isNewTeam()) {
                     disposable = teamViewModel.createTeam(team)
-                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), errorHandler);
+                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
                 }
                 // Update a team
                 else {
@@ -176,7 +169,7 @@ public class TeamEditFragment extends MainActivityFragment
                         team.update(updatedTeam);
                         showSnackbar(getString(R.string.updated_team));
                         recyclerView.getAdapter().notifyDataSetChanged();
-                    }, errorHandler);
+                    }, defaultErrorHandler);
                 }
                 disposables.add(disposable);
                 break;

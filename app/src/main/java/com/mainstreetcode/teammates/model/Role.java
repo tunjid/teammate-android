@@ -31,6 +31,7 @@ public class Role extends RoleEntity
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final String ADMIN = "Admin";
+
     public static final int IMAGE_POSITION = 0;
 
     @Ignore private final List<Item<Role>> items;

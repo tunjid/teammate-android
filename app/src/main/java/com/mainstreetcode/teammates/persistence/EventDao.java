@@ -19,7 +19,7 @@ import java.util.List;
 public interface EventDao {
     @Query("SELECT * FROM events as event" +
             " INNER JOIN teams as team" +
-            " ON event.team_id = team.team_id" +
+            " ON event.event_team_id = team.team_id" +
             " INNER JOIN roles as role" +
             " ON team.team_id = role.role_team_id" +
             " WHERE :userId = role.user_id")

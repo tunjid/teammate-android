@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -34,7 +35,10 @@ public class Event extends EventEntity
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
 
     private static final Date date = new Date();
-    private static final Event EMPTY = new Event("*", "*", "*", "*", Team.empty(), date, date);
+    private static final Event EMPTY = new Event("*", "*", "*", "*", date, date, Team.empty());
+
+    @Embedded
+    private Team team;
 
     @Ignore private List<User> attendees = new ArrayList<>();
     @Ignore private List<User> absentees = new ArrayList<>();
@@ -44,9 +48,9 @@ public class Event extends EventEntity
         return EMPTY;
     }
 
-    public Event(String id, String name, String notes, String imageUrl, Team team, Date startDate, Date endDate) {
-        super(id, name, notes, imageUrl, startDate, endDate, team);
-
+    public Event(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
+        super(id, name, notes, imageUrl, team.getId(), startDate, endDate);
+        this.team = team;
         items = itemsFromEvent(this);
     }
 
@@ -63,6 +67,19 @@ public class Event extends EventEntity
     @Override
     public Event toSource() {
         return null;
+    }
+
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public  void setRoles(List<Role> roles){
+        team.setRoles(roles);
     }
 
     public static class GsonAdapter
@@ -104,7 +121,7 @@ public class Event extends EventEntity
             String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
 
-            return new Event(id, name, notes, imageUrl, team, parseDate(startDate), parseDate(endDate));
+            return new Event(id, name, notes, imageUrl, parseDate(startDate), parseDate(endDate), team);
         }
     }
 
@@ -153,6 +170,7 @@ public class Event extends EventEntity
 
     protected Event(Parcel in) {
         super(in);
+        team = (Team) in.readValue(Team.class.getClassLoader());
         in.readList(attendees, User.class.getClassLoader());
         in.readList(absentees, User.class.getClassLoader());
         items = itemsFromEvent(this);
@@ -166,8 +184,9 @@ public class Event extends EventEntity
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeLong(startDate.getTime());
-        dest.writeLong(endDate.getTime());
+        dest.writeValue(team);
+        dest.writeList(attendees);
+        dest.writeList(absentees);
     }
 
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {

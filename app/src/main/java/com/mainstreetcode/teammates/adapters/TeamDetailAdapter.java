@@ -41,8 +41,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
 
         return viewType == R.id.viewholder_role
-                ? new UserViewHolder(itemView, adapterListener)
-                : new RequestViewHolder(itemView, adapterListener);
+                ? new UserRoleViewHolder(itemView, adapterListener)
+                : new JoinRequestViewHolder(itemView, adapterListener);
     }
 
     @Override
@@ -53,8 +53,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         boolean isJoinedUser = i < joinedUsersSize;
 
         int index = isJoinedUser ? i : i - joinedUsersSize;
-        if (isJoinedUser) ((UserViewHolder) baseTeamViewHolder).bind(roles.get(index));
-        else ((RequestViewHolder) baseTeamViewHolder).bind(joinRequests.get(index));
+        if (isJoinedUser) ((UserRoleViewHolder) baseTeamViewHolder).bind(roles.get(index));
+        else ((JoinRequestViewHolder) baseTeamViewHolder).bind(joinRequests.get(index));
     }
 
     @Override
@@ -87,12 +87,12 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         }
     }
 
-    static class UserViewHolder extends UserHoldingViewHolder
+    static class UserRoleViewHolder extends UserHoldingViewHolder
             implements View.OnClickListener {
 
         private Role role;
 
-        UserViewHolder(View itemView, UserAdapterListener adapterListener) {
+        UserRoleViewHolder(View itemView, UserAdapterListener adapterListener) {
             super(itemView, adapterListener);
             itemView.setOnClickListener(this);
         }
@@ -128,12 +128,12 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
         }
     }
 
-    static class RequestViewHolder extends UserHoldingViewHolder
+    static class JoinRequestViewHolder extends UserHoldingViewHolder
             implements View.OnClickListener {
 
         private JoinRequest request;
 
-        RequestViewHolder(View itemView, UserAdapterListener adapterListener) {
+        JoinRequestViewHolder(View itemView, UserAdapterListener adapterListener) {
             super(itemView, adapterListener);
             itemView.setOnClickListener(this);
         }

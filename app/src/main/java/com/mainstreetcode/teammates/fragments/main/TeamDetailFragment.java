@@ -6,7 +6,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -94,15 +93,14 @@ public class TeamDetailFragment extends MainActivityFragment
         fab.setOnClickListener(this);
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         toggleFab(false);
-
-        final User user = userViewModel.getCurrentUser();
-        currentRole = team.getRoleForUser(user);
+        updateCurrentRole();
 
         disposables.add(teamViewModel.getTeam(team).subscribe(
                 updatedTeam -> {
                     team.update(updatedTeam);
                     recyclerView.getAdapter().notifyDataSetChanged();
                     getActivity().invalidateOptionsMenu();
+                    updateCurrentRole();
                 },
                 defaultErrorHandler)
         );
@@ -166,17 +164,10 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String role = team.getRole();
-
-                if (TextUtils.isEmpty(role)) {
-                    showSnackbar(getString(R.string.select_role));
-                    return;
-                }
-
                 if (team.getId() != null) {
-                    disposables.add(teamViewModel.joinTeam(team, role)
-                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
-                                    defaultErrorHandler));
+//                    disposables.add(teamViewModel.joinTeam(team, role)
+//                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
+//                                    defaultErrorHandler));
                 }
                 else {
                     disposables.add(teamViewModel.createTeam(team)
@@ -219,5 +210,11 @@ public class TeamDetailFragment extends MainActivityFragment
             showSnackbar(getString(R.string.deleted_team, team.getName()));
             getActivity().onBackPressed();
         }, defaultErrorHandler));
+    }
+
+    private void updateCurrentRole() {
+        final User user = userViewModel.getCurrentUser();
+        currentRole = team.getRoleForUser(user);
+        if (currentRole == null) getActivity().onBackPressed();
     }
 }

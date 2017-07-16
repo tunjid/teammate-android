@@ -29,7 +29,6 @@ import java.util.List;
  */
 
 public class Team extends TeamEntity implements
-        Parcelable,
         ListableBean<Team, Item> {
 
     public static final int LOGO_POSITION = 0;
@@ -37,17 +36,16 @@ public class Team extends TeamEntity implements
     private static final int CITY_POSITION = 2;
     private static final int STATE_POSITION = 3;
     public static final int ZIP_POSITION = 4;
-    private static final int ROLE_POSITION = 5;
+    public static final int ROLE_POSITION = 5;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
     private static final Team EMPTY = new Team(NEW_TEAM, "", "", "", "", "");
 
-    @Ignore private String role;
-
     @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
-    @Ignore List<Role> roles = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
+
     @Ignore List<JoinRequest> joinRequests = new ArrayList<>();
 
     @Ignore private final List<Item<Team>> items;
@@ -58,6 +56,7 @@ public class Team extends TeamEntity implements
 
     public Team(String id, String name, String city, String state, String zip, String imageUrl) {
         super(id, name, city, state, zip, imageUrl);
+
         items = itemsFromTeam(this);
     }
 
@@ -78,7 +77,7 @@ public class Team extends TeamEntity implements
                 new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity, Team.class),
                 new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState, Team.class),
                 new Item(Item.INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip, Team.class),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, team.role == null ? "" : team.role, team::setRole, Team.class)
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, Team.class)
         );
     }
 
@@ -127,7 +126,6 @@ public class Team extends TeamEntity implements
             String logoUrl = TeammateService.API_BASE_URL + ModelUtils.asString(LOGO_KEY, teamJson);
 
             Team team = new Team(id, name, city, state, zip, logoUrl);
-            team.setRole(role);
 
             team.get(LOGO_POSITION).setValue(logoUrl);
             team.get(ROLE_POSITION).setValue(role);
@@ -141,15 +139,19 @@ public class Team extends TeamEntity implements
         @Override
         public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject team = new JsonObject();
-            //team.addProperty(UID_KEY, src.id);
             team.addProperty(NAME_KEY, src.name);
             team.addProperty(CITY_KEY, src.city);
             team.addProperty(STATE_KEY, src.state);
             team.addProperty(ZIP_KEY, src.zip);
-            team.addProperty(ROLE_KEY, src.role);
 
             return team;
         }
+    }
+
+    // This becaus of a room bug
+    public void setRoles(List<Role> roles) {
+        this.roles.clear();
+        this.roles.addAll(roles);
     }
 
     public void update(Team updatedTeam) {
@@ -190,14 +192,6 @@ public class Team extends TeamEntity implements
         return null;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }
@@ -207,10 +201,7 @@ public class Team extends TeamEntity implements
     }
 
     private Team(Parcel in) {
-        super(in.readString(), in.readString(), in.readString(),
-                in.readString(), in.readString(), in.readString());
-        role = in.readString();
-        in.readList(roles, User.class.getClassLoader());
+        super(in);
         in.readList(joinRequests, User.class.getClassLoader());
 
         items = itemsFromTeam(this);
@@ -223,13 +214,7 @@ public class Team extends TeamEntity implements
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(zip);
-        dest.writeString(city);
-        dest.writeString(state);
-        dest.writeString(imageUrl);
-        dest.writeString(role);
+        super.writeToParcel(dest, flags);
         dest.writeList(roles);
         dest.writeList(joinRequests);
     }

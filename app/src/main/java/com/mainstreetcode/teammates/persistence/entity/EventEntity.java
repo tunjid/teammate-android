@@ -1,14 +1,11 @@
 package com.mainstreetcode.teammates.persistence.entity;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.mainstreetcode.teammates.model.Team;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +15,7 @@ import java.util.Locale;
 
 
 @Entity(tableName = "events",
-        foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "team_id")
+        foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "event_team_id")
 )
 public class EventEntity implements Parcelable {
 
@@ -31,20 +28,18 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_name") protected String name;
     @ColumnInfo(name = "event_notes") protected String notes;
     @ColumnInfo(name = "event_image_url") protected String imageUrl;
+    @ColumnInfo(name = "event_team_id") protected String teamId;
     @ColumnInfo(name = "event_start_date") protected Date startDate;
     @ColumnInfo(name = "event_end_date") protected Date endDate;
 
-    @Embedded
-    protected Team team;
-
-    public EventEntity(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
+    public EventEntity(String id, String name, String notes, String imageUrl, String teamId, Date startDate, Date endDate) {
         this.id = id;
         this.name = name;
         this.notes = notes;
         this.imageUrl = imageUrl;
+        this.teamId = teamId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.team = team;
     }
 
     public String getId() {
@@ -63,6 +58,10 @@ public class EventEntity implements Parcelable {
         return imageUrl;
     }
 
+    public String getTeamId() {
+        return teamId;
+    }
+
     public Date getStartDate() {
         return startDate;
     }
@@ -70,14 +69,11 @@ public class EventEntity implements Parcelable {
     public Date getEndDate() {
         return endDate;
     }
+
     public String getTime() {
         String time = prettyPrinter.format(startDate) + " - ";
         time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
         return time;
-    }
-
-    public Team getTeam() {
-        return team;
     }
 
     private boolean endsSameDay() {
@@ -116,6 +112,10 @@ public class EventEntity implements Parcelable {
         this.imageUrl = imageUrl;
     }
 
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
+    }
+
     protected void setStartDate(String startDate) {
         this.startDate = parseDate(startDate, prettyPrinter);
     }
@@ -124,18 +124,14 @@ public class EventEntity implements Parcelable {
         this.endDate = parseDate(endDate, prettyPrinter);
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
     protected EventEntity(Parcel in) {
         id = in.readString();
         name = in.readString();
         notes = in.readString();
         imageUrl = in.readString();
+        teamId = in.readString();
         startDate = new Date(in.readLong());
         endDate = new Date(in.readLong());
-        team = (Team) in.readValue(Team.class.getClassLoader());
     }
 
     @Override
@@ -149,9 +145,9 @@ public class EventEntity implements Parcelable {
         dest.writeString(name);
         dest.writeString(notes);
         dest.writeString(imageUrl);
+        dest.writeString(teamId);
         dest.writeLong(startDate != null ? startDate.getTime() : -1L);
         dest.writeLong(endDate != null ? endDate.getTime() : -1L);
-        dest.writeValue(team);
     }
 
     public static final Parcelable.Creator<EventEntity> CREATOR = new Parcelable.Creator<EventEntity>() {
