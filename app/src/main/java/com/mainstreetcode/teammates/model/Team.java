@@ -148,7 +148,7 @@ public class Team extends TeamEntity implements
         }
     }
 
-    // This becaus of a room bug
+    // This because of a room bug
     public void setRoles(List<Role> roles) {
         this.roles.clear();
         this.roles.addAll(roles);
