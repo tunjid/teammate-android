@@ -2,8 +2,6 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammates.model.Role;
-import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
 
@@ -25,10 +23,6 @@ public class UserViewModel extends ViewModel {
 
     public boolean isSignedIn() {
         return repository.isSignedIn();
-    }
-
-    public boolean isTeamAdmin(Team team) {
-        return Role.isTeamAdmin(team, getCurrentUser());
     }
 
     public User getCurrentUser() {

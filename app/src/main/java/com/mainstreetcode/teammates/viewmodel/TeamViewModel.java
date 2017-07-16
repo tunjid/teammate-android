@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.viewmodel;
 import android.arch.lifecycle.ViewModel;
 
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.TeamRepository;
@@ -46,20 +47,24 @@ public class TeamViewModel extends ViewModel {
         return repository.getMyTeams();
     }
 
-    public Observable<User> updateTeamUser(Team team, User user) {
-        return repository.updateTeamUser(team, user);
+    public Observable<User> updateTeamUser(Role role) {
+        return repository.updateTeamUser(role);
     }
 
     public Observable<JoinRequest> joinTeam(Team team, String role) {
         return repository.joinTeam(team, role);
     }
 
-    public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
-        return repository.approveUser(team, user, approve);
+    public Observable<Role> approveUser(JoinRequest request) {
+        return repository.approveUser(request);
     }
 
-    public Observable<User> dropUser(Team team, User user) {
-        return repository.dropUser(team, user);
+    public Observable<JoinRequest> declineUser(JoinRequest request) {
+        return repository.declineUser(request);
+    }
+
+    public Observable<User> dropUser(Role role) {
+        return repository.dropUser(role);
     }
 
     public Observable<Team> deleteTeam(Team team) {

@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammates.model;
 
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Relation;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -12,6 +14,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ListableBean;
@@ -43,10 +46,9 @@ public class Team extends TeamEntity implements
 
     @Ignore private String role;
 
-    // Cannot be flattened in SQL
-    //@Relation(parentColumn = "id", entityColumn = "teamId", entity = Role.class)
-    @Ignore List<User> users = new ArrayList<>();
-    @Ignore List<User> pendingUsers = new ArrayList<>();
+    @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
+    @Ignore List<Role> roles = new ArrayList<>();
+    @Ignore List<JoinRequest> joinRequests = new ArrayList<>();
 
     @Ignore private final List<Item<Team>> items;
 
@@ -65,7 +67,7 @@ public class Team extends TeamEntity implements
                 source.get(ZIP_POSITION).value, source.get(LOGO_POSITION).value);
 
         this.items = itemsFromTeam(source);
-        this.users.addAll(source.users);
+        this.roles.addAll(source.roles);
     }
 
     @SuppressWarnings("unchecked")
@@ -107,9 +109,9 @@ public class Team extends TeamEntity implements
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
         private static final String ROLE_KEY = "role";
-        private static final String USERS_KEY = "users";
         private static final String LOGO_KEY = "imageUrl";
-        private static final String PENDING_USERS_KEY = "pendingUsers";
+        private static final String ROLES_KEY = "roles";
+        private static final String JOIN_REQUEST_KEY = "joinRequests";
 
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -130,8 +132,8 @@ public class Team extends TeamEntity implements
             team.get(LOGO_POSITION).setValue(logoUrl);
             team.get(ROLE_POSITION).setValue(role);
 
-            ModelUtils.deserializeList(context, teamJson.get(USERS_KEY), team.users, User.class);
-            ModelUtils.deserializeList(context, teamJson.get(PENDING_USERS_KEY), team.pendingUsers, User.class);
+            ModelUtils.deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
+            ModelUtils.deserializeList(context, teamJson.get(JOIN_REQUEST_KEY), team.joinRequests, JoinRequest.class);
 
             return team;
         }
@@ -154,11 +156,11 @@ public class Team extends TeamEntity implements
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
 
-        users.clear();
-        pendingUsers.clear();
+        roles.clear();
+        joinRequests.clear();
 
-        users.addAll(updatedTeam.getUsers());
-        pendingUsers.addAll(updatedTeam.getPendingUsers());
+        roles.addAll(updatedTeam.getRoles());
+        joinRequests.addAll(updatedTeam.getJoinRequests());
     }
 
     public boolean isNewTeam() {
@@ -182,6 +184,12 @@ public class Team extends TeamEntity implements
         return id.hashCode();
     }
 
+    @Nullable
+    public Role getRoleForUser(User user) {
+        for (Role role : roles) if (role.getUser().equals(user)) return role;
+        return null;
+    }
+
     public String getRole() {
         return role;
     }
@@ -190,20 +198,20 @@ public class Team extends TeamEntity implements
         this.role = role;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public List<User> getPendingUsers() {
-        return pendingUsers;
+    public List<JoinRequest> getJoinRequests() {
+        return joinRequests;
     }
 
     private Team(Parcel in) {
         super(in.readString(), in.readString(), in.readString(),
                 in.readString(), in.readString(), in.readString());
         role = in.readString();
-        in.readList(users, User.class.getClassLoader());
-        in.readList(pendingUsers, User.class.getClassLoader());
+        in.readList(roles, User.class.getClassLoader());
+        in.readList(joinRequests, User.class.getClassLoader());
 
         items = itemsFromTeam(this);
     }
@@ -222,8 +230,8 @@ public class Team extends TeamEntity implements
         dest.writeString(state);
         dest.writeString(imageUrl);
         dest.writeString(role);
-        dest.writeList(users);
-        dest.writeList(pendingUsers);
+        dest.writeList(roles);
+        dest.writeList(joinRequests);
     }
 
     public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {

@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -11,47 +10,47 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
-import com.mainstreetcode.teammates.persistence.entity.UserEntity;
+import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Roles on a team
  * <p>
  * Created by Shemanigans on 6/6/17.
  */
-@Entity(
-        tableName = "roles",
-        primaryKeys = {"userId", "teamId"},
-        foreignKeys = {
-                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "userId"),
-                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "teamId")
-        }
-)
-public class Role implements Parcelable {
+
+public class Role extends RoleEntity
+        implements
+        ListableBean<Role, Item> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final String ADMIN = "Admin";
+    public static final int IMAGE_POSITION = 0;
 
-    private String name;
-    private String userId;
-    private String teamId;
-    private String imageUrl;
+    @Ignore private final List<Item<Role>> items;
 
     @SuppressWarnings("unused")
-    public Role(String name, String userId, String teamId, String imageUrl) {
-        this.name = name;
-        this.teamId = teamId;
-        this.userId = userId;
-        this.imageUrl = imageUrl;
+    public Role(String id, String name, String teamId, String imageUrl, User user) {
+        super(id, name, teamId, imageUrl, user);
+        items = itemsFromRole(this);
+    }
+
+    protected Role(Parcel in) {
+        super(in);
+        items = itemsFromRole(this);
     }
 
     public static class GsonAdapter
             implements
             JsonDeserializer<Role> {
 
+        private static final String ID_KEY = "_id";
         private static final String NAME_KEY = "name";
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
@@ -62,48 +61,48 @@ public class Role implements Parcelable {
 
             JsonObject roleJson = json.getAsJsonObject();
 
+            String id = ModelUtils.asString(ID_KEY, roleJson);
             String name = ModelUtils.asString(NAME_KEY, roleJson);
-            String userId = ModelUtils.asString(USER_KEY, roleJson);
             String teamId = ModelUtils.asString(TEAM_KEY, roleJson);
             String imageUrl = TeammateService.API_BASE_URL + ModelUtils.asString(IMAGE_KEY, roleJson);
+            User user = context.deserialize(roleJson.get(USER_KEY), User.class);
 
-            return new Role(name, userId, teamId, imageUrl);
+            return new Role(id, name, teamId, imageUrl, user);
         }
     }
 
-    public String getName() {
-        return name;
+    @SuppressWarnings("unchecked")
+    private static List<Item<Role>> itemsFromRole(Role role) {
+        User user = role.getUser();
+        String imageUrl =  role.imageUrl;
+        return Arrays.asList(
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, Role.class),
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, Role.class),
+                new Item(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, Role.class),
+                new Item(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, Role.class),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, role.getName(), role::setName, User.class)
+        );
     }
 
-    public String getUserId() {
-        return userId;
+    @Override
+    public int size() {
+        return items.size();
     }
 
-    public String getTeamId() {
-        return teamId;
+    @Override
+    public Item get(int position) {
+        return items.get(position);
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    @Override
+    public Role toSource() {
+        return null;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public boolean isTeamAdmin() {
+        return !TextUtils.isEmpty(name) && ADMIN.equals(name);
     }
 
-    public static boolean isTeamAdmin(Team team, User user) {
-        int index = team.getUsers().indexOf(user);
-        if (index == -1) return false;
-        Role role = team.getUsers().get(index).getRole();
-        return !(role == null || TextUtils.isEmpty(role.getName())) && ADMIN.equals(role.getName());
-    }
-
-    protected Role(Parcel in) {
-        name = in.readString();
-        userId = in.readString();
-        teamId = in.readString();
-        imageUrl = in.readString();
-    }
 
     @Override
     public int describeContents() {
@@ -112,10 +111,7 @@ public class Role implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(userId);
-        dest.writeString(teamId);
-        dest.writeString(imageUrl);
+        super.writeToParcel(dest, flags);
     }
 
     @SuppressWarnings("unused")

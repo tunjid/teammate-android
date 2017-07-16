@@ -17,10 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.UserEditAdapter;
+import com.mainstreetcode.teammates.adapters.RoleEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
-import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.User;
 
 import java.util.ArrayList;
@@ -30,27 +30,24 @@ import java.util.List;
  * Edits a Team member
  */
 
-public class UserEditFragment extends MainActivityFragment
+public class RoleEditFragment extends MainActivityFragment
         implements
         View.OnClickListener,
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
 
-    private static final String ARG_TEAM = "team";
-    private static final String ARG_USER = "user";
+    private static final String ARG_ROLE = "role";
 
-    private Team team;
-    private User user;
+    private Role role;
     private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
-    public static UserEditFragment newInstance(Team team, User user) {
-        UserEditFragment fragment = new UserEditFragment();
+    public static RoleEditFragment newInstance(Role role) {
+        RoleEditFragment fragment = new RoleEditFragment();
         Bundle args = new Bundle();
 
-        args.putParcelable(ARG_TEAM, team);
-        args.putParcelable(ARG_USER, user);
+        args.putParcelable(ARG_ROLE, role);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,11 +55,10 @@ public class UserEditFragment extends MainActivityFragment
     @Override
     public String getStableTag() {
         String superResult = super.getStableTag();
-        Team tempTeam = getArguments().getParcelable(ARG_TEAM);
-        User tempUser = getArguments().getParcelable(ARG_USER);
+        Role tempRole = getArguments().getParcelable(ARG_ROLE);
 
-        return (tempTeam != null && tempUser != null)
-                ? superResult + "-" + tempTeam.hashCode() + "-" + tempUser.hashCode()
+        return (tempRole != null)
+                ? superResult + "-" + tempRole.hashCode()
                 : superResult;
     }
 
@@ -70,8 +66,7 @@ public class UserEditFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        team = getArguments().getParcelable(ARG_TEAM);
-        user = getArguments().getParcelable(ARG_USER);
+        role = getArguments().getParcelable(ARG_ROLE);
 
         getChildFragmentManager().beginTransaction()
                 .add(ImageWorkerFragment.newInstance(), ImageWorkerFragment.TAG)
@@ -84,9 +79,10 @@ public class UserEditFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_user_edit, container, false);
         recyclerView = rootView.findViewById(R.id.user_edit);
 
+        boolean isEditable = role.getUser().equals(userViewModel.getCurrentUser());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new UserEditAdapter(user, roles, userViewModel.getCurrentUser().equals(user), this));
+        recyclerView.setAdapter(new RoleEditAdapter(role, roles, isEditable, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -101,9 +97,7 @@ public class UserEditFragment extends MainActivityFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (userViewModel.isTeamAdmin(team) && !userViewModel.getCurrentUser().equals(user)) {
-            inflater.inflate(R.menu.fragment_user_edit, menu);
-        }
+        if (role.isTeamAdmin()) inflater.inflate(R.menu.fragment_user_edit, menu);
     }
 
     @Override
@@ -138,17 +132,18 @@ public class UserEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String role = user.getRoleName();
 
-                if (TextUtils.isEmpty(role)) {
+                String roleName = role.getName();
+
+                if (TextUtils.isEmpty(roleName)) {
                     showSnackbar("Please select a role");
                     return;
                 }
 
                 disposables.add(
-                        teamViewModel.updateTeamUser(team, user).subscribe(updatedUser -> {
-                            user.update(updatedUser);
-                            showSnackbar(getString(R.string.updated_user, user.getFirstName()));
+                        teamViewModel.updateTeamUser(role).subscribe(updatedUser -> {
+                            role.getUser().update(updatedUser);
+                            showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
                         }, defaultErrorHandler)
                 );
@@ -160,12 +155,12 @@ public class UserEditFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_kick:
-                final String firstName = user.getFirstName();
+                final String firstName = role.getUser().getFirstName();
                 final String prompt = getString(R.string.confirm_user_drop, firstName);
 
                 Snackbar.make(recyclerView, prompt, Snackbar.LENGTH_INDEFINITE)
                         .setAction(R.string.yes, view ->
-                                disposables.add(teamViewModel.dropUser(team, user).subscribe(dropped -> {
+                                disposables.add(teamViewModel.dropUser(role).subscribe(dropped -> {
                                     showSnackbar(getString(R.string.dropped_user, firstName));
                                     getActivity().onBackPressed();
                                 }, defaultErrorHandler)))
@@ -177,7 +172,7 @@ public class UserEditFragment extends MainActivityFragment
 
     @Override
     public void onImageCropped(Uri uri) {
-        user.get(User.IMAGE_POSITION).setValue(uri.getPath());
+        role.get(Role.IMAGE_POSITION).setValue(uri.getPath());
         recyclerView.getAdapter().notifyItemChanged(User.IMAGE_POSITION);
     }
 

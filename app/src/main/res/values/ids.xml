@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="viewholder_date" type="id"/>
     <item name="viewholder_team" type="id"/>
     <item name="viewholder_user" type="id"/>
     <item name="viewholder_role" type="id"/>
-    <item name="viewholder_date" type="id"/>
+    <item name="viewholder_join_request" type="id"/>
     <item name="request_code_team_pick" type="id"/>
     <item name="request_code_image_pick" type="id"/>
 </resources>

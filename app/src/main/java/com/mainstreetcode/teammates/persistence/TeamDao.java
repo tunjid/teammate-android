@@ -30,8 +30,8 @@ public interface TeamDao {
     @Query("SELECT team.team_id, team.team_name, team.team_city, team.team_state, team.team_zip, team.team_image_url" +
             " FROM teams as team" +
             " INNER JOIN roles as role" +
-            " ON team.team_id = role.teamId" +
-            " WHERE :userId = role.userId")
+            " ON team.team_id = role.role_team_id" +
+            " WHERE :userId = role.user_id")
     List<Team> myTeams(String userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

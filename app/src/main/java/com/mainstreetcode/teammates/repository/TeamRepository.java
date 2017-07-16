@@ -85,12 +85,7 @@ public class TeamRepository {
     public Observable<Team> deleteTeam(Team team) {
         return api.deleteTeam(team.getId())
                 .flatMap(team1 -> {
-                    List<User> users = team.getUsers();
-                    List<Role> roles = new ArrayList<>(users.size());
-
-                    for (User user : users) roles.add(user.getRole());
-
-                    roleDao.delete(roles);
+                    roleDao.delete(Collections.unmodifiableList(team.getRoles()));
                     teamDao.delete(team);
 
                     return just(team);
@@ -106,24 +101,26 @@ public class TeamRepository {
      * Used to save a team that has it's users populated
      */
     private Observable<Team> saveTeam(Team team) {
-        List<User> users = team.getUsers();
-        List<Role> roles = new ArrayList<>(users.size());
+        List<Role> roles = team.getRoles();
+        List<User> users = new ArrayList<>(roles.size());
 
-        for (User user : users) roles.add(user.getRole());
+        for (Role role : roles) users.add(role.getUser());
 
         teamDao.insert(Collections.singletonList(team));
         userDao.insert(Collections.unmodifiableList(users));
-        roleDao.insert(roles);
+        roleDao.insert(Collections.unmodifiableList(roles));
 
         return just(team);
     }
 
-    public Observable<User> updateTeamUser(Team team, User user) {
-        Observable<User> userObservable = api.updateTeamUser(team.getId(), user.getId(), user);
+    public Observable<User> updateTeamUser(Role role) {
+        String teamId = role.getTeamId();
+        User user = role.getUser();
+        Observable<User> userObservable = api.updateTeamUser(teamId, user.getId(), user);
 
-        MultipartBody.Part body = RepoUtils.getBody(user.get(User.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = RepoUtils.getBody(role.get(Role.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            userObservable = userObservable.flatMap(put -> api.uploadUserPhoto(team.getId(), user.getId(), body));
+            userObservable = userObservable.flatMap(put -> api.uploadUserPhoto(teamId, user.getId(), body));
         }
 
         return userObservable.flatMap(userRepository::saveUser).observeOn(mainThread());
@@ -133,17 +130,20 @@ public class TeamRepository {
         return api.joinTeam(team.getId(), role).observeOn(mainThread());
     }
 
-    public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
-        Observable<JoinRequest> observable = approve
-                ? api.approveUser(team.getId(), user.getId())
-                : api.declineUser(team.getId(), user.getId());
+    public Observable<Role> approveUser(JoinRequest request) {
+        Observable<Role> observable = api.approveUser(request.getTeamId(), request.getUser().getId());
         return observable.observeOn(mainThread());
     }
 
-    public Observable<User> dropUser(Team team, User user) {
-        return api.dropUser(team.getId(), user.getId()).flatMap(droppedUser -> {
-            roleDao.delete(Collections.singletonList(user.getRole()));
-            return just(user);
+    public Observable<JoinRequest> declineUser(JoinRequest request) {
+        Observable<JoinRequest> observable = api.declineUser(request.getTeamId(), request.getUser().getId());
+        return observable.observeOn(mainThread());
+    }
+
+    public Observable<User> dropUser(Role role) {
+        return api.dropUser(role.getTeamId(), role.getUser().getId()).flatMap(droppedUser -> {
+            roleDao.delete(Collections.singletonList(role));
+            return just(role.getUser());
         });
     }
 

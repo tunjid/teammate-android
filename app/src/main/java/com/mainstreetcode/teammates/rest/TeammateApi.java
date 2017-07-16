@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.rest;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
@@ -72,7 +73,7 @@ public interface TeammateApi {
                                     @Body User user);
 
     @GET("api/teams/{teamId}/user/{userId}/approve")
-    Observable<JoinRequest> approveUser(@Path("teamId") String teamId, @Path("userId") String userId);
+    Observable<Role> approveUser(@Path("teamId") String teamId, @Path("userId") String userId);
 
     @GET("api/teams/{teamId}/user/{userId}/decline")
     Observable<JoinRequest> declineUser(@Path("teamId") String teamId, @Path("userId") String userId);

@@ -13,6 +13,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -24,17 +25,17 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class UserEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
     private static final int PADDING = 11;
 
-    private final User user;
+    private final Role role;
     private final List<String> roles;
     private final boolean isEditable;
 
-    public UserEditAdapter(User user, List<String> roles, boolean isEditable, ImageWorkerFragment.ImagePickerListener listener) {
+    public RoleEditAdapter(Role role, List<String> roles, boolean isEditable, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
-        this.user = user;
+        this.role = role;
         this.roles = roles;
         this.isEditable = isEditable;
     }
@@ -65,17 +66,17 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(BaseItemViewHolder baseItemViewHolder, int i) {
-        if (i == user.size()) return;
-        baseItemViewHolder.bind(user.get(i));
+        if (i == role.size()) return;
+        baseItemViewHolder.bind(role.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return user.size() + 1;
+        return role.size() + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == user.size() ? PADDING : user.get(position).getItemType();
+        return position == role.size() ? PADDING : role.get(position).getItemType();
     }
 }

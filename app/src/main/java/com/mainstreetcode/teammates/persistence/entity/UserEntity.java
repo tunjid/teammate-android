@@ -10,7 +10,7 @@ import android.os.Parcelable;
 import com.mainstreetcode.teammates.model.User;
 
 @Entity(tableName = "users")
-public class UserEntity implements Parcelable{
+public class UserEntity implements Parcelable {
 
     @PrimaryKey @ColumnInfo(name = "user_id") protected String id;
     @ColumnInfo(name = "user_first_name") protected String firstName;
@@ -57,15 +57,15 @@ public class UserEntity implements Parcelable{
         return imageUrl;
     }
 
-    protected void setFirstName(String firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    protected void setLastName(String lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    protected void setPrimaryEmail(String primaryEmail) {
+    public void setPrimaryEmail(String primaryEmail) {
         this.primaryEmail = primaryEmail;
     }
 

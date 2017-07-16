@@ -8,15 +8,10 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
-import lombok.Getter;
-import lombok.experimental.Builder;
-
 /**
  * Join request for a {@link Team}
  */
 
-@Getter
-@Builder
 public class JoinRequest {
 
     public static final String DB_NAME = "joinRequests";
@@ -27,16 +22,36 @@ public class JoinRequest {
 
     boolean teamApproved;
     boolean userApproved;
-    String teamId;
-    String userId;
     String roleName;
+    String teamId;
+    User user;
 
-     JoinRequest(boolean teamApproved, boolean userApproved, String teamId, String userId, String roleName) {
+    JoinRequest(boolean teamApproved, boolean userApproved, String roleName, String teamId, User user) {
         this.teamApproved = teamApproved;
         this.userApproved = userApproved;
-        this.teamId = teamId;
-        this.userId = userId;
         this.roleName = roleName;
+        this.teamId = teamId;
+        this.user = user;
+    }
+
+    public boolean isTeamApproved() {
+        return teamApproved;
+    }
+
+    public boolean isUserApproved() {
+        return userApproved;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public static class GsonAdapter
@@ -57,11 +72,11 @@ public class JoinRequest {
             boolean teamApproved = ModelUtils.asBoolean(TEAM_APPROVAL_KEY, requestJson);
             boolean userApproved = ModelUtils.asBoolean(USER_APPROVAL_KEY, requestJson);
 
-            String userId = ModelUtils.asString(USER_KEY, requestJson);
-            String teamId = ModelUtils.asString(TEAM_KEY, requestJson);
             String roleName = ModelUtils.asString(NAME_KEY, requestJson);
+            String teamId = ModelUtils.asString(TEAM_KEY, requestJson);
+            User user = context.deserialize(requestJson.get(USER_KEY), User.class);
 
-            return new JoinRequest(teamApproved, userApproved, teamId, userId, roleName);
+            return new JoinRequest(teamApproved, userApproved, roleName, teamId, user);
         }
     }
 }

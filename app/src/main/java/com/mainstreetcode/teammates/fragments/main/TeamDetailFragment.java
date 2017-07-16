@@ -18,8 +18,12 @@ import android.widget.EditText;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * Displays a {@link Team team's} {@link User members}.
@@ -33,6 +37,7 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
+    private Role currentRole;
     private RecyclerView recyclerView;
 
     public static TeamDetailFragment newInstance(Team team) {
@@ -90,6 +95,9 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         toggleFab(false);
 
+        final User user = userViewModel.getCurrentUser();
+        currentRole = team.getRoleForUser(user);
+
         disposables.add(teamViewModel.getTeam(team).subscribe(
                 updatedTeam -> {
                     team.update(updatedTeam);
@@ -104,7 +112,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_team_detail, menu);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
-        deleteItem.setVisible(userViewModel.isTeamAdmin(team));
+        deleteItem.setVisible(currentRole != null && currentRole.isTeamAdmin());
     }
 
     @Override
@@ -131,18 +139,26 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public void onUserClicked(User user) {
+    public void onRoleClicked(Role role) {
         View rootView = getView();
         if (rootView == null) return;
 
-        if (user.isUserApproved() && !user.isTeamApproved() && userViewModel.isTeamAdmin(team)) {
-            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, user.getFirstName()))
-                    .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(user, true))
-                    .setNegativeButton(R.string.no, (dialog, which) -> approveUser(user, false))
-                    .show();
+
+        if (team.getRoles().contains(role)) {
+            showFragment(RoleEditFragment.newInstance(role));
         }
-        else if (team.getUsers().contains(user)) {
-            showFragment(UserEditFragment.newInstance(team, user));
+    }
+
+    @Override
+    public void onJoinRequestClicked(JoinRequest request) {
+        View rootView = getView();
+        if (rootView == null) return;
+
+        if (request.isUserApproved() && !request.isTeamApproved() && currentRole.isTeamAdmin()) {
+            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(request, true))
+                    .setNegativeButton(R.string.no, (dialog, which) -> approveUser(request, false))
+                    .show();
         }
     }
 
@@ -172,22 +188,30 @@ public class TeamDetailFragment extends MainActivityFragment
         }
     }
 
-    private void approveUser(final User user, final boolean approve) {
-        disposables.add(
-                teamViewModel.approveUser(team, user, approve).subscribe((joinRequest) -> {
-                    if (approve) {
-                        //user.setTeamApproved(true);
-                        team.getUsers().add(user);
-                    }
-                    team.getPendingUsers().remove(user);
-                    recyclerView.getAdapter().notifyDataSetChanged();
+    private void approveUser(final JoinRequest request, final boolean approve) {
+        Disposable disposable;
 
-                    String name = user.getFirstName();
-                    showSnackbar(approve
-                            ? getString(R.string.added_user, name)
-                            : getString(R.string.removed_user, name));
-                }, defaultErrorHandler)
-        );
+        if (approve) {
+            disposable = teamViewModel.approveUser(request).subscribe((role) -> {
+                team.getRoles().add(role);
+                team.getJoinRequests().remove(request);
+                recyclerView.getAdapter().notifyDataSetChanged();
+
+                String name = role.getUser().getFirstName();
+                showSnackbar(getString(R.string.added_user, name));
+            }, defaultErrorHandler);
+        }
+        else {
+            disposable = teamViewModel.declineUser(request).subscribe((joinRequest) -> {
+                team.getJoinRequests().remove(request);
+                recyclerView.getAdapter().notifyDataSetChanged();
+
+                String name = joinRequest.getUser().getFirstName();
+                showSnackbar(getString(R.string.removed_user, name));
+            }, defaultErrorHandler);
+        }
+
+        disposables.add(disposable);
     }
 
     private void deleteTeam() {

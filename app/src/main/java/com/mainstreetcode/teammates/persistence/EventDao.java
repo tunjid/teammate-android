@@ -21,8 +21,8 @@ public interface EventDao {
             " INNER JOIN teams as team" +
             " ON event.team_id = team.team_id" +
             " INNER JOIN roles as role" +
-            " ON team.team_id = role.teamId" +
-            " WHERE :userId = role.userId")
+            " ON team.team_id = role.role_team_id" +
+            " WHERE :userId = role.user_id")
     List<Event> getEvents(String userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
