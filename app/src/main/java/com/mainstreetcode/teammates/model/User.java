@@ -14,7 +14,6 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -29,7 +28,7 @@ import static com.mainstreetcode.teammates.model.ModelUtils.asString;
  */
 
 public class User extends UserEntity implements
-        ListableBean<User, Item> {
+        ItemListableBean<User> {
 
     public static final int IMAGE_POSITION = 0;
     public static final int EMAIL_POSITION = 3;
@@ -42,7 +41,24 @@ public class User extends UserEntity implements
     public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
         super(id, firstName, lastName, primaryEmail, imageUrl);
 
-        items = itemsFromUser(this);
+        items = buildItems();
+    }
+
+    protected User(Parcel in) {
+        super(in);
+        items = buildItems();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Item<User>> buildItems() {
+        return Arrays.asList(
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, User.class),
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, firstName == null ? "" : firstName, this::setFirstName, User.class),
+                new Item(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, User.class),
+                new Item(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, User.class)
+                //new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName, User.class)
+        );
     }
 
     @Override
@@ -55,10 +71,36 @@ public class User extends UserEntity implements
         return items.get(position);
     }
 
-    @Override
-    public User toSource() {
-        return null;
+    public void update(User updatedUser) {
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+    }
+
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
     public static class GsonAdapter implements
             JsonSerializer<User>,
@@ -87,7 +129,6 @@ public class User extends UserEntity implements
         @Override
         public JsonElement serialize(User src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject user = new JsonObject();
-            //user.addProperty(UID_KEY, src.id);
             user.addProperty(FIRST_NAME_KEY, src.firstName);
             user.addProperty(LAST_NAME_KEY, src.lastName);
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
@@ -96,55 +137,4 @@ public class User extends UserEntity implements
             return user;
         }
     }
-
-    @SuppressWarnings("unchecked")
-    private static List<Item<User>> itemsFromUser(User user) {
-        String imageUrl =  user.imageUrl;
-        return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, User.class),
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.firstName == null ? "" : user.firstName, user::setFirstName, User.class),
-                new Item(Item.INPUT, R.string.last_name, user.lastName == null ? "" : user.lastName, user::setLastName, User.class),
-                new Item(Item.INPUT, R.string.email, user.primaryEmail == null ? "" : user.primaryEmail, user::setPrimaryEmail, User.class)
-                //new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName, User.class)
-        );
-    }
-
-    public void update(User updatedUser) {
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
-    }
-
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-
-
-    protected User(Parcel in) {
-        super(in);
-        items = itemsFromUser(this);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-    }
-
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
 }

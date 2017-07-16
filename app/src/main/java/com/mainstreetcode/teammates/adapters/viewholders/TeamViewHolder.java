@@ -30,6 +30,8 @@ public class TeamViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterListen
     }
 
     public void bind(Team item) {
+        if (item.isEmpty()) return;
+        
         this.item = item;
         teamName.setText(item.getName());
         teamLocation.setText(item.getCity());

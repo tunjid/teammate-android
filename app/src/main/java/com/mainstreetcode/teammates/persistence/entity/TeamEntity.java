@@ -26,6 +26,15 @@ public class TeamEntity implements Parcelable{
         this.imageUrl = imageUrl;
     }
 
+    protected TeamEntity(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        city = in.readString();
+        state = in.readString();
+        zip = in.readString();
+        imageUrl = in.readString();
+    }
+
     public String getId() {return this.id;}
 
     public String getName() {return this.name;}
@@ -60,13 +69,20 @@ public class TeamEntity implements Parcelable{
         this.imageUrl = imageUrl;
     }
 
-    protected TeamEntity(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        city = in.readString();
-        state = in.readString();
-        zip = in.readString();
-        imageUrl = in.readString();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TeamEntity)) return false;
+
+        TeamEntity team = (TeamEntity) o;
+
+        //return uid.equals(team.uid);
+        return id.equals(team.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     @Override

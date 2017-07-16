@@ -101,7 +101,7 @@ public class TeamEditFragment extends MainActivityFragment
         toggleFab(true);
         setToolbarTitle(getString(!isEditable
                 ? R.string.join_team
-                : team.isNewTeam()
+                : team.isEmpty()
                 ? R.string.create_team
                 : R.string.edit_team));
 
@@ -159,7 +159,7 @@ public class TeamEditFragment extends MainActivityFragment
                             .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
                 }
                 // Create a team
-                else if (team.isNewTeam()) {
+                else if (team.isEmpty()) {
                     disposable = teamViewModel.createTeam(team)
                             .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
                 }

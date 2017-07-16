@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -63,7 +64,10 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        toggleFab(false);
+        FloatingActionButton fab = getFab();
+        fab.setImageResource(R.drawable.ic_add_white_24dp);
+        fab.setOnClickListener(this);
+        toggleFab(true);
         setToolbarTitle(getString(R.string.my_events));
 
         String userId = userViewModel.getCurrentUser().getId();
@@ -84,8 +88,8 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.create_team:
-                //showFragment(EventEditFragment.newInstance(Event.empty()));
+            case R.id.fab:
+                showFragment(EventEditFragment.newInstance(Event.empty()));
                 break;
         }
     }

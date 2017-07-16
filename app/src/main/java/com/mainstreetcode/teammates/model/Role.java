@@ -13,7 +13,6 @@ import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -27,7 +26,7 @@ import java.util.List;
 
 public class Role extends RoleEntity
         implements
-        ListableBean<Role, Item> {
+        ItemListableBean<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final String ADMIN = "Admin";
@@ -39,13 +38,63 @@ public class Role extends RoleEntity
     @SuppressWarnings("unused")
     public Role(String id, String name, String teamId, String imageUrl, User user) {
         super(id, name, teamId, imageUrl, user);
-        items = itemsFromRole(this);
+        items = buildItems();
     }
 
     protected Role(Parcel in) {
         super(in);
-        items = itemsFromRole(this);
+        items = buildItems();
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Item<Role>> buildItems() {
+        User user = getUser();
+        return Arrays.asList(
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, Role.class),
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, Role.class),
+                new Item(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, Role.class),
+                new Item(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, Role.class),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, name, this::setName, User.class)
+        );
+    }
+
+    @Override
+    public int size() {
+        return items.size();
+    }
+
+    @Override
+    public Item get(int position) {
+        return items.get(position);
+    }
+
+    public boolean isTeamAdmin() {
+        return !TextUtils.isEmpty(name) && ADMIN.equals(name);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Role> CREATOR = new Parcelable.Creator<Role>() {
+        @Override
+        public Role createFromParcel(Parcel in) {
+            return new Role(in);
+        }
+
+        @Override
+        public Role[] newArray(int size) {
+            return new Role[size];
+        }
+    };
 
     public static class GsonAdapter
             implements
@@ -71,60 +120,4 @@ public class Role extends RoleEntity
             return new Role(id, name, teamId, imageUrl, user);
         }
     }
-
-    @SuppressWarnings("unchecked")
-    private static List<Item<Role>> itemsFromRole(Role role) {
-        User user = role.getUser();
-        String imageUrl =  role.imageUrl;
-        return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, Role.class),
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, Role.class),
-                new Item(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, Role.class),
-                new Item(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, Role.class),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, role.getName(), role::setName, User.class)
-        );
-    }
-
-    @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public Role toSource() {
-        return null;
-    }
-
-    public boolean isTeamAdmin() {
-        return !TextUtils.isEmpty(name) && ADMIN.equals(name);
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Role> CREATOR = new Parcelable.Creator<Role>() {
-        @Override
-        public Role createFromParcel(Parcel in) {
-            return new Role(in);
-        }
-
-        @Override
-        public Role[] newArray(int size) {
-            return new Role[size];
-        }
-    };
 }

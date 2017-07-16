@@ -15,7 +15,6 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -29,13 +28,13 @@ import java.util.List;
 
 public class Event extends EventEntity
         implements
-        ListableBean<Event, Item> {
+        ItemListableBean<Event> {
 
     public static final int LOGO_POSITION = 0;
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
 
     private static final Date date = new Date();
-    private static final Event EMPTY = new Event("*", "*", "*", "*", date, date, Team.empty());
+    private static final Event EMPTY = new Event("", "", "", "", date, date, Team.empty());
 
     @Embedded
     private Team team;
@@ -44,14 +43,34 @@ public class Event extends EventEntity
     @Ignore private List<User> absentees = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
 
-    public static Event empty(Team team) {
+    public static Event empty() {
         return EMPTY;
     }
 
     public Event(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
         super(id, name, notes, imageUrl, team.getId(), startDate, endDate);
         this.team = team;
-        items = itemsFromEvent(this);
+        items = buildItems();
+    }
+
+    protected Event(Parcel in) {
+        super(in);
+        team = (Team) in.readValue(Team.class.getClassLoader());
+        in.readList(attendees, User.class.getClassLoader());
+        in.readList(absentees, User.class.getClassLoader());
+        items = buildItems();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Item<Event>> buildItems() {
+        return Arrays.asList(
+                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, Event.class),
+                new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, Event.class),
+                new Item(Item.INPUT, R.string.notes, notes == null ? "" : notes, this::setNotes, Event.class),
+                new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, Event.class),
+                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, Event.class)
+        );
     }
 
     @Override
@@ -64,12 +83,6 @@ public class Event extends EventEntity
         return items.get(position);
     }
 
-    @Override
-    public Event toSource() {
-        return null;
-    }
-
-
     public Team getTeam() {
         return team;
     }
@@ -78,9 +91,54 @@ public class Event extends EventEntity
         this.team = team;
     }
 
-    public  void setRoles(List<Role> roles){
+    public void setRoles(List<Role> roles) {
         team.setRoles(roles);
     }
+
+    public boolean isEmpty() {
+        return equals(empty());
+    }
+
+
+    public void update(Event updatedEvent) {
+        this.id = updatedEvent.getId();
+
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
+
+        attendees.clear();
+        absentees.clear();
+
+        attendees.addAll(updatedEvent.attendees);
+        absentees.addAll(updatedEvent.absentees);
+
+        team.update(updatedEvent.team);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeValue(team);
+        dest.writeList(attendees);
+        dest.writeList(absentees);
+    }
+
+    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
+        @Override
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
 
     public static class GsonAdapter
             implements
@@ -124,80 +182,4 @@ public class Event extends EventEntity
             return new Event(id, name, notes, imageUrl, parseDate(startDate), parseDate(endDate), team);
         }
     }
-
-    @SuppressWarnings("unchecked")
-    private static List<Item<Event>> itemsFromEvent(Event event) {
-        return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, event.imageUrl, event::setImageUrl, Event.class),
-                new Item(Item.INPUT, R.string.event_name, event.name == null ? "" : event.name, event::setName, Event.class),
-                new Item(Item.INPUT, R.string.notes, event.notes == null ? "" : event.notes, event::setNotes, Event.class),
-                new Item(Item.DATE, R.string.start_date, prettyPrinter.format(event.startDate), event::setStartDate, Event.class),
-                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(event.endDate), event::setEndDate, Event.class)
-        );
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Event)) return false;
-
-        Event event = (Event) o;
-
-        return id.equals(event.id);
-    }
-
-    public boolean isEmpty() {
-        return equals(empty(Team.empty()));
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    public void update(Event updatedEvent) {
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
-
-        attendees.clear();
-        absentees.clear();
-
-        attendees.addAll(updatedEvent.attendees);
-        absentees.addAll(updatedEvent.absentees);
-
-        team.update(updatedEvent.team);
-    }
-
-    protected Event(Parcel in) {
-        super(in);
-        team = (Team) in.readValue(Team.class.getClassLoader());
-        in.readList(attendees, User.class.getClassLoader());
-        in.readList(absentees, User.class.getClassLoader());
-        items = itemsFromEvent(this);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(team);
-        dest.writeList(attendees);
-        dest.writeList(absentees);
-    }
-
-    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
-        @Override
-        public Event createFromParcel(Parcel in) {
-            return new Event(in);
-        }
-
-        @Override
-        public Event[] newArray(int size) {
-            return new Event[size];
-        }
-    };
 }

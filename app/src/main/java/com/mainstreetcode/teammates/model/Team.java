@@ -17,7 +17,6 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.ListableBean;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -29,12 +28,12 @@ import java.util.List;
  */
 
 public class Team extends TeamEntity implements
-        ListableBean<Team, Item> {
+        ItemListableBean<Team> {
 
     public static final int LOGO_POSITION = 0;
-    private static final int NAME_POSITION = 1;
-    private static final int CITY_POSITION = 2;
-    private static final int STATE_POSITION = 3;
+    //    private static final int NAME_POSITION = 1;
+//    private static final int CITY_POSITION = 2;
+//    private static final int STATE_POSITION = 3;
     public static final int ZIP_POSITION = 4;
     public static final int ROLE_POSITION = 5;
 
@@ -46,7 +45,7 @@ public class Team extends TeamEntity implements
     @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
     private List<Role> roles = new ArrayList<>();
 
-    @Ignore List<JoinRequest> joinRequests = new ArrayList<>();
+    @Ignore private List<JoinRequest> joinRequests = new ArrayList<>();
 
     @Ignore private final List<Item<Team>> items;
 
@@ -57,26 +56,25 @@ public class Team extends TeamEntity implements
     public Team(String id, String name, String city, String state, String zip, String imageUrl) {
         super(id, name, city, state, zip, imageUrl);
 
-        items = itemsFromTeam(this);
+        items = buildItems();
     }
 
-    private Team(Team source) {
-        super(source.id, source.get(NAME_POSITION).value,
-                source.get(CITY_POSITION).value, source.get(STATE_POSITION).value,
-                source.get(ZIP_POSITION).value, source.get(LOGO_POSITION).value);
-
-        this.items = itemsFromTeam(source);
-        this.roles.addAll(source.roles);
+    private Team(Parcel in) {
+        super(in);
+        in.readList(roles, Role.class.getClassLoader());
+        in.readList(joinRequests, JoinRequest.class.getClassLoader());
+        items = buildItems();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    private static List<Item<Team>> itemsFromTeam(Team team) {
+    public List<Item<Team>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, team.imageUrl, team::setImageUrl, Team.class),
-                new Item(Item.INPUT, R.string.team_name, R.string.team_info, team.name == null ? "" : team.name, team::setName, Team.class),
-                new Item(Item.INPUT, R.string.city, team.city == null ? "" : team.city, team::setCity, Team.class),
-                new Item(Item.INPUT, R.string.state, team.state == null ? "" : team.state, team::setState, Team.class),
-                new Item(Item.INPUT, R.string.zip, team.zip == null ? "" : team.zip, team::setZip, Team.class),
+                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, Team.class),
+                new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, Team.class),
+                new Item(Item.INPUT, R.string.city, city == null ? "" : city, this::setCity, Team.class),
+                new Item(Item.INPUT, R.string.state, state == null ? "" : state, this::setState, Team.class),
+                new Item(Item.INPUT, R.string.zip, zip == null ? "" : zip, this::setZip, Team.class),
                 new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, Team.class)
         );
     }
@@ -91,10 +89,66 @@ public class Team extends TeamEntity implements
         return items.get(position);
     }
 
-    @Override
-    public Team toSource() {
-        return new Team(this);
+    public boolean isEmpty() {
+        return this.equals(EMPTY);
     }
+
+    // This because of a room bug
+    public void setRoles(List<Role> roles) {
+        this.roles.clear();
+        this.roles.addAll(roles);
+    }
+
+    public void update(Team updatedTeam) {
+        this.id = updatedTeam.id;
+
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
+
+        roles.clear();
+        joinRequests.clear();
+
+        roles.addAll(updatedTeam.getRoles());
+        joinRequests.addAll(updatedTeam.getJoinRequests());
+    }
+
+    @Nullable
+    public Role getRoleForUser(User user) {
+        for (Role role : roles) if (role.getUser().equals(user)) return role;
+        return null;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public List<JoinRequest> getJoinRequests() {
+        return joinRequests;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeList(roles);
+        dest.writeList(joinRequests);
+    }
+
+    public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {
+        @Override
+        public Team createFromParcel(Parcel in) {
+            return new Team(in);
+        }
+
+        @Override
+        public Team[] newArray(int size) {
+            return new Team[size];
+        }
+    };
 
 
     public static class GsonAdapter
@@ -147,88 +201,4 @@ public class Team extends TeamEntity implements
             return team;
         }
     }
-
-    // This because of a room bug
-    public void setRoles(List<Role> roles) {
-        this.roles.clear();
-        this.roles.addAll(roles);
-    }
-
-    public void update(Team updatedTeam) {
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
-
-        roles.clear();
-        joinRequests.clear();
-
-        roles.addAll(updatedTeam.getRoles());
-        joinRequests.addAll(updatedTeam.getJoinRequests());
-    }
-
-    public boolean isNewTeam() {
-        return NEW_TEAM.equals(id);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Team)) return false;
-
-        Team team = (Team) o;
-
-        //return uid.equals(team.uid);
-        return id.equals(team.id);
-    }
-
-    @Override
-    public int hashCode() {
-        //return uid.hashCode();
-        return id.hashCode();
-    }
-
-    @Nullable
-    public Role getRoleForUser(User user) {
-        for (Role role : roles) if (role.getUser().equals(user)) return role;
-        return null;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public List<JoinRequest> getJoinRequests() {
-        return joinRequests;
-    }
-
-    private Team(Parcel in) {
-        super(in);
-        in.readList(joinRequests, User.class.getClassLoader());
-
-        items = itemsFromTeam(this);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeList(roles);
-        dest.writeList(joinRequests);
-    }
-
-    public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {
-        @Override
-        public Team createFromParcel(Parcel in) {
-            return new Team(in);
-        }
-
-        @Override
-        public Team[] newArray(int size) {
-            return new Team[size];
-        }
-    };
-
 }

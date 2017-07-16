@@ -28,7 +28,9 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_name") protected String name;
     @ColumnInfo(name = "event_notes") protected String notes;
     @ColumnInfo(name = "event_image_url") protected String imageUrl;
-    @ColumnInfo(name = "event_team_id") protected String teamId;
+
+    @ColumnInfo(name = "event_team_id") private String teamId;
+
     @ColumnInfo(name = "event_start_date") protected Date startDate;
     @ColumnInfo(name = "event_end_date") protected Date endDate;
 
@@ -40,6 +42,16 @@ public class EventEntity implements Parcelable {
         this.teamId = teamId;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    protected EventEntity(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        notes = in.readString();
+        imageUrl = in.readString();
+        teamId = in.readString();
+        startDate = new Date(in.readLong());
+        endDate = new Date(in.readLong());
     }
 
     public String getId() {
@@ -124,14 +136,20 @@ public class EventEntity implements Parcelable {
         this.endDate = parseDate(endDate, prettyPrinter);
     }
 
-    protected EventEntity(Parcel in) {
-        id = in.readString();
-        name = in.readString();
-        notes = in.readString();
-        imageUrl = in.readString();
-        teamId = in.readString();
-        startDate = new Date(in.readLong());
-        endDate = new Date(in.readLong());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EventEntity)) return false;
+
+        EventEntity event = (EventEntity) o;
+
+        return id.equals(event.id);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     @Override
