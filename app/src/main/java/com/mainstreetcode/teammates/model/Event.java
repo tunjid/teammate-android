@@ -27,6 +27,7 @@ import java.util.List;
 
 public class Event extends EventEntity
         implements
+        Model<Event>,
         ItemListableBean<Event> {
 
     public static final int LOGO_POSITION = 0;
@@ -79,19 +80,12 @@ public class Event extends EventEntity
         return items.get(position);
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
-    public void setRoles(List<Role> roles) {
-        team.setRoles(roles);
-    }
-
+    @Override
     public boolean isEmpty() {
         return equals(empty());
     }
 
-
+    @Override
     public void update(Event updatedEvent) {
         this.id = updatedEvent.getId();
 
@@ -106,6 +100,16 @@ public class Event extends EventEntity
 
         team.update(updatedEvent.team);
     }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public void setRoles(List<Role> roles) {
+        team.setRoles(roles);
+    }
+
+
 
     @Override
     public int describeContents() {

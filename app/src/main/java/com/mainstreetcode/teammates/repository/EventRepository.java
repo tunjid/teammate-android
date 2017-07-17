@@ -22,7 +22,7 @@ import static io.reactivex.Observable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository {
+public class EventRepository extends CrudRespository<Event> {
 
     private static EventRepository ourInstance;
 
@@ -41,49 +41,53 @@ public class EventRepository {
         return ourInstance;
     }
 
-    public Observable<List<Event>> getEvents(String userId) {
-        Observable<List<Event>> local = fromCallable(() -> eventDao.getEvents(userId)).subscribeOn(io());
-        Observable<List<Event>> remote = api.getEvents().flatMap(this::saveEvents);
-
-        return concat(local, remote).observeOn(mainThread());
-    }
-
-
-    public Observable<Event> getEvent(Event event) {
-        return api.getEvent(event.getId())
-                .flatMap(this::saveEvent)
-                .observeOn(mainThread());
-    }
-
-    public Observable<Event> updateEvent(Event event) {
+    @Override
+    public Observable<Event> createOrUpdate(Event event) {
         Observable<Event> eventObservable = event.isEmpty()
-                ? api.createEvent(event)
-                : api.updateEvent(event.getId(), event);
+                ? api.createEvent(event).flatMap(created -> updateLocal(created, event))
+                : api.updateEvent(event.getId(), event).flatMap(created -> updateLocal(created, event));
 
         MultipartBody.Part body = getBody(event.get(Event.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
             eventObservable = eventObservable.flatMap(put -> api.uploadEventPhoto(event.getId(), body));
         }
 
-        return eventObservable.flatMap(this::saveEvent).observeOn(mainThread());
+        return eventObservable.flatMap(this::save).observeOn(mainThread());
     }
 
-    public Observable<Event> deleteEvent(Event event) {
-        return api.deleteEvent(event.getId())
-                .flatMap(team1 -> {
-//                    List<User> users = event.getUsers();
-//                    List<Role> roles = new ArrayList<>(users.size());
-//
-//                    for (User user : users) roles.add(user.getRole());
-//
-//                    roleDao.delete(roles);
-//                    teamDao.delete(event);
-
-                    return just(event);
-                });
+    @Override
+    public Observable<Event> get(String id) {
+        return api.getEvent(id)
+                .flatMap(this::save)
+                .observeOn(mainThread());
     }
 
-    private Observable<List<Event>> saveEvents(List<Event> events) {
+    @Override
+    public Observable<List<Event>> getList(String userId) {
+        Observable<List<Event>> local = fromCallable(() -> eventDao.getEvents(userId)).subscribeOn(io());
+        Observable<List<Event>> remote = api.getEvents().flatMap(this::saveList);
+
+        return concat(local, remote).observeOn(mainThread());
+    }
+
+
+//    public Observable<Event> deleteEvent(Event event) {
+//        return api.deleteEvent(event.getId())
+//                .flatMap(team1 -> {
+////                    List<User> users = event.getUsers();
+////                    List<Role> roles = new ArrayList<>(users.size());
+////
+////                    for (User user : users) roles.add(user.getRole());
+////
+////                    roleDao.delete(roles);
+////                    teamDao.delete(event);
+//
+//                    return just(event);
+//                });
+//    }
+
+    @Override
+    Observable<List<Event>> saveList(List<Event> events) {
         List<Team> teams = new ArrayList<>(events.size());
         for (Event event : events) teams.add(event.getTeam());
 
@@ -96,16 +100,8 @@ public class EventRepository {
     /**
      * Used to save a event that has it's users populated
      */
-    private Observable<Event> saveEvent(Event event) {
-//        List<User> users = event.getUsers();
-//        List<Role> roles = new ArrayList<>(users.size());
-//
-//        for (User user : users) roles.add(user.getRole());
-//
-//        teamDao.insert(Collections.singletonList(event));
-//        userDao.insert(users);
-//        roleDao.insert(roles);
-
-        return just(event);
+    @Override
+    Observable<Event> save(Event event) {
+        return saveList(Collections.singletonList(event)).flatMap(events -> just(events.get(0)));
     }
 }
