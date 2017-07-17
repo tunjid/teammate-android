@@ -63,6 +63,7 @@ dependencies {
 
     compile 'com.github.florent37:picassopalette:2.0.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.4.6'
+    compile 'com.facebook.stetho:stetho:1.5.0'
 
     //compile 'com.tunjid.android-bootstrap:core:1.0.0-SNAPSHOT'
     compile group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.0-SNAPSHOT", changing: true

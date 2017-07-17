@@ -93,7 +93,19 @@ public class TeamRepository {
     }
 
     Observable<List<Team>> saveTeams(List<Team> teams) {
+        List<Role> roles = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+
+        for (Team team : teams) {
+            List<Role> teamRoles = team.getRoles();
+            roles.addAll(teamRoles);
+            for(Role role : teamRoles) users.add(role.getUser());
+        }
+
         teamDao.insert(Collections.unmodifiableList(teams));
+        userDao.insert(Collections.unmodifiableList(users));
+        roleDao.insert(Collections.unmodifiableList(roles));
+
         return just(teams);
     }
 
@@ -101,16 +113,7 @@ public class TeamRepository {
      * Used to save a team that has it's users populated
      */
     private Observable<Team> saveTeam(Team team) {
-        List<Role> roles = team.getRoles();
-        List<User> users = new ArrayList<>(roles.size());
-
-        for (Role role : roles) users.add(role.getUser());
-
-        teamDao.insert(Collections.singletonList(team));
-        userDao.insert(Collections.unmodifiableList(users));
-        roleDao.insert(Collections.unmodifiableList(roles));
-
-        return just(team);
+        return saveTeams(Collections.singletonList(team)).flatMap(teams -> just(teams.get(0)));
     }
 
     public Observable<User> updateTeamUser(Role role) {

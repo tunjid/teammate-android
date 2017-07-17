@@ -27,7 +27,7 @@ public interface TeamDao {
     @Query("SELECT * FROM teams")
     List<Team> getTeams();
 
-    @Query("SELECT team.team_id, team.team_name, team.team_city, team.team_state, team.team_zip, team.team_image_url" +
+    @Query("SELECT *" +
             " FROM teams as team" +
             " INNER JOIN roles as role" +
             " ON team.team_id = role.role_team_id" +

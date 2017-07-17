@@ -45,6 +45,9 @@ public class Team extends TeamEntity implements
     @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
     private List<Role> roles = new ArrayList<>();
 
+    @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
+    public List<RoleEntity> roleEntities = new ArrayList<>();
+
     @Ignore private List<JoinRequest> joinRequests = new ArrayList<>();
 
     @Ignore private final List<Item<Team>> items;

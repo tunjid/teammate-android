@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.model;
 
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,8 +35,6 @@ public class Event extends EventEntity
     private static final Date date = new Date();
     private static final Event EMPTY = new Event("", "", "", "", date, date, Team.empty());
 
-    @Embedded
-    private Team team;
 
     @Ignore private List<User> attendees = new ArrayList<>();
     @Ignore private List<User> absentees = new ArrayList<>();
@@ -48,14 +45,13 @@ public class Event extends EventEntity
     }
 
     public Event(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
-        super(id, name, notes, imageUrl, team.getId(), startDate, endDate);
+        super(id, name, notes, imageUrl, startDate, endDate, team);
         this.team = team;
         items = buildItems();
     }
 
     protected Event(Parcel in) {
         super(in);
-        team = (Team) in.readValue(Team.class.getClassLoader());
         in.readList(attendees, User.class.getClassLoader());
         in.readList(absentees, User.class.getClassLoader());
         items = buildItems();
@@ -81,10 +77,6 @@ public class Event extends EventEntity
     @Override
     public Item get(int position) {
         return items.get(position);
-    }
-
-    public Team getTeam() {
-        return team;
     }
 
     public void setTeam(Team team) {
@@ -123,7 +115,6 @@ public class Event extends EventEntity
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeValue(team);
         dest.writeList(attendees);
         dest.writeList(absentees);
     }
