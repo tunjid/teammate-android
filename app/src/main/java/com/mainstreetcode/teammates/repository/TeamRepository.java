@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -19,12 +20,14 @@ import java.util.List;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 
+import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
 import static io.reactivex.Observable.fromCallable;
 import static io.reactivex.Observable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamRepository {
+public class TeamRepository extends CrudRespository<Team> {
+
     private static TeamRepository ourInstance;
 
     private final TeammateApi api;
@@ -46,43 +49,29 @@ public class TeamRepository {
         return ourInstance;
     }
 
-    public Observable<Team> createTeam(Team team) {
-        return api.createTeam(team)
-                .flatMap(this::saveTeam)
-                .observeOn(mainThread());
-    }
+    @Override
+    public Observable<Team> createOrUpdate(Team model) {
+        Observable<Team> eventObservable = model.isEmpty()
+                ? api.createTeam(model).flatMap(created -> updateLocal(model, created))
+                : api.updateTeam(model.getId(), model).flatMap(updated -> updateLocal(model, updated));
 
-    public Observable<Team> getTeam(Team team) {
-        return api.getTeam(team.getId())
-                .flatMap(this::saveTeam)
-                .observeOn(mainThread());
-    }
-
-    public Observable<Team> updateTeam(Team team) {
-        Observable<Team> teamObservable = api.updateTeam(team.getId(), team);
-
-        MultipartBody.Part body = RepoUtils.getBody(team.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = getBody(model.get(Team.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            teamObservable = teamObservable.flatMap(put -> api.uploadTeamLogo(team.getId(), body));
+            eventObservable = eventObservable.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
 
-        return teamObservable.flatMap(this::saveTeam).observeOn(mainThread());
+        return eventObservable.flatMap(this::save).observeOn(mainThread());
     }
 
-    public Observable<List<Team>> findTeams(String queryText) {
-        return api.findTeam(queryText).observeOn(mainThread());
+    @Override
+    public Observable<Team> get(String id) {
+        return api.getTeam(id)
+                .flatMap(this::save)
+                .observeOn(mainThread());
     }
 
-    public Observable<List<Team>> getMyTeams() {
-        User user = userRepository.getCurrentUser();
-
-        Observable<List<Team>> local = fromCallable(() -> teamDao.myTeams(user.getId())).subscribeOn(io());
-        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveTeams);
-
-        return Observable.concat(local, remote).observeOn(mainThread());
-    }
-
-    public Observable<Team> deleteTeam(Team team) {
+    @Override
+    public Observable<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
                 .flatMap(team1 -> {
                     roleDao.delete(Collections.unmodifiableList(team.getRoles()));
@@ -92,7 +81,7 @@ public class TeamRepository {
                 });
     }
 
-    Observable<List<Team>> saveTeams(List<Team> teams) {
+    Observable<List<Team>> saveList(List<Team> teams) {
         List<Role> roles = new ArrayList<>();
         List<User> users = new ArrayList<>();
 
@@ -109,11 +98,17 @@ public class TeamRepository {
         return just(teams);
     }
 
-    /**
-     * Used to save a team that has it's users populated
-     */
-    private Observable<Team> saveTeam(Team team) {
-        return saveTeams(Collections.singletonList(team)).flatMap(teams -> just(teams.get(0)));
+    public Observable<List<Team>> findTeams(String queryText) {
+        return api.findTeam(queryText).observeOn(mainThread());
+    }
+
+    public Observable<List<Team>> getMyTeams() {
+        User user = userRepository.getCurrentUser();
+
+        Observable<List<Team>> local = fromCallable(() -> teamDao.myTeams(user.getId())).subscribeOn(io());
+        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveList);
+
+        return Observable.concat(local, remote).observeOn(mainThread());
     }
 
     public Observable<User> updateTeamUser(Role role) {

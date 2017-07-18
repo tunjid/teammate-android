@@ -160,13 +160,12 @@ public class TeamEditFragment extends MainActivityFragment
                 }
                 // Create a team
                 else if (team.isEmpty()) {
-                    disposable = teamViewModel.createTeam(team)
+                    disposable = teamViewModel.createOrUpdate(team)
                             .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
                 }
                 // Update a team
                 else {
-                    disposable = teamViewModel.updateTeam(team).subscribe(updatedTeam -> {
-                        team.update(updatedTeam);
+                    disposable = teamViewModel.createOrUpdate(team).subscribe(updatedTeam -> {
                         showSnackbar(getString(R.string.updated_team));
                         recyclerView.getAdapter().notifyDataSetChanged();
                     }, defaultErrorHandler);

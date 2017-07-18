@@ -170,7 +170,7 @@ public class TeamDetailFragment extends MainActivityFragment
 //                                    defaultErrorHandler));
                 }
                 else {
-                    disposables.add(teamViewModel.createTeam(team)
+                    disposables.add(teamViewModel.createOrUpdate(team)
                             .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())),
                                     defaultErrorHandler)
                     );

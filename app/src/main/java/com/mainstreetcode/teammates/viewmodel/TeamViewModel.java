@@ -27,16 +27,12 @@ public class TeamViewModel extends ViewModel {
         repository = TeamRepository.getInstance();
     }
 
-    public Observable<Team> createTeam(Team team) {
-        return repository.createTeam(team);
+    public Observable<Team> createOrUpdate(Team team) {
+        return repository.createOrUpdate(team);
     }
 
     public Observable<Team> getTeam(Team team) {
-        return repository.getTeam(team);
-    }
-
-    public Observable<Team> updateTeam(Team team) {
-        return repository.updateTeam(team);
+        return repository.get(team.getId());
     }
 
     public Observable<List<Team>> findTeams(String queryText) {
@@ -68,6 +64,6 @@ public class TeamViewModel extends ViewModel {
     }
 
     public Observable<Team> deleteTeam(Team team) {
-        return repository.deleteTeam(team);
+        return repository.delete(team);
     }
 }

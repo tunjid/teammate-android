@@ -27,7 +27,9 @@ import java.util.List;
  * Teams
  */
 
-public class Team extends TeamEntity implements
+public class Team extends TeamEntity
+        implements
+        Model<Team>,
         ItemListableBean<Team> {
 
     public static final int LOGO_POSITION = 0;
@@ -92,16 +94,12 @@ public class Team extends TeamEntity implements
         return items.get(position);
     }
 
+    @Override
     public boolean isEmpty() {
         return this.equals(EMPTY);
     }
 
-    // This because of a room bug
-    public void setRoles(List<Role> roles) {
-        this.roles.clear();
-        this.roles.addAll(roles);
-    }
-
+    @Override
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
 
@@ -129,6 +127,12 @@ public class Team extends TeamEntity implements
         return joinRequests;
     }
 
+    // This because of a room bug
+    public void setRoles(List<Role> roles) {
+        this.roles.clear();
+        this.roles.addAll(roles);
+    }
+    
     @Override
     public int describeContents() {
         return 0;

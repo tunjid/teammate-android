@@ -44,8 +44,8 @@ public class EventRepository extends CrudRespository<Event> {
     @Override
     public Observable<Event> createOrUpdate(Event event) {
         Observable<Event> eventObservable = event.isEmpty()
-                ? api.createEvent(event).flatMap(created -> updateLocal(created, event))
-                : api.updateEvent(event.getId(), event).flatMap(created -> updateLocal(created, event));
+                ? api.createEvent(event).flatMap(created -> updateLocal(event, created))
+                : api.updateEvent(event.getId(), event).flatMap(updated -> updateLocal(event, updated));
 
         MultipartBody.Part body = getBody(event.get(Event.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
@@ -63,35 +63,27 @@ public class EventRepository extends CrudRespository<Event> {
     }
 
     @Override
-    public Observable<List<Event>> getList(String userId) {
+    public Observable<Event> delete(Event event) {
+        return api.deleteEvent(event.getId())
+                .flatMap(deleted -> {
+                    eventDao.delete(event);
+                    return just(event);
+                });
+    }
+
+    public Observable<List<Event>> getEvents(String userId) {
         Observable<List<Event>> local = fromCallable(() -> eventDao.getEvents(userId)).subscribeOn(io());
         Observable<List<Event>> remote = api.getEvents().flatMap(this::saveList);
 
         return concat(local, remote).observeOn(mainThread());
     }
 
-
-//    public Observable<Event> deleteEvent(Event event) {
-//        return api.deleteEvent(event.getId())
-//                .flatMap(team1 -> {
-////                    List<User> users = event.getUsers();
-////                    List<Role> roles = new ArrayList<>(users.size());
-////
-////                    for (User user : users) roles.add(user.getRole());
-////
-////                    roleDao.delete(roles);
-////                    teamDao.delete(event);
-//
-//                    return just(event);
-//                });
-//    }
-
     @Override
     Observable<List<Event>> saveList(List<Event> events) {
         List<Team> teams = new ArrayList<>(events.size());
         for (Event event : events) teams.add(event.getTeam());
 
-        return teamRepository.saveTeams(teams).flatMap(savedTeams -> {
+        return teamRepository.saveList(teams).flatMap(savedTeams -> {
             eventDao.insert(Collections.unmodifiableList(events));
             return just(events);
         });

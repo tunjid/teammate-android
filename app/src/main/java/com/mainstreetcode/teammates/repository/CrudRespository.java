@@ -20,8 +20,7 @@ public abstract class CrudRespository<T extends Model> {
 
     public abstract Observable<T> get(String id);
 
-    public abstract Observable<List<T>> getList(String id);
-
+    public abstract Observable<T> delete(T model);
 
     abstract Observable<List<T>> saveList(List<T> model);
 
