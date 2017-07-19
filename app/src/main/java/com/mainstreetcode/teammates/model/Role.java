@@ -10,6 +10,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -20,12 +22,11 @@ import java.util.List;
 
 /**
  * Roles on a team
- * <p>
- * Created by Shemanigans on 6/6/17.
  */
 
 public class Role extends RoleEntity
         implements
+        Model<Role>,
         ItemListableBean<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
@@ -69,6 +70,16 @@ public class Role extends RoleEntity
         return items.get(position);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public void update(Role updated) {
+
+    }
+
     public boolean isTeamAdmin() {
         return !TextUtils.isEmpty(name) && ADMIN.equals(name);
     }
@@ -98,6 +109,7 @@ public class Role extends RoleEntity
 
     public static class GsonAdapter
             implements
+            JsonSerializer<Role>,
             JsonDeserializer<Role> {
 
         private static final String ID_KEY = "_id";
@@ -105,6 +117,18 @@ public class Role extends RoleEntity
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
         private static final String IMAGE_KEY = "imageUrl";
+
+        @Override
+        public JsonElement serialize(Role src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject serialized = new JsonObject();
+
+            serialized.addProperty(ID_KEY, src.getId());
+            serialized.addProperty(NAME_KEY, src.getName());
+
+            serialized.add(USER_KEY, context.serialize(src.user));
+
+            return serialized;
+        }
 
         @Override
         public Role deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

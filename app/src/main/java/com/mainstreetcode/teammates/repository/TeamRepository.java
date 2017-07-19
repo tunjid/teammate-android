@@ -81,21 +81,21 @@ public class TeamRepository extends CrudRespository<Team> {
                 });
     }
 
-    Observable<List<Team>> saveList(List<Team> teams) {
+    Observable<List<Team>> saveList(List<Team> models) {
         List<Role> roles = new ArrayList<>();
         List<User> users = new ArrayList<>();
 
-        for (Team team : teams) {
+        for (Team team : models) {
             List<Role> teamRoles = team.getRoles();
             roles.addAll(teamRoles);
             for(Role role : teamRoles) users.add(role.getUser());
         }
 
-        teamDao.insert(Collections.unmodifiableList(teams));
+        teamDao.insert(Collections.unmodifiableList(models));
         userDao.insert(Collections.unmodifiableList(users));
         roleDao.insert(Collections.unmodifiableList(roles));
 
-        return just(teams);
+        return just(models);
     }
 
     public Observable<List<Team>> findTeams(String queryText) {
@@ -111,38 +111,13 @@ public class TeamRepository extends CrudRespository<Team> {
         return Observable.concat(local, remote).observeOn(mainThread());
     }
 
-    public Observable<User> updateTeamUser(Role role) {
-        String teamId = role.getTeamId();
-        User user = role.getUser();
-        Observable<User> userObservable = api.updateTeamUser(teamId, user.getId(), user);
-
-        MultipartBody.Part body = RepoUtils.getBody(role.get(Role.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
-        if (body != null) {
-            userObservable = userObservable.flatMap(put -> api.uploadUserPhoto(teamId, user.getId(), body));
-        }
-
-        return userObservable.flatMap(userRepository::saveUser).observeOn(mainThread());
-    }
-
     public Observable<JoinRequest> joinTeam(Team team, String role) {
         return api.joinTeam(team.getId(), role).observeOn(mainThread());
-    }
-
-    public Observable<Role> approveUser(JoinRequest request) {
-        Observable<Role> observable = api.approveUser(request.getTeamId(), request.getUser().getId());
-        return observable.observeOn(mainThread());
     }
 
     public Observable<JoinRequest> declineUser(JoinRequest request) {
         Observable<JoinRequest> observable = api.declineUser(request.getTeamId(), request.getUser().getId());
         return observable.observeOn(mainThread());
-    }
-
-    public Observable<User> dropUser(Role role) {
-        return api.dropUser(role.getTeamId(), role.getUser().getId()).flatMap(droppedUser -> {
-            roleDao.delete(Collections.singletonList(role));
-            return just(role.getUser());
-        });
     }
 
 }

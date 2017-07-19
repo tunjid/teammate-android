@@ -79,13 +79,13 @@ public class EventRepository extends CrudRespository<Event> {
     }
 
     @Override
-    Observable<List<Event>> saveList(List<Event> events) {
-        List<Team> teams = new ArrayList<>(events.size());
-        for (Event event : events) teams.add(event.getTeam());
+    Observable<List<Event>> saveList(List<Event> models) {
+        List<Team> teams = new ArrayList<>(models.size());
+        for (Event event : models) teams.add(event.getTeam());
 
         return teamRepository.saveList(teams).flatMap(savedTeams -> {
-            eventDao.insert(Collections.unmodifiableList(events));
-            return just(events);
+            eventDao.insert(Collections.unmodifiableList(models));
+            return just(models);
         });
     }
 

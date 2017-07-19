@@ -22,7 +22,7 @@ public abstract class CrudRespository<T extends Model> {
 
     public abstract Observable<T> delete(T model);
 
-    abstract Observable<List<T>> saveList(List<T> model);
+    abstract Observable<List<T>> saveList(List<T> models);
 
     Observable<T> save(T model) {
         return saveList(Collections.singletonList(model)).flatMap(list -> just(list.get(0)));

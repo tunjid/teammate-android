@@ -183,7 +183,7 @@ public class TeamDetailFragment extends MainActivityFragment
         Disposable disposable;
 
         if (approve) {
-            disposable = teamViewModel.approveUser(request).subscribe((role) -> {
+            disposable = roleViewModel.approveUser(request).subscribe((role) -> {
                 team.getRoles().add(role);
                 team.getJoinRequests().remove(request);
                 recyclerView.getAdapter().notifyDataSetChanged();

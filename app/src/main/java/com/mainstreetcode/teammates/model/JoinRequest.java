@@ -1,5 +1,8 @@
 package com.mainstreetcode.teammates.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,19 +15,13 @@ import java.lang.reflect.Type;
  * Join request for a {@link Team}
  */
 
-public class JoinRequest {
+public class JoinRequest implements Parcelable {
 
-    public static final String DB_NAME = "joinRequests";
-
-    public static final String TEAM_KEY = "teamId";
-    public static final String USER_KEY = "memberId";
-    public static final String ROLE_KEY = "roleId";
-
-    boolean teamApproved;
-    boolean userApproved;
-    String roleName;
-    String teamId;
-    User user;
+    private boolean teamApproved;
+    private boolean userApproved;
+    private String roleName;
+    private String teamId;
+    private User user;
 
     JoinRequest(boolean teamApproved, boolean userApproved, String roleName, String teamId, User user) {
         this.teamApproved = teamApproved;
@@ -32,6 +29,14 @@ public class JoinRequest {
         this.roleName = roleName;
         this.teamId = teamId;
         this.user = user;
+    }
+
+    protected JoinRequest(Parcel in) {
+        teamApproved = in.readByte() != 0x00;
+        userApproved = in.readByte() != 0x00;
+        roleName = in.readString();
+        teamId = in.readString();
+        user = (User) in.readValue(User.class.getClassLoader());
     }
 
     public boolean isTeamApproved() {
@@ -53,6 +58,33 @@ public class JoinRequest {
     public User getUser() {
         return user;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (teamApproved ? 0x01 : 0x00));
+        dest.writeByte((byte) (userApproved ? 0x01 : 0x00));
+        dest.writeString(roleName);
+        dest.writeString(teamId);
+        dest.writeValue(user);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<JoinRequest> CREATOR = new Parcelable.Creator<JoinRequest>() {
+        @Override
+        public JoinRequest createFromParcel(Parcel in) {
+            return new JoinRequest(in);
+        }
+
+        @Override
+        public JoinRequest[] newArray(int size) {
+            return new JoinRequest[size];
+        }
+    };
 
     public static class GsonAdapter
             implements

@@ -141,8 +141,7 @@ public class RoleEditFragment extends MainActivityFragment
                 }
 
                 disposables.add(
-                        teamViewModel.updateTeamUser(role).subscribe(updatedUser -> {
-                            role.getUser().update(updatedUser);
+                        roleViewModel.updateRole(role).subscribe(updatedRole -> {
                             showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
                         }, defaultErrorHandler)
@@ -160,7 +159,7 @@ public class RoleEditFragment extends MainActivityFragment
 
                 Snackbar.make(recyclerView, prompt, Snackbar.LENGTH_INDEFINITE)
                         .setAction(R.string.yes, view ->
-                                disposables.add(teamViewModel.dropUser(role).subscribe(dropped -> {
+                                disposables.add(roleViewModel.dropRole(role).subscribe(dropped -> {
                                     showSnackbar(getString(R.string.dropped_user, firstName));
                                     getActivity().onBackPressed();
                                 }, defaultErrorHandler)))

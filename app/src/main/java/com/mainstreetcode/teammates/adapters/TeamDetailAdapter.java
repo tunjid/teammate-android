@@ -145,8 +145,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
 
             userName.setText(item.getFirstName());
             userStatus.setText(request.isTeamApproved() && !request.isUserApproved()
-                    ? context.getString(R.string.user_invited)
-                    : context.getString(R.string.user_requests_join));
+                    ? context.getString(R.string.user_invited, request.getRoleName())
+                    : context.getString(R.string.user_requests_join, request.getRoleName()));
 
             String imageUrl = item.getImageUrl() != null ? item.getImageUrl() : "";
 
