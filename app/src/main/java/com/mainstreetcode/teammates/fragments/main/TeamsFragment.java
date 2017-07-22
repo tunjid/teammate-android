@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -73,7 +74,10 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        toggleFab(false);
+        FloatingActionButton fab = getFab();
+        fab.setImageResource(R.drawable.ic_add_white_24dp);
+        fab.setOnClickListener(this);
+        toggleFab(true);
         setToolbarTitle(getString(getTargetRequestCode() == R.id.request_code_team_pick
                 ? R.string.pick_team
                 : R.string.my_teams));
@@ -102,8 +106,8 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.create_team:
-                //showFragment(TeamDetailFragment.newInstance(Team.empty(), true));
+            case R.id.fab:
+                showFragment(TeamEditFragment.newInstance(Team.empty(), true));
                 break;
         }
     }
