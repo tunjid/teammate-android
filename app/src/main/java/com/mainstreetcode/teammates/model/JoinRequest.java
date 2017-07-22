@@ -84,7 +84,15 @@ public class JoinRequest extends JoinRequestEntity
 
         @Override
         public JsonElement serialize(JoinRequest src, Type typeOfSrc, JsonSerializationContext context) {
-            return null;
+            JsonObject result = new JsonObject();
+
+            result.addProperty(NAME_KEY, src.roleName);
+            result.addProperty(TEAM_KEY, src.teamId);
+            result.addProperty(TEAM_APPROVAL_KEY, src.teamApproved);
+            result.addProperty(USER_APPROVAL_KEY, src.userApproved);
+            result.addProperty(USER_KEY, src.getUser().getId());
+
+            return result;
         }
 
         @Override

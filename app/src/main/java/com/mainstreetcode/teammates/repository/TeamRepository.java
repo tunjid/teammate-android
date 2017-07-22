@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.repository;
 
 
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -73,14 +74,6 @@ public class TeamRepository extends CrudRespository<Team> {
     }
 
     @Override
-    Observable<Team> save(Team model) {
-        return super.save(model).flatMap(team -> {
-            joinRequestDao.insert(Collections.unmodifiableList(model.getJoinRequests()));
-            return just(team);
-        });
-    }
-
-    @Override
     public Observable<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
                 .flatMap(team1 -> {
@@ -92,18 +85,25 @@ public class TeamRepository extends CrudRespository<Team> {
     }
 
     Observable<List<Team>> saveList(List<Team> models) {
-        List<Role> roles = new ArrayList<>();
         List<User> users = new ArrayList<>();
+        List<Role> roles = new ArrayList<>();
+        List<JoinRequest> joinRequests = new ArrayList<>();
 
         for (Team team : models) {
             List<Role> teamRoles = team.getRoles();
+            List<JoinRequest> teamRequests = team.getJoinRequests();
+
             roles.addAll(teamRoles);
+            joinRequests.addAll(teamRequests);
+
             for (Role role : teamRoles) users.add(role.getUser());
+            for (JoinRequest request : teamRequests) users.add(request.getUser());
         }
 
         teamDao.insert(Collections.unmodifiableList(models));
         userDao.insert(Collections.unmodifiableList(users));
         roleDao.insert(Collections.unmodifiableList(roles));
+        joinRequestDao.insert(Collections.unmodifiableList(joinRequests));
 
         return just(models);
     }
