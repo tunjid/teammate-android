@@ -165,9 +165,10 @@ public class TeamDetailFragment extends MainActivityFragment
         switch (view.getId()) {
             case R.id.fab:
                 if (team.getId() != null) {
-//                    disposables.add(teamViewModel.joinTeam(team, role)
-//                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
-//                                    defaultErrorHandler));
+                    JoinRequest request = JoinRequest.create(false, true, currentRole.getName(), team.getId(), currentRole.getUser());
+                    disposables.add(roleViewModel.joinTeam(request)
+                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
+                                    defaultErrorHandler));
                 }
                 else {
                     disposables.add(teamViewModel.createOrUpdate(team)
@@ -193,7 +194,7 @@ public class TeamDetailFragment extends MainActivityFragment
             }, defaultErrorHandler);
         }
         else {
-            disposable = teamViewModel.declineUser(request).subscribe((joinRequest) -> {
+            disposable = roleViewModel.declineUser(request).subscribe((joinRequest) -> {
                 team.getJoinRequests().remove(request);
                 recyclerView.getAdapter().notifyDataSetChanged();
 

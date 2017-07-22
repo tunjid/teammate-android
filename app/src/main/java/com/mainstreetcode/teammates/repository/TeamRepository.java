@@ -2,11 +2,11 @@ package com.mainstreetcode.teammates.repository;
 
 
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.JoinRequestDao;
 import com.mainstreetcode.teammates.persistence.RoleDao;
 import com.mainstreetcode.teammates.persistence.TeamDao;
 import com.mainstreetcode.teammates.persistence.UserDao;
@@ -34,6 +34,7 @@ public class TeamRepository extends CrudRespository<Team> {
     private final UserDao userDao;
     private final TeamDao teamDao;
     private final RoleDao roleDao;
+    private final JoinRequestDao joinRequestDao;
     private final UserRepository userRepository;
 
     private TeamRepository() {
@@ -41,6 +42,7 @@ public class TeamRepository extends CrudRespository<Team> {
         userDao = AppDatabase.getInstance().userDao();
         teamDao = AppDatabase.getInstance().teamDao();
         roleDao = AppDatabase.getInstance().roleDao();
+        joinRequestDao = AppDatabase.getInstance().joinRequestDao();
         userRepository = UserRepository.getInstance();
     }
 
@@ -71,6 +73,14 @@ public class TeamRepository extends CrudRespository<Team> {
     }
 
     @Override
+    Observable<Team> save(Team model) {
+        return super.save(model).flatMap(team -> {
+            joinRequestDao.insert(Collections.unmodifiableList(model.getJoinRequests()));
+            return just(team);
+        });
+    }
+
+    @Override
     public Observable<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
                 .flatMap(team1 -> {
@@ -88,7 +98,7 @@ public class TeamRepository extends CrudRespository<Team> {
         for (Team team : models) {
             List<Role> teamRoles = team.getRoles();
             roles.addAll(teamRoles);
-            for(Role role : teamRoles) users.add(role.getUser());
+            for (Role role : teamRoles) users.add(role.getUser());
         }
 
         teamDao.insert(Collections.unmodifiableList(models));
@@ -110,14 +120,4 @@ public class TeamRepository extends CrudRespository<Team> {
 
         return Observable.concat(local, remote).observeOn(mainThread());
     }
-
-    public Observable<JoinRequest> joinTeam(Team team, String role) {
-        return api.joinTeam(team.getId(), role).observeOn(mainThread());
-    }
-
-    public Observable<JoinRequest> declineUser(JoinRequest request) {
-        Observable<JoinRequest> observable = api.declineUser(request.getTeamId(), request.getUser().getId());
-        return observable.observeOn(mainThread());
-    }
-
 }

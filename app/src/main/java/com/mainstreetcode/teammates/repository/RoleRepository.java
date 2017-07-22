@@ -76,7 +76,7 @@ public class RoleRepository extends CrudRespository<Role> {
     }
 
     public Observable<Role> approveUser(JoinRequest request) {
-        Observable<Role> observable = api.approveUser(request.getTeamId(), request.getUser().getId())
+        Observable<Role> observable = api.approveUser(request.getId())
                 .flatMap(this::save);
         return observable.observeOn(mainThread());
     }

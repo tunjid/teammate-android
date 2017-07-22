@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel;
 
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
+import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -22,12 +23,14 @@ import io.reactivex.subjects.ReplaySubject;
 public class RoleViewModel extends ViewModel {
 
     private final RoleRepository repository;
+    private final JoinRequestRepository joinRequestRepository;
 
     private TeammateApi api = TeammateService.getApiInstance();
     private ReplaySubject<List<String>> roleSubject;
 
     public RoleViewModel() {
         repository = RoleRepository.getInstance();
+        joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
     public Observable<List<String>> getRoleValues() {
@@ -45,6 +48,14 @@ public class RoleViewModel extends ViewModel {
 
     public Observable<Role> approveUser(JoinRequest request) {
         return repository.approveUser(request);
+    }
+
+    public Observable<JoinRequest> joinTeam(JoinRequest joinRequest) {
+        return joinRequestRepository.createOrUpdate(joinRequest);
+    }
+
+    public Observable<JoinRequest> declineUser(JoinRequest request) {
+        return joinRequestRepository.dropJoinRequest(request);
     }
 
     public Observable<Role> dropRole(Role role) {

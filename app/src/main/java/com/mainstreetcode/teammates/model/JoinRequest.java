@@ -8,6 +8,9 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 
 import java.lang.reflect.Type;
 
@@ -15,48 +18,34 @@ import java.lang.reflect.Type;
  * Join request for a {@link Team}
  */
 
-public class JoinRequest implements Parcelable {
+public class JoinRequest extends JoinRequestEntity
+        implements Model<JoinRequest> {
 
-    private boolean teamApproved;
-    private boolean userApproved;
-    private String roleName;
-    private String teamId;
-    private User user;
+    public static JoinRequest create(boolean teamApproved, boolean userApproved, String roleName, String teamId, User user) {
+        return new JoinRequest(teamApproved, userApproved, "*", roleName, teamId, user);
+    }
 
-    JoinRequest(boolean teamApproved, boolean userApproved, String roleName, String teamId, User user) {
-        this.teamApproved = teamApproved;
-        this.userApproved = userApproved;
-        this.roleName = roleName;
-        this.teamId = teamId;
-        this.user = user;
+    JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, String teamId, User user) {
+        super(teamApproved, userApproved, id, roleName, teamId, user);
     }
 
     protected JoinRequest(Parcel in) {
-        teamApproved = in.readByte() != 0x00;
-        userApproved = in.readByte() != 0x00;
-        roleName = in.readString();
-        teamId = in.readString();
-        user = (User) in.readValue(User.class.getClassLoader());
+        super(in);
     }
 
-    public boolean isTeamApproved() {
-        return teamApproved;
+    @Override
+    public boolean isEmpty() {
+        return false;
     }
 
-    public boolean isUserApproved() {
-        return userApproved;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public String getTeamId() {
-        return teamId;
-    }
-
-    public User getUser() {
-        return user;
+    @Override
+    public void update(JoinRequest updated) {
+        this.teamApproved = updated.teamApproved;
+        this.userApproved = updated.userApproved;
+        this.id = updated.id;
+        this.roleName = updated.roleName;
+        this.teamId = updated.teamId;
+        user.update(updated.user);
     }
 
     @Override
@@ -66,14 +55,9 @@ public class JoinRequest implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte((byte) (teamApproved ? 0x01 : 0x00));
-        dest.writeByte((byte) (userApproved ? 0x01 : 0x00));
-        dest.writeString(roleName);
-        dest.writeString(teamId);
-        dest.writeValue(user);
+        super.writeToParcel(dest, flags);
     }
 
-    @SuppressWarnings("unused")
     public static final Parcelable.Creator<JoinRequest> CREATOR = new Parcelable.Creator<JoinRequest>() {
         @Override
         public JoinRequest createFromParcel(Parcel in) {
@@ -88,13 +72,20 @@ public class JoinRequest implements Parcelable {
 
     public static class GsonAdapter
             implements
+            JsonSerializer<JoinRequest>,
             JsonDeserializer<JoinRequest> {
 
+        private static final String ID_KEY = "id";
         private static final String NAME_KEY = "roleName";
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
         private static final String TEAM_APPROVAL_KEY = "teamApproved";
         private static final String USER_APPROVAL_KEY = "userApproved";
+
+        @Override
+        public JsonElement serialize(JoinRequest src, Type typeOfSrc, JsonSerializationContext context) {
+            return null;
+        }
 
         @Override
         public JoinRequest deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -104,11 +95,12 @@ public class JoinRequest implements Parcelable {
             boolean teamApproved = ModelUtils.asBoolean(TEAM_APPROVAL_KEY, requestJson);
             boolean userApproved = ModelUtils.asBoolean(USER_APPROVAL_KEY, requestJson);
 
+            String id = ModelUtils.asString(ID_KEY, requestJson);
             String roleName = ModelUtils.asString(NAME_KEY, requestJson);
             String teamId = ModelUtils.asString(TEAM_KEY, requestJson);
             User user = context.deserialize(requestJson.get(USER_KEY), User.class);
 
-            return new JoinRequest(teamApproved, userApproved, roleName, teamId, user);
+            return new JoinRequest(teamApproved, userApproved, id, roleName, teamId, user);
         }
     }
 }

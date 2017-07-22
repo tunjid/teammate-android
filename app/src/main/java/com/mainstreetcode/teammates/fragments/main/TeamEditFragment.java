@@ -16,6 +16,7 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
+import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 
 import java.util.ArrayList;
@@ -155,8 +156,9 @@ public class TeamEditFragment extends MainActivityFragment
 
                 // Join a team
                 if (!isEditable) {
-                    disposable = teamViewModel.joinTeam(team, role)
-                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
+                    JoinRequest joinRequest =  JoinRequest.create(false, true, role, team.getId(), userViewModel.getCurrentUser());
+                    disposable = roleViewModel.joinTeam(joinRequest)
+                            .subscribe(request -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
                 }
                 // Create a team
                 else if (team.isEmpty()) {

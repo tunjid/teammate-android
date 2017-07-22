@@ -65,16 +65,6 @@ public interface TeammateApi {
     @DELETE("api/teams/{id}")
     Observable<Team> deleteTeam(@Path("id") String teamId);
 
-    @GET("api/teams/{id}/join")
-    Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
-
-    @GET("api/teams/{teamId}/user/{userId}/approve")
-    Observable<Role> approveUser(@Path("teamId") String teamId, @Path("userId") String userId);
-
-    @GET("api/teams/{teamId}/user/{userId}/decline")
-    Observable<JoinRequest> declineUser(@Path("teamId") String teamId, @Path("userId") String userId);
-
-
     @GET("api/me/teams")
     Observable<List<Team>> getMyTeams();
 
@@ -97,6 +87,19 @@ public interface TeammateApi {
 
     @DELETE("api/roles/{roleId}")
     Observable<Role> deleteRole(@Path("roleId") String roleId);
+
+    // =============================================================================================
+    // Join Request endpoints
+    // =============================================================================================
+
+    @POST("api/join-requests")
+    Observable<JoinRequest> joinTeam(@Body JoinRequest joinRequest);
+
+    @GET("api/join-requests/{requestId}/approve")
+    Observable<Role> approveUser(@Path("requestId") String requestId);
+
+    @GET("api/join-requests/{requestId}/decline")
+    Observable<JoinRequest> declineUser(@Path("requestId") String requestId);
 
     // =============================================================================================
     // Event endpoints

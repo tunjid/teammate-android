@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
+import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
@@ -15,11 +16,10 @@ import com.mainstreetcode.teammates.persistence.typeconverters.TeamTypeConverter
 
 /**
  * App Database
- * <p>
- * Created by Shemanigans on 6/12/17.
  */
 
-@Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class, RoleEntity.class}, version = 1)
+@Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
+        RoleEntity.class, JoinRequestEntity.class}, version = 1)
 @TypeConverters({DateTypeConverter.class, TeamTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -32,6 +32,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract RoleDao roleDao();
 
     public abstract EventDao eventDao();
+
+    public abstract JoinRequestDao joinRequestDao();
 
     public static AppDatabase getInstance() {
         if (INSTANCE == null) {
