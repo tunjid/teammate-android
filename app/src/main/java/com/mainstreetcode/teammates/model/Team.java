@@ -41,8 +41,6 @@ public class Team extends TeamEntity
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
-    private static final Team EMPTY = new Team(NEW_TEAM, "", "", "", "", "");
-
     @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
     private List<Role> roles = new ArrayList<>();
 
@@ -54,7 +52,7 @@ public class Team extends TeamEntity
     @Ignore private final List<Item<Team>> items;
 
     public static Team empty() {
-        return EMPTY;
+        return new Team(NEW_TEAM, "", "", "", "", "");
     }
 
     public Team(String id, String name, String city, String state, String zip, String imageUrl) {
@@ -95,7 +93,7 @@ public class Team extends TeamEntity
 
     @Override
     public boolean isEmpty() {
-        return this.equals(EMPTY);
+        return this.equals(empty());
     }
 
     @Override

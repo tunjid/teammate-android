@@ -97,7 +97,10 @@ public class RoleEditFragment extends MainActivityFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (role.isTeamAdmin()) inflater.inflate(R.menu.fragment_user_edit, menu);
+        User user = userViewModel.getCurrentUser();
+        if (role.isTeamAdmin() && !role.getUser().equals(user)) {
+            inflater.inflate(R.menu.fragment_user_edit, menu);
+        }
     }
 
     @Override
