@@ -22,8 +22,6 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
-import io.reactivex.disposables.Disposable;
-
 /**
  * Displays a {@link Team team's} {@link User members}.
  */
@@ -36,7 +34,9 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
+    @Nullable
     private Role currentRole;
+
     private RecyclerView recyclerView;
 
     public static TeamDetailFragment newInstance(Team team) {
@@ -151,6 +151,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onJoinRequestClicked(JoinRequest request) {
         View rootView = getView();
         if (rootView == null) return;
+        if (currentRole == null) return;
 
         if (request.isUserApproved() && !request.isTeamApproved() && currentRole.isTeamAdmin()) {
             new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
@@ -164,8 +165,11 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (team.getId() != null) {
-                    JoinRequest request = JoinRequest.create(false, true, currentRole.getName(), team.getId(), currentRole.getUser());
+                if (currentRole == null) {
+                    String roleName = team.get(Team.ROLE_POSITION).getValue();
+
+                    User user = userViewModel.getCurrentUser();
+                    JoinRequest request = JoinRequest.create(false, true, roleName, team.getId(), user);
                     disposables.add(roleViewModel.joinTeam(request)
                             .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
                                     defaultErrorHandler));
@@ -181,29 +185,22 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     private void approveUser(final JoinRequest request, final boolean approve) {
-        Disposable disposable;
+        disposables.add(approve
+                ? roleViewModel.approveUser(request).subscribe((role) -> {
+            team.getRoles().add(role);
+            team.getJoinRequests().remove(request);
+            recyclerView.getAdapter().notifyDataSetChanged();
 
-        if (approve) {
-            disposable = roleViewModel.approveUser(request).subscribe((role) -> {
-                team.getRoles().add(role);
-                team.getJoinRequests().remove(request);
-                recyclerView.getAdapter().notifyDataSetChanged();
+            String name = role.getUser().getFirstName();
+            showSnackbar(getString(R.string.added_user, name));
+        }, defaultErrorHandler)
+                : roleViewModel.declineUser(request).subscribe((joinRequest) -> {
+            team.getJoinRequests().remove(request);
+            recyclerView.getAdapter().notifyDataSetChanged();
 
-                String name = role.getUser().getFirstName();
-                showSnackbar(getString(R.string.added_user, name));
-            }, defaultErrorHandler);
-        }
-        else {
-            disposable = roleViewModel.declineUser(request).subscribe((joinRequest) -> {
-                team.getJoinRequests().remove(request);
-                recyclerView.getAdapter().notifyDataSetChanged();
-
-                String name = joinRequest.getUser().getFirstName();
-                showSnackbar(getString(R.string.removed_user, name));
-            }, defaultErrorHandler);
-        }
-
-        disposables.add(disposable);
+            String name = joinRequest.getUser().getFirstName();
+            showSnackbar(getString(R.string.removed_user, name));
+        }, defaultErrorHandler));
     }
 
     private void deleteTeam() {
@@ -214,8 +211,13 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     private void updateCurrentRole() {
+        if (team.isEmpty()) return;
+
         final User user = userViewModel.getCurrentUser();
-        currentRole = team.getRoleForUser(user);
-        if (currentRole == null) getActivity().onBackPressed();
+
+        disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId()).subscribe(role -> {
+            currentRole = role;
+            getActivity().invalidateOptionsMenu();
+        }));
     }
 }

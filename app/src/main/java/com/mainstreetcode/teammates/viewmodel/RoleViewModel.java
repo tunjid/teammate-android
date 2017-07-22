@@ -42,6 +42,10 @@ public class RoleViewModel extends ViewModel {
         return roleSubject;
     }
 
+    public Observable<Role> getRoleInTeam(String userId, String teamId) {
+        return repository.getRoleInTeam(userId, teamId);
+    }
+
     public Observable<Role> updateRole(Role role) {
         return repository.createOrUpdate(role);
     }

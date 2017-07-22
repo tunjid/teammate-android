@@ -18,7 +18,9 @@ import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
 
 /**
  * Edits a Team member
@@ -33,6 +35,7 @@ public class EventEditFragment extends MainActivityFragment
     private static final String ARG_EVENT = "event";
 
     private Event event;
+    private Role currentRole;
 
     private RecyclerView recyclerView;
 
@@ -89,9 +92,9 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        if (userViewModel.isTeamAdmin(event) && !userViewModel.getCurrentUser().equals(user)) {
-//            inflater.inflate(R.menu.fragment_user_edit, menu);
-//        }
+        if (currentRole != null && currentRole.isTeamAdmin()) {
+            inflater.inflate(R.menu.fragment_event_edit, menu);
+        }
     }
 
     @Override
@@ -103,10 +106,12 @@ public class EventEditFragment extends MainActivityFragment
         toggleFab(true);
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 
-//        disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
-//            roles.clear();
-//            roles.addAll(currentRoles);
-//        }));
+        User user = userViewModel.getCurrentUser();
+
+        disposables.add(roleViewModel.getRoleInTeam(user.getId(), event.getTeam().getId()).subscribe(role -> {
+            currentRole = role;
+            getActivity().invalidateOptionsMenu();
+        }));
     }
 
     @Override

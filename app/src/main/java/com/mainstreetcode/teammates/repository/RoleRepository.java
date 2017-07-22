@@ -16,8 +16,10 @@ import java.util.List;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 
+import static io.reactivex.Observable.fromCallable;
 import static io.reactivex.Observable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class RoleRepository extends CrudRespository<Role> {
 
@@ -83,5 +85,11 @@ public class RoleRepository extends CrudRespository<Role> {
 
     public Observable<Role> dropRole(Role role) {
         return api.deleteRole(role.getId()).flatMap(this::delete);
+    }
+
+    public Observable<Role> getRoleInTeam(String userId, String teamId) {
+        return fromCallable(() ->roleDao.getRoleInTeam(userId, teamId))
+                .subscribeOn(io())
+                .observeOn(mainThread());
     }
 }

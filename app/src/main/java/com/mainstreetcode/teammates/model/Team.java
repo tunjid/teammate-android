@@ -4,7 +4,6 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -111,12 +110,6 @@ public class Team extends TeamEntity
 
         roles.addAll(updatedTeam.getRoles());
         joinRequests.addAll(updatedTeam.getJoinRequests());
-    }
-
-    @Nullable
-    public Role getRoleForUser(User user) {
-        for (Role role : roles) if (role.getUser().equals(user)) return role;
-        return null;
     }
 
     public List<Role> getRoles() {

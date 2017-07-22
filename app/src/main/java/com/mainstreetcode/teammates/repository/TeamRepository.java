@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammates.repository;
 
 
-import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -58,7 +57,7 @@ public class TeamRepository extends CrudRespository<Team> {
                 ? api.createTeam(model).flatMap(created -> updateLocal(model, created))
                 : api.updateTeam(model.getId(), model).flatMap(updated -> updateLocal(model, updated));
 
-        MultipartBody.Part body = getBody(model.get(Team.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = getBody(model.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
             eventObservable = eventObservable.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
