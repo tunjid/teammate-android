@@ -218,6 +218,6 @@ public class TeamDetailFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId()).subscribe(role -> {
             currentRole = role;
             getActivity().invalidateOptionsMenu();
-        }));
+        }, error -> {}));
     }
 }

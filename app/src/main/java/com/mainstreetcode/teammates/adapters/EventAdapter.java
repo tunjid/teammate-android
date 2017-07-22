@@ -4,12 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammates.model.Event;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
  * Adapter for {@link com.mainstreetcode.teammates.model.Event}
  */
 
-public class EventAdapter extends BaseRecyclerViewAdapter<EventAdapter.EventViewHolder, EventAdapter.EventAdapterListener> {
+public class EventAdapter extends BaseRecyclerViewAdapter<EventViewHolder, EventAdapter.EventAdapterListener> {
 
     private final List<Event> items;
 
@@ -53,37 +52,4 @@ public class EventAdapter extends BaseRecyclerViewAdapter<EventAdapter.EventView
         void onEventClicked(Event item);
     }
 
-    static class EventViewHolder extends BaseViewHolder<EventAdapterListener>
-            implements View.OnClickListener {
-
-        private Event item;
-        //private ImageView teamLogo;
-        private TextView teamName;
-        private TextView teamLocation;
-
-        EventViewHolder(View itemView, EventAdapterListener adapterListener) {
-            super(itemView, adapterListener);
-            //teamLogo = itemView.findViewById(R.id.thumbnail);
-            teamName = itemView.findViewById(R.id.name);
-            teamLocation = itemView.findViewById(R.id.time);
-            itemView.setOnClickListener(this);
-        }
-
-        void bind(Event item) {
-            this.item = item;
-            teamName.setText(item.getName());
-            teamLocation.setText(item.getTime());
-//
-//            Picasso.with(itemView.getContext())
-//                    .load(item.getLogoUrl())
-//                    .fit()
-//                    .centerInside()
-//                    .into(teamLogo);
-        }
-
-        @Override
-        public void onClick(View view) {
-            adapterListener.onEventClicked(item);
-        }
-    }
 }

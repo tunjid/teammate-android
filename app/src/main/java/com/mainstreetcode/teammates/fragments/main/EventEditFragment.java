@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -98,6 +99,19 @@ public class EventEditFragment extends MainActivityFragment
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                disposables.add(eventViewModel.delete(event).subscribe(deleted -> {
+                    showSnackbar(getString(R.string.deleted_team, event.getName()));
+                    getActivity().onBackPressed();
+                }, defaultErrorHandler));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
@@ -111,7 +125,7 @@ public class EventEditFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleInTeam(user.getId(), event.getTeam().getId()).subscribe(role -> {
             currentRole = role;
             getActivity().invalidateOptionsMenu();
-        }));
+        }, error -> {}));
     }
 
     @Override
@@ -133,14 +147,12 @@ public class EventEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-
-                disposables.add(
-                        eventViewModel.updateEvent(event).subscribe(updatedEvent -> {
+                disposables.add(eventViewModel.updateEvent(event)
+                        .subscribe(updatedEvent -> {
                             event.update(updatedEvent);
                             showSnackbar(getString(R.string.updated_user, event.getName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
-                        }, defaultErrorHandler)
-                );
+                        }, defaultErrorHandler));
                 break;
         }
     }

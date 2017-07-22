@@ -29,4 +29,8 @@ public class EventViewModel extends ViewModel {
     public Observable<Event> updateEvent(final Event event) {
         return repository.createOrUpdate(event).observeOn(AndroidSchedulers.mainThread());
     }
+
+    public Observable<Event> delete(final Event event) {
+        return repository.delete(event).observeOn(AndroidSchedulers.mainThread());
+    }
 }

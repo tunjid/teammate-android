@@ -36,7 +36,7 @@ public class ImageViewHolder extends BaseItemViewHolder
             Picasso picasso = Picasso.with(itemView.getContext());
             RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
 
-            creator.fit().centerInside().into(picture,
+            creator.fit().centerCrop().into(picture,
                     PicassoPalette.with(pathOrUrl, picture)
                             .use(PicassoPalette.Profile.MUTED_DARK)
                             .intoBackground(itemView));

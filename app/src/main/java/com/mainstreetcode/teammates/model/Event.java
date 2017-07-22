@@ -33,16 +33,13 @@ public class Event extends EventEntity
     public static final int LOGO_POSITION = 0;
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
 
-    private static final Date date = new Date();
-    private static final Event EMPTY = new Event("", "", "", "", date, date, Team.empty());
-
-
     @Ignore private List<User> attendees = new ArrayList<>();
     @Ignore private List<User> absentees = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
 
     public static Event empty() {
-        return EMPTY;
+        Date date = new Date();
+        return new Event("", "", "", "", date, date, Team.empty());
     }
 
     public Event(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
