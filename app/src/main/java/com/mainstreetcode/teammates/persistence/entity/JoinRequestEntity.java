@@ -95,6 +95,7 @@ public class JoinRequestEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeByte((byte) (teamApproved ? 0x01 : 0x00));
         dest.writeByte((byte) (userApproved ? 0x01 : 0x00));
+        dest.writeString(id);
         dest.writeString(roleName);
         dest.writeString(teamId);
         dest.writeValue(user);
