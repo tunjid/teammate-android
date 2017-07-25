@@ -28,6 +28,7 @@ import static com.mainstreetcode.teammates.model.ModelUtils.asString;
  */
 
 public class User extends UserEntity implements
+        Model<User>,
         ItemListableBean<User> {
 
     public static final int IMAGE_POSITION = 0;
@@ -71,7 +72,14 @@ public class User extends UserEntity implements
         return items.get(position);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
     public void update(User updatedUser) {
+        this.id = updatedUser.id;
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
     }

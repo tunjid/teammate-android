@@ -10,7 +10,7 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
@@ -55,7 +55,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.INPUT:
                 return new InputViewHolder(itemView, isEditable);
             case Item.ROLE:
-                return new RoleViewHolder(itemView, roles);
+                return new RoleSelectViewHolder(itemView, roles);
             case Item.IMAGE:
                 return new ImageViewHolder(itemView, adapterListener);
             default:

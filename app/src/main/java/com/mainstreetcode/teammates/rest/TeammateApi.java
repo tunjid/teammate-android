@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -44,6 +45,9 @@ public interface TeammateApi {
 
     @GET("api/signOut")
     Observable<JsonObject> signOut();
+
+    @GET("api/me/feed")
+    Observable<List<FeedItem>> getFeed();
 
     // =============================================================================================
     // Team endpoints

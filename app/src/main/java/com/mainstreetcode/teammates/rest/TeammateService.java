@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Role;
@@ -37,14 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TeammateService {
 
     public static final String API_BASE_URL = "http://10.0.2.2:3000/";
-    private static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(Team.class, new Team.GsonAdapter())
-            .registerTypeAdapter(User.class, new User.GsonAdapter())
-            .registerTypeAdapter(Role.class, new Role.GsonAdapter())
-            .registerTypeAdapter(Event.class, new Event.GsonAdapter())
-            .registerTypeAdapter(Message.class, new Message.GsonAdapter())
-            .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
-            .create();
+    private static final Gson GSON = getGson();
 
     private static TeammateApi INSTANCE;
 
@@ -71,7 +65,16 @@ public class TeammateService {
     }
 
     public static Gson getGson() {
-        return GSON;
+
+        return new GsonBuilder()
+                .registerTypeAdapter(Team.class, new Team.GsonAdapter())
+                .registerTypeAdapter(User.class, new User.GsonAdapter())
+                .registerTypeAdapter(Role.class, new Role.GsonAdapter())
+                .registerTypeAdapter(Event.class, new Event.GsonAdapter())
+                .registerTypeAdapter(Message.class, new Message.GsonAdapter())
+                .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
+                .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
+                .create();
     }
 
     private static class SessionCookieJar implements CookieJar {

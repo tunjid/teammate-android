@@ -39,6 +39,11 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     @Override
+    public String getImageUrl() {
+        return user == null ? null : user.getImageUrl();
+    }
+
+    @Override
     public void update(JoinRequest updated) {
         this.teamApproved = updated.teamApproved;
         this.userApproved = updated.userApproved;
