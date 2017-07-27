@@ -12,6 +12,8 @@ import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+
 /**
  * DAO for {@link User}
  * <p>
@@ -30,5 +32,5 @@ public interface RoleDao {
             " FROM roles" +
             " WHERE :userId = user_id" +
             " AND :teamId = role_team_id")
-    Role getRoleInTeam(String userId, String teamId);
+    Maybe<Role> getRoleInTeam(String userId, String teamId);
 }

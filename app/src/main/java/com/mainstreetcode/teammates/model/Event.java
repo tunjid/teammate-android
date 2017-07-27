@@ -102,12 +102,6 @@ public class Event extends EventEntity
         this.team = team;
     }
 
-    public void setRoles(List<Role> roles) {
-        team.setRoles(roles);
-    }
-
-
-
     @Override
     public int describeContents() {
         return 0;

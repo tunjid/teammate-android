@@ -11,6 +11,8 @@ import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+
 /**
  * DAO for {@link Team}
  * <p>
@@ -22,17 +24,17 @@ public interface TeamDao {
 
     @Query("SELECT * FROM teams" +
             " WHERE :id = team_id")
-    Team getTeam(String id);
+    Maybe<Team> get(String id);
 
     @Query("SELECT * FROM teams")
-    List<Team> getTeams();
+    Maybe<List<Team>> getTeams();
 
     @Query("SELECT *" +
             " FROM teams as team" +
             " INNER JOIN roles as role" +
             " ON team.team_id = role.role_team_id" +
             " WHERE :userId = role.user_id")
-    List<Team> myTeams(String userId);
+    Maybe<List<Team>> myTeams(String userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<TeamEntity> teams);

@@ -17,12 +17,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
-import static io.reactivex.Observable.fromCallable;
-import static io.reactivex.Observable.just;
+import static io.reactivex.Maybe.concat;
+import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -52,28 +54,29 @@ public class TeamRepository extends CrudRespository<Team> {
     }
 
     @Override
-    public Observable<Team> createOrUpdate(Team model) {
-        Observable<Team> eventObservable = model.isEmpty()
+    public Single<Team> createOrUpdate(Team model) {
+        Single<Team> eventSingle = model.isEmpty()
                 ? api.createTeam(model).flatMap(created -> updateLocal(model, created))
                 : api.updateTeam(model.getId(), model).flatMap(updated -> updateLocal(model, updated));
 
         MultipartBody.Part body = getBody(model.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            eventObservable = eventObservable.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
+            eventSingle = eventSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
 
-        return eventObservable.flatMap(this::save).observeOn(mainThread());
+        return eventSingle.flatMap(this::save).observeOn(mainThread());
     }
 
     @Override
-    public Observable<Team> get(String id) {
-        return api.getTeam(id)
-                .flatMap(this::save)
-                .observeOn(mainThread());
+    public Flowable<Team> get(String id) {
+        Maybe<Team> local = teamDao.get(id).subscribeOn(io());
+        Maybe<Team> remote = api.getTeam(id).flatMap(this::save).toMaybe();
+
+        return concat(local, remote).observeOn(mainThread());
     }
 
     @Override
-    public Observable<Team> delete(Team team) {
+    public Single<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
                 .flatMap(team1 -> {
                     roleDao.delete(Collections.unmodifiableList(team.getRoles()));
@@ -83,7 +86,7 @@ public class TeamRepository extends CrudRespository<Team> {
                 });
     }
 
-    Observable<List<Team>> saveList(List<Team> models) {
+    Single<List<Team>> saveList(List<Team> models) {
         List<User> users = new ArrayList<>();
         List<Role> roles = new ArrayList<>();
         List<JoinRequest> joinRequests = new ArrayList<>();
@@ -107,16 +110,16 @@ public class TeamRepository extends CrudRespository<Team> {
         return just(models);
     }
 
-    public Observable<List<Team>> findTeams(String queryText) {
+    public Single<List<Team>> findTeams(String queryText) {
         return api.findTeam(queryText).observeOn(mainThread());
     }
 
-    public Observable<List<Team>> getMyTeams() {
+    public Flowable<List<Team>> getMyTeams() {
         User user = userRepository.getCurrentUser();
 
-        Observable<List<Team>> local = fromCallable(() -> teamDao.myTeams(user.getId())).subscribeOn(io());
-        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveList);
+        Maybe<List<Team>> local = teamDao.myTeams(user.getId()).subscribeOn(io());
+        Maybe<List<Team>> remote = api.getMyTeams().flatMap(this::saveList).toMaybe();
 
-        return Observable.concat(local, remote).observeOn(mainThread());
+        return concat(local, remote).observeOn(mainThread());
     }
 }

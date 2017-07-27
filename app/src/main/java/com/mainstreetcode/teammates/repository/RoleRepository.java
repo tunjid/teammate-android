@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 
-import static io.reactivex.Observable.fromCallable;
-import static io.reactivex.Observable.just;
+import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-import static io.reactivex.schedulers.Schedulers.io;
 
 public class RoleRepository extends CrudRespository<Role> {
 
@@ -41,32 +41,32 @@ public class RoleRepository extends CrudRespository<Role> {
     }
 
     @Override
-    public Observable<Role> createOrUpdate(Role model) {
-        Observable<Role> roleObservable = api.updateRole(model.getId(), model);
+    public Single<Role> createOrUpdate(Role model) {
+        Single<Role> roleSingle = api.updateRole(model.getId(), model);
 
         MultipartBody.Part body = RepoUtils.getBody(model.get(Role.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            roleObservable = roleObservable.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
+            roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
         }
 
-        return roleObservable
+        return roleSingle
                 .flatMap(updated -> updateLocal(model, updated))
                 .flatMap(this::save).observeOn(mainThread());
     }
 
     @Override
-    public Observable<Role> get(String id) {
+    public Flowable<Role> get(String id) {
         return null;
     }
 
     @Override
-    public Observable<Role> delete(Role model) {
+    public Single<Role> delete(Role model) {
         roleDao.delete(Collections.singletonList(model));
         return just(model);
     }
 
     @Override
-    Observable<List<Role>> saveList(List<Role> models) {
+    Single<List<Role>> saveList(List<Role> models) {
         List<User> users = new ArrayList<>(models.size());
 
         for (Role role : models) users.add(role.getUser());
@@ -77,19 +77,17 @@ public class RoleRepository extends CrudRespository<Role> {
         return just(models);
     }
 
-    public Observable<Role> approveUser(JoinRequest request) {
-        Observable<Role> observable = api.approveUser(request.getId())
+    public Single<Role> approveUser(JoinRequest request) {
+        Single<Role> observable = api.approveUser(request.getId())
                 .flatMap(this::save);
         return observable.observeOn(mainThread());
     }
 
-    public Observable<Role> dropRole(Role role) {
+    public Single<Role> dropRole(Role role) {
         return api.deleteRole(role.getId()).flatMap(this::delete);
     }
 
-    public Observable<Role> getRoleInTeam(String userId, String teamId) {
-        return fromCallable(() ->roleDao.getRoleInTeam(userId, teamId))
-                .subscribeOn(io())
-                .observeOn(mainThread());
+    public Maybe<Role> getRoleInTeam(String userId, String teamId) {
+        return roleDao.getRoleInTeam(userId, teamId).observeOn(mainThread());
     }
 }

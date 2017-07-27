@@ -7,8 +7,8 @@ import com.mainstreetcode.teammates.repository.EventRepository;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 /**
  * ViewModel for {@link Event events}
@@ -22,15 +22,15 @@ public class EventViewModel extends ViewModel {
         repository = EventRepository.getInstance();
     }
 
-    public Observable<List<Event>> getEvents(String userId) {
-        return repository.getEvents(userId).observeOn(AndroidSchedulers.mainThread());
+    public Flowable<List<Event>> getEvents(String userId) {
+        return repository.getEvents(userId);
     }
 
-    public Observable<Event> updateEvent(final Event event) {
-        return repository.createOrUpdate(event).observeOn(AndroidSchedulers.mainThread());
+    public Single<Event> updateEvent(final Event event) {
+        return repository.createOrUpdate(event);
     }
 
-    public Observable<Event> delete(final Event event) {
-        return repository.delete(event).observeOn(AndroidSchedulers.mainThread());
+    public Single<Event> delete(final Event event) {
+        return repository.delete(event);
     }
 }

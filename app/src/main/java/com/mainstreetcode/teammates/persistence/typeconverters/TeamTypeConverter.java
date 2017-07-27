@@ -18,6 +18,6 @@ public class TeamTypeConverter {
 
     @TypeConverter
     public Team fromId(String id) {
-        return teamDao.getTeam(id);
+        return teamDao.get(id).blockingGet();
     }
 }

@@ -118,7 +118,6 @@ public class Team extends TeamEntity
         return joinRequests;
     }
 
-    // This because of a room bug
     public void setRoles(List<Role> roles) {
         this.roles.clear();
         this.roles.addAll(roles);

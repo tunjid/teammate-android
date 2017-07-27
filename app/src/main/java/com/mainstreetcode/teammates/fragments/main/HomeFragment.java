@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+
 /**
  * Home screen
  * <p>
@@ -64,7 +66,7 @@ public final class HomeFragment extends MainActivityFragment {
                 (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getFirstName())),
                 defaultErrorHandler
         ));
-        disposables.add(TeammateService.getApiInstance().getFeed().subscribe(
+        disposables.add(TeammateService.getApiInstance().getFeed().observeOn(AndroidSchedulers.mainThread()).subscribe(
                 (updatedFeed) -> {
                     feed.clear();
                     feed.addAll(updatedFeed);

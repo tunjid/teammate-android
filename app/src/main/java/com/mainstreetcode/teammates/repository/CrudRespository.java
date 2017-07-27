@@ -6,9 +6,10 @@ import com.mainstreetcode.teammates.model.Model;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
-import static io.reactivex.Observable.just;
+import static io.reactivex.Single.just;
 
 /**
  * Repository that manages model CRUD operations
@@ -16,19 +17,19 @@ import static io.reactivex.Observable.just;
 
 public abstract class CrudRespository<T extends Model> {
 
-    public abstract Observable<T> createOrUpdate(T model);
+    public abstract Single<T> createOrUpdate(T model);
 
-    public abstract Observable<T> get(String id);
+    public abstract Flowable<T> get(String id);
 
-    public abstract Observable<T> delete(T model);
+    public abstract Single<T> delete(T model);
 
-    abstract Observable<List<T>> saveList(List<T> models);
+    abstract Single<List<T>> saveList(List<T> models);
 
-    Observable<T> save(T model) {
+    Single<T> save(T model) {
         return saveList(Collections.singletonList(model)).flatMap(list -> just(list.get(0)));
     }
 
-    Observable<T> updateLocal(T source, T updated) {
+    Single<T> updateLocal(T source, T updated) {
         source.update(updated);
         return save(updated);
     }

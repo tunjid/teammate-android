@@ -11,6 +11,8 @@ import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+
 /**
  * DAO for {@link Event}
  */
@@ -23,7 +25,11 @@ public interface EventDao {
             " INNER JOIN roles as role" +
             " ON team.team_id = role.role_team_id" +
             " WHERE :userId = role.user_id")
-    List<Event> getEvents(String userId);
+    Maybe<List<Event>> getEvents(String userId);
+
+    @Query("SELECT * FROM events" +
+            " WHERE :id = event_id")
+    Maybe<Event> get(String id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<EventEntity> events);

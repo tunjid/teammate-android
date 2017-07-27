@@ -5,7 +5,8 @@ import android.arch.lifecycle.ViewModel;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 /**
  * View model for registration
@@ -29,23 +30,23 @@ public class UserViewModel extends ViewModel {
         return repository.getCurrentUser();
     }
 
-    public Observable<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
+    public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
         return repository.signUp(firstName, lastName, primaryEmail, password);
     }
 
-    public Observable<User> signIn(String email, String password) {
+    public Single<User> signIn(String email, String password) {
         return repository.signIn(email, password);
     }
 
-    public Observable<User> getMe() {
+    public Flowable<User> getMe() {
         return repository.getMe();
     }
 
-    public Observable<Boolean> signOut() {
+    public Single<Boolean> signOut() {
         return repository.signOut();
     }
 
-    public Observable<Void> forgotPassword(String email) {
+    public Single<Void> forgotPassword(String email) {
         return repository.forgotPassword(email);
     }
 }

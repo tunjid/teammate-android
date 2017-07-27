@@ -11,7 +11,8 @@ import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.subjects.ReplaySubject;
 
 /**
@@ -33,36 +34,36 @@ public class RoleViewModel extends ViewModel {
         joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
-    public Observable<List<String>> getRoleValues() {
+    public Single<List<String>> getRoleValues() {
         // Use new subject if previous call errored out for whatever reason.
         if (roleSubject == null || roleSubject.hasThrowable()) {
             roleSubject = ReplaySubject.createWithSize(1);
-            api.getRoleValues().subscribe(roleSubject);
+            api.getRoleValues().toObservable().subscribe(roleSubject);
         }
-        return roleSubject;
+        return roleSubject.singleOrError();
     }
 
-    public Observable<Role> getRoleInTeam(String userId, String teamId) {
+    public Maybe<Role> getRoleInTeam(String userId, String teamId) {
         return repository.getRoleInTeam(userId, teamId);
     }
 
-    public Observable<Role> updateRole(Role role) {
+    public Single<Role> updateRole(Role role) {
         return repository.createOrUpdate(role);
     }
 
-    public Observable<Role> approveUser(JoinRequest request) {
+    public Single<Role> approveUser(JoinRequest request) {
         return repository.approveUser(request);
     }
 
-    public Observable<JoinRequest> joinTeam(JoinRequest joinRequest) {
+    public Single<JoinRequest> joinTeam(JoinRequest joinRequest) {
         return joinRequestRepository.createOrUpdate(joinRequest);
     }
 
-    public Observable<JoinRequest> declineUser(JoinRequest request) {
+    public Single<JoinRequest> declineUser(JoinRequest request) {
         return joinRequestRepository.dropJoinRequest(request);
     }
 
-    public Observable<Role> dropRole(Role role) {
+    public Single<Role> dropRole(Role role) {
         return repository.dropRole(role);
     }
 }

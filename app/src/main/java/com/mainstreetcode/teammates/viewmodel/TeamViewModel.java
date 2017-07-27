@@ -7,7 +7,8 @@ import com.mainstreetcode.teammates.repository.TeamRepository;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 
 /**
@@ -24,23 +25,23 @@ public class TeamViewModel extends ViewModel {
         repository = TeamRepository.getInstance();
     }
 
-    public Observable<Team> createOrUpdate(Team team) {
+    public Single<Team> createOrUpdate(Team team) {
         return repository.createOrUpdate(team);
     }
 
-    public Observable<Team> getTeam(Team team) {
+    public Flowable<Team> getTeam(Team team) {
         return repository.get(team.getId());
     }
 
-    public Observable<List<Team>> findTeams(String queryText) {
+    public Single<List<Team>> findTeams(String queryText) {
         return repository.findTeams(queryText);
     }
 
-    public Observable<List<Team>> getMyTeams() {
+    public Flowable<List<Team>> getMyTeams() {
         return repository.getMyTeams();
     }
 
-    public Observable<Team> deleteTeam(Team team) {
+    public Single<Team> deleteTeam(Team team) {
         return repository.delete(team);
     }
 }

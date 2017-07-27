@@ -11,6 +11,8 @@ import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+
 /**
  * DAO for {@link User}
  * <p>
@@ -20,7 +22,7 @@ import java.util.List;
 @Dao
 public interface UserDao {
     @Query("SELECT * FROM users WHERE user_primary_email LIKE :primaryEmail LIMIT 1")
-    User findByEmail(String primaryEmail );
+    Maybe<User> findByEmail(String primaryEmail );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<UserEntity> users);

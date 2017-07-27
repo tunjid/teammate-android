@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
-import static io.reactivex.Observable.concat;
-import static io.reactivex.Observable.fromCallable;
-import static io.reactivex.Observable.just;
+import static io.reactivex.Maybe.concat;
+import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -42,28 +43,29 @@ public class EventRepository extends CrudRespository<Event> {
     }
 
     @Override
-    public Observable<Event> createOrUpdate(Event event) {
-        Observable<Event> eventObservable = event.isEmpty()
+    public Single<Event> createOrUpdate(Event event) {
+        Single<Event> eventSingle = event.isEmpty()
                 ? api.createEvent(event).flatMap(created -> updateLocal(event, created))
                 : api.updateEvent(event.getId(), event).flatMap(updated -> updateLocal(event, updated));
 
         MultipartBody.Part body = getBody(event.get(Event.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            eventObservable = eventObservable.flatMap(put -> api.uploadEventPhoto(event.getId(), body));
+            eventSingle = eventSingle.flatMap(put -> api.uploadEventPhoto(event.getId(), body));
         }
 
-        return eventObservable.flatMap(this::save).observeOn(mainThread());
+        return eventSingle.flatMap(this::save).observeOn(mainThread());
     }
 
     @Override
-    public Observable<Event> get(String id) {
-        return api.getEvent(id)
-                .flatMap(this::save)
-                .observeOn(mainThread());
+    public Flowable<Event> get(String id) {
+        Maybe<Event> local = eventDao.get(id);
+        Maybe<Event> remote = api.getEvent(id).flatMap(this::save).toMaybe();
+
+        return concat(local, remote).observeOn(mainThread());
     }
 
     @Override
-    public Observable<Event> delete(Event event) {
+    public Single<Event> delete(Event event) {
         return api.deleteEvent(event.getId())
                 .flatMap(deleted -> {
                     eventDao.delete(event);
@@ -71,15 +73,15 @@ public class EventRepository extends CrudRespository<Event> {
                 });
     }
 
-    public Observable<List<Event>> getEvents(String userId) {
-        Observable<List<Event>> local = fromCallable(() -> eventDao.getEvents(userId)).subscribeOn(io());
-        Observable<List<Event>> remote = api.getEvents().flatMap(this::saveList);
+    public Flowable<List<Event>> getEvents(String userId) {
+        Maybe<List<Event>> local = eventDao.getEvents(userId).subscribeOn(io());
+        Maybe<List<Event>> remote = api.getEvents().flatMap(this::saveList).toMaybe();
 
         return concat(local, remote).observeOn(mainThread());
     }
 
     @Override
-    Observable<List<Event>> saveList(List<Event> models) {
+    Single<List<Event>> saveList(List<Event> models) {
         List<Team> teams = new ArrayList<>(models.size());
         for (Event event : models) teams.add(event.getTeam());
 
@@ -93,7 +95,7 @@ public class EventRepository extends CrudRespository<Event> {
      * Used to save a event that has it's users populated
      */
     @Override
-    Observable<Event> save(Event event) {
+    Single<Event> save(Event event) {
         return saveList(Collections.singletonList(event)).flatMap(events -> just(events.get(0)));
     }
 }
