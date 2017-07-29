@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="@dimen/single_margin"
@@ -12,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/time"
+        app:layout_constraintBottom_toBottomOf="@+id/model"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,15 +24,17 @@
         android:layout_height="0dp"
         android:background="@color/dark_grey"
         android:contentDescription="@string/team_logo"
-        app:layout_constraintBottom_toBottomOf="@+id/time"
+        app:layout_constraintBottom_toBottomOf="@+id/model"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
         android:paddingTop="@dimen/half_margin"
@@ -41,7 +44,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/time"
+        android:id="@+id/model"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:paddingBottom="@dimen/half_margin"
@@ -51,5 +54,37 @@
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/tiny_text"
         app:layout_constraintLeft_toRightOf="@+id/thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintTop_toBottomOf="@+id/message" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/negative"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:paddingBottom="@dimen/half_margin"-->
+        <!--android:paddingLeft="@dimen/single_margin"-->
+        <!--android:paddingRight="@dimen/single_margin"-->
+        <!--android:paddingTop="@dimen/half_margin"-->
+        <!--android:text="@string/decline"-->
+        <!--android:textAllCaps="true"-->
+        <!--android:textColor="@color/dark_grey"-->
+        <!--android:textSize="@dimen/tiny_text"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/thumbnail"-->
+        <!--tools:text="Decline" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/positive"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:paddingBottom="@dimen/half_margin"-->
+        <!--android:paddingLeft="@dimen/single_margin"-->
+        <!--android:paddingRight="@dimen/single_margin"-->
+        <!--android:paddingTop="@dimen/half_margin"-->
+        <!--android:text="@string/accept"-->
+        <!--android:textAllCaps="true"-->
+        <!--android:textColor="@color/dark_grey"-->
+        <!--android:textSize="@dimen/tiny_text"-->
+        <!--app:layout_constraintRight_toLeftOf="@+id/negative"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/message"-->
+        <!--tools:text="Accept" />-->
 </android.support.constraint.ConstraintLayout>

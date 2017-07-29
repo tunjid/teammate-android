@@ -58,7 +58,7 @@ public class EventRepository extends CrudRespository<Event> {
 
     @Override
     public Flowable<Event> get(String id) {
-        Maybe<Event> local = eventDao.get(id);
+        Maybe<Event> local = eventDao.get(id).subscribeOn(io());
         Maybe<Event> remote = api.getEvent(id).flatMap(this::save).toMaybe();
 
         return concat(local, remote).observeOn(mainThread());

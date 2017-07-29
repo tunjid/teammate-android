@@ -26,6 +26,10 @@ public class EventViewModel extends ViewModel {
         return repository.getEvents(userId);
     }
 
+    public Flowable<Event> getEvent(Event event) {
+        return repository.get(event);
+    }
+
     public Single<Event> updateEvent(final Event event) {
         return repository.createOrUpdate(event);
     }

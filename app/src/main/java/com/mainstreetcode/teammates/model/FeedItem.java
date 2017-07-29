@@ -14,12 +14,18 @@ import java.lang.reflect.Type;
 
 public class FeedItem<T extends Model> {
 
-    private String message;
-    private T model;
+    private final String type;
+    private final String message;
+    private final T model;
 
-    FeedItem(String message, T model) {
+    FeedItem(String type, String message, T model) {
+        this.type = type;
         this.message = message;
         this.model = model;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getMessage() {
@@ -34,6 +40,7 @@ public class FeedItem<T extends Model> {
             implements JsonDeserializer<FeedItem<T>> {
 
         private static final String TYPE_KEY = "type";
+        private static final String MODEL_TYPE_KEY = "modelName";
         private static final String MESSAGE_KEY = "message";
         private static final String MODEL_KEY = "model";
 
@@ -45,12 +52,13 @@ public class FeedItem<T extends Model> {
             JsonObject feedItemJson = json.getAsJsonObject();
 
             String type = ModelUtils.asString(TYPE_KEY, feedItemJson);
+            String modelType = ModelUtils.asString(MODEL_TYPE_KEY, feedItemJson);
             String message = ModelUtils.asString(MESSAGE_KEY, feedItemJson);
 
             Class typeClass;
 
             switch (type != null ? type : "") {
-                case "join-requests":
+                case "join-request":
                     typeClass = JoinRequest.class;
                     break;
                 case "event":
@@ -62,7 +70,7 @@ public class FeedItem<T extends Model> {
 
             T model = context.deserialize(feedItemJson.get(MODEL_KEY), typeClass);
 
-            return new FeedItem<>(message, model);
+            return new FeedItem<>(modelType, message, model);
         }
     }
 }

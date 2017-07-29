@@ -102,6 +102,14 @@ public class Event extends EventEntity
         this.team = team;
     }
 
+    public List<User> getAttendees() {
+        return attendees;
+    }
+
+    public List<User> getAbsentees() {
+        return absentees;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -165,7 +173,12 @@ public class Event extends EventEntity
             String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
 
-            return new Event(id, name, notes, imageUrl, parseDate(startDate), parseDate(endDate), team);
+            Event result = new Event(id, name, notes, imageUrl, parseDate(startDate), parseDate(endDate), team);
+
+            ModelUtils.deserializeList(context, roleJson.get("attendees"), result.attendees, User.class);
+            ModelUtils.deserializeList(context, roleJson.get("absentees"), result.absentees, User.class);
+
+            return result;
         }
     }
 }

@@ -125,7 +125,13 @@ public class EventEditFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleInTeam(user.getId(), event.getTeam().getId()).subscribe(role -> {
             currentRole = role;
             getActivity().invalidateOptionsMenu();
-        }, error -> {}));
+        }, emptyErrorHandler));
+
+        if (!event.isEmpty()) {
+            disposables.add(eventViewModel.getEvent(event).subscribe(updated -> {
+                recyclerView.getAdapter().notifyDataSetChanged();
+            }, defaultErrorHandler));
+        }
     }
 
     @Override

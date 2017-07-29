@@ -25,6 +25,13 @@ public abstract class CrudRespository<T extends Model> {
 
     abstract Single<List<T>> saveList(List<T> models);
 
+    public Flowable<T> get(T model) {
+        return get(model.getId()).map(emiitedModel -> {
+            model.update(emiitedModel);
+            return model;
+        });
+    }
+
     Single<T> save(T model) {
         return saveList(Collections.singletonList(model)).flatMap(list -> just(list.get(0)));
     }

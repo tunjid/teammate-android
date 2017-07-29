@@ -19,20 +19,22 @@ public class FeedItemViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterLi
 
     private FeedItem item;
     private ImageView teamLogo;
-    private TextView teamName;
+    private TextView description;
+    private TextView itemType;
 
     public FeedItemViewHolder(View itemView) {
         super(itemView);
         teamLogo = itemView.findViewById(R.id.thumbnail);
-        teamName = itemView.findViewById(R.id.name);
-        itemView.findViewById(R.id.time).setVisibility(View.GONE);
+        itemType = itemView.findViewById(R.id.message);
+        description = itemView.findViewById(R.id.model);
         itemView.setOnClickListener(this);
     }
 
     public void bind(FeedItem item) {
 
         this.item = item;
-        teamName.setText(item.getMessage());
+        description.setText(item.getMessage());
+        itemType.setText(item.getType());
 
         if (item.getImageUrl()!=null) {
             Picasso.with(itemView.getContext())

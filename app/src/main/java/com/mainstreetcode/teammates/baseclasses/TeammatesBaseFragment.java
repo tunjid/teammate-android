@@ -22,6 +22,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.components.KeyboardUtils;
 
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Base Fragment for this app
@@ -35,7 +36,8 @@ public class TeammatesBaseFragment extends BaseFragment {
     private KeyboardUtils keyboardUtils = new KeyboardUtils(this);
     protected CompositeDisposable disposables = new CompositeDisposable();
 
-    protected ErrorHandler defaultErrorHandler;
+    protected Consumer<Throwable> defaultErrorHandler;
+    protected Consumer<Throwable> emptyErrorHandler;
 
     protected void toggleProgress(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
@@ -70,6 +72,8 @@ public class TeammatesBaseFragment extends BaseFragment {
                 .defaultMessage(getString(R.string.default_error))
                 .add(this::showSnackbar)
                 .build();
+
+        emptyErrorHandler = throwable -> {};
     }
 
     @Override
