@@ -2,11 +2,17 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
+import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
+import com.mainstreetcode.teammates.rest.TeammateService;
+
+import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * View model for registration
@@ -44,6 +50,10 @@ public class UserViewModel extends ViewModel {
 
     public Single<Boolean> signOut() {
         return repository.signOut();
+    }
+
+    public Single<List<FeedItem>> getFeed() {
+        return TeammateService.getApiInstance().getFeed().subscribeOn(mainThread());
     }
 
     public Single<Void> forgotPassword(String email) {

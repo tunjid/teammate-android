@@ -127,4 +127,7 @@ public interface TeammateApi {
 
     @DELETE("api/events/{id}")
     Single<Event> deleteEvent(@Path("id") String eventId);
+
+    @GET("api/events/{id}/rsvp")
+    Single<Event> rsvpEvent(@Path("id") String eventId, @Query("attending") boolean attending);
 }
