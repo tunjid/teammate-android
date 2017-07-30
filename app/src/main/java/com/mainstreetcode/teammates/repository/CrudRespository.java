@@ -8,8 +8,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-
-import static io.reactivex.Single.just;
+import io.reactivex.functions.Function;
 
 /**
  * Repository that manages model CRUD operations
@@ -17,27 +16,34 @@ import static io.reactivex.Single.just;
 
 public abstract class CrudRespository<T extends Model> {
 
+    private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
+    private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);
+
     public abstract Single<T> createOrUpdate(T model);
 
     public abstract Flowable<T> get(String id);
 
     public abstract Single<T> delete(T model);
 
-    abstract Single<List<T>> saveList(List<T> models);
+    abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
-    public Flowable<T> get(T model) {
-        return get(model.getId()).map(emiitedModel -> {
-            model.update(emiitedModel);
-            return model;
-        });
+    public final Flowable<T> get(T model) {
+        return get(model.getId()).map(localMapper(model));
     }
 
-    Single<T> save(T model) {
-        return saveList(Collections.singletonList(model)).flatMap(list -> just(list.get(0)));
+    final Function<List<T>, List<T>> getSaveManyFunction() {
+        return saveListFunction;
     }
 
-    Single<T> updateLocal(T source, T updated) {
-        source.update(updated);
-        return save(updated);
+    final Function<T, T> getSaveFunction() {
+        return saveFunction;
     }
+
+    final Function<T, T> localMapper(T original) {
+        return emitted -> {
+            original.update(emitted);
+            return original;
+        };
+    }
+
 }

@@ -23,6 +23,7 @@ import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.ReplaySubject;
 
@@ -68,7 +69,7 @@ public class UserRepository extends CrudRespository<User> {
         signUpSubject = ReplaySubject.createWithSize(1);
 
         teammateApi.signUp(model)
-                .flatMap(this::save)
+                .map(getSaveFunction())
                 .toObservable()
                 .subscribe(signUpSubject);
 
@@ -78,7 +79,7 @@ public class UserRepository extends CrudRespository<User> {
     @Override
     public Flowable<User> get(String primaryEmail) {
         Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(Schedulers.io());
-        Single<User> remote = teammateApi.getMe().flatMap(this::save);
+        Single<User> remote = teammateApi.getMe().map(getSaveFunction());
 
         return concat(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe()).observeOn(mainThread());
     }
@@ -90,8 +91,11 @@ public class UserRepository extends CrudRespository<User> {
     }
 
     @Override
-    Single<List<User>> saveList(List<User> models) {
-        return null;
+    Function<List<User>, List<User>> provideSaveManyFunction() {
+        return models -> {
+            userDao.insert(Collections.unmodifiableList(models));
+            return models;
+        };
     }
 
     public User getCurrentUser() {
@@ -117,7 +121,7 @@ public class UserRepository extends CrudRespository<User> {
         request.addProperty("password", password);
 
         teammateApi.signIn(request)
-                .flatMap(this::save)
+                .map(getSaveFunction())
                 .toObservable()
                 .subscribe(signInSubject);
 
@@ -133,12 +137,6 @@ public class UserRepository extends CrudRespository<User> {
                 .flatMap(result -> clearUser())
                 .onErrorResumeNext(throwable -> clearUser())
                 .observeOn(mainThread());
-    }
-
-    @Override
-    Single<User> save(User user) {
-        userDao.insert(Collections.singletonList(user));
-        return just(user);
     }
 
     public boolean isSignedIn() {

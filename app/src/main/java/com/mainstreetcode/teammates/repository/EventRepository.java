@@ -15,6 +15,7 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
@@ -45,21 +46,21 @@ public class EventRepository extends CrudRespository<Event> {
     @Override
     public Single<Event> createOrUpdate(Event event) {
         Single<Event> eventSingle = event.isEmpty()
-                ? api.createEvent(event).flatMap(created -> updateLocal(event, created))
-                : api.updateEvent(event.getId(), event).flatMap(updated -> updateLocal(event, updated));
+                ? api.createEvent(event).map(localMapper(event))
+                : api.updateEvent(event.getId(), event).map(localMapper(event));
 
         MultipartBody.Part body = getBody(event.get(Event.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
             eventSingle = eventSingle.flatMap(put -> api.uploadEventPhoto(event.getId(), body));
         }
 
-        return eventSingle.flatMap(this::save).observeOn(mainThread());
+        return eventSingle.map(getSaveFunction()).observeOn(mainThread());
     }
 
     @Override
     public Flowable<Event> get(String id) {
         Maybe<Event> local = eventDao.get(id).subscribeOn(io());
-        Maybe<Event> remote = api.getEvent(id).flatMap(this::save).toMaybe();
+        Maybe<Event> remote = api.getEvent(id).map(getSaveFunction()).toMaybe();
 
         return concat(local, remote).observeOn(mainThread());
     }
@@ -75,27 +76,21 @@ public class EventRepository extends CrudRespository<Event> {
 
     public Flowable<List<Event>> getEvents(String userId) {
         Maybe<List<Event>> local = eventDao.getEvents(userId).subscribeOn(io());
-        Maybe<List<Event>> remote = api.getEvents().flatMap(this::saveList).toMaybe();
+        Maybe<List<Event>> remote = api.getEvents().map(getSaveManyFunction()).toMaybe();
 
         return concat(local, remote).observeOn(mainThread());
     }
 
     @Override
-    Single<List<Event>> saveList(List<Event> models) {
-        List<Team> teams = new ArrayList<>(models.size());
-        for (Event event : models) teams.add(event.getTeam());
+    Function<List<Event>, List<Event>> provideSaveManyFunction() {
+        return models -> {
+            List<Team> teams = new ArrayList<>(models.size());
+            for (Event event : models) teams.add(event.getTeam());
 
-        return teamRepository.saveList(teams).flatMap(savedTeams -> {
+            teamRepository.getSaveManyFunction().apply(teams);
             eventDao.insert(Collections.unmodifiableList(models));
-            return just(models);
-        });
-    }
 
-    /**
-     * Used to save a event that has it's users populated
-     */
-    @Override
-    Single<Event> save(Event event) {
-        return saveList(Collections.singletonList(event)).flatMap(events -> just(events.get(0)));
+            return models;
+        };
     }
 }

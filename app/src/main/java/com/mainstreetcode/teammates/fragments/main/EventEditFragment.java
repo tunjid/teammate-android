@@ -128,9 +128,7 @@ public class EventEditFragment extends MainActivityFragment
         }, emptyErrorHandler));
 
         if (!event.isEmpty()) {
-            disposables.add(eventViewModel.getEvent(event).subscribe(updated -> {
-                recyclerView.getAdapter().notifyDataSetChanged();
-            }, defaultErrorHandler));
+            disposables.add(eventViewModel.getEvent(event).subscribe(updated -> recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
         }
     }
 

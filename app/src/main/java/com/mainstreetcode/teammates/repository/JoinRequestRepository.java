@@ -4,7 +4,6 @@ import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.JoinRequestDao;
-import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -14,6 +13,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -21,14 +21,14 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class JoinRequestRepository extends CrudRespository<JoinRequest> {
 
     private final TeammateApi api;
-    private final UserDao userDao;
+    private final UserRepository userRepository;
     private final JoinRequestDao joinRequestDao;
 
     private static JoinRequestRepository ourInstance;
 
     private JoinRequestRepository() {
         api = TeammateService.getApiInstance();
-        userDao = AppDatabase.getInstance().userDao();
+        userRepository = UserRepository.getInstance();
         joinRequestDao = AppDatabase.getInstance().joinRequestDao();
     }
 
@@ -40,8 +40,8 @@ public class JoinRequestRepository extends CrudRespository<JoinRequest> {
     @Override
     public Single<JoinRequest> createOrUpdate(JoinRequest model) {
         return api.joinTeam(model)
-                .flatMap(updated -> updateLocal(model, updated))
-                .flatMap(this::save).observeOn(mainThread());
+                .map(localMapper(model))
+                .map(getSaveFunction()).observeOn(mainThread());
     }
 
     @Override
@@ -56,15 +56,18 @@ public class JoinRequestRepository extends CrudRespository<JoinRequest> {
     }
 
     @Override
-    Single<List<JoinRequest>> saveList(List<JoinRequest> models) {
-        List<User> users = new ArrayList<>(models.size());
+    Function<List<JoinRequest>, List<JoinRequest>> provideSaveManyFunction() {
+        return models -> {
+            List<User> users = new ArrayList<>(models.size());
 
-        for (JoinRequest role : models) users.add(role.getUser());
+            for (JoinRequest role : models) users.add(role.getUser());
 
-        userDao.insert(Collections.unmodifiableList(users));
-        joinRequestDao.insert(Collections.unmodifiableList(models));
+            userRepository.getSaveManyFunction().apply(Collections.unmodifiableList(users));
 
-        return just(models);
+            joinRequestDao.insert(Collections.unmodifiableList(models));
+
+            return models;
+        };
     }
 
     public Single<JoinRequest> dropJoinRequest(JoinRequest joinRequest) {

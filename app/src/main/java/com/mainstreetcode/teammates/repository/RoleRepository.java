@@ -16,6 +16,7 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
 import static io.reactivex.Single.just;
@@ -49,9 +50,7 @@ public class RoleRepository extends CrudRespository<Role> {
             roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
         }
 
-        return roleSingle
-                .flatMap(updated -> updateLocal(model, updated))
-                .flatMap(this::save).observeOn(mainThread());
+        return roleSingle.map(localMapper(model)).map(getSaveFunction()).observeOn(mainThread());
     }
 
     @Override
@@ -66,20 +65,21 @@ public class RoleRepository extends CrudRespository<Role> {
     }
 
     @Override
-    Single<List<Role>> saveList(List<Role> models) {
-        List<User> users = new ArrayList<>(models.size());
+    Function<List<Role>, List<Role>> provideSaveManyFunction() {
+        return models -> {
+            List<User> users = new ArrayList<>(models.size());
 
-        for (Role role : models) users.add(role.getUser());
+            for (Role role : models) users.add(role.getUser());
 
-        userDao.insert(Collections.unmodifiableList(users));
-        roleDao.insert(Collections.unmodifiableList(models));
+            userDao.insert(Collections.unmodifiableList(users));
+            roleDao.insert(Collections.unmodifiableList(models));
 
-        return just(models);
+            return models;
+        };
     }
 
     public Single<Role> approveUser(JoinRequest request) {
-        Single<Role> observable = api.approveUser(request.getId())
-                .flatMap(this::save);
+        Single<Role> observable = api.approveUser(request.getId()).map(getSaveFunction());
         return observable.observeOn(mainThread());
     }
 
