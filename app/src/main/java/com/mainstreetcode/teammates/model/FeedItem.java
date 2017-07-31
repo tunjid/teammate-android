@@ -36,6 +36,10 @@ public class FeedItem<T extends Model> {
         return model.getImageUrl();
     }
 
+    public T getModel() {
+        return model;
+    }
+
     public static class GsonAdapter<T extends Model>
             implements JsonDeserializer<FeedItem<T>> {
 

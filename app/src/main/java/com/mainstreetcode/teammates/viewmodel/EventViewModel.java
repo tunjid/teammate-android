@@ -34,6 +34,10 @@ public class EventViewModel extends ViewModel {
         return repository.createOrUpdate(event);
     }
 
+    public Single<Event> rsvpEvent(final Event event, boolean attending) {
+        return repository.rsvpEvent(event, attending);
+    }
+
     public Single<Event> delete(final Event event) {
         return repository.delete(event);
     }

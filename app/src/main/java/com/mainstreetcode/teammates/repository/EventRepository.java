@@ -81,6 +81,13 @@ public class EventRepository extends CrudRespository<Event> {
         return concat(local, remote).observeOn(mainThread());
     }
 
+    public Single<Event> rsvpEvent(final Event event, boolean attending) {
+        return api.rsvpEvent(event.getId(), attending)
+                .map(localMapper(event))
+                .map(getSaveFunction())
+                .observeOn(mainThread());
+    }
+
     @Override
     Function<List<Event>, List<Event>> provideSaveManyFunction() {
         return models -> {

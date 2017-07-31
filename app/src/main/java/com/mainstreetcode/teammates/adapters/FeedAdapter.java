@@ -20,8 +20,8 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<FeedItemViewHolder, Fee
 
     private final List<FeedItem> items;
 
-    public FeedAdapter(List<FeedItem> items) {
-        //super(listener);
+    public FeedAdapter(List<FeedItem> items, FeedItemAdapterListener listener) {
+        super(listener);
         this.items = items;
         setHasStableIds(true);
     }
@@ -30,7 +30,7 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<FeedItemViewHolder, Fee
     public FeedItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         Context context = viewGroup.getContext();
         View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_feed, viewGroup, false);
-        return new FeedItemViewHolder(itemView);
+        return new FeedItemViewHolder(itemView, adapterListener);
     }
 
     @Override
@@ -48,8 +48,8 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<FeedItemViewHolder, Fee
         return items.get(position).hashCode();
     }
 
-    interface FeedItemAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        //void onFeedItemClicked(FeedItem item);
+    public interface FeedItemAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+        void onFeedItemClicked(FeedItem item);
     }
 
 }

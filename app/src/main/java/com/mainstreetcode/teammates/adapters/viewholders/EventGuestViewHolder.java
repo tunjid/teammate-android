@@ -5,17 +5,23 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.model.User;
 import com.squareup.picasso.Picasso;
 
-public class EventGuestViewHolder extends UserHoldingViewHolder {
+public class EventGuestViewHolder extends UserHoldingViewHolder<EventEditAdapter.EditAdapterListener>
+        implements View.OnClickListener {
 
-    public EventGuestViewHolder(View itemView) {
-        super(itemView, null);
+    private User user;
 
+    public EventGuestViewHolder(View itemView, EventEditAdapter.EditAdapterListener listener) {
+        super(itemView, listener);
+        itemView.setOnClickListener(this);
     }
 
     public void bind(User user, boolean attending) {
+        this.user = user;
+
         Context context = itemView.getContext();
 
         userName.setText(user.getFirstName());
@@ -31,4 +37,8 @@ public class EventGuestViewHolder extends UserHoldingViewHolder {
         }
     }
 
+    @Override
+    public void onClick(View view) {
+        adapterListener.rsvpToEvent(user);
+    }
 }

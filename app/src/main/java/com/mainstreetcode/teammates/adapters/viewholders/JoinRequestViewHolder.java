@@ -10,7 +10,7 @@ import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.User;
 import com.squareup.picasso.Picasso;
 
-public class JoinRequestViewHolder extends UserHoldingViewHolder
+public class JoinRequestViewHolder extends UserHoldingViewHolder<TeamDetailAdapter.UserAdapterListener>
         implements View.OnClickListener {
 
     private JoinRequest request;

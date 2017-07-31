@@ -9,7 +9,7 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.User;
 import com.squareup.picasso.Picasso;
 
-public class RoleViewHolder extends UserHoldingViewHolder
+public class RoleViewHolder extends UserHoldingViewHolder<TeamDetailAdapter.UserAdapterListener>
         implements View.OnClickListener {
 
     private Role role;

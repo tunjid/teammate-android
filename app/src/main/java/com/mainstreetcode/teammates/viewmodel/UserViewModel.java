@@ -53,7 +53,7 @@ public class UserViewModel extends ViewModel {
     }
 
     public Single<List<FeedItem>> getFeed() {
-        return TeammateService.getApiInstance().getFeed().subscribeOn(mainThread());
+        return TeammateService.getApiInstance().getFeed().observeOn(mainThread());
     }
 
     public Single<Void> forgotPassword(String email) {

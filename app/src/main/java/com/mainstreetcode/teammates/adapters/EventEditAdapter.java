@@ -73,7 +73,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             case Item.IMAGE:
                 return new ImageViewHolder(itemView, adapterListener);
             case GUEST:
-                return new EventGuestViewHolder(itemView);
+                return new EventGuestViewHolder(itemView, adapterListener);
             case TEAM:
                 return new TeamViewHolder(itemView, item -> adapterListener.selectTeam());
             default:
@@ -118,6 +118,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             ImageWorkerFragment.ImagePickerListener {
 
         void selectTeam();
+
+        void rsvpToEvent(User user);
     }
 
 }

@@ -5,7 +5,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.TeamAdapter;
+import com.mainstreetcode.teammates.adapters.FeedAdapter;
 import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.Team;
 import com.squareup.picasso.Picasso;
@@ -14,7 +14,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 /**
  * Viewholder for a {@link Team}
  */
-public class FeedItemViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterListener>
+public class FeedItemViewHolder extends BaseViewHolder<FeedAdapter.FeedItemAdapterListener>
         implements View.OnClickListener {
 
     private FeedItem item;
@@ -22,8 +22,8 @@ public class FeedItemViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterLi
     private TextView description;
     private TextView itemType;
 
-    public FeedItemViewHolder(View itemView) {
-        super(itemView);
+    public FeedItemViewHolder(View itemView, FeedAdapter.FeedItemAdapterListener listener) {
+        super(itemView, listener);
         teamLogo = itemView.findViewById(R.id.thumbnail);
         itemType = itemView.findViewById(R.id.message);
         description = itemView.findViewById(R.id.model);
@@ -47,6 +47,6 @@ public class FeedItemViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterLi
 
     @Override
     public void onClick(View view) {
-        //adapterListener.onTeamClicked(item);
+        adapterListener.onFeedItemClicked(item);
     }
 }

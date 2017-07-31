@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,6 +37,8 @@ public class EventEditFragment extends MainActivityFragment
     private static final String ARG_EVENT = "event";
 
     private Event event;
+
+    @Nullable
     private Role currentRole;
 
     private RecyclerView recyclerView;
@@ -187,4 +190,22 @@ public class EventEditFragment extends MainActivityFragment
         showFragment(teamsFragment);
     }
 
+    @Override
+    public void rsvpToEvent(User user) {
+        if (currentRole == null || !user.equals(currentRole.getUser())) return;
+
+        new AlertDialog.Builder(getContext()).setTitle(getString(R.string.attend_event))
+                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
+                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
+                .show();
+    }
+
+    private void rsvpEvent(Event event, boolean attending) {
+        toggleProgress(true);
+        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(result -> {
+                    toggleProgress(false);
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }, defaultErrorHandler)
+        );
+    }
 }

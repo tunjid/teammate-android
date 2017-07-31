@@ -113,6 +113,7 @@
     <string name="location">Location</string>
     <string name="notes">Notes</string>
     <string name="delete_event">Delete event</string>
+    <string name="attend_event">Attending this event?</string>
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
 </resources>

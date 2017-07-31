@@ -5,17 +5,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 
-public class UserHoldingViewHolder extends BaseViewHolder<TeamDetailAdapter.UserAdapterListener> {
+public class UserHoldingViewHolder<T extends BaseRecyclerViewAdapter.AdapterListener> extends BaseViewHolder<T> {
 
     TextView userName;
     TextView userStatus;
     ImageView userPicture;
 
-    UserHoldingViewHolder(View itemView, TeamDetailAdapter.UserAdapterListener adapterListener) {
+    UserHoldingViewHolder(View itemView, T adapterListener) {
         super(itemView, adapterListener);
         userName = itemView.findViewById(R.id.user_name);
         userStatus = itemView.findViewById(R.id.user_status);

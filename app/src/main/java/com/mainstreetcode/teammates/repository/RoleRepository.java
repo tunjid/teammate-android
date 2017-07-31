@@ -21,6 +21,7 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class RoleRepository extends CrudRespository<Role> {
 
@@ -88,6 +89,6 @@ public class RoleRepository extends CrudRespository<Role> {
     }
 
     public Maybe<Role> getRoleInTeam(String userId, String teamId) {
-        return roleDao.getRoleInTeam(userId, teamId).observeOn(mainThread());
+        return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io()).observeOn(mainThread());
     }
 }
