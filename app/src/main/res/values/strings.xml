@@ -41,6 +41,8 @@
 
     <!--HomeFragment-->
     <string name="home_greeting">Good %1$s, %2$s</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>
@@ -74,11 +76,12 @@
 
     <!--TeamsFragment-->
     <string name="my_teams">My Teams</string>
+    <string name="pick_team">Pick a Team</string>
     <string name="team_name_prefix">Team: %1$s</string>
 
     <!--TeamDetailFragment-->
-    <string name="user_invited">Has been invited</string>
-    <string name="user_requests_join">Has requested to join</string>
+    <string name="user_invited">Has been invited as a %1$s</string>
+    <string name="user_requests_join">Has requested to join as a %1$s</string>
     <string name="delete_team">Delete team</string>
     <string name="delete_team_prompt">Delete %1$s?</string>
     <string name="deleted_team">Deleted %1$s</string>
@@ -97,4 +100,20 @@
     <string name="drop_user">Drop User</string>
     <string name="dropped_user">Dropped %1$s</string>
     <string name="confirm_user_drop">Drop %1$s from the team?</string>
+
+    <!--EventsFragment-->
+    <string name="my_events">My Events</string>
+
+    <!--EventDetailFragment-->
+    <string name="create_event">Create Event</string>
+    <string name="edit_event">Edit Event</string>
+    <string name="event_name">Event Name</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="location">Location</string>
+    <string name="notes">Notes</string>
+    <string name="delete_event">Delete event</string>
+    <string name="attend_event">Attending this event?</string>
+    <string name="event_attending">Going</string>
+    <string name="event_not_attending">Not Going</string>
 </resources>

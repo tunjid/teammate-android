@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates;
 
+import com.facebook.stetho.Stetho;
+
 /**
  * Application Singleton
  * <p>
@@ -14,6 +16,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
+        Stetho.initializeWithDefaults(this);
     }
 
     public static Application getInstance() {

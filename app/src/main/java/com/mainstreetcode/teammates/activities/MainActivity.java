@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
+import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
@@ -41,6 +42,9 @@ public class MainActivity extends TeammatesBaseActivity {
                 return true;
             case R.id.action_settings:
                 showFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_events:
+                showFragment(EventsFragment.newInstance());
                 return true;
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());

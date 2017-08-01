@@ -1,13 +1,16 @@
 package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -26,60 +29,105 @@ import retrofit2.http.Query;
  */
 
 public interface TeammateApi {
+
+    // =============================================================================================
+    // User endpoints
+    // =============================================================================================
+
     @POST("api/signUp")
-    Observable<User> signUp(@Body User user);
+    Single<User> signUp(@Body User user);
 
     @POST("api/signIn")
-    Observable<User> signIn(@Body JsonObject request);
+    Single<User> signIn(@Body JsonObject request);
 
     @GET("api/me")
-    Observable<User> getMe();
+    Single<User> getMe();
 
     @GET("api/signOut")
-    Observable<JsonObject> signOut();
+    Single<JsonObject> signOut();
+
+    @GET("api/me/feed")
+    Single<List<FeedItem>> getFeed();
+
+    // =============================================================================================
+    // Team endpoints
+    // =============================================================================================
 
     @POST("api/teams")
-    Observable<Team> createTeam(@Body Team team);
+    Single<Team> createTeam(@Body Team team);
 
     @GET("api/teams/{id}")
-    Observable<Team> getTeam(@Path("id") String teamId);
+    Single<Team> getTeam(@Path("id") String teamId);
 
     @PUT("api/teams/{id}")
-    Observable<Team> updateTeam(@Path("id") String teamId, @Body Team team);
+    Single<Team> updateTeam(@Path("id") String teamId, @Body Team team);
 
     @Multipart
     @POST("api/teams/{id}")
-    Observable<Team> uploadTeamLogo(@Path("id") String teamId, @Part MultipartBody.Part file);
+    Single<Team> uploadTeamLogo(@Path("id") String teamId, @Part MultipartBody.Part file);
 
     @DELETE("api/teams/{id}")
-    Observable<Team> deleteTeam(@Path("id") String teamId);
-
-    @GET("api/teams/{id}/join")
-    Observable<JoinRequest> joinTeam(@Path("id") String teamId, @Query("role") String role);
-
-    @PUT("api/teams/{teamId}/user/{userId}")
-    Observable<User> updateTeamUser(@Path("teamId") String teamId, @Path("userId") String userId,
-                                    @Body User user);
-
-    @GET("api/teams/{teamId}/user/{userId}/approve")
-    Observable<JoinRequest> approveUser(@Path("teamId") String teamId, @Path("userId") String userId);
-
-    @GET("api/teams/{teamId}/user/{userId}/decline")
-    Observable<JoinRequest> declineUser(@Path("teamId") String teamId, @Path("userId") String userId);
-
-    @GET("api/teams/{teamId}/user/{userId}/drop")
-    Observable<User> dropUser(@Path("teamId") String teamId, @Path("userId") String userId);
-
-    @Multipart
-    @POST("api/teams/{teamId}/user/{userId}")
-    Observable<User> uploadUserPhoto(@Path("teamId") String teamId, @Path("userId") String userId, @Part MultipartBody.Part file);
+    Single<Team> deleteTeam(@Path("id") String teamId);
 
     @GET("api/me/teams")
-    Observable<List<Team>> getMyTeams();
+    Single<List<Team>> getMyTeams();
 
     @GET("api/teams")
-    Observable<List<Team>> findTeam(@Query("name") String teamName);
+    Single<List<Team>> findTeam(@Query("name") String teamName);
+
+    // =============================================================================================
+    // Role endpoints
+    // =============================================================================================
 
     @GET("api/roles/values")
-    Observable<List<String>> getRoleValues();
+    Single<List<String>> getRoleValues();
+
+    @Multipart
+    @POST("api/roles/{roleId}")
+    Single<Role> uploadRolePhoto(@Path("roleId") String roleId, @Part MultipartBody.Part file);
+
+    @PUT("api/roles/{roleId}")
+    Single<Role> updateRole(@Path("roleId") String roleId, @Body Role role);
+
+    @DELETE("api/roles/{roleId}")
+    Single<Role> deleteRole(@Path("roleId") String roleId);
+
+    // =============================================================================================
+    // Join Request endpoints
+    // =============================================================================================
+
+    @POST("api/join-requests")
+    Single<JoinRequest> joinTeam(@Body JoinRequest joinRequest);
+
+    @GET("api/join-requests/{requestId}/approve")
+    Single<Role> approveUser(@Path("requestId") String requestId);
+
+    @GET("api/join-requests/{requestId}/decline")
+    Single<JoinRequest> declineUser(@Path("requestId") String requestId);
+
+    // =============================================================================================
+    // Event endpoints
+    // =============================================================================================
+
+    @GET("api/events")
+    Single<List<Event>> getEvents();
+
+    @POST("api/events")
+    Single<Event> createEvent(@Body Event event);
+
+    @Multipart
+    @POST("api/events/{id}")
+    Single<Event> uploadEventPhoto(@Path("id") String eventId, @Part MultipartBody.Part file);
+
+    @PUT("api/events/{id}")
+    Single<Event> updateEvent(@Path("id") String eventId, @Body Event event);
+
+    @GET("api/events/{id}")
+    Single<Event> getEvent(@Path("id") String eventId);
+
+    @DELETE("api/events/{id}")
+    Single<Event> deleteEvent(@Path("id") String eventId);
+
+    @GET("api/events/{id}/rsvp")
+    Single<Event> rsvpEvent(@Path("id") String eventId, @Query("attending") boolean attending);
 }

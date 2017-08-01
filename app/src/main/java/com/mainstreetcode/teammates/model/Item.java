@@ -13,34 +13,38 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * <p>
  * Created by Shemanigans on 6/18/17.
  */
-public class Item {
+public class Item<T> {
 
     @Retention(SOURCE)
-    @IntDef({INPUT, IMAGE, ROLE})
+    @IntDef({INPUT, IMAGE, ROLE, DATE})
     @interface ItemType {}
 
     public static final int INPUT = 2;
     public static final int IMAGE = 3;
     public static final int ROLE = 4;
+    public static final int DATE = 5;
 
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
     private @StringRes final int headerStringRes;
     private @Nullable final ValueChangeCallBack changeCallBack;
+    private final Class<T> itemizedClass;
 
     String value;
 
-    Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack) {
-        this(itemType, stringRes, 0, value, changeCallBack);
+    Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+         Class<T> itemizedClass) {
+        this(itemType, stringRes, 0, value, changeCallBack, itemizedClass);
     }
 
     Item(int itemType, int stringRes, int headerStringRes,
-         String value, @Nullable ValueChangeCallBack changeCallBack) {
+         String value, @Nullable ValueChangeCallBack changeCallBack, Class<T> itemizedClass) {
         this.itemType = itemType;
         this.stringRes = stringRes;
         this.headerStringRes = headerStringRes;
         this.value = value;
         this.changeCallBack = changeCallBack;
+        this.itemizedClass = itemizedClass;
     }
 
     public void setValue(String value) {
@@ -57,6 +61,10 @@ public class Item {
     }
 
     public String getValue() {return this.value;}
+
+    public Class<T> getItemizedClass() {
+        return itemizedClass;
+    }
 
     // Used to change the value of the Team's fields
     interface ValueChangeCallBack {

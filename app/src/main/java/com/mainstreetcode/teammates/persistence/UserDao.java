@@ -7,8 +7,11 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 
 import java.util.List;
+
+import io.reactivex.Maybe;
 
 /**
  * DAO for {@link User}
@@ -18,12 +21,12 @@ import java.util.List;
 
 @Dao
 public interface UserDao {
-    @Query("SELECT * FROM users WHERE primaryEmail LIKE :primaryEmail LIMIT 1")
-    User findByEmail(String primaryEmail );
+    @Query("SELECT * FROM users WHERE user_primary_email LIKE :primaryEmail LIMIT 1")
+    Maybe<User> findByEmail(String primaryEmail );
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(List<User> users);
+    void insert(List<UserEntity> users);
 
     @Delete
-    void delete(User user);
+    void delete(UserEntity user);
 }

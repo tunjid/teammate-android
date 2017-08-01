@@ -2,12 +2,17 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammates.model.Role;
-import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
+import com.mainstreetcode.teammates.rest.TeammateService;
 
-import io.reactivex.Observable;
+import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * View model for registration
@@ -27,31 +32,31 @@ public class UserViewModel extends ViewModel {
         return repository.isSignedIn();
     }
 
-    public boolean isTeamAdmin(Team team) {
-        return Role.isTeamAdmin(team, getCurrentUser());
-    }
-
     public User getCurrentUser() {
         return repository.getCurrentUser();
     }
 
-    public Observable<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
+    public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
         return repository.signUp(firstName, lastName, primaryEmail, password);
     }
 
-    public Observable<User> signIn(String email, String password) {
+    public Single<User> signIn(String email, String password) {
         return repository.signIn(email, password);
     }
 
-    public Observable<User> getMe() {
+    public Flowable<User> getMe() {
         return repository.getMe();
     }
 
-    public Observable<Boolean> signOut() {
+    public Single<Boolean> signOut() {
         return repository.signOut();
     }
 
-    public Observable<Void> forgotPassword(String email) {
+    public Single<List<FeedItem>> getFeed() {
+        return TeammateService.getApiInstance().getFeed().observeOn(mainThread());
+    }
+
+    public Single<Void> forgotPassword(String email) {
         return repository.forgotPassword(email);
     }
 }

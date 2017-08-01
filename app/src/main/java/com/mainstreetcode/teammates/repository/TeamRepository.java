@@ -1,42 +1,43 @@
 package com.mainstreetcode.teammates.repository;
 
 
-import android.support.annotation.Nullable;
-import android.webkit.MimeTypeMap;
-
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.JoinRequestDao;
 import com.mainstreetcode.teammates.persistence.RoleDao;
 import com.mainstreetcode.teammates.persistence.TeamDao;
 import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
-import okhttp3.MediaType;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
-import static io.reactivex.Observable.fromCallable;
-import static io.reactivex.Observable.just;
+import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
+import static io.reactivex.Maybe.concat;
+import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamRepository {
+public class TeamRepository extends CrudRespository<Team> {
+
     private static TeamRepository ourInstance;
 
     private final TeammateApi api;
     private final UserDao userDao;
     private final TeamDao teamDao;
     private final RoleDao roleDao;
+    private final JoinRequestDao joinRequestDao;
     private final UserRepository userRepository;
 
     private TeamRepository() {
@@ -44,6 +45,7 @@ public class TeamRepository {
         userDao = AppDatabase.getInstance().userDao();
         teamDao = AppDatabase.getInstance().teamDao();
         roleDao = AppDatabase.getInstance().roleDao();
+        joinRequestDao = AppDatabase.getInstance().joinRequestDao();
         userRepository = UserRepository.getInstance();
     }
 
@@ -52,121 +54,76 @@ public class TeamRepository {
         return ourInstance;
     }
 
-    public Observable<Team> createTeam(Team team) {
-        return api.createTeam(team)
-                .flatMap(this::saveTeam)
-                .observeOn(mainThread());
-    }
+    @Override
+    public Single<Team> createOrUpdate(Team model) {
+        Single<Team> eventSingle = model.isEmpty()
+                ? api.createTeam(model).map(localMapper(model))
+                : api.updateTeam(model.getId(), model).map(localMapper(model));
 
-    public Observable<Team> getTeam(Team team) {
-        return api.getTeam(team.getId())
-                .flatMap(this::saveTeam)
-                .observeOn(mainThread());
-    }
-
-    public Observable<Team> updateTeam(Team team) {
-        Observable<Team> teamObservable = api.updateTeam(team.getId(), team);
-
-        MultipartBody.Part body = getBody(team.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = getBody(model.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            teamObservable = teamObservable.flatMap(put -> api.uploadTeamLogo(team.getId(), body));
+            eventSingle = eventSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
 
-        return teamObservable.flatMap(this::saveTeam).observeOn(mainThread());
+        return eventSingle.map(getSaveFunction()).observeOn(mainThread());
     }
 
-    public Observable<List<Team>> findTeams(String queryText) {
-        return api.findTeam(queryText).observeOn(mainThread());
+    @Override
+    public Flowable<Team> get(String id) {
+        Maybe<Team> local = teamDao.get(id).subscribeOn(io());
+        Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
+
+        return concat(local, remote).observeOn(mainThread());
     }
 
-    public Observable<List<Team>> getMyTeams() {
-        User user = userRepository.getCurrentUser();
-
-        Observable<List<Team>> local = fromCallable(() -> teamDao.myTeams(user.getId())).subscribeOn(io());
-        Observable<List<Team>> remote = api.getMyTeams().flatMap(this::saveTeams);
-
-        return Observable.concat(local, remote).observeOn(mainThread());
-    }
-
-    public Observable<Team> deleteTeam(Team team) {
+    @Override
+    public Single<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
                 .flatMap(team1 -> {
-                    List<User> users = team.getUsers();
-                    List<Role> roles = new ArrayList<>(users.size());
-
-                    for (User user : users) roles.add(user.getRole());
-
-                    roleDao.delete(roles);
+                    roleDao.delete(Collections.unmodifiableList(team.getRoles()));
                     teamDao.delete(team);
 
                     return just(team);
                 });
     }
 
-    private Observable<List<Team>> saveTeams(List<Team> teams) {
-        teamDao.insert(teams);
-        return just(teams);
-    }
+    @Override
+    Function<List<Team>, List<Team>> provideSaveManyFunction() {
+        return models -> {
+            List<User> users = new ArrayList<>();
+            List<Role> roles = new ArrayList<>();
+            List<JoinRequest> joinRequests = new ArrayList<>();
 
-    /**
-     * Used to save a team that has it's users populated
-     */
-    private Observable<Team> saveTeam(Team team) {
-        List<User> users = team.getUsers();
-        List<Role> roles = new ArrayList<>(users.size());
+            for (Team team : models) {
+                List<Role> teamRoles = team.getRoles();
+                List<JoinRequest> teamRequests = team.getJoinRequests();
 
-        for (User user : users) roles.add(user.getRole());
+                roles.addAll(teamRoles);
+                joinRequests.addAll(teamRequests);
 
-        teamDao.insert(Collections.singletonList(team));
-        userDao.insert(users);
-        roleDao.insert(roles);
-
-        return just(team);
-    }
-
-    public Observable<User> updateTeamUser(Team team, User user) {
-        Observable<User> userObservable = api.updateTeamUser(team.getId(), user.getId(), user);
-
-        MultipartBody.Part body = getBody(user.get(User.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
-        if (body != null) {
-            userObservable = userObservable.flatMap(put -> api.uploadUserPhoto(team.getId(), user.getId(), body));
-        }
-
-        return userObservable.flatMap(userRepository::saveUser).observeOn(mainThread());
-    }
-
-    public Observable<JoinRequest> joinTeam(Team team, String role) {
-        return api.joinTeam(team.getId(), role).observeOn(mainThread());
-    }
-
-    public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
-        Observable<JoinRequest> observable = approve
-                ? api.approveUser(team.getId(), user.getId())
-                : api.declineUser(team.getId(), user.getId());
-        return observable.observeOn(mainThread());
-    }
-
-    public Observable<User> dropUser(Team team, User user) {
-        return api.dropUser(team.getId(), user.getId()).flatMap(droppedUser -> {
-            roleDao.delete(Collections.singletonList(user.getRole()));
-            return just(user);
-        });
-    }
-
-    @Nullable
-    private MultipartBody.Part getBody(String path, String photokey) {
-        File file = new File(path);
-
-        if (file.exists()) {
-            String extension = MimeTypeMap.getFileExtensionFromUrl(path);
-            if (extension != null) {
-                String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-                if (type != null) {
-                    RequestBody requestFile = RequestBody.create(MediaType.parse(type), file);
-                    return MultipartBody.Part.createFormData(photokey, file.getName(), requestFile);
-                }
+                for (Role role : teamRoles) users.add(role.getUser());
+                for (JoinRequest request : teamRequests) users.add(request.getUser());
             }
-        }
-        return null;
+
+            teamDao.insert(Collections.unmodifiableList(models));
+            userDao.insert(Collections.unmodifiableList(users));
+            roleDao.insert(Collections.unmodifiableList(roles));
+            joinRequestDao.insert(Collections.unmodifiableList(joinRequests));
+
+            return models;
+        };
+    }
+
+    public Single<List<Team>> findTeams(String queryText) {
+        return api.findTeam(queryText).observeOn(mainThread());
+    }
+
+    public Flowable<List<Team>> getMyTeams() {
+        User user = userRepository.getCurrentUser();
+
+        Maybe<List<Team>> local = teamDao.myTeams(user.getId()).subscribeOn(io());
+        Maybe<List<Team>> remote = api.getMyTeams().map(getSaveManyFunction()).toMaybe();
+
+        return concat(local, remote).observeOn(mainThread());
     }
 }

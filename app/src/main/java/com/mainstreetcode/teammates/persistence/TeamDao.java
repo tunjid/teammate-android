@@ -7,8 +7,11 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 
 import java.util.List;
+
+import io.reactivex.Maybe;
 
 /**
  * DAO for {@link Team}
@@ -18,19 +21,24 @@ import java.util.List;
 
 @Dao
 public interface TeamDao {
-    @Query("SELECT * FROM teams")
-    List<Team> getTeams();
 
-    @Query("SELECT team.id, team.name, team.city, team.state, team.zip, team.logoUrl" +
+    @Query("SELECT * FROM teams" +
+            " WHERE :id = team_id")
+    Maybe<Team> get(String id);
+
+    @Query("SELECT * FROM teams")
+    Maybe<List<Team>> getTeams();
+
+    @Query("SELECT *" +
             " FROM teams as team" +
             " INNER JOIN roles as role" +
-            " ON team.id = role.teamId" +
-            " WHERE :userId = role.userId")
-    List<Team> myTeams(String userId);
+            " ON team.team_id = role.role_team_id" +
+            " WHERE :userId = role.user_id")
+    Maybe<List<Team>> myTeams(String userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(List<Team> teams);
+    void insert(List<TeamEntity> teams);
 
     @Delete
-    void delete(Team user);
+    void delete(TeamEntity user);
 }

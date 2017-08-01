@@ -2,19 +2,18 @@ package com.mainstreetcode.teammates.adapters;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.JoinRequestViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.UserHoldingViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
+import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.User;
-import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
@@ -24,8 +23,7 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter.UserViewHolder, TeamDetailAdapter.UserAdapterListener> {
-
+public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHolder, TeamDetailAdapter.UserAdapterListener> {
     private final Team team;
 
     public TeamDetailAdapter(Team team, UserAdapterListener listener) {
@@ -34,75 +32,42 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<TeamDetailAdapter
     }
 
     @Override
-    public UserViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public UserHoldingViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         @LayoutRes int layoutRes = R.layout.viewholder_user_team;
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
 
-        return new UserViewHolder(itemView, adapterListener);
+        return viewType == R.id.viewholder_role
+                ? new RoleViewHolder(itemView, adapterListener)
+                : new JoinRequestViewHolder(itemView, adapterListener);
     }
 
     @Override
-    public void onBindViewHolder(UserViewHolder baseTeamViewHolder, int i) {
-        List<User> users = team.getUsers();
-        List<User> pendingUsers = team.getPendingUsers();
-        int joinedUsersSize = users.size();
+    public void onBindViewHolder(UserHoldingViewHolder baseTeamViewHolder, int i) {
+        List<Role> roles = team.getRoles();
+        List<JoinRequest> joinRequests = team.getJoinRequests();
+        int joinedUsersSize = roles.size();
         boolean isJoinedUser = i < joinedUsersSize;
 
         int index = isJoinedUser ? i : i - joinedUsersSize;
-        baseTeamViewHolder.bind(isJoinedUser ? users.get(index) : pendingUsers.get(index));
+        if (isJoinedUser) ((RoleViewHolder) baseTeamViewHolder).bind(roles.get(index));
+        else ((JoinRequestViewHolder) baseTeamViewHolder).bind(joinRequests.get(index));
     }
 
     @Override
     public int getItemCount() {
-        return team.getUsers().size() + team.getPendingUsers().size();
+        return team.getRoles().size() + team.getJoinRequests().size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position < team.getRoles().size() ? R.id.viewholder_role : R.id.viewholder_join_request;
     }
 
     public interface UserAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        void onUserClicked(User user);
+        void onRoleClicked(Role role);
+
+        void onJoinRequestClicked(JoinRequest request);
     }
 
-    static class UserViewHolder extends BaseViewHolder<UserAdapterListener>
-            implements View.OnClickListener {
-
-        private User user;
-        private TextView userName;
-        private TextView userStatus;
-        private ImageView userPicture;
-
-        UserViewHolder(View itemView, UserAdapterListener adapterListener) {
-            super(itemView, adapterListener);
-            userName = itemView.findViewById(R.id.user_name);
-            userStatus = itemView.findViewById(R.id.user_status);
-            userPicture = itemView.findViewById(R.id.thumbnail);
-            itemView.setOnClickListener(this);
-        }
-
-        void bind(User item) {
-            this.user = item;
-            Context context = itemView.getContext();
-
-            userName.setText(item.getFirstName());
-            userStatus.setText(item.isTeamApproved() && !item.isUserApproved()
-                    ? context.getString(R.string.user_invited)
-                    : !item.isTeamApproved() && item.isUserApproved()
-                    ? context.getString(R.string.user_requests_join)
-                    : item.getRoleName());
-
-            String imageUrl = user.getRole() != null ? user.getRole().getImageUrl() : "";
-
-            if (!TextUtils.isEmpty(imageUrl)) {
-                Picasso.with(itemView.getContext())
-                        .load(imageUrl)
-                        .fit()
-                        .centerInside()
-                        .into(userPicture);
-            }
-        }
-
-        @Override
-        public void onClick(View view) {
-            adapterListener.onUserClicked(user);
-        }
-    }
 }

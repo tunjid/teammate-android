@@ -2,14 +2,13 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 
 /**
@@ -26,43 +25,23 @@ public class TeamViewModel extends ViewModel {
         repository = TeamRepository.getInstance();
     }
 
-    public Observable<Team> createTeam(Team team) {
-        return repository.createTeam(team);
+    public Single<Team> createOrUpdate(Team team) {
+        return repository.createOrUpdate(team);
     }
 
-    public Observable<Team> getTeam(Team team) {
-        return repository.getTeam(team);
+    public Flowable<Team> getTeam(Team team) {
+        return repository.get(team.getId());
     }
 
-    public Observable<Team> updateTeam(Team team) {
-        return repository.updateTeam(team);
-    }
-
-    public Observable<List<Team>> findTeams(String queryText) {
+    public Single<List<Team>> findTeams(String queryText) {
         return repository.findTeams(queryText);
     }
 
-    public Observable<List<Team>> getMyTeams() {
+    public Flowable<List<Team>> getMyTeams() {
         return repository.getMyTeams();
     }
 
-    public Observable<User> updateTeamUser(Team team, User user) {
-        return repository.updateTeamUser(team, user);
-    }
-
-    public Observable<JoinRequest> joinTeam(Team team, String role) {
-        return repository.joinTeam(team, role);
-    }
-
-    public Observable<JoinRequest> approveUser(Team team, User user, boolean approve) {
-        return repository.approveUser(team, user, approve);
-    }
-
-    public Observable<User> dropUser(Team team, User user) {
-        return repository.dropUser(team, user);
-    }
-
-    public Observable<Team> deleteTeam(Team team) {
-        return repository.deleteTeam(team);
+    public Single<Team> deleteTeam(Team team) {
+        return repository.delete(team);
     }
 }
