@@ -36,14 +36,14 @@ public class SnackBarBehavior extends CoordinatorLayout.Behavior<View> {
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
         if (child.getVisibility() == View.VISIBLE) {
             float translationY = this.getViewTranslationYForSnackbar(parent, child);
-            ViewCompat.setTranslationY(child, translationY);
+            child.setTranslationY(translationY);
         }
         return true;
     }
 
     @Override
     public void onDependentViewRemoved(CoordinatorLayout parent, View child, View dependency) {
-        if (dependency instanceof Snackbar.SnackbarLayout && ViewCompat.getTranslationY(child) != 0.0F) {
+        if (dependency instanceof Snackbar.SnackbarLayout && child.getTranslationY() != 0.0F) {
             ViewCompat.animate(child).translationY(0.0F).scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
                     .setInterpolator(fastOutSlowInInterpolator);
         }
@@ -57,7 +57,7 @@ public class SnackBarBehavior extends CoordinatorLayout.Behavior<View> {
         for (int z = dependencies.size(); i < z; ++i) {
             View view = (View) dependencies.get(i);
             if (view instanceof Snackbar.SnackbarLayout && parent.doViewsOverlap(child, view)) {
-                minOffset = Math.min(minOffset, ViewCompat.getTranslationY(view) - (float) view.getHeight());
+                minOffset = Math.min(minOffset, view.getTranslationY() - (float) view.getHeight());
             }
         }
 

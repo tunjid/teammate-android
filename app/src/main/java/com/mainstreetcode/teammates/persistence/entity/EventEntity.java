@@ -22,7 +22,6 @@ import java.util.Locale;
 public class EventEntity implements Parcelable {
 
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
-    protected static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
     private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
     @PrimaryKey
@@ -106,10 +105,6 @@ public class EventEntity implements Parcelable {
         return start.get(Calendar.YEAR) == end.get(Calendar.YEAR)
                 && start.get(Calendar.MONTH) == end.get(Calendar.MONTH)
                 && start.get(Calendar.DATE) == end.get(Calendar.DATE);
-    }
-
-    protected static Date parseDate(String date) {
-        return parseDate(date, dateFormatter);
     }
 
     public static Date parseDate(String date, SimpleDateFormat formatter) {

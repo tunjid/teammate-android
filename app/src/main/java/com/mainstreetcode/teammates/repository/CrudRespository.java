@@ -28,6 +28,9 @@ public abstract class CrudRespository<T extends Model> {
     abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
     public final Flowable<T> get(T model) {
+        if (model.isEmpty()) {
+            return Flowable.error(new IllegalArgumentException("Model does not exist"));
+        }
         return get(model.getId()).map(localMapper(model));
     }
 

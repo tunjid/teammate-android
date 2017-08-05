@@ -116,4 +116,9 @@
     <string name="attend_event">Attending this event?</string>
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
+
+    <!--TeamChatFragment-->
+    <string name="chat_details">%1$s · %2$s</string>
+    <string name="image_description">image</string>
+    <string name="message_hint">Type a message…</string>
 </resources>

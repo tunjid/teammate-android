@@ -34,8 +34,8 @@ android {
 dependencies {
     provided 'org.projectlombok:lombok:1.14.4'
     annotationProcessor 'org.projectlombok:lombok:1.14.4'
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha6"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha6"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha7"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha7"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -44,10 +44,10 @@ dependencies {
     compile 'com.android.support:palette-v7:26.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile "android.arch.lifecycle:runtime:1.0.0-alpha6"
-    compile "android.arch.lifecycle:extensions:1.0.0-alpha6"
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha6"
-    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha6"
+    compile "android.arch.lifecycle:runtime:1.0.0-alpha7"
+    compile "android.arch.lifecycle:extensions:1.0.0-alpha7"
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha7"
+    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha7"
 
     compile 'com.google.firebase:firebase-database:10.2.6'
     compile 'com.google.firebase:firebase-auth:10.2.6'
@@ -66,6 +66,10 @@ dependencies {
     compile 'com.facebook.stetho:stetho:1.5.0'
 
     compile 'com.tunjid.android-bootstrap:core:1.0.0'
+    compile ('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
     //compile group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.0-SNAPSHOT", changing: true
 
     testCompile 'junit:junit:4.12'
