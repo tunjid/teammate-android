@@ -26,7 +26,6 @@ import java.util.List;
 
 public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private static final int PADDING = 11;
 
     private final Team team;
     private final List<String> roles;
@@ -65,17 +64,16 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(BaseItemViewHolder baseTeamViewHolder, int i) {
-        if (i == team.size()) return;
         baseTeamViewHolder.bind(team.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return team.size() + 1;
+        return team.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == team.size() ? PADDING : team.get(position).getItemType();
+        return team.get(position).getItemType();
     }
 }

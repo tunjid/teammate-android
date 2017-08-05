@@ -31,7 +31,6 @@ import java.util.List;
 
 public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventEditAdapter.EditAdapterListener> {
 
-    private static final int PADDING = 11;
     private static final int GUEST = 12;
     private static final int TEAM = 13;
 
@@ -97,16 +96,14 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public int getItemCount() {
-        return event.size() + attendees.size() + absentees.size() + 2;
+        return event.size() + attendees.size() + absentees.size() + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
         int guestStartIndex = event.size();
         int guestEndIndex = guestStartIndex + attendees.size() + absentees.size();
-        return position > guestEndIndex
-                ? PADDING
-                : position == guestStartIndex
+        return position == guestStartIndex
                 ? TEAM
                 : position <= guestEndIndex && position > guestStartIndex
                 ? GUEST
