@@ -74,7 +74,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
     }
 
     public Flowable<TeamChat> listenForChat(TeamChatRoom chatRoom) {
-        Socket socket = SocketFactory.getInstance().get();
+        Socket socket = SocketFactory.getInstance().getTeamChatSocket();
         if (socket == null) return Flowable.error(new Exception("Null Socket"));
 
         JSONObject result = null;
@@ -87,7 +87,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
     }
 
     public Completable post(TeamChat chat) {
-        Socket socket = SocketFactory.getInstance().get();
+        Socket socket = SocketFactory.getInstance().getTeamChatSocket();
 
         if (socket == null) {
             return Completable.error(new Exception("Could not establish connection"));

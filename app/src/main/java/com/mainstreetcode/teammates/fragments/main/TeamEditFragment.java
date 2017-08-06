@@ -109,7 +109,7 @@ public class TeamEditFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
                     roles.clear();
                     roles.addAll(currentRoles);
-                })
+                }, emptyErrorHandler)
         );
     }
 

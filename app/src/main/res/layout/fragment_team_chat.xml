@@ -18,7 +18,7 @@
         android:id="@+id/input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="left"
         android:hint="@string/message_hint"
         android:padding="@dimen/single_margin"
         android:textColor="@color/white"

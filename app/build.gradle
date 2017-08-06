@@ -64,13 +64,13 @@ dependencies {
     compile 'com.github.florent37:picassopalette:2.0.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.4.6'
     compile 'com.facebook.stetho:stetho:1.5.0'
-
-    compile 'com.tunjid.android-bootstrap:core:1.0.0'
     compile ('io.socket:socket.io-client:1.0.0') {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }
-    //compile group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.0-SNAPSHOT", changing: true
+
+    //compile 'com.tunjid.android-bootstrap:core:1.0.0'
+    compile group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.1-SNAPSHOT", changing: true
 
     testCompile 'junit:junit:4.12'
 

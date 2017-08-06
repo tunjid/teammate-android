@@ -25,7 +25,9 @@ import static io.socket.engineio.client.Transport.EVENT_REQUEST_HEADERS;
 
 public class SocketFactory {
 
+    private static final String TEAM_CHAT_NAMESPACE = "/team-chat";
     private static SocketFactory INSTANCE;
+
     private Application app = Application.getInstance();
 
     public static SocketFactory getInstance() {
@@ -36,13 +38,21 @@ public class SocketFactory {
     private SocketFactory() {}
 
     @Nullable
-    public Socket get() {
+    private Socket getMainSocket() {
         Socket socket = null;
 
         try {socket = IO.socket(API_BASE_URL);}
         catch (URISyntaxException e) {e.printStackTrace();}
 
+        return socket;
+    }
+
+    @Nullable
+    public Socket getTeamChatSocket() {
+        Socket socket = getMainSocket();
+
         if (socket != null) {
+            socket = socket.io().socket(TEAM_CHAT_NAMESPACE);
             socket.io().on(EVENT_TRANSPORT, this::routeTransportEvent);
             socket.connect();
         }

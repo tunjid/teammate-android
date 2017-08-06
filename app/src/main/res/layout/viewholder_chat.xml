@@ -19,9 +19,11 @@
     <ImageView
         android:id="@+id/image"
         android:layout_width="@dimen/triple_margin"
-        android:contentDescription="@string/image_description"
         android:layout_height="@dimen/triple_margin"
         android:background="@color/dark_grey"
+        android:contentDescription="@string/image_description"
+        android:maxHeight="@dimen/triple_margin"
+        android:maxWidth="@dimen/triple_margin"
         app:layout_constraintBottom_toBottomOf="@+id/content"
         app:layout_constraintLeft_toRightOf="@+id/left_guide"
         app:layout_constraintRight_toLeftOf="@+id/content" />
