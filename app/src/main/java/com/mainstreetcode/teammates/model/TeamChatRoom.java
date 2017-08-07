@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.model;
 
 
+import android.arch.persistence.room.Relation;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -12,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -19,23 +21,19 @@ import java.util.List;
 
 import static com.mainstreetcode.teammates.model.TeamChat.KIND_TEXT;
 
-public class TeamChatRoom implements
-        Parcelable,
+public class TeamChatRoom extends TeamChatRoomEntity
+        implements
         Model<TeamChatRoom> {
 
-    private String id;
-    private Team team;
-
+    @Relation(parentColumn = "team_chat_room_id", entityColumn = "team_chat_id", entity = TeamChat.class)
     private List<TeamChat> chats = new ArrayList<>();
 
     public TeamChatRoom(String id, Team team) {
-        this.id = id;
-        this.team = team;
+        super(id, team);
     }
 
     protected TeamChatRoom(Parcel in) {
-        id = in.readString();
-        team = (Team) in.readValue(Team.class.getClassLoader());
+        super(in);
         chats = new ArrayList<>();
         in.readList(chats, TeamChat.class.getClassLoader());
     }
@@ -63,12 +61,13 @@ public class TeamChatRoom implements
         chats.addAll(updated.chats);
     }
 
-    public Team getTeam() {
-        return team;
-    }
-
     public List<TeamChat> getChats() {
         return chats;
+    }
+
+    public void setChats(List<TeamChat> chats) {
+        chats.clear();
+        this.chats.addAll(chats);
     }
 
     public void add(TeamChat chat) {
@@ -80,29 +79,8 @@ public class TeamChatRoom implements
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TeamChatRoom)) return false;
-
-        TeamChatRoom that = (TeamChatRoom) o;
-
-        return id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeValue(team);
+        super.writeToParcel(dest, flags);
         dest.writeList(chats);
     }
 

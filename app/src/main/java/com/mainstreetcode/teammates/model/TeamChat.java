@@ -2,6 +2,10 @@ package com.mainstreetcode.teammates.model;
 
 
 import android.annotation.SuppressLint;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -13,12 +17,19 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(
+        tableName = "team-chats",
+        foreignKeys = @ForeignKey(entity = TeamChatRoomEntity.class, parentColumns = "team_chat_room_id", childColumns = "parent_chat_room_id", onDelete = CASCADE)
+)
 public class TeamChat implements
         Parcelable,
         Model<TeamChat> {
@@ -27,15 +38,16 @@ public class TeamChat implements
     private static final DateFormat CHAT_DATE_FORMAT = new SimpleDateFormat("h:mm a");
     static final String KIND_TEXT = "text";
 
-    private String id;
-    private String kind;
-    private String content;
-    private String teamRoomId;
+    @PrimaryKey
+    @ColumnInfo(name = "team_chat_id") private String id;
+    @ColumnInfo(name = "team_chat_kind") private String kind;
+    @ColumnInfo(name = "team_chat_content") private String content;
+    @ColumnInfo(name = "parent_chat_room_id") private String teamRoomId;
 
-    private User user;
-    private Date created;
+    @ColumnInfo(name = "team_chat_user") private User user;
+    @ColumnInfo(name = "team_chat_created") private Date created;
 
-    TeamChat(String id, String content, String kind, String teamRoomId, User user, Date created) {
+    public TeamChat(String id, String content, String kind, String teamRoomId, User user, Date created) {
         this.id = id;
         this.content = content;
         this.kind = kind;
@@ -61,7 +73,7 @@ public class TeamChat implements
 
     @Override
     public String getId() {
-        return null;
+        return id;
     }
 
     @Override
@@ -80,6 +92,18 @@ public class TeamChat implements
         user.update(updated.user);
     }
 
+    public String getTeamRoomId() {
+        return teamRoomId;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
     public User getUser() {
         return user;
     }
@@ -88,7 +112,7 @@ public class TeamChat implements
         return content;
     }
 
-    public String getCreated() {
+    public String getCreatedDate() {
         if (created == null) return "";
         return CHAT_DATE_FORMAT.format(created);
     }

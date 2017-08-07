@@ -52,7 +52,7 @@ public class TeamChatViewHolder extends BaseViewHolder {
                     .into(image);
         }
         if (showDetails) {
-            String date = item.getCreated();
+            String date = item.getCreatedDate();
             String firstName = item.getUser().getFirstName();
             String value = isSignedInUser ? date : context.getString(R.string.chat_details, firstName, date);
             details.setText(value);

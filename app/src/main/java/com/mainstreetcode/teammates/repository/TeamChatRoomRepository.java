@@ -3,15 +3,20 @@ package com.mainstreetcode.teammates.repository;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.TeamChatRoomDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.socket.SocketFactory;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.BackpressureStrategy;
@@ -21,12 +26,15 @@ import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Function;
 import io.socket.client.Socket;
 
+import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
 
@@ -39,9 +47,11 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
     private static TeamChatRoomRepository ourInstance;
 
     private final TeammateApi api;
+    private final TeamChatRoomDao chatRoomDao;
 
     private TeamChatRoomRepository() {
         api = TeammateService.getApiInstance();
+        chatRoomDao = AppDatabase.getInstance().teamChatRoomDao();
     }
 
     public static TeamChatRoomRepository getInstance() {
@@ -56,7 +66,10 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
 
     @Override
     public Flowable<TeamChatRoom> get(String id) {
-        return api.getTeamChatRoom(id).toFlowable().observeOn(mainThread());
+        Maybe<TeamChatRoom> local = chatRoomDao.get(id).subscribeOn(io());
+        Maybe<TeamChatRoom> remote = api.getTeamChatRoom(id).map(getSaveFunction()).toMaybe();
+
+        return concat(local, remote).observeOn(mainThread());
     }
 
     @Override
@@ -66,11 +79,14 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
 
     @Override
     Function<List<TeamChatRoom>, List<TeamChatRoom>> provideSaveManyFunction() {
-        return null;
+        return new ChatRoomSaver();
     }
 
     public Flowable<List<TeamChatRoom>> getTeamChatRooms() {
-        return api.getTeamChatRooms().toFlowable().observeOn(mainThread());
+        Maybe<List<TeamChatRoom>> local = chatRoomDao.getTeamChatRooms().subscribeOn(io());
+        Maybe<List<TeamChatRoom>> remote = api.getTeamChatRooms().map(getSaveManyFunction()).toMaybe();
+
+        return concat(local, remote).observeOn(mainThread());
     }
 
     public Flowable<TeamChat> listenForChat(TeamChatRoom chatRoom) {
@@ -191,6 +207,35 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
         @Override
         public void cancel() throws Exception {
             isCancelled = true;
+        }
+    }
+
+    private static final class ChatRoomSaver implements Function<List<TeamChatRoom>, List<TeamChatRoom>> {
+
+        private TeamChatRoomDao chatRoomDao = AppDatabase.getInstance().teamChatRoomDao();
+        private CrudRespository<Team> teamRepository = TeamRepository.getInstance();
+        private CrudRespository<User> userRepository = UserRepository.getInstance();
+
+        @Override
+        public List<TeamChatRoom> apply(List<TeamChatRoom> chatRooms) throws Exception {
+            List<Team> teams = new ArrayList<>(chatRooms.size());
+            List<User> users = new ArrayList<>();
+
+            List<TeamChat> chats = new ArrayList<>();
+
+            for (TeamChatRoom chatRoom : chatRooms) {
+                teams.add(chatRoom.getTeam());
+                chats.addAll(chatRoom.getChats());
+                for (TeamChat chat : chatRoom.getChats()) users.add(chat.getUser());
+            }
+
+            teamRepository.getSaveManyFunction().apply(teams);
+            userRepository.getSaveManyFunction().apply(users);
+
+            chatRoomDao.insert(Collections.unmodifiableList(chatRooms));
+            chatRoomDao.insertChats(chats);
+
+            return chatRooms;
         }
     }
 }
