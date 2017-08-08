@@ -43,8 +43,9 @@ public class TeamChatViewHolder extends BaseViewHolder {
         content.setText(item.getContent());
         itemView.setAlpha(item.isEmpty() ? 0.6F : 1F);
         details.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        image.setVisibility(isSignedInUser ? View.GONE : View.VISIBLE);
 
-        if (!TextUtils.isEmpty(item.getImageUrl())) {
+        if (!isSignedInUser && !TextUtils.isEmpty(item.getImageUrl())) {
             Picasso.with(context)
                     .load(item.getImageUrl())
                     .fit()

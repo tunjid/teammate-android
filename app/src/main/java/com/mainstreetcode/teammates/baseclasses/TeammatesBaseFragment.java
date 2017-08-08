@@ -19,7 +19,6 @@ import android.view.View;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
-import com.tunjid.androidbootstrap.core.components.KeyboardUtils;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -32,8 +31,6 @@ import io.reactivex.functions.Consumer;
 
 public class TeammatesBaseFragment extends BaseFragment {
 
-    // Needed because of the transparent status bar
-    private KeyboardUtils keyboardUtils = new KeyboardUtils(this);
     protected CompositeDisposable disposables = new CompositeDisposable();
 
     protected Consumer<Throwable> defaultErrorHandler;
@@ -80,14 +77,12 @@ public class TeammatesBaseFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        keyboardUtils.initialize();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         getFab().setOnClickListener(null);
-        keyboardUtils.stop();
         disposables.clear();
     }
 

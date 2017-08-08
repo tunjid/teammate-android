@@ -56,6 +56,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimaryDark;
                 getWindow().setStatusBarColor(ContextCompat.getColor(TeammatesBaseActivity.this, color));
             }
+
+            ViewCompat.setOnApplyWindowInsetsListener(v, TeammatesBaseActivity.this::consumeFragmentInsets);
         }
     };
 
@@ -128,5 +130,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return tag.contains(RoleEditFragment.class.getSimpleName())
                 || tag.contains(TeamEditFragment.class.getSimpleName())
                 || tag.contains(EventEditFragment.class.getSimpleName());
+    }
+
+    private WindowInsetsCompat consumeFragmentInsets(View view, WindowInsetsCompat insets) {
+        Fragment fragment = getCurrentFragment();
+
+        int padding = insets.getSystemWindowInsetBottom();
+
+        if (fragment instanceof MainActivityFragment) {
+            padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+        }
+
+        view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), padding);
+
+        return insets;
     }
 }

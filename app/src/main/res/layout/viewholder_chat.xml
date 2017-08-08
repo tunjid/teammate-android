@@ -18,12 +18,12 @@
 
     <ImageView
         android:id="@+id/image"
-        android:layout_width="@dimen/triple_margin"
-        android:layout_height="@dimen/triple_margin"
+        android:layout_width="@dimen/double_and_half_margin"
+        android:layout_height="@dimen/double_and_half_margin"
         android:background="@color/dark_grey"
         android:contentDescription="@string/image_description"
-        android:maxHeight="@dimen/triple_margin"
-        android:maxWidth="@dimen/triple_margin"
+        android:maxHeight="@dimen/double_and_half_margin"
+        android:maxWidth="@dimen/double_and_half_margin"
         app:layout_constraintBottom_toBottomOf="@+id/content"
         app:layout_constraintLeft_toRightOf="@+id/left_guide"
         app:layout_constraintRight_toLeftOf="@+id/content" />
@@ -33,6 +33,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/white"
+        android:gravity="left|center_vertical"
+        android:minHeight="@dimen/double_and_half_margin"
         android:padding="@dimen/half_margin"
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/small_text"
