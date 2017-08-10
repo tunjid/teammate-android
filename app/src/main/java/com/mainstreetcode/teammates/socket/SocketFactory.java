@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.socket;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.mainstreetcode.teammates.Application;
 
@@ -20,12 +21,18 @@ import static com.mainstreetcode.teammates.rest.TeammateService.API_BASE_URL;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
+import static io.socket.client.Socket.EVENT_ERROR;
+import static io.socket.client.Socket.EVENT_RECONNECT_ATTEMPT;
+import static io.socket.client.Socket.EVENT_RECONNECT_ERROR;
 import static io.socket.engineio.client.Transport.EVENT_REQUEST_HEADERS;
 
 
 public class SocketFactory {
 
+    private static final String TAG = "Socket Factory";
+    private static final String COOKIE = "Cookie";
     private static final String TEAM_CHAT_NAMESPACE = "/team-chat";
+
     private static SocketFactory INSTANCE;
 
     private Application app = Application.getInstance();
@@ -35,25 +42,42 @@ public class SocketFactory {
         return INSTANCE;
     }
 
+    private Socket teamChatSocket = buildTeamChatSocket();
+
     private SocketFactory() {}
 
     @Nullable
-    private Socket getMainSocket() {
+    public Socket getTeamChatSocket() {
+        return teamChatSocket;
+    }
+
+    @Nullable
+    private Socket buildBaseSocket() {
         Socket socket = null;
 
-        try {socket = IO.socket(API_BASE_URL);}
+        IO.Options options = new IO.Options();
+        options.forceNew = false;
+        options.reconnection = true;
+        options.reconnectionAttempts = 3;
+
+        try {socket = IO.socket(API_BASE_URL, options);}
         catch (URISyntaxException e) {e.printStackTrace();}
 
         return socket;
     }
 
     @Nullable
-    public Socket getTeamChatSocket() {
-        Socket socket = getMainSocket();
+    private Socket buildTeamChatSocket() {
+        Socket socket = buildBaseSocket();
 
         if (socket != null) {
             socket = socket.io().socket(TEAM_CHAT_NAMESPACE);
             socket.io().on(EVENT_TRANSPORT, this::routeTransportEvent);
+
+            socket.on(EVENT_ERROR, this::onError);
+            socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);
+            socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
+
             socket.connect();
         }
         return socket;
@@ -75,6 +99,19 @@ public class SocketFactory {
         Map<String, List<String>> headers = (Map<String, List<String>>) headerArgs[0];
 
         // modify request headers
-        headers.put("Cookie", Collections.singletonList(serializedCookie));
+        headers.put(COOKIE, Collections.singletonList(serializedCookie));
+    }
+
+    private void onReconnectionAttempt(Object... args) {
+        Log.i(TAG, "Reconnection attempt: " + args[0]);
+    }
+
+    private void onReconnectionError(Object... args) {
+        ((Exception) args[0]).printStackTrace();
+    }
+
+    private void onError(Object... args) {
+        ((Exception) args[0]).printStackTrace();
+        teamChatSocket = buildTeamChatSocket();
     }
 }

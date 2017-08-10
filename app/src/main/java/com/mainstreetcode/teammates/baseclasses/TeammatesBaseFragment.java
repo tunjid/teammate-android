@@ -67,8 +67,10 @@ public class TeammatesBaseFragment extends BaseFragment {
         super.onAttach(context);
         defaultErrorHandler = ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
-                .add(this::showSnackbar)
-                .add(unused -> toggleProgress(false))
+                .add(message -> {
+                    showSnackbar(message);
+                    toggleProgress(false);
+                })
                 .build();
 
         emptyErrorHandler = throwable -> {};

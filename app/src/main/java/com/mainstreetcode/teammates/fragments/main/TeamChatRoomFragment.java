@@ -67,9 +67,7 @@ public final class TeamChatRoomFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         toggleFab(false);
-        setToolbarTitle(getString(getTargetRequestCode() == R.id.request_code_team_pick
-                ? R.string.pick_team
-                : R.string.my_teams));
+        setToolbarTitle(getString(R.string.team_chat_rooms));
 
         disposables.add(teamChatViewModel.getTeamChatRooms().subscribe(teamConsumer, defaultErrorHandler));
     }

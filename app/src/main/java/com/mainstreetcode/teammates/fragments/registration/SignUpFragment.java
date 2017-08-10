@@ -12,13 +12,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.RegistrationActivity;
 import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 /**
  * Splash screen
@@ -120,16 +116,8 @@ public class SignUpFragment extends RegistrationActivityFragment
             toggleProgress(true);
 
             disposables.add(viewModel.signUp(firstName, lastname, email, password)
-                    .subscribe(
-                            (user) -> RegistrationActivity.startMainActivity(getActivity()),
-                            ErrorHandler.builder()
-                                    .defaultMessage(getString(R.string.sign_up_error_default))
-                                    .add(getString(R.string.sign_up_error_weak_password), FirebaseAuthWeakPasswordException.class)
-                                    .add(getString(R.string.sign_up_error_invalid_credentials), FirebaseAuthInvalidCredentialsException.class)
-                                    .add(getString(R.string.sign_up_error_duplicate_credentials), FirebaseAuthUserCollisionException.class)
-                                    .add(this::showSnackbar)
-                                    .build()
-                    )
+                    .subscribe((user) -> RegistrationActivity.startMainActivity(getActivity()),
+                            defaultErrorHandler)
             );
         }
     }

@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammates.fragments.registration.SplashFragment;
@@ -13,17 +12,11 @@ import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 public class RegistrationActivity extends TeammatesBaseActivity {
 
-    private static boolean isFirebaseInitialized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-
-        if (!isFirebaseInitialized) {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            isFirebaseInitialized = true;
-        }
 
         if (savedInstanceState == null) {
             UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);

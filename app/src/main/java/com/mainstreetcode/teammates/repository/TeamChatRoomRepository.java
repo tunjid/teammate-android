@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.repository;
 
 import android.support.annotation.Nullable;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
@@ -18,6 +19,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
@@ -27,6 +30,7 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Function;
@@ -34,6 +38,7 @@ import io.socket.client.Socket;
 
 import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.computation;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
@@ -103,12 +108,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
     }
 
     public Completable post(TeamChat chat) {
-        Socket socket = SocketFactory.getInstance().getTeamChatSocket();
-
-        if (socket == null) {
-            return Completable.error(new Exception("Could not establish connection"));
-        }
-        return Completable.create(new ChatCompletable(socket, chat)).observeOn(mainThread());
+        return Completable.create(new ChatCompletable(chat)).observeOn(mainThread());
     }
 
     @Nullable
@@ -172,11 +172,14 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
         private final TeamChat chat;
         private CompletableEmitter emitter;
 
-        ChatCompletable(Socket socket, TeamChat chat) {
-            this.socket = socket;
+        ChatCompletable(TeamChat chat) {
+            this.socket = SocketFactory.getInstance().getTeamChatSocket();
             this.chat = chat;
-            socket.on(NEW_MESSAGE_EVENT, this::parseChat);
-            socket.on(ERROR_EVENT, this::handleError);
+
+            if (socket != null) {
+                socket.on(NEW_MESSAGE_EVENT, this::parseChat);
+                socket.on(ERROR_EVENT, this::handleError);
+            }
         }
 
         @Override
@@ -184,12 +187,19 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
             emitter.setCancellable(this);
             this.emitter = emitter;
 
-            JSONObject result = null;
+            JSONObject result = new JSONObject(gson.toJson(chat));
 
-            try { result = new JSONObject(gson.toJson(chat));}
-            catch (Exception e) {e.printStackTrace();}
+            if (socket == null) {
+                handleError(new TimeoutException());
+                return;
+            }
 
-            socket.emit(NEW_MESSAGE_EVENT, new Object[]{result}, this::parseChat);
+            new Backoff(socket::connected,
+                    () -> {
+                        socket.connect();
+                        socket.emit(NEW_MESSAGE_EVENT, new Object[]{result}, this::parseChat);
+                    },
+                    () -> handleError(new TimeoutException()));
         }
 
         private void parseChat(Object... args) {
@@ -197,11 +207,13 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
 
             TeamChat teamChat = TeamChatRoomRepository.parseChat(args);
             chat.update(teamChat);
-            if (teamChat != null && emitter != null) emitter.onComplete();
+
+            if (teamChat != null && emitter != null && !emitter.isDisposed()) emitter.onComplete();
         }
 
         private void handleError(Object... args) {
-            this.emitter.onError((Throwable) args[0]);
+            if (emitter != null && !emitter.isDisposed()) this.emitter.onError((Throwable) args[0]);
+            socket.close();
         }
 
         @Override
@@ -223,7 +235,10 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
 
             List<TeamChat> chats = new ArrayList<>();
 
+            FirebaseMessaging messaging = FirebaseMessaging.getInstance();
             for (TeamChatRoom chatRoom : chatRooms) {
+                messaging.subscribeToTopic(chatRoom.getId());
+
                 teams.add(chatRoom.getTeam());
                 chats.addAll(chatRoom.getChats());
                 for (TeamChat chat : chatRoom.getChats()) users.add(chat.getUser());
@@ -237,5 +252,45 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
 
             return chatRooms;
         }
+    }
+
+    static class Backoff {
+
+        static int MAX = 3;
+        int elapsed;
+
+        private Condition condition;
+        private Runnable completeAction;
+        private Runnable timeoutAction;
+
+        Backoff(Condition condition, Runnable completeAction, Runnable timeoutAction) {
+            this.condition = condition;
+            this.completeAction = completeAction;
+            this.timeoutAction = timeoutAction;
+
+            start();
+        }
+
+        void start() {
+            Observable.timer(1, TimeUnit.SECONDS)
+                    .subscribeOn(computation())
+                    .subscribe(nothing -> evaluate());
+        }
+
+        void evaluate() {
+            elapsed++;
+
+            if (elapsed > MAX) {
+                timeoutAction.run();
+                return;
+            }
+
+            if (condition.met()) completeAction.run();
+            else start();
+        }
+    }
+
+    interface Condition {
+        boolean met();
     }
 }

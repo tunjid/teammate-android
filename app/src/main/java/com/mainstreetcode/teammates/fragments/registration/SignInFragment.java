@@ -14,12 +14,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.RegistrationActivity;
 import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 /**
@@ -124,12 +121,7 @@ public final class SignInFragment extends RegistrationActivityFragment
 
             disposables.add(viewModel.signIn(email, password)
                     .subscribe((authResult) -> RegistrationActivity.startMainActivity(getActivity()),
-                            ErrorHandler.builder()
-                                    .defaultMessage(getString(R.string.sign_in_error_default))
-                                    .add(this::showSnackbar)
-                                    .add(getString(R.string.sign_in_error_invalid_password), FirebaseAuthInvalidCredentialsException.class)
-                                    .add(getString(R.string.sign_in_error_invalid_email), FirebaseAuthInvalidUserException.class)
-                                    .build())
+                            defaultErrorHandler)
             );
         }
     }

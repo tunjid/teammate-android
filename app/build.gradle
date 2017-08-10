@@ -34,8 +34,8 @@ android {
 dependencies {
     provided 'org.projectlombok:lombok:1.14.4'
     annotationProcessor 'org.projectlombok:lombok:1.14.4'
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha7"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha7"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha8"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha8"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -44,13 +44,13 @@ dependencies {
     compile 'com.android.support:palette-v7:26.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile "android.arch.lifecycle:runtime:1.0.0-alpha7"
-    compile "android.arch.lifecycle:extensions:1.0.0-alpha7"
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha7"
-    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha7"
+    compile "android.arch.lifecycle:runtime:1.0.0-alpha8"
+    compile "android.arch.lifecycle:extensions:1.0.0-alpha8"
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha8"
+    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha8"
 
-    compile 'com.google.firebase:firebase-database:10.2.6'
-    compile 'com.google.firebase:firebase-auth:10.2.6'
+    compile 'com.google.firebase:firebase-core:11.0.4'
+    compile 'com.google.firebase:firebase-messaging:11.0.4'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.0"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'

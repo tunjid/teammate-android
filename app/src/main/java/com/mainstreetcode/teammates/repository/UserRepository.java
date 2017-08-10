@@ -4,7 +4,6 @@ package com.mainstreetcode.teammates.repository;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.User;
@@ -15,26 +14,21 @@ import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.ReplaySubject;
 
 import static io.reactivex.Maybe.concat;
-import static io.reactivex.Single.create;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class UserRepository extends CrudRespository<User> {
 
-    private static final int TIME_OUT = 4;
     private static final String PREFS = "prefs";
     private static final String EMAIL_KEY = "email_key";
 
@@ -150,7 +144,8 @@ public class UserRepository extends CrudRespository<User> {
     }
 
     public Single<Void> forgotPassword(String email) {
-        return create(new ForgotPasswordCall(email)).timeout(TIME_OUT, TimeUnit.SECONDS);
+        // TODO Implement this
+        return Single.error(new UnsupportedOperationException(email + "Not implemented"));
     }
 
     private Single<Boolean> clearUser() {
@@ -188,21 +183,5 @@ public class UserRepository extends CrudRespository<User> {
 
         result.subscribe(currentUserUpdater, (throwable -> {}));
         return result;
-    }
-
-    public static class ForgotPasswordCall implements SingleOnSubscribe<Void> {
-
-        private final String email;
-
-        private ForgotPasswordCall(String email) {
-            this.email = email;
-        }
-
-        @Override
-        public void subscribe(SingleEmitter<Void> emitter) throws Exception {
-            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                    .addOnSuccessListener(emitter::onSuccess)
-                    .addOnFailureListener(emitter::onError);
-        }
     }
 }

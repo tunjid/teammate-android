@@ -12,11 +12,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.RegistrationActivity;
 import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 /**
  * Forgot password screen
@@ -102,11 +100,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
 
             disposables.add(viewModel.forgotPassword(email)
                     .subscribe((Void) -> RegistrationActivity.startMainActivity(getActivity()),
-                            ErrorHandler.builder()
-                                    .defaultMessage(getString(R.string.default_error))
-                                    .add(this::showSnackbar)
-                                    .add(getString(R.string.sign_in_error_invalid_email), FirebaseAuthInvalidUserException.class)
-                                    .build())
+                            defaultErrorHandler)
             );
         }
     }
