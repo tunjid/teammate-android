@@ -21,6 +21,7 @@ import static com.mainstreetcode.teammates.rest.TeammateService.API_BASE_URL;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
+import static io.socket.client.Socket.EVENT_DISCONNECT;
 import static io.socket.client.Socket.EVENT_ERROR;
 import static io.socket.client.Socket.EVENT_RECONNECT_ATTEMPT;
 import static io.socket.client.Socket.EVENT_RECONNECT_ERROR;
@@ -77,6 +78,7 @@ public class SocketFactory {
             socket.on(EVENT_ERROR, this::onError);
             socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);
             socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
+            socket.on(EVENT_DISCONNECT, i -> onDisconnection());
 
             socket.connect();
         }
@@ -112,6 +114,10 @@ public class SocketFactory {
 
     private void onError(Object... args) {
         ((Exception) args[0]).printStackTrace();
+        teamChatSocket = buildTeamChatSocket();
+    }
+
+    private void onDisconnection() {
         teamChatSocket = buildTeamChatSocket();
     }
 }
