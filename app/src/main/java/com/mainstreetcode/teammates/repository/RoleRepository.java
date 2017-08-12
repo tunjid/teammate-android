@@ -5,7 +5,6 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.RoleDao;
-import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -26,15 +25,15 @@ import static io.reactivex.schedulers.Schedulers.io;
 public class RoleRepository extends CrudRespository<Role> {
 
     private final TeammateApi api;
-    private final UserDao userDao;
     private final RoleDao roleDao;
+    private final CrudRespository<User> userRepository;
 
     private static RoleRepository ourInstance;
 
     private RoleRepository() {
         api = TeammateService.getApiInstance();
-        userDao = AppDatabase.getInstance().userDao();
         roleDao = AppDatabase.getInstance().roleDao();
+        userRepository = UserRepository.getInstance();
     }
 
     public static RoleRepository getInstance() {
@@ -72,7 +71,7 @@ public class RoleRepository extends CrudRespository<Role> {
 
             for (Role role : models) users.add(role.getUser());
 
-            userDao.insert(Collections.unmodifiableList(users));
+            userRepository.getSaveManyFunction().apply(users);
             roleDao.insert(Collections.unmodifiableList(models));
 
             return models;

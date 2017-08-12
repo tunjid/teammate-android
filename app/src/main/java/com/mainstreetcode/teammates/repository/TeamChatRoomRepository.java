@@ -36,7 +36,6 @@ import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Function;
 import io.socket.client.Socket;
 
-import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.computation;
 import static io.reactivex.schedulers.Schedulers.io;
@@ -74,7 +73,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
         Maybe<TeamChatRoom> local = chatRoomDao.get(id).subscribeOn(io());
         Maybe<TeamChatRoom> remote = api.getTeamChatRoom(id).map(getSaveFunction()).toMaybe();
 
-        return concat(local, remote).observeOn(mainThread());
+        return cacheThenRemote(local, remote);
     }
 
     @Override
@@ -91,7 +90,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
         Maybe<List<TeamChatRoom>> local = chatRoomDao.getTeamChatRooms().subscribeOn(io());
         Maybe<List<TeamChatRoom>> remote = api.getTeamChatRooms().map(getSaveManyFunction()).toMaybe();
 
-        return concat(local, remote).observeOn(mainThread());
+        return cacheThenRemote(local, remote);
     }
 
     public Flowable<TeamChat> listenForChat(TeamChatRoom chatRoom) {

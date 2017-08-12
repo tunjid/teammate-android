@@ -23,7 +23,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.ReplaySubject;
 
-import static io.reactivex.Maybe.concat;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -75,7 +74,7 @@ public class UserRepository extends CrudRespository<User> {
         Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(Schedulers.io());
         Single<User> remote = teammateApi.getMe().map(getSaveFunction());
 
-        return concat(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe()).observeOn(mainThread());
+        return cacheThenRemote(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
     }
 
     @Override

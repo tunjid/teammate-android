@@ -6,10 +6,7 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
-import com.mainstreetcode.teammates.persistence.JoinRequestDao;
-import com.mainstreetcode.teammates.persistence.RoleDao;
 import com.mainstreetcode.teammates.persistence.TeamDao;
-import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -24,8 +21,6 @@ import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
-import static io.reactivex.Maybe.concat;
-import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -34,19 +29,17 @@ public class TeamRepository extends CrudRespository<Team> {
     private static TeamRepository ourInstance;
 
     private final TeammateApi api;
-    private final UserDao userDao;
     private final TeamDao teamDao;
-    private final RoleDao roleDao;
-    private final JoinRequestDao joinRequestDao;
-    private final UserRepository userRepository;
+    private final CrudRespository<User> userRepository;
+    private final CrudRespository<Role> roleRespository;
+    private final CrudRespository<JoinRequest> joinRequestRespository;
 
     private TeamRepository() {
         api = TeammateService.getApiInstance();
-        userDao = AppDatabase.getInstance().userDao();
         teamDao = AppDatabase.getInstance().teamDao();
-        roleDao = AppDatabase.getInstance().roleDao();
-        joinRequestDao = AppDatabase.getInstance().joinRequestDao();
         userRepository = UserRepository.getInstance();
+        roleRespository = RoleRepository.getInstance();
+        joinRequestRespository = JoinRequestRepository.getInstance();
     }
 
     public static TeamRepository getInstance() {
@@ -73,17 +66,15 @@ public class TeamRepository extends CrudRespository<Team> {
         Maybe<Team> local = teamDao.get(id).subscribeOn(io());
         Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
 
-        return concat(local, remote).observeOn(mainThread());
+        return cacheThenRemote(local, remote);
     }
 
     @Override
     public Single<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
-                .flatMap(team1 -> {
-                    roleDao.delete(Collections.unmodifiableList(team.getRoles()));
+                .map(team1 -> {
                     teamDao.delete(team);
-
-                    return just(team);
+                    return team;
                 });
     }
 
@@ -106,9 +97,9 @@ public class TeamRepository extends CrudRespository<Team> {
             }
 
             teamDao.insert(Collections.unmodifiableList(models));
-            userDao.insert(Collections.unmodifiableList(users));
-            roleDao.insert(Collections.unmodifiableList(roles));
-            joinRequestDao.insert(Collections.unmodifiableList(joinRequests));
+            userRepository.getSaveManyFunction().apply(users);
+            roleRespository.getSaveManyFunction().apply(roles);
+            joinRequestRespository.getSaveManyFunction().apply(joinRequests);
 
             return models;
         };
@@ -118,12 +109,10 @@ public class TeamRepository extends CrudRespository<Team> {
         return api.findTeam(queryText).observeOn(mainThread());
     }
 
-    public Flowable<List<Team>> getMyTeams() {
-        User user = userRepository.getCurrentUser();
-
-        Maybe<List<Team>> local = teamDao.myTeams(user.getId()).subscribeOn(io());
+    public Flowable<List<Team>> getMyTeams(String userId) {
+        Maybe<List<Team>> local = teamDao.myTeams(userId).subscribeOn(io());
         Maybe<List<Team>> remote = api.getMyTeams().map(getSaveManyFunction()).toMaybe();
 
-        return concat(local, remote).observeOn(mainThread());
+        return cacheThenRemote(local, remote);
     }
 }

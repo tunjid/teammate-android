@@ -7,8 +7,12 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+
+import static io.reactivex.Maybe.concat;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * Repository that manages model CRUD operations
@@ -49,4 +53,7 @@ public abstract class CrudRespository<T extends Model> {
         };
     }
 
+    static <R> Flowable<R> cacheThenRemote(Maybe<R> local, Maybe<R> remote) {
+        return concat(local, remote).observeOn(mainThread(), true);
+    }
 }
