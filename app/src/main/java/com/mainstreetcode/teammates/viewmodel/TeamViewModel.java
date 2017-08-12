@@ -37,8 +37,8 @@ public class TeamViewModel extends ViewModel {
         return repository.findTeams(queryText);
     }
 
-    public Flowable<List<Team>> getMyTeams() {
-        return repository.getMyTeams();
+    public Flowable<List<Team>> getMyTeams(String userId) {
+        return repository.getMyTeams(userId);
     }
 
     public Single<Team> deleteTeam(Team team) {

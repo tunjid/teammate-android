@@ -19,7 +19,6 @@ import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
-import static io.reactivex.Maybe.concat;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
@@ -30,7 +29,7 @@ public class EventRepository extends CrudRespository<Event> {
 
     private final TeammateApi api;
     private final EventDao eventDao;
-    private final TeamRepository teamRepository;
+    private final CrudRespository<Team> teamRepository;
 
     private EventRepository() {
         api = TeammateService.getApiInstance();
@@ -62,7 +61,7 @@ public class EventRepository extends CrudRespository<Event> {
         Maybe<Event> local = eventDao.get(id).subscribeOn(io());
         Maybe<Event> remote = api.getEvent(id).map(getSaveFunction()).toMaybe();
 
-        return concat(local, remote).observeOn(mainThread());
+        return cacheThenRemote(local, remote);
     }
 
     @Override
@@ -78,7 +77,7 @@ public class EventRepository extends CrudRespository<Event> {
         Maybe<List<Event>> local = eventDao.getEvents(userId).subscribeOn(io());
         Maybe<List<Event>> remote = api.getEvents().map(getSaveManyFunction()).toMaybe();
 
-        return concat(local, remote).observeOn(mainThread());
+        return cacheThenRemote(local, remote);
     }
 
     public Single<Event> rsvpEvent(final Event event, boolean attending) {

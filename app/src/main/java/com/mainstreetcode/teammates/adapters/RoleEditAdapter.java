@@ -27,8 +27,6 @@ import java.util.List;
 
 public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private static final int PADDING = 11;
-
     private final Role role;
     private final List<String> roles;
     private final boolean isEditable;
@@ -66,17 +64,16 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(BaseItemViewHolder baseItemViewHolder, int i) {
-        if (i == role.size()) return;
         baseItemViewHolder.bind(role.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return role.size() + 1;
+        return role.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == role.size() ? PADDING : role.get(position).getItemType();
+        return role.get(position).getItemType();
     }
 }

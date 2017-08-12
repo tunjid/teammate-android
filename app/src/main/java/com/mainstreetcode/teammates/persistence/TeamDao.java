@@ -40,5 +40,5 @@ public interface TeamDao {
     void insert(List<TeamEntity> teams);
 
     @Delete
-    void delete(TeamEntity user);
+    void delete(TeamEntity teamEntity);
 }

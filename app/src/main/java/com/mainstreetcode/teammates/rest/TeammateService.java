@@ -14,6 +14,8 @@ import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.TeamChat;
+import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
 
 import java.util.ArrayList;
@@ -37,9 +39,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "http://10.0.2.2:3000/";
-    private static final Gson GSON = getGson();
+    public static final String API_BASE_URL = "http://104.131.43.55:3000/";
+    public static final String SESSION_PREFS = "session.prefs";
+    public static final String SESSION_COOKIE = "connect.sid";
 
+    private static final Gson GSON = getGson();
     private static TeammateApi INSTANCE;
 
     public static TeammateApi getApiInstance() {
@@ -73,14 +77,14 @@ public class TeammateService {
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
+                .registerTypeAdapter(TeamChat.class, new TeamChat.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
+                .registerTypeAdapter(TeamChatRoom.class, new TeamChatRoom.GsonAdapter())
                 .create();
     }
 
     private static class SessionCookieJar implements CookieJar {
 
-        private static final String SESSION_PREFS = "session.prefs";
-        private static final String SESSION_COOKIE = "connect.sid";
         private static final String SIGN_IN_PATH = "/api/signIn";
         private static final String SIGN_UP_PATH = "/api/signUp";
         private static final String SIGN_OUT_PATH = "/api/signOut";
@@ -111,6 +115,7 @@ public class TeammateService {
             // Delete cookies when signing out
             if (url.encodedPath().equals(SIGN_OUT_PATH)) {
                 preferences.edit().remove(SESSION_COOKIE).apply();
+                return cookies;
             }
 
             String serializedCookie = preferences.getString(SESSION_COOKIE, "");

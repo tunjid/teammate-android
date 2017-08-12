@@ -11,11 +11,13 @@ import android.os.Parcelable;
 
 import com.mainstreetcode.teammates.model.User;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 @Entity(
         tableName = "join-requests",
         foreignKeys = {
                 @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "user_id"),
-                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "join_request_team_id")
+                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "join_request_team_id", onDelete = CASCADE)
         }
 )
 public class JoinRequestEntity implements Parcelable {

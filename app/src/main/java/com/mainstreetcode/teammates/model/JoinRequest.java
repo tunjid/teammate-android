@@ -80,7 +80,7 @@ public class JoinRequest extends JoinRequestEntity
             JsonSerializer<JoinRequest>,
             JsonDeserializer<JoinRequest> {
 
-        private static final String ID_KEY = "id";
+        private static final String ID_KEY = "_id";
         private static final String NAME_KEY = "roleName";
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";

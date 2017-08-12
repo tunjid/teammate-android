@@ -4,7 +4,4 @@
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:paddingBottom="@dimen/single_margin"
-    android:paddingLeft="@dimen/single_margin"
-    android:paddingRight="@dimen/single_margin" />
+    android:focusableInTouchMode="true"/>

@@ -82,7 +82,8 @@ public final class TeamsFragment extends MainActivityFragment
                 ? R.string.pick_team
                 : R.string.my_teams));
 
-        disposables.add(teamViewModel.getMyTeams().subscribe(teamConsumer, defaultErrorHandler));
+        String userId = userViewModel.getCurrentUser().getId();
+        disposables.add(teamViewModel  .getMyTeams(userId).subscribe(teamConsumer, defaultErrorHandler));
     }
 
     @Override

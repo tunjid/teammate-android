@@ -24,6 +24,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE user_primary_email LIKE :primaryEmail LIMIT 1")
     Maybe<User> findByEmail(String primaryEmail );
 
+    @Query("SELECT * FROM users WHERE :id = user_id")
+    Maybe<User> get(String id );
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<UserEntity> users);
 

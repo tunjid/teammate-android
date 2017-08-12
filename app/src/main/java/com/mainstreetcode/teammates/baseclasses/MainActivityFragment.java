@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
+import com.mainstreetcode.teammates.viewmodel.TeamChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
@@ -25,6 +26,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected UserViewModel userViewModel;
     protected TeamViewModel teamViewModel;
     protected EventViewModel eventViewModel;
+    protected TeamChatViewModel teamChatViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,11 +41,6 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         userViewModel = provider.get(UserViewModel.class);
         teamViewModel = provider.get(TeamViewModel.class);
         eventViewModel = provider.get(EventViewModel.class);
-
-        // Prefetch all roles
-//        if (!hasPrefetchedRoles) {
-//            roleViewModel.getRoles();
-//            hasPrefetchedRoles = true;
-//        }
+        teamChatViewModel = provider.get(TeamChatViewModel.class);
     }
 }

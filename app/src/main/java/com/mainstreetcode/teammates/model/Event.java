@@ -154,8 +154,8 @@ public class Event extends EventEntity
             serialized.addProperty(NAME_KEY, src.name);
             serialized.addProperty(NOTES_KEY, src.notes);
             serialized.addProperty(TEAM_KEY, src.team.getId());
-            serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate));
-            serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate));
+            serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
+            serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
 
             return serialized;
         }
@@ -173,7 +173,7 @@ public class Event extends EventEntity
             String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
 
-            Event result = new Event(id, name, notes, imageUrl, parseDate(startDate), parseDate(endDate), team);
+            Event result = new Event(id, name, notes, imageUrl, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team);
 
             ModelUtils.deserializeList(context, roleJson.get("attendees"), result.attendees, User.class);
             ModelUtils.deserializeList(context, roleJson.get("absentees"), result.absentees, User.class);

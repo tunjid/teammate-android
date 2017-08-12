@@ -115,7 +115,7 @@ public class RoleEditFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
             roles.clear();
             roles.addAll(currentRoles);
-        }));
+        }, emptyErrorHandler));
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
+import com.mainstreetcode.teammates.fragments.main.TeamChatRoomFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
@@ -48,6 +49,9 @@ public class MainActivity extends TeammatesBaseActivity {
                 return true;
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());
+                return true;
+            case R.id.action_messages:
+                showFragment(TeamChatRoomFragment.newInstance());
                 return true;
         }
         return super.onOptionsItemSelected(item);
