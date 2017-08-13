@@ -171,16 +171,16 @@ public class UserRepository extends CrudRespository<User> {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe
                 .singleOrError()
-                .flatMap(user -> {
+                .map(user -> {
                     application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                             .edit()
                             .putString(EMAIL_KEY, user.getPrimaryEmail())
                             .apply();
-                    return just(user);
+                    return user;
                 })
                 .observeOn(mainThread());
 
-        result.subscribe(currentUserUpdater, (throwable -> {}));
+        result.subscribe(currentUserUpdater, throwable -> {});
         return result;
     }
 }

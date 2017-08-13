@@ -6,7 +6,6 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
 
@@ -29,7 +28,4 @@ public interface TeamChatRoomDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<TeamChatRoomEntity> chatRooms);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertChats(List<TeamChat> chats);
 }

@@ -16,7 +16,7 @@ import com.mainstreetcode.teammates.adapters.FeedAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.FeedItem;
-import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.BaseModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,7 +84,7 @@ public final class HomeFragment extends MainActivityFragment
 
     @Override
     public void onFeedItemClicked(FeedItem item) {
-        Model model = item.getModel();
+        BaseModel model = item.getModel();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 

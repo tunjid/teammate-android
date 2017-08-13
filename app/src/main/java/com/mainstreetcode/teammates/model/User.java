@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.model;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -13,6 +14,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
+import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
@@ -36,6 +39,7 @@ public class User extends UserEntity implements
     //private static final int ROLE_POSITION = 4;
 
     @Ignore private transient String password;
+    @Ignore private transient String fcmToken;
 
     @Ignore private final List<Item<User>> items;
 
@@ -48,6 +52,10 @@ public class User extends UserEntity implements
     protected User(Parcel in) {
         super(in);
         items = buildItems();
+    }
+
+    public static User empty() {
+        return new User("", "", "", "", "");
     }
 
     @Override
@@ -74,7 +82,7 @@ public class User extends UserEntity implements
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return TextUtils.isEmpty(id);
     }
 
     @Override
@@ -84,8 +92,17 @@ public class User extends UserEntity implements
         for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
     }
 
+    @Override
+    public CrudRespository<User> getRepository() {
+        return UserRepository.getInstance();
+    }
+
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     @Override
@@ -115,11 +132,12 @@ public class User extends UserEntity implements
             JsonDeserializer<User> {
 
         private static final String UID_KEY = "_id";
-        private static final String PASSWORD_KEY = "password";
         private static final String LAST_NAME_KEY = "lastName";
         private static final String FIRST_NAME_KEY = "firstName";
         private static final String IMAGE_KEY = "imageUrl";
         private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
+        private static final String PASSWORD_KEY = "password";
+        private static final String FCM_TOKEN_KEY = "fcmToken";
 
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -140,7 +158,9 @@ public class User extends UserEntity implements
             user.addProperty(FIRST_NAME_KEY, src.firstName);
             user.addProperty(LAST_NAME_KEY, src.lastName);
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
-            user.addProperty(PASSWORD_KEY, src.password);
+
+            if (!TextUtils.isEmpty(src.password)) user.addProperty(PASSWORD_KEY, src.password);
+            if (!TextUtils.isEmpty(src.fcmToken)) user.addProperty(FCM_TOKEN_KEY, src.fcmToken);
 
             return user;
         }

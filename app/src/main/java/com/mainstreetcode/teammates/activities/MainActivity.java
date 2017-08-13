@@ -30,6 +30,8 @@ public class MainActivity extends TeammatesBaseActivity {
             return;
         }
 
+        userViewModel.getMe().subscribe(ignored -> {}, ignored -> {});
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         if (savedInstanceState == null) showFragment(HomeFragment.newInstance());

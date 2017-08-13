@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
 
-import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.BaseModel;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +18,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * Repository that manages model CRUD operations
  */
 
-public abstract class CrudRespository<T extends Model> {
+public abstract class CrudRespository<T extends BaseModel<T>> {
 
     private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
     private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);

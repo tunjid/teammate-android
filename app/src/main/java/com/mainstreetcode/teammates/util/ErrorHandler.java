@@ -36,6 +36,13 @@ public class ErrorHandler implements Consumer<Throwable> {
         return new Builder();
     }
 
+    public static ErrorHandler EMPTY = new ErrorHandler(null, null, null) {
+        @Override
+        public void accept(Throwable throwable) throws Exception {
+            throwable.printStackTrace();
+        }
+    };
+
     @Override
     public void accept(Throwable throwable) throws Exception {
         String key = throwable.getClass().getName();

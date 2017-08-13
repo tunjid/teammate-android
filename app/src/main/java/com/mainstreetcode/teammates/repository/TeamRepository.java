@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -85,7 +86,11 @@ public class TeamRepository extends CrudRespository<Team> {
             List<Role> roles = new ArrayList<>();
             List<JoinRequest> joinRequests = new ArrayList<>();
 
+            FirebaseMessaging messaging = FirebaseMessaging.getInstance();
+
             for (Team team : models) {
+                messaging.subscribeToTopic(team.getId());
+
                 List<Role> teamRoles = team.getRoles();
                 List<JoinRequest> teamRequests = team.getJoinRequests();
 

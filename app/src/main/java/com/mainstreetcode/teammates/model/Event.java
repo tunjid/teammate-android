@@ -13,6 +13,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
+import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.EventRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
@@ -98,6 +100,11 @@ public class Event extends EventEntity
         team.update(updatedEvent.team);
     }
 
+    @Override
+    public CrudRespository<Event> getRepository() {
+        return EventRepository.getInstance();
+    }
+
     public void setTeam(Team team) {
         this.team = team;
     }
@@ -172,6 +179,8 @@ public class Event extends EventEntity
             String startDate = ModelUtils.asString(START_DATE_KEY, roleJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
+
+            if (team == null) team = Team.empty();
 
             Event result = new Event(id, name, notes, imageUrl, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team);
 

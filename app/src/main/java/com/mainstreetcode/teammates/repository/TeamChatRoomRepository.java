@@ -226,6 +226,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
         private TeamChatRoomDao chatRoomDao = AppDatabase.getInstance().teamChatRoomDao();
         private CrudRespository<Team> teamRepository = TeamRepository.getInstance();
         private CrudRespository<User> userRepository = UserRepository.getInstance();
+        private CrudRespository<TeamChat> teamChatRepository = TeamChatRepository.getInstance();
 
         @Override
         public List<TeamChatRoom> apply(List<TeamChatRoom> chatRooms) throws Exception {
@@ -247,7 +248,7 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
             userRepository.getSaveManyFunction().apply(users);
 
             chatRoomDao.insert(Collections.unmodifiableList(chatRooms));
-            chatRoomDao.insertChats(chats);
+            teamChatRepository.getSaveManyFunction().apply(chats);
 
             return chatRooms;
         }

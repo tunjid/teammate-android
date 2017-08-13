@@ -6,6 +6,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.mainstreetcode.teammates.model.Team;
 
@@ -108,6 +109,7 @@ public class EventEntity implements Parcelable {
     }
 
     public static Date parseDate(String date, SimpleDateFormat formatter) {
+        if (TextUtils.isEmpty(date)) return new Date();
         try {
             return formatter.parse(date);
         }

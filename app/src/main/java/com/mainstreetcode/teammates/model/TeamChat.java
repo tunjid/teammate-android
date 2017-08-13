@@ -18,6 +18,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
+import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.TeamChatRepository;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -27,7 +29,7 @@ import java.util.Date;
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
-        tableName = "team-chats",
+        tableName = "team_chats",
         foreignKeys = @ForeignKey(entity = TeamChatRoomEntity.class, parentColumns = "team_chat_room_id", childColumns = "parent_chat_room_id", onDelete = CASCADE)
 )
 public class TeamChat implements
@@ -90,6 +92,11 @@ public class TeamChat implements
         created = updated.created;
 
         user.update(updated.user);
+    }
+
+    @Override
+    public CrudRespository<TeamChat> getRepository() {
+        return TeamChatRepository.getInstance();
     }
 
     public String getTeamRoomId() {
@@ -168,6 +175,8 @@ public class TeamChat implements
 
             User user = context.deserialize(teamJson.get(USER_KEY), User.class);
             Date created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, teamJson));
+
+            if (user == null) user = User.empty();
 
             return new TeamChat(id, content, kind, teamRoomId, user, created);
         }

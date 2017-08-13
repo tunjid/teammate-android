@@ -12,24 +12,24 @@ import java.lang.reflect.Type;
  * Items from a user's Feed
  */
 
-public class FeedItem<T extends Model> {
+public class FeedItem<T extends Model<T>> {
 
-    private final String type;
-    private final String message;
+    private final String title;
+    private final String body;
     private final T model;
 
-    FeedItem(String type, String message, T model) {
-        this.type = type;
-        this.message = message;
+    FeedItem(String title, String body, T model) {
+        this.title = title;
+        this.body = body;
         this.model = model;
     }
 
-    public String getType() {
-        return type;
+    public String getTitle() {
+        return title;
     }
 
-    public String getMessage() {
-        return message;
+    public String getBody() {
+        return body;
     }
 
     public String getImageUrl() {
@@ -40,13 +40,14 @@ public class FeedItem<T extends Model> {
         return model;
     }
 
-    public static class GsonAdapter<T extends Model>
+    public static class GsonAdapter<T extends Model<T>>
             implements JsonDeserializer<FeedItem<T>> {
 
         private static final String TYPE_KEY = "type";
-        private static final String MODEL_TYPE_KEY = "modelName";
-        private static final String MESSAGE_KEY = "message";
+        private static final String TITLE_KEY = "title";
+        private static final String BODY_KEY = "body";
         private static final String MODEL_KEY = "model";
+        private static final String MODEL_ID_KEY = "_id";
 
         public GsonAdapter() {
         }
@@ -56,8 +57,8 @@ public class FeedItem<T extends Model> {
             JsonObject feedItemJson = json.getAsJsonObject();
 
             String type = ModelUtils.asString(TYPE_KEY, feedItemJson);
-            String modelType = ModelUtils.asString(MODEL_TYPE_KEY, feedItemJson);
-            String message = ModelUtils.asString(MESSAGE_KEY, feedItemJson);
+            String title = ModelUtils.asString(TITLE_KEY, feedItemJson);
+            String body = ModelUtils.asString(BODY_KEY, feedItemJson);
 
             Class typeClass;
 
@@ -68,13 +69,26 @@ public class FeedItem<T extends Model> {
                 case "event":
                     typeClass = Event.class;
                     break;
+                case "team":
+                    typeClass = Team.class;
+                    break;
                 default:
                     typeClass = Object.class;
             }
 
-            T model = context.deserialize(feedItemJson.get(MODEL_KEY), typeClass);
+            JsonElement modelElement = feedItemJson.get(MODEL_KEY);
 
-            return new FeedItem<>(modelType, message, model);
+            if (modelElement.isJsonPrimitive()) {
+                String modelId = modelElement.getAsString();
+                JsonObject modelBody = new JsonObject();
+
+                modelBody.addProperty(MODEL_ID_KEY, modelId);
+                modelElement = modelBody;
+            }
+
+            T model = context.deserialize(modelElement, typeClass);
+
+            return new FeedItem<>(title, body, model);
         }
     }
 }
