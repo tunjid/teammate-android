@@ -29,7 +29,12 @@ public class TeammateMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        sendNotification(parseFeedItem(remoteMessage));
+        handleMessage(remoteMessage);
+    }
+
+    public <T extends Model<T>> void handleMessage(RemoteMessage remoteMessage) {
+        FeedItem<T> item = parseFeedItem(remoteMessage);
+        sendNotification(item);
     }
 
     private <T extends Model<T>> void sendNotification(@Nullable final FeedItem<T> item) {

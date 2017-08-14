@@ -72,6 +72,9 @@ public class FeedItem<T extends Model<T>> {
                 case "team":
                     typeClass = Team.class;
                     break;
+                case "team-chat":
+                    typeClass = TeamChat.class;
+                    break;
                 default:
                     typeClass = Object.class;
             }
