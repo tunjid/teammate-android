@@ -66,10 +66,12 @@ public class TeamChatFragment extends MainActivityFragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_chat, container, false);
         EditText input = rootView.findViewById(R.id.input);
+        View send = rootView.findViewById(R.id.send);
 
         recyclerView = rootView.findViewById(R.id.chat);
 
         input.setOnEditorActionListener(this);
+        send.setOnClickListener(view -> sendChat(input));
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
@@ -102,23 +104,7 @@ public class TeamChatFragment extends MainActivityFragment
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
                 && (event.getAction() == KeyEvent.ACTION_DOWN))) {
-
-            String text = textView.getText().toString();
-            textView.setText(null);
-
-            if (isEmpty(text)) return true;
-
-            TeamChat chat = chatRoom.chat(text, userViewModel.getCurrentUser());
-            chatRoom.add(chat);
-
-            final List<TeamChat> chats = chatRoom.getChats();
-            final int index = chats.indexOf(chat);
-            final RecyclerView.Adapter adapter = recyclerView.getAdapter();
-
-            recyclerView.smoothScrollToPosition(index);
-            adapter.notifyItemInserted(index);
-            teamChatViewModel.post(chat).subscribe(() -> adapter.notifyItemChanged(index), defaultErrorHandler);
-
+            sendChat(textView);
             return true;
         }
         return false;
@@ -136,5 +122,23 @@ public class TeamChatFragment extends MainActivityFragment
                     subsribeToChat();
                 })
                 .build()));
+    }
+
+    private void sendChat(TextView textView) {
+        String text = textView.getText().toString();
+        textView.setText(null);
+
+        if (isEmpty(text)) return;
+
+        TeamChat chat = chatRoom.chat(text, userViewModel.getCurrentUser());
+        chatRoom.add(chat);
+
+        final List<TeamChat> chats = chatRoom.getChats();
+        final int index = chats.indexOf(chat);
+        final RecyclerView.Adapter adapter = recyclerView.getAdapter();
+
+        recyclerView.smoothScrollToPosition(index);
+        adapter.notifyItemInserted(index);
+        teamChatViewModel.post(chat).subscribe(() -> adapter.notifyItemChanged(index), defaultErrorHandler);
     }
 }
