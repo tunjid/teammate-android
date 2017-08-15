@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -68,8 +67,11 @@ public class EventEditFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         event = getArguments().getParcelable(ARG_EVENT);
 
-        getChildFragmentManager().beginTransaction()
-                .add(ImageWorkerFragment.newInstance(), ImageWorkerFragment.TAG)
+        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
+        fragment.setTargetFragment(this, ImageWorkerFragment.GALLERY_CHOOSER);
+
+        getFragmentManager().beginTransaction()
+                .add(fragment, ImageWorkerFragment.TAG)
                 .commit();
     }
 
@@ -136,14 +138,6 @@ public class EventEditFragment extends MainActivityFragment
     }
 
     @Override
-    public void onAttachFragment(Fragment childFragment) {
-        if (childFragment instanceof ImageWorkerFragment) {
-            ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
-            fragment.setCropListener(this);
-        }
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
@@ -172,7 +166,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
-        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getChildFragmentManager()
+        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getFragmentManager()
                 .findFragmentByTag(ImageWorkerFragment.TAG);
 
         if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();
