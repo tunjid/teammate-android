@@ -16,7 +16,7 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamChatRepository extends CrudRespository<TeamChat> {
+public class TeamChatRepository extends ModelRespository<TeamChat> {
 
     private static TeamChatRepository ourInstance;
 
@@ -58,7 +58,7 @@ public class TeamChatRepository extends CrudRespository<TeamChat> {
     @Override
     Function<List<TeamChat>, List<TeamChat>> provideSaveManyFunction() {
         return chats -> {
-            chatDao.insert(chats);
+            chatDao.upsert(chats);
             return chats;
         };
     }

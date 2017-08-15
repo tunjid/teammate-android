@@ -18,7 +18,7 @@ import io.reactivex.functions.Function;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-public class JoinRequestRepository extends CrudRespository<JoinRequest> {
+public class JoinRequestRepository extends ModelRespository<JoinRequest> {
 
     private final TeammateApi api;
     private final UserRepository userRepository;
@@ -64,7 +64,7 @@ public class JoinRequestRepository extends CrudRespository<JoinRequest> {
 
             userRepository.getSaveManyFunction().apply(Collections.unmodifiableList(users));
 
-            joinRequestDao.insert(Collections.unmodifiableList(models));
+            joinRequestDao.upsert(Collections.unmodifiableList(models));
 
             return models;
         };

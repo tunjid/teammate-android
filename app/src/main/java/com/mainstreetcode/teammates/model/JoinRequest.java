@@ -11,7 +11,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
-import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 
 import java.lang.reflect.Type;
@@ -56,7 +56,7 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     @Override
-    public CrudRespository<JoinRequest> getRepository() {
+    public ModelRespository<JoinRequest> getRepository() {
         return JoinRequestRepository.getInstance();
     }
 

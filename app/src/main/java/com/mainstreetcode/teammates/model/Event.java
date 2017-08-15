@@ -13,7 +13,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
-import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.EventRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -101,7 +101,7 @@ public class Event extends EventEntity
     }
 
     @Override
-    public CrudRespository<Event> getRepository() {
+    public ModelRespository<Event> getRepository() {
         return EventRepository.getInstance();
     }
 

@@ -18,7 +18,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
-import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.TeamChatRepository;
 
 import java.lang.reflect.Type;
@@ -95,7 +95,7 @@ public class TeamChat implements
     }
 
     @Override
-    public CrudRespository<TeamChat> getRepository() {
+    public ModelRespository<TeamChat> getRepository() {
         return TeamChatRepository.getInstance();
     }
 

@@ -26,7 +26,7 @@ import io.reactivex.subjects.ReplaySubject;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-public class UserRepository extends CrudRespository<User> {
+public class UserRepository extends ModelRespository<User> {
 
     private static final String PREFS = "prefs";
     private static final String EMAIL_KEY = "email_key";
@@ -86,7 +86,7 @@ public class UserRepository extends CrudRespository<User> {
     @Override
     Function<List<User>, List<User>> provideSaveManyFunction() {
         return models -> {
-            userDao.insert(Collections.unmodifiableList(models));
+            userDao.upsert(Collections.unmodifiableList(models));
             return models;
         };
     }

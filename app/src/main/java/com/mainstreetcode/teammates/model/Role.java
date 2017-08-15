@@ -14,7 +14,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
-import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -88,7 +88,7 @@ public class Role extends RoleEntity
     }
 
     @Override
-    public CrudRespository<Role> getRepository() {
+    public ModelRespository<Role> getRepository() {
         return RoleRepository.getInstance();
     }
 

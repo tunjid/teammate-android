@@ -14,7 +14,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
-import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -93,7 +93,7 @@ public class User extends UserEntity implements
     }
 
     @Override
-    public CrudRespository<User> getRepository() {
+    public ModelRespository<User> getRepository() {
         return UserRepository.getInstance();
     }
 

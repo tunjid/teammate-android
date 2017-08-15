@@ -25,15 +25,15 @@ import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamRepository extends CrudRespository<Team> {
+public class TeamRepository extends ModelRespository<Team> {
 
     private static TeamRepository ourInstance;
 
     private final TeammateApi api;
     private final TeamDao teamDao;
-    private final CrudRespository<User> userRepository;
-    private final CrudRespository<Role> roleRespository;
-    private final CrudRespository<JoinRequest> joinRequestRespository;
+    private final ModelRespository<User> userRepository;
+    private final ModelRespository<Role> roleRespository;
+    private final ModelRespository<JoinRequest> joinRequestRespository;
 
     private TeamRepository() {
         api = TeammateService.getApiInstance();
@@ -101,7 +101,7 @@ public class TeamRepository extends CrudRespository<Team> {
                 for (JoinRequest request : teamRequests) users.add(request.getUser());
             }
 
-            teamDao.insert(Collections.unmodifiableList(models));
+            teamDao.upsert(Collections.unmodifiableList(models));
             userRepository.getSaveManyFunction().apply(users);
             roleRespository.getSaveManyFunction().apply(roles);
             joinRequestRespository.getSaveManyFunction().apply(joinRequests);

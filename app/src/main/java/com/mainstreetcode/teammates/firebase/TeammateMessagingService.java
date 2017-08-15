@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.FeedItem;
-import com.mainstreetcode.teammates.repository.CrudRespository;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -41,7 +41,7 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         if (item == null) return;
 
         T model = item.getModel();
-        CrudRespository<T> respository = model.getRepository();
+        ModelRespository<T> respository = model.getRepository();
 
         respository.get(model).lastElement().subscribe(onSuccess -> {
             Intent intent = new Intent(this, MainActivity.class);

@@ -15,10 +15,10 @@ import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
- * Repository that manages model CRUD operations
+ * Repository that manages {@link com.mainstreetcode.teammates.model.Model} CRUD operations
  */
 
-public abstract class CrudRespository<T extends BaseModel<T>> {
+public abstract class ModelRespository<T extends BaseModel<T>> {
 
     private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
     private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);
