@@ -124,6 +124,10 @@ public class TeamChat implements
         return CHAT_DATE_FORMAT.format(created);
     }
 
+    public TeamChatRoom getChatRoom() {
+        return new TeamChatRoom(teamRoomId, Team.empty());
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -137,9 +137,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         int padding = insets.getSystemWindowInsetBottom();
 
-        if (fragment instanceof MainActivityFragment) {
-            padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
-        }
+        if (fragment instanceof MainActivityFragment && padding != 0) padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), padding);
 

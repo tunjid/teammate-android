@@ -10,6 +10,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -36,6 +37,10 @@ public abstract class ModelRespository<T extends BaseModel<T>> {
             return Flowable.error(new IllegalArgumentException("Model does not exist"));
         }
         return get(model.getId()).map(localMapper(model));
+    }
+
+    public Predicate<T> getNotificationFilter() {
+        return t -> true;
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {

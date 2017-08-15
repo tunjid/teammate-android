@@ -13,6 +13,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -22,10 +23,12 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
 
     private final TeammateApi api;
     private final TeamChatDao chatDao;
+    private final UserRepository userRepository;
 
     private TeamChatRepository() {
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
+        userRepository = UserRepository.getInstance();
     }
 
     public static TeamChatRepository getInstance() {
@@ -61,5 +64,10 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
             chatDao.upsert(chats);
             return chats;
         };
+    }
+
+    @Override
+    public Predicate<TeamChat> getNotificationFilter() {
+        return teamChat -> !teamChat.getUser().equals(userRepository.getCurrentUser());
     }
 }
