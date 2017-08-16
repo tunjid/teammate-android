@@ -19,7 +19,6 @@ import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -38,8 +37,6 @@ public class MainActivity extends TeammatesBaseActivity {
             startRegistrationActivity(this);
             return;
         }
-
-        userViewModel.getMe().subscribe(ignored -> {}, ErrorHandler.EMPTY);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);

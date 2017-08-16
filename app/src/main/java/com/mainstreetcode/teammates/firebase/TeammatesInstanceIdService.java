@@ -5,6 +5,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 public class TeammatesInstanceIdService extends FirebaseInstanceIdService {
 
@@ -21,6 +22,6 @@ public class TeammatesInstanceIdService extends FirebaseInstanceIdService {
 
         user.setFcmToken(refreshedToken);
 
-        userRepository.createOrUpdate(user).subscribe(ignored -> {}, ignored -> {});
+        userRepository.createOrUpdate(user).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 }
