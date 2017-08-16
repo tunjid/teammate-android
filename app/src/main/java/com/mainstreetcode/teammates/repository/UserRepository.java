@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.repository;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.Application;
@@ -11,6 +12,7 @@ import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.util.Collections;
 import java.util.List;
@@ -100,7 +102,10 @@ public class UserRepository extends ModelRespository<User> {
     }
 
     public Flowable<User> getMe() {
-        return get(getPrimaryEmail());
+        String primaryEmail = getPrimaryEmail();
+        return TextUtils.isEmpty(primaryEmail)
+                ? Flowable.error(new TeammateException("No signed in user"))
+                : get(primaryEmail);
     }
 
     public Single<Boolean> signOut() {
@@ -137,7 +142,7 @@ public class UserRepository extends ModelRespository<User> {
         return userDao.findByEmail(email)
                 .flatMapSingle(this::delete)
                 .flatMap(deleted -> {
-                    currentUser = null;
+                    currentUser = User.empty();
                     return just(true);
                 });
     }
