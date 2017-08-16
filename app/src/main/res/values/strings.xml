@@ -122,4 +122,5 @@
     <string name="image_description">image</string>
     <string name="message_hint">Type a message…</string>
     <string name="team_chat_rooms">Team Chat Rooms</string>
+    <string name="team_chat_title">%1$s chat</string>
 </resources>

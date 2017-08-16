@@ -23,10 +23,6 @@ import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 
-/**
- * Edits a Team member
- */
-
 public class TeamChatFragment extends MainActivityFragment
         implements TextView.OnEditorActionListener {
 
@@ -86,7 +82,7 @@ public class TeamChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         toggleFab(false);
-        setToolbarTitle(getString(R.string.edit_user));
+        setToolbarTitle(getString(R.string.team_chat_title, chatRoom.getTeam().getName()));
 
         subsribeToChat();
 
