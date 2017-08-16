@@ -11,6 +11,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
+import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 
 import java.lang.reflect.Type;
 
@@ -51,6 +53,11 @@ public class JoinRequest extends JoinRequestEntity
         this.roleName = updated.roleName;
         this.teamId = updated.teamId;
         user.update(updated.user);
+    }
+
+    @Override
+    public ModelRespository<JoinRequest> getRepository() {
+        return JoinRequestRepository.getInstance();
     }
 
     @Override
@@ -112,6 +119,8 @@ public class JoinRequest extends JoinRequestEntity
             String roleName = ModelUtils.asString(NAME_KEY, requestJson);
             String teamId = ModelUtils.asString(TEAM_KEY, requestJson);
             User user = context.deserialize(requestJson.get(USER_KEY), User.class);
+
+            if (user == null) user = User.empty();
 
             return new JoinRequest(teamApproved, userApproved, id, roleName, teamId, user);
         }

@@ -15,6 +15,8 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
+import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
@@ -51,10 +53,6 @@ public class Team extends TeamEntity
 
     @Ignore private final List<Item<Team>> items;
 
-    public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "");
-    }
-
     public Team(String id, String name, String city, String state, String zip, String imageUrl) {
         super(id, name, city, state, zip, imageUrl);
 
@@ -66,6 +64,10 @@ public class Team extends TeamEntity
         in.readList(roles, Role.class.getClassLoader());
         in.readList(joinRequests, JoinRequest.class.getClassLoader());
         items = buildItems();
+    }
+
+    public static Team empty() {
+        return new Team(NEW_TEAM, "", "", "", "", "");
     }
 
     @Override
@@ -108,6 +110,11 @@ public class Team extends TeamEntity
 
         roles.addAll(updatedTeam.getRoles());
         joinRequests.addAll(updatedTeam.getJoinRequests());
+    }
+
+    @Override
+    public ModelRespository<Team> getRepository() {
+        return TeamRepository.getInstance();
     }
 
     public List<Role> getRoles() {

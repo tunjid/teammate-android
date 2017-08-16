@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.socket.client.IO;
+import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.engineio.client.Transport;
 
@@ -20,8 +21,8 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.mainstreetcode.teammates.rest.TeammateService.API_BASE_URL;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
+import static io.socket.client.Manager.EVENT_CLOSE;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
-import static io.socket.client.Socket.EVENT_DISCONNECT;
 import static io.socket.client.Socket.EVENT_ERROR;
 import static io.socket.client.Socket.EVENT_RECONNECT_ATTEMPT;
 import static io.socket.client.Socket.EVENT_RECONNECT_ERROR;
@@ -30,6 +31,7 @@ import static io.socket.engineio.client.Transport.EVENT_REQUEST_HEADERS;
 
 public class SocketFactory {
 
+    private static final int RECONNECTION_ATTEMPTS = 3;
     private static final String TAG = "Socket Factory";
     private static final String COOKIE = "Cookie";
     private static final String TEAM_CHAT_NAMESPACE = "/team-chat";
@@ -59,7 +61,7 @@ public class SocketFactory {
         IO.Options options = new IO.Options();
         options.forceNew = false;
         options.reconnection = true;
-        options.reconnectionAttempts = 3;
+        options.reconnectionAttempts = RECONNECTION_ATTEMPTS;
 
         try {socket = IO.socket(API_BASE_URL, options);}
         catch (URISyntaxException e) {e.printStackTrace();}
@@ -73,12 +75,16 @@ public class SocketFactory {
 
         if (socket != null) {
             socket = socket.io().socket(TEAM_CHAT_NAMESPACE);
-            socket.io().on(EVENT_TRANSPORT, this::routeTransportEvent);
+
+            Manager manager = socket.io();
+            manager.on(EVENT_TRANSPORT, this::routeTransportEvent);
+            manager.on(EVENT_CLOSE, i -> onDisconnection());
 
             socket.on(EVENT_ERROR, this::onError);
             socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);
             socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
-            socket.on(EVENT_DISCONNECT, i -> onDisconnection());
+            //socket.on(EVENT_DISCONNECT, i -> onDisconnection());
+            socket.on(EVENT_CLOSE, i -> onDisconnection());
 
             socket.connect();
         }
@@ -109,10 +115,12 @@ public class SocketFactory {
     }
 
     private void onReconnectionError(Object... args) {
+        Log.i(TAG, "Error reconnecting: " + args[0]);
         ((Exception) args[0]).printStackTrace();
     }
 
     private void onError(Object... args) {
+        Log.i(TAG, "Socket Error: " + args[0]);
         ((Exception) args[0]).printStackTrace();
         teamChatSocket = buildTeamChatSocket();
     }

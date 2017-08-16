@@ -14,6 +14,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
+import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
@@ -72,12 +74,22 @@ public class Role extends RoleEntity
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return TextUtils.isEmpty(id);
     }
 
     @Override
     public void update(Role updated) {
+        this.id = updated.getId();
+        this.name = updated.name;
+        this.teamId = updated.teamId;
+        this.imageUrl = updated.imageUrl;
 
+        this.user.update(updated.user);
+    }
+
+    @Override
+    public ModelRespository<Role> getRepository() {
+        return RoleRepository.getInstance();
     }
 
     public boolean isTeamAdmin() {
@@ -140,6 +152,8 @@ public class Role extends RoleEntity
             String teamId = ModelUtils.asString(TEAM_KEY, roleJson);
             String imageUrl = TeammateService.API_BASE_URL + ModelUtils.asString(IMAGE_KEY, roleJson);
             User user = context.deserialize(roleJson.get(USER_KEY), User.class);
+
+            if (user == null) user = User.empty();
 
             return new Role(id, name, teamId, imageUrl, user);
         }

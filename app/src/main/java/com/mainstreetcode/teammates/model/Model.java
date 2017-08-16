@@ -1,10 +1,12 @@
 package com.mainstreetcode.teammates.model;
 
 
+import com.mainstreetcode.teammates.repository.ModelRespository;
 
-public interface Model<T> {
-    boolean isEmpty();
-    String getId();
-    String getImageUrl();
-    void update(T updated);
+/**
+ * Interface definition to work around generic bounds in {@link BaseModel}
+ */
+public interface Model<T extends BaseModel<T>> extends BaseModel<T> {
+
+    ModelRespository<T> getRepository();
 }

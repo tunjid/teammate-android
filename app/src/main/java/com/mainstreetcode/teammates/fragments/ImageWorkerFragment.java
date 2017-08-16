@@ -22,16 +22,11 @@ import static android.os.Build.VERSION_CODES.M;
 
 public class ImageWorkerFragment extends Fragment {
 
-    private static final int GALLERY_CHOOSER = 1;
+    public static final int GALLERY_CHOOSER = 1;
     public static final String TAG = "ImageWorkerFragment";
-    private CropListener cropListener;
 
     public static ImageWorkerFragment newInstance() {
         return new ImageWorkerFragment();
-    }
-
-    public void setCropListener(CropListener listener) {
-        this.cropListener = listener;
     }
 
     public void requestCrop() {
@@ -60,6 +55,14 @@ public class ImageWorkerFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        int targetRequestCode = getTargetRequestCode();
+        Fragment target = getTargetFragment();
+
+        if (target == null || (!(target instanceof CropListener)) || targetRequestCode != GALLERY_CHOOSER) {
+            return;
+        }
+
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == GALLERY_CHOOSER) {
                 CropImage.activity(data.getData())
@@ -73,7 +76,7 @@ public class ImageWorkerFragment extends Fragment {
             else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
-                if (cropListener != null) cropListener.onImageCropped(resultUri);
+                ((CropListener) target).onImageCropped(resultUri);
             }
         }
     }

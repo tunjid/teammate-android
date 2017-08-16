@@ -14,6 +14,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
+import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.TeamChatRoomRepository;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -59,6 +61,11 @@ public class TeamChatRoom extends TeamChatRoomEntity
         team.update(updated.team);
         chats.clear();
         chats.addAll(updated.chats);
+    }
+
+    @Override
+    public ModelRespository<TeamChatRoom> getRepository() {
+        return TeamChatRoomRepository.getInstance();
     }
 
     public List<TeamChat> getChats() {
@@ -115,6 +122,8 @@ public class TeamChatRoom extends TeamChatRoomEntity
             List<TeamChat> chats = new ArrayList<>();
 
             ModelUtils.deserializeList(context, chatRoomJson.get(CHAT_KEY), chats, TeamChat.class);
+
+            if (team == null) team = Team.empty();
 
             TeamChatRoom chatRoom = new TeamChatRoom(id, team);
             chatRoom.chats.addAll(chats);

@@ -33,8 +33,8 @@ public class FeedItemViewHolder extends BaseViewHolder<FeedAdapter.FeedItemAdapt
     public void bind(FeedItem item) {
 
         this.item = item;
-        description.setText(item.getMessage());
-        itemType.setText(item.getType());
+        description.setText(item.getBody());
+        itemType.setText(item.getTitle());
 
         if (item.getImageUrl()!=null) {
             Picasso.with(itemView.getContext())

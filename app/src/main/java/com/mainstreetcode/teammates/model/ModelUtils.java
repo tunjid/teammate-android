@@ -26,7 +26,7 @@ class ModelUtils {
 
     static String asString(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
-        return element != null && element.isJsonPrimitive() ? element.getAsString() : null;
+        return element != null && element.isJsonPrimitive() ? element.getAsString() : "";
     }
 
     static <T> void deserializeList(JsonDeserializationContext context, JsonElement listElement,

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -68,8 +67,11 @@ public class RoleEditFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         role = getArguments().getParcelable(ARG_ROLE);
 
-        getChildFragmentManager().beginTransaction()
-                .add(ImageWorkerFragment.newInstance(), ImageWorkerFragment.TAG)
+        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
+        fragment.setTargetFragment(this, ImageWorkerFragment.GALLERY_CHOOSER);
+
+        getFragmentManager().beginTransaction()
+                .add(fragment, ImageWorkerFragment.TAG)
                 .commit();
     }
 
@@ -116,12 +118,6 @@ public class RoleEditFragment extends MainActivityFragment
             roles.clear();
             roles.addAll(currentRoles);
         }, emptyErrorHandler));
-    }
-
-    @Override
-    public void onAttachFragment(Fragment childFragment) {
-        ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
-        if (childFragment != null) fragment.setCropListener(this);
     }
 
     @Override
@@ -180,7 +176,7 @@ public class RoleEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
-        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getChildFragmentManager()
+        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getFragmentManager()
                 .findFragmentByTag(ImageWorkerFragment.TAG);
 
         if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();

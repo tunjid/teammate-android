@@ -34,7 +34,7 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected CompositeDisposable disposables = new CompositeDisposable();
 
     protected Consumer<Throwable> defaultErrorHandler;
-    protected Consumer<Throwable> emptyErrorHandler;
+    protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
 
     protected void toggleProgress(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
@@ -72,8 +72,6 @@ public class TeammatesBaseFragment extends BaseFragment {
                     toggleProgress(false);
                 })
                 .build();
-
-        emptyErrorHandler = throwable -> {};
     }
 
     @Override

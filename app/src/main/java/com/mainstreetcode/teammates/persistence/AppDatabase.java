@@ -39,6 +39,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract JoinRequestDao joinRequestDao();
 
+    public abstract TeamChatDao teamChatDao();
+
     public abstract TeamChatRoomDao teamChatRoomDao();
 
     public static AppDatabase getInstance() {

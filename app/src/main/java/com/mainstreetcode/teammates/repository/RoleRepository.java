@@ -22,11 +22,11 @@ import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class RoleRepository extends CrudRespository<Role> {
+public class RoleRepository extends ModelRespository<Role> {
 
     private final TeammateApi api;
     private final RoleDao roleDao;
-    private final CrudRespository<User> userRepository;
+    private final ModelRespository<User> userRepository;
 
     private static RoleRepository ourInstance;
 
@@ -72,7 +72,7 @@ public class RoleRepository extends CrudRespository<Role> {
             for (Role role : models) users.add(role.getUser());
 
             userRepository.getSaveManyFunction().apply(users);
-            roleDao.insert(Collections.unmodifiableList(models));
+            roleDao.upsert(Collections.unmodifiableList(models));
 
             return models;
         };

@@ -6,6 +6,7 @@ import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
 
@@ -133,12 +134,22 @@ public interface TeammateApi {
     Single<Event> rsvpEvent(@Path("id") String eventId, @Query("attending") boolean attending);
 
     // =============================================================================================
+    // Team Chat Room endpoints
+    // =============================================================================================
+
+    @GET("/api/team-chat-rooms/{id}")
+    Single<TeamChatRoom> getTeamChatRoom(@Path("id") String roomId);
+
+    @GET("/api/team-chat-rooms")
+    Single<List<TeamChatRoom>> getTeamChatRooms();
+
+    // =============================================================================================
     // Team Chat endpoints
     // =============================================================================================
 
     @GET("/api/team-chats/{id}")
-    Single<TeamChatRoom> getTeamChatRoom(@Path("id") String roomId);
+    Single<TeamChat> getTeamChat(@Path("id") String chatId);
 
-    @GET("/api/team-chats")
-    Single<List<TeamChatRoom>> getTeamChatRooms();
+    @DELETE("/api/team-chats/{id}")
+    Single<TeamChatRoom> deleteChat(@Path("id") String chatId);
 }

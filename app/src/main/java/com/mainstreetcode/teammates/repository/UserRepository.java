@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.repository;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.Application;
@@ -11,6 +12,7 @@ import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,12 +23,11 @@ import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.ReplaySubject;
 
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-public class UserRepository extends CrudRespository<User> {
+public class UserRepository extends ModelRespository<User> {
 
     private static final String PREFS = "prefs";
     private static final String EMAIL_KEY = "email_key";
@@ -37,10 +38,7 @@ public class UserRepository extends CrudRespository<User> {
     private final TeammateApi teammateApi;
     private final UserDao userDao;
 
-    private User currentUser;
-
-    // Used to save values of last call
-    private ReplaySubject<User> signInSubject;
+    private User currentUser = User.empty();
 
     private final Consumer<User> currentUserUpdater = updatedUser -> currentUser = updatedUser;
 
@@ -57,16 +55,8 @@ public class UserRepository extends CrudRespository<User> {
 
     @Override
     public Single<User> createOrUpdate(User model) {
-        ReplaySubject<User> signUpSubject;
-
-        signUpSubject = ReplaySubject.createWithSize(1);
-
-        teammateApi.signUp(model)
-                .map(getSaveFunction())
-                .toObservable()
-                .subscribe(signUpSubject);
-
-        return updateCurrent(signUpSubject.singleOrError());
+        Single<User> remote = teammateApi.signUp(model).map(getSaveFunction());
+        return updateCurrent(remote);
     }
 
     @Override
@@ -86,7 +76,7 @@ public class UserRepository extends CrudRespository<User> {
     @Override
     Function<List<User>, List<User>> provideSaveManyFunction() {
         return models -> {
-            userDao.insert(Collections.unmodifiableList(models));
+            userDao.upsert(Collections.unmodifiableList(models));
             return models;
         };
     }
@@ -103,26 +93,19 @@ public class UserRepository extends CrudRespository<User> {
     }
 
     public Single<User> signIn(String email, String password) {
-        if (signInSubject != null && signInSubject.hasComplete() && !signInSubject.hasThrowable()) {
-            return just(signInSubject.getValue());
-        }
-
-        signInSubject = ReplaySubject.createWithSize(1);
-
         JsonObject request = new JsonObject();
         request.addProperty("primaryEmail", email);
         request.addProperty("password", password);
 
-        teammateApi.signIn(request)
-                .map(getSaveFunction())
-                .toObservable()
-                .subscribe(signInSubject);
-
-        return updateCurrent(signInSubject.singleOrError());
+        Single<User> remote = teammateApi.signIn(request).map(getSaveFunction());
+        return updateCurrent(remote);
     }
 
     public Flowable<User> getMe() {
-        return get(getPrimaryEmail());
+        String primaryEmail = getPrimaryEmail();
+        return TextUtils.isEmpty(primaryEmail)
+                ? Flowable.error(new TeammateException("No signed in user"))
+                : get(primaryEmail);
     }
 
     public Single<Boolean> signOut() {
@@ -159,7 +142,7 @@ public class UserRepository extends CrudRespository<User> {
         return userDao.findByEmail(email)
                 .flatMapSingle(this::delete)
                 .flatMap(deleted -> {
-                    currentUser = null;
+                    currentUser = User.empty();
                     return just(true);
                 });
     }
@@ -171,16 +154,16 @@ public class UserRepository extends CrudRespository<User> {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe
                 .singleOrError()
-                .flatMap(user -> {
+                .map(user -> {
                     application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                             .edit()
                             .putString(EMAIL_KEY, user.getPrimaryEmail())
                             .apply();
-                    return just(user);
+                    return user;
                 })
                 .observeOn(mainThread());
 
-        result.subscribe(currentUserUpdater, (throwable -> {}));
+        result.subscribe(currentUserUpdater, throwable -> {});
         return result;
     }
 }

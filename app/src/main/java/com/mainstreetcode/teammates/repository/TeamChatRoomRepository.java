@@ -40,7 +40,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.computation;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
+public class TeamChatRoomRepository extends ModelRespository<TeamChatRoom> {
 
     private static final String JOIN_EVENT = "join";
     private static final String NEW_MESSAGE_EVENT = "newMessage";
@@ -224,8 +224,9 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
     private static final class ChatRoomSaver implements Function<List<TeamChatRoom>, List<TeamChatRoom>> {
 
         private TeamChatRoomDao chatRoomDao = AppDatabase.getInstance().teamChatRoomDao();
-        private CrudRespository<Team> teamRepository = TeamRepository.getInstance();
-        private CrudRespository<User> userRepository = UserRepository.getInstance();
+        private ModelRespository<Team> teamRepository = TeamRepository.getInstance();
+        private ModelRespository<User> userRepository = UserRepository.getInstance();
+        private ModelRespository<TeamChat> teamChatRepository = TeamChatRepository.getInstance();
 
         @Override
         public List<TeamChatRoom> apply(List<TeamChatRoom> chatRooms) throws Exception {
@@ -246,8 +247,8 @@ public class TeamChatRoomRepository extends CrudRespository<TeamChatRoom> {
             teamRepository.getSaveManyFunction().apply(teams);
             userRepository.getSaveManyFunction().apply(users);
 
-            chatRoomDao.insert(Collections.unmodifiableList(chatRooms));
-            chatRoomDao.insertChats(chats);
+            chatRoomDao.upsert(Collections.unmodifiableList(chatRooms));
+            teamChatRepository.getSaveManyFunction().apply(chats);
 
             return chatRooms;
         }

@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -65,8 +64,12 @@ public class TeamEditFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
 
         team = getArguments().getParcelable(ARG_TEAM);
-        getChildFragmentManager().beginTransaction()
-                .add(ImageWorkerFragment.newInstance(), ImageWorkerFragment.TAG)
+
+        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
+        fragment.setTargetFragment(this, ImageWorkerFragment.GALLERY_CHOOSER);
+
+        getFragmentManager().beginTransaction()
+                .add(fragment, ImageWorkerFragment.TAG)
                 .commit();
     }
 
@@ -114,12 +117,6 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
-    public void onAttachFragment(Fragment childFragment) {
-        ImageWorkerFragment fragment = (ImageWorkerFragment) childFragment;
-        if (childFragment != null) fragment.setCropListener(this);
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
@@ -128,7 +125,7 @@ public class TeamEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
-        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getChildFragmentManager()
+        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getFragmentManager()
                 .findFragmentByTag(ImageWorkerFragment.TAG);
 
         if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();
