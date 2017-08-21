@@ -70,9 +70,7 @@ public class RoleEditFragment extends MainActivityFragment
         ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
         fragment.setTargetFragment(this, ImageWorkerFragment.GALLERY_CHOOSER);
 
-        getFragmentManager().beginTransaction()
-                .add(fragment, ImageWorkerFragment.TAG)
-                .commit();
+        ImageWorkerFragment.attach(this);
     }
 
     @Nullable
@@ -176,9 +174,6 @@ public class RoleEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
-        ImageWorkerFragment imageWorkerFragment = (ImageWorkerFragment) getFragmentManager()
-                .findFragmentByTag(ImageWorkerFragment.TAG);
-
-        if (imageWorkerFragment != null) imageWorkerFragment.requestCrop();
+        ImageWorkerFragment.requestCrop(this);
     }
 }
