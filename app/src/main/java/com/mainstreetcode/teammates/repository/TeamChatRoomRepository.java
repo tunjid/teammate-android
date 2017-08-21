@@ -155,8 +155,8 @@ public class TeamChatRoomRepository extends ModelRespository<TeamChatRoom> {
         }
 
         private void handleError(Object... args) {
+            SocketFactory.getInstance().recreateTeamChatSocket();
             this.emitter.onError((Throwable) args[0]);
-            socket.close();
         }
     }
 
@@ -211,8 +211,8 @@ public class TeamChatRoomRepository extends ModelRespository<TeamChatRoom> {
         }
 
         private void handleError(Object... args) {
+            SocketFactory.getInstance().recreateTeamChatSocket();
             if (emitter != null && !emitter.isDisposed()) this.emitter.onError((Throwable) args[0]);
-            socket.close();
         }
 
         @Override

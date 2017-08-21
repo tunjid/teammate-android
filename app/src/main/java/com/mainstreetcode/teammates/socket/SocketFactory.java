@@ -54,6 +54,11 @@ public class SocketFactory {
         return teamChatSocket;
     }
 
+    public void recreateTeamChatSocket() {
+        teamChatSocket.close();
+        teamChatSocket = buildTeamChatSocket();
+    }
+
     @Nullable
     private Socket buildBaseSocket() {
         Socket socket = null;
@@ -84,7 +89,7 @@ public class SocketFactory {
             socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);
             socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
             //socket.on(EVENT_DISCONNECT, i -> onDisconnection());
-            socket.on(EVENT_CLOSE, i -> onDisconnection());
+            //socket.on(EVENT_CLOSE, i -> onDisconnection());
 
             socket.connect();
         }

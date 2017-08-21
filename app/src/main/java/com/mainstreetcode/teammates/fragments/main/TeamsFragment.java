@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -83,7 +86,22 @@ public final class TeamsFragment extends MainActivityFragment
                 : R.string.my_teams));
 
         String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(teamViewModel  .getMyTeams(userId).subscribe(teamConsumer, defaultErrorHandler));
+        disposables.add(teamViewModel.getMyTeams(userId).subscribe(teamConsumer, defaultErrorHandler));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_teams, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                showFragment(TeamSearchFragment.newInstance());
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
