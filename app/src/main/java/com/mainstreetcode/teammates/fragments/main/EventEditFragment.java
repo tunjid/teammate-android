@@ -140,6 +140,12 @@ public class EventEditFragment extends MainActivityFragment
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ImageWorkerFragment.detach(this);
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:

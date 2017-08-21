@@ -122,6 +122,12 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ImageWorkerFragment.detach(this);
+    }
+
+    @Override
     public void onImageClick() {
         ImageWorkerFragment.requestCrop(this);
     }

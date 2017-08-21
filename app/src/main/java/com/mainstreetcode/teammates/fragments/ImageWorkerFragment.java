@@ -55,6 +55,17 @@ public class ImageWorkerFragment extends Fragment {
         else instance.startImagePicker();
     }
 
+    public static void detach(BaseFragment host) {
+        if (getInstance(host) != null) return;
+
+        ImageWorkerFragment instance = ImageWorkerFragment.newInstance();
+        instance.setTargetFragment(host, ImageWorkerFragment.GALLERY_CHOOSER);
+
+        host.getFragmentManager().beginTransaction()
+                .remove(instance)
+                .commit();
+    }
+
     @Override
     public void onAttachFragment(Fragment childFragment) {
         super.onAttachFragment(childFragment);
