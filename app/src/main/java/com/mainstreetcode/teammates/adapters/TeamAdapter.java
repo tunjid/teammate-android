@@ -31,7 +31,7 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<TeamViewHolder, TeamAda
     @Override
     public TeamViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_team, viewGroup, false);
+        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_grid_item, viewGroup, false);
         return new TeamViewHolder(itemView, adapterListener);
     }
 

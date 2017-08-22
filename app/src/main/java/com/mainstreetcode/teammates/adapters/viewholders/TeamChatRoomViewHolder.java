@@ -25,8 +25,8 @@ public class TeamChatRoomViewHolder extends BaseViewHolder<TeamChatRoomAdapter.T
     public TeamChatRoomViewHolder(View itemView, TeamChatRoomAdapter.TeamChatRoomAdapterListener adapterListener) {
         super(itemView, adapterListener);
         teamLogo = itemView.findViewById(R.id.thumbnail);
-        teamName = itemView.findViewById(R.id.team_name);
-        teamLocation = itemView.findViewById(R.id.team_location);
+        teamName = itemView.findViewById(R.id.item_title);
+        teamLocation = itemView.findViewById(R.id.item_subtitle);
         itemView.setOnClickListener(this);
     }
 

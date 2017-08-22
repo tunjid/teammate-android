@@ -32,7 +32,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<UserAdapter.UserViewHol
     @Override
     public UserViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_user_team, viewGroup, false);
+        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_grid_item, viewGroup, false);
         return new UserViewHolder(itemView, adapterListener);
     }
 
@@ -64,8 +64,8 @@ public class UserAdapter extends BaseRecyclerViewAdapter<UserAdapter.UserViewHol
 
         UserViewHolder(View itemView, UserAdapterListener adapterListener) {
             super(itemView, adapterListener);
-            teamName = itemView.findViewById(R.id.user_name);
-            teamLocation = itemView.findViewById(R.id.user_status);
+            teamName = itemView.findViewById(R.id.item_title);
+            teamLocation = itemView.findViewById(R.id.item_subtitle);
             itemView.setOnClickListener(this);
         }
 

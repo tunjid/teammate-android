@@ -17,8 +17,8 @@ public class UserHoldingViewHolder<T extends BaseRecyclerViewAdapter.AdapterList
 
     UserHoldingViewHolder(View itemView, T adapterListener) {
         super(itemView, adapterListener);
-        userName = itemView.findViewById(R.id.user_name);
-        userStatus = itemView.findViewById(R.id.user_status);
+        userName = itemView.findViewById(R.id.item_title);
+        userStatus = itemView.findViewById(R.id.item_subtitle);
         userPicture = itemView.findViewById(R.id.thumbnail);
     }
 }

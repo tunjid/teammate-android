@@ -23,8 +23,8 @@ public class EventViewHolder extends BaseViewHolder<EventAdapter.EventAdapterLis
     public EventViewHolder(View itemView, EventAdapter.EventAdapterListener adapterListener) {
         super(itemView, adapterListener);
         image = itemView.findViewById(R.id.thumbnail);
-        teamName = itemView.findViewById(R.id.name);
-        teamLocation = itemView.findViewById(R.id.time);
+        teamName = itemView.findViewById(R.id.item_title);
+        teamLocation = itemView.findViewById(R.id.item_subtitle);
         itemView.setOnClickListener(this);
     }
 

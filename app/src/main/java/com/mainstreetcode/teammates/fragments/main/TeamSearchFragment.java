@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.transition.AutoTransition;
 import android.support.transition.TransitionManager;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
@@ -77,7 +77,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         createTeam = rootView.findViewById(R.id.create_team);
         recyclerView = rootView.findViewById(R.id.team_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(new TeamAdapter(teams, this));
 
         createTeam.setOnClickListener(this);

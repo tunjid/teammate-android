@@ -34,7 +34,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHo
     @Override
     public UserHoldingViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        @LayoutRes int layoutRes = R.layout.viewholder_user_team;
+        @LayoutRes int layoutRes = R.layout.viewholder_grid_item;
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
 
         return viewType == R.id.viewholder_role

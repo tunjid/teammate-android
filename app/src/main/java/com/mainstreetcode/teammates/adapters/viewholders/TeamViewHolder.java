@@ -24,8 +24,8 @@ public class TeamViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterListen
     public TeamViewHolder(View itemView, TeamAdapter.TeamAdapterListener adapterListener) {
         super(itemView, adapterListener);
         teamLogo = itemView.findViewById(R.id.thumbnail);
-        teamName = itemView.findViewById(R.id.team_name);
-        teamLocation = itemView.findViewById(R.id.team_location);
+        teamName = itemView.findViewById(R.id.item_title);
+        teamLocation = itemView.findViewById(R.id.item_subtitle);
         itemView.setOnClickListener(this);
     }
 

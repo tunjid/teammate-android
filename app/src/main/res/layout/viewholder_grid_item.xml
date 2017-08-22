@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/time"
+        app:layout_constraintBottom_toBottomOf="@+id/item_subtitle"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,33 +23,38 @@
         android:layout_height="0dp"
         android:background="@color/dark_grey"
         android:contentDescription="@string/team_logo"
-        app:layout_constraintBottom_toBottomOf="@+id/time"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/item_title"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
         android:paddingTop="@dimen/half_margin"
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/small_text"
-        app:layout_constraintLeft_toRightOf="@+id/thumbnail"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/thumbnail"
+        app:layout_constraintWidth_default="wrap" />
 
     <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
+        android:id="@+id/item_subtitle"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:gravity="center"
         android:paddingBottom="@dimen/half_margin"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
-        android:paddingTop="@dimen/half_margin"
+        android:paddingTop="@dimen/quarter_margin"
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/tiny_text"
-        app:layout_constraintLeft_toRightOf="@+id/thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_title"
+        app:layout_constraintWidth_default="wrap" />
 </android.support.constraint.ConstraintLayout>

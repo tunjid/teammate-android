@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/team_location"
+        app:layout_constraintBottom_toBottomOf="@+id/item_subtitle"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,13 +23,13 @@
         android:layout_height="0dp"
         android:background="@color/dark_grey"
         android:contentDescription="@string/team_logo"
-        app:layout_constraintBottom_toBottomOf="@+id/team_location"
+        app:layout_constraintBottom_toBottomOf="@+id/item_subtitle"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/team_name"
+        android:id="@+id/item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/single_margin"
@@ -41,7 +41,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/team_location"
+        android:id="@+id/item_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:paddingBottom="@dimen/half_margin"
@@ -51,5 +51,5 @@
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/tiny_text"
         app:layout_constraintLeft_toRightOf="@+id/thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/team_name" />
+        app:layout_constraintTop_toBottomOf="@+id/item_title" />
 </android.support.constraint.ConstraintLayout>

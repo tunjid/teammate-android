@@ -57,9 +57,9 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
                 : viewType == Item.IMAGE
                 ? R.layout.viewholder_item_image
                 : viewType == TEAM
-                ? R.layout.viewholder_team
+                ? R.layout.viewholder_list_item
                 : viewType == GUEST
-                ? R.layout.viewholder_user_team
+                ? R.layout.viewholder_list_item
                 : R.layout.view_holder_padding;
 
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
