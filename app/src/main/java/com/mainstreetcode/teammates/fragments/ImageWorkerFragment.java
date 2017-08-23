@@ -35,9 +35,8 @@ public class ImageWorkerFragment extends Fragment {
         if (getInstance(host) != null) return;
 
         ImageWorkerFragment instance = ImageWorkerFragment.newInstance();
-        instance.setTargetFragment(host, ImageWorkerFragment.GALLERY_CHOOSER);
 
-        host.getFragmentManager().beginTransaction()
+        host.getChildFragmentManager().beginTransaction()
                 .add(instance, makeTag(host))
                 .commit();
     }
@@ -85,12 +84,9 @@ public class ImageWorkerFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        int targetRequestCode = getTargetRequestCode();
-        Fragment target = getTargetFragment();
+        Fragment target = getParentFragment();
 
-        if (target == null || (!(target instanceof CropListener)) || targetRequestCode != GALLERY_CHOOSER) {
-            return;
-        }
+        if (target == null || (!(target instanceof CropListener))) return;
 
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == GALLERY_CHOOSER) {
@@ -116,7 +112,7 @@ public class ImageWorkerFragment extends Fragment {
 
     @Nullable
     private static ImageWorkerFragment getInstance(BaseFragment host) {
-        return (ImageWorkerFragment) host.getFragmentManager().findFragmentByTag(makeTag(host));
+        return (ImageWorkerFragment) host.getChildFragmentManager().findFragmentByTag(makeTag(host));
     }
 
     private void startImagePicker() {
