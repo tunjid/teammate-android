@@ -16,7 +16,6 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.UserRepository;
-import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -147,7 +146,7 @@ public class User extends UserEntity implements
             String firstName = asString(FIRST_NAME_KEY, userObject);
             String lastName = asString(LAST_NAME_KEY, userObject);
             String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
-            String imageUrl = TeammateService.API_BASE_URL + asString(IMAGE_KEY, userObject);
+            String imageUrl = asString(IMAGE_KEY, userObject);
 
             return new User(id, firstName, lastName, primaryEmail, imageUrl);
         }

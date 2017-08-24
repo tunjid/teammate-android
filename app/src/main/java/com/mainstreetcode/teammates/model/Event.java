@@ -13,9 +13,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.EventRepository;
-import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.repository.ModelRespository;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -175,7 +174,7 @@ public class Event extends EventEntity
             String id = ModelUtils.asString(ID_KEY, roleJson);
             String name = ModelUtils.asString(NAME_KEY, roleJson);
             String notes = ModelUtils.asString(NOTES_KEY, roleJson);
-            String imageUrl = TeammateService.API_BASE_URL + ModelUtils.asString(IMAGE_KEY, roleJson);
+            String imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson);
             String startDate = ModelUtils.asString(START_DATE_KEY, roleJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);

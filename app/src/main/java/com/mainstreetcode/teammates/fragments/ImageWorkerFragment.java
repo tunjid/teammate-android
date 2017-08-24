@@ -55,14 +55,14 @@ public class ImageWorkerFragment extends Fragment {
     }
 
     public static void detach(BaseFragment host) {
-        if (getInstance(host) != null) return;
-
-        ImageWorkerFragment instance = ImageWorkerFragment.newInstance();
-        instance.setTargetFragment(host, ImageWorkerFragment.GALLERY_CHOOSER);
-
-        host.getFragmentManager().beginTransaction()
-                .remove(instance)
-                .commit();
+//        if (getInstance(host) != null) return;
+//
+//        ImageWorkerFragment instance = ImageWorkerFragment.newInstance();
+//        instance.setTargetFragment(host, ImageWorkerFragment.GALLERY_CHOOSER);
+//
+//        host.getFragmentManager().beginTransaction()
+//                .remove(instance)
+//                .commit();
     }
 
     @Override

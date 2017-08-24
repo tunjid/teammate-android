@@ -17,7 +17,6 @@ import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
-import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -129,7 +128,7 @@ public class Team extends TeamEntity
         this.roles.clear();
         this.roles.addAll(roles);
     }
-    
+
     @Override
     public int describeContents() {
         return 0;
@@ -181,7 +180,7 @@ public class Team extends TeamEntity
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
             String role = ModelUtils.asString(ROLE_KEY, teamJson);
-            String logoUrl = TeammateService.API_BASE_URL + ModelUtils.asString(LOGO_KEY, teamJson);
+            String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
 
             Team team = new Team(id, name, city, state, zip, logoUrl);
 

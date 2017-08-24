@@ -16,7 +16,6 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
-import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -150,7 +149,7 @@ public class Role extends RoleEntity
             String id = ModelUtils.asString(ID_KEY, roleJson);
             String name = ModelUtils.asString(NAME_KEY, roleJson);
             String teamId = ModelUtils.asString(TEAM_KEY, roleJson);
-            String imageUrl = TeammateService.API_BASE_URL + ModelUtils.asString(IMAGE_KEY, roleJson);
+            String imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson);
             User user = context.deserialize(roleJson.get(USER_KEY), User.class);
 
             if (user == null) user = User.empty();
