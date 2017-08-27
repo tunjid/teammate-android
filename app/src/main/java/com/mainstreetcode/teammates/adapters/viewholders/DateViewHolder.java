@@ -9,6 +9,7 @@ import android.widget.TimePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Item;
+import com.mainstreetcode.teammates.model.ModelUtils;
 
 import java.util.Calendar;
 
@@ -41,7 +42,7 @@ public class DateViewHolder extends InputViewHolder
         super.bind(item);
         String time = item.getValue();
         editText.setText(time);
-        calendar.setTime(Event.parseDate(time, Event.prettyPrinter));
+        calendar.setTime(ModelUtils.parseDate(time, Event.prettyPrinter));
     }
 
     @Override

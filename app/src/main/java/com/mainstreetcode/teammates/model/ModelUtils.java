@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammates.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.Locale;
  * Static methods for models
  */
 
-class ModelUtils {
+public class ModelUtils {
 
     static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
 
@@ -41,6 +43,16 @@ class ModelUtils {
     }
 
     static Date parseDate(String date) {
-        return EventEntity.parseDate(date, dateFormatter);
+        return parseDate(date, dateFormatter);
+    }
+
+    public static Date parseDate(String date, SimpleDateFormat formatter) {
+        if (TextUtils.isEmpty(date)) return new Date();
+        try {
+            return formatter.parse(date);
+        }
+        catch (ParseException e) {
+            return new Date();
+        }
     }
 }

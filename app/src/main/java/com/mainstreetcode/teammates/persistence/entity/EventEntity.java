@@ -6,11 +6,10 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
 
+import com.mainstreetcode.teammates.model.ModelUtils;
 import com.mainstreetcode.teammates.model.Team;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -108,16 +107,6 @@ public class EventEntity implements Parcelable {
                 && start.get(Calendar.DATE) == end.get(Calendar.DATE);
     }
 
-    public static Date parseDate(String date, SimpleDateFormat formatter) {
-        if (TextUtils.isEmpty(date)) return new Date();
-        try {
-            return formatter.parse(date);
-        }
-        catch (ParseException e) {
-            return new Date();
-        }
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -135,11 +124,11 @@ public class EventEntity implements Parcelable {
 //    }
 
     protected void setStartDate(String startDate) {
-        this.startDate = parseDate(startDate, prettyPrinter);
+        this.startDate = ModelUtils.parseDate(startDate, prettyPrinter);
     }
 
     protected void setEndDate(String endDate) {
-        this.endDate = parseDate(endDate, prettyPrinter);
+        this.endDate = ModelUtils.parseDate(endDate, prettyPrinter);
     }
 
     @Override
