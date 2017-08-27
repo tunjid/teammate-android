@@ -39,7 +39,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "http://104.131.43.55:3000/";
+    public static final String API_BASE_URL = "http://10.0.2.2:3000/";
     public static final String SESSION_PREFS = "session.prefs";
     public static final String SESSION_COOKIE = "connect.sid";
 

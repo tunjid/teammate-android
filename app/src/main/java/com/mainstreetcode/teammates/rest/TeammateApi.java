@@ -10,6 +10,7 @@ import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -152,4 +153,7 @@ public interface TeammateApi {
 
     @DELETE("/api/team-chats/{id}")
     Single<TeamChatRoom> deleteChat(@Path("id") String chatId);
+
+    @POST("/api/team-chats")
+    Single<List<TeamChat>> chatsBefore(@Body TeamChatRoom chatRoom, @Query("date") Date date);
 }

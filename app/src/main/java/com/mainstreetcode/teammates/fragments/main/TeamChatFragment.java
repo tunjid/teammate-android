@@ -18,6 +18,7 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.EndlessScroller;
 
 import java.util.List;
 
@@ -74,6 +75,15 @@ public class TeamChatFragment extends MainActivityFragment
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(new TeamChatAdapter(chatRoom, userViewModel.getCurrentUser()));
+        recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int oldCount) {
+                toggleProgress(true);
+                disposables.add(teamChatViewModel
+                        .fetchOlderChats(chatRoom)
+                        .subscribe(showProgress -> onChatsUpdated(showProgress, oldCount), defaultErrorHandler));
+            }
+        });
 
         return rootView;
     }
@@ -86,8 +96,10 @@ public class TeamChatFragment extends MainActivityFragment
 
         subsribeToChat();
 
-        disposables.add(teamChatViewModel.getTeamChatRoom(chatRoom).subscribe(chat ->
-                recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
+        disposables.add(teamChatViewModel.getTeamChatRoom(chatRoom).subscribe(chat -> {
+            recyclerView.getAdapter().notifyItemInserted(0);
+            toggleProgress(false);
+        }, defaultErrorHandler));
     }
 
     @Override
@@ -104,6 +116,11 @@ public class TeamChatFragment extends MainActivityFragment
             return true;
         }
         return false;
+    }
+
+    private void onChatsUpdated(boolean showProgess, int oldCount) {
+        toggleProgress(showProgess);
+        if (!showProgess) recyclerView.getAdapter().notifyItemRangeInserted(0, chatRoom.getChats().size()-oldCount);
     }
 
     private void subsribeToChat() {

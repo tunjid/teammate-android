@@ -1,13 +1,17 @@
 package com.mainstreetcode.teammates.repository;
 
 import com.mainstreetcode.teammates.model.TeamChat;
+import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.TeamChatDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.TeammateException;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -15,7 +19,9 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
+import static java.util.Collections.sort;
 
 public class TeamChatRepository extends ModelRespository<TeamChat> {
 
@@ -69,5 +75,29 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
     @Override
     public Predicate<TeamChat> getNotificationFilter() {
         return teamChat -> !teamChat.getUser().equals(userRepository.getCurrentUser());
+    }
+
+    public Single<TeamChatRoom> fetchOlderChats(final TeamChatRoom chatRoom) {
+        final List<TeamChat> chats = chatRoom.getChats();
+        final Date date = chats.isEmpty() ? new Date() : chats.get(0).getCreated();
+
+        Maybe<List<TeamChat>> local = chatDao.chatsBefore(chatRoom.getId(), date)
+                .filter(teamChats -> false);
+        Single<List<TeamChat>> remote = api.chatsBefore(chatRoom, date);
+
+        return Maybe.concat(local, remote.toMaybe())
+                .firstOrError()
+                .map(fetchedChats -> {
+                    getSaveManyFunction().apply(fetchedChats);
+                    Set<TeamChat> chatSet = new HashSet<>(chats);
+                    chatSet.addAll(fetchedChats);
+
+                    chats.clear();
+                    chats.addAll(chatSet);
+                    sort(chats, TeamChat.COMPARATOR);
+                    return chatRoom;
+                })
+                .subscribeOn(io())
+                .observeOn(mainThread());
     }
 }

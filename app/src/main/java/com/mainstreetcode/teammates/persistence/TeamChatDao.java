@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -21,6 +22,11 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class TeamChatDao extends EntityDao<TeamChat> {
+
+    @Query("SELECT * FROM team_chats" +
+            " WHERE parent_chat_room_id = :chatRoomId" +
+            " AND team_chat_created < :date")
+    public abstract Maybe<List<TeamChat>> chatsBefore(String chatRoomId, Date date);
 
     @Query("SELECT * FROM team_chats" +
             " WHERE :id = team_chat_id")

@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,7 +37,7 @@ public class FeedItemViewHolder extends BaseViewHolder<FeedAdapter.FeedItemAdapt
         description.setText(item.getBody());
         itemType.setText(item.getTitle());
 
-        if (item.getImageUrl()!=null) {
+        if (!TextUtils.isEmpty(item.getImageUrl())) {
             Picasso.with(itemView.getContext())
                     .load(item.getImageUrl())
                     .fit()

@@ -17,7 +17,7 @@ import java.util.Locale;
 
 class ModelUtils {
 
-    static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+    static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
 
     static boolean asBoolean(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
