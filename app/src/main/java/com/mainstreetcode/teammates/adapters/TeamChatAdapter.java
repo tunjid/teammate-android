@@ -27,7 +27,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     private final User signedInUser;
 
     public TeamChatAdapter(TeamChatRoom teamChatRoom, User signedInUser) {
-        setHasStableIds(true);
+        //setHasStableIds(true);
         this.teamChatRoom = teamChatRoom;
         this.signedInUser = signedInUser;
     }

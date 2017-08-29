@@ -28,7 +28,7 @@ public class TeamChatRoom extends TeamChatRoomEntity
         Model<TeamChatRoom> {
 
     @Relation(parentColumn = "team_chat_room_id", entityColumn = "team_chat_id", entity = TeamChat.class)
-    private List<TeamChat> chats = new ArrayList<>();
+    private final List<TeamChat> chats = new ArrayList<>();
 
     public TeamChatRoom(String id, Team team) {
         super(id, team);
@@ -36,7 +36,6 @@ public class TeamChatRoom extends TeamChatRoomEntity
 
     protected TeamChatRoom(Parcel in) {
         super(in);
-        chats = new ArrayList<>();
         in.readList(chats, TeamChat.class.getClassLoader());
     }
 
@@ -82,7 +81,7 @@ public class TeamChatRoom extends TeamChatRoomEntity
     }
 
     public TeamChat chat(String content, User user) {
-        return new TeamChat(null, content, KIND_TEXT, id, user, null);
+        return new TeamChat("", content, KIND_TEXT, id, user, null);
     }
 
     @Override

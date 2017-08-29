@@ -96,10 +96,12 @@ public class TeamChatFragment extends MainActivityFragment
 
         subsribeToChat();
 
-        disposables.add(teamChatViewModel.getTeamChatRoom(chatRoom).subscribe(chat -> {
-            recyclerView.getAdapter().notifyItemInserted(0);
-            toggleProgress(false);
-        }, defaultErrorHandler));
+        if (chatRoom.getChats().isEmpty()) {
+            disposables.add(teamChatViewModel.getTeamChatRoom(chatRoom).subscribe(chat -> {
+                recyclerView.getAdapter().notifyItemInserted(0);
+                toggleProgress(false);
+            }, defaultErrorHandler));
+        }
     }
 
     @Override
@@ -120,7 +122,8 @@ public class TeamChatFragment extends MainActivityFragment
 
     private void onChatsUpdated(boolean showProgess, int oldCount) {
         toggleProgress(showProgess);
-        if (!showProgess) recyclerView.getAdapter().notifyItemRangeInserted(0, chatRoom.getChats().size()-oldCount);
+        if (!showProgess)
+            recyclerView.getAdapter().notifyItemRangeInserted(0, chatRoom.getChats().size() - oldCount);
     }
 
     private void subsribeToChat() {
