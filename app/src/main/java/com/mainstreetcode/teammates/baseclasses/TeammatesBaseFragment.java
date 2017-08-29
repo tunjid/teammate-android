@@ -17,6 +17,7 @@ import android.transition.TransitionSet;
 import android.view.View;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.LoadingSnackbar;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -31,14 +32,11 @@ import io.reactivex.functions.Consumer;
 
 public class TeammatesBaseFragment extends BaseFragment {
 
+    private LoadingSnackbar loadingSnackbar;
     protected CompositeDisposable disposables = new CompositeDisposable();
 
     protected Consumer<Throwable> defaultErrorHandler;
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
-
-    protected void toggleProgress(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleProgress(show);
-    }
 
     protected void toggleToolbar(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
@@ -81,9 +79,28 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         getFab().setOnClickListener(null);
+
+        if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) {
+            loadingSnackbar.dismiss();
+        }
+        loadingSnackbar = null;
         disposables.clear();
+        super.onDestroyView();
+    }
+
+    protected void toggleProgress(boolean show) {
+        View rootView = getView();
+
+        if (show && loadingSnackbar != null && loadingSnackbar.isShown()) return;
+
+        if (show && rootView != null) {
+            loadingSnackbar = LoadingSnackbar.make(rootView, Snackbar.LENGTH_INDEFINITE);
+            loadingSnackbar.show();
+        }
+        else if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) {
+            loadingSnackbar.dismiss();
+        }
     }
 
     @Nullable
