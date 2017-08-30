@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,11 +37,15 @@ public class TeamViewHolder extends BaseViewHolder<TeamAdapter.TeamAdapterListen
         teamName.setText(item.getName());
         teamLocation.setText(item.getCity());
 
-        Picasso.with(itemView.getContext())
-                .load(item.getImageUrl())
-                .fit()
-                .centerInside()
-                .into(teamLogo);
+        String imageUrl = item.getImageUrl();
+
+        if(!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(itemView.getContext())
+                    .load(imageUrl)
+                    .fit()
+                    .centerInside()
+                    .into(teamLogo);
+        }
     }
 
     @Override

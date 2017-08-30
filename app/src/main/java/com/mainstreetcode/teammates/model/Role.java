@@ -48,6 +48,10 @@ public class Role extends RoleEntity
         items = buildItems();
     }
 
+    public static Role empty() {
+        return new Role("", "", "", "", User.empty());
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public List<Item<Role>> buildItems() {

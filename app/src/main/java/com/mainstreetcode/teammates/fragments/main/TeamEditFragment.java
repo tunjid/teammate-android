@@ -16,7 +16,9 @@ import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +35,16 @@ public class TeamEditFragment extends MainActivityFragment
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
 
+    private static final int CREATING = 0;
+    private static final int EDITING = 1;
+    private static final int JOINING = 2;
+
     private static final String ARG_TEAM = "team";
     private static final String ARG_EDITABLE = "editable";
 
+    private int state;
     private Team team;
+    private Role currentRole = Role.empty();
     private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -107,11 +115,13 @@ public class TeamEditFragment extends MainActivityFragment
                 ? R.string.create_team
                 : R.string.edit_team));
 
-        disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
-                    roles.clear();
-                    roles.addAll(currentRoles);
-                }, emptyErrorHandler)
-        );
+        User user = userViewModel.getCurrentUser();
+
+        disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId())
+                .subscribe(this::onRoleUpdated, defaultErrorHandler));
+
+        disposables.add(roleViewModel.getRoleValues()
+                .subscribe(this::onRolesFetched, emptyErrorHandler));
     }
 
     @Override
@@ -149,29 +159,50 @@ public class TeamEditFragment extends MainActivityFragment
                     return;
                 }
 
-                boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
-                Disposable disposable;
+                Disposable disposable = null;
 
-                // Join a team
-                if (!isEditable) {
-                    JoinRequest joinRequest =  JoinRequest.create(false, true, role, team.getId(), userViewModel.getCurrentUser());
-                    disposable = roleViewModel.joinTeam(joinRequest)
-                            .subscribe(request -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
+                switch (state) {
+                    case CREATING:
+                        disposable = teamViewModel.createOrUpdate(team)
+                                .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
+                        break;
+                    case JOINING:
+                        JoinRequest joinRequest = JoinRequest.create(false, true, role, team.getId(), userViewModel.getCurrentUser());
+                        disposable = roleViewModel.joinTeam(joinRequest)
+                                .subscribe(request -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
+                        break;
+                    case EDITING:
+                        disposable = teamViewModel.createOrUpdate(team).subscribe(updatedTeam -> {
+                            showSnackbar(getString(R.string.updated_team));
+                            recyclerView.getAdapter().notifyDataSetChanged();
+                        }, defaultErrorHandler);
+                        break;
                 }
-                // Create a team
-                else if (team.isEmpty()) {
-                    disposable = teamViewModel.createOrUpdate(team)
-                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
-                }
-                // Update a team
-                else {
-                    disposable = teamViewModel.createOrUpdate(team).subscribe(updatedTeam -> {
-                        showSnackbar(getString(R.string.updated_team));
-                        recyclerView.getAdapter().notifyDataSetChanged();
-                    }, defaultErrorHandler);
-                }
-                disposables.add(disposable);
+
+                if (disposable != null) disposables.add(disposable);
+        }
+    }
+
+    private void onRoleUpdated(Role updated) {
+        currentRole.update(updated);
+
+        state = team.isEmpty() ? CREATING : currentRole.isEmpty() ? JOINING : EDITING;
+
+        switch (state) {
+            case CREATING:
+                setToolbarTitle(getString(R.string.create_team));
+                break;
+            case JOINING:
+                setToolbarTitle(getString(R.string.join_team));
+                break;
+            case EDITING:
+                setToolbarTitle(getString(R.string.edit_team));
                 break;
         }
+    }
+
+    private void onRolesFetched(List<String> fetchedRoles) {
+        roles.clear();
+        roles.addAll(fetchedRoles);
     }
 }
