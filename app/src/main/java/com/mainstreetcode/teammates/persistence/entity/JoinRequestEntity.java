@@ -14,7 +14,7 @@ import com.mainstreetcode.teammates.model.User;
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
-        tableName = "join-requests",
+        tableName = "join_requests",
         foreignKeys = {
                 @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "user_id"),
                 @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "join_request_team_id", onDelete = CASCADE)

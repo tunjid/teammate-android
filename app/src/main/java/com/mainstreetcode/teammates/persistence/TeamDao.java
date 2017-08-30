@@ -9,7 +9,6 @@ import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.List;
 
@@ -23,6 +22,11 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class TeamDao extends EntityDao<TeamEntity> {
+
+    @Override
+    protected String getTableName() {
+        return "teams";
+    }
 
     @Query("SELECT * FROM teams" +
             " WHERE :id = team_id")

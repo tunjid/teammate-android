@@ -7,7 +7,6 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.List;
 
@@ -17,6 +16,11 @@ import java.util.List;
 
 @Dao
 public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
+
+    @Override
+    protected String getTableName() {
+        return "join_requests";
+    }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void insert(List<JoinRequestEntity> teams);

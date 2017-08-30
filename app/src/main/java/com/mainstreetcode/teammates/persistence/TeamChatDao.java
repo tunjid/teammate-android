@@ -9,7 +9,6 @@ import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.Date;
 import java.util.List;
@@ -22,6 +21,11 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class TeamChatDao extends EntityDao<TeamChat> {
+
+    @Override
+    protected String getTableName() {
+        return "team_chats";
+    }
 
     @Query("SELECT * FROM team_chats" +
             " WHERE parent_chat_room_id = :chatRoomId" +

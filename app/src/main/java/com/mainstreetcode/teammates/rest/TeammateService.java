@@ -87,7 +87,6 @@ public class TeammateService {
 
         private static final String SIGN_IN_PATH = "/api/signIn";
         private static final String SIGN_UP_PATH = "/api/signUp";
-        private static final String SIGN_OUT_PATH = "/api/signOut";
 
         Application application = Application.getInstance();
 
@@ -111,12 +110,6 @@ public class TeammateService {
 
             SharedPreferences preferences = application
                     .getSharedPreferences(SESSION_PREFS, Context.MODE_PRIVATE);
-
-            // Delete cookies when signing out
-            if (url.encodedPath().equals(SIGN_OUT_PATH)) {
-                preferences.edit().remove(SESSION_COOKIE).apply();
-                return cookies;
-            }
 
             String serializedCookie = preferences.getString(SESSION_COOKIE, "");
 

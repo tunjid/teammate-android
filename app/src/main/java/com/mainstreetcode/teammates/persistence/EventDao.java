@@ -9,7 +9,6 @@ import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.List;
 
@@ -21,6 +20,12 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class EventDao extends EntityDao<EventEntity> {
+
+    @Override
+    protected String getTableName() {
+        return "events";
+    }
+
     @Query("SELECT * FROM events as event" +
             " INNER JOIN teams as team" +
             " ON event.event_team = team.team_id" +

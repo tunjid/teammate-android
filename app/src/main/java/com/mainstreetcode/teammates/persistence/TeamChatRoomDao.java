@@ -9,7 +9,6 @@ import android.arch.persistence.room.Update;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.List;
 
@@ -21,6 +20,12 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class TeamChatRoomDao extends EntityDao<TeamChatRoomEntity> {
+
+    @Override
+    protected String getTableName() {
+        return "team_chat_rooms";
+    }
+
     @Query("SELECT * FROM team_chat_rooms")
     public abstract Maybe<List<TeamChatRoom>> getTeamChatRooms();
 

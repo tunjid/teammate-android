@@ -22,10 +22,11 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
+import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class UserRepository extends ModelRespository<User> {
 
@@ -61,7 +62,7 @@ public class UserRepository extends ModelRespository<User> {
 
     @Override
     public Flowable<User> get(String primaryEmail) {
-        Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(Schedulers.io());
+        Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(io());
         Single<User> remote = teammateApi.getMe().map(getSaveFunction());
 
         return cacheThenRemote(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
@@ -109,9 +110,13 @@ public class UserRepository extends ModelRespository<User> {
     }
 
     public Single<Boolean> signOut() {
+        Single<Boolean> local = AppDatabase.getInstance().clearTables()
+                .flatMap(result -> clearUser());
+
         return teammateApi.signOut()
-                .flatMap(result -> clearUser())
-                .onErrorResumeNext(throwable -> clearUser())
+                .flatMap(result -> local)
+                .onErrorResumeNext(throwable -> local)
+                .subscribeOn(io())
                 .observeOn(mainThread());
     }
 
@@ -137,6 +142,7 @@ public class UserRepository extends ModelRespository<User> {
         application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .edit()
                 .remove(EMAIL_KEY)
+                .remove(SESSION_COOKIE) // Delete cookies when signing out
                 .apply();
 
         return userDao.findByEmail(email)

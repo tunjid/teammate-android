@@ -9,7 +9,6 @@ import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.List;
 
@@ -23,6 +22,12 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class UserDao extends EntityDao<UserEntity> {
+
+    @Override
+    protected String getTableName() {
+        return "users";
+    }
+
     @Query("SELECT * FROM users WHERE user_primary_email LIKE :primaryEmail LIMIT 1")
     public abstract Maybe<User> findByEmail(String primaryEmail );
 

@@ -10,7 +10,6 @@ import android.arch.persistence.room.Update;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
-import com.mainstreetcode.teammates.persistence.typeconverters.EntityDao;
 
 import java.util.List;
 
@@ -24,6 +23,12 @@ import io.reactivex.Maybe;
 
 @Dao
 public abstract class RoleDao extends EntityDao<RoleEntity> {
+
+    @Override
+    protected String getTableName() {
+        return "roles";
+    }
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void insert(List<RoleEntity> roles);
 
