@@ -1,8 +1,12 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import android.support.annotation.Nullable;
+import android.webkit.MimeTypeMap;
+
 import com.mainstreetcode.teammates.model.BaseModel;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +15,9 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -60,5 +67,21 @@ public abstract class ModelRespository<T extends BaseModel<T>> {
 
     static <R> Flowable<R> cacheThenRemote(Maybe<R> local, Maybe<R> remote) {
         return concat(local, remote).observeOn(mainThread(), true);
+    }
+
+    @Nullable
+    static MultipartBody.Part getBody(String path, String photokey) {
+        File file = new File(path);
+
+        if (!file.exists()) return null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+
+        if (extension == null) return null;
+        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+        if (type == null) return null;
+        RequestBody requestBody = RequestBody.create(MediaType.parse(type), file);
+
+        return MultipartBody.Part.createFormData(photokey, file.getName(), requestBody);
     }
 }

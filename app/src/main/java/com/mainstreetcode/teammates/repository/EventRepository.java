@@ -18,7 +18,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
-import static com.mainstreetcode.teammates.repository.RepoUtils.getBody;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
