@@ -10,6 +10,8 @@ import android.os.Parcelable;
 
 import com.mainstreetcode.teammates.model.Team;
 
+import java.util.Date;
+
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
@@ -22,15 +24,18 @@ public class TeamChatRoomEntity implements
     @PrimaryKey
     @ColumnInfo(name = "team_chat_room_id") protected String id;
     @ColumnInfo(name = "team_chat_room_team") protected Team team;
+    @ColumnInfo(name = "team_chat_room_last_seen") protected Date lastSeen;
 
     public TeamChatRoomEntity(String id, Team team) {
         this.id = id;
         this.team = team;
+        lastSeen = new Date();
     }
 
     protected TeamChatRoomEntity(Parcel in) {
         id = in.readString();
         team = (Team) in.readValue(Team.class.getClassLoader());
+        lastSeen = new Date(in.readLong());
     }
 
     public String getId() {
@@ -65,6 +70,7 @@ public class TeamChatRoomEntity implements
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeValue(team);
+        dest.writeLong(lastSeen.getTime());
     }
 
     public static final Creator<TeamChatRoomEntity> CREATOR = new Creator<TeamChatRoomEntity>() {

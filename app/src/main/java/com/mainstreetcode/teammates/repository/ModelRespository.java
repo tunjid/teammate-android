@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -21,6 +22,7 @@ import okhttp3.RequestBody;
 
 import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 /**
  * Repository that manages {@link com.mainstreetcode.teammates.model.Model} CRUD operations
@@ -63,6 +65,14 @@ public abstract class ModelRespository<T extends BaseModel<T>> {
             original.update(emitted);
             return original;
         };
+    }
+
+    public final void save(T model) {
+        Completable.fromCallable(() -> {
+            try {saveFunction.apply(model);}
+            catch (Exception e) {e.printStackTrace();}
+            return null;
+        }).subscribeOn(io());
     }
 
     static <R> Flowable<R> cacheThenRemote(Maybe<R> local, Maybe<R> remote) {

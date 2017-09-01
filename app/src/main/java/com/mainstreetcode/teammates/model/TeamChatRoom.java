@@ -19,6 +19,7 @@ import com.mainstreetcode.teammates.repository.TeamChatRoomRepository;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.mainstreetcode.teammates.model.TeamChat.KIND_TEXT;
@@ -65,6 +66,11 @@ public class TeamChatRoom extends TeamChatRoomEntity
     @Override
     public ModelRespository<TeamChatRoom> getRepository() {
         return TeamChatRoomRepository.getInstance();
+    }
+
+    public void updateLastSeen() {
+        lastSeen.setTime(new Date().getTime());
+        getRepository().save(this);
     }
 
     public List<TeamChat> getChats() {
