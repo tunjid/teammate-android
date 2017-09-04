@@ -1,4 +1,4 @@
-package com.mainstreetcode.teammates.firebase;
+package com.mainstreetcode.teammates.notifications;
 
 
 import com.google.firebase.iid.FirebaseInstanceId;

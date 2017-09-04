@@ -17,9 +17,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.notifications.Notifiable;
+import com.mainstreetcode.teammates.notifications.Notifier;
+import com.mainstreetcode.teammates.notifications.TeamChatNotifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
-import com.mainstreetcode.teammates.repository.TeamChatRepository;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -35,7 +37,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class TeamChat implements
         Parcelable,
-        Model<TeamChat> {
+        Model<TeamChat>,
+        Notifiable<TeamChat>{
 
     public static final Comparator<TeamChat> COMPARATOR = (a, b) -> a.created.compareTo(b.created);
 
@@ -98,8 +101,8 @@ public class TeamChat implements
     }
 
     @Override
-    public ModelRespository<TeamChat> getRepository() {
-        return TeamChatRepository.getInstance();
+    public Notifier<TeamChat> getNotifier() {
+        return TeamChatNotifier.getInstance();
     }
 
     public String getTeamRoomId() {
@@ -128,7 +131,7 @@ public class TeamChat implements
     }
 
     public TeamChatRoom getChatRoom() {
-        return new TeamChatRoom(teamRoomId, Team.empty());
+        return new TeamChatRoom(teamRoomId, Team.empty(), new Date());
     }
 
     @Override

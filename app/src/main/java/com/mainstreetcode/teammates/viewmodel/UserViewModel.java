@@ -2,7 +2,7 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammates.model.FeedItem;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.rest.TeammateService;

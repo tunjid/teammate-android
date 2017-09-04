@@ -1,4 +1,4 @@
-package com.mainstreetcode.teammates.model;
+package com.mainstreetcode.teammates.util;
 
 import android.text.TextUtils;
 
@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Static methods for models
@@ -19,20 +20,25 @@ import java.util.Locale;
 
 public class ModelUtils {
 
-    static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
+    public static final SimpleDateFormat dateFormatter;
 
-    static boolean asBoolean(String key, JsonObject jsonObject) {
+    static {
+        dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    public static boolean asBoolean(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
         return (element != null && element.isJsonPrimitive()) && element.getAsBoolean();
     }
 
-    static String asString(String key, JsonObject jsonObject) {
+    public static String asString(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
         return element != null && element.isJsonPrimitive() ? element.getAsString() : "";
     }
 
-    static <T> void deserializeList(JsonDeserializationContext context, JsonElement listElement,
-                                    List<T> destination, Class<T> type) {
+    public static <T> void deserializeList(JsonDeserializationContext context, JsonElement listElement,
+                                           List<T> destination, Class<T> type) {
         if (listElement != null && listElement.isJsonArray()) {
             JsonArray jsonArray = listElement.getAsJsonArray();
 
@@ -42,7 +48,7 @@ public class ModelUtils {
         }
     }
 
-    static Date parseDate(String date) {
+    public static Date parseDate(String date) {
         return parseDate(date, dateFormatter);
     }
 

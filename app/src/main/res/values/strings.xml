@@ -123,4 +123,7 @@
     <string name="message_hint">Type a message…</string>
     <string name="team_chat_rooms">Team Chat Rooms</string>
     <string name="team_chat_title">%1$s chat</string>
+    <string name="chat_notification_multiline_item">%1$s: %2$s</string>
+    <string name="chat_notification_multiline_summary">+%1$d more</string>
+    <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
 </resources>

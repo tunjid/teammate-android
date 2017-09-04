@@ -12,9 +12,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.notifications.EventNotifier;
+import com.mainstreetcode.teammates.notifications.Notifiable;
+import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
-import com.mainstreetcode.teammates.repository.EventRepository;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import java.util.List;
 public class Event extends EventEntity
         implements
         Model<Event>,
+        Notifiable<Event>,
         ItemListableBean<Event> {
 
     public static final int LOGO_POSITION = 0;
@@ -100,8 +103,8 @@ public class Event extends EventEntity
     }
 
     @Override
-    public ModelRespository<Event> getRepository() {
-        return EventRepository.getInstance();
+    public Notifier<Event> getNotifier() {
+        return EventNotifier.getInstance();
     }
 
     public void setTeam(Team team) {

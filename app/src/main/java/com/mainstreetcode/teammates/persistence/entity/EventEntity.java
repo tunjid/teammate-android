@@ -7,7 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.mainstreetcode.teammates.model.ModelUtils;
+import com.mainstreetcode.teammates.util.ModelUtils;
 import com.mainstreetcode.teammates.model.Team;
 
 import java.text.SimpleDateFormat;

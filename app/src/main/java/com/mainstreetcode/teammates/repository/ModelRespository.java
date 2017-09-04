@@ -4,7 +4,7 @@ package com.mainstreetcode.teammates.repository;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
-import com.mainstreetcode.teammates.model.BaseModel;
+import com.mainstreetcode.teammates.model.Model;
 
 import java.io.File;
 import java.util.Collections;
@@ -15,7 +15,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -25,10 +24,10 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 /**
- * Repository that manages {@link com.mainstreetcode.teammates.model.Model} CRUD operations
+ * Repository that manages {@link Model} CRUD operations
  */
 
-public abstract class ModelRespository<T extends BaseModel<T>> {
+public abstract class ModelRespository<T extends Model<T>> {
 
     private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
     private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);
@@ -46,10 +45,6 @@ public abstract class ModelRespository<T extends BaseModel<T>> {
             return Flowable.error(new IllegalArgumentException("Model does not exist"));
         }
         return get(model.getId()).map(localMapper(model));
-    }
-
-    public Predicate<T> getNotificationFilter() {
-        return t -> true;
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {

@@ -1,12 +1,17 @@
 package com.mainstreetcode.teammates.model;
 
 
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import android.os.Parcelable;
 
 /**
- * Interface definition to work around generic bounds in {@link BaseModel}
+ * Base interface for model interactions
  */
-public interface Model<T extends BaseModel<T>> extends BaseModel<T> {
+public interface Model<T> extends Parcelable {
+    void update(T updated);
 
-    ModelRespository<T> getRepository();
+    boolean isEmpty();
+
+    String getId();
+
+    String getImageUrl();
 }

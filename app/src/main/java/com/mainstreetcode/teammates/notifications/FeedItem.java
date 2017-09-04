@@ -1,12 +1,6 @@
-package com.mainstreetcode.teammates.model;
+package com.mainstreetcode.teammates.notifications;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
@@ -15,35 +9,29 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mainstreetcode.teammates.Application;
-import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.activities.MainActivity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-
-import static android.app.PendingIntent.*;
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Notifications from a user's feed
  */
 
-public class FeedItem<T extends Model<T>> {
+public class FeedItem<T extends Model<T> & Notifiable<T>> {
 
-    private static final int DEEP_LINK_REQ_CODE = 1;
-
-    private static final String JOIN_REQUEST = "join-request";
-    private static final String EVENT = "event";
-    private static final String TEAM = "team";
-    private static final String TEAM_CHAT = "team-chat";
+    static final String JOIN_REQUEST = "join-request";
+    static final String EVENT = "event";
+    static final String TEAM = "team";
+    static final String TEAM_CHAT = "team-chat";
 
     private static final Gson gson = TeammateService.getGson();
-
-    private final Application app = Application.getInstance();
 
     private final String title;
     private final String body;
@@ -58,7 +46,7 @@ public class FeedItem<T extends Model<T>> {
     }
 
     @Nullable
-    public static <T extends Model<T>> FeedItem<T> fromNotification(RemoteMessage message) {
+    static <T extends Model<T> & Notifiable<T>> FeedItem<T> fromNotification(RemoteMessage message) {
         Map<String, String> data = message.getData();
         if (data == null || data.isEmpty()) return null;
 
@@ -68,6 +56,10 @@ public class FeedItem<T extends Model<T>> {
         catch (Exception e) {e.printStackTrace();}
 
         return result;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getTitle() {
@@ -86,35 +78,9 @@ public class FeedItem<T extends Model<T>> {
         return model;
     }
 
-    public void handleNotification() {
-        ModelRespository<T> respository = model.getRepository();
 
-        respository.get(model).lastElement()
-                .filter(model.getRepository().getNotificationFilter())
-                .subscribe(this::sendNotification, ErrorHandler.EMPTY);
-    }
 
-    private void sendNotification(T model) {
-        Intent intent = new Intent(app, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(MainActivity.FEED_DEEP_LINK, model);
-
-        PendingIntent pendingIntent = getActivity(app, DEEP_LINK_REQ_CODE, intent, FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(app, type)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        notifier.notify(0, notificationBuilder.build());
-    }
-
-    public static class GsonAdapter<T extends Model<T>>
+    public static class GsonAdapter<T extends Model<T> & Notifiable<T>>
             implements JsonDeserializer<FeedItem<T>> {
 
         private static final String TYPE_KEY = "type";

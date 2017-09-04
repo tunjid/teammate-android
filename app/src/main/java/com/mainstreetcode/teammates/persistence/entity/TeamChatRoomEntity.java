@@ -26,10 +26,10 @@ public class TeamChatRoomEntity implements
     @ColumnInfo(name = "team_chat_room_team") protected Team team;
     @ColumnInfo(name = "team_chat_room_last_seen") protected Date lastSeen;
 
-    public TeamChatRoomEntity(String id, Team team) {
+    public TeamChatRoomEntity(String id, Team team, Date lastSeen) {
         this.id = id;
         this.team = team;
-        lastSeen = new Date();
+        this. lastSeen = lastSeen;
     }
 
     protected TeamChatRoomEntity(Parcel in) {
@@ -44,6 +44,10 @@ public class TeamChatRoomEntity implements
 
     public Team getTeam() {
         return team;
+    }
+
+    public Date getLastSeen() {
+        return lastSeen;
     }
 
     @Override

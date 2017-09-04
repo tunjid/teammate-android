@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.FeedItemViewHolder;
-import com.mainstreetcode.teammates.model.FeedItem;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
 /**
- * Adapter for {@link com.mainstreetcode.teammates.model.FeedItem}
+ * Adapter for {@link FeedItem}
  */
 
 public class FeedAdapter extends BaseRecyclerViewAdapter<FeedItemViewHolder, FeedAdapter.FeedItemAdapterListener> {

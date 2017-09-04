@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.FeedItem;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Role;

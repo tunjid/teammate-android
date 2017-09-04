@@ -1,8 +1,7 @@
-package com.mainstreetcode.teammates.firebase;
+package com.mainstreetcode.teammates.notifications;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.mainstreetcode.teammates.model.FeedItem;
 import com.mainstreetcode.teammates.model.Model;
 
 
@@ -13,8 +12,10 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         handleMessage(remoteMessage);
     }
 
-    public <T extends Model<T>> void handleMessage(RemoteMessage remoteMessage) {
+    public <T extends Model<T> & Notifiable<T>> void handleMessage(RemoteMessage remoteMessage) {
         FeedItem<T> item = FeedItem.fromNotification(remoteMessage);
-        if (item != null) item.handleNotification();
+        if (item == null) return;
+
+        item.getModel().getNotifier().notify(item);
     }
 }

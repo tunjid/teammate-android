@@ -2,7 +2,7 @@ package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.FeedItem;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;

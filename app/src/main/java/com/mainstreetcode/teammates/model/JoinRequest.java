@@ -10,9 +10,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.notifications.JoinRequestNotifier;
+import com.mainstreetcode.teammates.notifications.Notifiable;
+import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
-import com.mainstreetcode.teammates.repository.JoinRequestRepository;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 
@@ -21,7 +23,9 @@ import java.lang.reflect.Type;
  */
 
 public class JoinRequest extends JoinRequestEntity
-        implements Model<JoinRequest> {
+        implements
+        Model<JoinRequest>,
+        Notifiable<JoinRequest> {
 
     public static JoinRequest create(boolean teamApproved, boolean userApproved, String roleName, String teamId, User user) {
         return new JoinRequest(teamApproved, userApproved, "*", roleName, teamId, user);
@@ -56,8 +60,8 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     @Override
-    public ModelRespository<JoinRequest> getRepository() {
-        return JoinRequestRepository.getInstance();
+    public Notifier<JoinRequest> getNotifier() {
+        return JoinRequestNotifier.getInstance();
     }
 
     @Override

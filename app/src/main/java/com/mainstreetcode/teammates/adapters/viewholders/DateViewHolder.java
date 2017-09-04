@@ -9,7 +9,7 @@ import android.widget.TimePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Item;
-import com.mainstreetcode.teammates.model.ModelUtils;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.Calendar;
 

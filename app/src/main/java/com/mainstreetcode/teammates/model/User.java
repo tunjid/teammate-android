@@ -14,14 +14,12 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
-import com.mainstreetcode.teammates.repository.UserRepository;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mainstreetcode.teammates.model.ModelUtils.asString;
+import static com.mainstreetcode.teammates.util.ModelUtils.asString;
 
 /**
  * Users that may be part of a {@link Team}
@@ -89,11 +87,6 @@ public class User extends UserEntity implements
         this.id = updatedUser.id;
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
-    }
-
-    @Override
-    public ModelRespository<User> getRepository() {
-        return UserRepository.getInstance();
     }
 
     public void setPassword(String password) {

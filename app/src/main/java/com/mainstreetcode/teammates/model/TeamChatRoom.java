@@ -14,8 +14,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.persistence.entity.TeamChatRoomEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.TeamChatRoomRepository;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -31,8 +31,8 @@ public class TeamChatRoom extends TeamChatRoomEntity
     @Relation(parentColumn = "team_chat_room_id", entityColumn = "team_chat_id", entity = TeamChat.class)
     private final List<TeamChat> chats = new ArrayList<>();
 
-    public TeamChatRoom(String id, Team team) {
-        super(id, team);
+    public TeamChatRoom(String id, Team team, Date lastSeen) {
+        super(id, team, lastSeen);
     }
 
     protected TeamChatRoom(Parcel in) {
@@ -57,20 +57,16 @@ public class TeamChatRoom extends TeamChatRoomEntity
 
     @Override
     public void update(TeamChatRoom updated) {
+        // DO NOT UPDATE LAST SEEN
         this.id = updated.id;
         team.update(updated.team);
         chats.clear();
         chats.addAll(updated.chats);
     }
 
-    @Override
-    public ModelRespository<TeamChatRoom> getRepository() {
-        return TeamChatRoomRepository.getInstance();
-    }
-
     public void updateLastSeen() {
         lastSeen.setTime(new Date().getTime());
-        getRepository().save(this);
+        TeamChatRoomRepository.getInstance().save(this);
     }
 
     public List<TeamChat> getChats() {
@@ -130,7 +126,7 @@ public class TeamChatRoom extends TeamChatRoomEntity
 
             if (team == null) team = Team.empty();
 
-            TeamChatRoom chatRoom = new TeamChatRoom(id, team);
+            TeamChatRoom chatRoom = new TeamChatRoom(id, team, new Date());
             chatRoom.chats.addAll(chats);
 
             return chatRoom;

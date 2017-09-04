@@ -13,9 +13,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.notifications.Notifiable;
+import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -28,6 +30,7 @@ import java.util.List;
 public class Role extends RoleEntity
         implements
         Model<Role>,
+        Notifiable<Role>,
         ItemListableBean<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
@@ -91,8 +94,8 @@ public class Role extends RoleEntity
     }
 
     @Override
-    public ModelRespository<Role> getRepository() {
-        return RoleRepository.getInstance();
+    public Notifier<Role> getNotifier() {
+        return Notifier.defaultNotifier(RoleRepository.getInstance());
     }
 
     public boolean isTeamAdmin() {

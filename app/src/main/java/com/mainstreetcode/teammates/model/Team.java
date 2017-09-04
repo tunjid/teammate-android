@@ -13,10 +13,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.notifications.Notifiable;
+import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
-import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.List;
 public class Team extends TeamEntity
         implements
         Model<Team>,
+        Notifiable<Team>,
         ItemListableBean<Team> {
 
     public static final int LOGO_POSITION = 0;
@@ -112,8 +115,8 @@ public class Team extends TeamEntity
     }
 
     @Override
-    public ModelRespository<Team> getRepository() {
-        return TeamRepository.getInstance();
+    public Notifier<Team> getNotifier() {
+        return Notifier.defaultNotifier(TeamRepository.getInstance());
     }
 
     public List<Role> getRoles() {

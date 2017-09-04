@@ -17,7 +17,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
@@ -29,12 +28,10 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
 
     private final TeammateApi api;
     private final TeamChatDao chatDao;
-    private final UserRepository userRepository;
 
     private TeamChatRepository() {
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
-        userRepository = UserRepository.getInstance();
     }
 
     public static TeamChatRepository getInstance() {
@@ -72,11 +69,6 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
         };
     }
 
-    @Override
-    public Predicate<TeamChat> getNotificationFilter() {
-        return teamChat -> !teamChat.getUser().equals(userRepository.getCurrentUser());
-    }
-
     public Single<TeamChatRoom> fetchOlderChats(final TeamChatRoom chatRoom) {
         final List<TeamChat> chats = chatRoom.getChats();
         final Date date = chats.isEmpty() ? new Date() : chats.get(0).getCreated();
@@ -99,5 +91,12 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
                 })
                 .subscribeOn(io())
                 .observeOn(mainThread());
+    }
+
+    public Single<List<TeamChat>> fetchUnreadChats(String chatRoomId) {
+        return TeamChatRoomRepository.getInstance().get(chatRoomId).firstOrError()
+                .flatMapMaybe(chatRoom -> chatDao.chatsAfter(chatRoom.getId(), chatRoom.getLastSeen()).subscribeOn(io())
+                        .observeOn(mainThread()))
+                .toSingle();
     }
 }
