@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.repository;
 
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.TeamChatRoom;
+import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.TeamChatDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
@@ -94,8 +95,10 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
     }
 
     public Single<List<TeamChat>> fetchUnreadChats(String chatRoomId) {
+        User currentUser = UserRepository.getInstance().getCurrentUser();
         return TeamChatRoomRepository.getInstance().get(chatRoomId).firstOrError()
-                .flatMapMaybe(chatRoom -> chatDao.chatsAfter(chatRoom.getId(), chatRoom.getLastSeen()).subscribeOn(io())
+                .flatMapMaybe(chatRoom -> chatDao.unreadChats(chatRoom.getId(), currentUser, chatRoom.getLastSeen())
+                        .subscribeOn(io())
                         .observeOn(mainThread()))
                 .toSingle();
     }

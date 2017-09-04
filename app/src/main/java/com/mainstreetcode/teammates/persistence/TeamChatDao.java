@@ -9,6 +9,7 @@ import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.TeamChat;
+import com.mainstreetcode.teammates.model.User;
 
 import java.util.Date;
 import java.util.List;
@@ -34,8 +35,9 @@ public abstract class TeamChatDao extends EntityDao<TeamChat> {
 
     @Query("SELECT * FROM team_chats" +
             " WHERE parent_chat_room_id = :chatRoomId" +
+            " AND team_chat_user != :signedInUser" +
             " AND team_chat_created > :date")
-    public abstract Maybe<List<TeamChat>> chatsAfter(String chatRoomId, Date date);
+    public abstract Maybe<List<TeamChat>> unreadChats(String chatRoomId, User signedInUser, Date date);
 
     @Query("SELECT * FROM team_chats" +
             " WHERE :id = team_chat_id")
