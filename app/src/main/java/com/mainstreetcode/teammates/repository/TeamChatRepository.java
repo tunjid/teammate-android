@@ -81,13 +81,15 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
         return Maybe.concat(local, remote.toMaybe())
                 .firstOrError()
                 .map(fetchedChats -> {
-                    getSaveManyFunction().apply(fetchedChats);
-                    Set<TeamChat> chatSet = new HashSet<>(chats);
-                    chatSet.addAll(fetchedChats);
+                    Set<TeamChat> chatSet = new HashSet<>(fetchedChats);
 
-                    chats.clear();
-                    chats.addAll(chatSet);
-                    sort(chats, TeamChat.COMPARATOR);
+                    fetchedChats.clear();
+                    fetchedChats.addAll(chatSet);
+
+                    sort(fetchedChats, TeamChat.COMPARATOR);
+                    getSaveManyFunction().apply(fetchedChats);
+
+                    chats.addAll(0, fetchedChats);
                     return chatRoom;
                 })
                 .subscribeOn(io())
