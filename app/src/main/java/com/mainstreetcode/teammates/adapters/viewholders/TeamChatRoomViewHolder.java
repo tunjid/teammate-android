@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,17 +33,21 @@ public class TeamChatRoomViewHolder extends BaseViewHolder<TeamChatRoomAdapter.T
 
     public void bind(TeamChatRoom item) {
         if (item.isEmpty()) return;
-        
+
         this.item = item;
         Team team = item.getTeam();
         teamName.setText(team.getName());
         teamLocation.setText(team.getCity());
 
-        Picasso.with(itemView.getContext())
-                .load(item.getImageUrl())
-                .fit()
-                .centerInside()
-                .into(teamLogo);
+        String imageUrl = item.getImageUrl();
+
+        if (!TextUtils.isEmpty(imageUrl)) {
+            Picasso.with(itemView.getContext())
+                    .load(imageUrl)
+                    .fit()
+                    .centerInside()
+                    .into(teamLogo);
+        }
     }
 
     @Override
