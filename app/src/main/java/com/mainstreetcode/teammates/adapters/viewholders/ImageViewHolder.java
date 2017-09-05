@@ -6,7 +6,7 @@ import android.widget.ImageView;
 
 import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;

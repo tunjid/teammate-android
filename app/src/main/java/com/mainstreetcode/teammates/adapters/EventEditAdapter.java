@@ -13,7 +13,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.EventGuestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
-import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.User;

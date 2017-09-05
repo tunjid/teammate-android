@@ -1,4 +1,4 @@
-package com.mainstreetcode.teammates.fragments;
+package com.mainstreetcode.teammates.fragments.headless;
 
 import android.app.Activity;
 import android.content.Intent;

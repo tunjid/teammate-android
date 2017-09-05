@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
+import com.mainstreetcode.teammates.fragments.headless.TeamMediaPickerFragment;
 import com.mainstreetcode.teammates.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
@@ -61,6 +62,9 @@ public class MainActivity extends TeammatesBaseActivity {
                 return true;
             case R.id.action_messages:
                 showFragment(TeamChatRoomFragment.newInstance());
+                return true;
+            case R.id.action_media:
+                TeamMediaPickerFragment.request(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

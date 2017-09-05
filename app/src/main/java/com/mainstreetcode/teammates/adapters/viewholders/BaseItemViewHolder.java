@@ -2,7 +2,7 @@ package com.mainstreetcode.teammates.adapters.viewholders;
 
 import android.view.View;
 
-import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 

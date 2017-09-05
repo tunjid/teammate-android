@@ -54,7 +54,8 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public String getStableTag() {
         String superResult = super.getStableTag();
-        if (getTargetFragment() != null) superResult += getTargetRequestCode();
+        Fragment target = getTargetFragment();
+        if (target != null) superResult += (target.getTag() + getTargetRequestCode());
         return superResult;
     }
 
@@ -81,7 +82,8 @@ public final class TeamsFragment extends MainActivityFragment
         fab.setImageResource(R.drawable.ic_add_white_24dp);
         fab.setOnClickListener(this);
         toggleFab(true);
-        setToolbarTitle(getString(getTargetRequestCode() == R.id.request_code_team_pick
+        setToolbarTitle(getString(getTargetRequestCode() == R.id.request_event_team_pick
+                || getTargetRequestCode() == R.id.request_media_team_pick
                 ? R.string.pick_team
                 : R.string.my_teams));
 

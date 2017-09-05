@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammates.fragments.ImageWorkerFragment;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -178,7 +178,7 @@ public class EventEditFragment extends MainActivityFragment
     @Override
     public void selectTeam() {
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
-        teamsFragment.setTargetFragment(this, R.id.request_code_team_pick);
+        teamsFragment.setTargetFragment(this, R.id.request_event_team_pick);
         showFragment(teamsFragment);
     }
 
