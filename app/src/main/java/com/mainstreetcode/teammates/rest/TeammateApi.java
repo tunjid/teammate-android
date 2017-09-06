@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
@@ -156,4 +157,18 @@ public interface TeammateApi {
 
     @POST("/api/team-chats")
     Single<List<TeamChat>> chatsBefore(@Body TeamChatRoom chatRoom, @Query("date") Date date);
+
+    // =============================================================================================
+    // Team Media endpoints
+    // =============================================================================================
+
+    @GET("/api/team-media/{teamId}")
+    Single<Media> getMedia(@Path("teamId") String teamId);
+
+    @GET("/api/team-media/team/{teamId}}")
+    Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
+
+    @Multipart
+    @POST("api/team-media/team/{teamId}")
+    Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
 }

@@ -55,6 +55,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract EventDao eventDao();
 
+    public abstract MediaDao mediaDao();
+
     public abstract JoinRequestDao joinRequestDao();
 
     public abstract TeamChatDao teamChatDao();
@@ -69,6 +71,7 @@ public abstract class AppDatabase extends RoomDatabase {
         singles.add(clearTable(teamChatDao()));
         singles.add(clearTable(joinRequestDao()));
         singles.add(clearTable(eventDao()));
+        singles.add(clearTable(mediaDao()));
         singles.add(clearTable(roleDao()));
         singles.add(clearTable(teamDao()));
         singles.add(clearTable(userDao()));

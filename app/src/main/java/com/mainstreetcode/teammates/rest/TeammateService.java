@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Message;
@@ -75,6 +76,7 @@ public class TeammateService {
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
                 .registerTypeAdapter(Role.class, new Role.GsonAdapter())
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
+                .registerTypeAdapter(Media.class, new Media.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(TeamChat.class, new TeamChat.GsonAdapter())
