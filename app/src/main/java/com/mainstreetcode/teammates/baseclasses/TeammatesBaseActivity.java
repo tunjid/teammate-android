@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.fragments.main.EventEditFragment;
+import com.mainstreetcode.teammates.fragments.main.MediaDetailFragment;
 import com.mainstreetcode.teammates.fragments.main.RoleEditFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamEditFragment;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
@@ -122,7 +123,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     protected boolean isFullscreenFragment(String tag) {
         return tag.contains(RoleEditFragment.class.getSimpleName())
                 || tag.contains(TeamEditFragment.class.getSimpleName())
-                || tag.contains(EventEditFragment.class.getSimpleName());
+                || tag.contains(EventEditFragment.class.getSimpleName())
+                || tag.contains(MediaDetailFragment.class.getSimpleName());
     }
 
     private WindowInsetsCompat consumeFragmentInsets(View view, WindowInsetsCompat insets) {

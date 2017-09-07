@@ -165,7 +165,7 @@ public interface TeammateApi {
     @GET("/api/team-media/{teamId}")
     Single<Media> getMedia(@Path("teamId") String teamId);
 
-    @GET("/api/team-media/team/{teamId}}")
+    @GET("/api/team-media/team/{teamId}")
     Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
 
     @Multipart

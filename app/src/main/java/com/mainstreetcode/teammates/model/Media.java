@@ -18,6 +18,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.notifications.Notifier;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
+import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -28,8 +30,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(
         tableName = "team_media",
         foreignKeys = {
-                @ForeignKey(entity = User.class, parentColumns = "user_id", childColumns = "media_user_id", onDelete = CASCADE),
-                @ForeignKey(entity = Team.class, parentColumns = "team_id", childColumns = "media_team_id", onDelete = CASCADE)
+                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "media_user", onDelete = CASCADE),
+                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "media_team", onDelete = CASCADE)
         }
 )
 public class Media implements
@@ -38,6 +40,7 @@ public class Media implements
         Notifiable<Media> {
 
     public static final String UPLOAD_KEY = "team-media";
+    public static final String IMAGE = "image";
 
     @PrimaryKey
     @ColumnInfo(name = "media_id") private String id;
@@ -48,7 +51,7 @@ public class Media implements
     @ColumnInfo(name = "media_team") private Team team;
     @ColumnInfo(name = "media_created") private Date created;
 
-    Media(String id, String url, String mimeType, User user, Team team, Date created) {
+    public Media(String id, String url, String mimeType, User user, Team team, Date created) {
         this.id = id;
         this.url = url;
         this.mimeType = mimeType;
@@ -82,6 +85,10 @@ public class Media implements
         return url;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     @Override
     public void update(Media updated) {
         id = updated.id;
@@ -112,6 +119,10 @@ public class Media implements
 
     public Date getCreated() {
         return created;
+    }
+
+    public boolean isImage() {
+        return mimeType.startsWith(IMAGE);
     }
 
     @Override
@@ -163,7 +174,7 @@ public class Media implements
 
         private static final String UID_KEY = "_id";
         private static final String URL_KEY = "url";
-        private static final String MIME_TYPE_KEY = "mimeType";
+        private static final String MIME_TYPE_KEY = "mimetype";
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
         private static final String DATE_KEY = "created";

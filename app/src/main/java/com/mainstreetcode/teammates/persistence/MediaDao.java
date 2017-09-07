@@ -40,11 +40,11 @@ public abstract class MediaDao extends EntityDao<Media> {
 
     @Query("SELECT *" +
             " FROM team_media" +
-            " WHERE :media_id = id")
+            " WHERE :id = media_id")
     public abstract Maybe<Media> get(String id);
 
     @Query("SELECT *" +
             " FROM team_media" +
-            " WHERE :media_team = team")
+            " WHERE :team = media_team")
     public abstract Maybe<List<Media>> getTeamMedia(Team team);
 }

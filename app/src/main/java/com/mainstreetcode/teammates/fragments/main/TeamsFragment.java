@@ -55,7 +55,7 @@ public final class TeamsFragment extends MainActivityFragment
     public String getStableTag() {
         String superResult = super.getStableTag();
         Fragment target = getTargetFragment();
-        if (target != null) superResult += (target.getTag() + getTargetRequestCode());
+        if (target != null) superResult += ("-" + target.getTag() + "-" + getTargetRequestCode());
         return superResult;
     }
 
@@ -117,10 +117,12 @@ public final class TeamsFragment extends MainActivityFragment
 
     @Override
     public void onTeamClicked(Team team) {
+        int requestCode = getTargetRequestCode();
         Fragment target = getTargetFragment();
+
         if (target != null && target instanceof TeamAdapter.TeamAdapterListener) {
             ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
-            getActivity().onBackPressed();
+            if (requestCode == R.id.request_event_team_pick) getActivity().onBackPressed();
         }
         else {
             showFragment(TeamDetailFragment.newInstance(team));

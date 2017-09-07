@@ -8,6 +8,7 @@ import android.support.v4.util.Pair;
 import android.util.Log;
 
 import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
@@ -32,7 +33,7 @@ import static com.mainstreetcode.teammates.BuildConfig.DEBUG;
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
         RoleEntity.class, JoinRequestEntity.class, TeamChatRoomEntity.class,
-        TeamChat.class}, version = 1)
+        TeamChat.class, Media.class}, version = 1)
 @TypeConverters({DateTypeConverter.class, TeamTypeConverter.class, UserTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
