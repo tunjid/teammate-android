@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +9,6 @@ import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageMediaViewHolder;
@@ -18,21 +16,14 @@ import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Media;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 
-import java.util.Arrays;
-
-import jp.wasabeef.picasso.transformations.BlurTransformation;
-import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
-
-import static android.support.constraint.ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
-import static android.support.constraint.ConstraintLayout.LayoutParams.PARENT_ID;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
 public class MediaDetailFragment extends MainActivityFragment {
 
     public static final String ARG_MEDIA = "media";
+    private MediaViewHolder mediaViewHolder;
 
     public static MediaDetailFragment newInstance(Media media) {
         MediaDetailFragment fragment = new MediaDetailFragment();
@@ -68,27 +59,14 @@ public class MediaDetailFragment extends MainActivityFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ConstraintLayout rootView = (ConstraintLayout) inflater.inflate(R.layout.fragment_media_detail, container, false);
-        ImageView blurredBackground = rootView.findViewById(R.id.blurred_background);
-
         Media media = getArguments().getParcelable(ARG_MEDIA);
-
-        if (media == null) return rootView;
+        assert media != null;
 
         boolean isImage = media.isImage();
-        bindViewHolder(inflater, rootView, media, isImage);
+        int resource = isImage ? R.layout.viewholder_image : R.layout.viewholder_video;
 
-        if (isImage) {
-            Picasso.with(inflater.getContext())
-                    .load(media.getImageUrl())
-                    .fit()
-                    .centerCrop()
-                    .transform(Arrays.asList(new Transformation[]{
-                            new BlurTransformation(inflater.getContext(), 20),
-                            new ColorFilterTransformation(Color.parseColor("#C8000000"))
-                    }))
-                    .into(blurredBackground);
-        }
+        ConstraintLayout rootView = (ConstraintLayout) inflater.inflate(resource, container, false);
+        bindViewHolder(rootView, media, isImage);
 
         return rootView;
     }
@@ -103,23 +81,21 @@ public class MediaDetailFragment extends MainActivityFragment {
     public void onDestroyView() {
         super.onDestroyView();
         toggleToolbar(true);
+
+        if (mediaViewHolder != null) mediaViewHolder.unBind();
+
+        mediaViewHolder = null;
     }
 
-    private void bindViewHolder(LayoutInflater inflater, ConstraintLayout rootView, Media media, boolean isImage) {
-        int resource = isImage ? R.layout.viewholder_image : R.layout.viewholder_video;
+    private void bindViewHolder(ConstraintLayout rootView, Media media, boolean isImage) {
+        ViewGroup.LayoutParams params = rootView.getLayoutParams();
+        params.height = MATCH_PARENT;
 
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_CONSTRAINT, MATCH_CONSTRAINT);
-        params.leftToLeft = PARENT_ID;
-        params.topToTop = PARENT_ID;
-        params.rightToRight = PARENT_ID;
-        params.bottomToBottom = PARENT_ID;
+        rootView.setPadding(0, 0, 0, 0);
 
-        View itemView = inflater.inflate(resource, rootView, false);
-        rootView.addView(itemView, params);
-
-        MediaViewHolder mediaViewHolder = isImage
-                ? new ImageMediaViewHolder(itemView, null)
-                : new VideoMediaViewHolder(itemView, null);
+        mediaViewHolder = isImage
+                ? new ImageMediaViewHolder(rootView, null)
+                : new VideoMediaViewHolder(rootView, null);
 
         mediaViewHolder.bind(media);
     }

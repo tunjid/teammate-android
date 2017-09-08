@@ -16,6 +16,10 @@ public class VideoMediaViewHolder extends MediaViewHolder {
     public VideoMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
         videoView = itemView.findViewById(R.id.video_thumbnail);
+
+        if (adapterListener != null) {
+            videoView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        }
     }
 
     @Override
@@ -23,7 +27,19 @@ public class VideoMediaViewHolder extends MediaViewHolder {
         super.bind(media);
 
         String videoUrl = media.getImageUrl();
-        if (!TextUtils.isEmpty(videoUrl)) videoView.setVideoPath(videoUrl);
+
+        if (TextUtils.isEmpty(videoUrl)) return;
+
+        videoView.setVideoPath(videoUrl);
+
+        if (adapterListener == null) videoView.setOnPreparedListener(() -> videoView.start());
+    }
+
+    @Override
+    public void unBind() {
+        super.unBind();
+
+        videoView.release();
     }
 
     @Override
