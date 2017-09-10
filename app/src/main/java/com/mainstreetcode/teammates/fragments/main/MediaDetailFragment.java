@@ -53,7 +53,6 @@ public class MediaDetailFragment extends MainActivityFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Nullable
@@ -77,6 +76,8 @@ public class MediaDetailFragment extends MainActivityFragment {
         toggleToolbar(false);
     }
 
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -97,6 +98,6 @@ public class MediaDetailFragment extends MainActivityFragment {
                 ? new ImageMediaViewHolder(rootView, null)
                 : new VideoMediaViewHolder(rootView, null);
 
-        mediaViewHolder.bind(media);
+        mediaViewHolder.fullBind(media);
     }
 }

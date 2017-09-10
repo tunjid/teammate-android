@@ -30,21 +30,31 @@ public class ImageMediaViewHolder extends MediaViewHolder {
     public void bind(Media media) {
         super.bind(media);
 
-        String imageUrl = media.getImageUrl();
+        displayImage(media.getThumbnail());
+    }
 
-        if (TextUtils.isEmpty(imageUrl)) return;
+    @Override
+    public void fullBind(Media media) {
+        super.fullBind(media);
+
+        displayImage(media.getUrl());
+    }
+
+    private void displayImage(String url) {
+
+        if (TextUtils.isEmpty(url)) return;
 
         RequestCreator requestCreator = Picasso.with(itemView.getContext())
-                .load(imageUrl)
+                .load(url)
                 .fit()
                 .centerInside();
 
-        Callback callBack = PicassoPalette.with(imageUrl, thumbnail)
+        Callback callBack = PicassoPalette.with(url, thumbnail)
                 .use(PicassoPalette.Profile.MUTED_DARK)
-                .intoBackground(itemView);
+                .intoBackground(itemView)
+                .intoBackground(thumbnail);
 
-        if (adapterListener != null) requestCreator.into(thumbnail);
-        else requestCreator.into(thumbnail, callBack);
+        requestCreator.into(thumbnail, callBack);
     }
 
     @Override

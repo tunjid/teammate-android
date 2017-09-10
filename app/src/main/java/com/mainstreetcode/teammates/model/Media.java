@@ -46,15 +46,17 @@ public class Media implements
     @ColumnInfo(name = "media_id") private String id;
     @ColumnInfo(name = "media_url") private String url;
     @ColumnInfo(name = "media_mime_type") private String mimeType;
+    @ColumnInfo(name = "media_thumbnail") private String thumbnail;
 
     @ColumnInfo(name = "media_user") private User user;
     @ColumnInfo(name = "media_team") private Team team;
     @ColumnInfo(name = "media_created") private Date created;
 
-    public Media(String id, String url, String mimeType, User user, Team team, Date created) {
+    public Media(String id, String url, String mimeType, String thumbnail, User user, Team team, Date created) {
         this.id = id;
         this.url = url;
         this.mimeType = mimeType;
+        this.thumbnail = thumbnail;
         this.user = user;
         this.team = team;
         this.created = created;
@@ -64,6 +66,7 @@ public class Media implements
         id = in.readString();
         url = in.readString();
         mimeType = in.readString();
+        thumbnail = in.readString();
         user = (User) in.readValue(User.class.getClassLoader());
         team = (Team) in.readValue(Team.class.getClassLoader());
         long tmpCreated = in.readLong();
@@ -83,6 +86,10 @@ public class Media implements
     @Override
     public String getImageUrl() {
         return url;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
     }
 
     public String getUrl() {
@@ -175,6 +182,7 @@ public class Media implements
         private static final String UID_KEY = "_id";
         private static final String URL_KEY = "url";
         private static final String MIME_TYPE_KEY = "mimetype";
+        private static final String THUMBNAIL_KEY = "thumbnail";
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
         private static final String DATE_KEY = "created";
@@ -187,6 +195,7 @@ public class Media implements
             String id = ModelUtils.asString(UID_KEY, teamJson);
             String url = ModelUtils.asString(URL_KEY, teamJson);
             String mimeType = ModelUtils.asString(MIME_TYPE_KEY, teamJson);
+            String thumbnail = ModelUtils.asString(THUMBNAIL_KEY, teamJson);
 
             User user = context.deserialize(teamJson.get(USER_KEY), User.class);
             Team team = context.deserialize(teamJson.get(TEAM_KEY), Team.class);
@@ -195,7 +204,7 @@ public class Media implements
 
             if (user == null) user = User.empty();
 
-            return new Media(id, url, mimeType, user, team, created);
+            return new Media(id, url, mimeType, thumbnail, user, team, created);
         }
 
         @Override

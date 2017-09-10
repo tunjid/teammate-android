@@ -126,4 +126,8 @@
     <string name="chat_notification_multiline_item">%1$s: %2$s</string>
     <string name="chat_notification_multiline_summary">+%1$d more</string>
     <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
+
+    <!--MediaFragment-->
+    <string name="meda_title">Media for %1$s</string>
+
 </resources>

@@ -7,6 +7,7 @@ import com.devbrackets.android.exomedia.ui.widget.VideoView;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.model.Media;
+import com.squareup.picasso.Picasso;
 
 
 public class VideoMediaViewHolder extends MediaViewHolder {
@@ -26,13 +27,27 @@ public class VideoMediaViewHolder extends MediaViewHolder {
     public void bind(Media media) {
         super.bind(media);
 
-        String videoUrl = media.getImageUrl();
+        String thumbnail = media.getThumbnail();
+
+        if (TextUtils.isEmpty(thumbnail)) return;
+
+        Picasso.with(itemView.getContext())
+                .load(thumbnail)
+                .fit()
+                .centerInside()
+                .into(videoView.getPreviewImageView());
+    }
+
+    @Override
+    public void fullBind(Media media) {
+        super.fullBind(media);
+
+        String videoUrl = media.getUrl();
 
         if (TextUtils.isEmpty(videoUrl)) return;
 
         videoView.setVideoPath(videoUrl);
-
-        if (adapterListener == null) videoView.setOnPreparedListener(() -> videoView.start());
+        videoView.setOnPreparedListener(() -> videoView.start());
     }
 
     @Override

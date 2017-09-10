@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -83,8 +85,7 @@ public class TeamMediaFragment extends MainActivityFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         toggleFab(false);
-//        setToolbarTitle(getString(R.string.team_chat_title, team.getTeam().getName()));
-
+        setToolbarTitle(getString(R.string.meda_title, team.getName()));
 
         disposables.add(mediaViewModel.getTeamMedia(team).subscribe(newList -> {
             mediaList.clear();
@@ -92,6 +93,11 @@ public class TeamMediaFragment extends MainActivityFragment {
             recyclerView.getAdapter().notifyDataSetChanged();
             toggleProgress(false);
         }, defaultErrorHandler));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_media, menu);
     }
 
     @Override
