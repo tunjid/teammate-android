@@ -47,9 +47,10 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     protected void showSnackbar(String message) {
+        if (getView() == null) return;
         toggleProgress(false);
-        View root = getView();
-        if (root != null) Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
+        View coordinator = getActivity().findViewById(R.id.coordinator);
+        if (coordinator != null) Snackbar.make(coordinator, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -85,12 +86,14 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     protected void toggleProgress(boolean show) {
-        View rootView = getView();
+        if (getView() == null) return;
+
+        View coordinator  = getActivity().findViewById(R.id.coordinator);
 
         if (show && loadingSnackbar != null && loadingSnackbar.isShown()) return;
 
-        if (show && rootView != null) {
-            loadingSnackbar = LoadingSnackbar.make(rootView, Snackbar.LENGTH_INDEFINITE);
+        if (show && coordinator != null) {
+            loadingSnackbar = LoadingSnackbar.make(coordinator, Snackbar.LENGTH_INDEFINITE);
             loadingSnackbar.show();
         }
         else if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) {

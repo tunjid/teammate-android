@@ -82,6 +82,11 @@ public class SplashFragment extends RegistrationActivityFragment
         return false;
     }
 
+    @Override
+    protected boolean showsToolBar() {
+        return false;
+    }
+
     @Nullable
     @Override
     @SuppressLint("CommitTransaction")
