@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +17,7 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.headless.TeamMediaPickerFragment;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -98,6 +100,16 @@ public class TeamMediaFragment extends MainActivityFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_media, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_pick_team:
+                TeamMediaPickerFragment.pick(getActivity());
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

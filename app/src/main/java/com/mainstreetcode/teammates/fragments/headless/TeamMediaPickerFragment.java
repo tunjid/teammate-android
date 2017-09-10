@@ -2,8 +2,8 @@ package com.mainstreetcode.teammates.fragments.headless;
 
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamAdapter;
@@ -16,19 +16,28 @@ public class TeamMediaPickerFragment extends BaseFragment implements TeamAdapter
 
     private static final String TAG = "TeamMediaPickerFragment";
 
-    public static void request(AppCompatActivity host) {
+    private Team selectedTeam = Team.empty();
+
+    public static void request(FragmentActivity host) {
         assureInstance(host);
 
         TeamMediaPickerFragment instance = getInstance(host);
         if (instance == null) return;
 
-        TeamsFragment teamsFragment = TeamsFragment.newInstance();
-        teamsFragment.setTargetFragment(instance, R.id.request_media_team_pick);
-
-        instance.showFragment(teamsFragment);
+        instance.pick();
     }
 
-    private static void assureInstance(AppCompatActivity host) {
+    public static void pick(FragmentActivity host) {
+        assureInstance(host);
+
+        TeamMediaPickerFragment instance = getInstance(host);
+        if (instance == null) return;
+
+        instance.selectedTeam.update(Team.empty());
+        instance.pick();
+    }
+
+    private static void assureInstance(FragmentActivity host) {
         FragmentManager fragmentManager = host.getSupportFragmentManager();
         Fragment instance = getInstance(host);
 
@@ -37,7 +46,7 @@ public class TeamMediaPickerFragment extends BaseFragment implements TeamAdapter
                 .commitNow();
     }
 
-    private static TeamMediaPickerFragment getInstance(AppCompatActivity host) {
+    private static TeamMediaPickerFragment getInstance(FragmentActivity host) {
         return (TeamMediaPickerFragment) host.getSupportFragmentManager().findFragmentByTag(TAG);
     }
 
@@ -48,6 +57,19 @@ public class TeamMediaPickerFragment extends BaseFragment implements TeamAdapter
 
     @Override
     public void onTeamClicked(Team item) {
+        selectedTeam.update(item);
         showFragment(TeamMediaFragment.newInstance(item));
+    }
+
+    private void pick() {
+        if (!selectedTeam.isEmpty()) onTeamClicked(selectedTeam);
+        else showPicker();
+    }
+
+    private void showPicker() {
+        TeamsFragment teamsFragment = TeamsFragment.newInstance();
+        teamsFragment.setTargetFragment(this, R.id.request_media_team_pick);
+
+        showFragment(teamsFragment);
     }
 }
