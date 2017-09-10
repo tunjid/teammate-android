@@ -42,6 +42,10 @@ public class TeammatesBaseFragment extends BaseFragment {
         ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
     }
 
+    protected void toggleBottombar(boolean show) {
+        ((TeammatesBaseActivity) getActivity()).toggleBottombar(show);
+    }
+
     protected void toggleFab(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleFab(show);
     }

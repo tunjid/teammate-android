@@ -27,6 +27,7 @@ public class VideoMediaViewHolder extends MediaViewHolder {
     public void bind(Media media) {
         super.bind(media);
 
+        videoView.getVideoControls().hide();
         String thumbnail = media.getThumbnail();
 
         if (TextUtils.isEmpty(thumbnail)) return;
@@ -42,6 +43,7 @@ public class VideoMediaViewHolder extends MediaViewHolder {
     public void fullBind(Media media) {
         super.fullBind(media);
 
+        videoView.getVideoControls().show();
         String videoUrl = media.getUrl();
 
         if (TextUtils.isEmpty(videoUrl)) return;

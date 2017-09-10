@@ -36,11 +36,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private boolean insetsApplied;
     private int insetHeight;
     private View insetView;
+
     private Toolbar toolbar;
     private FloatingActionButton fab;
-    private ViewHider toolbarHider;
+
     private ViewHider fabHider;
-//    private Pair<? extends View, ? extends View> progressPair;
+    private ViewHider toolbarHider;
+    private ViewHider bottombarHider;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -76,8 +78,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         fab = findViewById(R.id.fab);
         insetView = findViewById(R.id.inset_view);
         toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
+        bottombarHider = new ViewHider(findViewById(R.id.bottom_navigation), ViewHider.BOTTOM);
         fabHider = new ViewHider(fab, ViewHider.BOTTOM);
-//        progressPair = new Pair<>(findViewById(R.id.background), findViewById(R.id.progress_bar));
 
         setSupportActionBar(toolbar);
 
@@ -92,6 +94,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void toggleToolbar(boolean show) {
         if (show) toolbarHider.show();
         else toolbarHider.hide();
+    }
+
+    public void toggleBottombar(boolean show) {
+        if (show) bottombarHider.show();
+        else bottombarHider.hide();
     }
 
     public void toggleFab(boolean show) {

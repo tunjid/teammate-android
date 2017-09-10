@@ -74,14 +74,15 @@ public class MediaDetailFragment extends MainActivityFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toggleToolbar(false);
+        toggleBottombar(false);
     }
-
 
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         toggleToolbar(true);
+        toggleBottombar(true);
 
         if (mediaViewHolder != null) mediaViewHolder.unBind();
 
