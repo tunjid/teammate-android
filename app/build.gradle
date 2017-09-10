@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion "android-26"
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.mainstreetcode.teammates"
         minSdkVersion 16
@@ -34,8 +34,8 @@ android {
 dependencies {
     provided 'org.projectlombok:lombok:1.14.4'
     annotationProcessor 'org.projectlombok:lombok:1.14.4'
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha8"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha8"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha9"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha9"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -46,13 +46,13 @@ dependencies {
 
     compile 'com.android.support.constraint:constraint-layout:1.1.0-beta1'
 
-    compile "android.arch.lifecycle:runtime:1.0.0-alpha8"
-    compile "android.arch.lifecycle:extensions:1.0.0-alpha8"
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha8"
-    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha8"
+    compile "android.arch.lifecycle:runtime:1.0.0-alpha9"
+    compile "android.arch.lifecycle:extensions:1.0.0-alpha9"
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha9"
+    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha9"
 
-    compile 'com.google.firebase:firebase-core:11.0.4'
-    compile 'com.google.firebase:firebase-messaging:11.0.4'
+    compile 'com.google.firebase:firebase-core:11.2.0'
+    compile 'com.google.firebase:firebase-messaging:11.2.0'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.0"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -73,7 +73,7 @@ dependencies {
     }
 
     //compile 'com.tunjid.android-bootstrap:core:1.0.0'
-    compile(group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.1-SNAPSHOT", changing: true) {
+    compile(group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.2-SNAPSHOT", changing: true) {
         exclude module: 'appcompat-v7'
         exclude module: 'support-annotations'
         exclude module: 'support-v4'
