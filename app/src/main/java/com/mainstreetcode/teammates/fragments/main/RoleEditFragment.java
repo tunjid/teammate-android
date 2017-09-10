@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -109,7 +109,6 @@ public class RoleEditFragment extends MainActivityFragment
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
         fab.setImageResource(R.drawable.ic_check_white_24dp);
-        toggleFab(true);
         setToolbarTitle(getString(R.string.edit_user));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
@@ -122,13 +121,22 @@ public class RoleEditFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
-        toggleFab(false);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         ImageWorkerFragment.detach(this);
+    }
+
+    @Override
+    public boolean drawsBehindStatusBar() {
+        return true;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return true;
     }
 
     @Override
@@ -160,12 +168,12 @@ public class RoleEditFragment extends MainActivityFragment
                 final String firstName = role.getUser().getFirstName();
                 final String prompt = getString(R.string.confirm_user_drop, firstName);
 
-                Snackbar.make(recyclerView, prompt, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.yes, view ->
-                                disposables.add(roleViewModel.dropRole(role).subscribe(dropped -> {
-                                    showSnackbar(getString(R.string.dropped_user, firstName));
-                                    getActivity().onBackPressed();
-                                }, defaultErrorHandler)))
+                new AlertDialog.Builder(getContext()).setTitle(prompt)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.dropRole(role).subscribe(dropped -> {
+                            showSnackbar(getString(R.string.dropped_user, firstName));
+                            getActivity().onBackPressed();
+                        }, defaultErrorHandler)))
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
         }

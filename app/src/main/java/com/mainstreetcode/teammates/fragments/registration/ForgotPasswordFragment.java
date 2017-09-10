@@ -63,7 +63,6 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
         fab.setImageResource(R.drawable.ic_check_white_24dp);
         fab.setOnClickListener(this);
 
-        toggleFab(true);
         setToolbarTitle(getString(R.string.sign_in_forgot_password));
     }
 
@@ -71,6 +70,11 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         emailInput = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return true;
     }
 
     @Override

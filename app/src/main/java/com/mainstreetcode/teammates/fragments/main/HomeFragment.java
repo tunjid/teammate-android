@@ -62,7 +62,6 @@ public final class HomeFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        toggleFab(false);
         disposables.add(userViewModel.getMe().subscribe(
                 (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getFirstName())),
                 defaultErrorHandler
@@ -94,6 +93,11 @@ public final class HomeFragment extends MainActivityFragment
                     .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(item, (Event) model, false))
                     .show();
         }
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
     }
 
     private void rsvpEvent(FeedItem item, Event event, boolean attending) {

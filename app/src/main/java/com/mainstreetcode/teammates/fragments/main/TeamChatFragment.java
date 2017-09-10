@@ -91,7 +91,6 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        toggleFab(false);
         setToolbarTitle(getString(R.string.team_chat_title, chatRoom.getTeam().getName()));
 
         subsribeToChat();
@@ -109,7 +108,11 @@ public class TeamChatFragment extends MainActivityFragment
         super.onDestroyView();
         chatRoom.updateLastSeen();
         recyclerView = null;
-        toggleFab(false);
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {

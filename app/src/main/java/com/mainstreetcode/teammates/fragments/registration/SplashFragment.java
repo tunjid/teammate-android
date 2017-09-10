@@ -65,14 +65,21 @@ public class SplashFragment extends RegistrationActivityFragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        toggleToolbar(false);
-        toggleFab(false);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        toggleToolbar(true);
+    }
+
+    @Override
+    public boolean drawsBehindStatusBar() {
+        return true;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
     }
 
     @Nullable

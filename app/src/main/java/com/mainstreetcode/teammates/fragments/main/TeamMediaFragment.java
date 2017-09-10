@@ -86,7 +86,6 @@ public class TeamMediaFragment extends MainActivityFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        toggleFab(false);
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
 
         disposables.add(mediaViewModel.getTeamMedia(team).subscribe(newList -> {
@@ -116,6 +115,16 @@ public class TeamMediaFragment extends MainActivityFragment {
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
+    }
+
+    @Override
+    protected boolean showsBottomNav() {
+        return false;
     }
 
     @Override

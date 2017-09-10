@@ -66,7 +66,6 @@ public final class TeamChatRoomFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        toggleFab(false);
         setToolbarTitle(getString(R.string.team_chat_rooms));
 
         disposables.add(teamChatViewModel.getTeamChatRooms().subscribe(teamConsumer, defaultErrorHandler));
@@ -76,6 +75,11 @@ public final class TeamChatRoomFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
     }
 
     @Override

@@ -38,18 +38,6 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected Consumer<Throwable> defaultErrorHandler;
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
 
-    protected void toggleToolbar(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
-    }
-
-    protected void toggleBottombar(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleBottombar(show);
-    }
-
-    protected void toggleFab(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleFab(show);
-    }
-
     protected void setToolbarTitle(CharSequence charSequence) {
         ((TeammatesBaseActivity) getActivity()).setToolbarTitle(charSequence);
     }
@@ -79,6 +67,9 @@ public class TeammatesBaseFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        toggleToolbar(showsToolBar());
+        toggleFab(showsFab());
+        toggleBottombar(showsBottomNav());
     }
 
     @Override
@@ -127,6 +118,34 @@ public class TeammatesBaseFragment extends BaseFragment {
             setSharedElementEnterTransition(baseSharedTransition);
             setSharedElementReturnTransition(baseSharedTransition);
         }
+    }
+
+    public boolean drawsBehindStatusBar() {
+        return false;
+    }
+
+    protected boolean showsFab() {
+        return false;
+    }
+
+    protected boolean showsToolBar() {
+        return true;
+    }
+
+    protected boolean showsBottomNav() {
+        return true;
+    }
+
+    protected void toggleFab(boolean show) {
+        ((TeammatesBaseActivity) getActivity()).toggleFab(show);
+    }
+
+    private void toggleToolbar(boolean show) {
+        ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
+    }
+
+    private void toggleBottombar(boolean show) {
+        ((TeammatesBaseActivity) getActivity()).toggleBottombar(show);
     }
 
     public static android.transition.Transition getTransition() {

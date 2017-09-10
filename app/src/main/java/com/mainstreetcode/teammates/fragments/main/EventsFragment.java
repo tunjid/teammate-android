@@ -67,7 +67,6 @@ public final class EventsFragment extends MainActivityFragment
         FloatingActionButton fab = getFab();
         fab.setImageResource(R.drawable.ic_add_white_24dp);
         fab.setOnClickListener(this);
-        toggleFab(true);
         setToolbarTitle(getString(R.string.my_events));
 
         String userId = userViewModel.getCurrentUser().getId();
@@ -78,6 +77,11 @@ public final class EventsFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return true;
     }
 
     @Override

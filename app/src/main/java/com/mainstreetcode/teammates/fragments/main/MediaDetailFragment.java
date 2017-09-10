@@ -73,20 +73,35 @@ public class MediaDetailFragment extends MainActivityFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        toggleToolbar(false);
-        toggleBottombar(false);
     }
-
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        toggleToolbar(true);
-        toggleBottombar(true);
 
         if (mediaViewHolder != null) mediaViewHolder.unBind();
 
         mediaViewHolder = null;
+    }
+
+    @Override
+    public boolean drawsBehindStatusBar() {
+        return true;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
+    }
+
+    @Override
+    protected boolean showsBottomNav() {
+        return false;
+    }
+
+    @Override
+    protected boolean showsToolBar() {
+        return false;
     }
 
     private void bindViewHolder(ConstraintLayout rootView, Media media, boolean isImage) {

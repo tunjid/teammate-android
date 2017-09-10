@@ -84,7 +84,6 @@ public final class TeamsFragment extends MainActivityFragment
         fab.setImageResource(R.drawable.ic_add_white_24dp);
         fab.setOnClickListener(this);
 
-        toggleFab(requestCode == 0);
         setToolbarTitle(getString(requestCode == R.id.request_event_team_pick
                 || requestCode == R.id.request_media_team_pick
                 ? R.string.pick_team
@@ -113,6 +112,11 @@ public final class TeamsFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return getTargetRequestCode() == 0;
     }
 
     @Override

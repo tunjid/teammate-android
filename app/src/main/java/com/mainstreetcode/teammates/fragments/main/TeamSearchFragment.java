@@ -97,7 +97,6 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        toggleFab(false);
         setToolbarTitle(getString(R.string.team_search));
 
         disposables.add(teamViewModel.findTeams("").subscribe(teamConsumer, searchErroHandler));
@@ -108,6 +107,11 @@ public final class TeamSearchFragment extends MainActivityFragment
         super.onDestroyView();
         createTeam = null;
         recyclerView = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
     }
 
     @Override

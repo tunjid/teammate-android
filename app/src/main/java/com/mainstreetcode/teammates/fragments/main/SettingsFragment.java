@@ -52,8 +52,6 @@ public final class SettingsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        toggleFab(false);
         setToolbarTitle(getString(R.string.settings));
     }
 
@@ -61,6 +59,11 @@ public final class SettingsFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
 
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return false;
     }
 
     @Override

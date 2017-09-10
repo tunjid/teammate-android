@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,10 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.fragments.main.EventEditFragment;
-import com.mainstreetcode.teammates.fragments.main.MediaDetailFragment;
-import com.mainstreetcode.teammates.fragments.main.RoleEditFragment;
-import com.mainstreetcode.teammates.fragments.main.TeamEditFragment;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
@@ -40,14 +37,17 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private Toolbar toolbar;
     private FloatingActionButton fab;
 
+    @Nullable
     private ViewHider fabHider;
+    @Nullable
     private ViewHider toolbarHider;
+    @Nullable
     private ViewHider bottombarHider;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
-            boolean isFullscreenFragment = isFullscreenFragment(f.getTag());
+            boolean isFullscreenFragment = isFullscreenFragment(f);
 
 //            TransitionManager.beginDelayedTransition((ViewGroup)toolbar.getParent(), new AutoTransition());
             ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
@@ -74,12 +74,16 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressLint("WrongViewCast")
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
+
+        insetView = findViewById(R.id.inset_view);
         toolbar = findViewById(R.id.toolbar);
         fab = findViewById(R.id.fab);
-        insetView = findViewById(R.id.inset_view);
-        toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
-        bottombarHider = new ViewHider(findViewById(R.id.bottom_navigation), ViewHider.BOTTOM);
-        fabHider = new ViewHider(fab, ViewHider.BOTTOM);
+
+        View bottomBar = findViewById(R.id.bottom_navigation);
+
+        if (toolbar != null) toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
+        if (fab != null) fabHider = new ViewHider(fab, ViewHider.BOTTOM);
+        if (bottomBar != null) bottombarHider = new ViewHider(bottomBar, ViewHider.BOTTOM);
 
         setSupportActionBar(toolbar);
 
@@ -92,16 +96,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     public void toggleToolbar(boolean show) {
+        if (toolbarHider == null) return;
         if (show) toolbarHider.show();
         else toolbarHider.hide();
     }
 
     public void toggleBottombar(boolean show) {
+        if (bottombarHider == null) return;
         if (show) bottombarHider.show();
         else bottombarHider.hide();
     }
 
     public void toggleFab(boolean show) {
+        if (fabHider == null) return;
         if (show) fabHider.show();
         else fabHider.hide();
     }
@@ -127,11 +134,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return insets;
     }
 
-    protected boolean isFullscreenFragment(String tag) {
-        return tag.contains(RoleEditFragment.class.getSimpleName())
-                || tag.contains(TeamEditFragment.class.getSimpleName())
-                || tag.contains(EventEditFragment.class.getSimpleName())
-                || tag.contains(MediaDetailFragment.class.getSimpleName());
+    protected boolean isFullscreenFragment(Fragment fragment) {
+        return fragment instanceof TeammatesBaseFragment
+                && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
     }
 
     private WindowInsetsCompat consumeFragmentInsets(View view, WindowInsetsCompat insets) {
@@ -139,7 +144,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         int padding = insets.getSystemWindowInsetBottom();
 
-        if (fragment instanceof MainActivityFragment && padding != 0) padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+        if (fragment instanceof MainActivityFragment && padding != 0)
+            padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), padding);
 

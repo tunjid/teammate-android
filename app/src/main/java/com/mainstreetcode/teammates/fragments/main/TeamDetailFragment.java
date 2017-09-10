@@ -92,7 +92,6 @@ public class TeamDetailFragment extends MainActivityFragment
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
-        toggleFab(false);
         updateCurrentRole();
 
         disposables.add(teamViewModel.getTeam(team).subscribe(
@@ -133,7 +132,11 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
-        toggleFab(false);
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return true;
     }
 
     @Override

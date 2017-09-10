@@ -66,7 +66,6 @@ public final class SignInFragment extends RegistrationActivityFragment
         fab.setImageResource(R.drawable.ic_check_white_24dp);
         fab.setOnClickListener(this);
 
-        toggleFab(true);
         setToolbarTitle(getString(R.string.sign_in));
     }
 
@@ -75,6 +74,11 @@ public final class SignInFragment extends RegistrationActivityFragment
         super.onDestroyView();
         emailInput = null;
         passwordInput = null;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return true;
     }
 
     @Nullable

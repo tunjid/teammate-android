@@ -26,10 +26,6 @@ public class RegistrationActivity extends TeammatesBaseActivity {
         }
     }
 
-    protected boolean isFullscreenFragment(String tag) {
-        return tag != null && tag.contains(SplashFragment.class.getSimpleName());
-    }
-
     public static void startMainActivity(Activity activity) {
         Intent main = new Intent(activity, MainActivity.class);
         activity.startActivity(main);

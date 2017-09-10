@@ -117,7 +117,6 @@ public class EventEditFragment extends MainActivityFragment
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
         fab.setImageResource(R.drawable.ic_check_white_24dp);
-        toggleFab(true);
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 
         User user = userViewModel.getCurrentUser();
@@ -136,13 +135,22 @@ public class EventEditFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
-        toggleFab(false);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         ImageWorkerFragment.detach(this);
+    }
+
+    @Override
+    public boolean drawsBehindStatusBar() {
+        return true;
+    }
+
+    @Override
+    protected boolean showsFab() {
+        return true;
     }
 
     @Override
