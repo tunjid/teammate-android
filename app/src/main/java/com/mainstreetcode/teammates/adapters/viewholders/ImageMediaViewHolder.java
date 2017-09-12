@@ -8,7 +8,6 @@ import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.model.Media;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -30,17 +29,17 @@ public class ImageMediaViewHolder extends MediaViewHolder {
     public void bind(Media media) {
         super.bind(media);
 
-        displayImage(media.getThumbnail());
+        displayImage(media.getThumbnail(), false);
     }
 
     @Override
     public void fullBind(Media media) {
-        super.fullBind(media);
+        super.bind(media);
 
-        displayImage(media.getUrl());
+        displayImage(media.getUrl(), true);
     }
 
-    private void displayImage(String url) {
+    private void displayImage(String url, boolean includeBackground) {
 
         if (TextUtils.isEmpty(url)) return;
 
@@ -49,10 +48,11 @@ public class ImageMediaViewHolder extends MediaViewHolder {
                 .fit()
                 .centerInside();
 
-        Callback callBack = PicassoPalette.with(url, thumbnail)
+        PicassoPalette callBack = PicassoPalette.with(url, thumbnail)
                 .use(PicassoPalette.Profile.MUTED_DARK)
-                .intoBackground(itemView)
                 .intoBackground(thumbnail);
+
+        if (includeBackground) callBack.intoBackground(itemView);
 
         requestCreator.into(thumbnail, callBack);
     }

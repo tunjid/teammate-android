@@ -1,7 +1,10 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.support.transition.Fade;
+import android.support.transition.TransitionManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.devbrackets.android.exomedia.ui.widget.VideoView;
 import com.mainstreetcode.teammates.R;
@@ -19,6 +22,7 @@ public class VideoMediaViewHolder extends MediaViewHolder {
         videoView = itemView.findViewById(R.id.video_thumbnail);
 
         if (adapterListener != null) {
+            thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
             videoView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
         }
     }
@@ -35,30 +39,36 @@ public class VideoMediaViewHolder extends MediaViewHolder {
                 .load(thumbnail)
                 .fit()
                 .centerInside()
-                .into(videoView.getPreviewImageView());
+                .into(thumbnailView);
     }
 
     @Override
     public void fullBind(Media media) {
         super.fullBind(media);
 
+        itemView.setBackgroundResource(R.color.black);
+
         String videoUrl = media.getUrl();
 
         if (TextUtils.isEmpty(videoUrl)) return;
 
         videoView.setVideoPath(videoUrl);
-        videoView.setOnPreparedListener(() -> videoView.start());
+        videoView.setOnPreparedListener(() -> {
+            TransitionManager.beginDelayedTransition((ViewGroup)itemView, new Fade());
+            videoView.setVisibility(View.VISIBLE);
+            videoView.start();
+        });
     }
 
     @Override
     public void unBind() {
         super.unBind();
-
+        videoView.setVisibility(View.INVISIBLE);
         videoView.release();
     }
 
     @Override
     public int getThumbnailId() {
-        return R.id.video_thumbnail;
+        return R.id.thumbnail;
     }
 }
