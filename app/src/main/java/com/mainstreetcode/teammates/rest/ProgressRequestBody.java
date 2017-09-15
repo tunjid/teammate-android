@@ -22,7 +22,7 @@ public class ProgressRequestBody extends RequestBody {
 
     private final File file;
     private final MediaType mediaType;
-    private final PublishProcessor<Float> floatPublishSubject = PublishProcessor.create();
+    private final PublishProcessor<Integer> floatPublishSubject = PublishProcessor.create();
 
     public ProgressRequestBody(File file, int numWriteToCallsToIgnore, MediaType mediaType) {
         this.file = file;
@@ -30,7 +30,7 @@ public class ProgressRequestBody extends RequestBody {
         this.mediaType = mediaType;
     }
 
-    public Flowable<Float> getProgressSubject() {
+    public Flowable<Integer> getProgressSubject() {
         return floatPublishSubject;
     }
 
@@ -75,7 +75,7 @@ public class ProgressRequestBody extends RequestBody {
                 if (currentProgress - overallProgress <= 1) continue;
 
                 // publish progress
-                floatPublishSubject.onNext(currentProgress);
+                floatPublishSubject.onNext((int) currentProgress);
                 overallProgress = currentProgress;
             }
 

@@ -9,27 +9,43 @@
         android:id="@+id/chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/input"
+        android:paddingBottom="@dimen/half_margin"
+        app:layout_constraintBottom_toTopOf="@+id/footer_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
+        android:id="@+id/footer_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/input" />
+        app:layout_constraintTop_toTopOf="@+id/top_padding" />
+
+    <View
+        android:id="@+id/top_padding"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/half_margin"
+        app:layout_constraintBottom_toTopOf="@+id/input"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <EditText
         android:id="@+id/input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/half_margin"
+        android:layout_marginLeft="@dimen/single_margin"
+        android:background="@drawable/bg_chat_box"
         android:gravity="left"
         android:hint="@string/message_hint"
-        android:padding="@dimen/single_margin"
+        android:paddingBottom="@dimen/half_margin"
+        android:paddingLeft="@dimen/single_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:paddingTop="@dimen/half_margin"
         android:textColor="@color/dark_grey"
         android:textColorHighlight="@color/dark_grey"
         android:textSize="@dimen/small_text"
@@ -40,11 +56,12 @@
     <ImageView
         android:id="@+id/send"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:padding="@dimen/single_margin"
         android:tint="@color/dark_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/input"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/footer_background"
         app:srcCompat="@drawable/ic_send_black_24dp" />
 </android.support.constraint.ConstraintLayout>

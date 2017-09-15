@@ -75,7 +75,7 @@ public abstract class ModelRespository<T extends Model<T>> {
     }
 
     @Nullable
-    static MultipartBody.Part getBody(String path, String photokey) {
+    MultipartBody.Part getBody(String path, String photokey) {
         File file = new File(path);
 
         if (!file.exists()) return null;
