@@ -130,5 +130,5 @@
     <!--MediaFragment-->
     <string name="meda_title">Media for %1$s</string>
     <string name="uploading_media">Uploading files</string>
-    <string name="upload_progress_status">$1$d of %2$d. %3$d failed.</string>
+    <string name="upload_progress_status">%1$d of %2$d. %3$d failed.</string>
 </resources>

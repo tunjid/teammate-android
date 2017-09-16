@@ -117,7 +117,7 @@ public class MediaRepository extends ModelRespository<Media> {
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
         if (type == null) return null;
-        RequestBody requestBody = new ProgressRequestBody(file, 2, MediaType.parse(type));
+        RequestBody requestBody = new ProgressRequestBody(file, 1, MediaType.parse(type));
 
         return MultipartBody.Part.createFormData(photokey, file.getName(), requestBody);
     }

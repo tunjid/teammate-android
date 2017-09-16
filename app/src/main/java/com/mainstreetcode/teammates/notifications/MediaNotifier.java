@@ -50,7 +50,7 @@ public class MediaNotifier extends Notifier<Event> {
                     }
                 });
 
-        progressRequestBody.getProgressSubject().subscribe(this::updateProgress, ErrorHandler.EMPTY);
+        progressRequestBody.getProgressSubject().subscribe(this::updateProgress, ErrorHandler.EMPTY, () -> updateProgress(100));
 
         return mediaSingle;
     }

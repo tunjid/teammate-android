@@ -10,6 +10,7 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.MediaRepository;
 import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,10 +45,10 @@ public class MediaUploadIntentService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionUpload(Context context, String teamId, List<Uri> mediaUris) {
+    public static void startActionUpload(Context context, Team team, List<Uri> mediaUris) {
         Intent intent = new Intent(context, MediaUploadIntentService.class);
         intent.setAction(ACTION_UPLOAD);
-        intent.putExtra(EXTRA_PARAM1, teamId);
+        intent.putExtra(EXTRA_PARAM1, team);
         intent.putParcelableArrayListExtra(EXTRA_PARAM2, new ArrayList<>(mediaUris));
         context.startService(intent);
     }
@@ -72,9 +73,9 @@ public class MediaUploadIntentService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_UPLOAD.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
+                final Team team = intent.getParcelableExtra(EXTRA_PARAM1);
                 final List<Uri> param2 = intent.getParcelableArrayListExtra(EXTRA_PARAM2);
-                handleActionUpload(param1, param2);
+                handleActionUpload(team, param2);
             }
             else if (ACTION_BAZ.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_PARAM1);
@@ -88,14 +89,14 @@ public class MediaUploadIntentService extends IntentService {
      * Handle action Upload in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionUpload(String teamId, List<Uri> mediaUris) {
+    private void handleActionUpload(Team team, List<Uri> mediaUris) {
         ModelRespository<Media> respository = MediaRepository.getInstance();
 
         for (Uri uri : mediaUris) {
-            Media media = new Media("", new File(uri.toString()).toString(),
-                    "", "", User.empty(), Team.empty(), new Date());
+            Media media = new Media("", new File(uri.getPath()).toString(),
+                    "", "", User.empty(), team, new Date());
 
-            respository.createOrUpdate(media);
+            respository.createOrUpdate(media).subscribe(media1 -> {}, ErrorHandler.EMPTY);
         }
     }
 

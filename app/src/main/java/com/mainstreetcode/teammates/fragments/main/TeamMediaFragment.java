@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
@@ -13,19 +14,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mainstreetcode.teammates.MediaUploadIntentService;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamMediaPickerFragment;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class TeamMediaFragment extends MainActivityFragment {
+public class TeamMediaFragment extends MainActivityFragment
+        implements ImageWorkerFragment.CropListener {
 
     private static final String ARG_TEAM = "team";
 
@@ -57,6 +62,8 @@ public class TeamMediaFragment extends MainActivityFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
+
+        ImageWorkerFragment.attach(this);
     }
 
     @Nullable
@@ -88,6 +95,7 @@ public class TeamMediaFragment extends MainActivityFragment {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
 
+        getFab().setOnClickListener(view -> ImageWorkerFragment.requestCrop(this));
         disposables.add(mediaViewModel.getTeamMedia(team).subscribe(newList -> {
             mediaList.clear();
             mediaList.addAll(newList);
@@ -103,7 +111,7 @@ public class TeamMediaFragment extends MainActivityFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_pick_team:
                 TeamMediaPickerFragment.pick(getActivity());
                 return true;
@@ -119,7 +127,7 @@ public class TeamMediaFragment extends MainActivityFragment {
 
     @Override
     protected boolean showsFab() {
-        return false;
+        return true;
     }
 
     @Override
@@ -143,5 +151,10 @@ public class TeamMediaFragment extends MainActivityFragment {
                     .addSharedElement(holder.thumbnailView, holder.media.hashCode() + "-" + holder.thumbnailView.getId());
         }
         return null;
+    }
+
+    @Override
+    public void onImageCropped(Uri uri) {
+        MediaUploadIntentService.startActionUpload(getContext(), team, Collections.singletonList(uri));
     }
 }
