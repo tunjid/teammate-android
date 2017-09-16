@@ -74,7 +74,7 @@ public class TeamEditFragment extends MainActivityFragment
         team = getArguments().getParcelable(ARG_TEAM);
 
         ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
-        fragment.setTargetFragment(this, ImageWorkerFragment.GALLERY_CHOOSER);
+        fragment.setTargetFragment(this, ImageWorkerFragment.CROP_CHOOSER);
 
         ImageWorkerFragment.attach(this);
     }

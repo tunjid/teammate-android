@@ -26,11 +26,10 @@ import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TeamMediaFragment extends MainActivityFragment
-        implements ImageWorkerFragment.CropListener {
+        implements ImageWorkerFragment.MediaListener {
 
     private static final String ARG_TEAM = "team";
 
@@ -95,7 +94,8 @@ public class TeamMediaFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
 
-        getFab().setOnClickListener(view -> ImageWorkerFragment.requestCrop(this));
+        getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
+
         disposables.add(mediaViewModel.getTeamMedia(team).subscribe(newList -> {
             mediaList.clear();
             mediaList.addAll(newList);
@@ -154,7 +154,8 @@ public class TeamMediaFragment extends MainActivityFragment
     }
 
     @Override
-    public void onImageCropped(Uri uri) {
-        MediaUploadIntentService.startActionUpload(getContext(), team, Collections.singletonList(uri));
+    public void onFilesSelected(List<Uri> uris) {
+        MediaUploadIntentService.startActionUpload(getContext(), team, uris);
     }
+
 }

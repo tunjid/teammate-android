@@ -68,7 +68,7 @@ public class RoleEditFragment extends MainActivityFragment
         role = getArguments().getParcelable(ARG_ROLE);
 
         ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
-        fragment.setTargetFragment(this, ImageWorkerFragment.GALLERY_CHOOSER);
+        fragment.setTargetFragment(this, ImageWorkerFragment.CROP_CHOOSER);
 
         ImageWorkerFragment.attach(this);
     }
