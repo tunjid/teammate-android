@@ -22,6 +22,7 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
 
     public void bind(Media media) {
         this.media = media;
+        ViewCompat.setTransitionName(itemView, media.hashCode() + "-" + itemView.getId());
         ViewCompat.setTransitionName(thumbnailView, media.hashCode() + "-" + thumbnailView.getId());
     }
 

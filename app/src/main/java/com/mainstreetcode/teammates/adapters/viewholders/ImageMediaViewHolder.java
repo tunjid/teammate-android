@@ -8,20 +8,30 @@ import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.model.Media;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
+import static com.github.florent37.picassopalette.PicassoPalette.Profile.MUTED_DARK;
 
-public class ImageMediaViewHolder extends MediaViewHolder {
 
-    private ImageView thumbnail;
+public class ImageMediaViewHolder extends MediaViewHolder
+        implements Callback {
+
+    private static final int FULL_RES_LOAD_DELAY = 400;
+    private static final int THUMBNAIL_SIZE = 200;
+
+    private final boolean isFullScreen;
+    private ImageView fullResView;
 
     public ImageMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
-        thumbnail = itemView.findViewById(R.id.image_thumbnail);
+        isFullScreen = adapterListener == null;
 
-        if (adapterListener != null) {
-            thumbnail.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        fullResView = itemView.findViewById(R.id.image_full_res);
+
+        if (!isFullScreen) {
+            thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
         }
     }
 
@@ -29,36 +39,45 @@ public class ImageMediaViewHolder extends MediaViewHolder {
     public void bind(Media media) {
         super.bind(media);
 
-        displayImage(media.getThumbnail(), false);
+        loadImage(media.getThumbnail(), false, thumbnailView);
     }
 
     @Override
     public void fullBind(Media media) {
-        super.bind(media);
-
-        displayImage(media.getUrl(), true);
+        super.fullBind(media);
+        itemView.postDelayed(() -> loadImage(media.getUrl(), true, fullResView), FULL_RES_LOAD_DELAY);
     }
 
-    private void displayImage(String url, boolean includeBackground) {
+    private void loadImage(String url, boolean fitToSize, ImageView destination) {
 
         if (TextUtils.isEmpty(url)) return;
 
-        RequestCreator requestCreator = Picasso.with(itemView.getContext())
-                .load(url)
-                .fit()
-                .centerInside();
+        RequestCreator creator = Picasso.with(itemView.getContext()).load(url);
 
-        PicassoPalette callBack = PicassoPalette.with(url, thumbnail)
-                .use(PicassoPalette.Profile.MUTED_DARK)
-                .intoBackground(thumbnail);
+        creator = fitToSize ? creator.fit() : creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        creator = creator.centerInside();
 
-        if (includeBackground) callBack.intoBackground(itemView);
+        Callback callBack = isFullScreen && fitToSize
+                ? this
+                : isFullScreen
+                ? PicassoPalette.with(url, destination).use(MUTED_DARK).intoBackground(itemView)
+                : PicassoPalette.with(url, destination).use(MUTED_DARK).intoBackground(thumbnailView);
 
-        requestCreator.into(thumbnail, callBack);
+        creator.into(destination, callBack);
     }
 
     @Override
     public int getThumbnailId() {
         return R.id.image_thumbnail;
+    }
+
+    @Override
+    public void onSuccess() {
+        fullResView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onError() {
+
     }
 }

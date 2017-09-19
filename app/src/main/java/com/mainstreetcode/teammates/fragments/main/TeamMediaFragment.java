@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,9 +24,11 @@ import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamMediaPickerFragment;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TeamMediaFragment extends MainActivityFragment
@@ -76,15 +79,20 @@ public class TeamMediaFragment extends MainActivityFragment
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(new MediaAdapter(mediaList, media -> showFragment(MediaDetailFragment.newInstance(media))));
-//        recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
-//            @Override
-//            public void onLoadMore(int oldCount) {
-//                toggleProgress(true);
-//                disposables.add(teamChatViewModel
-//                        .fetchOlderChats(team)
-//                        .subscribe(showProgress -> onChatsUpdated(showProgress, oldCount), defaultErrorHandler));
-//            }
-//        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (Math.abs(dy) < 3) return;
+                toggleFab(dy < 0);
+            }
+        });
+        recyclerView.addOnScrollListener(new EndlessScroller(layoutManager) {
+            @Override
+            public void onLoadMore(int oldCount) {
+                toggleProgress(true);
+                fetchMedia();
+            }
+        });
 
         return rootView;
     }
@@ -95,13 +103,11 @@ public class TeamMediaFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
 
         getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
+        fetchMedia();
+    }
 
-        disposables.add(mediaViewModel.getTeamMedia(team).subscribe(newList -> {
-            mediaList.clear();
-            mediaList.addAll(newList);
-            recyclerView.getAdapter().notifyDataSetChanged();
-            toggleProgress(false);
-        }, defaultErrorHandler));
+    void fetchMedia() {
+        disposables.add(mediaViewModel.getTeamMedia(mediaList, team, getQueryDate()).subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -148,6 +154,7 @@ public class TeamMediaFragment extends MainActivityFragment
             return getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
+                    .addSharedElement(holder.itemView, holder.media.hashCode() + "-" + holder.itemView.getId())
                     .addSharedElement(holder.thumbnailView, holder.media.hashCode() + "-" + holder.thumbnailView.getId());
         }
         return null;
@@ -158,4 +165,12 @@ public class TeamMediaFragment extends MainActivityFragment
         MediaUploadIntentService.startActionUpload(getContext(), team, uris);
     }
 
+    private Date getQueryDate() {
+        return mediaList.isEmpty() ? new Date() : mediaList.get(mediaList.size() - 1).getCreated();
+    }
+
+    private void onMediaUpdated(DiffUtil.DiffResult result) {
+        result.dispatchUpdatesTo(recyclerView.getAdapter());
+        toggleProgress(false);
+    }
 }
