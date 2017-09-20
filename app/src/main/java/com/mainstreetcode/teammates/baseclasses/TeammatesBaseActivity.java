@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.baseclasses;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -18,8 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.util.FabIconAnimator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
+
+import static android.view.View.*;
 
 /**
  * Base Activity for the app
@@ -43,6 +47,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ViewHider toolbarHider;
     @Nullable
     private ViewHider bottombarHider;
+    @Nullable
+    private FabIconAnimator fabIconAnimator;
+
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -52,7 +59,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 //            TransitionManager.beginDelayedTransition((ViewGroup)toolbar.getParent(), new AutoTransition());
             ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
             params.topMargin = isFullscreenFragment ? insetHeight : 0;
-            insetView.setVisibility(isFullscreenFragment ? View.GONE : View.VISIBLE);
+            insetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimaryDark;
@@ -82,15 +89,17 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         View bottomBar = findViewById(R.id.bottom_navigation);
 
         if (toolbar != null) toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
-        if (fab != null) fabHider = new ViewHider(fab, ViewHider.BOTTOM);
         if (bottomBar != null) bottombarHider = new ViewHider(bottomBar, ViewHider.BOTTOM);
+        if (fab != null) {
+            fabHider = new ViewHider(fab, ViewHider.BOTTOM);
+            fabIconAnimator = new FabIconAnimator(fab);
+        }
 
         setSupportActionBar(toolbar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.content_view), this);
         }
     }
@@ -111,6 +120,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (fabHider == null) return;
         if (show) fabHider.show();
         else fabHider.hide();
+    }
+
+    public void setFabIcon(@DrawableRes int icon) {
+        if (fabIconAnimator == null) return;
+        fabIconAnimator.setCurrentIcon(icon);
     }
 
     public void setToolbarTitle(CharSequence charSequence) {

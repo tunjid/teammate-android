@@ -81,7 +81,7 @@ public final class TeamsFragment extends MainActivityFragment
 
         int requestCode = getTargetRequestCode();
         FloatingActionButton fab = getFab();
-        fab.setImageResource(R.drawable.ic_add_white_24dp);
+        setFabIcon(R.drawable.ic_add_white_24dp);
         fab.setOnClickListener(this);
 
         setToolbarTitle(getString(requestCode == R.id.request_event_team_pick

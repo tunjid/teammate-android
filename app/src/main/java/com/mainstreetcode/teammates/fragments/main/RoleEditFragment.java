@@ -108,7 +108,7 @@ public class RoleEditFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        fab.setImageResource(R.drawable.ic_check_white_24dp);
+        setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.edit_user));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {

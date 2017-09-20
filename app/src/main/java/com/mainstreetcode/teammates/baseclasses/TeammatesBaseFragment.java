@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -137,6 +138,10 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     protected boolean showsBottomNav() {
         return true;
+    }
+
+    protected void setFabIcon(@DrawableRes int icon) {
+        ((TeammatesBaseActivity) getActivity()).setFabIcon(icon);
     }
 
     protected void toggleFab(boolean show) {

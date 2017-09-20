@@ -68,7 +68,7 @@ public class SignUpFragment extends RegistrationActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
-        fab.setImageResource(R.drawable.ic_check_white_24dp);
+        setFabIcon(R.drawable.ic_check_white_24dp);
         fab.setOnClickListener(this);
 
         setToolbarTitle(getString(R.string.sign_up));

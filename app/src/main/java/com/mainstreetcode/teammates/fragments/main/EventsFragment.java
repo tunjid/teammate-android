@@ -65,7 +65,7 @@ public final class EventsFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
-        fab.setImageResource(R.drawable.ic_add_white_24dp);
+        setFabIcon(R.drawable.ic_add_white_24dp);
         fab.setOnClickListener(this);
         setToolbarTitle(getString(R.string.my_events));
 

@@ -107,7 +107,7 @@ public class TeamEditFragment extends MainActivityFragment
         boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        fab.setImageResource(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
+        setFabIcon(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
         setToolbarTitle(getString(!isEditable
                 ? R.string.join_team
                 : team.isEmpty()

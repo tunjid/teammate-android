@@ -91,6 +91,7 @@ public class TeamDetailFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
+        setFabIcon(R.drawable.ic_group_add_white_24dp);
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
 
@@ -168,21 +169,10 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (currentRole == null) {
-                    String roleName = team.get(Team.ROLE_POSITION).getValue();
-
-                    User user = userViewModel.getCurrentUser();
-                    JoinRequest request = JoinRequest.create(false, true, roleName, team.getId(), user);
-                    disposables.add(roleViewModel.joinTeam(request)
-                            .subscribe(joinRequest -> showSnackbar(getString(R.string.team_submitted_join_request)),
-                                    defaultErrorHandler));
-                }
-                else {
-                    disposables.add(teamViewModel.createOrUpdate(team)
-                            .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())),
-                                    defaultErrorHandler)
-                    );
-                }
+                View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_invite_user, null);
+                new AlertDialog.Builder(getContext()).setTitle("")
+                        .setView(dialogView)
+                        .show();
                 break;
         }
     }
