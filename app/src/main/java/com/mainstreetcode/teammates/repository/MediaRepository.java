@@ -100,8 +100,8 @@ public class MediaRepository extends ModelRespository<Media> {
     }
 
     public Flowable<List<Media>> getTeamMedia(Team team, Date date) {
-        Maybe<List<Media>> local = mediaDao.getTeamMedia(team).subscribeOn(io());
-        Maybe<List<Media>> remote = api.getTeamMedia(team.getId(), date).toMaybe();
+        Maybe<List<Media>> local = mediaDao.getTeamMedia(team, date).subscribeOn(io());
+        Maybe<List<Media>> remote = api.getTeamMedia(team.getId(), date).map(getSaveManyFunction()).toMaybe();
 
         return cacheThenRemote(local, remote);
     }

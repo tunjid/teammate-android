@@ -56,10 +56,15 @@ public class MediaNotifier extends Notifier<Event> {
     }
 
     private void updateProgress(int percentage) {
+        boolean isComplete = percentage == 100;
+        String text = isComplete
+                ? app.getString(R.string.upload_complete_status, numFailed)
+                : app.getString(R.string.upload_progress_status, numAttempted, uploadsInProgress, numFailed);
+
         Notification notification = new NotificationCompat.Builder(app, "")
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(app.getString(R.string.uploading_media))
-                .setContentText(app.getString(R.string.upload_progress_status, numAttempted, uploadsInProgress, numFailed))
+                .setContentTitle(app.getString(isComplete ? R.string.upload_complete : R.string.uploading_media))
+                .setContentText(text)
                 .setProgress(100, percentage, false)
                 .build();
 

@@ -30,7 +30,8 @@ public abstract class TeamChatDao extends EntityDao<TeamChat> {
 
     @Query("SELECT * FROM team_chats" +
             " WHERE parent_chat_room_id = :chatRoomId" +
-            " AND team_chat_created < :date")
+            " AND team_chat_created < :date" +
+            " LIMIT 20")
     public abstract Maybe<List<TeamChat>> chatsBefore(String chatRoomId, Date date);
 
     @Query("SELECT * FROM team_chats" +

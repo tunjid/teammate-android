@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -45,6 +46,8 @@ public abstract class MediaDao extends EntityDao<Media> {
 
     @Query("SELECT *" +
             " FROM team_media" +
-            " WHERE :team = media_team")
-    public abstract Maybe<List<Media>> getTeamMedia(Team team);
+            " WHERE :team = media_team" +
+            " AND media_created < :date" +
+            " LIMIT 20")
+    public abstract Maybe<List<Media>> getTeamMedia(Team team, Date date);
 }
