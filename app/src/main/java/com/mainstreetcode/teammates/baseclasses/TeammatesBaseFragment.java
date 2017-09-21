@@ -20,6 +20,7 @@ import android.view.View;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.LoadingSnackbar;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -32,6 +33,8 @@ import io.reactivex.functions.Consumer;
  */
 
 public class TeammatesBaseFragment extends BaseFragment {
+
+    protected static final Validator validator = new Validator();
 
     private LoadingSnackbar loadingSnackbar;
     protected CompositeDisposable disposables = new CompositeDisposable();
@@ -78,9 +81,8 @@ public class TeammatesBaseFragment extends BaseFragment {
     public void onDestroyView() {
         getFab().setOnClickListener(null);
 
-        if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) {
-            loadingSnackbar.dismiss();
-        }
+        if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) loadingSnackbar.dismiss();
+
         loadingSnackbar = null;
         disposables.clear();
         super.onDestroyView();
@@ -89,7 +91,7 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected void toggleProgress(boolean show) {
         if (getView() == null) return;
 
-        View coordinator  = getActivity().findViewById(R.id.coordinator);
+        View coordinator = getActivity().findViewById(R.id.coordinator);
 
         if (show && loadingSnackbar != null && loadingSnackbar.isShown()) return;
 

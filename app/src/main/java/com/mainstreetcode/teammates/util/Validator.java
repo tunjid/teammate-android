@@ -26,7 +26,7 @@ public class Validator {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public boolean isValidName(CharSequence name) {
+    public boolean isNotEmpty(CharSequence name) {
         return !TextUtils.isEmpty(name);
     }
 
@@ -42,8 +42,8 @@ public class Validator {
         return isValid;
     }
 
-    public boolean isValidName(EditText editText) {
-        boolean isValid = isValidName(editText.getText());
+    public boolean isNotEmpty(EditText editText) {
+        boolean isValid = isNotEmpty(editText.getText());
         if (!isValid) editText.setError("Invalid name");
         return isValid;
     }

@@ -108,7 +108,7 @@ public class SignUpFragment extends RegistrationActivityFragment
     }
 
     private void signUp() {
-        if (validator.isValidName(firstNameInput)
+        if (validator.isNotEmpty(firstNameInput)
                 && validator.isValidEmail(emailInput)
                 && validator.isValidPassword(passwordInput)) {
 

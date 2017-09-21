@@ -1,8 +1,11 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,11 +19,18 @@ import android.widget.EditText;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
+import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.ErrorHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Displays a {@link Team team's} {@link User members}.
@@ -34,8 +44,10 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
+
     @Nullable
     private Role currentRole;
+    private final List<String> availableRoles = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
@@ -94,6 +106,11 @@ public class TeamDetailFragment extends MainActivityFragment
         setFabIcon(R.drawable.ic_group_add_white_24dp);
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
+
+        disposables.add(roleViewModel.getRoleValues().subscribe(values -> {
+            availableRoles.clear();
+            availableRoles.addAll(values);
+        }, ErrorHandler.EMPTY));
 
         disposables.add(teamViewModel.getTeam(team).subscribe(
                 updatedTeam -> {
@@ -169,10 +186,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_invite_user, null);
-                new AlertDialog.Builder(getContext()).setTitle("")
-                        .setView(dialogView)
-                        .show();
+                inviteUser();
                 break;
         }
     }
@@ -211,6 +225,44 @@ public class TeamDetailFragment extends MainActivityFragment
         disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId()).subscribe(role -> {
             currentRole = role;
             getActivity().invalidateOptionsMenu();
-        }, error -> {}));
+        }, ErrorHandler.EMPTY));
+    }
+
+    @SuppressLint("InflateParams")
+    private void inviteUser() {
+        Context context = getContext();
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_invite_user, null);
+        View inviteButton = dialogView.findViewById(R.id.invite);
+
+        final EditText firstNameText = dialogView.findViewById(R.id.first_name);
+        final EditText lastNameText = dialogView.findViewById(R.id.last_name);
+        final EditText emailText = dialogView.findViewById(R.id.email);
+        final TextInputLayout roleText = dialogView.findViewById(R.id.input_layout);
+
+        final AtomicReference<String> roleReference = new AtomicReference<>();
+
+        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles);
+        Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, String.class);
+
+        holder.bind(item);
+
+        inviteButton.setOnClickListener(view -> {
+
+            if (!validator.isNotEmpty(firstNameText)
+                    || !validator.isNotEmpty(lastNameText)
+                    || !validator.isValidEmail(emailText)
+                    || !validator.isNotEmpty(roleText.getEditText())) return;
+
+            String firstName = firstNameText.getText().toString();
+            String lastName = lastNameText.getText().toString();
+            String email = emailText.getText().toString();
+
+            JoinRequest joinRequest = JoinRequest.invite(roleReference.get(), team.getId(), firstName, lastName, email);
+
+            disposables.add(roleViewModel.joinTeam(joinRequest)
+                    .subscribe(request -> showSnackbar(getString(R.string.user_invite_sent)), defaultErrorHandler));
+        });
+
+        new AlertDialog.Builder(context).setTitle("").setView(dialogView).show();
     }
 }

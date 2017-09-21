@@ -175,7 +175,7 @@ public class TeamEditFragment extends MainActivityFragment
                                 .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
                         break;
                     case JOINING:
-                        JoinRequest joinRequest = JoinRequest.create(false, true, role, team.getId(), userViewModel.getCurrentUser());
+                        JoinRequest joinRequest = JoinRequest.join(role, team.getId(), userViewModel.getCurrentUser());
                         disposable = roleViewModel.joinTeam(joinRequest)
                                 .subscribe(request -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
                         break;

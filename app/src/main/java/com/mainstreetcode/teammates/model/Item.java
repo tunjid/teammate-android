@@ -30,15 +30,15 @@ public class Item<T> {
     private @Nullable final ValueChangeCallBack changeCallBack;
     private final Class<T> itemizedClass;
 
-    String value;
+    private String value;
 
-    Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-         Class<T> itemizedClass) {
+    public Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+                Class<T> itemizedClass) {
         this(itemType, stringRes, 0, value, changeCallBack, itemizedClass);
     }
 
-    Item(int itemType, int stringRes, int headerStringRes,
-         String value, @Nullable ValueChangeCallBack changeCallBack, Class<T> itemizedClass) {
+    public Item(int itemType, int stringRes, int headerStringRes,
+                String value, @Nullable ValueChangeCallBack changeCallBack, Class<T> itemizedClass) {
         this.itemType = itemType;
         this.stringRes = stringRes;
         this.headerStringRes = headerStringRes;
@@ -67,7 +67,7 @@ public class Item<T> {
     }
 
     // Used to change the value of the Team's fields
-    interface ValueChangeCallBack {
+    public interface ValueChangeCallBack {
         void onValueChanged(String value);
     }
 }

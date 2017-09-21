@@ -27,8 +27,13 @@ public class JoinRequest extends JoinRequestEntity
         Model<JoinRequest>,
         Notifiable<JoinRequest> {
 
-    public static JoinRequest create(boolean teamApproved, boolean userApproved, String roleName, String teamId, User user) {
-        return new JoinRequest(teamApproved, userApproved, "*", roleName, teamId, user);
+    public static JoinRequest join(String roleName, String teamId, User user) {
+        return new JoinRequest(false, true, "", roleName, teamId, user);
+    }
+
+    public static JoinRequest invite(String roleName, String teamId, String firstName, String lastName, String email) {
+        User user = new User("", firstName, lastName, email, "");
+        return new JoinRequest(true, false, "", roleName, teamId, user);
     }
 
     JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, String teamId, User user) {
@@ -94,6 +99,9 @@ public class JoinRequest extends JoinRequestEntity
         private static final String ID_KEY = "_id";
         private static final String NAME_KEY = "roleName";
         private static final String USER_KEY = "user";
+        private static final String USER_FIRST_NAME_KEY = "firstName";
+        private static final String USER_LAST_NAME_KEY = "lastName";
+        private static final String USER_PRIMARY_EMAIL_KEY = "primaryEmail";
         private static final String TEAM_KEY = "team";
         private static final String TEAM_APPROVAL_KEY = "teamApproved";
         private static final String USER_APPROVAL_KEY = "userApproved";
@@ -106,7 +114,17 @@ public class JoinRequest extends JoinRequestEntity
             result.addProperty(TEAM_KEY, src.teamId);
             result.addProperty(TEAM_APPROVAL_KEY, src.teamApproved);
             result.addProperty(USER_APPROVAL_KEY, src.userApproved);
-            result.addProperty(USER_KEY, src.getUser().getId());
+
+            User user = src.user;
+
+            if (src.teamApproved) {
+                result.addProperty(USER_FIRST_NAME_KEY, user.getFirstName());
+                result.addProperty(USER_LAST_NAME_KEY, user.getLastName());
+                result.addProperty(USER_PRIMARY_EMAIL_KEY, user.getPrimaryEmail());
+            }
+            else {
+                result.addProperty(USER_KEY, src.getUser().getId());
+            }
 
             return result;
         }

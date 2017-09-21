@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.InputType;
@@ -22,6 +23,7 @@ public class InputViewHolder extends BaseItemViewHolder
         TextWatcher {
 
     EditText editText;
+    @Nullable
     private TextView headerText;
     private TextInputLayout inputLayout;
 
@@ -50,11 +52,11 @@ public class InputViewHolder extends BaseItemViewHolder
                 ? InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
                 : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
-        if (item.getHeaderStringRes() != 0) {
+        if (item.getHeaderStringRes() != 0 && headerText != null) {
             headerText.setText(item.getHeaderStringRes());
             headerText.setVisibility(View.VISIBLE);
         }
-        else {
+        else if (headerText != null) {
             headerText.setVisibility(View.GONE);
         }
 

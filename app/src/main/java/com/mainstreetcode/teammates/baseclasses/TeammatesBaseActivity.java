@@ -23,7 +23,10 @@ import com.mainstreetcode.teammates.util.FabIconAnimator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
-import static android.view.View.*;
+import static android.view.View.GONE;
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+import static android.view.View.VISIBLE;
 
 /**
  * Base Activity for the app

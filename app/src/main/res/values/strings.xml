@@ -80,6 +80,8 @@
     <string name="team_name_prefix">Team: %1$s</string>
 
     <!--TeamDetailFragment-->
+    <string name="invite">invite</string>
+    <string name="user_invite_sent">Invite sent</string>
     <string name="user_invited">Has been invited as a %1$s</string>
     <string name="user_requests_join">Has requested to join as a %1$s</string>
     <string name="delete_team">Delete team</string>

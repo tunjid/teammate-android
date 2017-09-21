@@ -39,9 +39,8 @@ public class JoinRequestRepository extends ModelRespository<JoinRequest> {
 
     @Override
     public Single<JoinRequest> createOrUpdate(JoinRequest model) {
-        return api.joinTeam(model)
-                .map(localMapper(model))
-                .map(getSaveFunction()).observeOn(mainThread());
+        Single<JoinRequest> call = model.isUserApproved() ? api.joinTeam(model) : api.inviteUser(model);
+        return call.map(localMapper(model)).map(getSaveFunction()).observeOn(mainThread());
     }
 
     @Override
