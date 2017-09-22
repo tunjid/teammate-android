@@ -38,6 +38,7 @@ public class RoleEditFragment extends MainActivityFragment
     private static final String ARG_ROLE = "role";
 
     private Role role;
+    private Role currentRole = Role.empty();
     private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -98,7 +99,7 @@ public class RoleEditFragment extends MainActivityFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         User user = userViewModel.getCurrentUser();
-        if (role.isTeamAdmin() && !role.getUser().equals(user)) {
+        if (currentRole.isTeamAdmin() && !role.getUser().equals(user)) {
             inflater.inflate(R.menu.fragment_user_edit, menu);
         }
     }
@@ -110,6 +111,11 @@ public class RoleEditFragment extends MainActivityFragment
         fab.setOnClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.edit_user));
+
+        User user = userViewModel.getCurrentUser();
+
+        disposables.add(roleViewModel.getRoleInTeam(user.getId(), role.getTeamId())
+                .subscribe(this::onRoleUpdated, defaultErrorHandler));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
             roles.clear();
@@ -189,5 +195,10 @@ public class RoleEditFragment extends MainActivityFragment
     @Override
     public void onImageClick() {
         ImageWorkerFragment.requestCrop(this);
+    }
+
+    private void onRoleUpdated(Role role) {
+        currentRole.update(role);
+        getActivity().invalidateOptionsMenu();
     }
 }
