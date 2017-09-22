@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammates.notifications;
 
 
+import android.text.TextUtils;
+
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.mainstreetcode.teammates.model.User;
@@ -11,16 +13,19 @@ public class TeammatesInstanceIdService extends FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        updateFcmToken();
+    }
 
-        if (refreshedToken == null) return;
+    public static void updateFcmToken() {
+        String token = FirebaseInstanceId.getInstance().getToken();
+        if (TextUtils.isEmpty(token)) return;
 
         UserRepository userRepository = UserRepository.getInstance();
         User user = userRepository.getCurrentUser();
 
         if (user == null) return;
 
-        user.setFcmToken(refreshedToken);
+        user.setFcmToken(token);
 
         userRepository.createOrUpdate(user).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }

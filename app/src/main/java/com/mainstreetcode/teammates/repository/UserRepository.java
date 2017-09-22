@@ -56,7 +56,11 @@ public class UserRepository extends ModelRespository<User> {
 
     @Override
     public Single<User> createOrUpdate(User model) {
-        Single<User> remote = teammateApi.signUp(model).map(getSaveFunction());
+        Single<User> remote = model.isEmpty()
+                ? teammateApi.signUp(model)
+                : teammateApi.updateUser(model.getId(), model);
+
+        remote = remote.map(getSaveFunction());
         return updateCurrent(remote);
     }
 

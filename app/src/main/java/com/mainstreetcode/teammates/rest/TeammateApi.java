@@ -44,6 +44,9 @@ public interface TeammateApi {
     @POST("api/signIn")
     Single<User> signIn(@Body JsonObject request);
 
+    @PUT("api/users/{id}")
+    Single<User> updateUser(@Path("id") String userId, @Body User user);
+
     @GET("api/me")
     Single<User> getMe();
 
