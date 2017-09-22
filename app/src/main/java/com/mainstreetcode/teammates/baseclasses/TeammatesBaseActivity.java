@@ -7,6 +7,9 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.transition.AutoTransition;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -27,6 +30,8 @@ import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
+import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
+import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 
 /**
  * Base Activity for the app
@@ -91,10 +96,14 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         View bottomBar = findViewById(R.id.bottom_navigation);
 
-        if (toolbar != null) toolbarHider = new ViewHider(toolbar, ViewHider.TOP);
-        if (bottomBar != null) bottombarHider = new ViewHider(bottomBar, ViewHider.BOTTOM);
+        if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
+
+        if (bottomBar != null) {
+            bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
+                    .addEndRunnable(this::initTransition).build();
+        }
         if (fab != null) {
-            fabHider = new ViewHider(fab, ViewHider.BOTTOM);
+            fabHider = ViewHider.of(fab).setDirection(BOTTOM).build();
             fabIconAnimator = new FabIconAnimator(fab);
         }
 
@@ -157,6 +166,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     private WindowInsetsCompat consumeFragmentInsets(View view, WindowInsetsCompat insets) {
+        initTransition();
         Fragment fragment = getCurrentFragment();
 
         int padding = insets.getSystemWindowInsetBottom();
@@ -167,5 +177,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), padding);
 
         return insets;
+    }
+
+    private void initTransition() {
+        Transition transition = new AutoTransition();
+        transition.setDuration(200);
+        TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }
 }
