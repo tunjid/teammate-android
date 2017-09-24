@@ -9,10 +9,9 @@ import android.support.v4.app.NotificationCompat;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.repository.TeamChatRepository;
-import com.mainstreetcode.teammates.repository.TeamChatRoomRepository;
+import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
@@ -54,20 +53,19 @@ public class TeamChatNotifier extends Notifier<TeamChat> {
 
     @Override
     protected void handleNotification(FeedItem<TeamChat> item) {
-        TeamChatRoomRepository chatRoomRepository = TeamChatRoomRepository.getInstance();
+        TeamRepository teamRepository = TeamRepository.getInstance();
         TeamChat chat = item.getModel();
-        String roomId = chat.getTeamRoomId();
 
-        chatRoomRepository.get(roomId).firstOrError()
-                .flatMap(chatRoom -> fetchUnreadChats(item, chatRoom))
+        teamRepository.get(chat.getTeam()).firstOrError()
+                .flatMap(team -> fetchUnreadChats(item, team))
                 .map(unreadChats -> buildNotification(item, unreadChats))
                 .subscribe(this::sendNotification, ErrorHandler.EMPTY);
     }
 
-    private Single<List<TeamChat>> fetchUnreadChats(FeedItem<TeamChat> item, TeamChatRoom chatRoom) {
+    private Single<List<TeamChat>> fetchUnreadChats(FeedItem<TeamChat> item, Team team) {
         TeamChatRepository repository = TeamChatRepository.getInstance();
-        sender.update(chatRoom.getTeam());
-        return repository.fetchUnreadChats(item.getModel().getTeamRoomId())
+        sender.update(team);
+        return repository.fetchUnreadChats(item.getModel().getTeam())
                 .subscribeOn(io())
                 .observeOn(mainThread());
     }

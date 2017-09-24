@@ -9,15 +9,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.Media;
-import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +80,6 @@ public class TeammateService {
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(TeamChat.class, new TeamChat.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
-                .registerTypeAdapter(TeamChatRoom.class, new TeamChatRoom.GsonAdapter())
                 .create();
     }
 

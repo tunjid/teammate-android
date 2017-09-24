@@ -10,7 +10,6 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -23,12 +22,12 @@ import java.util.List;
  */
 
 public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
-    private final TeamChatRoom teamChatRoom;
+    private final List<TeamChat> chats;
     private final User signedInUser;
 
-    public TeamChatAdapter(TeamChatRoom teamChatRoom, User signedInUser) {
+    public TeamChatAdapter(List<TeamChat> chats, User signedInUser) {
         //setHasStableIds(true);
-        this.teamChatRoom = teamChatRoom;
+        this.chats = chats;
         this.signedInUser = signedInUser;
     }
 
@@ -43,7 +42,6 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
 
     @Override
     public void onBindViewHolder(TeamChatViewHolder viewHolder, int i) {
-        List<TeamChat> chats = teamChatRoom.getChats();
         int size = chats.size();
 
         TeamChat teamChat = chats.get(i);
@@ -57,11 +55,11 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
 
     @Override
     public int getItemCount() {
-        return teamChatRoom.getChats().size();
+        return chats.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return teamChatRoom.getChats().get(position).hashCode();
+        return chats.get(position).hashCode();
     }
 }

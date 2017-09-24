@@ -6,6 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -15,11 +18,14 @@ import android.widget.TextView;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.model.TeamChatRoom;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.EndlessScroller;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
@@ -27,16 +33,17 @@ import static android.text.TextUtils.isEmpty;
 public class TeamChatFragment extends MainActivityFragment
         implements TextView.OnEditorActionListener {
 
-    private static final String ARG_CHAT_ROOM = "chat-room";
+    private static final String ARG_TEAM = "team";
 
-    private TeamChatRoom chatRoom;
+    private Team team;
+    private List<TeamChat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
 
-    public static TeamChatFragment newInstance(TeamChatRoom chatRoom) {
+    public static TeamChatFragment newInstance(Team team) {
         TeamChatFragment fragment = new TeamChatFragment();
         Bundle args = new Bundle();
 
-        args.putParcelable(ARG_CHAT_ROOM, chatRoom);
+        args.putParcelable(ARG_TEAM, team);
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,10 +51,10 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public String getStableTag() {
         String superResult = super.getStableTag();
-        TeamChatRoom tempRoom = getArguments().getParcelable(ARG_CHAT_ROOM);
+        Team team = getArguments().getParcelable(ARG_TEAM);
 
-        return (tempRoom != null)
-                ? superResult + "-" + tempRoom.hashCode()
+        return (team != null)
+                ? superResult + "-" + team.hashCode()
                 : superResult;
     }
 
@@ -55,7 +62,7 @@ public class TeamChatFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        chatRoom = getArguments().getParcelable(ARG_CHAT_ROOM);
+        team = getArguments().getParcelable(ARG_TEAM);
     }
 
     @Nullable
@@ -74,13 +81,13 @@ public class TeamChatFragment extends MainActivityFragment
         linearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new TeamChatAdapter(chatRoom, userViewModel.getCurrentUser()));
+        recyclerView.setAdapter(new TeamChatAdapter(chats, userViewModel.getCurrentUser()));
         recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
                 disposables.add(teamChatViewModel
-                        .fetchOlderChats(chatRoom)
+                        .fetchOlderChats(chats, team, getQueryDate())
                         .subscribe(showProgress -> onChatsUpdated(showProgress, oldCount), defaultErrorHandler));
             }
         });
@@ -91,12 +98,12 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(getString(R.string.team_chat_title, chatRoom.getTeam().getName()));
+        setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
 
         subsribeToChat();
 
-        if (chatRoom.getChats().isEmpty()) {
-            disposables.add(teamChatViewModel.getTeamChatRoom(chatRoom).subscribe(chat -> {
+        if (chats.isEmpty()) {
+            disposables.add(teamChatViewModel.fetchOlderChats(chats, team, getQueryDate()).subscribe(chat -> {
                 recyclerView.getAdapter().notifyItemInserted(0);
                 toggleProgress(false);
             }, defaultErrorHandler));
@@ -104,9 +111,25 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_chat, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_pick_team:
+                teamViewModel.updateDefaultTeam(Team.empty());
+                TeamPickerFragment.pick(getActivity(), R.id.request_chat_team_pick);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-        chatRoom.updateLastSeen();
+        teamChatViewModel.updateLastSeen(team);
         recyclerView = null;
     }
 
@@ -126,16 +149,16 @@ public class TeamChatFragment extends MainActivityFragment
 
     private void onChatsUpdated(boolean showProgess, int oldCount) {
         toggleProgress(showProgess);
-        chatRoom.updateLastSeen();
+        teamChatViewModel.updateLastSeen(team);
         if (!showProgess)
-            recyclerView.getAdapter().notifyItemRangeInserted(0, chatRoom.getChats().size() - oldCount);
+            recyclerView.getAdapter().notifyItemRangeInserted(0, chats.size() - oldCount);
     }
 
     private void subsribeToChat() {
-        disposables.add(teamChatViewModel.listenForChat(chatRoom).subscribe(chat -> {
-            chatRoom.add(chat);
+        disposables.add(teamChatViewModel.listenForChat(team).subscribe(chat -> {
+            chats.add(chat);
             recyclerView.getAdapter().notifyDataSetChanged();
-            recyclerView.smoothScrollToPosition(chatRoom.getChats().size() - 1);
+            recyclerView.smoothScrollToPosition(chats.size() - 1);
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(message -> {
@@ -151,10 +174,9 @@ public class TeamChatFragment extends MainActivityFragment
 
         if (isEmpty(text)) return;
 
-        TeamChat chat = chatRoom.chat(text, userViewModel.getCurrentUser());
-        chatRoom.add(chat);
+        TeamChat chat = TeamChat.chat(text, userViewModel.getCurrentUser(), team);
+        chats.add(chat);
 
-        final List<TeamChat> chats = chatRoom.getChats();
         final int index = chats.indexOf(chat);
         final RecyclerView.Adapter adapter = recyclerView.getAdapter();
 
@@ -162,7 +184,11 @@ public class TeamChatFragment extends MainActivityFragment
         adapter.notifyItemInserted(index);
         teamChatViewModel.post(chat).subscribe(() -> {
             adapter.notifyItemChanged(index);
-            chatRoom.updateLastSeen();
+            teamChatViewModel.updateLastSeen(team);
         }, defaultErrorHandler);
+    }
+
+    private Date getQueryDate() {
+        return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
     }
 }

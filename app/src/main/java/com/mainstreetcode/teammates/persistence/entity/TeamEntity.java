@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 
 @Entity(tableName = "teams")
 public class TeamEntity implements Parcelable{
@@ -17,13 +19,17 @@ public class TeamEntity implements Parcelable{
     @ColumnInfo(name = "team_zip") protected String zip;
     @ColumnInfo(name = "team_image_url") protected String imageUrl;
 
-    public TeamEntity(String id, String name, String city, String state, String zip, String imageUrl) {
+    @ColumnInfo(name = "team_created") protected Date created;
+
+    public TeamEntity(String id, String name, String city, String state, String zip, String imageUrl,
+                      Date created) {
         this.id = id;
         this.name = name;
         this.city = city;
         this.state = state;
         this.zip = zip;
         this.imageUrl = imageUrl;
+        this.created = created;
     }
 
     protected TeamEntity(Parcel in) {
@@ -33,6 +39,7 @@ public class TeamEntity implements Parcelable{
         state = in.readString();
         zip = in.readString();
         imageUrl = in.readString();
+        created = new Date(in.readLong());
     }
 
     public String getId() {return this.id;}
@@ -40,6 +47,10 @@ public class TeamEntity implements Parcelable{
     public String getName() {return this.name;}
 
     public String getCity() {return this.city;}
+
+    public Date getCreated() {
+        return created;
+    }
 
     @SuppressWarnings("unused")
     public String getState() {
@@ -76,7 +87,6 @@ public class TeamEntity implements Parcelable{
 
         TeamEntity team = (TeamEntity) o;
 
-        //return uid.equals(team.uid);
         return id.equals(team.id);
     }
 
@@ -98,6 +108,7 @@ public class TeamEntity implements Parcelable{
         dest.writeString(state);
         dest.writeString(zip);
         dest.writeString(imageUrl);
+        dest.writeLong(created.getTime());
     }
 
     public static final Parcelable.Creator<TeamEntity> CREATOR = new Parcelable.Creator<TeamEntity>() {
