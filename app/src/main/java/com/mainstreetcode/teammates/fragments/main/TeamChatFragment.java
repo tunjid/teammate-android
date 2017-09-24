@@ -169,6 +169,6 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     private Date getQueryDate() {
-        return chats.isEmpty() ? new Date() : chats.get(chats.size() - 1).getCreated();
+        return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
     }
 }
