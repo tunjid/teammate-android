@@ -23,6 +23,7 @@ import com.mainstreetcode.teammates.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,8 +56,9 @@ public class Team extends TeamEntity
 
     @Ignore private final List<Item<Team>> items;
 
-    public Team(String id, String name, String city, String state, String zip, String imageUrl) {
-        super(id, name, city, state, zip, imageUrl);
+    public Team(String id, String name, String city, String state, String zip, String imageUrl,
+                Date created, Date lastSeen) {
+        super(id, name, city, state, zip, imageUrl, created, lastSeen);
 
         items = buildItems();
     }
@@ -69,7 +71,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "");
+        return new Team(NEW_TEAM, "", "", "", "", "", new Date(), new Date());
     }
 
     @Override
@@ -132,6 +134,11 @@ public class Team extends TeamEntity
         this.roles.addAll(roles);
     }
 
+    public void updateLastSeen() {
+        lastSeen.setTime(new Date().getTime());
+        TeamRepository.getInstance().save(this);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -169,6 +176,7 @@ public class Team extends TeamEntity
         private static final String ZIP_KEY = "zip";
         private static final String ROLE_KEY = "role";
         private static final String LOGO_KEY = "imageUrl";
+        private static final String CREATED_KEY = "created";
         private static final String ROLES_KEY = "roles";
         private static final String JOIN_REQUEST_KEY = "joinRequests";
 
@@ -184,8 +192,9 @@ public class Team extends TeamEntity
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
             String role = ModelUtils.asString(ROLE_KEY, teamJson);
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
+            Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
 
-            Team team = new Team(id, name, city, state, zip, logoUrl);
+            Team team = new Team(id, name, city, state, zip, logoUrl, created, new Date());
 
             team.get(LOGO_POSITION).setValue(logoUrl);
             team.get(ROLE_POSITION).setValue(role);

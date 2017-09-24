@@ -21,7 +21,7 @@ import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammates.fragments.headless.TeamMediaPickerFragment;
+import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
@@ -119,7 +119,7 @@ public class TeamMediaFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
-                TeamMediaPickerFragment.pick(getActivity());
+                TeamPickerFragment.pick(getActivity(), R.id.request_media_team_pick);
                 return true;
         }
         return super.onOptionsItemSelected(item);

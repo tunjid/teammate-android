@@ -9,13 +9,12 @@ import android.view.MenuItem;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.baseclasses.TeammatesBaseActivity;
-import com.mainstreetcode.teammates.fragments.headless.TeamMediaPickerFragment;
+import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamChatFragment;
-import com.mainstreetcode.teammates.fragments.main.TeamChatRoomFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Model;
@@ -64,10 +63,10 @@ public class MainActivity extends TeammatesBaseActivity {
                 showFragment(TeamsFragment.newInstance());
                 return true;
             case R.id.action_messages:
-                showFragment(TeamChatRoomFragment.newInstance());
+                TeamPickerFragment.request(this, R.id.request_chat_team_pick);
                 return true;
             case R.id.action_media:
-                TeamMediaPickerFragment.request(this);
+                TeamPickerFragment.request(this, R.id.request_media_team_pick);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -81,7 +80,7 @@ public class MainActivity extends TeammatesBaseActivity {
 
         if (model != null) {
             if (model instanceof Event) route = EventEditFragment.newInstance((Event) model);
-            if (model instanceof TeamChat) route = TeamChatFragment.newInstance(((TeamChat) model).getChatRoom());
+            if (model instanceof TeamChat) route = TeamChatFragment.newInstance(((TeamChat) model).getTeam());
         }
         else if (savedInstanceState == null) route = HomeFragment.newInstance();
 

@@ -2,14 +2,13 @@ package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.Media;
-import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.model.TeamChatRoom;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 
 import java.util.Date;
 import java.util.List;
@@ -142,16 +141,6 @@ public interface TeammateApi {
     Single<Event> rsvpEvent(@Path("id") String eventId, @Query("attending") boolean attending);
 
     // =============================================================================================
-    // Team Chat Room endpoints
-    // =============================================================================================
-
-    @GET("/api/team-chat-rooms/{id}")
-    Single<TeamChatRoom> getTeamChatRoom(@Path("id") String roomId);
-
-    @GET("/api/team-chat-rooms")
-    Single<List<TeamChatRoom>> getTeamChatRooms();
-
-    // =============================================================================================
     // Team Chat endpoints
     // =============================================================================================
 
@@ -159,22 +148,22 @@ public interface TeammateApi {
     Single<TeamChat> getTeamChat(@Path("id") String chatId);
 
     @DELETE("/api/team-chats/{id}")
-    Single<TeamChatRoom> deleteChat(@Path("id") String chatId);
+    Single<TeamChat> deleteChat(@Path("id") String chatId);
 
-    @POST("/api/team-chats")
-    Single<List<TeamChat>> chatsBefore(@Body TeamChatRoom chatRoom, @Query("date") Date date);
+    @GET("/api/team/chats/{teamId}")
+    Single<List<TeamChat>> chatsBefore(@Path("teamId") String teamId, @Query("date") Date date);
 
     // =============================================================================================
     // Team Media endpoints
     // =============================================================================================
 
-    @GET("/api/team-media/{teamId}")
-    Single<Media> getMedia(@Path("teamId") String teamId);
+    @GET("/api/team-media/{mediaId}")
+    Single<Media> getMedia(@Path("teamId") String mediaId);
 
-    @GET("/api/team-media/team/{teamId}")
+    @GET("/api/team/media/{teamId}")
     Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
 
     @Multipart
-    @POST("api/team-media/team/{teamId}")
+    @POST("api/team/media/{teamId}")
     Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
 }
