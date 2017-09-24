@@ -6,6 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.util.EndlessScroller;
@@ -104,6 +108,22 @@ public class TeamChatFragment extends MainActivityFragment
                 toggleProgress(false);
             }, defaultErrorHandler));
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_chat, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_pick_team:
+                teamViewModel.updateDefaultTeam(Team.empty());
+                TeamPickerFragment.pick(getActivity(), R.id.request_chat_team_pick);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

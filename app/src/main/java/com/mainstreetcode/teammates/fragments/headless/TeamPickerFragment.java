@@ -10,20 +10,19 @@ import android.support.v4.app.FragmentManager;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamAdapter;
+import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamChatFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamMediaFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Team;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
-public class TeamPickerFragment extends BaseFragment implements TeamAdapter.TeamAdapterListener {
+public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.TeamAdapterListener {
 
     private static final String TAG = "TeamMediaPickerFragment";
     private static final String ARGS_REQUEST_CODE = "ARGS_REQUEST_CODE";
 
     @IdRes
     private int requestCode;
-    private Team selectedTeam = Team.empty();
 
     private static TeamPickerFragment newInstance(@IdRes int requestCode) {
         TeamPickerFragment fragment = new TeamPickerFragment();
@@ -48,7 +47,6 @@ public class TeamPickerFragment extends BaseFragment implements TeamAdapter.Team
         TeamPickerFragment instance = getInstance(host, requestCode);
         if (instance == null) return;
 
-        instance.selectedTeam.update(Team.empty());
         instance.pick();
     }
 
@@ -77,13 +75,12 @@ public class TeamPickerFragment extends BaseFragment implements TeamAdapter.Team
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestCode = getArguments().getInt(ARGS_REQUEST_CODE);
     }
 
     @Override
     public void onTeamClicked(Team item) {
-        selectedTeam.update(item);
+        teamViewModel.updateDefaultTeam(item);
         switch (requestCode) {
             case R.id.request_chat_team_pick:
                 showFragment(TeamChatFragment.newInstance(item));
@@ -95,7 +92,8 @@ public class TeamPickerFragment extends BaseFragment implements TeamAdapter.Team
     }
 
     private void pick() {
-        if (!selectedTeam.isEmpty()) onTeamClicked(selectedTeam);
+        Team team = teamViewModel.getDefaultTeam();
+        if (!team.isEmpty()) onTeamClicked(team);
         else showPicker();
     }
 

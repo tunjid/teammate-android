@@ -1,6 +1,11 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.text.TextUtils;
+
+import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -25,8 +30,12 @@ import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamRepository extends ModelRespository<Team> {
 
+    private static final String TEAM_REPOSITORY_KEY = "TeamRepository";
+    private static final String DEFAULT_TEAM = "default.team";
+
     private static TeamRepository ourInstance;
 
+    private final Application app;
     private final TeammateApi api;
     private final TeamDao teamDao;
     private final ModelRespository<User> userRepository;
@@ -34,6 +43,7 @@ public class TeamRepository extends ModelRespository<Team> {
     private final ModelRespository<JoinRequest> joinRequestRespository;
 
     private TeamRepository() {
+        app = Application.getInstance();
         api = TeammateService.getApiInstance();
         teamDao = AppDatabase.getInstance().teamDao();
         userRepository = UserRepository.getInstance();
@@ -114,5 +124,17 @@ public class TeamRepository extends ModelRespository<Team> {
         Maybe<List<Team>> remote = api.getMyTeams().map(getSaveManyFunction()).toMaybe();
 
         return cacheThenRemote(local, remote);
+    }
+
+    public Maybe<Team> getDefaultTeam() {
+        SharedPreferences preferences = app.getSharedPreferences(TEAM_REPOSITORY_KEY, Context.MODE_PRIVATE);
+        String defaultTeamId = preferences.getString(DEFAULT_TEAM, "");
+
+        return TextUtils.isEmpty(defaultTeamId) ? Maybe.empty() : teamDao.get(defaultTeamId).subscribeOn(io());
+    }
+
+    public void saveDefaultTeam(Team team) {
+        SharedPreferences preferences = app.getSharedPreferences(TEAM_REPOSITORY_KEY, Context.MODE_PRIVATE);
+        preferences.edit().putString(DEFAULT_TEAM, team.getId()).apply();
     }
 }

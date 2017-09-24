@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel;
 
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.TeamRepository;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.List;
 
@@ -20,9 +21,11 @@ import io.reactivex.Single;
 public class TeamViewModel extends ViewModel {
 
     private final TeamRepository repository;
+    private final Team defaultTeam = Team.empty();
 
     public TeamViewModel() {
         repository = TeamRepository.getInstance();
+        repository.getDefaultTeam().subscribe(defaultTeam::update, ErrorHandler.EMPTY);
     }
 
     public Single<Team> createOrUpdate(Team team) {
@@ -43,5 +46,14 @@ public class TeamViewModel extends ViewModel {
 
     public Single<Team> deleteTeam(Team team) {
         return repository.delete(team);
+    }
+
+    public Team getDefaultTeam() {
+        return defaultTeam;
+    }
+
+    public void updateDefaultTeam(Team newDefault) {
+        defaultTeam.update(newDefault);
+        repository.saveDefaultTeam(defaultTeam);
     }
 }

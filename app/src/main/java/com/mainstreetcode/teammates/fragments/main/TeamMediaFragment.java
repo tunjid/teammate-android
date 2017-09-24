@@ -101,7 +101,7 @@ public class TeamMediaFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
-
+        setFabIcon(R.drawable.ic_add_white_24dp);
         getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
         fetchMedia();
     }
@@ -119,6 +119,7 @@ public class TeamMediaFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
+                teamViewModel.updateDefaultTeam(Team.empty());
                 TeamPickerFragment.pick(getActivity(), R.id.request_media_team_pick);
                 return true;
         }
