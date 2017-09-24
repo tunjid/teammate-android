@@ -33,6 +33,10 @@ public class TeamChatViewModel extends ViewModel {
         chatMap = new HashMap<>();
     }
 
+    public void updateLastSeen(Team team) {
+        repository.updateLastSeen(team);
+    }
+
     public Flowable<TeamChat> listenForChat(Team team) {
         return repository.listenForChat(team);
     }

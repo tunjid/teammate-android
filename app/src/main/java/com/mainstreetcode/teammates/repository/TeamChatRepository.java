@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -7,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.User;
@@ -46,20 +49,25 @@ import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamChatRepository extends ModelRespository<TeamChat> {
 
+
     private static final String JOIN_EVENT = "join";
     private static final String NEW_MESSAGE_EVENT = "newMessage";
     private static final String ERROR_EVENT = "error";
+    private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";
+    private static final int TEAM_NOT_SEEN = -1;
 
     private static final Gson CHAT_GSON = getChatGson();
 
     private static TeamChatRepository ourInstance;
 
     private final TeammateApi api;
+    private final Application app;
     private final TeamChatDao chatDao;
     private final ModelRespository<User> userModelRespository;
     private final ModelRespository<Team> teamModelRespository;
 
     private TeamChatRepository() {
+        app = Application.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
         userModelRespository = UserRepository.getInstance();
@@ -122,7 +130,7 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
 
     public Single<List<TeamChat>> fetchUnreadChats(Team team) {
         User currentUser = UserRepository.getInstance().getCurrentUser();
-        return chatDao.unreadChats(team.getId(), currentUser, team.getLastSeen())
+        return chatDao.unreadChats(team.getId(), currentUser, getLastTeamSeen(team))
                 .subscribeOn(io())
                 .observeOn(mainThread())
                 .toSingle();
@@ -143,6 +151,18 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
 
     public Completable post(TeamChat chat) {
         return Completable.create(new ChatCompletable(chat)).observeOn(mainThread());
+    }
+
+    public void updateLastSeen(Team team) {
+        SharedPreferences preferences = app.getSharedPreferences(TEAM_SEEN_TIMES, Context.MODE_PRIVATE);
+        preferences.edit().putLong(team.getId(), new Date().getTime()).apply();
+    }
+
+    private Date getLastTeamSeen(Team team) {
+        SharedPreferences preferences = app.getSharedPreferences(TEAM_SEEN_TIMES, Context.MODE_PRIVATE);
+        long timeStamp = preferences.getLong(team.getId(), TEAM_NOT_SEEN);
+        if (timeStamp == TEAM_NOT_SEEN) updateLastSeen(team);
+        return timeStamp == TEAM_NOT_SEEN ? new Date() : new Date(timeStamp);
     }
 
     @Nullable

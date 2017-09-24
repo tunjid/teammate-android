@@ -203,6 +203,7 @@ public class TeamChat implements
             Date created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, teamJson));
 
             if (user == null) user = User.empty();
+            if (team == null) team = Team.empty();
 
             return new TeamChat(id, content, kind, user, team, created);
         }

@@ -57,8 +57,8 @@ public class Team extends TeamEntity
     @Ignore private final List<Item<Team>> items;
 
     public Team(String id, String name, String city, String state, String zip, String imageUrl,
-                Date created, Date lastSeen) {
-        super(id, name, city, state, zip, imageUrl, created, lastSeen);
+                Date created) {
+        super(id, name, city, state, zip, imageUrl, created);
 
         items = buildItems();
     }
@@ -71,7 +71,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "", new Date(), new Date());
+        return new Team(NEW_TEAM, "", "", "", "", "", new Date());
     }
 
     @Override
@@ -134,11 +134,6 @@ public class Team extends TeamEntity
         this.roles.addAll(roles);
     }
 
-    public void updateLastSeen() {
-        lastSeen.setTime(new Date().getTime());
-        TeamRepository.getInstance().save(this);
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -194,7 +189,7 @@ public class Team extends TeamEntity
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
 
-            Team team = new Team(id, name, city, state, zip, logoUrl, created, new Date());
+            Team team = new Team(id, name, city, state, zip, logoUrl, created);
 
             team.get(LOGO_POSITION).setValue(logoUrl);
             team.get(ROLE_POSITION).setValue(role);

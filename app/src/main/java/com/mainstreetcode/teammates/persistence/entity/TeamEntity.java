@@ -20,10 +20,9 @@ public class TeamEntity implements Parcelable{
     @ColumnInfo(name = "team_image_url") protected String imageUrl;
 
     @ColumnInfo(name = "team_created") protected Date created;
-    @ColumnInfo(name = "team_last_seen") protected Date lastSeen;
 
     public TeamEntity(String id, String name, String city, String state, String zip, String imageUrl,
-                      Date created, Date lastSeen) {
+                      Date created) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -31,7 +30,6 @@ public class TeamEntity implements Parcelable{
         this.zip = zip;
         this.imageUrl = imageUrl;
         this.created = created;
-        this.lastSeen = lastSeen;
     }
 
     protected TeamEntity(Parcel in) {
@@ -42,7 +40,6 @@ public class TeamEntity implements Parcelable{
         zip = in.readString();
         imageUrl = in.readString();
         created = new Date(in.readLong());
-        lastSeen = new Date(in.readLong());
     }
 
     public String getId() {return this.id;}
@@ -53,10 +50,6 @@ public class TeamEntity implements Parcelable{
 
     public Date getCreated() {
         return created;
-    }
-
-    public Date getLastSeen() {
-        return lastSeen;
     }
 
     @SuppressWarnings("unused")
@@ -94,7 +87,6 @@ public class TeamEntity implements Parcelable{
 
         TeamEntity team = (TeamEntity) o;
 
-        //return uid.equals(team.uid);
         return id.equals(team.id);
     }
 
@@ -117,7 +109,6 @@ public class TeamEntity implements Parcelable{
         dest.writeString(zip);
         dest.writeString(imageUrl);
         dest.writeLong(created.getTime());
-        dest.writeLong(lastSeen.getTime());
     }
 
     public static final Parcelable.Creator<TeamEntity> CREATOR = new Parcelable.Creator<TeamEntity>() {

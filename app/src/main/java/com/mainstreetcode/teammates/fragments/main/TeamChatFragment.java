@@ -109,7 +109,7 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        team.updateLastSeen();
+        teamChatViewModel.updateLastSeen(team);
         recyclerView = null;
     }
 
@@ -129,7 +129,7 @@ public class TeamChatFragment extends MainActivityFragment
 
     private void onChatsUpdated(boolean showProgess, int oldCount) {
         toggleProgress(showProgess);
-        team.updateLastSeen();
+        teamChatViewModel.updateLastSeen(team);
         if (!showProgess)
             recyclerView.getAdapter().notifyItemRangeInserted(0, chats.size() - oldCount);
     }
@@ -164,7 +164,7 @@ public class TeamChatFragment extends MainActivityFragment
         adapter.notifyItemInserted(index);
         teamChatViewModel.post(chat).subscribe(() -> {
             adapter.notifyItemChanged(index);
-            team.updateLastSeen();
+            teamChatViewModel.updateLastSeen(team);
         }, defaultErrorHandler);
     }
 
