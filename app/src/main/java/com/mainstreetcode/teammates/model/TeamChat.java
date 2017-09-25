@@ -76,7 +76,7 @@ public class TeamChat implements
     }
 
     public static TeamChat chat(String content, User user, Team team) {
-        return new TeamChat("", content, KIND_TEXT, user, team, null);
+        return new TeamChat("", content, KIND_TEXT, user, team, new Date());
     }
 
     @Override

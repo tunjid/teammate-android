@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -246,6 +247,8 @@ public class TeamDetailFragment extends MainActivityFragment
 
         holder.bind(item);
 
+       final Dialog dialog = new AlertDialog.Builder(context).setTitle("").setView(dialogView).show();
+
         inviteButton.setOnClickListener(view -> {
 
             if (!validator.isNotEmpty(firstNameText)
@@ -261,8 +264,8 @@ public class TeamDetailFragment extends MainActivityFragment
 
             disposables.add(roleViewModel.joinTeam(joinRequest)
                     .subscribe(request -> showSnackbar(getString(R.string.user_invite_sent)), defaultErrorHandler));
-        });
 
-        new AlertDialog.Builder(context).setTitle("").setView(dialogView).show();
+            dialog.dismiss();
+        });
     }
 }
