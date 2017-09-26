@@ -41,6 +41,7 @@ public class EventEditFragment extends MainActivityFragment
     private static final String ARG_EVENT = "event";
     public static final int PLACE_PICKER_REQUEST = 1;
 
+    private boolean fromUserPickerAction;
     private Event event;
 
     @Nullable
@@ -131,9 +132,10 @@ public class EventEditFragment extends MainActivityFragment
             getActivity().invalidateOptionsMenu();
         }, emptyErrorHandler));
 
-        if (!event.isEmpty()) {
+        if (!event.isEmpty() && !fromUserPickerAction) {
             disposables.add(eventViewModel.getEvent(event).subscribe(updated -> recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
         }
+        fromUserPickerAction = false;
     }
 
     @Override
@@ -194,6 +196,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
+        fromUserPickerAction = true;
         ImageWorkerFragment.requestCrop(this);
     }
 
@@ -204,6 +207,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void selectTeam() {
+        fromUserPickerAction = true;
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, R.id.request_event_team_pick);
         showFragment(teamsFragment);
@@ -221,6 +225,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onLocationClicked() {
+        fromUserPickerAction = true;
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {e.printStackTrace();}
@@ -231,7 +236,6 @@ public class EventEditFragment extends MainActivityFragment
         disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(result -> {
                     toggleProgress(false);
                     recyclerView.getAdapter().notifyDataSetChanged();
-                }, defaultErrorHandler)
-        );
+                }, defaultErrorHandler));
     }
 }

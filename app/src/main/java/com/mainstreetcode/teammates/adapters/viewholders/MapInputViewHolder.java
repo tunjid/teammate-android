@@ -15,7 +15,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Item;
 
 /**
- * ViewHolder for selecting locations from a map
+ * ViewHolder for selecting {@link com.mainstreetcode.teammates.model.Event}
  */
 public class MapInputViewHolder extends InputViewHolder<EventEditAdapter.EditAdapterListener>
         implements View.OnClickListener {
@@ -50,11 +50,12 @@ public class MapInputViewHolder extends InputViewHolder<EventEditAdapter.EditAda
         else {
             addButton.setVisibility(View.GONE);
             mapView.setVisibility(View.VISIBLE);
-            mapView.getMapAsync(googleMap -> {
+            mapView.getMapAsync(map -> {
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(location);
-                googleMap.moveCamera(cameraUpdate);
-                googleMap.clear();
-                googleMap.addMarker(new MarkerOptions().position(location));
+                map.moveCamera(cameraUpdate);
+                map.clear();
+                map.addMarker(new MarkerOptions().position(location));
+                map.getUiSettings().setMapToolbarEnabled(false);
             });
         }
     }

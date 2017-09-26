@@ -116,10 +116,10 @@ public class Event extends EventEntity
     }
 
     public void setTeam(Team team) {
-        this.team = team;
+        this.team.update(team);
     }
 
-    public void setPlace(Place place){
+    public void setPlace(Place place) {
         items.get(LOCATION_POSITION).setValue(place.getName().toString());
         location = place.getLatLng();
     }
