@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.BaseItemViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.ClickInputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
@@ -24,14 +25,14 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
 
     private final Team team;
     private final List<String> roles;
     private final boolean isEditable;
 
-    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable, ImageWorkerFragment.ImagePickerListener listener) {
+    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
         this.team = team;
         this.roles = roles;
@@ -42,7 +43,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
 
-        @LayoutRes int layoutRes = viewType == Item.INPUT || viewType == Item.ROLE
+        @LayoutRes int layoutRes = viewType == Item.INPUT || viewType == Item.ROLE || viewType == Item.ADDRESS
                 ? R.layout.viewholder_simple_input
                 : viewType == Item.IMAGE
                 ? R.layout.viewholder_item_image
@@ -57,6 +58,8 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
                 return new RoleSelectViewHolder(itemView, roles);
             case Item.IMAGE:
                 return new ImageViewHolder(itemView, adapterListener);
+            case Item.ADDRESS:
+                return new ClickInputViewHolder(itemView, adapterListener);
             default:
                 return new BaseItemViewHolder(itemView);
         }
@@ -75,5 +78,9 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     @Override
     public int getItemViewType(int position) {
         return team.get(position).getItemType();
+    }
+
+    public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
+        void onAddressClicked();
     }
 }

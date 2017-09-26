@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.model;
 
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
+import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -38,8 +39,8 @@ public class Team extends TeamEntity
 
     public static final int LOGO_POSITION = 0;
     //    private static final int NAME_POSITION = 1;
-//    private static final int CITY_POSITION = 2;
-//    private static final int STATE_POSITION = 3;
+    private static final int CITY_POSITION = 2;
+    private static final int STATE_POSITION = 3;
     public static final int ZIP_POSITION = 4;
     public static final int ROLE_POSITION = 5;
 
@@ -80,9 +81,9 @@ public class Team extends TeamEntity
         return Arrays.asList(
                 new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, Team.class),
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, Team.class),
-                new Item(Item.INPUT, R.string.city, city == null ? "" : city, this::setCity, Team.class),
-                new Item(Item.INPUT, R.string.state, state == null ? "" : state, this::setState, Team.class),
-                new Item(Item.INPUT, R.string.zip, zip == null ? "" : zip, this::setZip, Team.class),
+                new Item(Item.ADDRESS, R.string.city, city == null ? "" : city, this::setCity, Team.class),
+                new Item(Item.ADDRESS, R.string.state, state == null ? "" : state, this::setState, Team.class),
+                new Item(Item.ADDRESS, R.string.zip, zip == null ? "" : zip, this::setZip, Team.class),
                 new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, Team.class)
         );
     }
@@ -132,6 +133,12 @@ public class Team extends TeamEntity
     public void setRoles(List<Role> roles) {
         this.roles.clear();
         this.roles.addAll(roles);
+    }
+
+    public void setAddress(Address address) {
+        items.get(CITY_POSITION).setValue(address.getLocality());
+        items.get(STATE_POSITION).setValue(address.getAdminArea());
+        items.get(ZIP_POSITION).setValue(address.getPostalCode());
     }
 
     @Override

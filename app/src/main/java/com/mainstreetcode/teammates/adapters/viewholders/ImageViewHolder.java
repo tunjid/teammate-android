@@ -16,7 +16,7 @@ import java.io.File;
 /**
  * Viewholder for {@link Item}.
  */
-public class ImageViewHolder extends BaseItemViewHolder
+public class ImageViewHolder extends BaseItemViewHolder<ImageWorkerFragment.ImagePickerListener>
         implements View.OnClickListener {
 
     private ImageView picture;
