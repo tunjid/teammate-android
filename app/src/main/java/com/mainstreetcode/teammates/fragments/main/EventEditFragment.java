@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -121,8 +120,7 @@ public class EventEditFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton fab = getFab();
-        fab.setOnClickListener(this);
+        getFab().setOnClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 
@@ -148,6 +146,7 @@ public class EventEditFragment extends MainActivityFragment
             recyclerView.getAdapter().notifyDataSetChanged();
         }
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -174,10 +173,13 @@ public class EventEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
+                boolean wasEmpty = event.isEmpty();
                 disposables.add(eventViewModel.updateEvent(event)
                         .subscribe(updatedEvent -> {
                             event.update(updatedEvent);
-                            showSnackbar(getString(R.string.updated_user, event.getName()));
+                            showSnackbar(wasEmpty
+                                    ? getString(R.string.added_user, event.getName())
+                                    : getString(R.string.updated_user, event.getName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
                         }, defaultErrorHandler));
                 break;

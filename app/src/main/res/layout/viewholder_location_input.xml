@@ -49,7 +49,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/single_margin"
-            android:drawableTint="@color/colorAccent"
+            android:backgroundTint="@color/colorAccent"
+            android:text="@string/map_pick"
+            android:textColor="@color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/input_layout" />
 
         <com.google.android.gms.maps.MapView

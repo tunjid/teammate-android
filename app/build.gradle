@@ -57,8 +57,8 @@ dependencies {
     compile 'com.google.firebase:firebase-core:11.2.0'
     compile 'com.google.firebase:firebase-messaging:11.2.0'
 
-    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.2'
-    compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.2'
+//    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.2'
+//    compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.2'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.0"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'

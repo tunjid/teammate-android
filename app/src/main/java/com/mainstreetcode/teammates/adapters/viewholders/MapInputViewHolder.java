@@ -15,7 +15,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Item;
 
 /**
- * ViewHolder for selecting {@link com.mainstreetcode.teammates.model.Role}
+ * ViewHolder for selecting locations from a map
  */
 public class MapInputViewHolder extends InputViewHolder<EventEditAdapter.EditAdapterListener>
         implements View.OnClickListener {
