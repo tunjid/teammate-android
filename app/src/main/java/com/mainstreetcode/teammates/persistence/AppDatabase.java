@@ -16,6 +16,7 @@ import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.persistence.typeconverters.DateTypeConverter;
+import com.mainstreetcode.teammates.persistence.typeconverters.LatLngTypeConverter;
 import com.mainstreetcode.teammates.persistence.typeconverters.TeamTypeConverter;
 import com.mainstreetcode.teammates.persistence.typeconverters.UserTypeConverter;
 
@@ -33,7 +34,8 @@ import static com.mainstreetcode.teammates.BuildConfig.DEBUG;
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
         RoleEntity.class, JoinRequestEntity.class, TeamChat.class, Media.class}, version = 1)
 
-@TypeConverters({DateTypeConverter.class, TeamTypeConverter.class, UserTypeConverter.class})
+@TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class,
+        TeamTypeConverter.class, UserTypeConverter.class})
 
 public abstract class AppDatabase extends RoomDatabase {
 

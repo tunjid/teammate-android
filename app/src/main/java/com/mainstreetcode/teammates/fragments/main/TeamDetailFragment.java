@@ -243,7 +243,7 @@ public class TeamDetailFragment extends MainActivityFragment
         final AtomicReference<String> roleReference = new AtomicReference<>();
 
         RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles);
-        Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, String.class);
+        Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, "");
 
         holder.bind(item);
 

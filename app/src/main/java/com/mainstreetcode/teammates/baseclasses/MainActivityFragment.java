@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
+import com.mainstreetcode.teammates.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammates.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamChatViewModel;
@@ -29,6 +30,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected EventViewModel eventViewModel;
     protected MediaViewModel mediaViewModel;
     protected TeamChatViewModel teamChatViewModel;
+    protected LocationViewModel locationViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,5 +47,6 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         eventViewModel = provider.get(EventViewModel.class);
         mediaViewModel = provider.get(MediaViewModel.class);
         teamChatViewModel = provider.get(TeamChatViewModel.class);
+        locationViewModel = provider.get(LocationViewModel.class);
     }
 }

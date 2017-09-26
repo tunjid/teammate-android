@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
@@ -25,6 +29,8 @@ import java.util.List;
 
 import io.reactivex.disposables.Disposable;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Creates, edits or lets a {@link com.mainstreetcode.teammates.model.User} join a {@link Team}
  */
@@ -33,7 +39,7 @@ public class TeamEditFragment extends MainActivityFragment
         implements
         View.OnClickListener,
         ImageWorkerFragment.CropListener,
-        ImageWorkerFragment.ImagePickerListener {
+        TeamEditAdapter.TeamEditAdapterListener {
 
     private static final int CREATING = 0;
     private static final int EDITING = 1;
@@ -41,6 +47,7 @@ public class TeamEditFragment extends MainActivityFragment
 
     private static final String ARG_TEAM = "team";
     private static final String ARG_EDITABLE = "editable";
+    public static final int PLACE_PICKER_REQUEST = 2;
 
     private int state;
     private Team team;
@@ -151,9 +158,31 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
+    public void onAddressClicked() {
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
+        catch (Exception e) {e.printStackTrace();}
+    }
+
+    @Override
     public void onImageCropped(Uri uri) {
         team.get(Team.LOGO_POSITION).setValue(uri.getPath());
         recyclerView.getAdapter().notifyItemChanged(Team.LOGO_POSITION);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != PLACE_PICKER_REQUEST) return;
+        if (resultCode == RESULT_OK) {
+            toggleProgress(true);
+            Context context = getContext();
+            Place place = PlacePicker.getPlace(context, data);
+            locationViewModel.fromPlace(place).subscribe(address -> {
+                team.setAddress(address);
+                recyclerView.getAdapter().notifyDataSetChanged();
+                toggleProgress(false);
+            }, defaultErrorHandler);
+        }
     }
 
     @Override

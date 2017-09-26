@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -18,7 +19,7 @@ import com.mainstreetcode.teammates.model.User;
 /**
  * Viewholder for editing simple text fields for an {@link Item}
  */
-public class InputViewHolder extends BaseItemViewHolder
+public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseItemViewHolder<T>
         implements
         TextWatcher {
 
@@ -44,7 +45,7 @@ public class InputViewHolder extends BaseItemViewHolder
         editText.setText(item.getValue());
 
         int position = getAdapterPosition();
-        Class itemizedClass = item.getItemizedClass();
+        Class itemizedClass = item.getItemizedObject().getClass();
 
         editText.setInputType(itemizedClass.equals(Team.class) && position == Team.ZIP_POSITION
                 ? InputType.TYPE_CLASS_NUMBER

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/half_margin"
+    android:layout_marginLeft="@dimen/single_margin"
+    android:layout_marginRight="@dimen/single_margin"
+    android:layout_marginTop="@dimen/half_margin">
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/half_margin">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/dark_grey"
+            android:contentDescription="@string/team_logo"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/black_50"
+            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/thumbnail" />
+
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:paddingLeft="@dimen/single_margin"
+            android:paddingRight="@dimen/single_margin"
+            android:textColor="@color/white"
+            android:textSize="@dimen/regular_text"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/thumbnail"
+            app:layout_constraintWidth_default="wrap" />
+
+        <TextView
+            android:id="@+id/item_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_access_time_white_24dp"
+            android:drawablePadding="@dimen/single_margin"
+            android:drawableTint="@color/dark_grey"
+            android:gravity="left"
+            android:paddingLeft="@dimen/single_margin"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingTop="@dimen/half_margin"
+            android:textColor="@color/dark_grey"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/thumbnail"
+            app:layout_constraintWidth_default="wrap" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_location_on_white_24dp"
+            android:drawablePadding="@dimen/single_margin"
+            android:drawableTint="@color/dark_grey"
+            android:gravity="left"
+            android:paddingLeft="@dimen/single_margin"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingTop="@dimen/half_margin"
+            android:textColor="@color/dark_grey"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_subtitle"
+            app:layout_constraintWidth_default="wrap" />
+    </android.support.constraint.ConstraintLayout>
+</android.support.v7.widget.CardView>

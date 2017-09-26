@@ -9,14 +9,14 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 /**
  * Viewholder for {@link Item items}
  */
-public class BaseItemViewHolder extends BaseViewHolder<ImageWorkerFragment.ImagePickerListener> {
+public class BaseItemViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseViewHolder<T> {
     Item item;
 
     public BaseItemViewHolder(View itemView) {
         super(itemView);
     }
 
-    BaseItemViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
+    BaseItemViewHolder(View itemView, T listener) {
         super(itemView, listener);
     }
 

@@ -4,6 +4,9 @@ import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -36,6 +39,7 @@ public class Event extends EventEntity
 
     public static final int LOGO_POSITION = 0;
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
+    private static final int LOCATION_POSITION = 5;
 
     @Ignore private List<User> attendees = new ArrayList<>();
     @Ignore private List<User> absentees = new ArrayList<>();
@@ -43,11 +47,12 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", "", "", "", date, date, Team.empty());
+        return new Event("", "", "", "", "", date, date, Team.empty(), null);
     }
 
-    public Event(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
-        super(id, name, notes, imageUrl, startDate, endDate, team);
+    public Event(String id, String name, String notes, String imageUrl, String locationName,
+                 Date startDate, Date endDate, Team team, LatLng location) {
+        super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location);
         this.team = team;
         items = buildItems();
     }
@@ -63,11 +68,12 @@ public class Event extends EventEntity
     @SuppressWarnings("unchecked")
     public List<Item<Event>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, Event.class),
-                new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, Event.class),
-                new Item(Item.INPUT, R.string.notes, notes == null ? "" : notes, this::setNotes, Event.class),
-                new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, Event.class),
-                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, Event.class)
+                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this),
+                new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
+                new Item(Item.INPUT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
+                new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
+                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, this),
+                new Item(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this)
         );
     }
 
@@ -93,6 +99,8 @@ public class Event extends EventEntity
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
 
+        location = updatedEvent.location;
+
         attendees.clear();
         absentees.clear();
 
@@ -108,7 +116,12 @@ public class Event extends EventEntity
     }
 
     public void setTeam(Team team) {
-        this.team = team;
+        this.team.update(team);
+    }
+
+    public void setPlace(Place place) {
+        items.get(LOCATION_POSITION).setValue(place.getName().toString());
+        location = place.getLatLng();
     }
 
     public List<User> getAttendees() {
@@ -153,8 +166,10 @@ public class Event extends EventEntity
         private static final String TEAM_KEY = "team";
         private static final String NOTES_KEY = "notes";
         private static final String IMAGE_KEY = "imageUrl";
+        private static final String LOCATION_NAME_KEY = "locationName";
         private static final String START_DATE_KEY = "startDate";
         private static final String END_DATE_KEY = "endDate";
+        private static final String LOCATION_KEY = "location";
 
         @Override
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
@@ -162,9 +177,17 @@ public class Event extends EventEntity
 
             serialized.addProperty(NAME_KEY, src.name);
             serialized.addProperty(NOTES_KEY, src.notes);
+            serialized.addProperty(LOCATION_NAME_KEY, src.locationName);
             serialized.addProperty(TEAM_KEY, src.team.getId());
             serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
             serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
+
+            if (src.location != null) {
+                JsonArray coordinates = new JsonArray();
+                coordinates.add(src.location.longitude);
+                coordinates.add(src.location.latitude);
+                serialized.add(LOCATION_KEY, coordinates);
+            }
 
             return serialized;
         }
@@ -172,22 +195,24 @@ public class Event extends EventEntity
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
-            JsonObject roleJson = json.getAsJsonObject();
+            JsonObject eventJson = json.getAsJsonObject();
 
-            String id = ModelUtils.asString(ID_KEY, roleJson);
-            String name = ModelUtils.asString(NAME_KEY, roleJson);
-            String notes = ModelUtils.asString(NOTES_KEY, roleJson);
-            String imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson);
-            String startDate = ModelUtils.asString(START_DATE_KEY, roleJson);
-            String endDate = ModelUtils.asString(END_DATE_KEY, roleJson);
-            Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
+            String id = ModelUtils.asString(ID_KEY, eventJson);
+            String name = ModelUtils.asString(NAME_KEY, eventJson);
+            String notes = ModelUtils.asString(NOTES_KEY, eventJson);
+            String imageUrl = ModelUtils.asString(IMAGE_KEY, eventJson);
+            String locationName = ModelUtils.asString(LOCATION_NAME_KEY, eventJson);
+            String startDate = ModelUtils.asString(START_DATE_KEY, eventJson);
+            String endDate = ModelUtils.asString(END_DATE_KEY, eventJson);
+            Team team = context.deserialize(eventJson.get(TEAM_KEY), Team.class);
+            LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, eventJson);
 
             if (team == null) team = Team.empty();
 
-            Event result = new Event(id, name, notes, imageUrl, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team);
+            Event result = new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location);
 
-            ModelUtils.deserializeList(context, roleJson.get("attendees"), result.attendees, User.class);
-            ModelUtils.deserializeList(context, roleJson.get("absentees"), result.absentees, User.class);
+            ModelUtils.deserializeList(context, eventJson.get("attendees"), result.attendees, User.class);
+            ModelUtils.deserializeList(context, eventJson.get("absentees"), result.absentees, User.class);
 
             return result;
         }

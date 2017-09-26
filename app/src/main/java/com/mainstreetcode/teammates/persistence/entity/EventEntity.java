@@ -7,8 +7,9 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.mainstreetcode.teammates.util.ModelUtils;
+import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,23 +30,24 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_name") protected String name;
     @ColumnInfo(name = "event_notes") protected String notes;
     @ColumnInfo(name = "event_image_url") protected String imageUrl;
-
-    //@ColumnInfo(name = "event_team_id") private String teamId;
+    @ColumnInfo(name = "event_location_name") protected String locationName;
 
     @ColumnInfo(name = "event_team") protected Team team;
-
     @ColumnInfo(name = "event_start_date") protected Date startDate;
     @ColumnInfo(name = "event_end_date") protected Date endDate;
+    @ColumnInfo(name = "event_location") protected LatLng location;
 
-    public EventEntity(String id, String name, String notes, String imageUrl, Date startDate, Date endDate, Team team) {
+    public EventEntity(String id, String name, String notes, String imageUrl, String locationName,
+                       Date startDate, Date endDate, Team team, LatLng location) {
         this.id = id;
         this.name = name;
         this.notes = notes;
         this.imageUrl = imageUrl;
-//        this.teamId = teamId;
+        this.locationName = locationName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.team = team;
+        this.location = location;
     }
 
     protected EventEntity(Parcel in) {
@@ -53,9 +55,11 @@ public class EventEntity implements Parcelable {
         name = in.readString();
         notes = in.readString();
         imageUrl = in.readString();
+        locationName = in.readString();
         startDate = new Date(in.readLong());
         endDate = new Date(in.readLong());
         team = (Team) in.readValue(Team.class.getClassLoader());
+        location = (LatLng) in.readValue(LatLng.class.getClassLoader());
     }
 
     public String getId() {
@@ -74,13 +78,17 @@ public class EventEntity implements Parcelable {
         return imageUrl;
     }
 
+    public String getLocationName() {
+        return locationName;
+    }
+
     public Team getTeam() {
         return team;
     }
 
-//    public String getTeamId() {
-//        return teamId;
-//    }
+    public LatLng getLocation() {
+        return location;
+    }
 
     public Date getStartDate() {
         return startDate;
@@ -113,6 +121,10 @@ public class EventEntity implements Parcelable {
 
     protected void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 
     protected void setImageUrl(String imageUrl) {
@@ -158,9 +170,11 @@ public class EventEntity implements Parcelable {
         dest.writeString(name);
         dest.writeString(notes);
         dest.writeString(imageUrl);
+        dest.writeString(locationName);
         dest.writeLong(startDate.getTime());
         dest.writeLong(endDate.getTime());
         dest.writeValue(team);
+        dest.writeValue(location);
     }
 
     public static final Parcelable.Creator<EventEntity> CREATOR = new Parcelable.Creator<EventEntity>() {

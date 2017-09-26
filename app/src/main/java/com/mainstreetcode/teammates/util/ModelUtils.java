@@ -1,7 +1,9 @@
 package com.mainstreetcode.teammates.util;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -51,6 +53,26 @@ public class ModelUtils {
     public static Date parseDate(String date) {
         return parseDate(date, dateFormatter);
     }
+
+    @Nullable
+    public static LatLng parseCoordinates(String key, JsonElement source) {
+        if (!source.isJsonObject()) return null;
+
+        JsonElement element = source.getAsJsonObject().get(key);
+        if (element == null || !element.isJsonArray()) return null;
+
+        JsonArray array = element.getAsJsonArray();
+        if (array.size() != 2) return null;
+
+        JsonElement longitude = array.get(0);
+        JsonElement latitude = array.get(1);
+
+        if (!longitude.isJsonPrimitive() || !latitude.isJsonPrimitive()) return null;
+
+        try {return new LatLng(latitude.getAsDouble(), longitude.getAsDouble());}
+        catch (Exception e) {return null;}
+    }
+
 
     public static Date parseDate(String date, SimpleDateFormat formatter) {
         if (TextUtils.isEmpty(date)) return new Date();

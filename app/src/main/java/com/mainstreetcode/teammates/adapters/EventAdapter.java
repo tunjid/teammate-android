@@ -29,7 +29,7 @@ public class EventAdapter extends BaseRecyclerViewAdapter<EventViewHolder, Event
     @Override
     public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_grid_item, viewGroup, false);
+        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_event, viewGroup, false);
         return new EventViewHolder(itemView, adapterListener);
     }
 

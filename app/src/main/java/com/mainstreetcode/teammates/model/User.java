@@ -59,11 +59,11 @@ public class User extends UserEntity implements
     @SuppressWarnings("unchecked")
     public List<Item<User>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, User.class),
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, firstName == null ? "" : firstName, this::setFirstName, User.class),
-                new Item(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, User.class),
-                new Item(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, User.class)
-                //new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName, User.class)
+                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this),
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, firstName == null ? "" : firstName, this::setFirstName, this),
+                new Item(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, this),
+                new Item(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, this)
+                //new Item(Item.ROLE, R.string.team_role, R.string.team_role, user.role == null ? "" : user.role.getName(), user::setRoleName, this)
         );
     }
 

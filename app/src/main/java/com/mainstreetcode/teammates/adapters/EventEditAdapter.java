@@ -12,6 +12,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.DateViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.EventGuestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.MapInputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
@@ -60,6 +61,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
                 ? R.layout.viewholder_list_item
                 : viewType == GUEST
                 ? R.layout.viewholder_list_item
+                : viewType == Item.LOCATION
+                ? R.layout.viewholder_location_input
                 : R.layout.view_holder_padding;
 
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
@@ -71,6 +74,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
                 return new DateViewHolder(itemView);
             case Item.IMAGE:
                 return new ImageViewHolder(itemView, adapterListener);
+            case Item.LOCATION:
+                return new MapInputViewHolder(itemView, adapterListener);
             case GUEST:
                 return new EventGuestViewHolder(itemView, adapterListener);
             case TEAM:
@@ -115,6 +120,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             ImageWorkerFragment.ImagePickerListener {
 
         void selectTeam();
+
+        void onLocationClicked();
 
         void rsvpToEvent(User user);
     }

@@ -1,9 +1,10 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
@@ -22,6 +25,8 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Edits a Team member
@@ -34,7 +39,9 @@ public class EventEditFragment extends MainActivityFragment
         EventEditAdapter.EditAdapterListener {
 
     private static final String ARG_EVENT = "event";
+    public static final int PLACE_PICKER_REQUEST = 1;
 
+    private boolean fromUserPickerAction;
     private Event event;
 
     @Nullable
@@ -114,8 +121,7 @@ public class EventEditFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton fab = getFab();
-        fab.setOnClickListener(this);
+        getFab().setOnClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 
@@ -126,8 +132,20 @@ public class EventEditFragment extends MainActivityFragment
             getActivity().invalidateOptionsMenu();
         }, emptyErrorHandler));
 
-        if (!event.isEmpty()) {
+        if (!event.isEmpty() && !fromUserPickerAction) {
             disposables.add(eventViewModel.getEvent(event).subscribe(updated -> recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
+        }
+        fromUserPickerAction = false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != PLACE_PICKER_REQUEST) return;
+        if (resultCode == RESULT_OK) {
+            Context context = getContext();
+            Place place = PlacePicker.getPlace(context, data);
+            event.setPlace(place);
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 
@@ -157,10 +175,13 @@ public class EventEditFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
+                boolean wasEmpty = event.isEmpty();
                 disposables.add(eventViewModel.updateEvent(event)
                         .subscribe(updatedEvent -> {
                             event.update(updatedEvent);
-                            showSnackbar(getString(R.string.updated_user, event.getName()));
+                            showSnackbar(wasEmpty
+                                    ? getString(R.string.added_user, event.getName())
+                                    : getString(R.string.updated_user, event.getName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
                         }, defaultErrorHandler));
                 break;
@@ -175,6 +196,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
+        fromUserPickerAction = true;
         ImageWorkerFragment.requestCrop(this);
     }
 
@@ -185,6 +207,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void selectTeam() {
+        fromUserPickerAction = true;
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, R.id.request_event_team_pick);
         showFragment(teamsFragment);
@@ -200,12 +223,19 @@ public class EventEditFragment extends MainActivityFragment
                 .show();
     }
 
+    @Override
+    public void onLocationClicked() {
+        fromUserPickerAction = true;
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
+        catch (Exception e) {e.printStackTrace();}
+    }
+
     private void rsvpEvent(Event event, boolean attending) {
         toggleProgress(true);
         disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(result -> {
                     toggleProgress(false);
                     recyclerView.getAdapter().notifyDataSetChanged();
-                }, defaultErrorHandler)
-        );
+                }, defaultErrorHandler));
     }
 }

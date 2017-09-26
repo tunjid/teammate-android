@@ -113,6 +113,7 @@
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="location">Location</string>
+    <string name="map_pick">Pick On Map</string>
     <string name="notes">Notes</string>
     <string name="delete_event">Delete event</string>
     <string name="attend_event">Attending this event?</string>

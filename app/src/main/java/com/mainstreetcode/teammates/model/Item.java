@@ -16,35 +16,37 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class Item<T> {
 
     @Retention(SOURCE)
-    @IntDef({INPUT, IMAGE, ROLE, DATE})
+    @IntDef({INPUT, IMAGE, ROLE, DATE, ADDRESS, LOCATION})
     @interface ItemType {}
 
     public static final int INPUT = 2;
     public static final int IMAGE = 3;
     public static final int ROLE = 4;
     public static final int DATE = 5;
+    public static final int ADDRESS = 6;
+    public static final int LOCATION = 7;
 
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
     private @StringRes final int headerStringRes;
     private @Nullable final ValueChangeCallBack changeCallBack;
-    private final Class<T> itemizedClass;
+    private final T itemizedObject;
 
     private String value;
 
     public Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-                Class<T> itemizedClass) {
-        this(itemType, stringRes, 0, value, changeCallBack, itemizedClass);
+                 T itemizedObject) {
+        this(itemType, stringRes, 0, value, changeCallBack, itemizedObject);
     }
 
     public Item(int itemType, int stringRes, int headerStringRes,
-                String value, @Nullable ValueChangeCallBack changeCallBack, Class<T> itemizedClass) {
+                String value, @Nullable ValueChangeCallBack changeCallBack, T itemizedObject) {
         this.itemType = itemType;
         this.stringRes = stringRes;
         this.headerStringRes = headerStringRes;
         this.value = value;
         this.changeCallBack = changeCallBack;
-        this.itemizedClass = itemizedClass;
+        this.itemizedObject = itemizedObject;
     }
 
     public void setValue(String value) {
@@ -62,8 +64,8 @@ public class Item<T> {
 
     public String getValue() {return this.value;}
 
-    public Class<T> getItemizedClass() {
-        return itemizedClass;
+    public T getItemizedObject() {
+        return itemizedObject;
     }
 
     // Used to change the value of the Team's fields
