@@ -6,6 +6,8 @@ import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -58,8 +60,8 @@ public class Team extends TeamEntity
     @Ignore private final List<Item<Team>> items;
 
     public Team(String id, String name, String city, String state, String zip, String imageUrl,
-                Date created) {
-        super(id, name, city, state, zip, imageUrl, created);
+                Date created, LatLng location) {
+        super(id, name, city, state, zip, imageUrl, created, location);
 
         items = buildItems();
     }
@@ -72,19 +74,19 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "", new Date());
+        return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, Team.class),
-                new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, Team.class),
-                new Item(Item.ADDRESS, R.string.city, city == null ? "" : city, this::setCity, Team.class),
-                new Item(Item.ADDRESS, R.string.state, state == null ? "" : state, this::setState, Team.class),
-                new Item(Item.ADDRESS, R.string.zip, zip == null ? "" : zip, this::setZip, Team.class),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, Team.class)
+                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this),
+                new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, this),
+                new Item(Item.ADDRESS, R.string.city, city == null ? "" : city, this::setCity, this),
+                new Item(Item.ADDRESS, R.string.state, state == null ? "" : state, this::setState, this),
+                new Item(Item.ADDRESS, R.string.zip, zip == null ? "" : zip, this::setZip, this),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, this)
         );
     }
 
@@ -109,6 +111,8 @@ public class Team extends TeamEntity
 
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
+
+        location = updatedTeam.location;
 
         roles.clear();
         joinRequests.clear();
@@ -139,6 +143,8 @@ public class Team extends TeamEntity
         items.get(CITY_POSITION).setValue(address.getLocality());
         items.get(STATE_POSITION).setValue(address.getAdminArea());
         items.get(ZIP_POSITION).setValue(address.getPostalCode());
+
+        location = new LatLng(address.getLatitude(), address.getLongitude());
     }
 
     @Override
@@ -180,6 +186,7 @@ public class Team extends TeamEntity
         private static final String LOGO_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
         private static final String ROLES_KEY = "roles";
+        private static final String LOCATION_KEY = "location";
         private static final String JOIN_REQUEST_KEY = "joinRequests";
 
         @Override
@@ -195,8 +202,9 @@ public class Team extends TeamEntity
             String role = ModelUtils.asString(ROLE_KEY, teamJson);
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
+            LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip, logoUrl, created);
+            Team team = new Team(id, name, city, state, zip, logoUrl, created, location);
 
             team.get(LOGO_POSITION).setValue(logoUrl);
             team.get(ROLE_POSITION).setValue(role);
@@ -214,6 +222,13 @@ public class Team extends TeamEntity
             team.addProperty(CITY_KEY, src.city);
             team.addProperty(STATE_KEY, src.state);
             team.addProperty(ZIP_KEY, src.zip);
+
+            if (src.location != null) {
+                JsonArray coordinates = new JsonArray();
+                coordinates.add(src.location.longitude);
+                coordinates.add(src.location.latitude);
+                team.add(LOCATION_KEY, coordinates);
+            }
 
             return team;
         }

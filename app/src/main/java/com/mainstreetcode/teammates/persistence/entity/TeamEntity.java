@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.Date;
 
 
@@ -20,9 +22,10 @@ public class TeamEntity implements Parcelable{
     @ColumnInfo(name = "team_image_url") protected String imageUrl;
 
     @ColumnInfo(name = "team_created") protected Date created;
+    @ColumnInfo(name = "team_location") protected LatLng location;
 
     public TeamEntity(String id, String name, String city, String state, String zip, String imageUrl,
-                      Date created) {
+                      Date created, LatLng location) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -30,6 +33,7 @@ public class TeamEntity implements Parcelable{
         this.zip = zip;
         this.imageUrl = imageUrl;
         this.created = created;
+        this.location = location;
     }
 
     protected TeamEntity(Parcel in) {
@@ -40,6 +44,7 @@ public class TeamEntity implements Parcelable{
         zip = in.readString();
         imageUrl = in.readString();
         created = new Date(in.readLong());
+        location = (LatLng) in.readValue(LatLng.class.getClassLoader());
     }
 
     public String getId() {return this.id;}
@@ -65,6 +70,10 @@ public class TeamEntity implements Parcelable{
     @SuppressWarnings("unused")
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public LatLng getLocation() {
+        return location;
     }
 
     protected void setName(String name) {this.name = name; }
@@ -109,6 +118,7 @@ public class TeamEntity implements Parcelable{
         dest.writeString(zip);
         dest.writeString(imageUrl);
         dest.writeLong(created.getTime());
+        dest.writeValue(location);
     }
 
     public static final Parcelable.Creator<TeamEntity> CREATOR = new Parcelable.Creator<TeamEntity>() {

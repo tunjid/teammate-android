@@ -17,21 +17,26 @@ public class EventViewHolder extends BaseViewHolder<EventAdapter.EventAdapterLis
 
     private Event item;
     private ImageView image;
-    private TextView teamName;
-    private TextView teamLocation;
+    private TextView eventName;
+    private TextView eventTime;
+    private TextView eventLocation;
 
     public EventViewHolder(View itemView, EventAdapter.EventAdapterListener adapterListener) {
         super(itemView, adapterListener);
         image = itemView.findViewById(R.id.thumbnail);
-        teamName = itemView.findViewById(R.id.item_title);
-        teamLocation = itemView.findViewById(R.id.item_subtitle);
+        eventName = itemView.findViewById(R.id.item_title);
+        eventTime = itemView.findViewById(R.id.item_subtitle);
+        eventLocation = itemView.findViewById(R.id.location);
         itemView.setOnClickListener(this);
     }
 
     public void bind(Event item) {
         this.item = item;
-        teamName.setText(item.getName());
-        teamLocation.setText(item.getTime());
+        eventName.setText(item.getName());
+        eventTime.setText(item.getTime());
+
+        eventLocation.setText(item.getLocationName());
+        eventLocation.setVisibility(TextUtils.isEmpty(item.getLocationName()) ? View.GONE : View.VISIBLE);
 
         if (!TextUtils.isEmpty(item.getImageUrl())) {
             Picasso.with(itemView.getContext())
