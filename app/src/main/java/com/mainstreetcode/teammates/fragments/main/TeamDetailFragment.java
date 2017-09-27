@@ -46,8 +46,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private Team team;
 
-    @Nullable
-    private Role currentRole;
+    private Role currentRole = Role.empty();
     private final List<String> availableRoles = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -91,7 +90,7 @@ public class TeamDetailFragment extends MainActivityFragment
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (currentRole == null || !currentRole.isPrivilegedRole()) return;
+                if (!showsFab()) return;
                 if (Math.abs(dy) < 3) return;
                 toggleFab(dy < 0);
             }
@@ -129,7 +128,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_team_detail, menu);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
-        deleteItem.setVisible(currentRole != null && currentRole.isPrivilegedRole());
+        deleteItem.setVisible(showsFab());
     }
 
     @Override
@@ -156,7 +155,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return currentRole != null && currentRole.isPrivilegedRole();
+        return currentRole.isPrivilegedRole();
     }
 
     @Override
@@ -171,9 +170,9 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onJoinRequestClicked(JoinRequest request) {
         View rootView = getView();
         if (rootView == null) return;
-        if (currentRole == null) return;
+        if (!currentRole.isPrivilegedRole()) return;
 
-        if (request.isUserApproved() && !request.isTeamApproved() && currentRole.isPrivilegedRole()) {
+        if (request.isUserApproved() && !request.isTeamApproved()) {
             new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
                     .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(request, true))
                     .setNegativeButton(R.string.no, (dialog, which) -> approveUser(request, false))
@@ -185,7 +184,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (currentRole != null && currentRole.isPrivilegedRole()) inviteUser();
+                if (showsFab()) inviteUser();
                 break;
         }
     }
@@ -219,13 +218,14 @@ public class TeamDetailFragment extends MainActivityFragment
     private void updateCurrentRole() {
         if (team.isEmpty()) return;
 
-        final User user = userViewModel.getCurrentUser();
+        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
+                .subscribe(this::onRoleUpdated, ErrorHandler.EMPTY));
+    }
 
-        disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId()).subscribe(role -> {
-            currentRole = role;
-            getActivity().invalidateOptionsMenu();
-            toggleFab(role.isPrivilegedRole());
-        }, ErrorHandler.EMPTY));
+    private void onRoleUpdated(Role role) {
+        currentRole.update(role);
+        getActivity().invalidateOptionsMenu();
+        toggleFab(showsFab());
     }
 
     @SuppressLint("InflateParams")

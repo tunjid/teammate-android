@@ -100,7 +100,7 @@ public class Role extends RoleEntity
     }
 
     public boolean isPrivilegedRole() {
-        return !TextUtils.isEmpty(name) && PRIVILEGED_ROLES.contains(name);
+        return !TextUtils.isEmpty(name) && !isEmpty() && PRIVILEGED_ROLES.contains(name);
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.mainstreetcode.teammates.adapters.RoleEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Role;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
 import java.util.ArrayList;
@@ -95,14 +96,6 @@ public class RoleEditFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        User user = userViewModel.getCurrentUser();
-        if (currentRole.isPrivilegedRole() && !role.getUser().equals(user)) {
-            inflater.inflate(R.menu.fragment_user_edit, menu);
-        }
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
@@ -111,14 +104,23 @@ public class RoleEditFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.edit_user));
 
         User user = userViewModel.getCurrentUser();
+        Team team = new Team(role.getTeamId(), "", "", "", "", "", null, null);
 
-        disposables.add(roleViewModel.getRoleInTeam(user.getId(), role.getTeamId())
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team)
                 .subscribe(this::onRoleUpdated, defaultErrorHandler));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
             roles.clear();
             roles.addAll(currentRoles);
         }, emptyErrorHandler));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        User user = userViewModel.getCurrentUser();
+        if (currentRole.isPrivilegedRole() && !role.getUser().equals(user)) {
+            inflater.inflate(R.menu.fragment_user_edit, menu);
+        }
     }
 
     @Override
@@ -140,7 +142,7 @@ public class RoleEditFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return true;
+        return canChangeRole() || canEditRoleUserInfo();
     }
 
     @Override
@@ -156,9 +158,9 @@ public class RoleEditFragment extends MainActivityFragment
                 }
 
                 disposables.add(roleViewModel.updateRole(role).subscribe(updatedRole -> {
-                            showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
-                            recyclerView.getAdapter().notifyDataSetChanged();
-                        }, defaultErrorHandler));
+                    showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }, defaultErrorHandler));
                 break;
         }
     }
@@ -198,7 +200,7 @@ public class RoleEditFragment extends MainActivityFragment
         recyclerView.getRecycledViewPool().clear();
         recyclerView.getAdapter().notifyItemChanged(Role.ROLE_NAME_POSITION);
         getActivity().invalidateOptionsMenu();
-
+        toggleFab(showsFab());
     }
 
     private boolean canEditRoleUserInfo() {
@@ -206,6 +208,6 @@ public class RoleEditFragment extends MainActivityFragment
     }
 
     private boolean canChangeRole() {
-        return (!currentRole.isEmpty() && currentRole.isPrivilegedRole()) || canEditRoleUserInfo();
+        return !currentRole.isEmpty() && currentRole.isPrivilegedRole();
     }
 }
