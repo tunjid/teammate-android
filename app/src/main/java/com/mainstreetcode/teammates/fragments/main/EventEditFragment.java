@@ -190,6 +190,8 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
+        if (!showsFab()) return;
+
         fromUserPickerAction = true;
         ImageWorkerFragment.requestCrop(this);
     }

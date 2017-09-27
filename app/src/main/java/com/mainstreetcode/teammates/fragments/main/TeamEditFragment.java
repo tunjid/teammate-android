@@ -154,6 +154,7 @@ public class TeamEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
+        if (!showsFab()) return;
         ImageWorkerFragment.requestCrop(this);
     }
 

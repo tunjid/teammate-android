@@ -30,7 +30,7 @@ public class localRoleViewModel extends ViewModel {
                 .map(this::onRoleFound);
     }
 
-    private Role onRoleFound(Role foundRole){
+    private Role onRoleFound(Role foundRole) {
         role.update(foundRole);
         return role;
     }
