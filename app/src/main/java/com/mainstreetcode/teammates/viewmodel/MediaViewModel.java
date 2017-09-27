@@ -6,7 +6,7 @@ import android.support.v7.util.DiffUtil;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.MediaRepository;
-import com.mainstreetcode.teammates.util.MediaDiffCallback;
+import com.mainstreetcode.teammates.util.ModelDiffCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +20,7 @@ import io.reactivex.Flowable;
 
 public class MediaViewModel extends ViewModel {
 
-    public static final Comparator<Media> COMPARATOR = (a, b) -> a.getCreated().compareTo(b.getCreated());
+    private static final Comparator<Media> COMPARATOR = (a, b) -> a.getCreated().compareTo(b.getCreated());
 
     private final MediaRepository repository;
 
@@ -38,7 +38,7 @@ public class MediaViewModel extends ViewModel {
             source.addAll(set);
             Collections.sort(source, COMPARATOR);
 
-            return DiffUtil.calculateDiff(new MediaDiffCallback(source, copy));
+            return DiffUtil.calculateDiff(new ModelDiffCallback<>(source, copy));
         });
     }
 
