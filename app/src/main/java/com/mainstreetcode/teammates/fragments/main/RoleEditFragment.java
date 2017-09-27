@@ -80,10 +80,8 @@ public class RoleEditFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_user_edit, container, false);
         recyclerView = rootView.findViewById(R.id.user_edit);
 
-        boolean isEditable = role.getUser().equals(userViewModel.getCurrentUser());
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RoleEditAdapter(role, roles, isEditable, this));
+        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this::canChangeRole, canEditRoleUserInfo(), this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -99,7 +97,7 @@ public class RoleEditFragment extends MainActivityFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         User user = userViewModel.getCurrentUser();
-        if (currentRole.isTeamAdmin() && !role.getUser().equals(user)) {
+        if (currentRole.isPrivilegedRole() && !role.getUser().equals(user)) {
             inflater.inflate(R.menu.fragment_user_edit, menu);
         }
     }
@@ -157,12 +155,10 @@ public class RoleEditFragment extends MainActivityFragment
                     return;
                 }
 
-                disposables.add(
-                        roleViewModel.updateRole(role).subscribe(updatedRole -> {
+                disposables.add(roleViewModel.updateRole(role).subscribe(updatedRole -> {
                             showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
                             recyclerView.getAdapter().notifyDataSetChanged();
-                        }, defaultErrorHandler)
-                );
+                        }, defaultErrorHandler));
                 break;
         }
     }
@@ -199,6 +195,17 @@ public class RoleEditFragment extends MainActivityFragment
 
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
+        recyclerView.getRecycledViewPool().clear();
+        recyclerView.getAdapter().notifyItemChanged(Role.ROLE_NAME_POSITION);
         getActivity().invalidateOptionsMenu();
+
+    }
+
+    private boolean canEditRoleUserInfo() {
+        return role.getUser().equals(userViewModel.getCurrentUser());
+    }
+
+    private boolean canChangeRole() {
+        return (!currentRole.isEmpty() && currentRole.isPrivilegedRole()) || canEditRoleUserInfo();
     }
 }

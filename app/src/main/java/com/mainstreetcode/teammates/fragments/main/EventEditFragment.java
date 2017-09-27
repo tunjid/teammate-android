@@ -100,7 +100,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (currentRole != null && currentRole.isTeamAdmin()) {
+        if (currentRole != null && currentRole.isPrivilegedRole()) {
             inflater.inflate(R.menu.fragment_event_edit, menu);
         }
     }

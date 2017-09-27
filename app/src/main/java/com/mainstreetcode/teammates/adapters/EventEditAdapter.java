@@ -1,9 +1,5 @@
 package com.mainstreetcode.teammates.adapters;
 
-import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
@@ -23,6 +19,8 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammates.model.Event  }
@@ -51,37 +49,21 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-
-        @LayoutRes int layoutRes = viewType == Item.INPUT || viewType == Item.DATE
-                ? R.layout.viewholder_simple_input
-                : viewType == Item.IMAGE
-                ? R.layout.viewholder_item_image
-                : viewType == TEAM
-                ? R.layout.viewholder_list_item
-                : viewType == GUEST
-                ? R.layout.viewholder_list_item
-                : viewType == Item.LOCATION
-                ? R.layout.viewholder_location_input
-                : R.layout.view_holder_padding;
-
-        View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
-
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(itemView, isEditable);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), isEditable);
             case Item.DATE:
-                return new DateViewHolder(itemView);
+                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case Item.IMAGE:
-                return new ImageViewHolder(itemView, adapterListener);
+                return new ImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
             case Item.LOCATION:
-                return new MapInputViewHolder(itemView, adapterListener);
+                return new MapInputViewHolder(getItemView(R.layout.viewholder_location_input, viewGroup), adapterListener);
             case GUEST:
-                return new EventGuestViewHolder(itemView, adapterListener);
+                return new EventGuestViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
             case TEAM:
-                return new TeamViewHolder(itemView, item -> adapterListener.selectTeam());
+                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), item -> adapterListener.selectTeam());
             default:
-                return new BaseItemViewHolder(itemView);
+                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }
 
