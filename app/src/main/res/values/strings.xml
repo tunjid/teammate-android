@@ -47,6 +47,7 @@
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>
     <string name="join_team">Join Team</string>
+    <string name="my_profile">My Profile</string>
 
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>

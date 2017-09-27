@@ -28,6 +28,7 @@ public final class SettingsFragment extends MainActivityFragment
 
     private static final List<SettingsItem> items = Arrays.asList(
             new SettingsItem(R.string.join_team),
+            new SettingsItem(R.string.my_profile),
             new SettingsItem(R.string.sign_out)
     );
 
@@ -77,6 +78,9 @@ public final class SettingsFragment extends MainActivityFragment
                 break;
             case R.string.join_team:
                 showFragment(TeamSearchFragment.newInstance());
+                break;
+            case R.string.my_profile:
+                showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
                 break;
         }
 

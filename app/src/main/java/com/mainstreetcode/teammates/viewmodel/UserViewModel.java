@@ -44,6 +44,10 @@ public class UserViewModel extends ViewModel {
         return repository.signIn(email, password);
     }
 
+    public Single<User> updateUser(User user) {
+        return repository.createOrUpdate(user);
+    }
+
     public Flowable<User> getMe() {
         return repository.getMe();
     }

@@ -4,14 +4,17 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.BaseItemViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
+import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
-import java.util.List;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link User}
@@ -19,65 +22,48 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class UserAdapter extends BaseRecyclerViewAdapter<UserAdapter.UserViewHolder, UserAdapter.UserAdapterListener> {
+public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private final List<User> users;
+    private final User user;
 
-    public UserAdapter(List<User> users, UserAdapterListener listener) {
+    public UserAdapter(User user, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
-        this.users = users;
-        setHasStableIds(true);
+        this.user = user;
     }
 
     @Override
-    public UserViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_grid_item, viewGroup, false);
-        return new UserViewHolder(itemView, adapterListener);
+        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_simple_input, viewGroup, false);
+
+        switch (viewType) {
+            case Item.IMAGE:
+                return new ImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
+            case Item.INPUT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), true);
+            default:
+                return new BaseItemViewHolder(itemView);
+        }
     }
 
     @Override
-    public void onBindViewHolder(UserViewHolder viewHolder, int i) {
-        viewHolder.bind(users.get(i));
+    public void onBindViewHolder(BaseItemViewHolder viewHolder, int i) {
+        viewHolder.bind(user.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return users.size();
+        return user.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return user.get(position).getItemType();
     }
 
     @Override
     public long getItemId(int position) {
-        return users.get(position).hashCode();
+        return user.get(position).hashCode();
     }
 
-    public interface UserAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        void onUserClicked(User item);
-    }
-
-    static class UserViewHolder extends BaseViewHolder<UserAdapterListener>
-            implements View.OnClickListener {
-
-        private User item;
-        private TextView teamName;
-        private TextView teamLocation;
-
-        UserViewHolder(View itemView, UserAdapterListener adapterListener) {
-            super(itemView, adapterListener);
-            teamName = itemView.findViewById(R.id.item_title);
-            teamLocation = itemView.findViewById(R.id.item_subtitle);
-            itemView.setOnClickListener(this);
-        }
-
-        void bind(User item) {
-            this.item = item;
-            teamName.setText(item.getFirstName());
-            //teamLocation.setText(item.getCity());
-        }
-
-        @Override
-        public void onClick(View view) {
-            adapterListener.onUserClicked(item);
-        }
-    }
 }
