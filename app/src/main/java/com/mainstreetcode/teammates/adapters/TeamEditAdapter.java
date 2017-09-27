@@ -1,9 +1,5 @@
 package com.mainstreetcode.teammates.adapters;
 
-import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
@@ -18,6 +14,8 @@ import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Team}
@@ -41,27 +39,17 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-
-        @LayoutRes int layoutRes = viewType == Item.INPUT || viewType == Item.ROLE || viewType == Item.ADDRESS
-                ? R.layout.viewholder_simple_input
-                : viewType == Item.IMAGE
-                ? R.layout.viewholder_item_image
-                : R.layout.view_holder_padding;
-
-        View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
-
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(itemView, isEditable);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), isEditable);
             case Item.ROLE:
-                return new RoleSelectViewHolder(itemView, roles);
+                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, true);
             case Item.IMAGE:
-                return new ImageViewHolder(itemView, adapterListener);
+                return new ImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
             case Item.ADDRESS:
-                return new ClickInputViewHolder(itemView, adapterListener);
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener);
             default:
-                return new BaseItemViewHolder(itemView);
+                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }
 

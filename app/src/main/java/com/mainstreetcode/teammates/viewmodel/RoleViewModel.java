@@ -11,7 +11,6 @@ import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.util.List;
 
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.subjects.ReplaySubject;
 
@@ -41,10 +40,6 @@ public class RoleViewModel extends ViewModel {
             api.getRoleValues().toObservable().subscribe(roleSubject);
         }
         return roleSubject.singleOrError();
-    }
-
-    public Maybe<Role> getRoleInTeam(String userId, String teamId) {
-        return repository.getRoleInTeam(userId, teamId);
     }
 
     public Single<Role> updateRole(Role role) {

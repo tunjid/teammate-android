@@ -123,7 +123,7 @@ public class TeamEditFragment extends MainActivityFragment
 
         User user = userViewModel.getCurrentUser();
 
-        disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId())
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team)
                 .subscribe(this::onRoleUpdated, defaultErrorHandler));
 
         disposables.add(roleViewModel.getRoleValues()
@@ -149,11 +149,12 @@ public class TeamEditFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return true;
+        return state == CREATING || state == JOINING || currentRole.isPrivilegedRole();
     }
 
     @Override
     public void onImageClick() {
+        if (!showsFab()) return;
         ImageWorkerFragment.requestCrop(this);
     }
 
@@ -236,6 +237,7 @@ public class TeamEditFragment extends MainActivityFragment
                 setToolbarTitle(getString(R.string.edit_team));
                 break;
         }
+        toggleFab(showsFab());
     }
 
     private void onRolesFetched(List<String> fetchedRoles) {

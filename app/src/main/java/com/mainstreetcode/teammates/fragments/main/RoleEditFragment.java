@@ -20,6 +20,7 @@ import com.mainstreetcode.teammates.adapters.RoleEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Role;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
 import java.util.ArrayList;
@@ -80,10 +81,8 @@ public class RoleEditFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_user_edit, container, false);
         recyclerView = rootView.findViewById(R.id.user_edit);
 
-        boolean isEditable = role.getUser().equals(userViewModel.getCurrentUser());
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RoleEditAdapter(role, roles, isEditable, this));
+        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this::canChangeRole, canEditRoleUserInfo(), this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -97,14 +96,6 @@ public class RoleEditFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        User user = userViewModel.getCurrentUser();
-        if (currentRole.isTeamAdmin() && !role.getUser().equals(user)) {
-            inflater.inflate(R.menu.fragment_user_edit, menu);
-        }
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
@@ -113,14 +104,23 @@ public class RoleEditFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.edit_user));
 
         User user = userViewModel.getCurrentUser();
+        Team team = new Team(role.getTeamId(), "", "", "", "", "", null, null);
 
-        disposables.add(roleViewModel.getRoleInTeam(user.getId(), role.getTeamId())
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team)
                 .subscribe(this::onRoleUpdated, defaultErrorHandler));
 
         disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
             roles.clear();
             roles.addAll(currentRoles);
         }, emptyErrorHandler));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        User user = userViewModel.getCurrentUser();
+        if (currentRole.isPrivilegedRole() && !role.getUser().equals(user)) {
+            inflater.inflate(R.menu.fragment_user_edit, menu);
+        }
     }
 
     @Override
@@ -142,7 +142,7 @@ public class RoleEditFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return true;
+        return canChangeRole() || canEditRoleUserInfo();
     }
 
     @Override
@@ -157,12 +157,10 @@ public class RoleEditFragment extends MainActivityFragment
                     return;
                 }
 
-                disposables.add(
-                        roleViewModel.updateRole(role).subscribe(updatedRole -> {
-                            showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
-                            recyclerView.getAdapter().notifyDataSetChanged();
-                        }, defaultErrorHandler)
-                );
+                disposables.add(roleViewModel.updateRole(role).subscribe(updatedRole -> {
+                    showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }, defaultErrorHandler));
                 break;
         }
     }
@@ -194,11 +192,23 @@ public class RoleEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
+        if (!showsFab()) return;
         ImageWorkerFragment.requestCrop(this);
     }
 
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
+        recyclerView.getRecycledViewPool().clear();
+        recyclerView.getAdapter().notifyItemChanged(Role.ROLE_NAME_POSITION);
         getActivity().invalidateOptionsMenu();
+        toggleFab(showsFab());
+    }
+
+    private boolean canEditRoleUserInfo() {
+        return role.getUser().equals(userViewModel.getCurrentUser());
+    }
+
+    private boolean canChangeRole() {
+        return !currentRole.isEmpty() && currentRole.isPrivilegedRole();
     }
 }

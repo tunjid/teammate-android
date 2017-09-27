@@ -34,9 +34,10 @@ public class Role extends RoleEntity
         ItemListableBean<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
-    private static final String ADMIN = "Admin";
+    private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
 
     public static final int IMAGE_POSITION = 0;
+    public static final int ROLE_NAME_POSITION = 4;
 
     @Ignore private final List<Item<Role>> items;
 
@@ -98,8 +99,8 @@ public class Role extends RoleEntity
         return Notifier.defaultNotifier(RoleRepository.getInstance());
     }
 
-    public boolean isTeamAdmin() {
-        return !TextUtils.isEmpty(name) && ADMIN.equals(name);
+    public boolean isPrivilegedRole() {
+        return !TextUtils.isEmpty(name) && !isEmpty() && PRIVILEGED_ROLES.contains(name);
     }
 
     @Override

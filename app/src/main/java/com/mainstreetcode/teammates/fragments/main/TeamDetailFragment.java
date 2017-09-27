@@ -46,8 +46,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private Team team;
 
-    @Nullable
-    private Role currentRole;
+    private Role currentRole = Role.empty();
     private final List<String> availableRoles = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -91,6 +90,7 @@ public class TeamDetailFragment extends MainActivityFragment
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (!showsFab()) return;
                 if (Math.abs(dy) < 3) return;
                 toggleFab(dy < 0);
             }
@@ -128,7 +128,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_team_detail, menu);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
-        deleteItem.setVisible(currentRole != null && currentRole.isTeamAdmin());
+        deleteItem.setVisible(showsFab());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return true;
+        return currentRole.isPrivilegedRole();
     }
 
     @Override
@@ -163,19 +163,16 @@ public class TeamDetailFragment extends MainActivityFragment
         View rootView = getView();
         if (rootView == null) return;
 
-
-        if (team.getRoles().contains(role)) {
-            showFragment(RoleEditFragment.newInstance(role));
-        }
+        if (team.getRoles().contains(role)) showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
     public void onJoinRequestClicked(JoinRequest request) {
         View rootView = getView();
         if (rootView == null) return;
-        if (currentRole == null) return;
+        if (!currentRole.isPrivilegedRole()) return;
 
-        if (request.isUserApproved() && !request.isTeamApproved() && currentRole.isTeamAdmin()) {
+        if (request.isUserApproved() && !request.isTeamApproved()) {
             new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
                     .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(request, true))
                     .setNegativeButton(R.string.no, (dialog, which) -> approveUser(request, false))
@@ -187,7 +184,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                inviteUser();
+                if (showsFab()) inviteUser();
                 break;
         }
     }
@@ -221,12 +218,14 @@ public class TeamDetailFragment extends MainActivityFragment
     private void updateCurrentRole() {
         if (team.isEmpty()) return;
 
-        final User user = userViewModel.getCurrentUser();
+        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
+                .subscribe(this::onRoleUpdated, ErrorHandler.EMPTY));
+    }
 
-        disposables.add(roleViewModel.getRoleInTeam(user.getId(), team.getId()).subscribe(role -> {
-            currentRole = role;
-            getActivity().invalidateOptionsMenu();
-        }, ErrorHandler.EMPTY));
+    private void onRoleUpdated(Role role) {
+        currentRole.update(role);
+        getActivity().invalidateOptionsMenu();
+        toggleFab(showsFab());
     }
 
     @SuppressLint("InflateParams")
@@ -242,12 +241,12 @@ public class TeamDetailFragment extends MainActivityFragment
 
         final AtomicReference<String> roleReference = new AtomicReference<>();
 
-        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles);
+        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles, true);
         Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, "");
 
         holder.bind(item);
 
-       final Dialog dialog = new AlertDialog.Builder(context).setTitle("").setView(dialogView).show();
+        final Dialog dialog = new AlertDialog.Builder(context).setTitle("").setView(dialogView).show();
 
         inviteButton.setOnClickListener(view -> {
 

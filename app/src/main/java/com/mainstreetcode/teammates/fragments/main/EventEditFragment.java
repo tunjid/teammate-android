@@ -42,10 +42,8 @@ public class EventEditFragment extends MainActivityFragment
     public static final int PLACE_PICKER_REQUEST = 1;
 
     private boolean fromUserPickerAction;
+    private Role currentRole = Role.empty();
     private Event event;
-
-    @Nullable
-    private Role currentRole;
 
     private RecyclerView recyclerView;
 
@@ -100,9 +98,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (currentRole != null && currentRole.isTeamAdmin()) {
-            inflater.inflate(R.menu.fragment_event_edit, menu);
-        }
+        if (showsFab()) inflater.inflate(R.menu.fragment_event_edit, menu);
     }
 
     @Override
@@ -127,10 +123,8 @@ public class EventEditFragment extends MainActivityFragment
 
         User user = userViewModel.getCurrentUser();
 
-        disposables.add(roleViewModel.getRoleInTeam(user.getId(), event.getTeam().getId()).subscribe(role -> {
-            currentRole = role;
-            getActivity().invalidateOptionsMenu();
-        }, emptyErrorHandler));
+        disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam())
+                .subscribe(this::onRoleUpdated, emptyErrorHandler));
 
         if (!event.isEmpty() && !fromUserPickerAction) {
             disposables.add(eventViewModel.getEvent(event).subscribe(updated -> recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
@@ -168,7 +162,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return true;
+        return currentRole.isPrivilegedRole();
     }
 
     @Override
@@ -196,6 +190,8 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void onImageClick() {
+        if (!showsFab()) return;
+
         fromUserPickerAction = true;
         ImageWorkerFragment.requestCrop(this);
     }
@@ -215,7 +211,7 @@ public class EventEditFragment extends MainActivityFragment
 
     @Override
     public void rsvpToEvent(User user) {
-        if (currentRole == null || !user.equals(currentRole.getUser())) return;
+        if (!user.equals(currentRole.getUser())) return;
 
         new AlertDialog.Builder(getContext()).setTitle(getString(R.string.attend_event))
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
@@ -234,8 +230,14 @@ public class EventEditFragment extends MainActivityFragment
     private void rsvpEvent(Event event, boolean attending) {
         toggleProgress(true);
         disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(result -> {
-                    toggleProgress(false);
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                }, defaultErrorHandler));
+            toggleProgress(false);
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }, defaultErrorHandler));
+    }
+
+    private void onRoleUpdated(Role role) {
+        currentRole.update(role);
+        getActivity().invalidateOptionsMenu();
+        toggleFab(showsFab());
     }
 }

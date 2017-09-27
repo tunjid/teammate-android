@@ -2,7 +2,6 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -64,9 +63,8 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton fab = getFab();
+        getFab().setOnClickListener(this);
         setFabIcon(R.drawable.ic_add_white_24dp);
-        fab.setOnClickListener(this);
         setToolbarTitle(getString(R.string.my_events));
 
         String userId = userViewModel.getCurrentUser().getId();
