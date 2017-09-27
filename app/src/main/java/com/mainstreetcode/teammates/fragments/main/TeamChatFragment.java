@@ -2,6 +2,8 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -87,8 +89,8 @@ public class TeamChatFragment extends MainActivityFragment
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
                 disposables.add(teamChatViewModel
-                        .fetchOlderChats(chats, team, getQueryDate())
-                        .subscribe(showProgress -> onChatsUpdated(showProgress, oldCount), defaultErrorHandler));
+                        .chatsBefore(chats, team, getQueryDate())
+                        .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
             }
         });
 
@@ -99,15 +101,12 @@ public class TeamChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
-
         subsribeToChat();
 
-        if (chats.isEmpty()) {
-            disposables.add(teamChatViewModel.fetchOlderChats(chats, team, getQueryDate()).subscribe(chat -> {
-                recyclerView.getAdapter().notifyItemInserted(0);
-                toggleProgress(false);
-            }, defaultErrorHandler));
-        }
+        Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
+        disposables.add(teamChatViewModel
+                .chatsBefore(chats, team, queryDate)
+                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -129,6 +128,7 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        teamChatViewModel.onChatRoomLeft(team);
         teamChatViewModel.updateLastSeen(team);
         recyclerView = null;
     }
@@ -145,13 +145,6 @@ public class TeamChatFragment extends MainActivityFragment
             return true;
         }
         return false;
-    }
-
-    private void onChatsUpdated(boolean showProgess, int oldCount) {
-        toggleProgress(showProgess);
-        teamChatViewModel.updateLastSeen(team);
-        if (!showProgess)
-            recyclerView.getAdapter().notifyItemRangeInserted(0, chats.size() - oldCount);
     }
 
     private void subsribeToChat() {
@@ -190,5 +183,11 @@ public class TeamChatFragment extends MainActivityFragment
 
     private Date getQueryDate() {
         return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
+    }
+
+    private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
+        toggleProgress(resultPair.first);
+        teamChatViewModel.updateLastSeen(team);
+        if (!resultPair.first) resultPair.second.dispatchUpdatesTo(recyclerView.getAdapter());
     }
 }
