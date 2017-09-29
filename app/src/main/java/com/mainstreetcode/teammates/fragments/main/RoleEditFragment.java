@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,8 +16,9 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.RoleEditAdapter;
-import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -30,11 +30,9 @@ import java.util.List;
  * Edits a Team member
  */
 
-public class RoleEditFragment extends MainActivityFragment
+public class RoleEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener,
-        ImageWorkerFragment.CropListener,
-        ImageWorkerFragment.ImagePickerListener {
+        View.OnClickListener{
 
     private static final String ARG_ROLE = "role";
 
@@ -78,8 +76,8 @@ public class RoleEditFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_user_edit, container, false);
-        recyclerView = rootView.findViewById(R.id.user_edit);
+        View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
+        recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new RoleEditAdapter(role, roles, this::canChangeRole, canEditRoleUserInfo(), this));
@@ -146,6 +144,11 @@ public class RoleEditFragment extends MainActivityFragment
     }
 
     @Override
+    protected HeaderedModel getHeaderedModel() {
+        return role;
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
@@ -182,12 +185,6 @@ public class RoleEditFragment extends MainActivityFragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onImageCropped(Uri uri) {
-        role.get(Role.IMAGE_POSITION).setValue(uri.getPath());
-        recyclerView.getAdapter().notifyItemChanged(User.IMAGE_POSITION);
     }
 
     @Override

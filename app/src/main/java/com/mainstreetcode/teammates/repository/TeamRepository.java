@@ -62,7 +62,7 @@ public class TeamRepository extends ModelRespository<Team> {
                 ? api.createTeam(model).map(localMapper(model))
                 : api.updateTeam(model.getId(), model).map(localMapper(model));
 
-        MultipartBody.Part body = getBody(model.get(Team.LOGO_POSITION).getValue(), Team.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
             eventSingle = eventSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
@@ -72,7 +72,7 @@ public class TeamRepository extends ModelRespository<Team> {
 
     @Override
     public Flowable<Team> get(String id) {
-        Maybe<Team> local = teamDao.get(id).subscribeOn(io());
+        Maybe<Team> local = teamDao.get(id).map(Team::updateDelayedRoles).subscribeOn(io());
         Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
 
         return cacheThenRemote(local, remote);

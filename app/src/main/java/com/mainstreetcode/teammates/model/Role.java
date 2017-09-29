@@ -31,13 +31,13 @@ public class Role extends RoleEntity
         implements
         Model<Role>,
         Notifiable<Role>,
+        HeaderedModel<Role>,
         ItemListableBean<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
 
-    public static final int IMAGE_POSITION = 0;
-    public static final int ROLE_NAME_POSITION = 4;
+    public static final int ROLE_NAME_POSITION = 3;
 
     @Ignore private final List<Item<Role>> items;
 
@@ -61,7 +61,6 @@ public class Role extends RoleEntity
     public List<Item<Role>> buildItems() {
         User user = getUser();
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this),
                 new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
                 new Item(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
                 new Item(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, this),
@@ -80,6 +79,11 @@ public class Role extends RoleEntity
     }
 
     @Override
+    public Item<Role> getHeaderItem() {
+        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this);
+    }
+
+    @Override
     public boolean isEmpty() {
         return TextUtils.isEmpty(id);
     }
@@ -90,6 +94,9 @@ public class Role extends RoleEntity
         this.name = updated.name;
         this.teamId = updated.teamId;
         this.imageUrl = updated.imageUrl;
+
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue(updated.get(i).getValue());
 
         this.user.update(updated.user);
     }

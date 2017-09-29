@@ -42,8 +42,9 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements OnApplyWindowInsetsListener {
 
+    public static int insetHeight;
+
     private boolean insetsApplied;
-    private int insetHeight;
     private View insetView;
 
     private Toolbar toolbar;
@@ -64,7 +65,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
             boolean isFullscreenFragment = isFullscreenFragment(f);
 
-//            TransitionManager.beginDelayedTransition((ViewGroup)toolbar.getParent(), new AutoTransition());
             ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
             params.topMargin = isFullscreenFragment ? insetHeight : 0;
             insetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);

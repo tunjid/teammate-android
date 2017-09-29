@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -12,18 +11,18 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.UserAdapter;
-import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.User;
 
 /**
  * Edits a Team member
  */
 
-public class UserEditFragment extends MainActivityFragment
+public class UserEditFragment extends HeaderedFragment
         implements
         View.OnClickListener,
-        ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
 
     private static final String ARG_USER = "user";
@@ -65,8 +64,8 @@ public class UserEditFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_user_edit, container, false);
-        recyclerView = rootView.findViewById(R.id.user_edit);
+        View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
+        recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new UserAdapter(user, this));
@@ -117,6 +116,11 @@ public class UserEditFragment extends MainActivityFragment
     }
 
     @Override
+    protected HeaderedModel getHeaderedModel() {
+        return user;
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
@@ -129,12 +133,6 @@ public class UserEditFragment extends MainActivityFragment
                 );
                 break;
         }
-    }
-
-    @Override
-    public void onImageCropped(Uri uri) {
-        user.get(User.IMAGE_POSITION).setValue(uri.getPath());
-        recyclerView.getAdapter().notifyItemChanged(User.IMAGE_POSITION);
     }
 
     @Override

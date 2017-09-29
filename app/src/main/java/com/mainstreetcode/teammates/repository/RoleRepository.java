@@ -45,7 +45,7 @@ public class RoleRepository extends ModelRespository<Role> {
     public Single<Role> createOrUpdate(Role model) {
         Single<Role> roleSingle = api.updateRole(model.getId(), model);
 
-        MultipartBody.Part body = getBody(model.get(Role.IMAGE_POSITION).getValue(), Role.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Role.PHOTO_UPLOAD_KEY);
         if (body != null) {
             roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
         }
