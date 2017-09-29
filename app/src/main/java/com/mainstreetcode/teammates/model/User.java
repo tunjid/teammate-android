@@ -29,11 +29,10 @@ import static com.mainstreetcode.teammates.util.ModelUtils.asString;
 
 public class User extends UserEntity implements
         Model<User>,
+        HeaderedModel<User>,
         ItemListableBean<User> {
 
-    public static final int IMAGE_POSITION = 0;
-    public static final int EMAIL_POSITION = 3;
-    //private static final int ROLE_POSITION = 4;
+    public static final int EMAIL_POSITION = 2;
 
     @Ignore private transient String password;
     @Ignore private transient String fcmToken;
@@ -59,7 +58,6 @@ public class User extends UserEntity implements
     @SuppressWarnings("unchecked")
     public List<Item<User>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this),
                 new Item(Item.INPUT, R.string.first_name, R.string.user_info, firstName == null ? "" : firstName, this::setFirstName, this),
                 new Item(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, this),
                 new Item(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, this)
@@ -77,6 +75,11 @@ public class User extends UserEntity implements
     }
 
     @Override
+    public Item<User> getHeaderItem() {
+        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this);
+    }
+
+    @Override
     public boolean isEmpty() {
         return TextUtils.isEmpty(id);
     }
@@ -84,6 +87,8 @@ public class User extends UserEntity implements
     @Override
     public void update(User updatedUser) {
         this.id = updatedUser.id;
+        this.imageUrl = updatedUser.imageUrl;
+
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
     }

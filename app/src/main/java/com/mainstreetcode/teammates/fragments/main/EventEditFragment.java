@@ -2,7 +2,6 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -19,9 +18,10 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventEditAdapter;
-import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -32,10 +32,9 @@ import static android.app.Activity.RESULT_OK;
  * Edits a Team member
  */
 
-public class EventEditFragment extends MainActivityFragment
+public class EventEditFragment extends HeaderedFragment
         implements
         View.OnClickListener,
-        ImageWorkerFragment.CropListener,
         EventEditAdapter.EditAdapterListener {
 
     private static final String ARG_EVENT = "event";
@@ -78,8 +77,8 @@ public class EventEditFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_user_edit, container, false);
-        recyclerView = rootView.findViewById(R.id.user_edit);
+        View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
+        recyclerView = rootView.findViewById(R.id.model_list);
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -166,6 +165,11 @@ public class EventEditFragment extends MainActivityFragment
     }
 
     @Override
+    protected HeaderedModel getHeaderedModel() {
+        return event;
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
@@ -180,12 +184,6 @@ public class EventEditFragment extends MainActivityFragment
                         }, defaultErrorHandler));
                 break;
         }
-    }
-
-    @Override
-    public void onImageCropped(Uri uri) {
-        event.get(Event.LOGO_POSITION).setValue(uri.getPath());
-        recyclerView.getAdapter().notifyItemChanged(Event.LOGO_POSITION);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,8 +16,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
-import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -35,10 +35,9 @@ import static android.app.Activity.RESULT_OK;
  * Creates, edits or lets a {@link com.mainstreetcode.teammates.model.User} join a {@link Team}
  */
 
-public class TeamEditFragment extends MainActivityFragment
+public class TeamEditFragment extends HeaderedFragment
         implements
         View.OnClickListener,
-        ImageWorkerFragment.CropListener,
         TeamEditAdapter.TeamEditAdapterListener {
 
     private static final int CREATING = 0;
@@ -89,8 +88,8 @@ public class TeamEditFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_team_edit, container, false);
-        recyclerView = rootView.findViewById(R.id.team_edit);
+        View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
+        recyclerView = rootView.findViewById(R.id.model_list);
 
         boolean isEditable = getArguments().getBoolean(ARG_EDITABLE);
 
@@ -153,6 +152,11 @@ public class TeamEditFragment extends MainActivityFragment
     }
 
     @Override
+    protected HeaderedModel getHeaderedModel() {
+        return team;
+    }
+
+    @Override
     public void onImageClick() {
         if (!showsFab()) return;
         ImageWorkerFragment.requestCrop(this);
@@ -163,12 +167,6 @@ public class TeamEditFragment extends MainActivityFragment
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {e.printStackTrace();}
-    }
-
-    @Override
-    public void onImageCropped(Uri uri) {
-        team.get(Team.LOGO_POSITION).setValue(uri.getPath());
-        recyclerView.getAdapter().notifyItemChanged(Team.LOGO_POSITION);
     }
 
     @Override

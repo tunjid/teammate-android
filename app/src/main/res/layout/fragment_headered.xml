@@ -14,19 +14,19 @@
             app:contentScrim="@color/black_75"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <include layout="@layout/viewholder_item_image"></include>
+            <include layout="@layout/viewholder_item_image" />
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/header_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="parallax"
+                app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/team_edit"
+        android:id="@+id/model_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:descendantFocusability="beforeDescendants"

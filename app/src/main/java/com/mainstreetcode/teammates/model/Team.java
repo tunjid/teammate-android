@@ -37,14 +37,13 @@ public class Team extends TeamEntity
         implements
         Model<Team>,
         Notifiable<Team>,
+        HeaderedModel<Team>,
         ItemListableBean<Team> {
 
-    public static final int LOGO_POSITION = 0;
-    //    private static final int NAME_POSITION = 1;
-    private static final int CITY_POSITION = 2;
-    private static final int STATE_POSITION = 3;
-    public static final int ZIP_POSITION = 4;
-    public static final int ROLE_POSITION = 5;
+    private static final int CITY_POSITION = 1;
+    private static final int STATE_POSITION = 2;
+    public static final int ZIP_POSITION = 3;
+    public static final int ROLE_POSITION = 4;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
@@ -81,7 +80,6 @@ public class Team extends TeamEntity
     @SuppressWarnings("unchecked")
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this),
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, this),
                 new Item(Item.ADDRESS, R.string.city, city == null ? "" : city, this::setCity, this),
                 new Item(Item.ADDRESS, R.string.state, state == null ? "" : state, this::setState, this),
@@ -101,6 +99,11 @@ public class Team extends TeamEntity
     }
 
     @Override
+    public Item<Team> getHeaderItem() {
+        return new Item<>(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this);
+    }
+
+    @Override
     public boolean isEmpty() {
         return this.equals(empty());
     }
@@ -108,6 +111,7 @@ public class Team extends TeamEntity
     @Override
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
+        this.imageUrl = updatedTeam.imageUrl;
 
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
@@ -182,7 +186,6 @@ public class Team extends TeamEntity
         private static final String CITY_KEY = "city";
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
-        private static final String ROLE_KEY = "role";
         private static final String LOGO_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
         private static final String ROLES_KEY = "roles";
@@ -199,15 +202,11 @@ public class Team extends TeamEntity
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
-            String role = ModelUtils.asString(ROLE_KEY, teamJson);
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
 
             Team team = new Team(id, name, city, state, zip, logoUrl, created, location);
-
-            team.get(LOGO_POSITION).setValue(logoUrl);
-            team.get(ROLE_POSITION).setValue(role);
 
             ModelUtils.deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
             ModelUtils.deserializeList(context, teamJson.get(JOIN_REQUEST_KEY), team.joinRequests, JoinRequest.class);

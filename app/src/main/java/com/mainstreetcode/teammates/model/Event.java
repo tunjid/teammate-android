@@ -35,11 +35,11 @@ public class Event extends EventEntity
         implements
         Model<Event>,
         Notifiable<Event>,
+        HeaderedModel<Event>,
         ItemListableBean<Event> {
 
-    public static final int LOGO_POSITION = 0;
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
-    private static final int LOCATION_POSITION = 5;
+    private static final int LOCATION_POSITION = 4;
 
     @Ignore private List<User> attendees = new ArrayList<>();
     @Ignore private List<User> absentees = new ArrayList<>();
@@ -68,7 +68,6 @@ public class Event extends EventEntity
     @SuppressWarnings("unchecked")
     public List<Item<Event>> buildItems() {
         return Arrays.asList(
-                new Item(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this),
                 new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
                 new Item(Item.INPUT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
                 new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
@@ -88,6 +87,11 @@ public class Event extends EventEntity
     }
 
     @Override
+    public Item<Event> getHeaderItem() {
+        return new Item<>(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this);
+    }
+
+    @Override
     public boolean isEmpty() {
         return equals(empty());
     }
@@ -95,6 +99,7 @@ public class Event extends EventEntity
     @Override
     public void update(Event updatedEvent) {
         this.id = updatedEvent.getId();
+        this.imageUrl = updatedEvent.imageUrl;
 
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());

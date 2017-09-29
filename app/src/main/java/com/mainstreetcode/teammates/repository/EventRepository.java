@@ -47,7 +47,7 @@ public class EventRepository extends ModelRespository<Event> {
                 ? api.createEvent(event).map(localMapper(event))
                 : api.updateEvent(event.getId(), event).map(localMapper(event));
 
-        MultipartBody.Part body = getBody(event.get(Event.LOGO_POSITION).getValue(), Event.PHOTO_UPLOAD_KEY);
+        MultipartBody.Part body = getBody(event.getHeaderItem().getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
             eventSingle = eventSingle.flatMap(put -> api.uploadEventPhoto(event.getId(), body));
         }
