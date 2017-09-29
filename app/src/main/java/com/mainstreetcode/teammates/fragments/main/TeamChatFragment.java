@@ -33,7 +33,9 @@ import java.util.List;
 import static android.text.TextUtils.isEmpty;
 
 public class TeamChatFragment extends MainActivityFragment
-        implements TextView.OnEditorActionListener {
+        implements
+        TextView.OnEditorActionListener,
+        TeamChatAdapter.ChatAdapterListener {
 
     private static final String ARG_TEAM = "team";
 
@@ -83,7 +85,7 @@ public class TeamChatFragment extends MainActivityFragment
         linearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new TeamChatAdapter(chats, userViewModel.getCurrentUser()));
+        recyclerView.setAdapter(new TeamChatAdapter(chats, userViewModel.getCurrentUser(), this));
         recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
             @Override
             public void onLoadMore(int oldCount) {
@@ -138,6 +140,17 @@ public class TeamChatFragment extends MainActivityFragment
         return false;
     }
 
+    @Override
+    public void onChatClicked(TeamChat chat) {
+        if (chat.isSuccessful() || !chat.isEmpty()) return;
+        for (int i = 0; i < chats.size(); i++) {
+            if (chats.get(i).getCreated().equals(chat.getCreated())) {
+                postChat(i, chat);
+                return;
+            }
+        }
+    }
+
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
                 && (event.getAction() == KeyEvent.ACTION_DOWN))) {
@@ -154,10 +167,7 @@ public class TeamChatFragment extends MainActivityFragment
             recyclerView.smoothScrollToPosition(chats.size() - 1);
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
-                .add(message -> {
-                    showSnackbar(message);
-                    subsribeToChat();
-                })
+                .add(message -> showSnackbar(message))
                 .build()));
     }
 
@@ -170,15 +180,26 @@ public class TeamChatFragment extends MainActivityFragment
         TeamChat chat = TeamChat.chat(text, userViewModel.getCurrentUser(), team);
         chats.add(chat);
 
-        final int index = chats.indexOf(chat);
-        final RecyclerView.Adapter adapter = recyclerView.getAdapter();
+        final int index = chats.size() - 1;
 
         recyclerView.smoothScrollToPosition(index);
-        adapter.notifyItemInserted(index);
+        recyclerView.getAdapter().notifyItemInserted(index);
+        postChat(index, chat);
+    }
+
+    private void postChat(int index, TeamChat chat) {
+        final RecyclerView.Adapter adapter = recyclerView.getAdapter();
+
         teamChatViewModel.post(chat).subscribe(() -> {
-            adapter.notifyItemChanged(index);
             teamChatViewModel.updateLastSeen(team);
-        }, defaultErrorHandler);
+            adapter.notifyItemChanged(index);
+        }, ErrorHandler.builder()
+                .defaultMessage(getString(R.string.default_error))
+                .add(errorMessage -> {
+                    chat.setSuccessful(false);
+                    adapter.notifyItemChanged(index);
+                })
+                .build());
     }
 
     private Date getQueryDate() {

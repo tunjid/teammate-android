@@ -21,12 +21,13 @@ import java.util.List;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
     private final List<TeamChat> chats;
     private final User signedInUser;
 
-    public TeamChatAdapter(List<TeamChat> chats, User signedInUser) {
-        //setHasStableIds(true);
+    public TeamChatAdapter(List<TeamChat> chats, User signedInUser,
+                           TeamChatAdapter.ChatAdapterListener listener) {
+        super(listener);
         this.chats = chats;
         this.signedInUser = signedInUser;
     }
@@ -37,7 +38,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
         @LayoutRes int layoutRes = R.layout.viewholder_chat;
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
 
-        return new TeamChatViewHolder(itemView);
+        return new TeamChatViewHolder(itemView, adapterListener);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
         int size = chats.size();
 
         TeamChat teamChat = chats.get(i);
-        TeamChat next = i < size - 1 ? chats.get(i + 1): null;
+        TeamChat next = i < size - 1 ? chats.get(i + 1) : null;
 
         User chatUser = teamChat.getUser();
         boolean hideDetails = (next != null && chatUser.equals(next.getUser()));
@@ -61,5 +62,9 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     @Override
     public long getItemId(int position) {
         return chats.get(position).hashCode();
+    }
+
+    public interface ChatAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+        void onChatClicked(TeamChat chat);
     }
 }

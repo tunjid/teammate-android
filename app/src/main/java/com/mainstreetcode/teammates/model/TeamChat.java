@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -45,6 +46,9 @@ public class TeamChat implements
     @SuppressLint("SimpleDateFormat")
     private static final DateFormat CHAT_DATE_FORMAT = new SimpleDateFormat("h:mm a");
     private static final String KIND_TEXT = "text";
+
+    @Ignore
+    private transient boolean isSuccessful = true;
 
     @PrimaryKey
     @ColumnInfo(name = "team_chat_id") private String id;
@@ -100,6 +104,7 @@ public class TeamChat implements
         kind = updated.kind;
         content = updated.content;
         created = updated.created;
+        isSuccessful = updated.isSuccessful;
 
         user.update(updated.user);
         team.update(updated.team);
@@ -133,6 +138,14 @@ public class TeamChat implements
     public String getCreatedDate() {
         if (created == null) return "";
         return CHAT_DATE_FORMAT.format(created);
+    }
+
+    public void setSuccessful(boolean successful) {
+        isSuccessful = successful;
+    }
+
+    public boolean isSuccessful() {
+        return isSuccessful;
     }
 
     @Override

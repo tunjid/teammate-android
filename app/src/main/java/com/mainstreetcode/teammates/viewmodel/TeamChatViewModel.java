@@ -48,11 +48,11 @@ public class TeamChatViewModel extends ViewModel {
     }
 
     public Flowable<TeamChat> listenForChat(Team team) {
-        return repository.listenForChat(team);
+        return repository.listenForChat(team).retry();
     }
 
     public Completable post(TeamChat chat) {
-        return repository.post(chat);
+        return repository.post(chat).retry(2);
     }
 
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<TeamChat> chats, final Team team, Date date) {
