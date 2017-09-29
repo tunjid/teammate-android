@@ -2,6 +2,8 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -31,7 +33,9 @@ import java.util.List;
 import static android.text.TextUtils.isEmpty;
 
 public class TeamChatFragment extends MainActivityFragment
-        implements TextView.OnEditorActionListener {
+        implements
+        TextView.OnEditorActionListener,
+        TeamChatAdapter.ChatAdapterListener {
 
     private static final String ARG_TEAM = "team";
 
@@ -81,14 +85,14 @@ public class TeamChatFragment extends MainActivityFragment
         linearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new TeamChatAdapter(chats, userViewModel.getCurrentUser()));
+        recyclerView.setAdapter(new TeamChatAdapter(chats, userViewModel.getCurrentUser(), this));
         recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
                 disposables.add(teamChatViewModel
-                        .fetchOlderChats(chats, team, getQueryDate())
-                        .subscribe(showProgress -> onChatsUpdated(showProgress, oldCount), defaultErrorHandler));
+                        .chatsBefore(chats, team, getQueryDate())
+                        .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
             }
         });
 
@@ -99,15 +103,12 @@ public class TeamChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
-
         subsribeToChat();
 
-        if (chats.isEmpty()) {
-            disposables.add(teamChatViewModel.fetchOlderChats(chats, team, getQueryDate()).subscribe(chat -> {
-                recyclerView.getAdapter().notifyItemInserted(0);
-                toggleProgress(false);
-            }, defaultErrorHandler));
-        }
+        Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
+        disposables.add(teamChatViewModel
+                .chatsBefore(chats, team, queryDate)
+                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -129,6 +130,7 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        teamChatViewModel.onChatRoomLeft(team);
         teamChatViewModel.updateLastSeen(team);
         recyclerView = null;
     }
@@ -136,6 +138,17 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     protected boolean showsFab() {
         return false;
+    }
+
+    @Override
+    public void onChatClicked(TeamChat chat) {
+        if (chat.isSuccessful() || !chat.isEmpty()) return;
+        for (int i = 0; i < chats.size(); i++) {
+            if (chats.get(i).getCreated().equals(chat.getCreated())) {
+                postChat(i, chat);
+                return;
+            }
+        }
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -147,13 +160,6 @@ public class TeamChatFragment extends MainActivityFragment
         return false;
     }
 
-    private void onChatsUpdated(boolean showProgess, int oldCount) {
-        toggleProgress(showProgess);
-        teamChatViewModel.updateLastSeen(team);
-        if (!showProgess)
-            recyclerView.getAdapter().notifyItemRangeInserted(0, chats.size() - oldCount);
-    }
-
     private void subsribeToChat() {
         disposables.add(teamChatViewModel.listenForChat(team).subscribe(chat -> {
             chats.add(chat);
@@ -161,10 +167,7 @@ public class TeamChatFragment extends MainActivityFragment
             recyclerView.smoothScrollToPosition(chats.size() - 1);
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
-                .add(message -> {
-                    showSnackbar(message);
-                    subsribeToChat();
-                })
+                .add(message -> showSnackbar(message))
                 .build()));
     }
 
@@ -177,18 +180,35 @@ public class TeamChatFragment extends MainActivityFragment
         TeamChat chat = TeamChat.chat(text, userViewModel.getCurrentUser(), team);
         chats.add(chat);
 
-        final int index = chats.indexOf(chat);
-        final RecyclerView.Adapter adapter = recyclerView.getAdapter();
+        final int index = chats.size() - 1;
 
         recyclerView.smoothScrollToPosition(index);
-        adapter.notifyItemInserted(index);
+        recyclerView.getAdapter().notifyItemInserted(index);
+        postChat(index, chat);
+    }
+
+    private void postChat(int index, TeamChat chat) {
+        final RecyclerView.Adapter adapter = recyclerView.getAdapter();
+
         teamChatViewModel.post(chat).subscribe(() -> {
-            adapter.notifyItemChanged(index);
             teamChatViewModel.updateLastSeen(team);
-        }, defaultErrorHandler);
+            adapter.notifyItemChanged(index);
+        }, ErrorHandler.builder()
+                .defaultMessage(getString(R.string.default_error))
+                .add(errorMessage -> {
+                    chat.setSuccessful(false);
+                    adapter.notifyItemChanged(index);
+                })
+                .build());
     }
 
     private Date getQueryDate() {
         return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
+    }
+
+    private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
+        toggleProgress(resultPair.first);
+        teamChatViewModel.updateLastSeen(team);
+        if (!resultPair.first) resultPair.second.dispatchUpdatesTo(recyclerView.getAdapter());
     }
 }

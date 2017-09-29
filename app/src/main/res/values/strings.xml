@@ -122,6 +122,8 @@
     <string name="event_not_attending">Not Going</string>
 
     <!--TeamChatFragment-->
+    <string name="chat_sending">Sending…</string>
+    <string name="chat_failed">Failed</string>
     <string name="chat_details">%1$s · %2$s</string>
     <string name="image_description">image</string>
     <string name="message_hint">Type a message…</string>
