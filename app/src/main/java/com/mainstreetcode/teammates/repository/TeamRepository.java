@@ -72,7 +72,7 @@ public class TeamRepository extends ModelRespository<Team> {
 
     @Override
     public Flowable<Team> get(String id) {
-        Maybe<Team> local = teamDao.get(id).subscribeOn(io());
+        Maybe<Team> local = teamDao.get(id).map(Team::updateDelayedRoles).subscribeOn(io());
         Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
 
         return cacheThenRemote(local, remote);

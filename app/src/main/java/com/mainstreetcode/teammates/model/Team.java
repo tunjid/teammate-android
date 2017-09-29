@@ -48,11 +48,12 @@ public class Team extends TeamEntity
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
-    @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
-    private List<Role> roles = new ArrayList<>();
+    // Room fetches roles after setRoles is called. Since the reference of roles can't be changed,
+    // store the delayed roles here and update after Room is done.
+    @Ignore private List<Role> delayed = new ArrayList<>();
 
     @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
-    public List<RoleEntity> roleEntities = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 
     @Ignore private List<JoinRequest> joinRequests = new ArrayList<>();
 
@@ -74,6 +75,12 @@ public class Team extends TeamEntity
 
     public static Team empty() {
         return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null);
+    }
+
+    public static Team updateDelayedRoles(Team team){
+        team.roles.clear();
+        team.roles.addAll(team.delayed);
+        return team;
     }
 
     @Override
@@ -139,8 +146,7 @@ public class Team extends TeamEntity
     }
 
     public void setRoles(List<Role> roles) {
-        this.roles.clear();
-        this.roles.addAll(roles);
+        delayed = roles;
     }
 
     public void setAddress(Address address) {
