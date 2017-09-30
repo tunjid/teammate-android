@@ -4,7 +4,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
@@ -36,10 +35,7 @@ public class ImageViewHolder extends BaseItemViewHolder<ImageWorkerFragment.Imag
             Picasso picasso = Picasso.with(itemView.getContext());
             RequestCreator creator = file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
 
-            creator.fit().centerCrop().into(picture,
-                    PicassoPalette.with(pathOrUrl, picture)
-                            .use(PicassoPalette.Profile.MUTED_DARK)
-                            .intoBackground(itemView));
+            creator.fit().centerCrop().into(picture);
         }
     }
 
