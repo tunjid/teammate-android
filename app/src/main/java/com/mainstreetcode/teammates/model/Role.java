@@ -15,8 +15,8 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.notifications.Notifier;
+import com.mainstreetcode.teammates.notifications.RoleNotifier;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
-import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -103,7 +103,7 @@ public class Role extends RoleEntity
 
     @Override
     public Notifier<Role> getNotifier() {
-        return Notifier.defaultNotifier(RoleRepository.getInstance());
+        return RoleNotifier.getInstance();
     }
 
     public boolean isPrivilegedRole() {

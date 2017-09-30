@@ -7,32 +7,32 @@ import android.app.NotificationManager;
 import android.os.Build;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.repository.ModelRespository;
-import com.mainstreetcode.teammates.repository.TeamRepository;
+import com.mainstreetcode.teammates.repository.RoleRepository;
 
 
-public class TeamNotifier extends Notifier<Team> {
+public class RoleNotifier extends Notifier<Role> {
 
-    private static TeamNotifier INSTANCE;
+    private static RoleNotifier INSTANCE;
 
-    private TeamNotifier() {
+    private RoleNotifier() {
 
     }
 
-    public static TeamNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new TeamNotifier();
+    public static RoleNotifier getInstance() {
+        if (INSTANCE == null) INSTANCE = new RoleNotifier();
         return INSTANCE;
     }
 
     @Override
-    protected ModelRespository<Team> getRepository() {
-        return TeamRepository.getInstance();
+    protected ModelRespository<Role> getRepository() {
+        return RoleRepository.getInstance();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
-        return new NotificationChannel[]{buildNotificationChannel(FeedItem.TEAM, R.string.team, R.string.team_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
+        return new NotificationChannel[]{buildNotificationChannel(FeedItem.ROLE, R.string.roles, R.string.role_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }
 }

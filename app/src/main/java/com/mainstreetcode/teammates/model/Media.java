@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.notifications.MediaNotifier;
 import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
@@ -109,7 +110,7 @@ public class Media implements
 
     @Override
     public Notifier<Media> getNotifier() {
-        return Notifier.defaultNotifier(null);
+        return MediaNotifier.getInstance();
     }
 
     public User getUser() {

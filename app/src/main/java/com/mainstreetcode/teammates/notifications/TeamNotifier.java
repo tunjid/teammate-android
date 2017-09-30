@@ -7,32 +7,32 @@ import android.app.NotificationManager;
 import android.os.Build;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.repository.EventRepository;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.TeamRepository;
 
 
-public class EventNotifier extends Notifier<Event> {
+public class TeamNotifier extends Notifier<Team> {
 
-    private static EventNotifier INSTANCE;
+    private static TeamNotifier INSTANCE;
 
-    private EventNotifier() {
+    private TeamNotifier() {
 
     }
 
-    public static EventNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new EventNotifier();
+    public static TeamNotifier getInstance() {
+        if (INSTANCE == null) INSTANCE = new TeamNotifier();
         return INSTANCE;
     }
 
     @Override
-    protected ModelRespository<Event> getRepository() {
-        return EventRepository.getInstance();
+    protected ModelRespository<Team> getRepository() {
+        return TeamRepository.getInstance();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
-        return new NotificationChannel[]{buildNotificationChannel(FeedItem.EVENT, R.string.events, R.string.events_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
+        return new NotificationChannel[]{buildNotificationChannel(FeedItem.TEAM, R.string.teams, R.string.team_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }
 }

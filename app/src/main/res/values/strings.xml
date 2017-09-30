@@ -32,9 +32,12 @@
     <!--Main Activity Navigation Menu-->
     <string name="home">Home</string>
     <string name="events">Events</string>
-    <string name="messages">Messages</string>
+    <string name="chats">Chats</string>
     <string name="media">Media</string>
+    <string name="my_teams">My Teams</string>
+
     <string name="team">Team</string>
+    <string name="teams">Teams</string>
 
     <!--Main Activity Options Menu-->
     <string name="settings">Settings</string>
@@ -76,7 +79,6 @@
     <string name="updated_team">Updated team</string>
 
     <!--TeamsFragment-->
-    <string name="my_teams">My Teams</string>
     <string name="pick_team">Pick a Team</string>
     <string name="team_name_prefix">Team: %1$s</string>
 
@@ -140,4 +142,15 @@
     <string name="upload_complete">Upload complete.</string>
     <string name="upload_complete_status">%1$d failed.</string>
     <string name="pick_picture">Select Picture</string>
+
+    <!--Notifier-->
+    <string name="roles">Roles</string>
+    <string name="join_requests">Join Requests</string>
+    <string name="chats_notifier_description">Notifications for team chats</string>
+    <string name="team_notifier_description">Notifications for media</string>
+    <string name="role_notifier_description">Notifications for media</string>
+    <string name="events_notifier_description">Notifications for events</string>
+    <string name="media_notifier_description">Notifications for media</string>
+    <string name="join_requests_notifier_description">Notifications for join requests</string>
+
 </resources>

@@ -26,10 +26,12 @@ import java.util.Map;
 
 public class FeedItem<T extends Model<T> & Notifiable<T>> {
 
-    static final String JOIN_REQUEST = "join-request";
-    static final String EVENT = "event";
-    static final String TEAM = "team";
-    static final String TEAM_CHAT = "team-chat";
+    public static final String JOIN_REQUEST = "join-request";
+    public static final String EVENT = "event";
+    public static final String TEAM = "team";
+    public static final String ROLE = "role";
+    public static final String TEAM_CHAT = "team-chat";
+    public static final String MEDIA = "team-media";
 
     private static final Gson gson = TeammateService.getGson();
 

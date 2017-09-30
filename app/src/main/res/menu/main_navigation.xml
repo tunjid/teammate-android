@@ -17,7 +17,7 @@
         android:id="@+id/action_messages"
         android:enabled="true"
         android:icon="@drawable/ic_message_black_24dp"
-        android:title="@string/messages"
+        android:title="@string/chats"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_media"
