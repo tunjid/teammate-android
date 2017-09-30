@@ -127,8 +127,13 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_team_detail, menu);
+        boolean visible = showsFab();
+
+        MenuItem editItem = menu.findItem(R.id.action_edit);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
-        deleteItem.setVisible(showsFab());
+
+        editItem.setVisible(visible);
+        deleteItem.setVisible(visible);
     }
 
     @Override
