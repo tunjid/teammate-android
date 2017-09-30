@@ -122,7 +122,7 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
     }
 
     public Flowable<List<TeamChat>> chatsBefore(Team team, Date date) {
-        Maybe<List<TeamChat>> local = chatDao.chatsBefore(team.getId(), date).subscribeOn(io()).filter(chats -> false);
+        Maybe<List<TeamChat>> local = chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
         Maybe<List<TeamChat>> remote = api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
 
         return cacheThenRemote(local, remote);

@@ -8,21 +8,21 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.repository.TeamChatRepository;
 import com.mainstreetcode.teammates.util.ModelDiffCallback;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
 import static com.mainstreetcode.teammates.model.TeamChat.COMPARATOR;
-import static io.reactivex.Flowable.*;
+import static io.reactivex.Flowable.concat;
+import static io.reactivex.Flowable.just;
 
 
 public class TeamChatViewModel extends ViewModel {
@@ -68,10 +68,7 @@ public class TeamChatViewModel extends ViewModel {
                 .doOnCancel(() -> chatMap.put(team, RETRY))
                 .map(updatedChats -> {
                     List<TeamChat> copy = new ArrayList<>(chats);
-                    Set<TeamChat> set = new HashSet<>(chats);
-                    set.addAll(updatedChats);
-                    chats.clear();
-                    chats.addAll(set);
+                    ModelUtils.preserveList(chats, updatedChats);
                     Collections.sort(chats, COMPARATOR);
 
                     if (chats.size() == currentSize) chatMap.put(team, NO_MORE);

@@ -33,6 +33,7 @@ public class User extends UserEntity implements
         ItemListableBean<User> {
 
     public static final int EMAIL_POSITION = 2;
+    public static final String PHOTO_UPLOAD_KEY = "user-photo";
 
     @Ignore private transient String password;
     @Ignore private transient String fcmToken;
@@ -76,7 +77,7 @@ public class User extends UserEntity implements
 
     @Override
     public Item<User> getHeaderItem() {
-        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this);
+        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, this::setImageUrl, this);
     }
 
     @Override

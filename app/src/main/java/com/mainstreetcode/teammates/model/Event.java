@@ -106,11 +106,8 @@ public class Event extends EventEntity
 
         location = updatedEvent.location;
 
-        attendees.clear();
-        absentees.clear();
-
-        attendees.addAll(updatedEvent.attendees);
-        absentees.addAll(updatedEvent.absentees);
+        ModelUtils.preserveList(attendees, updatedEvent.attendees);
+        ModelUtils.preserveList(absentees, updatedEvent.absentees);
 
         team.update(updatedEvent.team);
     }

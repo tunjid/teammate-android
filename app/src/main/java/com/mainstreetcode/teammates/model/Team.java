@@ -125,11 +125,8 @@ public class Team extends TeamEntity
 
         location = updatedTeam.location;
 
-        roles.clear();
-        joinRequests.clear();
-
-        roles.addAll(updatedTeam.getRoles());
-        joinRequests.addAll(updatedTeam.getJoinRequests());
+        ModelUtils.preserveList(roles, updatedTeam.roles);
+        ModelUtils.preserveList(joinRequests, updatedTeam.joinRequests);
     }
 
     @Override
