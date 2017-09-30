@@ -27,6 +27,8 @@
             android:id="@+id/item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:paddingLeft="@dimen/single_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/half_margin"
