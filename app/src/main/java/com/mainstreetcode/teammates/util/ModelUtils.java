@@ -12,8 +12,10 @@ import com.google.gson.JsonObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 /**
@@ -82,5 +84,12 @@ public class ModelUtils {
         catch (ParseException e) {
             return new Date();
         }
+    }
+
+    public static <T> void preserveList(List<T> source, List<T> additions) {
+        Set<T> set = new HashSet<>(source);
+        set.addAll(additions);
+        source.clear();
+        source.addAll(set);
     }
 }

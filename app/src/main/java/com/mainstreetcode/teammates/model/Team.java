@@ -18,9 +18,9 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.notifications.Notifier;
+import com.mainstreetcode.teammates.notifications.TeamNotifier;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
-import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -125,16 +125,13 @@ public class Team extends TeamEntity
 
         location = updatedTeam.location;
 
-        roles.clear();
-        joinRequests.clear();
-
-        roles.addAll(updatedTeam.getRoles());
-        joinRequests.addAll(updatedTeam.getJoinRequests());
+        ModelUtils.preserveList(roles, updatedTeam.roles);
+        ModelUtils.preserveList(joinRequests, updatedTeam.joinRequests);
     }
 
     @Override
     public Notifier<Team> getNotifier() {
-        return Notifier.defaultNotifier(TeamRepository.getInstance());
+        return TeamNotifier.getInstance();
     }
 
     public List<Role> getRoles() {

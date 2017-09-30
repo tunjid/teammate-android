@@ -1,14 +1,16 @@
 package com.mainstreetcode.teammates.notifications;
 
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Media;
-import com.mainstreetcode.teammates.repository.EventRepository;
+import com.mainstreetcode.teammates.repository.MediaRepository;
 import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.rest.ProgressRequestBody;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -19,7 +21,7 @@ import okhttp3.RequestBody;
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 
-public class MediaNotifier extends Notifier<Event> {
+public class MediaNotifier extends Notifier<Media> {
 
     private int uploadsInProgress;
     private int numFailed;
@@ -32,6 +34,17 @@ public class MediaNotifier extends Notifier<Event> {
     public static MediaNotifier getInstance() {
         if (INSTANCE == null) INSTANCE = new MediaNotifier();
         return INSTANCE;
+    }
+
+    @Override
+    protected ModelRespository<Media> getRepository() {
+        return MediaRepository.getInstance();
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    protected NotificationChannel[] getNotificationChannels() {
+        return new NotificationChannel[]{buildNotificationChannel(FeedItem.MEDIA, R.string.media, R.string.media_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }
 
     public Single<Media> notifyOfUploads(Single<Media> mediaSingle, RequestBody requestBody) {
@@ -61,7 +74,7 @@ public class MediaNotifier extends Notifier<Event> {
                 ? app.getString(R.string.upload_complete_status, numFailed)
                 : app.getString(R.string.upload_progress_status, numAttempted, uploadsInProgress, numFailed);
 
-        Notification notification = new NotificationCompat.Builder(app, "")
+        Notification notification = new NotificationCompat.Builder(app, FeedItem.MEDIA)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(app.getString(isComplete ? R.string.upload_complete : R.string.uploading_media))
                 .setContentText(text)
@@ -70,10 +83,5 @@ public class MediaNotifier extends Notifier<Event> {
 
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
         notifier.notify(1, notification);
-    }
-
-    @Override
-    protected ModelRespository<Event> getRepository() {
-        return EventRepository.getInstance();
     }
 }

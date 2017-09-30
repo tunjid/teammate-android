@@ -22,6 +22,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static io.reactivex.Single.just;
@@ -36,7 +37,7 @@ public class UserRepository extends ModelRespository<User> {
     private static UserRepository ourInstance;
 
     private final Application application;
-    private final TeammateApi teammateApi;
+    private final TeammateApi api;
     private final UserDao userDao;
 
     private User currentUser = User.empty();
@@ -45,7 +46,7 @@ public class UserRepository extends ModelRespository<User> {
 
     private UserRepository() {
         application = Application.getInstance();
-        teammateApi = TeammateService.getApiInstance();
+        api = TeammateService.getApiInstance();
         userDao = AppDatabase.getInstance().userDao();
     }
 
@@ -57,8 +58,14 @@ public class UserRepository extends ModelRespository<User> {
     @Override
     public Single<User> createOrUpdate(User model) {
         Single<User> remote = model.isEmpty()
-                ? teammateApi.signUp(model)
-                : teammateApi.updateUser(model.getId(), model);
+                ? api.signUp(model)
+                : api.updateUser(model.getId(), model);
+
+
+        MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), User.PHOTO_UPLOAD_KEY);
+        if (body != null) {
+            remote = remote.flatMap(put -> api.uploadUserPhoto(model.getId(), body));
+        }
 
         remote = remote.map(getSaveFunction());
         return updateCurrent(remote);
@@ -67,7 +74,7 @@ public class UserRepository extends ModelRespository<User> {
     @Override
     public Flowable<User> get(String primaryEmail) {
         Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(io());
-        Single<User> remote = teammateApi.getMe().map(getSaveFunction());
+        Single<User> remote = api.getMe().map(getSaveFunction());
 
         return cacheThenRemote(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
     }
@@ -102,7 +109,7 @@ public class UserRepository extends ModelRespository<User> {
         request.addProperty("primaryEmail", email);
         request.addProperty("password", password);
 
-        Single<User> remote = teammateApi.signIn(request).map(getSaveFunction());
+        Single<User> remote = api.signIn(request).map(getSaveFunction());
         return updateCurrent(remote);
     }
 
@@ -117,7 +124,7 @@ public class UserRepository extends ModelRespository<User> {
         Single<Boolean> local = AppDatabase.getInstance().clearTables()
                 .flatMap(result -> clearUser());
 
-        return teammateApi.signOut()
+        return api.signOut()
                 .flatMap(result -> local)
                 .onErrorResumeNext(throwable -> local)
                 .subscribeOn(io())

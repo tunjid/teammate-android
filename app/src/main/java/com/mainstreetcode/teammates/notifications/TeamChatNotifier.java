@@ -1,9 +1,13 @@
 package com.mainstreetcode.teammates.notifications;
 
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 import com.mainstreetcode.teammates.R;
@@ -32,9 +36,7 @@ public class TeamChatNotifier extends Notifier<TeamChat> {
     private final UserRepository userRepository;
     private Team sender = Team.empty();
 
-    private TeamChatNotifier() {
-        userRepository = UserRepository.getInstance();
-    }
+    private TeamChatNotifier() {userRepository = UserRepository.getInstance();}
 
     public static TeamChatNotifier getInstance() {
         if (INSTANCE == null) INSTANCE = new TeamChatNotifier();
@@ -44,6 +46,12 @@ public class TeamChatNotifier extends Notifier<TeamChat> {
     @Override
     protected ModelRespository<TeamChat> getRepository() {
         return TeamChatRepository.getInstance();
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    protected NotificationChannel[] getNotificationChannels() {
+        return new NotificationChannel[]{buildNotificationChannel(FeedItem.TEAM_CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH)};
     }
 
     @Override

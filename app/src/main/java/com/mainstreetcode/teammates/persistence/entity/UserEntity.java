@@ -69,6 +69,10 @@ public class UserEntity implements Parcelable {
         this.primaryEmail = primaryEmail;
     }
 
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     protected UserEntity(Parcel in) {
         id = in.readString();
         firstName = in.readString();

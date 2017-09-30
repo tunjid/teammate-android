@@ -1,12 +1,16 @@
 package com.mainstreetcode.teammates.notifications;
 
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 
 import com.mainstreetcode.teammates.Application;
@@ -15,6 +19,9 @@ import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.repository.ModelRespository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.reactivex.functions.Predicate;
 
@@ -26,7 +33,25 @@ public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
 
     private static final int DEEP_LINK_REQ_CODE = 1;
 
-    protected final Application app = Application.getInstance();
+    protected final Application app;
+    private final Map<String, NotificationChannel> channelMap;
+
+    public Notifier() {
+        app = Application.getInstance();
+        channelMap = new HashMap<>();
+
+        NotificationManager manager = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel[] channels = getNotificationChannels();
+            if (channels == null || channels.length < 1) return;
+
+            for (NotificationChannel channel : channels) {
+                manager.createNotificationChannel(channel);
+                channelMap.put(channel.getId(), channel);
+            }
+        }
+    }
 
     final void notify(FeedItem<T> item) {
         getRepository().get(item.getModel()).lastElement()
@@ -36,7 +61,11 @@ public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
     }
 
     final NotificationCompat.Builder getNotificationBuilder(FeedItem<T> item) {
-        return new NotificationCompat.Builder(app, item.getType());
+        String type = item.getType();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(app, type);
+
+        if (channelMap.containsKey(type)) builder.setChannelId(type);
+        return builder;
     }
 
     PendingIntent getDeepLinkIntent(FeedItem<T> item) {
@@ -64,18 +93,19 @@ public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
                 .build());
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
+    NotificationChannel buildNotificationChannel(String id, @StringRes int name, @StringRes int description, int importance) {
+        NotificationChannel channel = new NotificationChannel(id, app.getString(name), importance);
+        channel.setDescription(app.getString(description));
+
+        return channel;
+    }
+
     protected abstract ModelRespository<T> getRepository();
+
+    protected abstract NotificationChannel[] getNotificationChannels();
 
     public Predicate<T> getNotificationFilter() {
         return t -> true;
-    }
-
-    public static <T extends Model<T> & Notifiable<T>> Notifier<T> defaultNotifier(ModelRespository<T> respository) {
-        return new Notifier<T>() {
-            @Override
-            protected ModelRespository<T> getRepository() {
-                return respository;
-            }
-        };
     }
 }

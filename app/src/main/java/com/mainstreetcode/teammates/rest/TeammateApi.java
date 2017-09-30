@@ -46,6 +46,10 @@ public interface TeammateApi {
     @PUT("api/users/{id}")
     Single<User> updateUser(@Path("id") String userId, @Body User user);
 
+    @Multipart
+    @POST("api/users/{id}")
+    Single<User> uploadUserPhoto(@Path("id") String userId, @Part MultipartBody.Part file);
+
     @GET("api/me")
     Single<User> getMe();
 
