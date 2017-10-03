@@ -167,7 +167,7 @@ public class TeamChatFragment extends MainActivityFragment
             recyclerView.smoothScrollToPosition(chats.size() - 1);
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
-                .add(message -> showSnackbar(message))
+                .add(message -> showSnackbar(message.getMessage()))
                 .build()));
     }
 

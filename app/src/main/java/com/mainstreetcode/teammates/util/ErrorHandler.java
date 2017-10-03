@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammates.util;
 
-import android.text.TextUtils;
-
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
@@ -20,14 +18,14 @@ import retrofit2.HttpException;
 
 public class ErrorHandler implements Consumer<Throwable> {
 
-    private final String errorMessage;
-    private final Consumer<String> messageConsumer;
+    private final String defaultMessage;
+    private final Consumer<Message> messageConsumer;
     private final Map<String, String> messageMap;
 
-    private ErrorHandler(String errorMessage,
-                         Consumer<String> messageConsumer,
+    private ErrorHandler(String defaultMessage,
+                         Consumer<Message> messageConsumer,
                          Map<String, String> messageMap) {
-        this.errorMessage = errorMessage;
+        this.defaultMessage = defaultMessage;
         this.messageConsumer = messageConsumer;
         this.messageMap = messageMap;
     }
@@ -46,32 +44,40 @@ public class ErrorHandler implements Consumer<Throwable> {
     @Override
     public void accept(Throwable throwable) throws Exception {
         String key = throwable.getClass().getName();
-        String message = null;
+        Message message = null;
 
-        if (messageMap.containsKey(key)) message = messageMap.get(key);
+        if (messageMap.containsKey(key)) {
+            message = new Message(messageMap.get(key));
+        }
+        else if (throwable instanceof TeammateException) {
+            message = new Message(throwable.getMessage());
+        }
         else if (throwable instanceof HttpException) {
-            HttpException httpException = (HttpException) throwable;
-            try {
-                ResponseBody errorBody = httpException.response().errorBody();
-                if (errorBody != null) {
-                    String json = errorBody.string();
-                    message = TeammateService.getGson().fromJson(json, Message.class).getMessage();
-                }
-            }
-            catch (Exception e) {
-                message = errorMessage;
-            }
+            message = getMessage((HttpException) throwable, defaultMessage);
         }
 
-        if (TextUtils.isEmpty(message)) message = errorMessage;
         messageConsumer.accept(message);
 
         throwable.printStackTrace();
     }
 
+    private Message getMessage(HttpException throwable, String defaultMessage) {
+        try {
+            ResponseBody errorBody = throwable.response().errorBody();
+            if (errorBody != null) {
+                String json = errorBody.string();
+                return TeammateService.getGson().fromJson(json, Message.class);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Message(defaultMessage);
+    }
+
     public static class Builder {
         String defaultMessage;
-        Consumer<String> messageConsumer;
+        Consumer<Message> messageConsumer;
         Map<String, String> messageMap = new HashMap<>();
 
         public Builder defaultMessage(String errorMessage) {
@@ -79,12 +85,7 @@ public class ErrorHandler implements Consumer<Throwable> {
             return this;
         }
 
-        public Builder add(String message, Class<? extends Throwable> exceptionClass) {
-            messageMap.put(exceptionClass.getName(), message);
-            return this;
-        }
-
-        public Builder add(Consumer<String> messageConsumer) {
+        public Builder add(Consumer<Message> messageConsumer) {
             this.messageConsumer = messageConsumer;
             return this;
         }
