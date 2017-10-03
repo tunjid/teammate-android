@@ -65,10 +65,6 @@ public class TeammatesBaseFragment extends BaseFragment {
         defaultErrorHandler = ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(message -> {
-                    if (message.isUnauthorizedUser()) {
-                        startRegistrationActivity(getActivity());
-                        return;
-                    }
                     showSnackbar(message.getMessage());
                     toggleProgress(false);
                 })
