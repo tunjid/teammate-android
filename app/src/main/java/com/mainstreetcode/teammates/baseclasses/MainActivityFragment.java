@@ -6,14 +6,18 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.activities.MainActivity;
+import com.mainstreetcode.teammates.model.Message;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
 import com.mainstreetcode.teammates.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammates.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
-import com.mainstreetcode.teammates.viewmodel.localRoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
+import com.mainstreetcode.teammates.viewmodel.localRoleViewModel;
 
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammates.activities.MainActivity}
@@ -51,5 +55,26 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         mediaViewModel = provider.get(MediaViewModel.class);
         teamChatViewModel = provider.get(TeamChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
+
+        defaultErrorHandler = ErrorHandler.builder()
+                .defaultMessage(getString(R.string.default_error))
+                .add(this::handleErrorMEssage)
+                .build();
+    }
+
+    protected void signOut() {
+        userViewModel.signOut().subscribe(
+                success -> MainActivity.startRegistrationActivity(getActivity()),
+                throwable -> MainActivity.startRegistrationActivity(getActivity())
+        );
+    }
+
+    private void handleErrorMEssage(Message message) {
+        if (message.isUnauthorizedUser()) {
+            signOut();
+            return;
+        }
+        showSnackbar(message.getMessage());
+        toggleProgress(false);
     }
 }

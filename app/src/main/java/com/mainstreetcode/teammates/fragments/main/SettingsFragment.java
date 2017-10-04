@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.adapters.SettingsAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.SettingsItem;
@@ -71,10 +70,7 @@ public final class SettingsFragment extends MainActivityFragment
     public void onSettingsItemClicked(SettingsItem item) {
         switch (item.getStringResorce()) {
             case R.string.sign_out:
-                userViewModel.signOut().subscribe(
-                        success -> MainActivity.startRegistrationActivity(getActivity()),
-                        throwable -> MainActivity.startRegistrationActivity(getActivity())
-                );
+                signOut();
                 break;
             case R.string.join_team:
                 showFragment(TeamSearchFragment.newInstance());

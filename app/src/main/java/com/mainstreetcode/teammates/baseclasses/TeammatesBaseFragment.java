@@ -26,6 +26,8 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 
+import static com.mainstreetcode.teammates.activities.MainActivity.startRegistrationActivity;
+
 /**
  * Base Fragment for this app
  * <p>
@@ -63,7 +65,7 @@ public class TeammatesBaseFragment extends BaseFragment {
         defaultErrorHandler = ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(message -> {
-                    showSnackbar(message);
+                    showSnackbar(message.getMessage());
                     toggleProgress(false);
                 })
                 .build();
