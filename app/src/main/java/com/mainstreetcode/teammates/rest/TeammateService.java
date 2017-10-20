@@ -3,7 +3,6 @@ package com.mainstreetcode.teammates.rest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -31,6 +30,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.text.TextUtils.isEmpty;
+
 /**
  * Teammates RESTful API
  * <p>
@@ -39,7 +40,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "http://104.131.43.55:8080/";
+    public static final String API_BASE_URL = "https://teammate-52655.appspot.com/";
     public static final String SESSION_PREFS = "session.prefs";
     public static final String SESSION_COOKIE = "connect.sid";
 
@@ -49,7 +50,7 @@ public class TeammateService {
     public static TeammateApi getApiInstance() {
         if (INSTANCE == null) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(loggingInterceptor)
@@ -113,12 +114,9 @@ public class TeammateService {
 
             String serializedCookie = preferences.getString(SESSION_COOKIE, "");
 
-            if (!TextUtils.isEmpty(serializedCookie)) {
-                cookies.add(Cookie.parse(url, serializedCookie));
-            }
+            if (!isEmpty(serializedCookie)) cookies.add(Cookie.parse(url, serializedCookie));
 
             return cookies;
         }
     }
-
 }

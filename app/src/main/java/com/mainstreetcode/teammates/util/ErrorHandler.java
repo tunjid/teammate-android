@@ -44,24 +44,27 @@ public class ErrorHandler implements Consumer<Throwable> {
     @Override
     public void accept(Throwable throwable) throws Exception {
         String key = throwable.getClass().getName();
-        Message message = null;
-
-        if (messageMap.containsKey(key)) {
-            message = new Message(messageMap.get(key));
-        }
-        else if (throwable instanceof TeammateException) {
-            message = new Message(throwable.getMessage());
-        }
-        else if (throwable instanceof HttpException) {
-            message = getMessage((HttpException) throwable, defaultMessage);
-        }
+        Message message = messageMap.containsKey(key)
+                ? new Message(messageMap.get(key))
+                : isTeammateException(throwable)
+                ? new Message(throwable.getMessage())
+                : isHttpException(throwable)
+                ? getMessage((HttpException) throwable)
+                : new Message(defaultMessage);
 
         messageConsumer.accept(message);
-
         throwable.printStackTrace();
     }
 
-    private Message getMessage(HttpException throwable, String defaultMessage) {
+    private boolean isHttpException(Throwable throwable) {
+        return throwable instanceof HttpException;
+    }
+
+    private boolean isTeammateException(Throwable throwable) {
+        return throwable instanceof TeammateException;
+    }
+
+    private Message getMessage(HttpException throwable) {
         try {
             ResponseBody errorBody = throwable.response().errorBody();
             if (errorBody != null) {
