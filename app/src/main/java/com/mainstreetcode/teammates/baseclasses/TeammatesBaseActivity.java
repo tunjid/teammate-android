@@ -13,8 +13,6 @@ import android.support.transition.TransitionManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.OnApplyWindowInsetsListener;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +24,7 @@ import com.mainstreetcode.teammates.util.FabIconAnimator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
+import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
@@ -39,12 +38,12 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
  * Created by Shemanigans on 6/1/17.
  */
 
-public abstract class TeammatesBaseActivity extends BaseActivity
-        implements OnApplyWindowInsetsListener {
+public abstract class TeammatesBaseActivity extends BaseActivity {
 
     public static int insetHeight;
 
     private boolean insetsApplied;
+    private View keyboardPadding;
     private View insetView;
 
     private Toolbar toolbar;
@@ -60,7 +59,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private FabIconAnimator fabIconAnimator;
 
 
-    final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+    final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
             boolean isFullscreenFragment = isFullscreenFragment(f);
@@ -74,7 +73,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 getWindow().setStatusBarColor(ContextCompat.getColor(TeammatesBaseActivity.this, color));
             }
 
-            ViewCompat.setOnApplyWindowInsetsListener(v, TeammatesBaseActivity.this::consumeFragmentInsets);
+            setOnApplyWindowInsetsListener(v, (view, insets) -> consumeFragmentInsets(insets));
         }
     };
 
@@ -82,7 +81,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getSupportFragmentManager().registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
+        getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
     }
 
     @Override
@@ -90,6 +89,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
 
+        keyboardPadding = findViewById(R.id.keyboard_padding);
         insetView = findViewById(R.id.inset_view);
         toolbar = findViewById(R.id.toolbar);
         fab = findViewById(R.id.fab);
@@ -112,7 +112,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             View decorView = getWindow().getDecorView();
             decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.content_view), this);
+            setOnApplyWindowInsetsListener(findViewById(R.id.content_view), (view, insets) -> consumeToolbarInsets(insets));
         }
     }
 
@@ -148,8 +148,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return fab;
     }
 
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+    protected boolean isFullscreenFragment(Fragment fragment) {
+        return fragment instanceof TeammatesBaseFragment
+                && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
+    }
+
+    private WindowInsetsCompat consumeToolbarInsets(WindowInsetsCompat insets) {
         if (insetsApplied) return insets;
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) insetView.getLayoutParams();
@@ -160,12 +164,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return insets;
     }
 
-    protected boolean isFullscreenFragment(Fragment fragment) {
-        return fragment instanceof TeammatesBaseFragment
-                && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
-    }
-
-    private WindowInsetsCompat consumeFragmentInsets(View view, WindowInsetsCompat insets) {
+    private WindowInsetsCompat consumeFragmentInsets(WindowInsetsCompat insets) {
         initTransition();
         Fragment fragment = getCurrentFragment();
 
@@ -174,7 +173,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (fragment instanceof MainActivityFragment && padding != 0)
             padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
-        view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), padding);
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();
+        params.height = padding;
 
         return insets;
     }
