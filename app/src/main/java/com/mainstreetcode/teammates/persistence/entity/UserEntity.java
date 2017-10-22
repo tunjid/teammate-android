@@ -6,19 +6,21 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.mainstreetcode.teammates.model.User;
 
 @Entity(tableName = "users")
 public class UserEntity implements Parcelable {
 
-    @PrimaryKey @ColumnInfo(name = "user_id") protected String id;
+    @NonNull @PrimaryKey
+    @ColumnInfo(name = "user_id") protected String id;
     @ColumnInfo(name = "user_first_name") protected String firstName;
     @ColumnInfo(name = "user_last_name") protected String lastName;
     @ColumnInfo(name = "user_primary_email") protected String primaryEmail;
     @ColumnInfo(name = "user_image_url") protected String imageUrl;
 
-    public UserEntity(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
+    public UserEntity(@NonNull String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -44,6 +46,7 @@ public class UserEntity implements Parcelable {
     @Override
     public String toString() {return "com.mainstreetcode.teammates.model.User(id=" + this.id + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", primaryEmail=" + this.primaryEmail + ")";}
 
+    @NonNull
     public String getId() {return this.id;}
 
     public String getFirstName() {return this.firstName;}

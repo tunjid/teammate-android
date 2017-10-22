@@ -7,6 +7,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -22,14 +23,15 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class RoleEntity implements Parcelable {
 
-    @PrimaryKey @ColumnInfo(name = "role_id") protected String id;
+    @NonNull @PrimaryKey
+    @ColumnInfo(name = "role_id") protected String id;
     @ColumnInfo(name = "role_name") protected String name;
     @ColumnInfo(name = "role_image_url") protected String imageUrl;
 
     @ColumnInfo(name = "role_team") protected Team team;
     @ColumnInfo(name = "role_user") protected User user;
 
-    public RoleEntity(String id, String name, String imageUrl, Team team, User user) {
+    public RoleEntity(@NonNull String id, String name, String imageUrl, Team team, User user) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -45,6 +47,7 @@ public class RoleEntity implements Parcelable {
         user = (User) in.readValue(User.class.getClassLoader());
     }
 
+    @NonNull
     public String getId() {
         return id;
     }

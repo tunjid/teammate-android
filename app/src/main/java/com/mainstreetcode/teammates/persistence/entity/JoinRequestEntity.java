@@ -7,6 +7,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -25,13 +26,15 @@ public class JoinRequestEntity implements Parcelable {
     @ColumnInfo(name = "join_request_team_approved") protected boolean teamApproved;
     @ColumnInfo(name = "join_request_team_userApproved") protected boolean userApproved;
 
-    @PrimaryKey @ColumnInfo(name = "join_request_id") protected String id;
+    @NonNull @PrimaryKey
+    @ColumnInfo(name = "join_request_id") protected String id;
     @ColumnInfo(name = "join_request_role_name") protected String roleName;
 
     @ColumnInfo(name = "join_request_team") protected Team team;
     @ColumnInfo(name = "join_request_user") protected User user;
 
-    protected JoinRequestEntity(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
+    protected JoinRequestEntity(boolean teamApproved, boolean userApproved,
+                                @NonNull String id, String roleName, Team team, User user) {
         this.teamApproved = teamApproved;
         this.userApproved = userApproved;
         this.id = id;
@@ -49,6 +52,7 @@ public class JoinRequestEntity implements Parcelable {
         user = (User) in.readValue(User.class.getClassLoader());
     }
 
+    @NonNull
     public String getId() {
         return id;
     }

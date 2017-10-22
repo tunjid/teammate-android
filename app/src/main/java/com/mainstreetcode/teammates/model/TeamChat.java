@@ -9,6 +9,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -50,7 +51,7 @@ public class TeamChat implements
     @Ignore
     private transient boolean isSuccessful = true;
 
-    @PrimaryKey
+    @NonNull @PrimaryKey
     @ColumnInfo(name = "team_chat_id") private String id;
     @ColumnInfo(name = "team_chat_kind") private String kind;
     @ColumnInfo(name = "team_chat_content") private String content;
@@ -60,7 +61,8 @@ public class TeamChat implements
 
     @ColumnInfo(name = "team_chat_created") private Date created;
 
-    public TeamChat(String id, String content, String kind, User user, Team team, Date created) {
+    public TeamChat(@NonNull String id, String content, String kind,
+                    User user, Team team, Date created) {
         this.id = id;
         this.content = content;
         this.kind = kind;
@@ -88,6 +90,7 @@ public class TeamChat implements
         return TextUtils.isEmpty(id);
     }
 
+    @NonNull
     @Override
     public String getId() {
         return id;

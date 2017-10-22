@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -14,7 +15,8 @@ import java.util.Date;
 @Entity(tableName = "teams")
 public class TeamEntity implements Parcelable{
 
-    @PrimaryKey @ColumnInfo(name = "team_id") protected String id;
+    @NonNull @PrimaryKey
+    @ColumnInfo(name = "team_id") protected String id;
     @ColumnInfo(name = "team_name") protected String name;
     @ColumnInfo(name = "team_city") protected String city;
     @ColumnInfo(name = "team_state") protected String state;
@@ -24,8 +26,8 @@ public class TeamEntity implements Parcelable{
     @ColumnInfo(name = "team_created") protected Date created;
     @ColumnInfo(name = "team_location") protected LatLng location;
 
-    public TeamEntity(String id, String name, String city, String state, String zip, String imageUrl,
-                      Date created, LatLng location) {
+    public TeamEntity(@NonNull String id, String name, String city, String state,
+                      String zip, String imageUrl, Date created, LatLng location) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -47,6 +49,7 @@ public class TeamEntity implements Parcelable{
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
     }
 
+    @NonNull
     public String getId() {return this.id;}
 
     public String getName() {return this.name;}

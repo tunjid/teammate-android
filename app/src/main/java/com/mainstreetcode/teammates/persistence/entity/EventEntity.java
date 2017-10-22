@@ -6,6 +6,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammates.model.Team;
@@ -25,7 +26,7 @@ public class EventEntity implements Parcelable {
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
     private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
-    @PrimaryKey
+    @NonNull @PrimaryKey
     @ColumnInfo(name = "event_id") protected String id;
     @ColumnInfo(name = "event_name") protected String name;
     @ColumnInfo(name = "event_notes") protected String notes;
@@ -37,7 +38,7 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_end_date") protected Date endDate;
     @ColumnInfo(name = "event_location") protected LatLng location;
 
-    public EventEntity(String id, String name, String notes, String imageUrl, String locationName,
+    public EventEntity(@NonNull String id, String name, String notes, String imageUrl, String locationName,
                        Date startDate, Date endDate, Team team, LatLng location) {
         this.id = id;
         this.name = name;
@@ -62,6 +63,7 @@ public class EventEntity implements Parcelable {
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
     }
 
+    @NonNull
     public String getId() {
         return id;
     }

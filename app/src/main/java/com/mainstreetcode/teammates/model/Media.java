@@ -7,6 +7,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -43,7 +44,7 @@ public class Media implements
     public static final String UPLOAD_KEY = "team-media";
     public static final String IMAGE = "image";
 
-    @PrimaryKey
+    @NonNull @PrimaryKey
     @ColumnInfo(name = "media_id") private String id;
     @ColumnInfo(name = "media_url") private String url;
     @ColumnInfo(name = "media_mime_type") private String mimeType;
@@ -53,7 +54,8 @@ public class Media implements
     @ColumnInfo(name = "media_team") private Team team;
     @ColumnInfo(name = "media_created") private Date created;
 
-    public Media(String id, String url, String mimeType, String thumbnail, User user, Team team, Date created) {
+    public Media(@NonNull String id, String url, String mimeType, String thumbnail,
+                 User user, Team team, Date created) {
         this.id = id;
         this.url = url;
         this.mimeType = mimeType;
@@ -79,6 +81,7 @@ public class Media implements
         return TextUtils.isEmpty(id);
     }
 
+    @NonNull
     @Override
     public String getId() {
         return id;
