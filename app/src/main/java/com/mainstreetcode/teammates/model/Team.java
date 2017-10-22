@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.mainstreetcode.teammates.util.ModelUtils.deserializeList;
+
 /**
  * Teams
  */
@@ -52,7 +54,7 @@ public class Team extends TeamEntity
     // store the delayed roles here and update after Room is done.
     @Ignore private List<Role> delayed = new ArrayList<>();
 
-    @Relation(parentColumn = "team_id", entityColumn = "role_team_id", entity = RoleEntity.class)
+    @Relation(parentColumn = "team_id", entityColumn = "role_team", entity = RoleEntity.class)
     private List<Role> roles = new ArrayList<>();
 
     @Ignore private List<JoinRequest> joinRequests = new ArrayList<>();
@@ -77,7 +79,7 @@ public class Team extends TeamEntity
         return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null);
     }
 
-    public static Team updateDelayedRoles(Team team){
+    public static Team updateDelayedRoles(Team team) {
         team.roles.clear();
         team.roles.addAll(team.delayed);
         return team;
@@ -211,8 +213,12 @@ public class Team extends TeamEntity
 
             Team team = new Team(id, name, city, state, zip, logoUrl, created, location);
 
-            ModelUtils.deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
-            ModelUtils.deserializeList(context, teamJson.get(JOIN_REQUEST_KEY), team.joinRequests, JoinRequest.class);
+            if (teamJson.has(ROLES_KEY)) {
+                deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
+            }
+            if (teamJson.has(JOIN_REQUEST_KEY)) {
+                deserializeList(context, teamJson.get(JOIN_REQUEST_KEY), team.joinRequests, JoinRequest.class);
+            }
 
             return team;
         }

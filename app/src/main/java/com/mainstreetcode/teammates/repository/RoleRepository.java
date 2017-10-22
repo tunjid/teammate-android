@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.repository;
 
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.RoleDao;
@@ -22,18 +23,16 @@ import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class RoleRepository extends ModelRespository<Role> {
+public class RoleRepository extends ModelRepository<Role> {
 
     private final TeammateApi api;
     private final RoleDao roleDao;
-    private final ModelRespository<User> userRepository;
 
     private static RoleRepository ourInstance;
 
     private RoleRepository() {
         api = TeammateService.getApiInstance();
         roleDao = AppDatabase.getInstance().roleDao();
-        userRepository = UserRepository.getInstance();
     }
 
     public static RoleRepository getInstance() {
@@ -67,11 +66,17 @@ public class RoleRepository extends ModelRespository<Role> {
     @Override
     Function<List<Role>, List<Role>> provideSaveManyFunction() {
         return models -> {
+            List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
 
-            for (Role role : models) users.add(role.getUser());
+            for (Role role : models) {
+                teams.add(role.getTeam());
+                users.add(role.getUser());
+            }
 
-            userRepository.getSaveManyFunction().apply(users);
+            //if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
+            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
+
             roleDao.upsert(Collections.unmodifiableList(models));
 
             return models;

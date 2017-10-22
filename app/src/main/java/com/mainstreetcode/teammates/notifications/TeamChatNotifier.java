@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.repository.TeamChatRepository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.repository.UserRepository;
@@ -44,7 +44,7 @@ public class TeamChatNotifier extends Notifier<TeamChat> {
     }
 
     @Override
-    protected ModelRespository<TeamChat> getRepository() {
+    protected ModelRepository<TeamChat> getRepository() {
         return TeamChatRepository.getInstance();
     }
 

@@ -42,8 +42,8 @@ public class Role extends RoleEntity
     @Ignore private final List<Item<Role>> items;
 
     @SuppressWarnings("unused")
-    public Role(String id, String name, String teamId, String imageUrl, User user) {
-        super(id, name, teamId, imageUrl, user);
+    public Role(String id, String name, String imageUrl, Team team, User user) {
+        super(id, name, imageUrl, team, user);
         items = buildItems();
     }
 
@@ -53,7 +53,7 @@ public class Role extends RoleEntity
     }
 
     public static Role empty() {
-        return new Role("", "", "", "", User.empty());
+        return new Role("", "", "", Team.empty(), User.empty());
     }
 
     @Override
@@ -92,12 +92,12 @@ public class Role extends RoleEntity
     public void update(Role updated) {
         this.id = updated.getId();
         this.name = updated.name;
-        this.teamId = updated.teamId;
         this.imageUrl = updated.imageUrl;
 
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updated.get(i).getValue());
 
+        this.team.update(updated.team);
         this.user.update(updated.user);
     }
 
@@ -163,13 +163,13 @@ public class Role extends RoleEntity
 
             String id = ModelUtils.asString(ID_KEY, roleJson);
             String name = ModelUtils.asString(NAME_KEY, roleJson);
-            String teamId = ModelUtils.asString(TEAM_KEY, roleJson);
             String imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson);
+            Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(roleJson.get(USER_KEY), User.class);
 
             if (user == null) user = User.empty();
 
-            return new Role(id, name, teamId, imageUrl, user);
+            return new Role(id, name, imageUrl, team, user);
         }
     }
 }

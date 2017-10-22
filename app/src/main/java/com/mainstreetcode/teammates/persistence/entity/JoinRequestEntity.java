@@ -2,13 +2,13 @@ package com.mainstreetcode.teammates.persistence.entity;
 
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -16,8 +16,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(
         tableName = "join_requests",
         foreignKeys = {
-                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "user_id"),
-                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "join_request_team_id", onDelete = CASCADE)
+                @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "join_request_team", onDelete = CASCADE),
+                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "join_request_user")
         }
 )
 public class JoinRequestEntity implements Parcelable {
@@ -27,16 +27,16 @@ public class JoinRequestEntity implements Parcelable {
 
     @PrimaryKey @ColumnInfo(name = "join_request_id") protected String id;
     @ColumnInfo(name = "join_request_role_name") protected String roleName;
-    @ColumnInfo(name = "join_request_team_id") protected String teamId;
 
-    @Embedded protected User user;
+    @ColumnInfo(name = "join_request_team") protected Team team;
+    @ColumnInfo(name = "join_request_user") protected User user;
 
-    protected JoinRequestEntity(boolean teamApproved, boolean userApproved, String id, String roleName, String teamId, User user) {
+    protected JoinRequestEntity(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
         this.teamApproved = teamApproved;
         this.userApproved = userApproved;
         this.id = id;
         this.roleName = roleName;
-        this.teamId = teamId;
+        this.team = team;
         this.user = user;
     }
 
@@ -45,7 +45,7 @@ public class JoinRequestEntity implements Parcelable {
         userApproved = in.readByte() != 0x00;
         id = in.readString();
         roleName = in.readString();
-        teamId = in.readString();
+        team = (Team) in.readValue(Team.class.getClassLoader());
         user = (User) in.readValue(User.class.getClassLoader());
     }
 
@@ -57,8 +57,8 @@ public class JoinRequestEntity implements Parcelable {
         return roleName;
     }
 
-    public String getTeamId() {
-        return teamId;
+    public Team getTeam() {
+        return team;
     }
 
     public User getUser() {
@@ -99,7 +99,7 @@ public class JoinRequestEntity implements Parcelable {
         dest.writeByte((byte) (userApproved ? 0x01 : 0x00));
         dest.writeString(id);
         dest.writeString(roleName);
-        dest.writeString(teamId);
+        dest.writeValue(team);
         dest.writeValue(user);
     }
 

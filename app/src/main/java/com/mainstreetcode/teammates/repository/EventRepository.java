@@ -22,13 +22,13 @@ import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends ModelRespository<Event> {
+public class EventRepository extends ModelRepository<Event> {
 
     private static EventRepository ourInstance;
 
     private final TeammateApi api;
     private final EventDao eventDao;
-    private final ModelRespository<Team> teamRepository;
+    private final ModelRepository<Team> teamRepository;
 
     private EventRepository() {
         api = TeammateService.getApiInstance();

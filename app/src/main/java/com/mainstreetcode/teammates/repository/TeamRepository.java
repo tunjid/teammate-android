@@ -28,7 +28,7 @@ import okhttp3.MultipartBody;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamRepository extends ModelRespository<Team> {
+public class TeamRepository extends ModelRepository<Team> {
 
     private static final String TEAM_REPOSITORY_KEY = "TeamRepository";
     private static final String DEFAULT_TEAM = "default.team";
@@ -38,9 +38,9 @@ public class TeamRepository extends ModelRespository<Team> {
     private final Application app;
     private final TeammateApi api;
     private final TeamDao teamDao;
-    private final ModelRespository<User> userRepository;
-    private final ModelRespository<Role> roleRespository;
-    private final ModelRespository<JoinRequest> joinRequestRespository;
+    private final ModelRepository<User> userRepository;
+    private final ModelRepository<Role> roleRespository;
+    private final ModelRepository<JoinRequest> joinRequestRespository;
 
     private TeamRepository() {
         app = Application.getInstance();
@@ -92,7 +92,7 @@ public class TeamRepository extends ModelRespository<Team> {
         return models -> {
             List<User> users = new ArrayList<>();
             List<Role> roles = new ArrayList<>();
-            List<JoinRequest> joinRequests = new ArrayList<>();
+            List<JoinRequest> requests = new ArrayList<>();
 
             for (Team team : models) {
 
@@ -100,16 +100,17 @@ public class TeamRepository extends ModelRespository<Team> {
                 List<JoinRequest> teamRequests = team.getJoinRequests();
 
                 roles.addAll(teamRoles);
-                joinRequests.addAll(teamRequests);
+                requests.addAll(teamRequests);
 
                 for (Role role : teamRoles) users.add(role.getUser());
                 for (JoinRequest request : teamRequests) users.add(request.getUser());
             }
 
             teamDao.upsert(Collections.unmodifiableList(models));
-            userRepository.getSaveManyFunction().apply(users);
-            roleRespository.getSaveManyFunction().apply(roles);
-            joinRequestRespository.getSaveManyFunction().apply(joinRequests);
+
+            if (!users.isEmpty()) userRepository.getSaveManyFunction().apply(users);
+            if (!roles.isEmpty()) roleRespository.getSaveManyFunction().apply(roles);
+            if (!requests.isEmpty()) joinRequestRespository.getSaveManyFunction().apply(requests);
 
             return models;
         };

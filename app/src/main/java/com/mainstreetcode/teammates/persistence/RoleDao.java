@@ -40,7 +40,7 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
 
     @Query("SELECT *" +
             " FROM roles" +
-            " WHERE :userId = user_id" +
-            " AND :teamId = role_team_id")
+            " WHERE :teamId = role_team" +
+            " AND :userId = role_user")
     public abstract Maybe<Role> getRoleInTeam(String userId, String teamId);
 }

@@ -8,7 +8,7 @@ import android.os.Build;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 
 
@@ -26,7 +26,7 @@ public class TeamNotifier extends Notifier<Team> {
     }
 
     @Override
-    protected ModelRespository<Team> getRepository() {
+    protected ModelRepository<Team> getRepository() {
         return TeamRepository.getInstance();
     }
 

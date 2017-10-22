@@ -9,7 +9,7 @@ import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.MediaRepository;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.io.File;
@@ -55,7 +55,7 @@ public class MediaUploadIntentService extends IntentService {
      * parameters.
      */
     private void handleActionUpload(Team team, List<Uri> mediaUris) {
-        ModelRespository<Media> respository = MediaRepository.getInstance();
+        ModelRepository<Media> respository = MediaRepository.getInstance();
 
         for (Uri uri : mediaUris) {
             Media media = new Media("", new File(uri.getPath()).toString(),

@@ -123,7 +123,7 @@ public class EventEntity implements Parcelable {
         this.notes = notes;
     }
 
-    public void setLocationName(String locationName) {
+    protected void setLocationName(String locationName) {
         this.locationName = locationName;
     }
 

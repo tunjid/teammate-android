@@ -102,7 +102,7 @@ public class RoleEditFragment extends HeaderedFragment
         setToolbarTitle(getString(R.string.edit_user));
 
         User user = userViewModel.getCurrentUser();
-        Team team = new Team(role.getTeamId(), "", "", "", "", "", null, null);
+        Team team = role.getTeam();
 
         disposables.add(localRoleViewModel.getRoleInTeam(user, team)
                 .subscribe(this::onRoleUpdated, defaultErrorHandler));

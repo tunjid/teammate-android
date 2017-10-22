@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.repository.MediaRepository;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.rest.ProgressRequestBody;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
@@ -37,7 +37,7 @@ public class MediaNotifier extends Notifier<Media> {
     }
 
     @Override
-    protected ModelRespository<Media> getRepository() {
+    protected ModelRepository<Media> getRepository() {
         return MediaRepository.getInstance();
     }
 

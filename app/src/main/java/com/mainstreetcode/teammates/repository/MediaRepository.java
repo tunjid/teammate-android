@@ -32,12 +32,12 @@ import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class MediaRepository extends ModelRespository<Media> {
+public class MediaRepository extends ModelRepository<Media> {
 
     private final TeammateApi api;
     private final MediaDao mediaDao;
-    private final ModelRespository<User> userRepository;
-    private final ModelRespository<Team> teamRespository;
+    private final ModelRepository<User> userRepository;
+    private final ModelRepository<Team> teamRespository;
 
     private static MediaRepository ourInstance;
 

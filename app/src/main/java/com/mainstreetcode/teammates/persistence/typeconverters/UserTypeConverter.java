@@ -4,12 +4,9 @@ import android.arch.persistence.room.TypeConverter;
 
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
-import com.mainstreetcode.teammates.persistence.UserDao;
 
 
 public class UserTypeConverter {
-
-    private final UserDao userDao = AppDatabase.getInstance().userDao();
 
     @TypeConverter
     public String toId(User user) {
@@ -18,6 +15,6 @@ public class UserTypeConverter {
 
     @TypeConverter
     public User fromId(String id) {
-        return userDao.get(id).blockingGet();
+        return AppDatabase.getInstance().userDao().get(id).blockingGet();
     }
 }

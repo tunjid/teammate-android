@@ -264,7 +264,7 @@ public class TeamDetailFragment extends MainActivityFragment
             String lastName = lastNameText.getText().toString();
             String email = emailText.getText().toString();
 
-            JoinRequest joinRequest = JoinRequest.invite(roleReference.get(), team.getId(), firstName, lastName, email);
+            JoinRequest joinRequest = JoinRequest.invite(roleReference.get(), team, firstName, lastName, email);
 
             disposables.add(roleViewModel.joinTeam(joinRequest)
                     .subscribe(request -> showSnackbar(getString(R.string.user_invite_sent)), defaultErrorHandler));

@@ -9,7 +9,7 @@ import android.os.Build;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 
 
 public class JoinRequestNotifier extends Notifier<JoinRequest> {
@@ -26,7 +26,7 @@ public class JoinRequestNotifier extends Notifier<JoinRequest> {
     }
 
     @Override
-    protected ModelRespository<JoinRequest> getRepository() {
+    protected ModelRepository<JoinRequest> getRepository() {
         return JoinRequestRepository.getInstance();
     }
 

@@ -25,7 +25,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * Repository that manages {@link Model} CRUD operations
  */
 
-public abstract class ModelRespository<T extends Model<T>> {
+public abstract class ModelRepository<T extends Model<T>> {
 
     private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
     private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);

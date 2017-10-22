@@ -9,7 +9,7 @@ import android.os.Build;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.repository.EventRepository;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 
 
 public class EventNotifier extends Notifier<Event> {
@@ -26,7 +26,7 @@ public class EventNotifier extends Notifier<Event> {
     }
 
     @Override
-    protected ModelRespository<Event> getRepository() {
+    protected ModelRepository<Event> getRepository() {
         return EventRepository.getInstance();
     }
 

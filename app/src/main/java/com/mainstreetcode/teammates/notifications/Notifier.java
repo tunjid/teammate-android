@@ -17,7 +17,7 @@ import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Model;
-import com.mainstreetcode.teammates.repository.ModelRespository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.HashMap;
@@ -101,7 +101,7 @@ public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
         return channel;
     }
 
-    protected abstract ModelRespository<T> getRepository();
+    protected abstract ModelRepository<T> getRepository();
 
     protected abstract NotificationChannel[] getNotificationChannels();
 

@@ -27,17 +27,17 @@ public class JoinRequest extends JoinRequestEntity
         Model<JoinRequest>,
         Notifiable<JoinRequest> {
 
-    public static JoinRequest join(String roleName, String teamId, User user) {
-        return new JoinRequest(false, true, "", roleName, teamId, user);
+    public static JoinRequest join(String roleName, Team team, User user) {
+        return new JoinRequest(false, true, "", roleName, team, user);
     }
 
-    public static JoinRequest invite(String roleName, String teamId, String firstName, String lastName, String email) {
+    public static JoinRequest invite(String roleName, Team team, String firstName, String lastName, String email) {
         User user = new User("", firstName, lastName, email, "");
-        return new JoinRequest(true, false, "", roleName, teamId, user);
+        return new JoinRequest(true, false, "", roleName, team, user);
     }
 
-    JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, String teamId, User user) {
-        super(teamApproved, userApproved, id, roleName, teamId, user);
+    JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
+        super(teamApproved, userApproved, id, roleName, team, user);
     }
 
     protected JoinRequest(Parcel in) {
@@ -60,7 +60,8 @@ public class JoinRequest extends JoinRequestEntity
         this.userApproved = updated.userApproved;
         this.id = updated.id;
         this.roleName = updated.roleName;
-        this.teamId = updated.teamId;
+
+        team.update(updated.team);
         user.update(updated.user);
     }
 
@@ -111,7 +112,7 @@ public class JoinRequest extends JoinRequestEntity
             JsonObject result = new JsonObject();
 
             result.addProperty(NAME_KEY, src.roleName);
-            result.addProperty(TEAM_KEY, src.teamId);
+            result.addProperty(TEAM_KEY, src.team.getId());
             result.addProperty(TEAM_APPROVAL_KEY, src.teamApproved);
             result.addProperty(USER_APPROVAL_KEY, src.userApproved);
 
@@ -139,12 +140,13 @@ public class JoinRequest extends JoinRequestEntity
 
             String id = ModelUtils.asString(ID_KEY, requestJson);
             String roleName = ModelUtils.asString(NAME_KEY, requestJson);
-            String teamId = ModelUtils.asString(TEAM_KEY, requestJson);
+            Team team = context.deserialize(requestJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(requestJson.get(USER_KEY), User.class);
 
+            if (team == null) team = Team.empty();
             if (user == null) user = User.empty();
 
-            return new JoinRequest(teamApproved, userApproved, id, roleName, teamId, user);
+            return new JoinRequest(teamApproved, userApproved, id, roleName, team, user);
         }
     }
 }

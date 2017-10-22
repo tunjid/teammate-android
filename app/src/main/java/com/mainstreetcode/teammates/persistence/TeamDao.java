@@ -30,6 +30,10 @@ public abstract class TeamDao extends EntityDao<TeamEntity> {
 
     @Query("SELECT * FROM teams" +
             " WHERE :id = team_id")
+    public abstract Maybe<TeamEntity> getAsEntity(String id);
+
+    @Query("SELECT * FROM teams" +
+            " WHERE :id = team_id")
     public abstract Maybe<Team> get(String id);
 
     @Query("SELECT * FROM teams")
@@ -38,8 +42,8 @@ public abstract class TeamDao extends EntityDao<TeamEntity> {
     @Query("SELECT *" +
             " FROM teams as team" +
             " INNER JOIN roles as role" +
-            " ON team.team_id = role.role_team_id" +
-            " WHERE :userId = role.user_id")
+            " ON team.team_id = role.role_team" +
+            " WHERE :userId = role.role_user")
     public abstract Maybe<List<Team>> myTeams(String userId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

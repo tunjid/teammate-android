@@ -29,7 +29,7 @@ import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class UserRepository extends ModelRespository<User> {
+public class UserRepository extends ModelRepository<User> {
 
     private static final String PREFS = "prefs";
     private static final String EMAIL_KEY = "email_key";

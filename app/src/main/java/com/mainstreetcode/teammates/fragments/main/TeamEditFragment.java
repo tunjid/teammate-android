@@ -114,13 +114,10 @@ public class TeamEditFragment extends HeaderedFragment
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
         setFabIcon(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
-        setToolbarTitle(getString(!isEditable
-                ? R.string.join_team
-                : team.isEmpty()
-                ? R.string.create_team
-                : R.string.edit_team));
 
         User user = userViewModel.getCurrentUser();
+
+        onRoleUpdated(Role.empty());
 
         disposables.add(localRoleViewModel.getRoleInTeam(user, team)
                 .subscribe(this::onRoleUpdated, defaultErrorHandler));
@@ -203,7 +200,7 @@ public class TeamEditFragment extends HeaderedFragment
                                 .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
                         break;
                     case JOINING:
-                        JoinRequest joinRequest = JoinRequest.join(role, team.getId(), userViewModel.getCurrentUser());
+                        JoinRequest joinRequest = JoinRequest.join(role, team, userViewModel.getCurrentUser());
                         disposable = roleViewModel.joinTeam(joinRequest)
                                 .subscribe(request -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
                         break;

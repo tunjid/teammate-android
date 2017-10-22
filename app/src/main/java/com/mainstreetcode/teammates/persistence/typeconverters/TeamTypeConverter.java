@@ -4,12 +4,10 @@ import android.arch.persistence.room.TypeConverter;
 
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
-import com.mainstreetcode.teammates.persistence.TeamDao;
+import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 
 
 public class TeamTypeConverter {
-
-    private final TeamDao teamDao = AppDatabase.getInstance().teamDao();
 
     @TypeConverter
     public String toId(Team team) {
@@ -18,6 +16,9 @@ public class TeamTypeConverter {
 
     @TypeConverter
     public Team fromId(String id) {
-        return teamDao.get(id).blockingGet();
+        TeamEntity entity = AppDatabase.getInstance().teamDao().getAsEntity(id).blockingGet();
+        return new Team(entity.getId(), entity.getName(), entity.getCity(),
+                entity.getState(), entity.getZip(), entity.getImageUrl(),
+                entity.getCreated(), entity.getLocation());
     }
 }

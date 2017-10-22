@@ -47,7 +47,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.computation;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamChatRepository extends ModelRespository<TeamChat> {
+public class TeamChatRepository extends ModelRepository<TeamChat> {
 
 
     private static final String JOIN_EVENT = "join";
@@ -63,8 +63,8 @@ public class TeamChatRepository extends ModelRespository<TeamChat> {
     private final TeammateApi api;
     private final Application app;
     private final TeamChatDao chatDao;
-    private final ModelRespository<User> userModelRespository;
-    private final ModelRespository<Team> teamModelRespository;
+    private final ModelRepository<User> userModelRespository;
+    private final ModelRepository<Team> teamModelRespository;
 
     private TeamChatRepository() {
         app = Application.getInstance();

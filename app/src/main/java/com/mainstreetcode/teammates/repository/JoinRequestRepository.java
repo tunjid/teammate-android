@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.JoinRequestDao;
@@ -18,17 +19,15 @@ import io.reactivex.functions.Function;
 import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-public class JoinRequestRepository extends ModelRespository<JoinRequest> {
+public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     private final TeammateApi api;
-    private final UserRepository userRepository;
     private final JoinRequestDao joinRequestDao;
 
     private static JoinRequestRepository ourInstance;
 
     private JoinRequestRepository() {
         api = TeammateService.getApiInstance();
-        userRepository = UserRepository.getInstance();
         joinRequestDao = AppDatabase.getInstance().joinRequestDao();
     }
 
@@ -57,11 +56,16 @@ public class JoinRequestRepository extends ModelRespository<JoinRequest> {
     @Override
     Function<List<JoinRequest>, List<JoinRequest>> provideSaveManyFunction() {
         return models -> {
+            List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
 
-            for (JoinRequest role : models) users.add(role.getUser());
+            for (JoinRequest request : models) {
+                teams.add(request.getTeam());
+                users.add(request.getUser());
+            }
 
-            userRepository.getSaveManyFunction().apply(Collections.unmodifiableList(users));
+            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
+            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
 
             joinRequestDao.upsert(Collections.unmodifiableList(models));
 
