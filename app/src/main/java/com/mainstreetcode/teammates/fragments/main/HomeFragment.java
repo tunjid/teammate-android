@@ -13,10 +13,11 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.FeedAdapter;
+import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.notifications.FeedItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,14 +25,13 @@ import java.util.List;
 
 /**
  * Home screen
- * <p>
- * Created by Shemanigans on 6/1/17.
  */
 
 public final class HomeFragment extends MainActivityFragment
         implements FeedAdapter.FeedItemAdapterListener {
 
     private RecyclerView recyclerView;
+    private EmptyViewHolder emptyViewHolder;
 
     private final List<FeedItem> feed = new ArrayList<>();
 
@@ -55,6 +55,9 @@ public final class HomeFragment extends MainActivityFragment
         recyclerView = rootView.findViewById(R.id.feed_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new FeedAdapter(feed, this));
+
+        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed);
+
         return rootView;
     }
 
@@ -71,9 +74,17 @@ public final class HomeFragment extends MainActivityFragment
                     feed.clear();
                     feed.addAll(updatedFeed);
                     recyclerView.getAdapter().notifyDataSetChanged();
+                    emptyViewHolder.toggle(feed.isEmpty());
                 },
                 defaultErrorHandler
         ));
+    }
+
+    @Override
+    public void onDestroyView() {
+        recyclerView = null;
+        emptyViewHolder = null;
+        super.onDestroyView();
     }
 
     @Override

@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.MediaUploadIntentService;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
+import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
@@ -39,6 +40,7 @@ public class TeamMediaFragment extends MainActivityFragment
     private Team team;
     private List<Media> mediaList = new ArrayList<>();
     private RecyclerView recyclerView;
+    private EmptyViewHolder emptyViewHolder;
 
     public static TeamMediaFragment newInstance(Team team) {
         TeamMediaFragment fragment = new TeamMediaFragment();
@@ -94,6 +96,8 @@ public class TeamMediaFragment extends MainActivityFragment
             }
         });
 
+        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media);
+
         return rootView;
     }
 
@@ -130,6 +134,7 @@ public class TeamMediaFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+        emptyViewHolder = null;
     }
 
     @Override
@@ -173,5 +178,6 @@ public class TeamMediaFragment extends MainActivityFragment
     private void onMediaUpdated(DiffUtil.DiffResult result) {
         result.dispatchUpdatesTo(recyclerView.getAdapter());
         toggleProgress(false);
+        emptyViewHolder.toggle(mediaList.isEmpty());
     }
 }

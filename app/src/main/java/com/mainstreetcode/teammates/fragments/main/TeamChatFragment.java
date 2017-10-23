@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamChatAdapter;
+import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Team;
@@ -42,6 +43,7 @@ public class TeamChatFragment extends MainActivityFragment
     private Team team;
     private List<TeamChat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
+    private EmptyViewHolder emptyViewHolder;
 
     public static TeamChatFragment newInstance(Team team) {
         TeamChatFragment fragment = new TeamChatFragment();
@@ -96,6 +98,8 @@ public class TeamChatFragment extends MainActivityFragment
             }
         });
 
+        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats);
+
         return rootView;
     }
 
@@ -103,7 +107,7 @@ public class TeamChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
-        subsribeToChat();
+        subscribeToChat();
 
         Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
         disposables.add(teamChatViewModel
@@ -133,6 +137,7 @@ public class TeamChatFragment extends MainActivityFragment
         teamChatViewModel.onChatRoomLeft(team);
         teamChatViewModel.updateLastSeen(team);
         recyclerView = null;
+        emptyViewHolder = null;
     }
 
     @Override
@@ -160,7 +165,7 @@ public class TeamChatFragment extends MainActivityFragment
         return false;
     }
 
-    private void subsribeToChat() {
+    private void subscribeToChat() {
         disposables.add(teamChatViewModel.listenForChat(team).subscribe(chat -> {
             chats.add(chat);
             recyclerView.getAdapter().notifyDataSetChanged();
@@ -210,5 +215,6 @@ public class TeamChatFragment extends MainActivityFragment
         toggleProgress(resultPair.first);
         teamChatViewModel.updateLastSeen(team);
         if (!resultPair.first) resultPair.second.dispatchUpdatesTo(recyclerView.getAdapter());
+        emptyViewHolder.toggle(chats.isEmpty());
     }
 }

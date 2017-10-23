@@ -153,4 +153,11 @@
     <string name="media_notifier_description">Notifications for media</string>
     <string name="join_requests_notifier_description">Notifications for join requests</string>
 
+    <!--Empty ViewHolder-->
+    <string name="no_events">Organize. Plan. Strategize. Your team\'s events live here.</string>
+    <string name="no_feed">You\'re all caught up!</string>
+    <string name="no_team">You aren\'t part of any teams. Tap the floating button to create one or search for your team.</string>
+    <string name="no_chats">Say hi to your teammates!</string>
+    <string name="no_media">Share the highlights of your team! Tap the floating button to upload.</string>
+
 </resources>

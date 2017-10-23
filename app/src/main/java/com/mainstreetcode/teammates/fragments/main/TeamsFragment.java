@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamAdapter;
+import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 
@@ -25,8 +26,6 @@ import io.reactivex.functions.Consumer;
 
 /**
  * Searches for teams
- * <p>
- * Created by Shemanigans on 6/1/17.
  */
 
 public final class TeamsFragment extends MainActivityFragment
@@ -35,12 +34,15 @@ public final class TeamsFragment extends MainActivityFragment
         TeamAdapter.TeamAdapterListener {
 
     private RecyclerView recyclerView;
+    private EmptyViewHolder emptyViewHolder;
+
     private final List<Team> teams = new ArrayList<>();
 
     private final Consumer<List<Team>> teamConsumer = (teams) -> {
         this.teams.clear();
         this.teams.addAll(teams);
         recyclerView.getAdapter().notifyDataSetChanged();
+        emptyViewHolder.toggle(teams.isEmpty());
     };
 
     public static TeamsFragment newInstance() {
@@ -72,6 +74,8 @@ public final class TeamsFragment extends MainActivityFragment
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(new TeamAdapter(teams, this));
 
+        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team);
+
         return rootView;
     }
 
@@ -86,6 +90,7 @@ public final class TeamsFragment extends MainActivityFragment
 
         setToolbarTitle(getString(requestCode == R.id.request_event_team_pick
                 || requestCode == R.id.request_media_team_pick
+                || requestCode == R.id.request_chat_team_pick
                 ? R.string.pick_team
                 : R.string.my_teams));
 
@@ -112,6 +117,12 @@ public final class TeamsFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+        emptyViewHolder = null;
+    }
+
+    @Override
+    protected boolean showsBottomNav() {
+        return getTargetRequestCode() == 0;
     }
 
     @Override

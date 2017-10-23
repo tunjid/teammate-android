@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventAdapter;
+import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Event;
 
@@ -28,12 +29,14 @@ public final class EventsFragment extends MainActivityFragment
         EventAdapter.EventAdapterListener {
 
     private RecyclerView recyclerView;
+    private EmptyViewHolder emptyViewHolder;
     private final List<Event> events = new ArrayList<>();
 
     private final Consumer<List<Event>> eventConsumer = (events) -> {
         this.events.clear();
         this.events.addAll(events);
         recyclerView.getAdapter().notifyDataSetChanged();
+        emptyViewHolder.toggle(events.isEmpty());
     };
 
     public static EventsFragment newInstance() {
@@ -57,6 +60,8 @@ public final class EventsFragment extends MainActivityFragment
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new EventAdapter(events, this));
 
+        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events);
+
         return rootView;
     }
 
@@ -75,6 +80,7 @@ public final class EventsFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+        emptyViewHolder = null;
     }
 
     @Override
