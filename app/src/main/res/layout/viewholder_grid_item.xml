@@ -34,7 +34,7 @@
 
         <TextView
             android:id="@+id/item_title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:gravity="center"
             android:paddingLeft="@dimen/single_margin"
@@ -42,10 +42,10 @@
             android:paddingTop="@dimen/half_margin"
             android:textColor="@color/dark_grey"
             android:textSize="@dimen/small_text"
+            app:layout_constrainedWidth="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/thumbnail"
-            app:layout_constraintWidth_default="wrap" />
+            app:layout_constraintTop_toBottomOf="@+id/thumbnail" />
 
         <TextView
             android:id="@+id/item_subtitle"

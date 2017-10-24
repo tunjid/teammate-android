@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/content"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="left|center_vertical"
@@ -38,10 +38,10 @@
         android:padding="@dimen/half_margin"
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/small_text"
+        app:layout_constrainedWidth="true"
         app:layout_constraintLeft_toRightOf="@+id/image"
         app:layout_constraintRight_toLeftOf="@+id/right_guide"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/right_guide"
