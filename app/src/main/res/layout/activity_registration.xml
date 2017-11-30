@@ -20,7 +20,7 @@
         android:id="@+id/main_fragment_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding"
+        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding_wrapper"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inset_view" />
@@ -38,7 +38,7 @@
         android:id="@+id/coordinator"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding"
+        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding_wrapper"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -55,6 +55,15 @@
         android:id="@+id/keyboard_padding"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent" />
+
+    <include
+        android:id="@+id/keyboard_padding_wrapper"
+        layout="@layout/keyboard_padding"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintLeft_toRightOf="parent" />

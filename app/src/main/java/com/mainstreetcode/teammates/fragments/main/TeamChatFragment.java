@@ -39,6 +39,7 @@ public class TeamChatFragment extends MainActivityFragment
         TeamChatAdapter.ChatAdapterListener {
 
     private static final String ARG_TEAM = "team";
+    private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
     private List<TeamChat> chats = new ArrayList<>();
@@ -143,6 +144,11 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     protected boolean showsFab() {
         return false;
+    }
+
+    @Override
+    public int[] staticViews() {
+        return EXCLUDED_VIEWS;
     }
 
     @Override

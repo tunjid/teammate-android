@@ -19,7 +19,7 @@
         android:id="@+id/main_fragment_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding"
+        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding_wrapper"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inset_view" />
@@ -35,24 +35,11 @@
         app:layout_constraintTop_toBottomOf="@+id/inset_view"
         app:titleTextColor="@color/white" />
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:elevation="@dimen/half_margin"
-        app:itemIconTint="@color/dark_grey"
-        app:itemTextColor="@color/dark_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/main_navigation" />
-
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coordinator"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding"
+        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding_wrapper"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -65,11 +52,25 @@
             android:layout_margin="@dimen/single_margin" />
     </android.support.design.widget.CoordinatorLayout>
 
-    <View
-        android:id="@+id/keyboard_padding"
+    <include
+        android:id="@+id/keyboard_padding_wrapper"
+        layout="@layout/keyboard_padding"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintLeft_toRightOf="parent" />
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:elevation="@dimen/half_margin"
+        app:itemIconTint="@color/dark_grey"
+        app:itemTextColor="@color/dark_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:menu="@menu/main_navigation" />
 </android.support.constraint.ConstraintLayout>
