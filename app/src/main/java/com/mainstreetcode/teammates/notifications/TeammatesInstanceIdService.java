@@ -5,7 +5,8 @@ import android.text.TextUtils;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.model.Device;
+import com.mainstreetcode.teammates.repository.DeviceRepository;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
@@ -18,15 +19,12 @@ public class TeammatesInstanceIdService extends FirebaseInstanceIdService {
 
     public static void updateFcmToken() {
         String token = FirebaseInstanceId.getInstance().getToken();
-        if (TextUtils.isEmpty(token)) return;
+        if (TextUtils.isEmpty(token) || UserRepository.getInstance().getCurrentUser() == null)
+            return;
 
-        UserRepository userRepository = UserRepository.getInstance();
-        User user = userRepository.getCurrentUser();
+        Device device = new Device();
+        device.setFcmToken(token);
 
-        if (user == null) return;
-
-        user.setFcmToken(token);
-
-        userRepository.createOrUpdate(user).subscribe(ignored -> {}, ErrorHandler.EMPTY);
+        DeviceRepository.getInstance().createOrUpdate(device).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 }

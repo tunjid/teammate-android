@@ -182,6 +182,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity {
     private void initTransition() {
         Transition transition = new AutoTransition();
         transition.setDuration(200);
+
+        TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+        if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
+
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }
 }

@@ -36,7 +36,6 @@ public class User extends UserEntity implements
     public static final String PHOTO_UPLOAD_KEY = "user-photo";
 
     @Ignore private transient String password;
-    @Ignore private transient String fcmToken;
 
     @Ignore private final List<Item<User>> items;
 
@@ -98,10 +97,6 @@ public class User extends UserEntity implements
         this.password = password;
     }
 
-    public void setFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -134,7 +129,6 @@ public class User extends UserEntity implements
         private static final String IMAGE_KEY = "imageUrl";
         private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
         private static final String PASSWORD_KEY = "password";
-        private static final String FCM_TOKEN_KEY = "fcmToken";
 
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -157,7 +151,6 @@ public class User extends UserEntity implements
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
 
             if (!TextUtils.isEmpty(src.password)) user.addProperty(PASSWORD_KEY, src.password);
-            if (!TextUtils.isEmpty(src.fcmToken)) user.addProperty(FCM_TOKEN_KEY, src.fcmToken);
 
             return user;
         }

@@ -55,6 +55,11 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     }
 
     @Override
+    public void onViewRecycled(TeamChatViewHolder holder) {
+        super.onViewRecycled(holder);
+    }
+
+    @Override
     public int getItemCount() {
         return chats.size();
     }

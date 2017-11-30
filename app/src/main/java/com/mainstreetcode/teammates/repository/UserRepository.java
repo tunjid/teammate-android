@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.UserDao;
@@ -121,10 +122,12 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<Boolean> signOut() {
-        Single<Boolean> local = AppDatabase.getInstance().clearTables()
-                .flatMap(result -> clearUser());
+        AppDatabase database = AppDatabase.getInstance();
+        Single<Boolean> local = database.clearTables().flatMap(result -> clearUser());
+        Device device = database.deviceDao().getCurrentDevice();
+        String deviceId = device != null ? device.getId() : "";
 
-        return api.signOut()
+        return api.signOut(deviceId)
                 .flatMap(result -> local)
                 .onErrorResumeNext(throwable -> local)
                 .subscribeOn(io())

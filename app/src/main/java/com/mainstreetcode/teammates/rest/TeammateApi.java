@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Media;
@@ -54,7 +55,7 @@ public interface TeammateApi {
     Single<User> getMe();
 
     @GET("api/signOut")
-    Single<JsonObject> signOut();
+    Single<JsonObject> signOut(@Query("device") String currentDevice);
 
     @GET("api/me/feed")
     Single<List<FeedItem>> getFeed();
@@ -170,4 +171,15 @@ public interface TeammateApi {
     @Multipart
     @POST("api/team/media/{teamId}")
     Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
+
+
+    // =============================================================================================
+    // Device endpoints
+    // =============================================================================================
+
+    @POST("api/me/devices")
+    Single<Device> createDevice(@Body Device device);
+
+    @PUT("api/me/devices/{id}")
+    Single<Device> updateDevice(@Path("id") String deviceId, @Body Device device);
 }
