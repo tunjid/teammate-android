@@ -55,7 +55,7 @@ public interface TeammateApi {
     Single<User> getMe();
 
     @GET("api/signOut")
-    Single<JsonObject> signOut();
+    Single<JsonObject> signOut(@Query("device") String currentDevice);
 
     @GET("api/me/feed")
     Single<List<FeedItem>> getFeed();

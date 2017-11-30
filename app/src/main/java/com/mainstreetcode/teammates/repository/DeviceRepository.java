@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
 import com.mainstreetcode.teammates.model.Device;
+import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.DeviceDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -22,7 +23,7 @@ public class DeviceRepository extends ModelRepository<Device> {
 
     private DeviceRepository() {
         api = TeammateService.getApiInstance();
-        dao = new DeviceDao();
+        dao = AppDatabase.getInstance().deviceDao();
     }
 
     public static DeviceRepository getInstance() {
