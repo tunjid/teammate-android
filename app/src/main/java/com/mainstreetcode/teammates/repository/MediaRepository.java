@@ -8,6 +8,7 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.notifications.MediaNotifier;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.MediaDao;
 import com.mainstreetcode.teammates.rest.ProgressRequestBody;
 import com.mainstreetcode.teammates.rest.TeammateApi;
@@ -28,7 +29,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
-import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -37,7 +37,7 @@ public class MediaRepository extends ModelRepository<Media> {
     private final TeammateApi api;
     private final MediaDao mediaDao;
     private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRespository;
+    private final ModelRepository<Team> teamRepository;
 
     private static MediaRepository ourInstance;
 
@@ -45,12 +45,17 @@ public class MediaRepository extends ModelRepository<Media> {
         api = TeammateService.getApiInstance();
         mediaDao = AppDatabase.getInstance().mediaDao();
         userRepository = UserRepository.getInstance();
-        teamRespository = TeamRepository.getInstance();
+        teamRepository = TeamRepository.getInstance();
     }
 
     public static MediaRepository getInstance() {
         if (ourInstance == null) ourInstance = new MediaRepository();
         return ourInstance;
+    }
+
+    @Override
+    public EntityDao<? super Media> dao() {
+        return mediaDao;
     }
 
     @Override
@@ -70,13 +75,14 @@ public class MediaRepository extends ModelRepository<Media> {
         Maybe<Media> local = mediaDao.get(id).subscribeOn(io());
         Maybe<Media> remote = api.getMedia(id).map(getSaveFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
     public Single<Media> delete(Media model) {
-        mediaDao.delete(Collections.singletonList(model));
-        return just(model);
+        return api.deleteMedia(model.getId())
+                .doAfterSuccess(this::deleteLocally)
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 
     @Override
@@ -91,7 +97,7 @@ public class MediaRepository extends ModelRepository<Media> {
             }
 
             userRepository.getSaveManyFunction().apply(users);
-            teamRespository.getSaveManyFunction().apply(teams);
+            teamRepository.getSaveManyFunction().apply(teams);
 
             mediaDao.upsert(Collections.unmodifiableList(models));
 
@@ -103,11 +109,11 @@ public class MediaRepository extends ModelRepository<Media> {
         Maybe<List<Media>> local = mediaDao.getTeamMedia(team, date).subscribeOn(io());
         Maybe<List<Media>> remote = api.getTeamMedia(team.getId(), date).map(getSaveManyFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGet(local, remote);
     }
 
     @Nullable
-    MultipartBody.Part getBody(String path, String photokey) {
+    MultipartBody.Part getBody(String path, String photoKey) {
         File file = new File(path);
 
         if (!file.exists()) return null;
@@ -119,6 +125,6 @@ public class MediaRepository extends ModelRepository<Media> {
         if (type == null) return null;
         RequestBody requestBody = new ProgressRequestBody(file, 1, MediaType.parse(type));
 
-        return MultipartBody.Part.createFormData(photokey, file.getName(), requestBody);
+        return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
     }
 }

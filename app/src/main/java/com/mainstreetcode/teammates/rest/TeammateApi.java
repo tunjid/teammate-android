@@ -162,8 +162,11 @@ public interface TeammateApi {
     // Team Media endpoints
     // =============================================================================================
 
-    @GET("/api/team-media/{mediaId}")
-    Single<Media> getMedia(@Path("teamId") String mediaId);
+    @GET("/api/media/{mediaId}")
+    Single<Media> getMedia(@Path("mediaId") String mediaId);
+
+    @DELETE("/api/media/{mediaId}")
+    Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 
     @GET("/api/team/media/{teamId}")
     Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);

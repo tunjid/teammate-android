@@ -4,19 +4,26 @@ package com.mainstreetcode.teammates.repository;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.persistence.EntityDao;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import retrofit2.HttpException;
 
 import static io.reactivex.Maybe.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -29,6 +36,8 @@ public abstract class ModelRepository<T extends Model<T>> {
 
     private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
     private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);
+
+    public abstract EntityDao<? super T> dao();
 
     public abstract Single<T> createOrUpdate(T model);
 
@@ -60,12 +69,32 @@ public abstract class ModelRepository<T extends Model<T>> {
         };
     }
 
-    static <R> Flowable<R> cacheThenRemote(Maybe<R> local, Maybe<R> remote) {
+    final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
+        AtomicReference<T> reference = new AtomicReference<>();
+        local = local.doOnSuccess(reference::set);
+        return fetchThenGet(local, remote)
+                .doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
+    }
+
+    static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
         return concat(local, remote).observeOn(mainThread(), true);
     }
 
+    final void deleteInvalidModel(T model, Throwable throwable) {
+        if (model == null || !(throwable instanceof HttpException)) return;
+
+        Message message = new Message((HttpException) throwable);
+        if (message.isInvalidObject()) deleteLocally(model);
+    }
+
+    final void deleteLocally(T model) {
+        Completable.fromRunnable(() -> dao().delete(model))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> {}, ErrorHandler.EMPTY);
+    }
+
     @Nullable
-    MultipartBody.Part getBody(String path, String photokey) {
+    MultipartBody.Part getBody(String path, String photoKey) {
         File file = new File(path);
 
         if (!file.exists()) return null;
@@ -77,6 +106,6 @@ public abstract class ModelRepository<T extends Model<T>> {
         if (type == null) return null;
         RequestBody requestBody = RequestBody.create(MediaType.parse(type), file);
 
-        return MultipartBody.Part.createFormData(photokey, file.getName(), requestBody);
+        return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
     }
 }

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.repository;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.DeviceDao;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.TeammateException;
@@ -31,6 +32,10 @@ public class DeviceRepository extends ModelRepository<Device> {
         return ourInstance;
     }
 
+    @Override
+    public EntityDao<? super Device> dao() {
+        return dao;
+    }
 
     @Override
     public Single<Device> createOrUpdate(Device model) {

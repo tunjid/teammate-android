@@ -5,9 +5,11 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.RoleDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,8 +43,14 @@ public class RoleRepository extends ModelRepository<Role> {
     }
 
     @Override
+    public EntityDao<? super Role> dao() {
+        return roleDao;
+    }
+
+    @Override
     public Single<Role> createOrUpdate(Role model) {
-        Single<Role> roleSingle = api.updateRole(model.getId(), model);
+        Single<Role> roleSingle = api.updateRole(model.getId(), model)
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Role.PHOTO_UPLOAD_KEY);
         if (body != null) {
@@ -54,12 +62,12 @@ public class RoleRepository extends ModelRepository<Role> {
 
     @Override
     public Flowable<Role> get(String id) {
-        return null;
+        return Flowable.error(new TeammateException(""));
     }
 
     @Override
     public Single<Role> delete(Role model) {
-        roleDao.delete(Collections.singletonList(model));
+        roleDao.delete(model);
         return just(model);
     }
 
@@ -74,7 +82,7 @@ public class RoleRepository extends ModelRepository<Role> {
                 users.add(role.getUser());
             }
 
-            //if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
+            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
             if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));

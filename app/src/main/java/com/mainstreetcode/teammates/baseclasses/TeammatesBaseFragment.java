@@ -19,6 +19,7 @@ import android.view.View;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.LoadingSnackbar;
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -60,17 +61,15 @@ public class TeammatesBaseFragment extends BaseFragment {
         super.onAttach(context);
         defaultErrorHandler = ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
-                .add(message -> {
-                    showSnackbar(message.getMessage());
-                    toggleProgress(false);
-                })
+                .add(this::handleErrorMessage)
                 .build();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (view == null) return;
+        if (view == null) return; // In case of headless Fragments
+
         toggleToolbar(showsToolBar());
         toggleFab(showsFab());
         toggleBottombar(showsBottomNav());
@@ -101,6 +100,12 @@ public class TeammatesBaseFragment extends BaseFragment {
         else if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) {
             loadingSnackbar.dismiss();
         }
+    }
+
+    protected void handleErrorMessage(Message message) {
+        showSnackbar(message.getMessage());
+        toggleProgress(false);
+        if (message.isInvalidObject()) getActivity().onBackPressed();
     }
 
     @Nullable

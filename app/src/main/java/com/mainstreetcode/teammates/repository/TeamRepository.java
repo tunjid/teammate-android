@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.TeamDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -57,17 +58,24 @@ public class TeamRepository extends ModelRepository<Team> {
     }
 
     @Override
+    public EntityDao<? super Team> dao() {
+        return teamDao;
+    }
+
+    @Override
     public Single<Team> createOrUpdate(Team model) {
-        Single<Team> eventSingle = model.isEmpty()
+        Single<Team> teamSingle = model.isEmpty()
                 ? api.createTeam(model).map(localMapper(model))
-                : api.updateTeam(model.getId(), model).map(localMapper(model));
+                : api.updateTeam(model.getId(), model)
+                .map(localMapper(model))
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            eventSingle = eventSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
+            teamSingle = teamSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
 
-        return eventSingle.map(getSaveFunction()).observeOn(mainThread());
+        return teamSingle.map(getSaveFunction()).observeOn(mainThread());
     }
 
     @Override
@@ -75,16 +83,14 @@ public class TeamRepository extends ModelRepository<Team> {
         Maybe<Team> local = teamDao.get(id).map(Team::updateDelayedRoles).subscribeOn(io());
         Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
     public Single<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
-                .map(team1 -> {
-                    teamDao.delete(team);
-                    return team;
-                });
+                .doAfterSuccess(this::deleteLocally)
+                .doOnError(throwable -> deleteInvalidModel(team, throwable));
     }
 
     @Override
@@ -124,7 +130,7 @@ public class TeamRepository extends ModelRepository<Team> {
         Maybe<List<Team>> local = teamDao.myTeams(userId).subscribeOn(io());
         Maybe<List<Team>> remote = api.getMyTeams().map(getSaveManyFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGet(local, remote);
     }
 
     public Maybe<Team> getDefaultTeam() {

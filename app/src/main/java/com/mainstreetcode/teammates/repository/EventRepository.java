@@ -4,6 +4,7 @@ package com.mainstreetcode.teammates.repository;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.EventDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -18,7 +19,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
-import static io.reactivex.Single.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -42,10 +42,17 @@ public class EventRepository extends ModelRepository<Event> {
     }
 
     @Override
+    public EntityDao<? super Event> dao() {
+        return eventDao;
+    }
+
+    @Override
     public Single<Event> createOrUpdate(Event event) {
         Single<Event> eventSingle = event.isEmpty()
                 ? api.createEvent(event).map(localMapper(event))
-                : api.updateEvent(event.getId(), event).map(localMapper(event));
+                : api.updateEvent(event.getId(), event)
+                .map(localMapper(event))
+                .doOnError(throwable -> deleteInvalidModel(event, throwable));
 
         MultipartBody.Part body = getBody(event.getHeaderItem().getValue(), Event.PHOTO_UPLOAD_KEY);
         if (body != null) {
@@ -60,23 +67,21 @@ public class EventRepository extends ModelRepository<Event> {
         Maybe<Event> local = eventDao.get(id).subscribeOn(io());
         Maybe<Event> remote = api.getEvent(id).map(getSaveFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
     public Single<Event> delete(Event event) {
         return api.deleteEvent(event.getId())
-                .flatMap(deleted -> {
-                    eventDao.delete(event);
-                    return just(event);
-                });
+                .doAfterSuccess(this::deleteLocally)
+                .doOnError(throwable -> deleteInvalidModel(event, throwable));
     }
 
     public Flowable<List<Event>> getEvents(String userId) {
         Maybe<List<Event>> local = eventDao.getEvents(userId).subscribeOn(io());
         Maybe<List<Event>> remote = api.getEvents().map(getSaveManyFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGet(local, remote);
     }
 
     public Single<Event> rsvpEvent(final Event event, boolean attending) {

@@ -14,6 +14,7 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.TeamChatDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -80,6 +81,11 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
     }
 
     @Override
+    public EntityDao<? super TeamChat> dao() {
+        return chatDao;
+    }
+
+    @Override
     public Single<TeamChat> createOrUpdate(TeamChat model) {
         return Single.error(new TeammateException("Chats are created via socket IO"));
     }
@@ -89,7 +95,7 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         Maybe<TeamChat> local = chatDao.get(id).subscribeOn(io());
         Maybe<TeamChat> remote = api.getTeamChat(id).map(getSaveFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
@@ -125,7 +131,7 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         Maybe<List<TeamChat>> local = chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
         Maybe<List<TeamChat>> remote = api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
 
-        return cacheThenRemote(local, remote);
+        return fetchThenGet(local, remote);
     }
 
     public Single<List<TeamChat>> fetchUnreadChats(Team team) {

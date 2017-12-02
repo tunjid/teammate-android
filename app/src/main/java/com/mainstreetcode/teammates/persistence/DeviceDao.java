@@ -37,6 +37,11 @@ public class DeviceDao extends EntityDao<Device> {
         return new Device(id);
     }
 
+    @Override
+    public void delete(Device model) {
+        deleteCurrentDevice();
+    }
+
     public void deleteCurrentDevice() {
         getPreferences().edit().remove(KEY).apply();
     }

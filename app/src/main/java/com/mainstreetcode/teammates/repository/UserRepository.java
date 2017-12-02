@@ -10,6 +10,7 @@ import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.UserDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
@@ -57,10 +58,15 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     @Override
+    public EntityDao<? super User> dao() {
+        return userDao;
+    }
+
+    @Override
     public Single<User> createOrUpdate(User model) {
         Single<User> remote = model.isEmpty()
                 ? api.signUp(model)
-                : api.updateUser(model.getId(), model);
+                : api.updateUser(model.getId(), model).doOnError(throwable -> deleteInvalidModel(model, throwable));
 
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), User.PHOTO_UPLOAD_KEY);
@@ -77,7 +83,7 @@ public class UserRepository extends ModelRepository<User> {
         Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(io());
         Single<User> remote = api.getMe().map(getSaveFunction());
 
-        return cacheThenRemote(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
+        return fetchThenGetModel(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
     }
 
     @Override

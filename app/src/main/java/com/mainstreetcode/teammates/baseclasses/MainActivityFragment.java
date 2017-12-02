@@ -6,10 +6,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Message;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
 import com.mainstreetcode.teammates.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammates.viewmodel.MediaViewModel;
@@ -55,11 +53,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         mediaViewModel = provider.get(MediaViewModel.class);
         teamChatViewModel = provider.get(TeamChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
+    }
 
-        defaultErrorHandler = ErrorHandler.builder()
-                .defaultMessage(getString(R.string.default_error))
-                .add(this::handleErrorMEssage)
-                .build();
+    @Override
+    protected void handleErrorMessage(Message message) {
+        if (message.isUnauthorizedUser()) signOut();
+        else super.handleErrorMessage(message);
     }
 
     protected void signOut() {
@@ -67,14 +66,5 @@ public class MainActivityFragment extends TeammatesBaseFragment {
                 success -> MainActivity.startRegistrationActivity(getActivity()),
                 throwable -> MainActivity.startRegistrationActivity(getActivity())
         );
-    }
-
-    private void handleErrorMEssage(Message message) {
-        if (message.isUnauthorizedUser()) {
-            signOut();
-            return;
-        }
-        showSnackbar(message.getMessage());
-        toggleProgress(false);
     }
 }

@@ -4,9 +4,11 @@ import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.JoinRequestDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +39,11 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
     }
 
     @Override
+    public EntityDao<? super JoinRequest> dao() {
+        return joinRequestDao;
+    }
+
+    @Override
     public Single<JoinRequest> createOrUpdate(JoinRequest model) {
         Single<JoinRequest> call = model.isUserApproved() ? api.joinTeam(model) : api.inviteUser(model);
         return call.map(localMapper(model)).map(getSaveFunction()).observeOn(mainThread());
@@ -44,12 +51,12 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     @Override
     public Flowable<JoinRequest> get(String id) {
-        return null;
+        return Flowable.error(new TeammateException(""));
     }
 
     @Override
     public Single<JoinRequest> delete(JoinRequest model) {
-        joinRequestDao.delete(Collections.singletonList(model));
+        joinRequestDao.delete(model);
         return just(model);
     }
 

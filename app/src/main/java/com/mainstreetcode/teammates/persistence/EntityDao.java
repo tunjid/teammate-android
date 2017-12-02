@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates.persistence;
 
+import android.arch.persistence.room.Delete;
+
 import java.util.List;
 
 import io.reactivex.Single;
@@ -12,6 +14,9 @@ public abstract class EntityDao<T> {
     protected abstract void insert(List<T> models);
 
     protected abstract void update(List<T> models);
+
+    @Delete
+    public abstract void delete(T model);
 
     public void upsert(List<T> models) {
         insert(models);

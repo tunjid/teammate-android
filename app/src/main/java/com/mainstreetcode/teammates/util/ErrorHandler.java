@@ -1,13 +1,11 @@
 package com.mainstreetcode.teammates.util;
 
 import com.mainstreetcode.teammates.model.Message;
-import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.functions.Consumer;
-import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 
 /**
@@ -49,7 +47,7 @@ public class ErrorHandler implements Consumer<Throwable> {
                 : isTeammateException(throwable)
                 ? new Message(throwable.getMessage())
                 : isHttpException(throwable)
-                ? getMessage((HttpException) throwable)
+                ? new Message((HttpException) throwable)
                 : new Message(defaultMessage);
 
         messageConsumer.accept(message);
@@ -62,20 +60,6 @@ public class ErrorHandler implements Consumer<Throwable> {
 
     private boolean isTeammateException(Throwable throwable) {
         return throwable instanceof TeammateException;
-    }
-
-    private Message getMessage(HttpException throwable) {
-        try {
-            ResponseBody errorBody = throwable.response().errorBody();
-            if (errorBody != null) {
-                String json = errorBody.string();
-                return TeammateService.getGson().fromJson(json, Message.class);
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new Message(defaultMessage);
     }
 
     public static class Builder {

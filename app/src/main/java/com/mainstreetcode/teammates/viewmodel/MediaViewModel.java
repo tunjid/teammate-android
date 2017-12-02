@@ -27,8 +27,11 @@ public class MediaViewModel extends ViewModel {
         repository = MediaRepository.getInstance();
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
+    public Flowable<Media> getMedia(Media model) {
+        return repository.get(model);
+    }
 
+    public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
         return repository.getTeamMedia(team, date).map(updatedMedia -> {
             List<Media> copy = new ArrayList<>(source);
             ModelUtils.preserveList(source, updatedMedia);

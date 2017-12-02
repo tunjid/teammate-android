@@ -23,6 +23,8 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 public class MediaDetailFragment extends MainActivityFragment {
 
     public static final String ARG_MEDIA = "media";
+
+    private Media media;
     private MediaViewHolder mediaViewHolder;
 
     public static MediaDetailFragment newInstance(Media media) {
@@ -53,14 +55,12 @@ public class MediaDetailFragment extends MainActivityFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        media = getArguments().getParcelable(ARG_MEDIA);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Media media = getArguments().getParcelable(ARG_MEDIA);
-        assert media != null;
-
         boolean isImage = media.isImage();
         int resource = isImage ? R.layout.viewholder_image : R.layout.viewholder_video;
 
@@ -71,8 +71,10 @@ public class MediaDetailFragment extends MainActivityFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mediaViewModel.getMedia(media).subscribe(updated -> {}, defaultErrorHandler);
     }
 
     @Override
