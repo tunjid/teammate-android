@@ -72,6 +72,10 @@ public class RoleEntity implements Parcelable {
         this.name = name;
     }
 
+    protected void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

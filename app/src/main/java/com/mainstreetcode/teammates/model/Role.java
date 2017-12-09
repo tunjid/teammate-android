@@ -80,7 +80,7 @@ public class Role extends RoleEntity
 
     @Override
     public Item<Role> getHeaderItem() {
-        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, null, this);
+        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, this::setImageUrl, this);
     }
 
     @Override
