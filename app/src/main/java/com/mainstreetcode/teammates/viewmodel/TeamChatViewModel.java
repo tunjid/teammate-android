@@ -11,7 +11,6 @@ import com.mainstreetcode.teammates.util.ModelDiffCallback;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +21,8 @@ import io.reactivex.Flowable;
 
 import static io.reactivex.Flowable.concat;
 import static io.reactivex.Flowable.just;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.computation;
 
 
 public class TeamChatViewModel extends ViewModel {
@@ -62,17 +63,30 @@ public class TeamChatViewModel extends ViewModel {
         if (currentSize.equals(lastSize)) return just(getPair(true, getDiffResult(chats, chats)));
 
         chatMap.put(team, currentSize);
-        return concat(just(getPair(true, getDiffResult(chats, chats))), repository.chatsBefore(team, date)
-                .doOnError(throwable -> chatMap.put(team, RETRY))
-                .doOnCancel(() -> chatMap.put(team, RETRY))
-                .map(updatedChats -> {
-                    List<TeamChat> copy = new ArrayList<>(chats);
-                    ModelUtils.preserveList(chats, updatedChats);
-                    Collections.sort(chats);
 
-                    if (chats.size() == currentSize) chatMap.put(team, NO_MORE);
-                    return getPair(false, getDiffResult(chats, copy));
-                }));
+        final List<TeamChat> updated = new ArrayList<>(chats);
+
+        return concat(
+                Flowable.fromCallable(() -> getPair(true, getDiffResult(chats, chats)))
+                        .subscribeOn(computation())
+                        .observeOn(mainThread()),
+                repository.chatsBefore(team, date)
+                        .doOnError(throwable -> chatMap.put(team, RETRY))
+                        .doOnCancel(() -> chatMap.put(team, RETRY))
+                        .concatMapDelayError(fetchedChats -> Flowable.fromCallable(() -> {
+                                    ModelUtils.preserveList(updated, fetchedChats);
+                                    List<TeamChat> stale = new ArrayList<>(chats);
+
+                                    if (updated.size() == currentSize) chatMap.put(team, NO_MORE);
+                                    return getPair(false, getDiffResult(updated, stale));
+                                })
+                                        .subscribeOn(computation())
+                                        .observeOn(mainThread())
+                                        .doOnNext(pair -> {
+                                            chats.clear();
+                                            chats.addAll(updated);
+                                        })
+                        ));
     }
 
     private DiffUtil.DiffResult getDiffResult(List<TeamChat> updated, List<TeamChat> stale) {
