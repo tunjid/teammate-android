@@ -4,7 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.transition.Fade;
+import android.support.v4.util.Pair;
 import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,20 +30,16 @@ public class MediaDetailFragment extends MainActivityFragment {
     public static MediaDetailFragment newInstance(Media media) {
         MediaDetailFragment fragment = new MediaDetailFragment();
         Bundle args = new Bundle();
+
         args.putParcelable(ARG_MEDIA, media);
         fragment.setArguments(args);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
+            Pair<Transition, Transition> pair = fragment.setDefaultSharedTransitions();
 
-            baseTransition.excludeTarget(R.id.image, true);
-
-            fragment.setEnterTransition(baseTransition);
-            fragment.setExitTransition(baseTransition);
-            fragment.setSharedElementEnterTransition(baseSharedTransition);
-            fragment.setSharedElementReturnTransition(baseSharedTransition);
+            if (pair != null) pair.first.excludeTarget(R.id.image, true);
         }
+
         return fragment;
     }
 

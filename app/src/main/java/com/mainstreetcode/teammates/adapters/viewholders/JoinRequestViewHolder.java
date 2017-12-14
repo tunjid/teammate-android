@@ -25,8 +25,8 @@ public class JoinRequestViewHolder extends UserHoldingViewHolder<TeamDetailAdapt
         User item = request.getUser();
         Context context = itemView.getContext();
 
-        userName.setText(item.getFirstName());
-        userStatus.setText(request.isTeamApproved() && !request.isUserApproved()
+        title.setText(item.getFirstName());
+        subtitle.setText(request.isTeamApproved() && !request.isUserApproved()
                 ? context.getString(R.string.user_invited, request.getRoleName())
                 : context.getString(R.string.user_requests_join, request.getRoleName()));
 
@@ -37,7 +37,7 @@ public class JoinRequestViewHolder extends UserHoldingViewHolder<TeamDetailAdapt
                     .load(imageUrl)
                     .fit()
                     .centerInside()
-                    .into(userPicture);
+                    .into(thumbnail);
         }
     }
 

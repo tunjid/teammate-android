@@ -7,12 +7,12 @@ import com.mainstreetcode.teammates.model.Model;
 
 import java.util.List;
 
-public class ModelDiffCallback<T extends Model> extends DiffUtil.Callback {
+public class ModelDiffCallback extends DiffUtil.Callback {
 
-    private final List<T> stale;
-    private final List<T> updated;
+    private final List<? extends Model> stale;
+    private final List<? extends Model> updated;
 
-    public ModelDiffCallback(List<T> updated, List<T> stale) {
+    public ModelDiffCallback(List<? extends Model> updated, List<? extends Model> stale) {
         this.updated = updated;
         this.stale = stale;
     }
@@ -40,7 +40,6 @@ public class ModelDiffCallback<T extends Model> extends DiffUtil.Callback {
     @Nullable
     @Override
     public Object getChangePayload(int oldItemPosition, int newItemPosition) {
-        //you can return particular field for changed item.
         return super.getChangePayload(oldItemPosition, newItemPosition);
     }
 }

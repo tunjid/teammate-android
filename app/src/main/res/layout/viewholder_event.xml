@@ -73,9 +73,9 @@
             android:paddingTop="@dimen/quarter_margin"
             android:textColor="@color/dark_grey"
             android:textSize="@dimen/small_text"
+            app:layout_constrainedWidth="true"
             app:layout_constraintLeft_toRightOf="@+id/time_icon"
             app:layout_constraintTop_toBottomOf="@+id/thumbnail"
-            app:layout_constraintWidth_default="wrap"
             tools:text="This is a test" />
 
         <ImageView

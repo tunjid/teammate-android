@@ -34,7 +34,7 @@ public class RoleEditFragment extends HeaderedFragment
         implements
         View.OnClickListener{
 
-    private static final String ARG_ROLE = "role";
+    public static final String ARG_ROLE = "role";
 
     private Role role;
     private Role currentRole = Role.empty();
@@ -48,6 +48,8 @@ public class RoleEditFragment extends HeaderedFragment
 
         args.putParcelable(ARG_ROLE, role);
         fragment.setArguments(args);
+        fragment.setDefaultSharedTransitions();
+
         return fragment;
     }
 

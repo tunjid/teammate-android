@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.model;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -42,6 +43,11 @@ public class Device implements Model<Device> {
     public void update(Device updated) {
         this.id = updated.id;
         this.fcmToken = updated.fcmToken;
+    }
+
+    @Override
+    public int compareTo(@NonNull Device o) {
+        return id.compareTo(o.id);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.model;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -91,6 +92,18 @@ public class User extends UserEntity implements
 
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
+    }
+
+    @Override
+    public int compareTo(@NonNull User o) {
+        int firstNameComparison = firstName.compareTo(o.firstName);
+        int lastNameComparison = lastName.compareTo(o.lastName);
+
+        return firstNameComparison != 0
+                ? firstNameComparison
+                : lastNameComparison != 0
+                ? lastNameComparison
+                : id.compareTo(o.id);
     }
 
     public void setPassword(String password) {

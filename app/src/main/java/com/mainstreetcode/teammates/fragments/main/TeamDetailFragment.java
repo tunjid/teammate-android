@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,17 +23,22 @@ import android.widget.EditText;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.UserHoldingViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 /**
  * Displays a {@link Team team's} {@link User members}.
@@ -48,6 +55,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private Role currentRole = Role.empty();
     private final List<String> availableRoles = new ArrayList<>();
+    private final List<Model> teamModels = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
@@ -81,12 +89,11 @@ public class TeamDetailFragment extends MainActivityFragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
         EditText editText = rootView.findViewById(R.id.team_name);
-        recyclerView = rootView.findViewById(R.id.team_detail);
-
         editText.setText(team.getName());
 
+        recyclerView = rootView.findViewById(R.id.team_detail);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        recyclerView.setAdapter(new TeamDetailAdapter(team, this));
+        recyclerView.setAdapter(new TeamDetailAdapter(teamModels, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -95,7 +102,6 @@ public class TeamDetailFragment extends MainActivityFragment
                 toggleFab(dy < 0);
             }
         });
-
         return rootView;
     }
 
@@ -108,20 +114,8 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
 
-        disposables.add(roleViewModel.getRoleValues().subscribe(values -> {
-            availableRoles.clear();
-            availableRoles.addAll(values);
-        }, ErrorHandler.EMPTY));
-
-        disposables.add(teamViewModel.getTeam(team).subscribe(
-                updatedTeam -> {
-                    team.update(updatedTeam);
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                    getActivity().invalidateOptionsMenu();
-                    updateCurrentRole();
-                },
-                defaultErrorHandler)
-        );
+        disposables.add(roleViewModel.getRoleValues().subscribe(this::onRolesUpdated, ErrorHandler.EMPTY));
+        disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -194,30 +188,49 @@ public class TeamDetailFragment extends MainActivityFragment
         }
     }
 
+    @Override
+    @Nullable
+    @SuppressLint("CommitTransaction")
+    public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
+        if (fragmentTo.getStableTag().contains(RoleEditFragment.class.getSimpleName())) {
+            Role role = fragmentTo.getArguments().getParcelable(RoleEditFragment.ARG_ROLE);
+            if (role == null) return null;
+
+            UserHoldingViewHolder holder = (UserHoldingViewHolder) recyclerView.findViewHolderForItemId(role.hashCode());
+            if (holder == null) return null;
+
+            return beginTransaction()
+                    .addSharedElement(holder.itemView, getTransitionName(role, R.id.fragment_header_background))
+                    .addSharedElement(holder.getThumbnail(), getTransitionName(role, R.id.fragment_header_thumbnail));
+        }
+        return super.provideFragmentTransaction(fragmentTo);
+    }
+
     private void approveUser(final JoinRequest request, final boolean approve) {
         disposables.add(approve
-                ? roleViewModel.approveUser(request).subscribe((role) -> {
-            team.getRoles().add(role);
-            team.getJoinRequests().remove(request);
-            recyclerView.getAdapter().notifyDataSetChanged();
-
-            String name = role.getUser().getFirstName();
-            showSnackbar(getString(R.string.added_user, name));
-        }, defaultErrorHandler)
-                : roleViewModel.declineUser(request).subscribe((joinRequest) -> {
-            team.getJoinRequests().remove(request);
-            recyclerView.getAdapter().notifyDataSetChanged();
-
-            String name = joinRequest.getUser().getFirstName();
-            showSnackbar(getString(R.string.removed_user, name));
-        }, defaultErrorHandler));
+                ? roleViewModel.approveUser(request).subscribe(role -> onRoleApproved(request, role), defaultErrorHandler)
+                : roleViewModel.declineUser(request).subscribe(joinRequest -> onJoinDeclined(request, joinRequest), defaultErrorHandler));
     }
 
     private void deleteTeam() {
-        disposables.add(teamViewModel.deleteTeam(team).subscribe(deleted -> {
-            showSnackbar(getString(R.string.deleted_team, team.getName()));
-            getActivity().onBackPressed();
-        }, defaultErrorHandler));
+        disposables.add(teamViewModel.deleteTeam(team).subscribe(deleted -> onTeamDeleted(), defaultErrorHandler));
+    }
+
+    private void onTeamUpdated(DiffUtil.DiffResult diffResult) {
+        getActivity().invalidateOptionsMenu();
+        updateCurrentRole();
+        updateTeamModels();
+        diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+    }
+
+    private void onRolesUpdated(List<String> values) {
+        availableRoles.clear();
+        availableRoles.addAll(values);
+    }
+
+    private void onTeamDeleted() {
+        showSnackbar(getString(R.string.deleted_team, team.getName()));
+        getActivity().onBackPressed();
     }
 
     private void updateCurrentRole() {
@@ -227,10 +240,33 @@ public class TeamDetailFragment extends MainActivityFragment
                 .subscribe(this::onRoleUpdated, ErrorHandler.EMPTY));
     }
 
+    private void onJoinDeclined(JoinRequest request, JoinRequest joinRequest) {
+        team.getJoinRequests().remove(request);
+        recyclerView.getAdapter().notifyDataSetChanged();
+
+        String name = joinRequest.getUser().getFirstName();
+        showSnackbar(getString(R.string.removed_user, name));
+    }
+
+    private void onRoleApproved(JoinRequest request, Role role) {
+        team.getRoles().add(role);
+        team.getJoinRequests().remove(request);
+        recyclerView.getAdapter().notifyDataSetChanged();
+
+        String name = role.getUser().getFirstName();
+        showSnackbar(getString(R.string.added_user, name));
+    }
+
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
         getActivity().invalidateOptionsMenu();
         toggleFab(showsFab());
+    }
+
+    private void updateTeamModels() {
+        teamModels.clear();
+        teamModels.addAll(team.getRoles());
+        teamModels.addAll(team.getJoinRequests());
     }
 
     @SuppressLint("InflateParams")

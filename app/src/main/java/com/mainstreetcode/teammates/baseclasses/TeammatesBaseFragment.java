@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
@@ -108,17 +109,22 @@ public class TeammatesBaseFragment extends BaseFragment {
         if (message.isInvalidObject()) getActivity().onBackPressed();
     }
 
+    @SuppressLint("CommitTransaction")
+    protected final FragmentTransaction beginTransaction() {
+        return getActivity().getSupportFragmentManager().beginTransaction();
+    }
+
     @Nullable
     @Override
     @SuppressLint("CommitTransaction")
     public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
-        return getActivity().getSupportFragmentManager()
-                .beginTransaction()
+        return beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    protected void setDefaultSharedTransitions() {
+    @Nullable
+    protected Pair<Transition, Transition> setDefaultSharedTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Transition baseTransition = new Fade();
             Transition baseSharedTransition = getTransition();
@@ -127,7 +133,10 @@ public class TeammatesBaseFragment extends BaseFragment {
             setExitTransition(baseTransition);
             setSharedElementEnterTransition(baseSharedTransition);
             setSharedElementReturnTransition(baseSharedTransition);
+
+            return new Pair<>(baseTransition, baseSharedTransition);
         }
+        return null;
     }
 
     public int[] staticViews() {
@@ -167,17 +176,14 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     public static android.transition.Transition getTransition() {
-        TransitionSet result = null;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            result = new TransitionSet();
-
-            result.setOrdering(TransitionSet.ORDERING_TOGETHER)
+            return new TransitionSet()
                     .addTransition(new ChangeBounds())
                     .addTransition(new ChangeTransform())
-                    .addTransition(new ChangeImageTransform());
+                    .addTransition(new ChangeImageTransform())
+                    .setOrdering(TransitionSet.ORDERING_TOGETHER);
         }
-        return result;
+        return null;
     }
 
 }

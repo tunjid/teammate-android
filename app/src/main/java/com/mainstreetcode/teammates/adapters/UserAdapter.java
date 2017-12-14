@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
@@ -18,8 +18,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link User}
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
 public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
@@ -38,7 +36,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
         switch (viewType) {
             case Item.IMAGE:
-                return new ImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
+                return new HeaderedImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), true);
             default:

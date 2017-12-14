@@ -20,7 +20,6 @@ import java.util.Map;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
-import static com.mainstreetcode.teammates.model.TeamChat.COMPARATOR;
 import static io.reactivex.Flowable.concat;
 import static io.reactivex.Flowable.just;
 
@@ -69,7 +68,7 @@ public class TeamChatViewModel extends ViewModel {
                 .map(updatedChats -> {
                     List<TeamChat> copy = new ArrayList<>(chats);
                     ModelUtils.preserveList(chats, updatedChats);
-                    Collections.sort(chats, COMPARATOR);
+                    Collections.sort(chats);
 
                     if (chats.size() == currentSize) chatMap.put(team, NO_MORE);
                     return getPair(false, getDiffResult(chats, copy));
@@ -77,7 +76,7 @@ public class TeamChatViewModel extends ViewModel {
     }
 
     private DiffUtil.DiffResult getDiffResult(List<TeamChat> updated, List<TeamChat> stale) {
-        return DiffUtil.calculateDiff(new ModelDiffCallback<>(updated, stale));
+        return DiffUtil.calculateDiff(new ModelDiffCallback(updated, stale));
     }
 
     private Pair<Boolean, DiffUtil.DiffResult> getPair(Boolean flag, DiffUtil.DiffResult diffResult) {

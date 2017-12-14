@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
+
 public class TeamMediaFragment extends MainActivityFragment
         implements ImageWorkerFragment.MediaListener {
 
@@ -157,11 +159,9 @@ public class TeamMediaFragment extends MainActivityFragment
             if (media == null) return null;
             MediaViewHolder holder = (MediaViewHolder) recyclerView.findViewHolderForItemId(media.hashCode());
 
-            return getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .addSharedElement(holder.itemView, holder.media.hashCode() + "-" + holder.itemView.getId())
-                    .addSharedElement(holder.thumbnailView, holder.media.hashCode() + "-" + holder.thumbnailView.getId());
+            return beginTransaction()
+                    .addSharedElement(holder.itemView, getTransitionName(media, R.id.fragment_media_background))
+                    .addSharedElement(holder.thumbnailView, getTransitionName(media, R.id.fragment_header_thumbnail));
         }
         return null;
     }

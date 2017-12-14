@@ -112,6 +112,11 @@ public class Media implements
     }
 
     @Override
+    public int compareTo(@NonNull Media o) {
+        return created.compareTo(o.created);
+    }
+
+    @Override
     public Notifier<Media> getNotifier() {
         return MediaNotifier.getInstance();
     }

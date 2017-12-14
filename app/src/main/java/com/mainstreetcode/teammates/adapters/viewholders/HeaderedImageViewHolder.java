@@ -12,15 +12,12 @@ import com.squareup.picasso.RequestCreator;
 
 import java.io.File;
 
-/**
- * Viewholder for {@link Item}.
- */
-public class ImageViewHolder extends BaseItemViewHolder<ImageWorkerFragment.ImagePickerListener>
+public class HeaderedImageViewHolder extends BaseItemViewHolder<ImageWorkerFragment.ImagePickerListener>
         implements View.OnClickListener {
 
     private ImageView picture;
 
-    public ImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
+    public HeaderedImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
         super(itemView, listener);
         picture = itemView.findViewById(R.id.image);
         picture.setOnClickListener(this);
@@ -42,5 +39,9 @@ public class ImageViewHolder extends BaseItemViewHolder<ImageWorkerFragment.Imag
     @Override
     public void onClick(View view) {
         adapterListener.onImageClick();
+    }
+
+    public ImageView getPicture() {
+        return picture;
     }
 }

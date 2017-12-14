@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.model;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -99,6 +100,18 @@ public class Role extends RoleEntity
 
         this.team.update(updated.team);
         this.user.update(updated.user);
+    }
+
+    @Override
+    public int compareTo(@NonNull Role o) {
+        int roleComparison = name.compareTo(o.name);
+        int userComparison = user.compareTo(o.user);
+
+        return roleComparison != 0
+                ? roleComparison
+                : userComparison != 0
+                ? userComparison
+                : id.compareTo(o.id);
     }
 
     @Override
