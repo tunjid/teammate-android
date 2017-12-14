@@ -2,6 +2,8 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,13 +13,15 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.functions.Consumer;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 /**
  * Lists {@link com.mainstreetcode.teammates.model.Event events}
@@ -31,13 +35,6 @@ public final class EventsFragment extends MainActivityFragment
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
     private final List<Event> events = new ArrayList<>();
-
-    private final Consumer<List<Event>> eventConsumer = (events) -> {
-        this.events.clear();
-        this.events.addAll(events);
-        recyclerView.getAdapter().notifyDataSetChanged();
-        emptyViewHolder.toggle(events.isEmpty());
-    };
 
     public static EventsFragment newInstance() {
         EventsFragment fragment = new EventsFragment();
@@ -73,7 +70,7 @@ public final class EventsFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.my_events));
 
         String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(eventViewModel.getEvents(userId).subscribe(eventConsumer, defaultErrorHandler));
+        disposables.add(eventViewModel.getEvents(events, userId).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -100,5 +97,30 @@ public final class EventsFragment extends MainActivityFragment
                 showFragment(EventEditFragment.newInstance(Event.empty()));
                 break;
         }
+    }
+
+    @Nullable
+    @Override
+    public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
+        FragmentTransaction superResult = super.provideFragmentTransaction(fragmentTo);
+
+        if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
+            Event event = fragmentTo.getArguments().getParcelable(EventEditFragment.ARG_EVENT);
+            if (event == null) return superResult;
+
+            EventViewHolder viewHolder = (EventViewHolder)recyclerView.findViewHolderForItemId(event.hashCode());
+            if(viewHolder == null) return superResult;
+
+            return beginTransaction()
+                    .addSharedElement(viewHolder.itemView, getTransitionName(event, R.id.fragment_header_background))
+                    .addSharedElement(viewHolder.getImage(), getTransitionName(event, R.id.fragment_header_thumbnail));
+
+        }
+        return superResult;
+    }
+
+    private void onEventsUpdated(DiffUtil.DiffResult result) {
+        emptyViewHolder.toggle(events.isEmpty());
+        result.dispatchUpdatesTo(recyclerView.getAdapter());
     }
 }

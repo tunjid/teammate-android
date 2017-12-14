@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +11,8 @@ import com.mainstreetcode.teammates.adapters.EventAdapter;
 import com.mainstreetcode.teammates.model.Event;
 import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 
 public class EventViewHolder extends BaseViewHolder<EventAdapter.EventAdapterListener>
@@ -38,6 +41,9 @@ public class EventViewHolder extends BaseViewHolder<EventAdapter.EventAdapterLis
         eventLocation.setText(item.getLocationName());
         eventLocation.setVisibility(TextUtils.isEmpty(item.getLocationName()) ? View.GONE : View.VISIBLE);
 
+        ViewCompat.setTransitionName(itemView, getTransitionName(item, R.id.fragment_header_background));
+        ViewCompat.setTransitionName(image, getTransitionName(item, R.id.fragment_header_thumbnail));
+
         if (!TextUtils.isEmpty(item.getImageUrl())) {
             Picasso.with(itemView.getContext())
                     .load(item.getImageUrl())
@@ -50,5 +56,9 @@ public class EventViewHolder extends BaseViewHolder<EventAdapter.EventAdapterLis
     @Override
     public void onClick(View view) {
         adapterListener.onEventClicked(item);
+    }
+
+    public ImageView getImage() {
+        return image;
     }
 }

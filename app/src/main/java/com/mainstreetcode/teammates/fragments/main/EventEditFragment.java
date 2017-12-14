@@ -37,7 +37,7 @@ public class EventEditFragment extends HeaderedFragment
         View.OnClickListener,
         EventEditAdapter.EditAdapterListener {
 
-    private static final String ARG_EVENT = "event";
+    public static final String ARG_EVENT = "event";
     public static final int PLACE_PICKER_REQUEST = 1;
 
     private boolean fromUserPickerAction;
@@ -52,6 +52,8 @@ public class EventEditFragment extends HeaderedFragment
 
         args.putParcelable(ARG_EVENT, event);
         fragment.setArguments(args);
+        fragment.setDefaultSharedTransitions();
+
         return fragment;
     }
 
