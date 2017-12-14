@@ -48,7 +48,7 @@ public class RoleEditFragment extends HeaderedFragment
 
         args.putParcelable(ARG_ROLE, role);
         fragment.setArguments(args);
-        fragment.setDefaultSharedTransitions();
+        fragment.setEnterExitTransitions();
 
         return fragment;
     }

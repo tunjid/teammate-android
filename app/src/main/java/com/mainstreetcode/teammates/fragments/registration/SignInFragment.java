@@ -38,7 +38,7 @@ public final class SignInFragment extends RegistrationActivityFragment
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
-        fragment.setDefaultSharedTransitions();
+        fragment.setEnterExitTransitions();
         return fragment;
     }
 

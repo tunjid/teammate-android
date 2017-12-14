@@ -162,7 +162,7 @@ public class TeamMediaFragment extends MainActivityFragment
             holder.bind(media); // Rebind, to make sure transition names remain.
             return beginTransaction()
                     .addSharedElement(holder.itemView, getTransitionName(media, R.id.fragment_media_background))
-                    .addSharedElement(holder.thumbnailView, getTransitionName(media, R.id.fragment_header_thumbnail));
+                    .addSharedElement(holder.thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail));
         }
         return null;
     }

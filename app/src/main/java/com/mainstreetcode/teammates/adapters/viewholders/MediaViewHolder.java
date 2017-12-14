@@ -15,11 +15,16 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName
 
 public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaAdapterListener> {
 
+    static final String UNITY_ASPECT_RATIO = "1";
+
+    final boolean isFullScreen;
     public Media media;
     public ImageView thumbnailView;
 
     MediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
+        isFullScreen = adapterListener == null;
+
         thumbnailView = itemView.findViewById(getThumbnailId());
     }
 
@@ -30,12 +35,10 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
     }
 
     public void fullBind(Media media) {
-       bind(media);
+        bind(media);
     }
 
-    public void unBind() {
-
-    }
+    public void unBind() {}
 
     @IdRes
     public abstract int getThumbnailId();

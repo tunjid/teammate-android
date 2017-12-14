@@ -52,7 +52,7 @@ public class EventEditFragment extends HeaderedFragment
 
         args.putParcelable(ARG_EVENT, event);
         fragment.setArguments(args);
-        fragment.setDefaultSharedTransitions();
+        fragment.setEnterExitTransitions();
 
         return fragment;
     }

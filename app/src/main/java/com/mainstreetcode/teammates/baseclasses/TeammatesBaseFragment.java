@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.util.Pair;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
@@ -123,20 +122,20 @@ public class TeammatesBaseFragment extends BaseFragment {
                         android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    @Nullable
-    protected Pair<Transition, Transition> setDefaultSharedTransitions() {
+    protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
+            Transition baseSharedTransition = new TransitionSet()
+                    .addTransition(new ChangeBounds())
+                    .addTransition(new ChangeTransform())
+                    .addTransition(new ChangeImageTransform())
+                    .setOrdering(TransitionSet.ORDERING_TOGETHER);
 
             setEnterTransition(baseTransition);
             setExitTransition(baseTransition);
             setSharedElementEnterTransition(baseSharedTransition);
             setSharedElementReturnTransition(baseSharedTransition);
-
-            return new Pair<>(baseTransition, baseSharedTransition);
         }
-        return null;
     }
 
     public int[] staticViews() {
@@ -174,16 +173,4 @@ public class TeammatesBaseFragment extends BaseFragment {
     private void toggleBottombar(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleBottombar(show);
     }
-
-    public static android.transition.Transition getTransition() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return new TransitionSet()
-                    .addTransition(new ChangeBounds())
-                    .addTransition(new ChangeTransform())
-                    .addTransition(new ChangeImageTransform())
-                    .setOrdering(TransitionSet.ORDERING_TOGETHER);
-        }
-        return null;
-    }
-
 }
