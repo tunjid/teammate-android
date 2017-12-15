@@ -18,7 +18,11 @@ public class RoleSelectViewHolder extends InputViewHolder
     public RoleSelectViewHolder(View itemView, List<String> roles, boolean isEditable) {
         super(itemView, false);
         this.roles = roles;
-        if (isEditable) itemView.findViewById(R.id.click_view).setOnClickListener(this);
+
+        if (isEditable) {
+            itemView.findViewById(R.id.click_view).setOnClickListener(this);
+            setClickableState();
+        }
     }
 
 

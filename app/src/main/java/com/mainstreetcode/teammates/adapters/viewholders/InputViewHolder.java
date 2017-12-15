@@ -1,7 +1,9 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.content.res.ColorStateList;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -84,5 +86,10 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         if (TextUtils.isEmpty(editText.getText())) {
             editText.setError(editText.getContext().getString(R.string.team_invalid_empty_field));
         }
+    }
+
+    void setClickableState() {
+        int colorInt = ContextCompat.getColor(itemView.getContext(), R.color.black);
+        editText.setTextColor(ColorStateList.valueOf(colorInt));
     }
 }

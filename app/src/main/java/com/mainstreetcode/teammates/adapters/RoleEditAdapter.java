@@ -30,15 +30,13 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     private final Role role;
     private final List<String> roles;
     private final BooleanSupplier roleCheckSupplier;
-    private final boolean isEditable;
 
     public RoleEditAdapter(Role role, List<String> roles,
-                           BooleanSupplier roleCheckSupplier, boolean isEditable,
+                           BooleanSupplier roleCheckSupplier,
                            ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
         this.role = role;
         this.roles = roles;
-        this.isEditable = isEditable;
         this.roleCheckSupplier = roleCheckSupplier;
     }
 
@@ -46,7 +44,7 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), isEditable);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), false);
             case Item.ROLE:
                 return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, canEditRole());
             case Item.IMAGE:

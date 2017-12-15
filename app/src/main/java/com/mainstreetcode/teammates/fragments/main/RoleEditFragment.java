@@ -82,7 +82,7 @@ public class RoleEditFragment extends HeaderedFragment
         recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this::canChangeRole, canEditRoleUserInfo(), this));
+        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this::canChangeRole, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -142,7 +142,7 @@ public class RoleEditFragment extends HeaderedFragment
 
     @Override
     protected boolean showsFab() {
-        return canChangeRole() || canEditRoleUserInfo();
+        return canChangeRole();
     }
 
     @Override
@@ -201,10 +201,6 @@ public class RoleEditFragment extends HeaderedFragment
         recyclerView.getAdapter().notifyItemChanged(Role.ROLE_NAME_POSITION);
         getActivity().invalidateOptionsMenu();
         toggleFab(showsFab());
-    }
-
-    private boolean canEditRoleUserInfo() {
-        return role.getUser().equals(userViewModel.getCurrentUser());
     }
 
     private boolean canChangeRole() {
