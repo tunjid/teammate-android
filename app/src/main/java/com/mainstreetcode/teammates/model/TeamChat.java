@@ -28,7 +28,6 @@ import com.mainstreetcode.teammates.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -41,8 +40,6 @@ public class TeamChat implements
         Parcelable,
         Model<TeamChat>,
         Notifiable<TeamChat> {
-
-    public static final Comparator<TeamChat> COMPARATOR = (a, b) -> a.created.compareTo(b.created);
 
     @SuppressLint("SimpleDateFormat")
     private static final DateFormat CHAT_DATE_FORMAT = new SimpleDateFormat("h:mm a");
@@ -111,6 +108,11 @@ public class TeamChat implements
 
         user.update(updated.user);
         team.update(updated.team);
+    }
+
+    @Override
+    public int compareTo(@NonNull TeamChat o) {
+        return created.compareTo(o.created);
     }
 
     @Override

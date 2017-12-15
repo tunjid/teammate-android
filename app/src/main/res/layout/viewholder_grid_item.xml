@@ -49,7 +49,7 @@
 
         <TextView
             android:id="@+id/item_subtitle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:gravity="center"
             android:paddingBottom="@dimen/half_margin"
@@ -58,9 +58,9 @@
             android:paddingTop="@dimen/quarter_margin"
             android:textColor="@color/dark_grey"
             android:textSize="@dimen/tiny_text"
+            app:layout_constrainedWidth="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_title"
-            app:layout_constraintWidth_default="wrap" />
+            app:layout_constraintTop_toBottomOf="@+id/item_title" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

@@ -9,24 +9,33 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.viewholders.ImageViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Item;
 
+import static android.support.v4.view.ViewCompat.setTransitionName;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
+
 public abstract class HeaderedFragment extends MainActivityFragment
         implements
         ImageWorkerFragment.CropListener,
-        ImageWorkerFragment.ImagePickerListener{
+        ImageWorkerFragment.ImagePickerListener {
 
-    protected ImageViewHolder imageViewHolder;
+    protected HeaderedImageViewHolder viewHolder;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        imageViewHolder = new ImageViewHolder(view, this);
-        imageViewHolder.bind(getHeaderedModel().getHeaderItem());
+        HeaderedModel model = getHeaderedModel();
+        Item headerItem = model.getHeaderItem();
+
+        viewHolder = new HeaderedImageViewHolder(view, this);
+        viewHolder.bind(headerItem);
+
+        setTransitionName(view, getTransitionName(model, R.id.fragment_header_background));
+        setTransitionName(viewHolder.getPicture(), getTransitionName(model, R.id.fragment_header_thumbnail));
 
         Toolbar headerToolbar = view.findViewById(R.id.header_toolbar);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerToolbar.getLayoutParams();
@@ -37,13 +46,13 @@ public abstract class HeaderedFragment extends MainActivityFragment
     public void onImageCropped(Uri uri) {
         Item item = getHeaderedModel().getHeaderItem();
         item.setValue(uri.getPath());
-        imageViewHolder.bind(item);
+        viewHolder.bind(item);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        imageViewHolder = null;
+        viewHolder = null;
     }
 
     protected abstract HeaderedModel getHeaderedModel();

@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -63,6 +64,18 @@ public class JoinRequest extends JoinRequestEntity
 
         team.update(updated.team);
         user.update(updated.user);
+    }
+
+    @Override
+    public int compareTo(@NonNull JoinRequest o) {
+        int roleComparison = roleName.compareTo(o.roleName);
+        int userComparison = user.compareTo(o.user);
+
+        return roleComparison != 0
+                ? roleComparison
+                : userComparison != 0
+                ? userComparison
+                : id.compareTo(o.id);
     }
 
     @Override

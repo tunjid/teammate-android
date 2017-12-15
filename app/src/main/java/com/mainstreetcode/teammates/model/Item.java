@@ -68,6 +68,21 @@ public class Item<T> {
         return itemizedObject;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item)) return false;
+
+        Item<?> item = (Item<?>) o;
+
+        return value != null ? value.equals(item.value) : item.value == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return value != null ? value.hashCode() : 0;
+    }
+
     // Used to change the value of the Team's fields
     public interface ValueChangeCallBack {
         void onValueChanged(String value);

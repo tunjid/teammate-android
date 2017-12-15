@@ -8,9 +8,10 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.JoinRequestViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.UserHoldingViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.UserHoldingViewHolder;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
@@ -19,16 +20,15 @@ import java.util.List;
 
 /**
  * Adapter for {@link Team}
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
 public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHolder, TeamDetailAdapter.UserAdapterListener> {
-    private final Team team;
+    private final List<? extends Model> teamModels;
 
-    public TeamDetailAdapter(Team team, UserAdapterListener listener) {
+    public TeamDetailAdapter(List<? extends Model> teamModels, UserAdapterListener listener) {
         super(listener);
-        this.team = team;
+        setHasStableIds(true);
+        this.teamModels = teamModels;
     }
 
     @Override
@@ -43,25 +43,26 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHo
     }
 
     @Override
-    public void onBindViewHolder(UserHoldingViewHolder baseTeamViewHolder, int i) {
-        List<Role> roles = team.getRoles();
-        List<JoinRequest> joinRequests = team.getJoinRequests();
-        int joinedUsersSize = roles.size();
-        boolean isJoinedUser = i < joinedUsersSize;
+    public void onBindViewHolder(UserHoldingViewHolder baseTeamViewHolder, int position) {
+        Model model = teamModels.get(position);
 
-        int index = isJoinedUser ? i : i - joinedUsersSize;
-        if (isJoinedUser) ((RoleViewHolder) baseTeamViewHolder).bind(roles.get(index));
-        else ((JoinRequestViewHolder) baseTeamViewHolder).bind(joinRequests.get(index));
+        if (model instanceof Role) ((RoleViewHolder) baseTeamViewHolder).bind((Role) model);
+        else ((JoinRequestViewHolder) baseTeamViewHolder).bind((JoinRequest) model);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return teamModels.get(position).hashCode();
     }
 
     @Override
     public int getItemCount() {
-        return team.getRoles().size() + team.getJoinRequests().size();
+        return teamModels.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position < team.getRoles().size() ? R.id.viewholder_role : R.id.viewholder_join_request;
+        return teamModels.get(position) instanceof Role ? R.id.viewholder_role : R.id.viewholder_join_request;
     }
 
     public interface UserAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

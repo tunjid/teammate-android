@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.model;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
@@ -110,6 +111,18 @@ public class Event extends EventEntity
         ModelUtils.preserveList(absentees, updatedEvent.absentees);
 
         team.update(updatedEvent.team);
+    }
+
+    @Override
+    public int compareTo(@NonNull Event o) {
+        int startDateComparison = startDate.compareTo(o.startDate);
+        int endDateComparison = endDate.compareTo(o.endDate);
+
+        return startDateComparison != 0
+                ? startDateComparison
+                : endDateComparison != 0
+                ? endDateComparison
+                : id.compareTo(o.id);
     }
 
     @Override

@@ -94,15 +94,13 @@ public class SplashFragment extends RegistrationActivityFragment
         View rootView = getView();
         if (rootView != null) {
             if (fragmentTo.getStableTag().contains(SignInFragment.class.getSimpleName())) {
-                return getActivity().getSupportFragmentManager()
-                        .beginTransaction()
+                return beginTransaction()
                         .addSharedElement(rootView.findViewById(R.id.border), TRANSITION_BACKGROUND)
                         .addSharedElement(rootView.findViewById(R.id.title), TRANSITION_TITLE)
                         .addSharedElement(rootView.findViewById(R.id.sub_title), TRANSITION_SUBTITLE);
             }
             else if (fragmentTo.getStableTag().contains(SignUpFragment.class.getSimpleName())) {
-                return getActivity().getSupportFragmentManager()
-                        .beginTransaction()
+                return beginTransaction()
                         .addSharedElement(rootView.findViewById(R.id.border), TRANSITION_BACKGROUND)
                         .addSharedElement(rootView.findViewById(R.id.title), TRANSITION_TITLE);
             }

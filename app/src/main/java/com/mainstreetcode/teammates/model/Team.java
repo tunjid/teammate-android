@@ -5,6 +5,7 @@ import android.arch.persistence.room.Relation;
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
@@ -129,6 +130,12 @@ public class Team extends TeamEntity
 
         ModelUtils.preserveList(roles, updatedTeam.roles);
         ModelUtils.preserveList(joinRequests, updatedTeam.joinRequests);
+    }
+
+    @Override
+    public int compareTo(@NonNull Team o) {
+        int nameComparision = name.compareTo(o.name);
+        return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
     }
 
     @Override

@@ -10,16 +10,16 @@ import com.mainstreetcode.teammates.util.ModelDiffCallback;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
 
-public class MediaViewModel extends ViewModel {
+import static android.support.v7.util.DiffUtil.calculateDiff;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.computation;
 
-    private static final Comparator<Media> COMPARATOR = (a, b) -> a.getCreated().compareTo(b.getCreated());
+public class MediaViewModel extends ViewModel {
 
     private final MediaRepository repository;
 
@@ -32,13 +32,21 @@ public class MediaViewModel extends ViewModel {
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
-        return repository.getTeamMedia(team, date).map(updatedMedia -> {
-            List<Media> copy = new ArrayList<>(source);
-            ModelUtils.preserveList(source, updatedMedia);
-            Collections.sort(source, COMPARATOR);
+        final List<Media> updated = new ArrayList<>(source);
 
-            return DiffUtil.calculateDiff(new ModelDiffCallback<>(source, copy));
-        });
+        return repository.getTeamMedia(team, date)
+                .concatMapDelayError(fetchedMedia -> Flowable.fromCallable(() -> {
+                            List<Media> stale = new ArrayList<>(source);
+                            ModelUtils.preserveList(updated, fetchedMedia);
+                            return calculateDiff(new ModelDiffCallback(updated, stale));
+                        })
+                                .subscribeOn(computation())
+                                .observeOn(mainThread())
+                                .doOnNext(diffResult -> {
+                                    source.clear();
+                                    source.addAll(updated);
+                                })
+                );
     }
 
 }

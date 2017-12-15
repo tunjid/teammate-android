@@ -1,11 +1,8 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.transition.Fade;
-import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,20 +27,11 @@ public class MediaDetailFragment extends MainActivityFragment {
     public static MediaDetailFragment newInstance(Media media) {
         MediaDetailFragment fragment = new MediaDetailFragment();
         Bundle args = new Bundle();
+
         args.putParcelable(ARG_MEDIA, media);
         fragment.setArguments(args);
+        fragment.setEnterExitTransitions();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
-
-            baseTransition.excludeTarget(R.id.image, true);
-
-            fragment.setEnterTransition(baseTransition);
-            fragment.setExitTransition(baseTransition);
-            fragment.setSharedElementEnterTransition(baseSharedTransition);
-            fragment.setSharedElementReturnTransition(baseSharedTransition);
-        }
         return fragment;
     }
 

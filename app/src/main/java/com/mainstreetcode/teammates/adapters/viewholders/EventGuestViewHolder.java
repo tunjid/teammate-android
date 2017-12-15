@@ -24,8 +24,8 @@ public class EventGuestViewHolder extends UserHoldingViewHolder<EventEditAdapter
 
         Context context = itemView.getContext();
 
-        userName.setText(user.getFirstName());
-        userStatus.setText(context.getString(attending ? R.string.event_attending : R.string.event_not_attending));
+        title.setText(user.getFirstName());
+        subtitle.setText(context.getString(attending ? R.string.event_attending : R.string.event_not_attending));
         String imageUrl = user.getImageUrl() != null ? user.getImageUrl() : "";
 
         if (!TextUtils.isEmpty(imageUrl)) {
@@ -33,7 +33,7 @@ public class EventGuestViewHolder extends UserHoldingViewHolder<EventEditAdapter
                     .load(imageUrl)
                     .fit()
                     .centerInside()
-                    .into(userPicture);
+                    .into(thumbnail);
         }
     }
 

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Base interface for model interactions
  */
-public interface Model<T> extends Parcelable {
+public interface Model<T> extends Parcelable, Comparable<T> {
     void update(T updated);
 
     boolean isEmpty();

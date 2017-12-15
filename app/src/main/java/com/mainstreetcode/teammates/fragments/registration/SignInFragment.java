@@ -38,7 +38,7 @@ public final class SignInFragment extends RegistrationActivityFragment
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
-        fragment.setDefaultSharedTransitions();
+        fragment.setEnterExitTransitions();
         return fragment;
     }
 
@@ -86,8 +86,7 @@ public final class SignInFragment extends RegistrationActivityFragment
     @SuppressLint("CommitTransaction")
     public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
         if (getView() != null && fragmentTo.getStableTag().contains(ForgotPasswordFragment.class.getSimpleName())) {
-            return getActivity().getSupportFragmentManager()
-                    .beginTransaction()
+            return beginTransaction()
                     .addSharedElement(emailInput, SplashFragment.TRANSITION_TITLE)
                     .addSharedElement(getView().findViewById(R.id.card_view_wrapper), SplashFragment.TRANSITION_BACKGROUND);
         }

@@ -11,14 +11,18 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 public class UserHoldingViewHolder<T extends BaseRecyclerViewAdapter.AdapterListener> extends BaseViewHolder<T> {
 
-    TextView userName;
-    TextView userStatus;
-    ImageView userPicture;
+    TextView title;
+    TextView subtitle;
+    ImageView thumbnail;
 
     UserHoldingViewHolder(View itemView, T adapterListener) {
         super(itemView, adapterListener);
-        userName = itemView.findViewById(R.id.item_title);
-        userStatus = itemView.findViewById(R.id.item_subtitle);
-        userPicture = itemView.findViewById(R.id.thumbnail);
+        title = itemView.findViewById(R.id.item_title);
+        subtitle = itemView.findViewById(R.id.item_subtitle);
+        thumbnail = itemView.findViewById(R.id.thumbnail);
+    }
+
+    public ImageView getThumbnail() {
+        return thumbnail;
     }
 }

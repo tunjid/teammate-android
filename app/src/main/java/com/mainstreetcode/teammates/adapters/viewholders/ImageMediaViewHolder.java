@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,16 +23,22 @@ public class ImageMediaViewHolder extends MediaViewHolder
     private static final int FULL_RES_LOAD_DELAY = 400;
     private static final int THUMBNAIL_SIZE = 200;
 
-    private final boolean isFullScreen;
     private ImageView fullResView;
 
     public ImageMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
-        isFullScreen = adapterListener == null;
 
         fullResView = itemView.findViewById(R.id.image_full_res);
 
         if (!isFullScreen) {
+            ConstraintLayout constraintLayout = (ConstraintLayout) itemView;
+            ConstraintSet set = new ConstraintSet();
+
+            set.clone(constraintLayout);
+            set.setDimensionRatio(thumbnailView.getId(), UNITY_ASPECT_RATIO);
+            set.setDimensionRatio(fullResView.getId(), UNITY_ASPECT_RATIO);
+            set.applyTo(constraintLayout);
+
             thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
         }
     }

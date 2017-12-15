@@ -108,20 +108,28 @@ public class TeammatesBaseFragment extends BaseFragment {
         if (message.isInvalidObject()) getActivity().onBackPressed();
     }
 
+    @SuppressLint("CommitTransaction")
+    protected final FragmentTransaction beginTransaction() {
+        return getActivity().getSupportFragmentManager().beginTransaction();
+    }
+
     @Nullable
     @Override
     @SuppressLint("CommitTransaction")
     public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
-        return getActivity().getSupportFragmentManager()
-                .beginTransaction()
+        return beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    protected void setDefaultSharedTransitions() {
+    protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Transition baseTransition = new Fade();
-            Transition baseSharedTransition = getTransition();
+            Transition baseSharedTransition = new TransitionSet()
+                    .addTransition(new ChangeBounds())
+                    .addTransition(new ChangeTransform())
+                    .addTransition(new ChangeImageTransform())
+                    .setOrdering(TransitionSet.ORDERING_TOGETHER);
 
             setEnterTransition(baseTransition);
             setExitTransition(baseTransition);
@@ -165,19 +173,4 @@ public class TeammatesBaseFragment extends BaseFragment {
     private void toggleBottombar(boolean show) {
         ((TeammatesBaseActivity) getActivity()).toggleBottombar(show);
     }
-
-    public static android.transition.Transition getTransition() {
-        TransitionSet result = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            result = new TransitionSet();
-
-            result.setOrdering(TransitionSet.ORDERING_TOGETHER)
-                    .addTransition(new ChangeBounds())
-                    .addTransition(new ChangeTransform())
-                    .addTransition(new ChangeImageTransform());
-        }
-        return result;
-    }
-
 }

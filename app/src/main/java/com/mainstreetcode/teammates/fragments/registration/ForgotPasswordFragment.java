@@ -37,7 +37,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
 
         args.putCharSequence(ARG_EMAIL, email);
         fragment.setArguments(args);
-        fragment.setDefaultSharedTransitions();
+        fragment.setEnterExitTransitions();
         return fragment;
     }
 
