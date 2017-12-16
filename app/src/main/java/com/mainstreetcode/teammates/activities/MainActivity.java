@@ -23,7 +23,7 @@ import com.mainstreetcode.teammates.fragments.main.TeamMediaFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Model;
-import com.mainstreetcode.teammates.model.TeamChat;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -111,8 +111,8 @@ public class MainActivity extends TeammatesBaseActivity {
 
         if (model != null) {
             if (model instanceof Event) route = EventEditFragment.newInstance((Event) model);
-            if (model instanceof TeamChat)
-                route = TeamChatFragment.newInstance(((TeamChat) model).getTeam());
+            if (model instanceof Chat)
+                route = TeamChatFragment.newInstance(((Chat) model).getTeam());
         }
         else if (savedInstanceState == null) route = HomeFragment.newInstance();
 

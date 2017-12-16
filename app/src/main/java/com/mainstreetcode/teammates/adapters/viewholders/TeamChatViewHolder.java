@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamChatAdapter;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -19,7 +19,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
  */
 public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapterListener> {
 
-    private TeamChat item;
+    private Chat item;
     private View leftGuide;
     private View rightGuide;
     private ImageView image;
@@ -38,7 +38,7 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
         content.setOnClickListener(view -> adapterListener.onChatClicked(item));
     }
 
-    public void bind(TeamChat item, boolean isSignedInUser, boolean showDetails) {
+    public void bind(Chat item, boolean isSignedInUser, boolean showDetails) {
 
         this.item = item;
         boolean chatFailed = !item.isSuccessful();
@@ -71,7 +71,7 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
         rightParams.rightMargin = isSignedInUser ? 0 : margin;
     }
 
-    private String getDetailsText(TeamChat item, boolean isSignedInUser, Context context) {
+    private String getDetailsText(Chat item, boolean isSignedInUser, Context context) {
         String date = item.getCreatedDate();
         String firstName = item.getUser().getFirstName();
         return isSignedInUser ? date : context.getString(R.string.chat_details, firstName, date);

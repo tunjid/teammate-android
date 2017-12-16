@@ -11,9 +11,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -26,12 +27,12 @@ import java.util.Map;
 
 public class FeedItem<T extends Model<T> & Notifiable<T>> {
 
-    public static final String JOIN_REQUEST = "join-request";
-    public static final String EVENT = "event";
-    public static final String TEAM = "team";
-    public static final String ROLE = "role";
-    public static final String TEAM_CHAT = "team-chat";
-    public static final String MEDIA = "team-media";
+    static final String JOIN_REQUEST = "join-request";
+    static final String EVENT = "event";
+    static final String TEAM = "team";
+    static final String ROLE = "role";
+    static final String TEAM_CHAT = "team-chat";
+    static final String MEDIA = "team-media";
 
     private static final Gson gson = TeammateService.getGson();
 
@@ -115,7 +116,10 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> {
                     typeClass = Team.class;
                     break;
                 case TEAM_CHAT:
-                    typeClass = TeamChat.class;
+                    typeClass = Chat.class;
+                    break;
+                case MEDIA:
+                    typeClass = Media.class;
                     break;
                 default:
                     typeClass = Object.class;

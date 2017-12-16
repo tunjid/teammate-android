@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Media;
-import com.mainstreetcode.teammates.model.TeamChat;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
@@ -32,7 +32,7 @@ import static com.mainstreetcode.teammates.BuildConfig.DEBUG;
  */
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
-        RoleEntity.class, JoinRequestEntity.class, TeamChat.class, Media.class}, version = 1)
+        RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class}, version = 1)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class,
         TeamTypeConverter.class, UserTypeConverter.class})
@@ -62,7 +62,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract JoinRequestDao joinRequestDao();
 
-    public abstract TeamChatDao teamChatDao();
+    public abstract ChatDao teamChatDao();
 
     public DeviceDao deviceDao() {return new DeviceDao();}
 

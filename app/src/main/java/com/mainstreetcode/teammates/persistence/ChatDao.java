@@ -7,8 +7,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Event;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.User;
 
 import java.util.Date;
@@ -21,7 +21,7 @@ import io.reactivex.Maybe;
  */
 
 @Dao
-public abstract class TeamChatDao extends EntityDao<TeamChat> {
+public abstract class ChatDao extends EntityDao<Chat> {
 
     @Override
     protected String getTableName() {
@@ -32,24 +32,24 @@ public abstract class TeamChatDao extends EntityDao<TeamChat> {
             " WHERE team_chat_team = :teamId" +
             " AND team_chat_created < :date" +
             " LIMIT 20")
-    public abstract Maybe<List<TeamChat>> chatsBefore(String teamId, Date date);
+    public abstract Maybe<List<Chat>> chatsBefore(String teamId, Date date);
 
     @Query("SELECT * FROM team_chats" +
             " WHERE team_chat_team = :teamId" +
             " AND team_chat_user != :signedInUser" +
             " AND team_chat_created > :date")
-    public abstract Maybe<List<TeamChat>> unreadChats(String teamId, User signedInUser, Date date);
+    public abstract Maybe<List<Chat>> unreadChats(String teamId, User signedInUser, Date date);
 
     @Query("SELECT * FROM team_chats" +
             " WHERE :id = team_chat_id")
-    public abstract Maybe<TeamChat> get(String id);
+    public abstract Maybe<Chat> get(String id);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<TeamChat> teams);
+    protected abstract void insert(List<Chat> teams);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<TeamChat> teams);
+    protected abstract void update(List<Chat> teams);
 
     @Delete
-    public abstract void delete(TeamChat teamChat);
+    public abstract void delete(Chat chat);
 }
