@@ -42,6 +42,11 @@ public abstract class HeaderedFragment extends MainActivityFragment
     }
 
     @Override
+    public void onImageClick() {
+        if (showsFab()) ImageWorkerFragment.requestCrop(this);
+    }
+
+    @Override
     public void onImageCropped(Uri uri) {
         Item item = getHeaderedModel().getHeaderItem();
         item.setValue(uri.getPath());

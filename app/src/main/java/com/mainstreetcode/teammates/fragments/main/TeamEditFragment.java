@@ -154,12 +154,6 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    public void onImageClick() {
-        if (!showsFab()) return;
-        ImageWorkerFragment.requestCrop(this);
-    }
-
-    @Override
     public void onAddressClicked() {
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}

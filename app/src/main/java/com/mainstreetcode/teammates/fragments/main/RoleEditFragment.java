@@ -189,12 +189,6 @@ public class RoleEditFragment extends HeaderedFragment
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onImageClick() {
-        if (!showsFab()) return;
-        ImageWorkerFragment.requestCrop(this);
-    }
-
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
         recyclerView.getRecycledViewPool().clear();

@@ -197,10 +197,8 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void onImageClick() {
-        if (!showsFab()) return;
-
-        fromUserPickerAction = true;
-        ImageWorkerFragment.requestCrop(this);
+        if (showsFab()) fromUserPickerAction = true;
+        super.onImageClick();
     }
 
     @Override

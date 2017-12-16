@@ -134,10 +134,4 @@ public class UserEditFragment extends HeaderedFragment
                 break;
         }
     }
-
-    @Override
-    public void onImageClick() {
-        ImageWorkerFragment.requestCrop(this);
-    }
-
 }
