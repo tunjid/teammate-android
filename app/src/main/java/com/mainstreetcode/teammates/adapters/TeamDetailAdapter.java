@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.JoinRequestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.UserHoldingViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
@@ -22,7 +22,7 @@ import java.util.List;
  * Adapter for {@link Team}
  */
 
-public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHolder, TeamDetailAdapter.UserAdapterListener> {
+public class TeamDetailAdapter extends BaseRecyclerViewAdapter<ModelCardViewHolder, TeamDetailAdapter.UserAdapterListener> {
     private final List<? extends Model> teamModels;
 
     public TeamDetailAdapter(List<? extends Model> teamModels, UserAdapterListener listener) {
@@ -32,7 +32,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHo
     }
 
     @Override
-    public UserHoldingViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public ModelCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         @LayoutRes int layoutRes = R.layout.viewholder_grid_item;
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
@@ -43,7 +43,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<UserHoldingViewHo
     }
 
     @Override
-    public void onBindViewHolder(UserHoldingViewHolder baseTeamViewHolder, int position) {
+    public void onBindViewHolder(ModelCardViewHolder baseTeamViewHolder, int position) {
         Model model = teamModels.get(position);
 
         if (model instanceof Role) ((RoleViewHolder) baseTeamViewHolder).bind((Role) model);

@@ -4,7 +4,6 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
@@ -47,8 +46,6 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), false);
             case Item.ROLE:
                 return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, canEditRole());
-            case Item.IMAGE:
-                return new HeaderedImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

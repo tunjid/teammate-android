@@ -29,10 +29,9 @@ public abstract class HeaderedFragment extends MainActivityFragment
         super.onViewCreated(view, savedInstanceState);
 
         HeaderedModel model = getHeaderedModel();
-        Item headerItem = model.getHeaderItem();
 
         viewHolder = new HeaderedImageViewHolder(view, this);
-        viewHolder.bind(headerItem);
+        viewHolder.bind(model);
 
         setTransitionName(view, getTransitionName(model, R.id.fragment_header_background));
         setTransitionName(viewHolder.getPicture(), getTransitionName(model, R.id.fragment_header_thumbnail));
@@ -46,7 +45,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
     public void onImageCropped(Uri uri) {
         Item item = getHeaderedModel().getHeaderItem();
         item.setValue(uri.getPath());
-        viewHolder.bind(item);
+        viewHolder.bind(getHeaderedModel());
     }
 
     @Override

@@ -23,7 +23,7 @@ import android.widget.EditText;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.UserHoldingViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
@@ -196,7 +196,7 @@ public class TeamDetailFragment extends MainActivityFragment
             Role role = fragmentTo.getArguments().getParcelable(RoleEditFragment.ARG_ROLE);
             if (role == null) return null;
 
-            UserHoldingViewHolder holder = (UserHoldingViewHolder) recyclerView.findViewHolderForItemId(role.hashCode());
+            ModelCardViewHolder holder = (ModelCardViewHolder) recyclerView.findViewHolderForItemId(role.hashCode());
             if (holder == null) return null;
 
             return beginTransaction()
