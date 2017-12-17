@@ -77,11 +77,12 @@ public class MediaNotifier extends Notifier<Media> {
         Notification notification = new NotificationCompat.Builder(app, FeedItem.MEDIA)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(app.getString(isComplete ? R.string.upload_complete : R.string.uploading_media))
+                .setChannelId(FeedItem.MEDIA)
                 .setContentText(text)
                 .setProgress(100, percentage, false)
                 .build();
 
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        notifier.notify(1, notification);
+        if (notifier != null) notifier.notify(1, notification);
     }
 }

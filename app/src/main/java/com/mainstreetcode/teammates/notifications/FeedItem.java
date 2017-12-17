@@ -31,7 +31,7 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> {
     static final String EVENT = "event";
     static final String TEAM = "team";
     static final String ROLE = "role";
-    static final String TEAM_CHAT = "team-chat";
+    static final String CHAT = "team-chat";
     static final String MEDIA = "team-media";
 
     private static final Gson gson = TeammateService.getGson();
@@ -115,7 +115,7 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> {
                 case TEAM:
                     typeClass = Team.class;
                     break;
-                case TEAM_CHAT:
+                case CHAT:
                     typeClass = Chat.class;
                     break;
                 case MEDIA:

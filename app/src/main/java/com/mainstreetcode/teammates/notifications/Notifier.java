@@ -41,6 +41,7 @@ public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
         channelMap = new HashMap<>();
 
         NotificationManager manager = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
+        if (manager == null) return;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel[] channels = getNotificationChannels();
@@ -78,7 +79,7 @@ public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
 
     void sendNotification(Notification notification) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        notifier.notify(0, notification);
+        if (notifier != null) notifier.notify(0, notification);
     }
 
     protected void handleNotification(FeedItem<T> item) {
