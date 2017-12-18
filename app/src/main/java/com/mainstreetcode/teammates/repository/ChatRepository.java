@@ -10,12 +10,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.EntityDao;
-import com.mainstreetcode.teammates.persistence.TeamChatDao;
+import com.mainstreetcode.teammates.persistence.ChatDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.socket.SocketFactory;
@@ -48,7 +48,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.computation;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamChatRepository extends ModelRepository<TeamChat> {
+public class ChatRepository extends ModelRepository<Chat> {
 
 
     private static final String JOIN_EVENT = "join";
@@ -59,15 +59,15 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
 
     private static final Gson CHAT_GSON = getChatGson();
 
-    private static TeamChatRepository ourInstance;
+    private static ChatRepository ourInstance;
 
     private final TeammateApi api;
     private final Application app;
-    private final TeamChatDao chatDao;
+    private final ChatDao chatDao;
     private final ModelRepository<User> userModelRespository;
     private final ModelRepository<Team> teamModelRespository;
 
-    private TeamChatRepository() {
+    private ChatRepository() {
         app = Application.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
@@ -75,31 +75,31 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         teamModelRespository = TeamRepository.getInstance();
     }
 
-    public static TeamChatRepository getInstance() {
-        if (ourInstance == null) ourInstance = new TeamChatRepository();
+    public static ChatRepository getInstance() {
+        if (ourInstance == null) ourInstance = new ChatRepository();
         return ourInstance;
     }
 
     @Override
-    public EntityDao<? super TeamChat> dao() {
+    public EntityDao<? super Chat> dao() {
         return chatDao;
     }
 
     @Override
-    public Single<TeamChat> createOrUpdate(TeamChat model) {
+    public Single<Chat> createOrUpdate(Chat model) {
         return Single.error(new TeammateException("Chats are created via socket IO"));
     }
 
     @Override
-    public Flowable<TeamChat> get(String id) {
-        Maybe<TeamChat> local = chatDao.get(id).subscribeOn(io());
-        Maybe<TeamChat> remote = api.getTeamChat(id).map(getSaveFunction()).toMaybe();
+    public Flowable<Chat> get(String id) {
+        Maybe<Chat> local = chatDao.get(id).subscribeOn(io());
+        Maybe<Chat> remote = api.getTeamChat(id).map(getSaveFunction()).toMaybe();
 
         return fetchThenGetModel(local, remote);
     }
 
     @Override
-    public Single<TeamChat> delete(TeamChat chat) {
+    public Single<Chat> delete(Chat chat) {
         return api.deleteChat(chat.getId())
                 .map(ignored -> {
                     chatDao.delete(chat);
@@ -108,13 +108,13 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
     }
 
     @Override
-    Function<List<TeamChat>, List<TeamChat>> provideSaveManyFunction() {
+    Function<List<Chat>, List<Chat>> provideSaveManyFunction() {
         return chats -> {
             int size = chats.size();
             List<User> users = new ArrayList<>(size);
             List<Team> teams = new ArrayList<>(size);
 
-            for (TeamChat chat : chats) {
+            for (Chat chat : chats) {
                 users.add(chat.getUser());
                 teams.add(chat.getTeam());
             }
@@ -127,14 +127,14 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         };
     }
 
-    public Flowable<List<TeamChat>> chatsBefore(Team team, Date date) {
-        Maybe<List<TeamChat>> local = chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
-        Maybe<List<TeamChat>> remote = api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+    public Flowable<List<Chat>> chatsBefore(Team team, Date date) {
+        Maybe<List<Chat>> local = chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
+        Maybe<List<Chat>> remote = api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
 
         return fetchThenGet(local, remote);
     }
 
-    public Single<List<TeamChat>> fetchUnreadChats(Team team) {
+    public Single<List<Chat>> fetchUnreadChats(Team team) {
         User currentUser = UserRepository.getInstance().getCurrentUser();
         return chatDao.unreadChats(team.getId(), currentUser, getLastTeamSeen(team))
                 .subscribeOn(io())
@@ -142,7 +142,7 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
                 .toSingle();
     }
 
-    public Flowable<TeamChat> listenForChat(Team team) {
+    public Flowable<Chat> listenForChat(Team team) {
         Socket socket = SocketFactory.getInstance().getTeamChatSocket();
         if (socket == null) return Flowable.error(new Exception("Null Socket"));
 
@@ -155,7 +155,7 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         return Flowable.create(new ChatFlowable(socket), BackpressureStrategy.DROP).observeOn(mainThread());
     }
 
-    public Completable post(TeamChat chat) {
+    public Completable post(Chat chat) {
         return Completable.create(new ChatCompletable(chat)).observeOn(mainThread());
     }
 
@@ -172,8 +172,8 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
     }
 
     @Nullable
-    private static TeamChat parseChat(Object... args) {
-        try {return CHAT_GSON.fromJson(args[0].toString(), TeamChat.class);}
+    private static Chat parseChat(Object... args) {
+        try {return CHAT_GSON.fromJson(args[0].toString(), Chat.class);}
         catch (Exception e) {return null;}
     }
 
@@ -189,18 +189,18 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         return new GsonBuilder()
                 .registerTypeAdapter(Team.class, adapter)
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
-                .registerTypeAdapter(TeamChat.class, new TeamChat.GsonAdapter())
+                .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .create();
     }
 
     private static final class ChatFlowable implements
             Cancellable,
-            FlowableOnSubscribe<TeamChat> {
+            FlowableOnSubscribe<Chat> {
 
         private final Socket socket;
         private final User signedInUser;
 
-        private FlowableEmitter<TeamChat> emitter;
+        private FlowableEmitter<Chat> emitter;
 
         ChatFlowable(Socket socket) {
             this.socket = socket;
@@ -210,7 +210,7 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         }
 
         @Override
-        public void subscribe(FlowableEmitter<TeamChat> flowableEmitter) throws Exception {
+        public void subscribe(FlowableEmitter<Chat> flowableEmitter) throws Exception {
             flowableEmitter.setCancellable(this);
             this.emitter = flowableEmitter;
         }
@@ -221,7 +221,7 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         }
 
         private void parseChat(Object... args) {
-            TeamChat chat = TeamChatRepository.parseChat(args);
+            Chat chat = ChatRepository.parseChat(args);
             if (chat != null && !signedInUser.equals(chat.getUser()) && emitter != null)
                 emitter.onNext(chat);
         }
@@ -240,10 +240,10 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         private volatile boolean isCancelled;
 
         private final Socket socket;
-        private final TeamChat chat;
+        private final Chat chat;
         private CompletableEmitter emitter;
 
-        ChatCompletable(TeamChat chat) {
+        ChatCompletable(Chat chat) {
             this.socket = SocketFactory.getInstance().getTeamChatSocket();
             this.chat = chat;
 
@@ -276,10 +276,10 @@ public class TeamChatRepository extends ModelRepository<TeamChat> {
         private void parseChat(Object... args) {
             if (isCancelled) return;
 
-            TeamChat teamChat = TeamChatRepository.parseChat(args);
-            chat.update(teamChat);
+            Chat chat = ChatRepository.parseChat(args);
+            this.chat.update(chat);
 
-            if (teamChat != null && emitter != null && !emitter.isDisposed()) emitter.onComplete();
+            if (chat != null && emitter != null && !emitter.isDisposed()) emitter.onComplete();
         }
 
         private void handleError(Object... args) {

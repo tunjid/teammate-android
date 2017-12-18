@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamChatViewHolder;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -22,10 +22,10 @@ import java.util.List;
  */
 
 public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
-    private final List<TeamChat> chats;
+    private final List<Chat> chats;
     private final User signedInUser;
 
-    public TeamChatAdapter(List<TeamChat> chats, User signedInUser,
+    public TeamChatAdapter(List<Chat> chats, User signedInUser,
                            TeamChatAdapter.ChatAdapterListener listener) {
         super(listener);
         this.chats = chats;
@@ -45,13 +45,13 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     public void onBindViewHolder(TeamChatViewHolder viewHolder, int i) {
         int size = chats.size();
 
-        TeamChat teamChat = chats.get(i);
-        TeamChat next = i < size - 1 ? chats.get(i + 1) : null;
+        Chat chat = chats.get(i);
+        Chat next = i < size - 1 ? chats.get(i + 1) : null;
 
-        User chatUser = teamChat.getUser();
+        User chatUser = chat.getUser();
         boolean hideDetails = (next != null && chatUser.equals(next.getUser()));
 
-        viewHolder.bind(teamChat, signedInUser.equals(teamChat.getUser()), !hideDetails);
+        viewHolder.bind(chat, signedInUser.equals(chat.getUser()), !hideDetails);
     }
 
     @Override
@@ -70,6 +70,6 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     }
 
     public interface ChatAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        void onChatClicked(TeamChat chat);
+        void onChatClicked(Chat chat);
     }
 }

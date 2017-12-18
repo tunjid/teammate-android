@@ -4,9 +4,9 @@ import android.arch.lifecycle.ViewModel;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
-import com.mainstreetcode.teammates.repository.TeamChatRepository;
+import com.mainstreetcode.teammates.repository.ChatRepository;
 import com.mainstreetcode.teammates.util.ModelDiffCallback;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -30,12 +30,12 @@ public class TeamChatViewModel extends ViewModel {
     private static final int NO_MORE = -1;
     private static final int RETRY = -2;
 
-    private final TeamChatRepository repository;
+    private final ChatRepository repository;
 
     private final Map<Team, Integer> chatMap;
 
     public TeamChatViewModel() {
-        repository = TeamChatRepository.getInstance();
+        repository = ChatRepository.getInstance();
         chatMap = new HashMap<>();
     }
 
@@ -47,15 +47,15 @@ public class TeamChatViewModel extends ViewModel {
         repository.updateLastSeen(team);
     }
 
-    public Flowable<TeamChat> listenForChat(Team team) {
+    public Flowable<Chat> listenForChat(Team team) {
         return repository.listenForChat(team).retry();
     }
 
-    public Completable post(TeamChat chat) {
+    public Completable post(Chat chat) {
         return repository.post(chat).retry(2);
     }
 
-    public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<TeamChat> chats, final Team team, Date date) {
+    public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<Chat> chats, final Team team, Date date) {
         final Integer lastSize = chatMap.get(team);
         final Integer currentSize = chats.size();
 
@@ -64,7 +64,7 @@ public class TeamChatViewModel extends ViewModel {
 
         chatMap.put(team, currentSize);
 
-        final List<TeamChat> updated = new ArrayList<>(chats);
+        final List<Chat> updated = new ArrayList<>(chats);
 
         return concat(
                 Flowable.fromCallable(() -> getPair(true, getDiffResult(chats, chats)))
@@ -75,7 +75,7 @@ public class TeamChatViewModel extends ViewModel {
                         .doOnCancel(() -> chatMap.put(team, RETRY))
                         .concatMapDelayError(fetchedChats -> Flowable.fromCallable(() -> {
                                     ModelUtils.preserveList(updated, fetchedChats);
-                                    List<TeamChat> stale = new ArrayList<>(chats);
+                                    List<Chat> stale = new ArrayList<>(chats);
 
                                     if (updated.size() == currentSize) chatMap.put(team, NO_MORE);
                                     return getPair(false, getDiffResult(updated, stale));
@@ -89,7 +89,7 @@ public class TeamChatViewModel extends ViewModel {
                         ));
     }
 
-    private DiffUtil.DiffResult getDiffResult(List<TeamChat> updated, List<TeamChat> stale) {
+    private DiffUtil.DiffResult getDiffResult(List<Chat> updated, List<Chat> stale) {
         return DiffUtil.calculateDiff(new ModelDiffCallback(updated, stale));
     }
 

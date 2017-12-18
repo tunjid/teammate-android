@@ -1,13 +1,13 @@
 package com.mainstreetcode.teammates.rest;
 
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 
@@ -150,13 +150,13 @@ public interface TeammateApi {
     // =============================================================================================
 
     @GET("/api/team-chats/{id}")
-    Single<TeamChat> getTeamChat(@Path("id") String chatId);
+    Single<Chat> getTeamChat(@Path("id") String chatId);
 
     @DELETE("/api/team-chats/{id}")
-    Single<TeamChat> deleteChat(@Path("id") String chatId);
+    Single<Chat> deleteChat(@Path("id") String chatId);
 
     @GET("/api/team/chats/{teamId}")
-    Single<List<TeamChat>> chatsBefore(@Path("teamId") String teamId, @Query("date") Date date);
+    Single<List<Chat>> chatsBefore(@Path("teamId") String teamId, @Query("date") Date date);
 
     // =============================================================================================
     // Team Media endpoints

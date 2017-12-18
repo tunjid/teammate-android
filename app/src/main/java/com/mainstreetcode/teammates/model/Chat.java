@@ -21,7 +21,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.notifications.Notifier;
-import com.mainstreetcode.teammates.notifications.TeamChatNotifier;
+import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -36,10 +36,10 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "team_chats",
         foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "team_chat_team", onDelete = CASCADE)
 )
-public class TeamChat implements
+public class Chat implements
         Parcelable,
-        Model<TeamChat>,
-        Notifiable<TeamChat> {
+        Model<Chat>,
+        Notifiable<Chat> {
 
     @SuppressLint("SimpleDateFormat")
     private static final DateFormat CHAT_DATE_FORMAT = new SimpleDateFormat("h:mm a");
@@ -58,8 +58,8 @@ public class TeamChat implements
 
     @ColumnInfo(name = "team_chat_created") private Date created;
 
-    public TeamChat(@NonNull String id, String content, String kind,
-                    User user, Team team, Date created) {
+    public Chat(@NonNull String id, String content, String kind,
+                User user, Team team, Date created) {
         this.id = id;
         this.content = content;
         this.kind = kind;
@@ -68,7 +68,7 @@ public class TeamChat implements
         this.created = created;
     }
 
-    private TeamChat(Parcel in) {
+    private Chat(Parcel in) {
         id = in.readString();
         kind = in.readString();
         content = in.readString();
@@ -78,8 +78,8 @@ public class TeamChat implements
         created = tmpCreated != -1 ? new Date(tmpCreated) : null;
     }
 
-    public static TeamChat chat(String content, User user, Team team) {
-        return new TeamChat("", content, KIND_TEXT, user, team, new Date());
+    public static Chat chat(String content, User user, Team team) {
+        return new Chat("", content, KIND_TEXT, user, team, new Date());
     }
 
     @Override
@@ -99,7 +99,7 @@ public class TeamChat implements
     }
 
     @Override
-    public void update(TeamChat updated) {
+    public void update(Chat updated) {
         id = updated.id;
         kind = updated.kind;
         content = updated.content;
@@ -111,13 +111,13 @@ public class TeamChat implements
     }
 
     @Override
-    public int compareTo(@NonNull TeamChat o) {
+    public int compareTo(@NonNull Chat o) {
         return created.compareTo(o.created);
     }
 
     @Override
-    public Notifier<TeamChat> getNotifier() {
-        return TeamChatNotifier.getInstance();
+    public Notifier<Chat> getNotifier() {
+        return ChatNotifier.getInstance();
     }
 
     public String getKind() {
@@ -156,9 +156,9 @@ public class TeamChat implements
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TeamChat)) return false;
+        if (!(o instanceof Chat)) return false;
 
-        TeamChat chat = (TeamChat) o;
+        Chat chat = (Chat) o;
 
         return id.equals(chat.id);
     }
@@ -183,22 +183,22 @@ public class TeamChat implements
         dest.writeLong(created != null ? created.getTime() : -1L);
     }
 
-    public static final Parcelable.Creator<TeamChat> CREATOR = new Parcelable.Creator<TeamChat>() {
+    public static final Parcelable.Creator<Chat> CREATOR = new Parcelable.Creator<Chat>() {
         @Override
-        public TeamChat createFromParcel(Parcel in) {
-            return new TeamChat(in);
+        public Chat createFromParcel(Parcel in) {
+            return new Chat(in);
         }
 
         @Override
-        public TeamChat[] newArray(int size) {
-            return new TeamChat[size];
+        public Chat[] newArray(int size) {
+            return new Chat[size];
         }
     };
 
     public static class GsonAdapter
             implements
-            JsonSerializer<TeamChat>,
-            JsonDeserializer<TeamChat> {
+            JsonSerializer<Chat>,
+            JsonDeserializer<Chat> {
 
         private static final String UID_KEY = "_id";
         private static final String KIND_KEY = "kind";
@@ -208,7 +208,7 @@ public class TeamChat implements
         private static final String DATE_KEY = "created";
 
         @Override
-        public TeamChat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Chat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
             JsonObject teamJson = json.getAsJsonObject();
 
@@ -223,11 +223,11 @@ public class TeamChat implements
             if (user == null) user = User.empty();
             if (team == null) team = Team.empty();
 
-            return new TeamChat(id, content, kind, user, team, created);
+            return new Chat(id, content, kind, user, team, created);
         }
 
         @Override
-        public JsonElement serialize(TeamChat src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(Chat src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject team = new JsonObject();
             team.addProperty(KIND_KEY, src.kind);
             team.addProperty(CONTENT_KEY, src.content);

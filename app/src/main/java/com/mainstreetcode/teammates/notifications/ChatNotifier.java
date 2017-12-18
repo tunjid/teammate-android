@@ -11,10 +11,10 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.repository.ModelRepository;
-import com.mainstreetcode.teammates.repository.TeamChatRepository;
+import com.mainstreetcode.teammates.repository.ChatRepository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -28,41 +28,41 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 
-public class TeamChatNotifier extends Notifier<TeamChat> {
+public class ChatNotifier extends Notifier<Chat> {
 
     private static final int MAX_LINES = 5;
-    private static TeamChatNotifier INSTANCE;
+    private static ChatNotifier INSTANCE;
 
     private final UserRepository userRepository;
     private Team sender = Team.empty();
 
-    private TeamChatNotifier() {userRepository = UserRepository.getInstance();}
+    private ChatNotifier() {userRepository = UserRepository.getInstance();}
 
-    public static TeamChatNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new TeamChatNotifier();
+    public static ChatNotifier getInstance() {
+        if (INSTANCE == null) INSTANCE = new ChatNotifier();
         return INSTANCE;
     }
 
     @Override
-    protected ModelRepository<TeamChat> getRepository() {
-        return TeamChatRepository.getInstance();
+    protected ModelRepository<Chat> getRepository() {
+        return ChatRepository.getInstance();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
-        return new NotificationChannel[]{buildNotificationChannel(FeedItem.TEAM_CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH)};
+        return new NotificationChannel[]{buildNotificationChannel(FeedItem.CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH)};
     }
 
     @Override
-    public Predicate<TeamChat> getNotificationFilter() {
+    public Predicate<Chat> getNotificationFilter() {
         return teamChat -> !teamChat.getUser().equals(userRepository.getCurrentUser());
     }
 
     @Override
-    protected void handleNotification(FeedItem<TeamChat> item) {
+    protected void handleNotification(FeedItem<Chat> item) {
         TeamRepository teamRepository = TeamRepository.getInstance();
-        TeamChat chat = item.getModel();
+        Chat chat = item.getModel();
 
         teamRepository.get(chat.getTeam()).firstOrError()
                 .flatMap(team -> fetchUnreadChats(item, team))
@@ -70,15 +70,15 @@ public class TeamChatNotifier extends Notifier<TeamChat> {
                 .subscribe(this::sendNotification, ErrorHandler.EMPTY);
     }
 
-    private Single<List<TeamChat>> fetchUnreadChats(FeedItem<TeamChat> item, Team team) {
-        TeamChatRepository repository = TeamChatRepository.getInstance();
+    private Single<List<Chat>> fetchUnreadChats(FeedItem<Chat> item, Team team) {
+        ChatRepository repository = ChatRepository.getInstance();
         sender.update(team);
         return repository.fetchUnreadChats(item.getModel().getTeam())
                 .subscribeOn(io())
                 .observeOn(mainThread());
     }
 
-    private Notification buildNotification(FeedItem<TeamChat> item, List<TeamChat> chats) {
+    private Notification buildNotification(FeedItem<Chat> item, List<Chat> chats) {
         int size = chats.size();
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder(item)
@@ -96,7 +96,7 @@ public class TeamChatNotifier extends Notifier<TeamChat> {
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 
         for (int i = 0; i < min; i++) {
-            TeamChat chat = chats.get(i);
+            Chat chat = chats.get(i);
             style.addLine(app.getString(R.string.chat_notification_multiline_item,
                     chat.getUser().getFirstName(), chat.getContent()));
         }

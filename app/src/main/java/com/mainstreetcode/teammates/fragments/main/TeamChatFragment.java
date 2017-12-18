@@ -22,8 +22,8 @@ import com.mainstreetcode.teammates.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.TeamChat;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
@@ -42,7 +42,7 @@ public class TeamChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
-    private List<TeamChat> chats = new ArrayList<>();
+    private List<Chat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -152,7 +152,7 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     @Override
-    public void onChatClicked(TeamChat chat) {
+    public void onChatClicked(Chat chat) {
         if (chat.isSuccessful() || !chat.isEmpty()) return;
         for (int i = 0; i < chats.size(); i++) {
             if (chats.get(i).getCreated().equals(chat.getCreated())) {
@@ -188,7 +188,7 @@ public class TeamChatFragment extends MainActivityFragment
 
         if (isEmpty(text)) return;
 
-        TeamChat chat = TeamChat.chat(text, userViewModel.getCurrentUser(), team);
+        Chat chat = Chat.chat(text, userViewModel.getCurrentUser(), team);
         chats.add(chat);
 
         final int index = chats.size() - 1;
@@ -198,7 +198,7 @@ public class TeamChatFragment extends MainActivityFragment
         postChat(index, chat);
     }
 
-    private void postChat(int index, TeamChat chat) {
+    private void postChat(int index, Chat chat) {
         final RecyclerView.Adapter adapter = recyclerView.getAdapter();
 
         teamChatViewModel.post(chat).subscribe(() -> {
