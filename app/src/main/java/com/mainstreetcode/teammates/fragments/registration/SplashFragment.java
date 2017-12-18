@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.fragments.registration;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewCompat;
@@ -63,7 +64,7 @@ public class SplashFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -42,17 +43,17 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
 
     protected void setToolbarTitle(CharSequence charSequence) {
-        ((TeammatesBaseActivity) getActivity()).setToolbarTitle(charSequence);
+        getTeammatesActivity().setToolbarTitle(charSequence);
     }
 
     protected FloatingActionButton getFab() {
-        return ((TeammatesBaseActivity) getActivity()).getFab();
+        return getTeammatesActivity().getFab();
     }
 
     protected void showSnackbar(String message) {
         if (getView() == null) return;
         toggleProgress(false);
-        View coordinator = getActivity().findViewById(R.id.coordinator);
+        View coordinator = getTeammatesActivity().findViewById(R.id.coordinator);
         if (coordinator != null) Snackbar.make(coordinator, message, Snackbar.LENGTH_LONG).show();
     }
 
@@ -66,9 +67,8 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (view == null) return; // In case of headless Fragments
 
         toggleToolbar(showsToolBar());
         toggleFab(showsFab());
@@ -89,7 +89,7 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected void toggleProgress(boolean show) {
         if (getView() == null) return;
 
-        View coordinator = getActivity().findViewById(R.id.coordinator);
+        View coordinator = getTeammatesActivity().findViewById(R.id.coordinator);
 
         if (show && loadingSnackbar != null && loadingSnackbar.isShown()) return;
 
@@ -105,12 +105,12 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected void handleErrorMessage(Message message) {
         showSnackbar(message.getMessage());
         toggleProgress(false);
-        if (message.isInvalidObject()) getActivity().onBackPressed();
+        if (message.isInvalidObject()) getTeammatesActivity().onBackPressed();
     }
 
     @SuppressLint("CommitTransaction")
     protected final FragmentTransaction beginTransaction() {
-        return getActivity().getSupportFragmentManager().beginTransaction();
+        return getTeammatesActivity().getSupportFragmentManager().beginTransaction();
     }
 
     @Nullable
@@ -158,19 +158,23 @@ public class TeammatesBaseFragment extends BaseFragment {
         return true;
     }
 
+    protected TeammatesBaseActivity getTeammatesActivity() {
+        return ((TeammatesBaseActivity) getActivity());
+    }
+
     protected void setFabIcon(@DrawableRes int icon) {
-        ((TeammatesBaseActivity) getActivity()).setFabIcon(icon);
+        getTeammatesActivity().setFabIcon(icon);
     }
 
     protected void toggleFab(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleFab(show);
+        getTeammatesActivity().toggleFab(show);
     }
 
     private void toggleToolbar(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleToolbar(show);
+        getTeammatesActivity().toggleToolbar(show);
     }
 
     private void toggleBottombar(boolean show) {
-        ((TeammatesBaseActivity) getActivity()).toggleBottombar(show);
+        getTeammatesActivity().toggleBottombar(show);
     }
 }
