@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion "android-26"
+    compileSdkVersion 27
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.mainstreetcode.teammates"
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -34,30 +34,30 @@ android {
 dependencies {
     provided 'org.projectlombok:lombok:1.14.4'
     annotationProcessor 'org.projectlombok:lombok:1.14.4'
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-rc1"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-rc1"
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support:exifinterface:26.1.0'
-    compile 'com.android.support:cardview-v7:26.1.0'
-    compile 'com.android.support:palette-v7:26.1.0'
-    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:appcompat-v7:27.0.2'
+    compile 'com.android.support:exifinterface:27.0.2'
+    compile 'com.android.support:cardview-v7:27.0.2'
+    compile 'com.android.support:palette-v7:27.0.2'
+    compile 'com.android.support:design:27.0.2'
 
 
-    compile 'com.android.support.constraint:constraint-layout:1.1.0-beta3'
+    compile 'com.android.support.constraint:constraint-layout:1.1.0-beta4'
 
-    compile "android.arch.lifecycle:runtime:1.0.0-rc1"
-    compile "android.arch.lifecycle:extensions:1.0.0-rc1"
-    compile "android.arch.persistence.room:runtime:1.0.0-rc1"
-    compile "android.arch.persistence.room:rxjava2:1.0.0-rc1"
+    compile "android.arch.lifecycle:runtime:1.0.3"
+    compile "android.arch.lifecycle:extensions:1.0.0"
+    compile "android.arch.persistence.room:runtime:1.0.0"
+    compile "android.arch.persistence.room:rxjava2:1.0.0"
 
-    compile 'com.google.android.gms:play-services-base:11.4.2'
-    compile 'com.google.android.gms:play-services-places:11.4.2'
+    compile 'com.google.android.gms:play-services-base:11.6.2'
+    compile 'com.google.android.gms:play-services-places:11.6.2'
 
-    compile 'com.google.firebase:firebase-core:11.4.2'
-    compile 'com.google.firebase:firebase-messaging:11.4.2'
+    compile 'com.google.firebase:firebase-core:11.6.2'
+    compile 'com.google.firebase:firebase-messaging:11.6.2'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.5"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -78,7 +78,7 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
     //compile 'com.theartofdev.edmodo:android-image-cropper:2.5.0'
-    compile('com.theartofdev.edmodo:android-image-cropper:2.5.0') {
+    compile('com.theartofdev.edmodo:android-image-cropper:2.6.0') {
         exclude module: 'support-annotations'
         exclude module: 'recyclerview-v7'
         exclude module: 'exifinterface'
@@ -88,7 +88,7 @@ dependencies {
         exclude module: 'design'
     }
     //compile 'com.tunjid.android-bootstrap:core:1.0.0'
-    compile(group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.2-SNAPSHOT", changing: true) {
+    compile(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.0-SNAPSHOT", changing: true) {
         exclude module: 'support-annotations'
         exclude module: 'recyclerview-v7'
         exclude module: 'exifinterface'

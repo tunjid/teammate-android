@@ -6,8 +6,6 @@ import com.mainstreetcode.teammates.util.ErrorHandler;
 
 /**
  * Application Singleton
- * <p>
- * Created by Shemanigans on 6/14/17.
  */
 
 public class Application extends android.app.Application {
