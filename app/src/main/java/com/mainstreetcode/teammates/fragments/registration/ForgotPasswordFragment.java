@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.registration;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
@@ -18,8 +19,6 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 
 /**
  * Forgot password screen
- * <p>
- * Created by Shemanigans on 6/1/17.
  */
 
 public final class ForgotPasswordFragment extends RegistrationActivityFragment
@@ -42,12 +41,14 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_forgot_password, container, false);
         View border = rootView.findViewById(R.id.card_view_wrapper);
         emailInput = rootView.findViewById(R.id.email);
 
-        emailInput.setText(getArguments().getCharSequence(ARG_EMAIL, ""));
+        Bundle args = getArguments();
+
+        if (args != null) emailInput.setText(args.getCharSequence(ARG_EMAIL, ""));
         emailInput.setOnEditorActionListener(this);
 
         ViewCompat.setTransitionName(emailInput, SplashFragment.TRANSITION_TITLE);

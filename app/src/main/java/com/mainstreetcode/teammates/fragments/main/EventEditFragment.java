@@ -1,8 +1,9 @@
 package com.mainstreetcode.teammates.fragments.main;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -58,6 +59,7 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Event tempEvent = getArguments().getParcelable(ARG_EVENT);
@@ -68,6 +70,7 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -78,7 +81,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
         recyclerView = rootView.findViewById(R.id.model_list);
 
@@ -114,8 +117,11 @@ public class EventEditFragment extends HeaderedFragment
         switch (item.getItemId()) {
             case R.id.action_delete:
                 disposables.add(eventViewModel.delete(event).subscribe(deleted -> {
+                    Activity activity;
+                    if ((activity = getActivity()) == null) return;
+
                     showSnackbar(getString(R.string.deleted_team, event.getName()));
-                    getActivity().onBackPressed();
+                    activity.onBackPressed();
                 }, defaultErrorHandler));
                 return true;
         }
@@ -144,8 +150,10 @@ public class EventEditFragment extends HeaderedFragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != PLACE_PICKER_REQUEST) return;
         if (resultCode == RESULT_OK) {
-            Context context = getContext();
-            Place place = PlacePicker.getPlace(context, data);
+            Activity activity;
+            if ((activity = getActivity()) == null) return;
+
+            Place place = PlacePicker.getPlace(activity, data);
             event.setPlace(place);
             recyclerView.getAdapter().notifyDataSetChanged();
         }
@@ -216,9 +224,10 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void rsvpToEvent(User user) {
-        if (!user.equals(currentRole.getUser())) return;
+        Activity activity;
+        if ((activity = getActivity()) == null || !user.equals(currentRole.getUser())) return;
 
-        new AlertDialog.Builder(getContext()).setTitle(getString(R.string.attend_event))
+        new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
                 .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
                 .show();
@@ -228,7 +237,11 @@ public class EventEditFragment extends HeaderedFragment
     public void onLocationClicked() {
         fromUserPickerAction = true;
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
+
+        Activity activity;
+        if ((activity = getActivity()) == null) return;
+
+        try {startActivityForResult(builder.build(activity), PLACE_PICKER_REQUEST);}
         catch (Exception e) {e.printStackTrace();}
     }
 
@@ -242,7 +255,11 @@ public class EventEditFragment extends HeaderedFragment
 
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
-        getActivity().invalidateOptionsMenu();
+
+        Activity activity;
+        if ((activity = getActivity()) == null) return;
+
         toggleFab(showsFab());
+        activity.invalidateOptionsMenu();
     }
 }

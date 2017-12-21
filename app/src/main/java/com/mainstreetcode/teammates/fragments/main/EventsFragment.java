@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
@@ -51,7 +52,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
         recyclerView = rootView.findViewById(R.id.team_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -105,11 +106,14 @@ public final class EventsFragment extends MainActivityFragment
         FragmentTransaction superResult = super.provideFragmentTransaction(fragmentTo);
 
         if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
-            Event event = fragmentTo.getArguments().getParcelable(EventEditFragment.ARG_EVENT);
+            Bundle args = getArguments();
+            if (args == null) return superResult;
+
+            Event event = args.getParcelable(EventEditFragment.ARG_EVENT);
             if (event == null) return superResult;
 
-            EventViewHolder viewHolder = (EventViewHolder)recyclerView.findViewHolderForItemId(event.hashCode());
-            if(viewHolder == null) return superResult;
+            EventViewHolder viewHolder = (EventViewHolder) recyclerView.findViewHolderForItemId(event.hashCode());
+            if (viewHolder == null) return superResult;
 
             return beginTransaction()
                     .addSharedElement(viewHolder.itemView, getTransitionName(event, R.id.fragment_header_background))

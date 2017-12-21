@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.transition.AutoTransition;
 import android.support.transition.TransitionManager;
@@ -66,7 +67,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_search, container, false);
         createTeam = rootView.findViewById(R.id.create_team);
         recyclerView = rootView.findViewById(R.id.team_list);

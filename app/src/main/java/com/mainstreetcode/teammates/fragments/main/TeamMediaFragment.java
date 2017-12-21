@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.fragments.main;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
@@ -54,6 +55,7 @@ public class TeamMediaFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Team tempTeam = getArguments().getParcelable(ARG_TEAM);
@@ -64,6 +66,7 @@ public class TeamMediaFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -74,7 +77,7 @@ public class TeamMediaFragment extends MainActivityFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_media, container, false);
 
         recyclerView = rootView.findViewById(R.id.team_media);
@@ -152,6 +155,7 @@ public class TeamMediaFragment extends MainActivityFragment
     @Override
     @Nullable
     @SuppressLint("CommitTransaction")
+    @SuppressWarnings("ConstantConditions")
     public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
         if (fragmentTo.getStableTag().contains(MediaDetailFragment.class.getSimpleName())) {
             Media media = fragmentTo.getArguments().getParcelable(MediaDetailFragment.ARG_MEDIA);

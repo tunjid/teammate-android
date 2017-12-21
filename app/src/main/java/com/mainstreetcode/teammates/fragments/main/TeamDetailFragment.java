@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
@@ -22,8 +24,8 @@ import android.widget.EditText;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
-import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ModelCardViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
@@ -69,6 +71,7 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Team tempTeam = getArguments().getParcelable(ARG_TEAM);
@@ -77,6 +80,7 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -86,7 +90,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
         EditText editText = rootView.findViewById(R.id.team_name);
         editText.setText(team.getName());
@@ -137,7 +141,7 @@ public class TeamDetailFragment extends MainActivityFragment
                 showFragment(TeamEditFragment.newInstance(team, true));
                 return true;
             case R.id.action_delete:
-                new AlertDialog.Builder(getContext()).setTitle(getString(R.string.delete_team_prompt, team.getName()))
+                new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.delete_team_prompt, team.getName()))
                         .setPositiveButton(R.string.yes, (dialog, which) -> deleteTeam())
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
@@ -172,7 +176,7 @@ public class TeamDetailFragment extends MainActivityFragment
         if (!currentRole.isPrivilegedRole()) return;
 
         if (request.isUserApproved() && !request.isTeamApproved()) {
-            new AlertDialog.Builder(getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
+            new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
                     .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(request, true))
                     .setNegativeButton(R.string.no, (dialog, which) -> approveUser(request, false))
                     .show();
@@ -191,6 +195,7 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     @Nullable
     @SuppressLint("CommitTransaction")
+    @SuppressWarnings("ConstantConditions")
     public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
         if (fragmentTo.getStableTag().contains(RoleEditFragment.class.getSimpleName())) {
             Role role = fragmentTo.getArguments().getParcelable(RoleEditFragment.ARG_ROLE);
@@ -217,10 +222,12 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     private void onTeamUpdated(DiffUtil.DiffResult diffResult) {
-        getActivity().invalidateOptionsMenu();
         updateCurrentRole();
         updateTeamModels();
         diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+
+        Activity activity = getActivity();
+        if (activity != null) activity.invalidateOptionsMenu();
     }
 
     private void onRolesUpdated(List<String> values) {
@@ -230,7 +237,8 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private void onTeamDeleted() {
         showSnackbar(getString(R.string.deleted_team, team.getName()));
-        getActivity().onBackPressed();
+        Activity activity = getActivity();
+        if (activity != null) activity.invalidateOptionsMenu();
     }
 
     private void updateCurrentRole() {
@@ -259,8 +267,9 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
-        getActivity().invalidateOptionsMenu();
         toggleFab(showsFab());
+        Activity activity = getActivity();
+        if (activity != null) activity.invalidateOptionsMenu();
     }
 
     private void updateTeamModels() {
@@ -271,7 +280,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @SuppressLint("InflateParams")
     private void inviteUser() {
-        Context context = getContext();
+        Context context = recyclerView.getContext();
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_invite_user, null);
         View inviteButton = dialogView.findViewById(R.id.invite);
 
