@@ -140,7 +140,7 @@ public final class TeamsFragment extends MainActivityFragment
 
         if (target != null && target instanceof TeamAdapter.TeamAdapterListener) {
             ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
-            if (requestCode == R.id.request_event_team_pick) getActivity().onBackPressed();
+            if (requestCode == R.id.request_event_edit_pick) getActivity().onBackPressed();
         }
         else {
             showFragment(TeamDetailFragment.newInstance(team));

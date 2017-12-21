@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamChatFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamMediaFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
@@ -76,7 +77,6 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestCode = getArguments().getInt(ARGS_REQUEST_CODE);
     }
 
@@ -84,6 +84,9 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     public void onTeamClicked(Team item) {
         teamViewModel.updateDefaultTeam(item);
         switch (requestCode) {
+            case R.id.request_event_team_pick:
+                showFragment(EventsFragment.newInstance(item));
+                break;
             case R.id.request_chat_team_pick:
                 showFragment(TeamChatFragment.newInstance(item));
                 break;

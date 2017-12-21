@@ -29,10 +29,10 @@ public class EventViewModel extends ViewModel {
         repository = EventRepository.getInstance();
     }
 
-    public Flowable<DiffUtil.DiffResult> getEvents(List<Event> source, String userId) {
-        return repository.getEvents(userId).map(updatedMedia -> {
+    public Flowable<DiffUtil.DiffResult> getEvents(List<Event> source, String teamId) {
+        return repository.getEvents(teamId).map(updatedEvents -> {
             List<Event> copy = new ArrayList<>(source);
-            ModelUtils.preserveList(source, updatedMedia);
+            ModelUtils.preserveList(source, updatedEvents);
             Collections.sort(source);
 
             return calculateDiff(new ModelDiffCallback(source, copy));

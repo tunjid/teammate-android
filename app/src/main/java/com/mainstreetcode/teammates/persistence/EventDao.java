@@ -29,10 +29,8 @@ public abstract class EventDao extends EntityDao<EventEntity> {
     @Query("SELECT * FROM events as event" +
             " INNER JOIN teams as team" +
             " ON event.event_team = team.team_id" +
-            " INNER JOIN roles as role" +
-            " ON team.team_id = role.role_team" +
-            " WHERE :userId = role.role_user")
-    public abstract Maybe<List<Event>> getEvents(String userId);
+            " WHERE :teamId = team.team_id")
+    public abstract Maybe<List<Event>> getEvents(String teamId);
 
     @Query("SELECT * FROM events" +
             " WHERE :id = event_id")

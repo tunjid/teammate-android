@@ -85,7 +85,7 @@ public class MainActivity extends TeammatesBaseActivity {
                 showFragment(HomeFragment.newInstance());
                 return true;
             case R.id.action_events:
-                showFragment(EventsFragment.newInstance());
+                TeamPickerFragment.request(this, R.id.request_event_team_pick);
                 return true;
             case R.id.action_messages:
                 TeamPickerFragment.request(this, R.id.request_chat_team_pick);

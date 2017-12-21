@@ -77,9 +77,9 @@ public class EventRepository extends ModelRepository<Event> {
                 .doOnError(throwable -> deleteInvalidModel(event, throwable));
     }
 
-    public Flowable<List<Event>> getEvents(String userId) {
-        Maybe<List<Event>> local = eventDao.getEvents(userId).subscribeOn(io());
-        Maybe<List<Event>> remote = api.getEvents().map(getSaveManyFunction()).toMaybe();
+    public Flowable<List<Event>> getEvents(String teamId) {
+        Maybe<List<Event>> local = eventDao.getEvents(teamId).subscribeOn(io());
+        Maybe<List<Event>> remote = api.getEvents(teamId).map(getSaveManyFunction()).toMaybe();
 
         return fetchThenGet(local, remote);
     }

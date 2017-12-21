@@ -123,8 +123,8 @@ public interface TeammateApi {
     // Event endpoints
     // =============================================================================================
 
-    @GET("api/events")
-    Single<List<Event>> getEvents();
+    @GET("/api/teams/events/{teamId}")
+    Single<List<Event>> getEvents(@Path("teamId") String teamId);
 
     @POST("api/events")
     Single<Event> createEvent(@Body Event event);
@@ -155,7 +155,7 @@ public interface TeammateApi {
     @DELETE("/api/team-chats/{id}")
     Single<Chat> deleteChat(@Path("id") String chatId);
 
-    @GET("/api/team/chats/{teamId}")
+    @GET("/api/teams/chats/{teamId}")
     Single<List<Chat>> chatsBefore(@Path("teamId") String teamId, @Query("date") Date date);
 
     // =============================================================================================
@@ -168,7 +168,7 @@ public interface TeammateApi {
     @DELETE("/api/media/{mediaId}")
     Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 
-    @GET("/api/team/media/{teamId}")
+    @GET("/api/teams/media/{teamId}")
     Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
 
     @Multipart

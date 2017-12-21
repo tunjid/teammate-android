@@ -218,7 +218,7 @@ public class EventEditFragment extends HeaderedFragment
     public void selectTeam() {
         fromUserPickerAction = true;
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
-        teamsFragment.setTargetFragment(this, R.id.request_event_team_pick);
+        teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
         showFragment(teamsFragment);
     }
 

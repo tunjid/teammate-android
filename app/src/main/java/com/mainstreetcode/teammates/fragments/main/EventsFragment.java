@@ -8,6 +8,9 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,7 +19,9 @@ import com.mainstreetcode.teammates.adapters.EventAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
@@ -33,22 +38,37 @@ public final class EventsFragment extends MainActivityFragment
         View.OnClickListener,
         EventAdapter.EventAdapterListener {
 
+    private static final String ARG_TEAM = "team";
+
+    private Team team;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
     private final List<Event> events = new ArrayList<>();
 
-    public static EventsFragment newInstance() {
+    public static EventsFragment newInstance(Team team) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = new Bundle();
 
+        args.putParcelable(ARG_TEAM, team);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
+    public String getStableTag() {
+        String superResult = super.getStableTag();
+        Team tempTeam = getArguments().getParcelable(ARG_TEAM);
+
+        return (tempTeam != null)
+                ? superResult + "-" + tempTeam.hashCode()
+                : superResult;
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
+        team = getArguments().getParcelable(ARG_TEAM);
     }
 
     @Override
@@ -70,8 +90,23 @@ public final class EventsFragment extends MainActivityFragment
         setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.my_events));
 
-        String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(eventViewModel.getEvents(events, userId).subscribe(this::onEventsUpdated, defaultErrorHandler));
+        disposables.add(eventViewModel.getEvents(events, team.getId()).subscribe(this::onEventsUpdated, defaultErrorHandler));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_events, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_pick_team:
+                teamViewModel.updateDefaultTeam(Team.empty());
+                TeamPickerFragment.pick(getActivity(), R.id.request_event_team_pick);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
