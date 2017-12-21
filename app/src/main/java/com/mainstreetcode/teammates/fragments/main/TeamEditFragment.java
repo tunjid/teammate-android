@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.fragments.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,6 +49,7 @@ public class TeamEditFragment extends HeaderedFragment
     private static final String ARG_EDITABLE = "editable";
     public static final int PLACE_PICKER_REQUEST = 2;
 
+    private boolean isEditable;
     private int state;
     private Team team;
     private Role currentRole = Role.empty();
@@ -66,6 +68,7 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Team tempTeam = getArguments().getParcelable(ARG_TEAM);
@@ -74,9 +77,11 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        isEditable = getArguments().getBoolean(ARG_EDITABLE);
         team = getArguments().getParcelable(ARG_TEAM);
 
         ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
@@ -87,11 +92,9 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
         recyclerView = rootView.findViewById(R.id.model_list);
-
-        boolean isEditable = getArguments().getBoolean(ARG_EDITABLE);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new TeamEditAdapter(team, roles, isEditable, this));
@@ -110,7 +113,6 @@ public class TeamEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        boolean isEditable = getArguments().getBoolean(ARG_EDITABLE, false);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
         setFabIcon(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
@@ -155,6 +157,8 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Override
     public void onAddressClicked() {
+        if (getActivity() == null) return;
+
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {e.printStackTrace();}
@@ -165,7 +169,7 @@ public class TeamEditFragment extends HeaderedFragment
         if (requestCode != PLACE_PICKER_REQUEST) return;
         if (resultCode == RESULT_OK) {
             toggleProgress(true);
-            Context context = getContext();
+            Context context = recyclerView.getContext();
             Place place = PlacePicker.getPlace(context, data);
             locationViewModel.fromPlace(place).subscribe(address -> {
                 team.setAddress(address);

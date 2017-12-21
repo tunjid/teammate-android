@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,7 +51,7 @@ public final class HomeFragment extends MainActivityFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = rootView.findViewById(R.id.feed_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -96,7 +97,7 @@ public final class HomeFragment extends MainActivityFragment
     public void onFeedItemClicked(FeedItem item) {
         Model model = item.getModel();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(recyclerView.getContext());
 
         if (model instanceof Event) {
             builder.setTitle(getString(R.string.attend_event))

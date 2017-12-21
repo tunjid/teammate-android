@@ -73,8 +73,10 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestCode = getArguments().getInt(ARGS_REQUEST_CODE);
     }
 

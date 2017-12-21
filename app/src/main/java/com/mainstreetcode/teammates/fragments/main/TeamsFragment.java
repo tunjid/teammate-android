@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -68,7 +69,7 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
         recyclerView = rootView.findViewById(R.id.team_list);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -131,7 +132,9 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onTeamClicked(Team team) {
+
         int requestCode = getTargetRequestCode();
         Fragment target = getTargetFragment();
 

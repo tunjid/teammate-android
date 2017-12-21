@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +34,7 @@ import java.util.List;
 
 public class RoleEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener{
+        View.OnClickListener {
 
     public static final String ARG_ROLE = "role";
 
@@ -54,6 +56,7 @@ public class RoleEditFragment extends HeaderedFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Role tempRole = getArguments().getParcelable(ARG_ROLE);
@@ -64,6 +67,7 @@ public class RoleEditFragment extends HeaderedFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -77,7 +81,7 @@ public class RoleEditFragment extends HeaderedFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
         recyclerView = rootView.findViewById(R.id.model_list);
 
@@ -177,10 +181,13 @@ public class RoleEditFragment extends HeaderedFragment
                 final String firstName = role.getUser().getFirstName();
                 final String prompt = getString(R.string.confirm_user_drop, firstName);
 
-                new AlertDialog.Builder(getContext()).setTitle(prompt)
+                Activity activity;
+                if ((activity = getActivity()) == null) return super.onOptionsItemSelected(item);
+
+                new AlertDialog.Builder(activity).setTitle(prompt)
                         .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.dropRole(role).subscribe(dropped -> {
                             showSnackbar(getString(R.string.dropped_user, firstName));
-                            getActivity().onBackPressed();
+                            activity.onBackPressed();
                         }, defaultErrorHandler)))
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
@@ -193,7 +200,11 @@ public class RoleEditFragment extends HeaderedFragment
         currentRole.update(role);
         recyclerView.getRecycledViewPool().clear();
         recyclerView.getAdapter().notifyItemChanged(Role.ROLE_NAME_POSITION);
-        getActivity().invalidateOptionsMenu();
+
+        Activity activity;
+        if ((activity = getActivity()) == null) return;
+
+        activity.invalidateOptionsMenu();
         toggleFab(showsFab());
     }
 

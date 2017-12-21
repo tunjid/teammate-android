@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
@@ -56,6 +57,7 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Team team = getArguments().getParcelable(ARG_TEAM);
@@ -66,6 +68,7 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -74,7 +77,7 @@ public class TeamChatFragment extends MainActivityFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_chat, container, false);
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
@@ -218,9 +221,12 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
-        toggleProgress(resultPair.first);
+        boolean showProgress = resultPair.first != null ? resultPair.first : false;
+        DiffUtil.DiffResult result = resultPair.second;
+
+        toggleProgress(showProgress);
         teamChatViewModel.updateLastSeen(team);
-        if (!resultPair.first) resultPair.second.dispatchUpdatesTo(recyclerView.getAdapter());
         emptyViewHolder.toggle(chats.isEmpty());
+        if (!showProgress && result != null) result.dispatchUpdatesTo(recyclerView.getAdapter());
     }
 }

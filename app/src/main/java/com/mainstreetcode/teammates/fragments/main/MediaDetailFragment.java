@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
@@ -36,11 +37,13 @@ public class MediaDetailFragment extends MainActivityFragment {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         return super.getStableTag() + "-" + getArguments().getParcelable(ARG_MEDIA);
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         media = getArguments().getParcelable(ARG_MEDIA);
@@ -48,7 +51,7 @@ public class MediaDetailFragment extends MainActivityFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         boolean isImage = media.isImage();
         int resource = isImage ? R.layout.viewholder_image : R.layout.viewholder_video;
 

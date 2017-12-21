@@ -18,9 +18,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 /**
- * Spalsh screen
- * <p>
- * Created by Shemanigans on 6/1/17.
+ * Splash screen
  */
 
 public class SplashFragment extends RegistrationActivityFragment
@@ -40,7 +38,7 @@ public class SplashFragment extends RegistrationActivityFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_splash, container, false);
         TextView emailSignUp = rootView.findViewById(R.id.email_sign_up);
         TextView login = rootView.findViewById(R.id.login);
