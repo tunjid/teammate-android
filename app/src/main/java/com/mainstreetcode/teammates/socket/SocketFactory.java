@@ -26,6 +26,7 @@ import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
 import static com.mainstreetcode.teammates.rest.TeammateService.getHttpClient;
 import static io.socket.client.Manager.EVENT_CLOSE;
+import static io.socket.client.Manager.EVENT_OPEN;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
 import static io.socket.client.Socket.EVENT_ERROR;
 import static io.socket.client.Socket.EVENT_RECONNECT_ATTEMPT;
@@ -95,6 +96,7 @@ public class SocketFactory {
             Manager manager = socket.io();
             manager.on(EVENT_TRANSPORT, this::routeTransportEvent);
             manager.on(EVENT_CLOSE, i -> onDisconnection());
+            manager.on(EVENT_OPEN, args ->Log.i(TAG, "Socket connected"));
 
             socket.on(EVENT_ERROR, this::onError);
             socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);

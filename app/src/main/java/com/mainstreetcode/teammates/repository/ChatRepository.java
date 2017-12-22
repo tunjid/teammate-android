@@ -14,8 +14,8 @@ import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
-import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.ChatDao;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.socket.SocketFactory;
@@ -64,15 +64,15 @@ public class ChatRepository extends ModelRepository<Chat> {
     private final TeammateApi api;
     private final Application app;
     private final ChatDao chatDao;
-    private final ModelRepository<User> userModelRespository;
-    private final ModelRepository<Team> teamModelRespository;
+    private final ModelRepository<User> userModelRepository;
+    private final ModelRepository<Team> teamModelRepository;
 
     private ChatRepository() {
         app = Application.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
-        userModelRespository = UserRepository.getInstance();
-        teamModelRespository = TeamRepository.getInstance();
+        userModelRepository = UserRepository.getInstance();
+        teamModelRepository = TeamRepository.getInstance();
     }
 
     public static ChatRepository getInstance() {
@@ -119,8 +119,8 @@ public class ChatRepository extends ModelRepository<Chat> {
                 teams.add(chat.getTeam());
             }
 
-            userModelRespository.getSaveManyFunction().apply(users);
-            teamModelRespository.getSaveManyFunction().apply(teams);
+            userModelRepository.getSaveManyFunction().apply(users);
+            teamModelRepository.getSaveManyFunction().apply(teams);
 
             chatDao.upsert(chats);
             return chats;
@@ -156,7 +156,8 @@ public class ChatRepository extends ModelRepository<Chat> {
     }
 
     public Completable post(Chat chat) {
-        return Completable.create(new ChatCompletable(chat)).observeOn(mainThread());
+        Socket socket = SocketFactory.getInstance().getTeamChatSocket();
+        return Completable.create(new ChatCompletable(socket, chat)).observeOn(mainThread());
     }
 
     public void updateLastSeen(Team team) {
@@ -243,8 +244,8 @@ public class ChatRepository extends ModelRepository<Chat> {
         private final Chat chat;
         private CompletableEmitter emitter;
 
-        ChatCompletable(Chat chat) {
-            this.socket = SocketFactory.getInstance().getTeamChatSocket();
+        ChatCompletable(Socket socket, Chat chat) {
+            this.socket = socket;
             this.chat = chat;
 
             if (socket != null) {
