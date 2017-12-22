@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
@@ -14,12 +16,24 @@ import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cookie;
@@ -35,39 +49,43 @@ import static android.text.TextUtils.isEmpty;
 
 /**
  * Teammates RESTful API
- * <p>
- * Created by Shemanigans on 6/12/17.
  */
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "https://teammate-52655.appspot.com/";
+    public static final String API_BASE_URL = "https://teammatesapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     public static final String SESSION_COOKIE = "connect.sid";
 
     private static final Gson GSON = getGson();
-    private static TeammateApi INSTANCE;
+
+    private static TeammateApi api;
+    private static OkHttpClient httpClient;
 
     public static TeammateApi getApiInstance() {
-        if (INSTANCE == null) {
+        if (api == null) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-            OkHttpClient client = new OkHttpClient.Builder()
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .addInterceptor(loggingInterceptor)
-                    .cookieJar(new SessionCookieJar())
-                    .build();
+                    .cookieJar(new SessionCookieJar());
 
-            INSTANCE = new Retrofit.Builder()
+            SSLSocketFactory sslSocketFactory = getSSLSocketFactory();
+            if (sslSocketFactory != null) builder.sslSocketFactory(sslSocketFactory);
+
+            httpClient = builder.build();
+
+            api = new Retrofit.Builder()
                     .baseUrl(API_BASE_URL)
-                    .client(client)
+                    .client(httpClient)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                     .addConverterFactory(GsonConverterFactory.create(GSON))
                     .build()
                     .create(TeammateApi.class);
         }
 
-        return INSTANCE;
+        return api;
     }
 
     public static Gson getGson() {
@@ -86,8 +104,43 @@ public class TeammateService {
                 .create();
     }
 
-    private static class SessionCookieJar implements CookieJar {
+    public static OkHttpClient getHttpClient() {
+        if (api == null) getApiInstance();
 
+        return httpClient;
+    }
+
+    private static SSLSocketFactory getSSLSocketFactory() {
+
+        try {
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            InputStream stream = Application.getInstance().getResources().openRawResource(R.raw.server);
+
+            Certificate certificate = certificateFactory.generateCertificate(stream);
+            stream.close();
+
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", certificate);
+
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, tmf.getTrustManagers(), null);
+
+            return sslContext.getSocketFactory();
+
+        }
+        catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static class SessionCookieJar implements CookieJar {
         private static final String SIGN_IN_PATH = "/api/signIn";
         private static final String SIGN_UP_PATH = "/api/signUp";
 

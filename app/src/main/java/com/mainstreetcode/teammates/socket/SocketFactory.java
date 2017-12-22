@@ -11,16 +11,20 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.socket.client.IO;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.engineio.client.Transport;
+import okhttp3.OkHttpClient;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.mainstreetcode.teammates.rest.TeammateService.API_BASE_URL;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
+import static com.mainstreetcode.teammates.rest.TeammateService.getHttpClient;
 import static io.socket.client.Manager.EVENT_CLOSE;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
 import static io.socket.client.Socket.EVENT_ERROR;
@@ -32,7 +36,7 @@ import static io.socket.engineio.client.Transport.EVENT_REQUEST_HEADERS;
 public class SocketFactory {
 
     private static final int RECONNECTION_ATTEMPTS = 3;
-    private static final String TAG = "Socket Factory";
+    private static final String TAG = "Socket.Factory";
     private static final String COOKIE = "Cookie";
     private static final String TEAM_CHAT_NAMESPACE = "/team-chat";
 
@@ -45,27 +49,34 @@ public class SocketFactory {
         return INSTANCE;
     }
 
-    private Socket teamChatSocket = buildTeamChatSocket();
+    private AtomicReference<Socket> teamChatSocket = new AtomicReference<>();
 
     private SocketFactory() {}
 
     @Nullable
     public Socket getTeamChatSocket() {
-        return teamChatSocket;
-    }
+        Log.i(TAG, "Getting Team Chat Socket");
+        Socket current = teamChatSocket.get();
+        if (current == null) teamChatSocket.set(buildTeamChatSocket());
 
-    public void recreateTeamChatSocket() {
-        teamChatSocket.close();
-        teamChatSocket = buildTeamChatSocket();
+        return teamChatSocket.get();
     }
 
     @Nullable
     private Socket buildBaseSocket() {
         Socket socket = null;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .pingInterval(20, TimeUnit.SECONDS)
+                .sslSocketFactory(getHttpClient().sslSocketFactory())
+                .build();
+
+        IO.setDefaultOkHttpWebSocketFactory(client);
+        IO.setDefaultOkHttpCallFactory(client);
 
         IO.Options options = new IO.Options();
-        options.forceNew = false;
-        options.reconnection = true;
+        options.secure = true;
+        options.forceNew = true;
+        options.reconnection = false;
         options.reconnectionAttempts = RECONNECTION_ATTEMPTS;
 
         try {socket = IO.socket(API_BASE_URL, options);}
@@ -127,10 +138,14 @@ public class SocketFactory {
     private void onError(Object... args) {
         Log.i(TAG, "Socket Error: " + args[0]);
         ((Exception) args[0]).printStackTrace();
-        teamChatSocket = buildTeamChatSocket();
+
+        Socket socket = teamChatSocket.get();
+        if (socket != null) socket.close();
+
+        teamChatSocket.set(null);
     }
 
     private void onDisconnection() {
-        teamChatSocket = buildTeamChatSocket();
+        //teamChatSocket = buildTeamChatSocket();
     }
 }

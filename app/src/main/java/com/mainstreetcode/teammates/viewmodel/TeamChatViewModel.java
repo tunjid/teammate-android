@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.viewmodel;
 import android.arch.lifecycle.ViewModel;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
+import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
@@ -10,6 +11,7 @@ import com.mainstreetcode.teammates.repository.ChatRepository;
 import com.mainstreetcode.teammates.util.ModelDiffCallback;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +20,8 @@ import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
+import io.socket.engineio.client.EngineIOException;
 
 import static io.reactivex.Flowable.concat;
 import static io.reactivex.Flowable.just;
@@ -48,11 +52,11 @@ public class TeamChatViewModel extends ViewModel {
     }
 
     public Flowable<Chat> listenForChat(Team team) {
-        return repository.listenForChat(team).retry();
+        return repository.listenForChat(team).onErrorResumeNext(retryFunction(team));
     }
 
     public Completable post(Chat chat) {
-        return repository.post(chat).retry(2);
+        return repository.post(chat);
     }
 
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<Chat> chats, final Team team, Date date) {
@@ -95,5 +99,18 @@ public class TeamChatViewModel extends ViewModel {
 
     private Pair<Boolean, DiffUtil.DiffResult> getPair(Boolean flag, DiffUtil.DiffResult diffResult) {
         return new Pair<>(flag, diffResult);
+    }
+
+    private Function<Throwable, Flowable<Chat>> retryFunction(Team team) {
+        return (throwable -> shouldRetry(throwable)
+                ? repository.listenForChat(team).onErrorResumeNext(retryFunction(team))
+                : Flowable.error(throwable)
+        );
+    }
+
+    private boolean shouldRetry(Throwable throwable) {
+        boolean retry = throwable instanceof EngineIOException && throwable.getCause() instanceof EOFException;
+        if (retry) Log.i("CHAT", "Retrying because of EOF");
+        return retry;
     }
 }

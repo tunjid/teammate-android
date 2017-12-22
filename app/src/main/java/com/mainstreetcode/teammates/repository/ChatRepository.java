@@ -206,13 +206,13 @@ public class ChatRepository extends ModelRepository<Chat> {
             this.socket = socket;
             signedInUser = UserRepository.getInstance().getCurrentUser();
             socket.on(NEW_MESSAGE_EVENT, this::parseChat);
-            socket.on(ERROR_EVENT, this::handleError);
+            socket.once(ERROR_EVENT, this::handleError);
         }
 
         @Override
-        public void subscribe(FlowableEmitter<Chat> flowableEmitter) throws Exception {
-            flowableEmitter.setCancellable(this);
-            this.emitter = flowableEmitter;
+        public void subscribe(FlowableEmitter<Chat> emitter) throws Exception {
+            emitter.setCancellable(this);
+            this.emitter = emitter;
         }
 
         @Override
@@ -227,7 +227,7 @@ public class ChatRepository extends ModelRepository<Chat> {
         }
 
         private void handleError(Object... args) {
-            SocketFactory.getInstance().recreateTeamChatSocket();
+            socket.off(NEW_MESSAGE_EVENT, this::parseChat);
             this.emitter.onError((Throwable) args[0]);
         }
     }
@@ -248,8 +248,8 @@ public class ChatRepository extends ModelRepository<Chat> {
             this.chat = chat;
 
             if (socket != null) {
-                socket.on(NEW_MESSAGE_EVENT, this::parseChat);
-                socket.on(ERROR_EVENT, this::handleError);
+                socket.once(NEW_MESSAGE_EVENT, this::parseChat);
+                socket.once(ERROR_EVENT, this::handleError);
             }
         }
 
@@ -283,7 +283,6 @@ public class ChatRepository extends ModelRepository<Chat> {
         }
 
         private void handleError(Object... args) {
-            SocketFactory.getInstance().recreateTeamChatSocket();
             if (emitter != null && !emitter.isDisposed()) this.emitter.onError((Throwable) args[0]);
         }
 

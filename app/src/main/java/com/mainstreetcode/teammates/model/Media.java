@@ -42,7 +42,7 @@ public class Media implements
         Notifiable<Media> {
 
     public static final String UPLOAD_KEY = "team-media";
-    public static final String IMAGE = "image";
+    private static final String IMAGE = "image";
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "media_id") private String id;
@@ -166,6 +166,7 @@ public class Media implements
         dest.writeString(id);
         dest.writeString(url);
         dest.writeString(mimeType);
+        dest.writeString(thumbnail);
         dest.writeValue(user);
         dest.writeValue(team);
         dest.writeLong(created != null ? created.getTime() : -1L);
