@@ -142,7 +142,9 @@ public class ChatRepository extends ModelRepository<Chat> {
 
             return Flowable.<Chat>create(emitter -> {
                 socket.on(EVENT_NEW_MESSAGE, args -> emitter.onNext(parseChat(args)));
-                socket.once(EVENT_ERROR, args -> emitter.onError((Throwable) args[0]));
+                socket.once(EVENT_ERROR, args -> {
+                    if (!emitter.isCancelled()) emitter.onError((Throwable) args[0]);
+                });
             }, BackpressureStrategy.DROP)
                     .filter(chat -> team.equals(chat.getTeam()) && !signedInUser.equals(chat.getUser()))
                     .observeOn(mainThread());

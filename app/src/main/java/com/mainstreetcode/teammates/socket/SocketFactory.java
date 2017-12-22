@@ -95,7 +95,7 @@ public class SocketFactory {
     private Socket buildBaseSocket() {
         Socket socket = null;
         OkHttpClient client = new OkHttpClient.Builder()
-                .pingInterval(20, TimeUnit.SECONDS)
+                .pingInterval(10, TimeUnit.SECONDS)
                 .sslSocketFactory(getHttpClient().sslSocketFactory())
                 .build();
 
