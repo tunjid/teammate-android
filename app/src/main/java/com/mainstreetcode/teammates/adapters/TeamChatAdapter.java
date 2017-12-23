@@ -9,16 +9,13 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammates.model.Chat;
-import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
 /**
- * Adapter for {@link Team}
- * <p>
- * Created by Shemanigans on 6/3/17.
+ * Adapter for {@link Chat}
  */
 
 public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
@@ -28,6 +25,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     public TeamChatAdapter(List<Chat> chats, User signedInUser,
                            TeamChatAdapter.ChatAdapterListener listener) {
         super(listener);
+        setHasStableIds(true);
         this.chats = chats;
         this.signedInUser = signedInUser;
     }

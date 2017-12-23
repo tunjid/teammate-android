@@ -35,6 +35,7 @@ import java.util.List;
 import io.reactivex.disposables.Disposable;
 
 import static android.text.TextUtils.isEmpty;
+import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
 
 public class TeamChatFragment extends MainActivityFragment
         implements
@@ -99,9 +100,13 @@ public class TeamChatFragment extends MainActivityFragment
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
-                disposables.add(teamChatViewModel
-                        .chatsBefore(chats, team, getQueryDate())
-                        .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+                fetchChatsBefore(getQueryDate());
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat())
+                    fetchChatsBefore(new Date());
             }
         });
 
@@ -116,9 +121,7 @@ public class TeamChatFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
 
         Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
-        disposables.add(teamChatViewModel
-                .chatsBefore(chats, team, queryDate)
-                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+        fetchChatsBefore(queryDate);
     }
 
     @Override
@@ -184,14 +187,17 @@ public class TeamChatFragment extends MainActivityFragment
         return false;
     }
 
+    private void fetchChatsBefore(Date date) {
+        disposables.add(teamChatViewModel
+                .chatsBefore(chats, team, date)
+                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+    }
+
     private void subscribeToChat() {
         chatDisposable = teamChatViewModel.listenForChat(team).subscribe(chat -> {
             chats.add(chat);
 
-            LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
-            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-
-            notifyAndScrollToLast(Math.abs(chats.size() - lastVisibleItemPosition) < 4);
+            notifyAndScrollToLast(isNearBottomOfChat());
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(message -> showSnackbar(message.getMessage()))
@@ -247,6 +253,13 @@ public class TeamChatFragment extends MainActivityFragment
 
     private boolean isSubscribedToChat() {
         return chatDisposable != null && !chatDisposable.isDisposed();
+    }
+
+    private boolean isNearBottomOfChat() {
+        LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+        int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+
+        return Math.abs(chats.size() - lastVisibleItemPosition) < 4;
     }
 
     private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
