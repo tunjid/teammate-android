@@ -5,13 +5,17 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.FrameLayout;
 
 import com.mainstreetcode.teammates.R;
+
+import java.lang.reflect.Field;
 
 public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
 
@@ -24,6 +28,11 @@ public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
      */
     private LoadingSnackbar(ViewGroup parent, View content, ContentViewCallback callback) {
         super(parent, content, callback);
+
+        // Remove the default insets applied that account for the keyboard showing up
+        // since it's handled by us
+        View wrapper = (View) content.getParent();
+        ViewCompat.setOnApplyWindowInsetsListener(wrapper, (view, insets) -> insets);
     }
 
     public static LoadingSnackbar make(@NonNull View view, @Duration int duration) {
@@ -33,6 +42,7 @@ public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
         final ContentViewCallback viewCallback = new ContentViewCallback(content);
         final LoadingSnackbar loadingSnackbar = new LoadingSnackbar(parent, content, viewCallback);
         loadingSnackbar.setDuration(duration);
+        forceAnimation(loadingSnackbar);
         return loadingSnackbar;
     }
 
@@ -60,6 +70,20 @@ public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
 
         // If we reach here then we didn't find a CoL or a suitable content view so we'll fallback
         return fallback;
+    }
+
+    private static void forceAnimation(BaseTransientBottomBar bottomBar) {
+        try {
+            Field mAccessibilityManagerField = BaseTransientBottomBar.class.getDeclaredField("mAccessibilityManager");
+            mAccessibilityManagerField.setAccessible(true);
+            AccessibilityManager accessibilityManager = (AccessibilityManager) mAccessibilityManagerField.get(bottomBar);
+            Field mIsEnabledField = AccessibilityManager.class.getDeclaredField("mIsEnabled");
+            mIsEnabledField.setAccessible(true);
+            mIsEnabledField.setBoolean(accessibilityManager, false);
+            mAccessibilityManagerField.set(bottomBar, accessibilityManager);
+        } catch (Exception e) {
+            Log.d("Snackbar", "Reflection error: " + e.toString());
+        }
     }
 
     private static class ContentViewCallback implements BaseTransientBottomBar.ContentViewCallback {
