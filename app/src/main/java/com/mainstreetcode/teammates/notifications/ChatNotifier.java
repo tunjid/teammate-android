@@ -13,13 +13,15 @@ import android.support.v4.app.NotificationCompat;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.repository.ChatRepository;
+import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
@@ -33,6 +35,7 @@ public class ChatNotifier extends Notifier<Chat> {
     private static final int MAX_LINES = 5;
     private static ChatNotifier INSTANCE;
 
+    private final Map<Team, Boolean> visibleChatMap = new HashMap<>();
     private final UserRepository userRepository;
     private Team sender = Team.empty();
 
@@ -56,7 +59,11 @@ public class ChatNotifier extends Notifier<Chat> {
 
     @Override
     public Predicate<Chat> getNotificationFilter() {
-        return teamChat -> !teamChat.getUser().equals(userRepository.getCurrentUser());
+        return teamChat -> {
+            Boolean visible = visibleChatMap.get(teamChat.getTeam());
+            boolean showNotification = visible == null || !visible;
+            return showNotification && !teamChat.getUser().equals(userRepository.getCurrentUser());
+        };
     }
 
     @Override
@@ -68,6 +75,10 @@ public class ChatNotifier extends Notifier<Chat> {
                 .flatMap(team -> fetchUnreadChats(item, team))
                 .map(unreadChats -> buildNotification(item, unreadChats))
                 .subscribe(this::sendNotification, ErrorHandler.EMPTY);
+    }
+
+    public void setChatVisibility(Team team, boolean visible) {
+        visibleChatMap.put(team, visible);
     }
 
     private Single<List<Chat>> fetchUnreadChats(FeedItem<Chat> item, Team team) {
