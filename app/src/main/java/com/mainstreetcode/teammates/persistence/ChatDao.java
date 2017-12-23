@@ -31,6 +31,7 @@ public abstract class ChatDao extends EntityDao<Chat> {
     @Query("SELECT * FROM team_chats" +
             " WHERE team_chat_team = :teamId" +
             " AND team_chat_created < :date" +
+            " ORDER BY team_chat_created DESC" +
             " LIMIT 20")
     public abstract Maybe<List<Chat>> chatsBefore(String teamId, Date date);
 

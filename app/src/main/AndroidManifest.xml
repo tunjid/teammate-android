@@ -42,6 +42,7 @@
         </activity>
         <activity
             android:name=".activities.MainActivity"
+            android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"

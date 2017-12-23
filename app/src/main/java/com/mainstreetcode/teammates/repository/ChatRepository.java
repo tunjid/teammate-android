@@ -14,8 +14,8 @@ import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
-import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.ChatDao;
+import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.socket.SocketFactory;
@@ -27,33 +27,22 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Maybe;
-import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Function;
-import io.socket.client.Socket;
 
+import static com.mainstreetcode.teammates.socket.SocketFactory.EVENT_NEW_MESSAGE;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-import static io.reactivex.schedulers.Schedulers.computation;
 import static io.reactivex.schedulers.Schedulers.io;
+import static io.socket.client.Socket.EVENT_ERROR;
 
 public class ChatRepository extends ModelRepository<Chat> {
 
 
-    private static final String JOIN_EVENT = "join";
-    private static final String NEW_MESSAGE_EVENT = "newMessage";
-    private static final String ERROR_EVENT = "error";
     private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";
     private static final int TEAM_NOT_SEEN = -1;
 
@@ -61,18 +50,18 @@ public class ChatRepository extends ModelRepository<Chat> {
 
     private static ChatRepository ourInstance;
 
-    private final TeammateApi api;
     private final Application app;
+    private final TeammateApi api;
     private final ChatDao chatDao;
-    private final ModelRepository<User> userModelRespository;
-    private final ModelRepository<Team> teamModelRespository;
+    private final ModelRepository<User> userModelRepository;
+    private final ModelRepository<Team> teamModelRepository;
 
     private ChatRepository() {
         app = Application.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
-        userModelRespository = UserRepository.getInstance();
-        teamModelRespository = TeamRepository.getInstance();
+        userModelRepository = UserRepository.getInstance();
+        teamModelRepository = TeamRepository.getInstance();
     }
 
     public static ChatRepository getInstance() {
@@ -119,8 +108,8 @@ public class ChatRepository extends ModelRepository<Chat> {
                 teams.add(chat.getTeam());
             }
 
-            userModelRespository.getSaveManyFunction().apply(users);
-            teamModelRespository.getSaveManyFunction().apply(teams);
+            userModelRepository.getSaveManyFunction().apply(users);
+            teamModelRepository.getSaveManyFunction().apply(teams);
 
             chatDao.upsert(chats);
             return chats;
@@ -143,20 +132,40 @@ public class ChatRepository extends ModelRepository<Chat> {
     }
 
     public Flowable<Chat> listenForChat(Team team) {
-        Socket socket = SocketFactory.getInstance().getTeamChatSocket();
-        if (socket == null) return Flowable.error(new Exception("Null Socket"));
+        return SocketFactory.getInstance().getTeamChatSocket().flatMapPublisher(socket -> {
+            JSONObject result;
+            try { result = new JSONObject(CHAT_GSON.toJson(team));}
+            catch (Exception e) {return Flowable.error(e);}
 
-        JSONObject result = null;
+            socket.emit(SocketFactory.EVENT_JOIN, result);
+            User signedInUser = UserRepository.getInstance().getCurrentUser();
 
-        try { result = new JSONObject(CHAT_GSON.toJson(team));}
-        catch (Exception e) {e.printStackTrace();}
-
-        socket.emit(JOIN_EVENT, result);
-        return Flowable.create(new ChatFlowable(socket), BackpressureStrategy.DROP).observeOn(mainThread());
+            return Flowable.<Chat>create(emitter -> {
+                socket.on(EVENT_NEW_MESSAGE, args -> emitter.onNext(parseChat(args)));
+                socket.once(EVENT_ERROR, args -> {
+                    if (!emitter.isCancelled()) emitter.onError((Throwable) args[0]);
+                });
+            }, BackpressureStrategy.DROP)
+                    .filter(chat -> team.equals(chat.getTeam()) && !signedInUser.equals(chat.getUser()))
+                    .observeOn(mainThread());
+        });
     }
 
     public Completable post(Chat chat) {
-        return Completable.create(new ChatCompletable(chat)).observeOn(mainThread());
+        return SocketFactory.getInstance().getTeamChatSocket().flatMapCompletable(socket -> Completable.create(emitter -> {
+            JSONObject result = new JSONObject(CHAT_GSON.toJson(chat));
+
+            socket.emit(EVENT_NEW_MESSAGE, new Object[]{result}, args -> {
+                Chat created = parseChat(args);
+                if (created == null) {
+                    emitter.onError(new TeammateException("Unable to post chat"));
+                    return;
+                }
+                chat.update(created);
+                emitter.onComplete();
+            });
+
+        }).observeOn(mainThread()));
     }
 
     public void updateLastSeen(Team team) {
@@ -178,7 +187,7 @@ public class ChatRepository extends ModelRepository<Chat> {
     }
 
     private static Gson getChatGson() {
-        Team.GsonAdapter adapter = new Team.GsonAdapter() {
+        Team.GsonAdapter teamAdapter = new Team.GsonAdapter() {
             @Override
             public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
                 JsonObject result = super.serialize(src, typeOfSrc, context).getAsJsonObject();
@@ -186,150 +195,18 @@ public class ChatRepository extends ModelRepository<Chat> {
                 return result;
             }
         };
+        Chat.GsonAdapter chatAdapter = new Chat.GsonAdapter() {
+            @Override
+            public JsonElement serialize(Chat src, Type typeOfSrc, JsonSerializationContext context) {
+                JsonObject result = super.serialize(src, typeOfSrc, context).getAsJsonObject();
+                result.addProperty("_id", src.getId());
+                return result;
+            }
+        };
         return new GsonBuilder()
-                .registerTypeAdapter(Team.class, adapter)
+                .registerTypeAdapter(Team.class, teamAdapter)
+                .registerTypeAdapter(Chat.class, chatAdapter)
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
-                .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .create();
     }
-
-    private static final class ChatFlowable implements
-            Cancellable,
-            FlowableOnSubscribe<Chat> {
-
-        private final Socket socket;
-        private final User signedInUser;
-
-        private FlowableEmitter<Chat> emitter;
-
-        ChatFlowable(Socket socket) {
-            this.socket = socket;
-            signedInUser = UserRepository.getInstance().getCurrentUser();
-            socket.on(NEW_MESSAGE_EVENT, this::parseChat);
-            socket.once(ERROR_EVENT, this::handleError);
-        }
-
-        @Override
-        public void subscribe(FlowableEmitter<Chat> emitter) throws Exception {
-            emitter.setCancellable(this);
-            this.emitter = emitter;
-        }
-
-        @Override
-        public void cancel() throws Exception {
-            socket.close();
-        }
-
-        private void parseChat(Object... args) {
-            Chat chat = ChatRepository.parseChat(args);
-            if (chat != null && !signedInUser.equals(chat.getUser()) && emitter != null)
-                emitter.onNext(chat);
-        }
-
-        private void handleError(Object... args) {
-            socket.off(NEW_MESSAGE_EVENT, this::parseChat);
-            this.emitter.onError((Throwable) args[0]);
-        }
-    }
-
-    private static final class ChatCompletable
-            implements
-            Cancellable,
-            CompletableOnSubscribe {
-
-        private volatile boolean isCancelled;
-
-        private final Socket socket;
-        private final Chat chat;
-        private CompletableEmitter emitter;
-
-        ChatCompletable(Chat chat) {
-            this.socket = SocketFactory.getInstance().getTeamChatSocket();
-            this.chat = chat;
-
-            if (socket != null) {
-                socket.once(NEW_MESSAGE_EVENT, this::parseChat);
-                socket.once(ERROR_EVENT, this::handleError);
-            }
-        }
-
-        @Override
-        public void subscribe(CompletableEmitter emitter) throws Exception {
-            emitter.setCancellable(this);
-            this.emitter = emitter;
-
-            JSONObject result = new JSONObject(CHAT_GSON.toJson(chat));
-
-            if (socket == null) {
-                handleError(new TimeoutException());
-                return;
-            }
-
-            new Backoff(socket::connected,
-                    () -> {
-                        socket.connect();
-                        socket.emit(NEW_MESSAGE_EVENT, new Object[]{result}, this::parseChat);
-                    },
-                    () -> handleError(new TimeoutException()));
-        }
-
-        private void parseChat(Object... args) {
-            if (isCancelled) return;
-
-            Chat chat = ChatRepository.parseChat(args);
-            this.chat.update(chat);
-
-            if (chat != null && emitter != null && !emitter.isDisposed()) emitter.onComplete();
-        }
-
-        private void handleError(Object... args) {
-            if (emitter != null && !emitter.isDisposed()) this.emitter.onError((Throwable) args[0]);
-        }
-
-        @Override
-        public void cancel() throws Exception {
-            isCancelled = true;
-        }
-    }
-
-    static class Backoff {
-
-        static int MAX = 3;
-        int elapsed;
-
-        private Condition condition;
-        private Runnable completeAction;
-        private Runnable timeoutAction;
-
-        Backoff(Condition condition, Runnable completeAction, Runnable timeoutAction) {
-            this.condition = condition;
-            this.completeAction = completeAction;
-            this.timeoutAction = timeoutAction;
-
-            start();
-        }
-
-        void start() {
-            Observable.timer(1, TimeUnit.SECONDS)
-                    .subscribeOn(computation())
-                    .subscribe(nothing -> evaluate());
-        }
-
-        void evaluate() {
-            elapsed++;
-
-            if (elapsed > MAX) {
-                timeoutAction.run();
-                return;
-            }
-
-            if (condition.met()) completeAction.run();
-            else start();
-        }
-    }
-
-    interface Condition {
-        boolean met();
-    }
-
 }

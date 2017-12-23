@@ -32,7 +32,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
+
 import static android.text.TextUtils.isEmpty;
+import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
 
 public class TeamChatFragment extends MainActivityFragment
         implements
@@ -43,6 +46,7 @@ public class TeamChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
+    private Disposable chatDisposable;
     private List<Chat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
@@ -96,9 +100,13 @@ public class TeamChatFragment extends MainActivityFragment
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
-                disposables.add(teamChatViewModel
-                        .chatsBefore(chats, team, getQueryDate())
-                        .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+                fetchChatsBefore(getQueryDate());
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat())
+                    fetchChatsBefore(new Date());
             }
         });
 
@@ -111,12 +119,15 @@ public class TeamChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
-        subscribeToChat();
 
         Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
-        disposables.add(teamChatViewModel
-                .chatsBefore(chats, team, queryDate)
-                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+        fetchChatsBefore(queryDate);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        subscribeToChat();
     }
 
     @Override
@@ -157,12 +168,14 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onChatClicked(Chat chat) {
         if (chat.isSuccessful() || !chat.isEmpty()) return;
-        for (int i = 0; i < chats.size(); i++) {
-            if (chats.get(i).getCreated().equals(chat.getCreated())) {
-                postChat(i, chat);
-                return;
-            }
-        }
+
+        int index = chats.indexOf(chat);
+        if (index == -1) return;
+
+        chats.remove(index);
+        recyclerView.getAdapter().notifyItemRemoved(index);
+
+        postChat(chat);
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -174,15 +187,23 @@ public class TeamChatFragment extends MainActivityFragment
         return false;
     }
 
+    private void fetchChatsBefore(Date date) {
+        disposables.add(teamChatViewModel
+                .chatsBefore(chats, team, date)
+                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+    }
+
     private void subscribeToChat() {
-        disposables.add(teamChatViewModel.listenForChat(team).subscribe(chat -> {
+        chatDisposable = teamChatViewModel.listenForChat(team).subscribe(chat -> {
             chats.add(chat);
-            recyclerView.getAdapter().notifyDataSetChanged();
-            recyclerView.smoothScrollToPosition(chats.size() - 1);
+
+            notifyAndScrollToLast(isNearBottomOfChat());
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(message -> showSnackbar(message.getMessage()))
-                .build()));
+                .build());
+
+        disposables.add(chatDisposable);
     }
 
     private void sendChat(TextView textView) {
@@ -194,30 +215,51 @@ public class TeamChatFragment extends MainActivityFragment
         Chat chat = Chat.chat(text, userViewModel.getCurrentUser(), team);
         chats.add(chat);
 
-        final int index = chats.size() - 1;
+        notifyAndScrollToLast(true);
 
-        recyclerView.smoothScrollToPosition(index);
-        recyclerView.getAdapter().notifyItemInserted(index);
-        postChat(index, chat);
+        postChat(chat);
     }
 
-    private void postChat(int index, Chat chat) {
+    private void postChat(Chat chat) {
         final RecyclerView.Adapter adapter = recyclerView.getAdapter();
 
         teamChatViewModel.post(chat).subscribe(() -> {
             teamChatViewModel.updateLastSeen(team);
-            adapter.notifyItemChanged(index);
+            int index = chats.indexOf(chat);
+
+            if (index != 0) adapter.notifyItemChanged(index);
+            if (!isSubscribedToChat()) subscribeToChat();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(errorMessage -> {
                     chat.setSuccessful(false);
-                    adapter.notifyItemChanged(index);
+
+                    int index = chats.indexOf(chat);
+                    if (index != -1) adapter.notifyItemChanged(index);
                 })
                 .build());
     }
 
+    private void notifyAndScrollToLast(boolean scrollToLast) {
+        final int index = chats.size() - 1;
+
+        recyclerView.getAdapter().notifyItemInserted(index);
+        if (scrollToLast) recyclerView.smoothScrollToPosition(index);
+    }
+
     private Date getQueryDate() {
         return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
+    }
+
+    private boolean isSubscribedToChat() {
+        return chatDisposable != null && !chatDisposable.isDisposed();
+    }
+
+    private boolean isNearBottomOfChat() {
+        LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+        int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+
+        return Math.abs(chats.size() - lastVisibleItemPosition) < 4;
     }
 
     private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {

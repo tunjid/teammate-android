@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -14,6 +15,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.reactivex.Single;
+import io.reactivex.processors.PublishProcessor;
 import io.socket.client.IO;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
@@ -25,7 +28,7 @@ import static com.mainstreetcode.teammates.rest.TeammateService.API_BASE_URL;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
 import static com.mainstreetcode.teammates.rest.TeammateService.getHttpClient;
-import static io.socket.client.Manager.EVENT_CLOSE;
+import static io.socket.client.Manager.EVENT_OPEN;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
 import static io.socket.client.Socket.EVENT_ERROR;
 import static io.socket.client.Socket.EVENT_RECONNECT_ATTEMPT;
@@ -39,6 +42,8 @@ public class SocketFactory {
     private static final String TAG = "Socket.Factory";
     private static final String COOKIE = "Cookie";
     private static final String TEAM_CHAT_NAMESPACE = "/team-chat";
+    public static final String EVENT_NEW_MESSAGE = "newMessage";
+    public static final String EVENT_JOIN = "join";
 
     private static SocketFactory INSTANCE;
 
@@ -53,20 +58,44 @@ public class SocketFactory {
 
     private SocketFactory() {}
 
-    @Nullable
-    public Socket getTeamChatSocket() {
+    public Single<Socket> getTeamChatSocket() {
         Log.i(TAG, "Getting Team Chat Socket");
         Socket current = teamChatSocket.get();
-        if (current == null) teamChatSocket.set(buildTeamChatSocket());
 
-        return teamChatSocket.get();
+        if (isConnected(current)) return Single.just(current);
+        if (current != null) return Single.timer(1200, TimeUnit.MILLISECONDS).map(ignored -> {
+            Socket delayed = teamChatSocket.get();
+            boolean isConnected = isConnected(delayed);
+
+            if (!isConnected) teamChatSocket.set(null);
+
+            if (isConnected) return delayed;
+            else throw new TeammateException("Unable to connect");
+        });
+
+        Socket pending = buildTeamChatSocket();
+        if (pending == null) return Single.error(new TeammateException("Unable to connect"));
+
+        PublishProcessor<Socket> processor = PublishProcessor.create();
+
+        pending.io().once(EVENT_OPEN, args -> {
+            teamChatSocket.set(pending);
+            processor.onNext(pending);
+            processor.onComplete();
+            Log.i(TAG, "Connected to socket");
+        });
+
+        pending.once(EVENT_ERROR, this::onError);
+        pending.connect();
+
+        return processor.firstOrError();
     }
 
     @Nullable
     private Socket buildBaseSocket() {
         Socket socket = null;
         OkHttpClient client = new OkHttpClient.Builder()
-                .pingInterval(20, TimeUnit.SECONDS)
+                .pingInterval(10, TimeUnit.SECONDS)
                 .sslSocketFactory(getHttpClient().sslSocketFactory())
                 .build();
 
@@ -94,15 +123,10 @@ public class SocketFactory {
 
             Manager manager = socket.io();
             manager.on(EVENT_TRANSPORT, this::routeTransportEvent);
-            manager.on(EVENT_CLOSE, i -> onDisconnection());
+//            manager.on(EVENT_CLOSE, i -> onDisconnection());
 
-            socket.on(EVENT_ERROR, this::onError);
             socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);
             socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
-            //socket.on(EVENT_DISCONNECT, i -> onDisconnection());
-            //socket.on(EVENT_CLOSE, i -> onDisconnection());
-
-            socket.connect();
         }
         return socket;
     }
@@ -140,12 +164,16 @@ public class SocketFactory {
         ((Exception) args[0]).printStackTrace();
 
         Socket socket = teamChatSocket.get();
-        if (socket != null) socket.close();
+
+        if (socket != null) {
+            socket.off(EVENT_NEW_MESSAGE);
+            socket.close();
+        }
 
         teamChatSocket.set(null);
     }
 
-    private void onDisconnection() {
-        //teamChatSocket = buildTeamChatSocket();
+    private boolean isConnected(@Nullable Socket socket) {
+        return socket != null && socket.connected();
     }
 }

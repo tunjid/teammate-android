@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.repository.ChatRepository;
 import com.mainstreetcode.teammates.util.ModelDiffCallback;
 import com.mainstreetcode.teammates.util.ModelUtils;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -35,11 +37,13 @@ public class TeamChatViewModel extends ViewModel {
     private static final int RETRY = -2;
 
     private final ChatRepository repository;
+    private final ChatNotifier notifier;
 
     private final Map<Team, Integer> chatMap;
 
     public TeamChatViewModel() {
         repository = ChatRepository.getInstance();
+        notifier = ChatNotifier.getInstance();
         chatMap = new HashMap<>();
     }
 
@@ -52,11 +56,14 @@ public class TeamChatViewModel extends ViewModel {
     }
 
     public Flowable<Chat> listenForChat(Team team) {
-        return repository.listenForChat(team).onErrorResumeNext(retryFunction(team));
+        return repository.listenForChat(team)
+                .onErrorResumeNext(listenRetryFunction(team))
+                .doOnSubscribe(subscription -> notifier.setChatVisibility(team, true))
+                .doFinally(() -> notifier.setChatVisibility(team, false));
     }
 
     public Completable post(Chat chat) {
-        return repository.post(chat);
+        return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0));
     }
 
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<Chat> chats, final Team team, Date date) {
@@ -101,11 +108,23 @@ public class TeamChatViewModel extends ViewModel {
         return new Pair<>(flag, diffResult);
     }
 
-    private Function<Throwable, Flowable<Chat>> retryFunction(Team team) {
+    private Function<Throwable, Flowable<Chat>> listenRetryFunction(Team team) {
         return (throwable -> shouldRetry(throwable)
-                ? repository.listenForChat(team).onErrorResumeNext(retryFunction(team))
+                ? repository.listenForChat(team)
+                .onErrorResumeNext(listenRetryFunction(team))
+                .doOnSubscribe(subscription -> notifier.setChatVisibility(team, true))
+                .doFinally(() -> notifier.setChatVisibility(team, false))
                 : Flowable.error(throwable)
         );
+    }
+
+    private Function<Throwable, Completable> postRetryFunction(Chat chat, int previousRetries) {
+        return throwable -> {
+            int retries = previousRetries + 1;
+            return retries <= 3
+                    ? Completable.timer(300, TimeUnit.MILLISECONDS).andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries)))
+                    : Completable.error(throwable);
+        };
     }
 
     private boolean shouldRetry(Throwable throwable) {

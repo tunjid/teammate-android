@@ -76,6 +76,12 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     @Override
+    public void onPause() {
+        disposables.clear();
+        super.onPause();
+    }
+
+    @Override
     public void onDestroyView() {
         getFab().setOnClickListener(null);
 
