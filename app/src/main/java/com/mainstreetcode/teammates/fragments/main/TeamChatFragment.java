@@ -165,12 +165,14 @@ public class TeamChatFragment extends MainActivityFragment
     @Override
     public void onChatClicked(Chat chat) {
         if (chat.isSuccessful() || !chat.isEmpty()) return;
-        for (int i = 0; i < chats.size(); i++) {
-            if (chats.get(i).getCreated().equals(chat.getCreated())) {
-                postChat(i, chat);
-                return;
-            }
-        }
+
+        int index = chats.indexOf(chat);
+        if (index == -1) return;
+
+        chats.remove(index);
+        recyclerView.getAdapter().notifyItemRemoved(index);
+
+        postChat(chat);
     }
 
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -207,32 +209,36 @@ public class TeamChatFragment extends MainActivityFragment
         Chat chat = Chat.chat(text, userViewModel.getCurrentUser(), team);
         chats.add(chat);
 
-        postChat(notifyAndScrollToLast(true), chat);
+        notifyAndScrollToLast(true);
+
+        postChat(chat);
     }
 
-    private void postChat(int index, Chat chat) {
+    private void postChat(Chat chat) {
         final RecyclerView.Adapter adapter = recyclerView.getAdapter();
 
         teamChatViewModel.post(chat).subscribe(() -> {
             teamChatViewModel.updateLastSeen(team);
-            adapter.notifyItemChanged(index);
+            int index = chats.indexOf(chat);
+
+            if (index != 0) adapter.notifyItemChanged(index);
             if (!isSubscribedToChat()) subscribeToChat();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(errorMessage -> {
                     chat.setSuccessful(false);
-                    adapter.notifyItemChanged(index);
+
+                    int index = chats.indexOf(chat);
+                    if (index != -1) adapter.notifyItemChanged(index);
                 })
                 .build());
     }
 
-    private int notifyAndScrollToLast(boolean scrollToLast) {
+    private void notifyAndScrollToLast(boolean scrollToLast) {
         final int index = chats.size() - 1;
 
         recyclerView.getAdapter().notifyItemInserted(index);
         if (scrollToLast) recyclerView.smoothScrollToPosition(index);
-
-        return index;
     }
 
     private Date getQueryDate() {
