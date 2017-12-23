@@ -24,6 +24,7 @@ import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
+import com.mainstreetcode.teammates.util.ObjectId;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -79,7 +80,7 @@ public class Chat implements
     }
 
     public static Chat chat(String content, User user, Team team) {
-        return new Chat("", content, KIND_TEXT, user, team, new Date());
+        return new Chat(new ObjectId().toHexString(), content, KIND_TEXT, user, team, new Date());
     }
 
     @Override

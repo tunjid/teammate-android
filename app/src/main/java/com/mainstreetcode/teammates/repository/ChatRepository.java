@@ -187,7 +187,7 @@ public class ChatRepository extends ModelRepository<Chat> {
     }
 
     private static Gson getChatGson() {
-        Team.GsonAdapter adapter = new Team.GsonAdapter() {
+        Team.GsonAdapter teamAdapter = new Team.GsonAdapter() {
             @Override
             public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
                 JsonObject result = super.serialize(src, typeOfSrc, context).getAsJsonObject();
@@ -195,10 +195,18 @@ public class ChatRepository extends ModelRepository<Chat> {
                 return result;
             }
         };
+        Chat.GsonAdapter chatAdapter = new Chat.GsonAdapter() {
+            @Override
+            public JsonElement serialize(Chat src, Type typeOfSrc, JsonSerializationContext context) {
+                JsonObject result = super.serialize(src, typeOfSrc, context).getAsJsonObject();
+                result.addProperty("_id", src.getId());
+                return result;
+            }
+        };
         return new GsonBuilder()
-                .registerTypeAdapter(Team.class, adapter)
+                .registerTypeAdapter(Team.class, teamAdapter)
+                .registerTypeAdapter(Chat.class, chatAdapter)
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
-                .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .create();
     }
 }

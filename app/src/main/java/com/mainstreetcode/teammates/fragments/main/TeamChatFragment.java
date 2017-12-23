@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
+
 import static android.text.TextUtils.isEmpty;
 
 public class TeamChatFragment extends MainActivityFragment
@@ -43,6 +45,7 @@ public class TeamChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
+    private Disposable chatDisposable;
     private List<Chat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
@@ -111,12 +114,17 @@ public class TeamChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
-        subscribeToChat();
 
         Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
         disposables.add(teamChatViewModel
                 .chatsBefore(chats, team, queryDate)
                 .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        subscribeToChat();
     }
 
     @Override
@@ -175,14 +183,19 @@ public class TeamChatFragment extends MainActivityFragment
     }
 
     private void subscribeToChat() {
-        disposables.add(teamChatViewModel.listenForChat(team).subscribe(chat -> {
+        chatDisposable = teamChatViewModel.listenForChat(team).subscribe(chat -> {
             chats.add(chat);
-            recyclerView.getAdapter().notifyDataSetChanged();
-            recyclerView.smoothScrollToPosition(chats.size() - 1);
+
+            LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+
+            notifyAndScrollToLast(Math.abs(chats.size() - lastVisibleItemPosition) < 4);
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(message -> showSnackbar(message.getMessage()))
-                .build()));
+                .build());
+
+        disposables.add(chatDisposable);
     }
 
     private void sendChat(TextView textView) {
@@ -194,11 +207,7 @@ public class TeamChatFragment extends MainActivityFragment
         Chat chat = Chat.chat(text, userViewModel.getCurrentUser(), team);
         chats.add(chat);
 
-        final int index = chats.size() - 1;
-
-        recyclerView.smoothScrollToPosition(index);
-        recyclerView.getAdapter().notifyItemInserted(index);
-        postChat(index, chat);
+        postChat(notifyAndScrollToLast(true), chat);
     }
 
     private void postChat(int index, Chat chat) {
@@ -207,6 +216,7 @@ public class TeamChatFragment extends MainActivityFragment
         teamChatViewModel.post(chat).subscribe(() -> {
             teamChatViewModel.updateLastSeen(team);
             adapter.notifyItemChanged(index);
+            if (!isSubscribedToChat()) subscribeToChat();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
                 .add(errorMessage -> {
@@ -216,8 +226,21 @@ public class TeamChatFragment extends MainActivityFragment
                 .build());
     }
 
+    private int notifyAndScrollToLast(boolean scrollToLast) {
+        final int index = chats.size() - 1;
+
+        recyclerView.getAdapter().notifyItemInserted(index);
+        if (scrollToLast) recyclerView.smoothScrollToPosition(index);
+
+        return index;
+    }
+
     private Date getQueryDate() {
         return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
+    }
+
+    private boolean isSubscribedToChat() {
+        return chatDisposable != null && !chatDisposable.isDisposed();
     }
 
     private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
