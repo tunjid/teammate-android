@@ -20,8 +20,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapterListener> {
 
     private Chat item;
-    private View leftGuide;
-    private View rightGuide;
+    private View midGuide;
     private ImageView image;
     private TextView content;
     private TextView details;
@@ -32,22 +31,23 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
         image = itemView.findViewById(R.id.image);
         details = itemView.findViewById(R.id.details);
         content = itemView.findViewById(R.id.content);
-        leftGuide = itemView.findViewById(R.id.left_guide);
-        rightGuide = itemView.findViewById(R.id.right_guide);
+        midGuide = itemView.findViewById(R.id.mid_guide);
 
         content.setOnClickListener(view -> adapterListener.onChatClicked(item));
     }
 
-    public void bind(Chat item, boolean isSignedInUser, boolean showDetails) {
+    public void bind(Chat item, boolean isSignedInUser, boolean showDetails, boolean showPicture) {
 
         this.item = item;
-        boolean chatFailed = !item.isSuccessful();
         Context context = itemView.getContext();
+        boolean chatFailed = !item.isSuccessful();
 
         content.setText(item.getContent());
         itemView.setAlpha(item.isEmpty() ? 0.6F : 1F);
-        image.setVisibility(isSignedInUser ? View.GONE : View.VISIBLE);
+        image.setVisibility(showPicture ? View.VISIBLE : View.GONE);
+        midGuide.setVisibility(showPicture ? View.VISIBLE : View.GONE);
         details.setVisibility(showDetails || item.isEmpty() || chatFailed ? View.VISIBLE : View.GONE);
+        content.setBackgroundResource(isSignedInUser ? R.drawable.bg_chat_box : R.drawable.bg_chat_box_alt);
 
         if (!isSignedInUser && !TextUtils.isEmpty(item.getImageUrl())) {
             Picasso.with(context)
@@ -61,14 +61,10 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
         else if (item.isEmpty()) details.setText(R.string.chat_sending);
         else if (showDetails) details.setText(getDetailsText(item, isSignedInUser, context));
 
-        int margin = context.getResources().getDimensionPixelOffset(R.dimen.triple_margin);
+        ConstraintLayout.LayoutParams detailsParams = (ConstraintLayout.LayoutParams) details.getLayoutParams();
+        ConstraintLayout.LayoutParams leftParams = (ConstraintLayout.LayoutParams) image.getLayoutParams();
 
-        ConstraintLayout.LayoutParams leftParams = (ConstraintLayout.LayoutParams) leftGuide.getLayoutParams();
-        ConstraintLayout.LayoutParams rightParams = (ConstraintLayout.LayoutParams) rightGuide.getLayoutParams();
-
-        leftParams.horizontalBias = isSignedInUser ? 1F : 0F;
-        leftParams.leftMargin = isSignedInUser ? margin : 0;
-        rightParams.rightMargin = isSignedInUser ? 0 : margin;
+        leftParams.horizontalBias = detailsParams.horizontalBias = isSignedInUser ? 1F : 0F;
     }
 
     private String getDetailsText(Chat item, boolean isSignedInUser, Context context) {

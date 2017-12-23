@@ -44,12 +44,14 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
         int size = chats.size();
 
         Chat chat = chats.get(i);
+        Chat prev = i == 0 ? null : chats.get(i - 1);
         Chat next = i < size - 1 ? chats.get(i + 1) : null;
 
         User chatUser = chat.getUser();
         boolean hideDetails = (next != null && chatUser.equals(next.getUser()));
+        boolean showPicture = !signedInUser.equals(chatUser) && (prev == null || !chatUser.equals(prev.getUser()));
 
-        viewHolder.bind(chat, signedInUser.equals(chat.getUser()), !hideDetails);
+        viewHolder.bind(chat, signedInUser.equals(chat.getUser()), !hideDetails, showPicture);
     }
 
     @Override
