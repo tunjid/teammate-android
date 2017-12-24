@@ -55,6 +55,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
         Team tempTeam = getArguments().getParcelable(ARG_TEAM);
@@ -65,6 +66,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -141,7 +143,7 @@ public final class EventsFragment extends MainActivityFragment
         FragmentTransaction superResult = super.provideFragmentTransaction(fragmentTo);
 
         if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
-            Bundle args = getArguments();
+            Bundle args = fragmentTo.getArguments();
             if (args == null) return superResult;
 
             Event event = args.getParcelable(EventEditFragment.ARG_EVENT);

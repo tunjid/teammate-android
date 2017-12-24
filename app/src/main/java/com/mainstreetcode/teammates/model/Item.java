@@ -4,16 +4,16 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
+import com.mainstreetcode.teammates.util.ObjectId;
+
 import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Item for listing properties of a {@link com.mainstreetcode.teammates.util.ListableBean}
- * <p>
- * Created by Shemanigans on 6/18/17.
  */
-public class Item<T> {
+public class Item<T> implements Identifiable {
 
     @Retention(SOURCE)
     @IntDef({INPUT, IMAGE, ROLE, DATE, ADDRESS, LOCATION})
@@ -30,7 +30,9 @@ public class Item<T> {
     private @StringRes final int stringRes;
     private @StringRes final int headerStringRes;
     private @Nullable final ValueChangeCallBack changeCallBack;
+
     private final T itemizedObject;
+    private final String id = new ObjectId().toHexString();
 
     private String value;
 
@@ -63,6 +65,9 @@ public class Item<T> {
     }
 
     public String getValue() {return this.value;}
+
+    @Override
+    public String getId() {return id;}
 
     public T getItemizedObject() {
         return itemizedObject;

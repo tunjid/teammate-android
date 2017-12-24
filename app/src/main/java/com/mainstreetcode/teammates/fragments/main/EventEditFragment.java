@@ -23,9 +23,13 @@ import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.HeaderedModel;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,6 +48,7 @@ public class EventEditFragment extends HeaderedFragment
     private boolean fromUserPickerAction;
     private Role currentRole = Role.empty();
     private Event event;
+    private final List<Identifiable> eventItems = new ArrayList<>();
 
     private RecyclerView recyclerView;
 
@@ -94,7 +99,7 @@ public class EventEditFragment extends HeaderedFragment
             }
         });
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new EventEditAdapter(event, true, this));
+        recyclerView.setAdapter(new EventEditAdapter(event, eventItems, true, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -137,11 +142,10 @@ public class EventEditFragment extends HeaderedFragment
 
         User user = userViewModel.getCurrentUser();
 
-        disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam())
-                .subscribe(this::onRoleUpdated, emptyErrorHandler));
+        disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
 
         if (!event.isEmpty() && !fromUserPickerAction) {
-            disposables.add(eventViewModel.getEvent(event).subscribe(updated -> recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
+            disposables.add(eventViewModel.getEvent(event, eventItems).subscribe(diffResult -> diffResult.dispatchUpdatesTo(recyclerView.getAdapter()), defaultErrorHandler));
         }
         fromUserPickerAction = false;
     }
@@ -191,13 +195,12 @@ public class EventEditFragment extends HeaderedFragment
         switch (view.getId()) {
             case R.id.fab:
                 boolean wasEmpty = event.isEmpty();
-                disposables.add(eventViewModel.updateEvent(event)
-                        .subscribe(updatedEvent -> {
-                            event.update(updatedEvent);
+                disposables.add(eventViewModel.updateEvent(event, eventItems)
+                        .subscribe(diffResult -> {
+                            diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
                             showSnackbar(wasEmpty
                                     ? getString(R.string.added_user, event.getName())
                                     : getString(R.string.updated_user, event.getName()));
-                            recyclerView.getAdapter().notifyDataSetChanged();
                         }, defaultErrorHandler));
                 break;
         }
@@ -247,9 +250,9 @@ public class EventEditFragment extends HeaderedFragment
 
     private void rsvpEvent(Event event, boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(result -> {
+        disposables.add(eventViewModel.rsvpEvent(event, eventItems, attending).subscribe(result -> {
+            result.dispatchUpdatesTo(recyclerView.getAdapter());
             toggleProgress(false);
-            recyclerView.getAdapter().notifyDataSetChanged();
         }, defaultErrorHandler));
     }
 

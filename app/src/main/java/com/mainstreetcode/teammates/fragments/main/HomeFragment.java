@@ -114,7 +114,7 @@ public final class HomeFragment extends MainActivityFragment
 
     private void rsvpEvent(FeedItem item, Event event, boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(result -> {
+        disposables.add(eventViewModel.rsvpEvent(event, new ArrayList<>(), attending).subscribe(result -> {
                     toggleProgress(false);
                     int index = feed.indexOf(item);
                     if (index >= 0) {

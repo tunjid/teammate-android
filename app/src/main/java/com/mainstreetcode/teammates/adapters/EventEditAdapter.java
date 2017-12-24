@@ -12,12 +12,13 @@ import com.mainstreetcode.teammates.adapters.viewholders.MapInputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Item;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
@@ -36,14 +37,13 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     private final boolean isEditable;
 
     private final Event event;
-    private final List<User> attendees;
-    private final List<User> absentees;
+    private final List<Identifiable> things;
 
-    public EventEditAdapter(Event event, boolean isEditable, EditAdapterListener listener) {
+    public EventEditAdapter(Event event, List<Identifiable> things, boolean isEditable, EditAdapterListener listener) {
         super(listener);
+        setHasStableIds(true);
         this.event = event;
-        attendees = event.getAttendees();
-        absentees = event.getAbsentees();
+        this.things = things;
         this.isEditable = isEditable;
     }
 
@@ -69,32 +69,33 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public void onBindViewHolder(BaseViewHolder viewHolder, int i) {
-        List<User> users = new ArrayList<>(attendees);
-        users.addAll(event.getAbsentees());
+        Object thing = things.get(i);
+        List<User> attendees = event.getAttendees();
 
-        int guestStartIndex = event.size();
-        int guestEndIndex = guestStartIndex + users.size();
-        if (i > guestEndIndex) return;
-        if (i == guestStartIndex) ((TeamViewHolder) viewHolder).bind(event.getTeam());
-        else if (i > guestStartIndex && i <= guestEndIndex)
-            ((EventGuestViewHolder) viewHolder).bind(users.get(i - guestStartIndex - 1), attendees.contains(users.get(i - guestStartIndex - 1)));
-        else ((BaseItemViewHolder) viewHolder).bind(event.get(i));
+        if (thing instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) thing);
+        else if (thing instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) thing);
+        else if (thing instanceof User)
+            ((EventGuestViewHolder) viewHolder).bind((User) thing, attendees.contains(thing));
     }
 
     @Override
     public int getItemCount() {
-        return event.size() + attendees.size() + absentees.size() + 1;
+        return things.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return things.get(position).getId().hashCode();
     }
 
     @Override
     public int getItemViewType(int position) {
-        int guestStartIndex = event.size();
-        int guestEndIndex = guestStartIndex + attendees.size() + absentees.size();
-        return position == guestStartIndex
+        Object thing = things.get(position);
+        return thing instanceof Item
+                ? ((Item) thing).getItemType()
+                : thing instanceof Team
                 ? TEAM
-                : position <= guestEndIndex && position > guestStartIndex
-                ? GUEST
-                : event.get(position).getItemType();
+                : GUEST;
     }
 
     public interface EditAdapterListener extends

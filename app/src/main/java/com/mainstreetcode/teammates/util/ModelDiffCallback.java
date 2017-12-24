@@ -3,16 +3,16 @@ package com.mainstreetcode.teammates.util;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
-import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.Identifiable;
 
 import java.util.List;
 
 public class ModelDiffCallback extends DiffUtil.Callback {
 
-    private final List<? extends Model> stale;
-    private final List<? extends Model> updated;
+    private final List<? extends Identifiable> stale;
+    private final List<? extends Identifiable> updated;
 
-    public ModelDiffCallback(List<? extends Model> updated, List<? extends Model> stale) {
+    public ModelDiffCallback(List<? extends Identifiable> updated, List<? extends Identifiable> stale) {
         this.updated = updated;
         this.stale = stale;
     }
