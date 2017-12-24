@@ -55,13 +55,13 @@ public class MediaUploadIntentService extends IntentService {
      * parameters.
      */
     private void handleActionUpload(Team team, List<Uri> mediaUris) {
-        ModelRepository<Media> respository = MediaRepository.getInstance();
+        ModelRepository<Media> repository = MediaRepository.getInstance();
 
         for (Uri uri : mediaUris) {
             Media media = new Media("", new File(uri.getPath()).toString(),
                     "", "", User.empty(), team, new Date());
 
-            respository.createOrUpdate(media).subscribe(ignored -> {}, ErrorHandler.EMPTY);
+            repository.createOrUpdate(media).subscribe(ignored -> {}, ErrorHandler.EMPTY);
         }
     }
 }

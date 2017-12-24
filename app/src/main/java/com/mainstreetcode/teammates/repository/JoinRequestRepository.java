@@ -19,7 +19,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
 import static io.reactivex.Single.just;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
@@ -46,7 +45,7 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
     @Override
     public Single<JoinRequest> createOrUpdate(JoinRequest model) {
         Single<JoinRequest> call = model.isUserApproved() ? api.joinTeam(model) : api.inviteUser(model);
-        return call.map(localMapper(model)).map(getSaveFunction()).observeOn(mainThread());
+        return call.map(localMapper(model)).map(getSaveFunction());
     }
 
     @Override

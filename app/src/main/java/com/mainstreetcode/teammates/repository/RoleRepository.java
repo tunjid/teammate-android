@@ -22,7 +22,6 @@ import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
 import static io.reactivex.Single.just;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class RoleRepository extends ModelRepository<Role> {
@@ -57,7 +56,7 @@ public class RoleRepository extends ModelRepository<Role> {
             roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
         }
 
-        return roleSingle.map(localMapper(model)).map(getSaveFunction()).observeOn(mainThread());
+        return roleSingle.map(localMapper(model)).map(getSaveFunction());
     }
 
     @Override
@@ -92,8 +91,7 @@ public class RoleRepository extends ModelRepository<Role> {
     }
 
     public Single<Role> approveUser(JoinRequest request) {
-        Single<Role> observable = api.approveUser(request.getId()).map(getSaveFunction());
-        return observable.observeOn(mainThread());
+       return api.approveUser(request.getId()).map(getSaveFunction());
     }
 
     public Single<Role> dropRole(Role role) {
@@ -101,6 +99,6 @@ public class RoleRepository extends ModelRepository<Role> {
     }
 
     public Maybe<Role> getRoleInTeam(String userId, String teamId) {
-        return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io()).observeOn(mainThread());
+        return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io());
     }
 }

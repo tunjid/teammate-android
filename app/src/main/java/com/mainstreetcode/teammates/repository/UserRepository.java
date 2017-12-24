@@ -28,7 +28,6 @@ import okhttp3.MultipartBody;
 
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static io.reactivex.Single.just;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class UserRepository extends ModelRepository<User> {
@@ -136,8 +135,7 @@ public class UserRepository extends ModelRepository<User> {
         return api.signOut(deviceId)
                 .flatMap(result -> local)
                 .onErrorResumeNext(throwable -> local)
-                .subscribeOn(io())
-                .observeOn(mainThread());
+                .subscribeOn(io());
     }
 
     public boolean isSignedIn() {
@@ -186,8 +184,7 @@ public class UserRepository extends ModelRepository<User> {
                             .putString(EMAIL_KEY, user.getPrimaryEmail())
                             .apply();
                     return user;
-                })
-                .observeOn(mainThread());
+                });
 
         result.subscribe(currentUserUpdater, throwable -> {});
         return result;

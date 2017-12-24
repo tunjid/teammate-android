@@ -82,10 +82,9 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     private Single<List<Chat>> fetchUnreadChats(FeedItem<Chat> item, Team team) {
-        ChatRepository repository = ChatRepository.getInstance();
         sender.update(team);
+        ChatRepository repository = ChatRepository.getInstance();
         return repository.fetchUnreadChats(item.getModel().getTeam())
-                .subscribeOn(io())
                 .observeOn(mainThread());
     }
 

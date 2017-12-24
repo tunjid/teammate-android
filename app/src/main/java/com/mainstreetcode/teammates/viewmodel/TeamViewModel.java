@@ -35,7 +35,7 @@ public class TeamViewModel extends ViewModel {
     }
 
     public Single<Team> createOrUpdate(Team team) {
-        return repository.createOrUpdate(team);
+        return repository.createOrUpdate(team).observeOn(mainThread());
     }
 
     public Flowable<DiffUtil.DiffResult> getTeam(Team team) {
@@ -58,15 +58,15 @@ public class TeamViewModel extends ViewModel {
     }
 
     public Single<List<Team>> findTeams(String queryText) {
-        return repository.findTeams(queryText);
+        return repository.findTeams(queryText).observeOn(mainThread());
     }
 
     public Flowable<List<Team>> getMyTeams(String userId) {
-        return repository.getMyTeams(userId);
+        return repository.getMyTeams(userId).observeOn(mainThread());
     }
 
     public Single<Team> deleteTeam(Team team) {
-        return repository.delete(team);
+        return repository.delete(team).observeOn(mainThread());
     }
 
     public Team getDefaultTeam() {

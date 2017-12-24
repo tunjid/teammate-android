@@ -37,12 +37,20 @@ public class EventViewModel extends ViewModel {
     }
 
     public Flowable<DiffUtil.DiffResult> getEvents(List<Event> source, String teamId) {
-        return repository.getEvents(teamId).map(updatedEvents -> {
-            List<Event> copy = new ArrayList<>(source);
-            ModelUtils.preserveList(source, updatedEvents);
+        final List<Event> updated = new ArrayList<>(source);
 
-            return calculateDiff(new ModelDiffCallback(source, copy));
-        });
+        return repository.getEvents(teamId).concatMapDelayError(fetchedEvents -> Flowable.fromCallable(() -> {
+            List<Event> stale = new ArrayList<>(source);
+            ModelUtils.preserveList(updated, fetchedEvents);
+
+            return calculateDiff(new ModelDiffCallback(updated, stale));
+        })
+                .subscribeOn(computation())
+                .observeOn(mainThread()))
+                .doOnNext(diffResult -> {
+                    source.clear();
+                    source.addAll(updated);
+                });
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {

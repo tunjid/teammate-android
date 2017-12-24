@@ -19,7 +19,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class EventRepository extends ModelRepository<Event> {
@@ -59,7 +58,7 @@ public class EventRepository extends ModelRepository<Event> {
             eventSingle = eventSingle.flatMap(put -> api.uploadEventPhoto(event.getId(), body));
         }
 
-        return eventSingle.map(getSaveFunction()).observeOn(mainThread());
+        return eventSingle.map(getSaveFunction());
     }
 
     @Override
@@ -87,8 +86,7 @@ public class EventRepository extends ModelRepository<Event> {
     public Single<Event> rsvpEvent(final Event event, boolean attending) {
         return api.rsvpEvent(event.getId(), attending)
                 .map(localMapper(event))
-                .map(getSaveFunction())
-                .observeOn(mainThread());
+                .map(getSaveFunction());
     }
 
     @Override

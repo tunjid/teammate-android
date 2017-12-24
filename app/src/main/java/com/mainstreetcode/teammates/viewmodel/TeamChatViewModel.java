@@ -59,11 +59,12 @@ public class TeamChatViewModel extends ViewModel {
         return repository.listenForChat(team)
                 .onErrorResumeNext(listenRetryFunction(team))
                 .doOnSubscribe(subscription -> notifier.setChatVisibility(team, true))
-                .doFinally(() -> notifier.setChatVisibility(team, false));
+                .doFinally(() -> notifier.setChatVisibility(team, false))
+                .observeOn(mainThread());
     }
 
     public Completable post(Chat chat) {
-        return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0));
+        return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0)).observeOn(mainThread());
     }
 
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<Chat> chats, final Team team, Date date) {
@@ -114,6 +115,7 @@ public class TeamChatViewModel extends ViewModel {
                 .onErrorResumeNext(listenRetryFunction(team))
                 .doOnSubscribe(subscription -> notifier.setChatVisibility(team, true))
                 .doFinally(() -> notifier.setChatVisibility(team, false))
+                .observeOn(mainThread())
                 : Flowable.error(throwable)
         );
     }
@@ -122,7 +124,7 @@ public class TeamChatViewModel extends ViewModel {
         return throwable -> {
             int retries = previousRetries + 1;
             return retries <= 3
-                    ? Completable.timer(300, TimeUnit.MILLISECONDS).andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries)))
+                    ? Completable.timer(300, TimeUnit.MILLISECONDS).andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries))).observeOn(mainThread())
                     : Completable.error(throwable);
         };
     }

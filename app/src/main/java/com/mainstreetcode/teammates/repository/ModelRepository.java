@@ -26,7 +26,6 @@ import okhttp3.RequestBody;
 import retrofit2.HttpException;
 
 import static io.reactivex.Maybe.concat;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * Repository that manages {@link Model} CRUD operations
@@ -72,12 +71,12 @@ public abstract class ModelRepository<T extends Model<T>> {
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
         AtomicReference<T> reference = new AtomicReference<>();
         local = local.doOnSuccess(reference::set);
-        return fetchThenGet(local, remote)
-                .doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
+
+        return fetchThenGet(local, remote).doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
     }
 
     static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
-        return concat(local, remote).observeOn(mainThread(), true);
+        return concat(local, remote);
     }
 
     final void deleteInvalidModel(T model, Throwable throwable) {

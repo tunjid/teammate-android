@@ -36,7 +36,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
 import static com.mainstreetcode.teammates.socket.SocketFactory.EVENT_NEW_MESSAGE;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 import static io.socket.client.Socket.EVENT_ERROR;
 
@@ -127,7 +126,6 @@ public class ChatRepository extends ModelRepository<Chat> {
         User currentUser = UserRepository.getInstance().getCurrentUser();
         return chatDao.unreadChats(team.getId(), currentUser, getLastTeamSeen(team))
                 .subscribeOn(io())
-                .observeOn(mainThread())
                 .toSingle();
     }
 
@@ -146,8 +144,7 @@ public class ChatRepository extends ModelRepository<Chat> {
                     if (!emitter.isCancelled()) emitter.onError((Throwable) args[0]);
                 });
             }, BackpressureStrategy.DROP)
-                    .filter(chat -> team.equals(chat.getTeam()) && !signedInUser.equals(chat.getUser()))
-                    .observeOn(mainThread());
+                    .filter(chat -> team.equals(chat.getTeam()) && !signedInUser.equals(chat.getUser()));
         });
     }
 
@@ -165,7 +162,7 @@ public class ChatRepository extends ModelRepository<Chat> {
                 emitter.onComplete();
             });
 
-        }).observeOn(mainThread()));
+        }));
     }
 
     public void updateLastSeen(Team team) {
