@@ -21,7 +21,7 @@ import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammates.fragments.main.ChatFragment;
-import com.mainstreetcode.teammates.fragments.main.TeamMediaFragment;
+import com.mainstreetcode.teammates.fragments.main.MediaFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Model;
@@ -49,7 +49,7 @@ public class MainActivity extends TeammatesBaseActivity {
             if (t.contains(HomeFragment.class.getSimpleName())) id = R.id.action_home;
             else if (t.contains(EventsFragment.class.getSimpleName())) id = R.id.action_events;
             else if (t.contains(ChatFragment.class.getSimpleName())) id = R.id.action_messages;
-            else if (t.contains(TeamMediaFragment.class.getSimpleName())) id = R.id.action_media;
+            else if (t.contains(MediaFragment.class.getSimpleName())) id = R.id.action_media;
             else if (t.contains(TeamsFragment.class.getSimpleName())) id = R.id.action_team;
 
             if (id == 0) return;

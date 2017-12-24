@@ -82,7 +82,7 @@ public class ChatFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_team_chat, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
 

@@ -13,7 +13,7 @@ import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.ChatFragment;
-import com.mainstreetcode.teammates.fragments.main.TeamMediaFragment;
+import com.mainstreetcode.teammates.fragments.main.MediaFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Team;
 
@@ -91,7 +91,7 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
                 showFragment(ChatFragment.newInstance(item));
                 break;
             case R.id.request_media_team_pick:
-                showFragment(TeamMediaFragment.newInstance(item));
+                showFragment(MediaFragment.newInstance(item));
                 break;
         }
     }

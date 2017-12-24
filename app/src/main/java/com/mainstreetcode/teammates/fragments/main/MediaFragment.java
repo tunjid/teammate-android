@@ -35,7 +35,7 @@ import java.util.List;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
-public class TeamMediaFragment extends MainActivityFragment
+public class MediaFragment extends MainActivityFragment
         implements ImageWorkerFragment.MediaListener {
 
     private static final String ARG_TEAM = "team";
@@ -45,8 +45,8 @@ public class TeamMediaFragment extends MainActivityFragment
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
-    public static TeamMediaFragment newInstance(Team team) {
-        TeamMediaFragment fragment = new TeamMediaFragment();
+    public static MediaFragment newInstance(Team team) {
+        MediaFragment fragment = new MediaFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
@@ -78,7 +78,7 @@ public class TeamMediaFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_team_media, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_media, container, false);
 
         recyclerView = rootView.findViewById(R.id.team_media);
 
