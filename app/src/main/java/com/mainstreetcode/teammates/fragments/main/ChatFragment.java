@@ -37,7 +37,7 @@ import io.reactivex.disposables.Disposable;
 import static android.text.TextUtils.isEmpty;
 import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
 
-public class TeamChatFragment extends MainActivityFragment
+public class ChatFragment extends MainActivityFragment
         implements
         TextView.OnEditorActionListener,
         TeamChatAdapter.ChatAdapterListener {
@@ -51,8 +51,8 @@ public class TeamChatFragment extends MainActivityFragment
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
-    public static TeamChatFragment newInstance(Team team) {
-        TeamChatFragment fragment = new TeamChatFragment();
+    public static ChatFragment newInstance(Team team) {
+        ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
@@ -190,7 +190,7 @@ public class TeamChatFragment extends MainActivityFragment
     private void fetchChatsBefore(Date date) {
         disposables.add(teamChatViewModel
                 .chatsBefore(chats, team, date)
-                .subscribe(TeamChatFragment.this::onChatsUpdated, defaultErrorHandler));
+                .subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
     private void subscribeToChat() {

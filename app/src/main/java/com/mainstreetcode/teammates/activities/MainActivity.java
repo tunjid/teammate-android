@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,7 +20,7 @@ import com.mainstreetcode.teammates.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
-import com.mainstreetcode.teammates.fragments.main.TeamChatFragment;
+import com.mainstreetcode.teammates.fragments.main.ChatFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamMediaFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Event;
@@ -46,7 +48,7 @@ public class MainActivity extends TeammatesBaseActivity {
 
             if (t.contains(HomeFragment.class.getSimpleName())) id = R.id.action_home;
             else if (t.contains(EventsFragment.class.getSimpleName())) id = R.id.action_events;
-            else if (t.contains(TeamChatFragment.class.getSimpleName())) id = R.id.action_messages;
+            else if (t.contains(ChatFragment.class.getSimpleName())) id = R.id.action_messages;
             else if (t.contains(TeamMediaFragment.class.getSimpleName())) id = R.id.action_media;
             else if (t.contains(TeamsFragment.class.getSimpleName())) id = R.id.action_team;
 
@@ -75,7 +77,13 @@ public class MainActivity extends TeammatesBaseActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
 
-        route(savedInstanceState);
+        route(savedInstanceState, getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        route(null, intent);
     }
 
     @Override
@@ -103,16 +111,13 @@ public class MainActivity extends TeammatesBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void route(Bundle savedInstanceState) {
-        Intent intent = getIntent();
+    private void route(@Nullable Bundle savedInstanceState, @NonNull Intent intent) {
         Model model = intent.getParcelableExtra(FEED_DEEP_LINK);
-
         BaseFragment route = null;
 
         if (model != null) {
             if (model instanceof Event) route = EventEditFragment.newInstance((Event) model);
-            if (model instanceof Chat)
-                route = TeamChatFragment.newInstance(((Chat) model).getTeam());
+            if (model instanceof Chat) route = ChatFragment.newInstance(((Chat) model).getTeam());
         }
         else if (savedInstanceState == null) route = HomeFragment.newInstance();
 

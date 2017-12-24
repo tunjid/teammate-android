@@ -10,8 +10,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/image"
-        android:layout_width="@dimen/double_and_half_margin"
-        android:layout_height="@dimen/double_and_half_margin"
+        android:layout_width="@dimen/double_margin"
+        android:layout_height="@dimen/double_margin"
         android:contentDescription="@string/image_description"
         android:maxHeight="@dimen/double_and_half_margin"
         android:maxWidth="@dimen/double_and_half_margin"

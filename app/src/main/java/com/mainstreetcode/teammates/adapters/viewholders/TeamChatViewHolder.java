@@ -20,7 +20,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapterListener> {
 
     private Chat item;
-    private View midGuide;
+    private View space;
     private ImageView image;
     private TextView content;
     private TextView details;
@@ -29,10 +29,9 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
     public TeamChatViewHolder(View itemView, TeamChatAdapter.ChatAdapterListener listener) {
         super(itemView, listener);
         image = itemView.findViewById(R.id.image);
+        space = itemView.findViewById(R.id.mid_guide);
         details = itemView.findViewById(R.id.details);
         content = itemView.findViewById(R.id.content);
-        midGuide = itemView.findViewById(R.id.mid_guide);
-
         content.setOnClickListener(view -> adapterListener.onChatClicked(item));
     }
 
@@ -45,7 +44,7 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
         content.setText(item.getContent());
         itemView.setAlpha(item.isEmpty() ? 0.6F : 1F);
         image.setVisibility(showPicture ? View.VISIBLE : View.GONE);
-        midGuide.setVisibility(showPicture ? View.VISIBLE : View.GONE);
+        space.setVisibility(showPicture ? View.VISIBLE : View.GONE);
         details.setVisibility(showDetails || item.isEmpty() || chatFailed ? View.VISIBLE : View.GONE);
         content.setBackgroundResource(isSignedInUser ? R.drawable.bg_chat_box : R.drawable.bg_chat_box_alt);
 
