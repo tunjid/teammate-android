@@ -71,8 +71,9 @@ public abstract class ModelRepository<T extends Model<T>> {
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
         AtomicReference<T> reference = new AtomicReference<>();
         local = local.doOnSuccess(reference::set);
+        remote = remote.doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
 
-        return fetchThenGet(local, remote).doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
+        return fetchThenGet(local, remote);
     }
 
     static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {

@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammates.model.Message;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+
+import retrofit2.HttpException;
 
 /**
  * Static methods for models
@@ -95,5 +98,12 @@ public class ModelUtils {
         Collections.sort(source);
 
         return source;
+    }
+
+    public static <T> void checkForInvalidObject(Throwable throwable, T model, List<T> list) {
+        if (!(throwable instanceof HttpException)) return;
+        Message message = new Message((HttpException) throwable);
+
+        if (message.isInvalidObject()) list.remove(model);
     }
 }

@@ -29,7 +29,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class MediaFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Media> mediaList = new ArrayList<>();
+    private List<Media> mediaList;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -71,6 +70,7 @@ public class MediaFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
+        mediaList = mediaViewModel.getMediaList(team);
 
         ImageWorkerFragment.attach(this);
     }

@@ -172,7 +172,7 @@ public interface TeammateApi {
     Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
 
     @Multipart
-    @POST("api/team/media/{teamId}")
+    @POST("api/teams/media/{teamId}")
     Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
 
 
