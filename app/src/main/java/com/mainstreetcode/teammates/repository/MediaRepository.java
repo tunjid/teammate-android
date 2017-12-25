@@ -29,7 +29,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class MediaRepository extends ModelRepository<Media> {
@@ -65,7 +64,7 @@ public class MediaRepository extends ModelRepository<Media> {
         if (body == null) return Single.error(new TeammateException("Unable to upload media"));
 
         Single<Media> mediaSingle = api.uploadTeamMedia(model.getTeam().getId(), body);
-        mediaSingle = mediaSingle.map(localMapper(model)).map(getSaveFunction()).observeOn(mainThread());
+        mediaSingle = mediaSingle.map(localMapper(model)).map(getSaveFunction());
 
         return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());
     }

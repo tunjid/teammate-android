@@ -85,7 +85,7 @@ public class Item<T> implements Identifiable {
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        return id.hashCode();
     }
 
     // Used to change the value of the Team's fields

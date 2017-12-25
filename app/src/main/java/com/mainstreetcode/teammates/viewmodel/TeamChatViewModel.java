@@ -6,10 +6,10 @@ import android.support.v7.util.DiffUtil;
 import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.repository.ChatRepository;
-import com.mainstreetcode.teammates.util.ModelDiffCallback;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.io.EOFException;
@@ -28,7 +28,6 @@ import io.socket.engineio.client.EngineIOException;
 import static io.reactivex.Flowable.concat;
 import static io.reactivex.Flowable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-import static io.reactivex.schedulers.Schedulers.computation;
 
 
 public class TeamChatViewModel extends ViewModel {
@@ -59,53 +58,40 @@ public class TeamChatViewModel extends ViewModel {
         return repository.listenForChat(team)
                 .onErrorResumeNext(listenRetryFunction(team))
                 .doOnSubscribe(subscription -> notifier.setChatVisibility(team, true))
-                .doFinally(() -> notifier.setChatVisibility(team, false));
+                .doFinally(() -> notifier.setChatVisibility(team, false))
+                .observeOn(mainThread());
     }
 
     public Completable post(Chat chat) {
-        return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0));
+        return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0)).observeOn(mainThread());
     }
 
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<Chat> chats, final Team team, Date date) {
         final Integer lastSize = chatMap.get(team);
         final Integer currentSize = chats.size();
 
-        if (currentSize.equals(NO_MORE)) return just(getPair(false, getDiffResult(chats, chats)));
-        if (currentSize.equals(lastSize)) return just(getPair(true, getDiffResult(chats, chats)));
+        if (currentSize.equals(NO_MORE)) return getDiffResult(false, chats);
+        if (currentSize.equals(lastSize)) return getDiffResult(true, chats);
 
         chatMap.put(team, currentSize);
 
-        final List<Chat> updated = new ArrayList<>(chats);
+        Flowable<List<Chat>> sourceFlowable = repository.chatsBefore(team, date)
+                .doOnError(throwable -> chatMap.put(team, RETRY))
+                .doOnCancel(() -> chatMap.put(team, RETRY));
 
-        return concat(
-                Flowable.fromCallable(() -> getPair(true, getDiffResult(chats, chats)))
-                        .subscribeOn(computation())
-                        .observeOn(mainThread()),
-                repository.chatsBefore(team, date)
-                        .doOnError(throwable -> chatMap.put(team, RETRY))
-                        .doOnCancel(() -> chatMap.put(team, RETRY))
-                        .concatMapDelayError(fetchedChats -> Flowable.fromCallable(() -> {
-                                    ModelUtils.preserveList(updated, fetchedChats);
-                                    List<Chat> stale = new ArrayList<>(chats);
+        Flowable<Pair<Boolean, DiffUtil.DiffResult>> immediate = getDiffResult(true, chats);
 
-                                    if (updated.size() == currentSize) chatMap.put(team, NO_MORE);
-                                    return getPair(false, getDiffResult(updated, stale));
-                                })
-                                        .subscribeOn(computation())
-                                        .observeOn(mainThread())
-                                        .doOnNext(pair -> {
-                                            chats.clear();
-                                            chats.addAll(updated);
-                                        })
-                        ));
+        Flowable<Pair<Boolean, DiffUtil.DiffResult>> fetched = Identifiable.diff(sourceFlowable, () -> chats, ModelUtils::preserveList)
+                .map(diffResult -> new Pair<>(false, diffResult))
+                .doOnNext(pair -> {if (chats.size() == currentSize) chatMap.put(team, NO_MORE);});
+
+        return concat(immediate, fetched);
     }
 
-    private DiffUtil.DiffResult getDiffResult(List<Chat> updated, List<Chat> stale) {
-        return DiffUtil.calculateDiff(new ModelDiffCallback(updated, stale));
-    }
-
-    private Pair<Boolean, DiffUtil.DiffResult> getPair(Boolean flag, DiffUtil.DiffResult diffResult) {
-        return new Pair<>(flag, diffResult);
+    private Flowable<Pair<Boolean, DiffUtil.DiffResult>> getDiffResult(boolean showProgress, List<Chat> chats) {
+        Flowable<List<Chat>> sourceFlowable = just(new ArrayList<Chat>());
+        return Identifiable.diff(sourceFlowable, () -> chats, (sameChats, emptyAdditions) -> sameChats)
+                .map(diffResult -> new Pair<>(showProgress, diffResult));
     }
 
     private Function<Throwable, Flowable<Chat>> listenRetryFunction(Team team) {
@@ -114,6 +100,7 @@ public class TeamChatViewModel extends ViewModel {
                 .onErrorResumeNext(listenRetryFunction(team))
                 .doOnSubscribe(subscription -> notifier.setChatVisibility(team, true))
                 .doFinally(() -> notifier.setChatVisibility(team, false))
+                .observeOn(mainThread())
                 : Flowable.error(throwable)
         );
     }
@@ -122,7 +109,7 @@ public class TeamChatViewModel extends ViewModel {
         return throwable -> {
             int retries = previousRetries + 1;
             return retries <= 3
-                    ? Completable.timer(300, TimeUnit.MILLISECONDS).andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries)))
+                    ? Completable.timer(300, TimeUnit.MILLISECONDS).andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries))).observeOn(mainThread())
                     : Completable.error(throwable);
         };
     }

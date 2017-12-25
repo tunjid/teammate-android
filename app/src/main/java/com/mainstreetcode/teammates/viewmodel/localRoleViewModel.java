@@ -9,6 +9,8 @@ import com.mainstreetcode.teammates.repository.RoleRepository;
 
 import io.reactivex.Maybe;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 /**
  * ViewModel for signed in team
  * <p>
@@ -27,7 +29,7 @@ public class localRoleViewModel extends ViewModel {
 
     public Maybe<Role> getRoleInTeam(User user, Team team) {
         return !role.isEmpty() ? Maybe.just(role) : repository.getRoleInTeam(user.getId(), team.getId())
-                .map(this::onRoleFound);
+                .map(this::onRoleFound).observeOn(mainThread());
     }
 
     private Role onRoleFound(Role foundRole) {

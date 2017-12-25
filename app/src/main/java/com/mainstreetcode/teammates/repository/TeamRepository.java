@@ -26,7 +26,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class TeamRepository extends ModelRepository<Team> {
@@ -40,16 +39,16 @@ public class TeamRepository extends ModelRepository<Team> {
     private final TeammateApi api;
     private final TeamDao teamDao;
     private final ModelRepository<User> userRepository;
-    private final ModelRepository<Role> roleRespository;
-    private final ModelRepository<JoinRequest> joinRequestRespository;
+    private final ModelRepository<Role> roleRepository;
+    private final ModelRepository<JoinRequest> joinRequestRepository;
 
     private TeamRepository() {
         app = Application.getInstance();
         api = TeammateService.getApiInstance();
         teamDao = AppDatabase.getInstance().teamDao();
         userRepository = UserRepository.getInstance();
-        roleRespository = RoleRepository.getInstance();
-        joinRequestRespository = JoinRequestRepository.getInstance();
+        roleRepository = RoleRepository.getInstance();
+        joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
     public static TeamRepository getInstance() {
@@ -75,7 +74,7 @@ public class TeamRepository extends ModelRepository<Team> {
             teamSingle = teamSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
         }
 
-        return teamSingle.map(getSaveFunction()).observeOn(mainThread());
+        return teamSingle.map(getSaveFunction());
     }
 
     @Override
@@ -115,15 +114,15 @@ public class TeamRepository extends ModelRepository<Team> {
             teamDao.upsert(Collections.unmodifiableList(models));
 
             if (!users.isEmpty()) userRepository.getSaveManyFunction().apply(users);
-            if (!roles.isEmpty()) roleRespository.getSaveManyFunction().apply(roles);
-            if (!requests.isEmpty()) joinRequestRespository.getSaveManyFunction().apply(requests);
+            if (!roles.isEmpty()) roleRepository.getSaveManyFunction().apply(roles);
+            if (!requests.isEmpty()) joinRequestRepository.getSaveManyFunction().apply(requests);
 
             return models;
         };
     }
 
     public Single<List<Team>> findTeams(String queryText) {
-        return api.findTeam(queryText).observeOn(mainThread());
+        return api.findTeam(queryText);
     }
 
     public Flowable<List<Team>> getMyTeams(String userId) {

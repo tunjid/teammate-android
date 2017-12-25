@@ -14,10 +14,10 @@ import java.util.List;
 import io.reactivex.Single;
 import io.reactivex.subjects.ReplaySubject;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 /**
- * ViewModel for signed in team
- * <p>
- * Created by Shemanigans on 6/4/17.
+ * ViewModel for roles in a team
  */
 
 public class RoleViewModel extends ViewModel {
@@ -43,22 +43,22 @@ public class RoleViewModel extends ViewModel {
     }
 
     public Single<Role> updateRole(Role role) {
-        return repository.createOrUpdate(role);
+        return repository.createOrUpdate(role).observeOn(mainThread());
     }
 
     public Single<Role> approveUser(JoinRequest request) {
-        return repository.approveUser(request);
+        return repository.approveUser(request).observeOn(mainThread());
     }
 
     public Single<JoinRequest> joinTeam(JoinRequest joinRequest) {
-        return joinRequestRepository.createOrUpdate(joinRequest);
+        return joinRequestRepository.createOrUpdate(joinRequest).observeOn(mainThread());
     }
 
     public Single<JoinRequest> declineUser(JoinRequest request) {
-        return joinRequestRepository.dropJoinRequest(request);
+        return joinRequestRepository.dropJoinRequest(request).observeOn(mainThread());
     }
 
     public Single<Role> dropRole(Role role) {
-        return repository.dropRole(role);
+        return repository.dropRole(role).observeOn(mainThread());
     }
 }
