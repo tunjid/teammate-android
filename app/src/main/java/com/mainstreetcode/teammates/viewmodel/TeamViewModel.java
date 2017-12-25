@@ -3,11 +3,11 @@ package com.mainstreetcode.teammates.viewmodel;
 import android.arch.lifecycle.ViewModel;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.util.ModelDiffCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class TeamViewModel extends ViewModel {
                     original.clear();
                     original.addAll(updated);
 
-                    return calculateDiff(new ModelDiffCallback(updated, stale));
+                    return calculateDiff(new Identifiable.IdentifiableDiffCallback(updated, stale));
                 })
                         .subscribeOn(computation())
                         .observeOn(mainThread()));
