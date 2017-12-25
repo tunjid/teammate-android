@@ -119,7 +119,7 @@ public class TeamDetailFragment extends MainActivityFragment
         updateCurrentRole();
 
         disposables.add(roleViewModel.getRoleValues().subscribe(this::onRolesUpdated, ErrorHandler.EMPTY));
-        disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
+        disposables.add(teamViewModel.getTeam(team, teamModels).subscribe(this::onTeamUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -223,7 +223,6 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private void onTeamUpdated(DiffUtil.DiffResult diffResult) {
         updateCurrentRole();
-        updateTeamModels();
         diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
 
         Activity activity = getActivity();
@@ -270,12 +269,6 @@ public class TeamDetailFragment extends MainActivityFragment
         toggleFab(showsFab());
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();
-    }
-
-    private void updateTeamModels() {
-        teamModels.clear();
-        teamModels.addAll(team.getRoles());
-        teamModels.addAll(team.getJoinRequests());
     }
 
     @SuppressLint("InflateParams")
