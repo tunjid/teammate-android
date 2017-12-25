@@ -62,6 +62,8 @@ public class ImageMediaViewHolder extends MediaViewHolder
 
         RequestCreator creator = Picasso.with(itemView.getContext()).load(url);
 
+        if (!isFullScreen) creator.placeholder(R.drawable.bg_image_placeholder);
+
         creator = fitToSize ? creator.fit() : creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         creator = creator.centerInside();
 
