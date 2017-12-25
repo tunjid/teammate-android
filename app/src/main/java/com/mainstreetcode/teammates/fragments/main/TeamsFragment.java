@@ -24,8 +24,6 @@ import com.mainstreetcode.teammates.model.Team;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.functions.Consumer;
-
 /**
  * Searches for teams
  */
