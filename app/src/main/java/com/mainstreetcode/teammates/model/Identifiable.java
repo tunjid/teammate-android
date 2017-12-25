@@ -52,7 +52,7 @@ public interface Identifiable {
         private final List<? extends Identifiable> stale;
         private final List<? extends Identifiable> updated;
 
-        public IdentifiableDiffCallback(List<? extends Identifiable> updated, List<? extends Identifiable> stale) {
+        IdentifiableDiffCallback(List<? extends Identifiable> updated, List<? extends Identifiable> stale) {
             this.updated = updated;
             this.stale = stale;
         }

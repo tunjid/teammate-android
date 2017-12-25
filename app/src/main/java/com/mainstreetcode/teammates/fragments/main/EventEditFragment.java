@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -145,7 +146,7 @@ public class EventEditFragment extends HeaderedFragment
         disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
 
         if (!event.isEmpty() && !fromUserPickerAction) {
-            disposables.add(eventViewModel.getEvent(event, eventItems).subscribe(diffResult -> diffResult.dispatchUpdatesTo(recyclerView.getAdapter()), defaultErrorHandler));
+            disposables.add(eventViewModel.getEvent(event, eventItems).subscribe(this::onEventChanged, defaultErrorHandler));
         }
         fromUserPickerAction = false;
     }
@@ -197,7 +198,7 @@ public class EventEditFragment extends HeaderedFragment
                 boolean wasEmpty = event.isEmpty();
                 disposables.add(eventViewModel.updateEvent(event, eventItems)
                         .subscribe(diffResult -> {
-                            diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+                            onEventChanged(diffResult);
                             showSnackbar(wasEmpty
                                     ? getString(R.string.added_user, event.getName())
                                     : getString(R.string.updated_user, event.getName()));
@@ -250,10 +251,12 @@ public class EventEditFragment extends HeaderedFragment
 
     private void rsvpEvent(Event event, boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, eventItems, attending).subscribe(result -> {
-            result.dispatchUpdatesTo(recyclerView.getAdapter());
-            toggleProgress(false);
-        }, defaultErrorHandler));
+        disposables.add(eventViewModel.rsvpEvent(event, eventItems, attending).subscribe(this::onEventChanged, defaultErrorHandler));
+    }
+
+    private void onEventChanged(DiffUtil.DiffResult result) {
+        result.dispatchUpdatesTo(recyclerView.getAdapter());
+        toggleProgress(false);
     }
 
     private void onRoleUpdated(Role role) {
