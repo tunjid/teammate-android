@@ -145,6 +145,10 @@ public class User extends UserEntity implements
 
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive()) {
+                return new User(json.getAsString(), "", "", "", "");
+            }
+
             JsonObject userObject = json.getAsJsonObject();
 
             String id = asString(UID_KEY, userObject);

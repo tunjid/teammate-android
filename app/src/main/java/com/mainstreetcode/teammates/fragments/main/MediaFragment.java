@@ -110,6 +110,7 @@ public class MediaFragment extends MainActivityFragment
         });
 
         contextBar.inflateMenu(R.menu.fragment_media_context);
+        contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media);
 
@@ -140,6 +141,12 @@ public class MediaFragment extends MainActivityFragment
             case R.id.action_pick_team:
                 teamViewModel.updateDefaultTeam(Team.empty());
                 TeamPickerFragment.pick(getActivity(), R.id.request_media_team_pick);
+                return true;
+            case R.id.action_delete:
+                mediaViewModel.deleteMedia(team).subscribe(diffResult -> {
+                    diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+                    toggleContextMenu(false);
+                }, defaultErrorHandler);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -216,7 +223,7 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public void onFilesSelected(List<Uri> uris) {
-        MediaUploadIntentService.startActionUpload(getContext(),userViewModel.getCurrentUser(), team, uris);
+        MediaUploadIntentService.startActionUpload(getContext(), userViewModel.getCurrentUser(), team, uris);
     }
 
     private Date getQueryDate() {

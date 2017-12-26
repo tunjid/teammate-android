@@ -117,6 +117,10 @@ public class MediaRepository extends ModelRepository<Media> {
         return fetchThenGet(local, remote);
     }
 
+    public Single<List<Media>> delete(List<Media> models) {
+        return api.deleteManyMedia(models).doAfterSuccess(deleted -> dao().delete(Collections.unmodifiableList(deleted)));
+    }
+
     @Nullable
     MultipartBody.Part getBody(String path, String photoKey) {
         File file = new File(path);
@@ -137,11 +141,11 @@ public class MediaRepository extends ModelRepository<Media> {
         int callsToIgnore = 0;
         OkHttpClient client = TeammateService.getHttpClient();
 
-        for (Interceptor i : client.interceptors()) if (logsOutstreamWrites(i)) callsToIgnore++;
+        for (Interceptor i : client.interceptors()) if (logsRequestBody(i)) callsToIgnore++;
         return callsToIgnore;
     }
 
-    private boolean logsOutstreamWrites(Interceptor interceptor) {
+    private boolean logsRequestBody(Interceptor interceptor) {
         return interceptor instanceof HttpLoggingInterceptor
                 && ((HttpLoggingInterceptor) interceptor).getLevel().equals(HttpLoggingInterceptor.Level.BODY);
     }

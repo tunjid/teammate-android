@@ -175,9 +175,8 @@ public interface TeammateApi {
     @POST("api/teams/media/{teamId}")
     Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
 
-    @Multipart
     @POST("api/media/delete")
-    Single<Media> deleteManyMedia(@Body List<Media> delete);
+    Single<List<Media>> deleteManyMedia(@Body List<Media> delete);
 
     // =============================================================================================
     // Device endpoints

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 
 public class MediaViewModel extends ViewModel {
 
@@ -35,6 +36,18 @@ public class MediaViewModel extends ViewModel {
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
         return Identifiable.diff(repository.getTeamMedia(team, date), () -> source, ModelUtils::preserveList);
+    }
+
+    public Maybe<DiffUtil.DiffResult> deleteMedia(Team team) {
+        List<Media> source = mediaMap.get(team);
+        List<Media> toDelete = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
+
+        if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
+
+        return Identifiable.diff(repository.delete(toDelete).toFlowable(), () -> source, (sourceCopy, deleted) -> {
+            sourceCopy.removeAll(deleted);
+            return sourceCopy;
+        }).firstElement().doOnSuccess(diffResult -> clearSelections(team));
     }
 
     public List<Media> getMediaList(Team team) {
