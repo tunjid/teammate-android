@@ -255,6 +255,5 @@ public class MediaFragment extends MainActivityFragment
         if (holder == null) return;
 
         holder.performLongClick();
-
     }
 }

@@ -17,6 +17,8 @@
         android:id="@+id/team_media"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/eigth_margin"
+        android:paddingRight="@dimen/eigth_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/alt_toolbar" />
