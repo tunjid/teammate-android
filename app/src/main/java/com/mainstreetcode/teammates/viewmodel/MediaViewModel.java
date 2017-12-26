@@ -63,8 +63,12 @@ public class MediaViewModel extends ViewModel {
     }
 
     public boolean hasSelections(Team team) {
+        return getNumSelected(team) != 0;
+    }
+
+    public int getNumSelected(Team team) {
         Set<Media> set = selectionMap.get(team);
-        return set != null && set.size() > 0;
+        return set == null ? 0 : set.size();
     }
 
     public boolean isSelected(Media media) {

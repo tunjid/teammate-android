@@ -120,7 +120,7 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(getString(R.string.meda_title, team.getName()));
+        setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
         getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
         fetchMedia(new Date());
@@ -240,14 +240,19 @@ public class MediaFragment extends MainActivityFragment
     private void toggleContextMenu(boolean show) {
         boolean current = contextBar.getVisibility() == View.VISIBLE;
         ViewGroup root = (ViewGroup) getView();
-        if (current == show || root == null) return;
+        if (root == null) return;
+
+        contextBar.setTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
+
+        if (current == show) return;
 
         Transition transition = new Fade();
         transition.addTarget(contextBar);
 
+        getTeammatesActivity().toggleToolbar(!show);
+
         TransitionManager.beginDelayedTransition(root, transition);
         contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
-        getTeammatesActivity().toggleToolbar(!show);
     }
 
     private void longClickMedia(Media media) {
