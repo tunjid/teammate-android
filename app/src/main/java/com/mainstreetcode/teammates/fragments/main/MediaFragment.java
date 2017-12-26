@@ -112,7 +112,7 @@ public class MediaFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
         getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
-        fetchMedia(restoredFromBackStack() ? new Date() : getQueryDate());
+        fetchMedia(new Date());
     }
 
     void fetchMedia(Date date) {

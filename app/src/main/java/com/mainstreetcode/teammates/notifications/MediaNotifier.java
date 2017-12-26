@@ -23,7 +23,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class MediaNotifier extends Notifier<Media> {
 
-    private static final long[] NO_VIBRATION_PATTERN = {-1};
+    private static final long[] NO_VIBRATION_PATTERN = {0L};
 
     private static MediaNotifier INSTANCE;
 
@@ -56,17 +56,19 @@ public class MediaNotifier extends Notifier<Media> {
 
     private void updateProgress(int percentage) {
         MediaUploadIntentService.UploadStats stats = MediaUploadIntentService.getStats();
-        boolean isComplete = stats.isComplete() && percentage > 99;
+        boolean isComplete = stats.isComplete() && percentage > 95;
 
         String text = isComplete
                 ? app.getString(R.string.upload_complete_status, stats.getNumErrors())
                 : app.getString(R.string.upload_progress_status, stats.getNumAttempted(), stats.getNumToUpload(), stats.getNumErrors());
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(app, FeedItem.MEDIA)
-                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(app.getString(isComplete ? R.string.upload_complete : R.string.uploading_media))
                 .setProgress(isComplete ? 0 : 100, isComplete ? 0 : percentage, false)
+                .setDefaults(NotificationCompat.DEFAULT_SOUND)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setVibrate(NO_VIBRATION_PATTERN)
                 .setChannelId(FeedItem.MEDIA)
                 .setContentText(text);
 
