@@ -12,8 +12,10 @@ import com.mainstreetcode.teammates.util.ModelUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.reactivex.Flowable;
 
@@ -21,9 +23,18 @@ public class MediaViewModel extends ViewModel {
 
     private final MediaRepository repository;
     private final Map<Team, List<Media>> mediaMap = new HashMap<>();
+    private final Map<Team, Set<Media>> selectionMap = new HashMap<>();
 
     public MediaViewModel() {
         repository = MediaRepository.getInstance();
+    }
+
+    public Flowable<Media> getMedia(Media model) {
+        return repository.get(model).doOnError(throwable -> ModelUtils.checkForInvalidObject(throwable, model, getMediaList(model.getTeam())));
+    }
+
+    public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
+        return Identifiable.diff(repository.getTeamMedia(team, date), () -> source, ModelUtils::preserveList);
     }
 
     public List<Media> getMediaList(Team team) {
@@ -37,12 +48,27 @@ public class MediaViewModel extends ViewModel {
         return media;
     }
 
-    public Flowable<Media> getMedia(Media model) {
-        return repository.get(model).doOnError(throwable -> ModelUtils.checkForInvalidObject(throwable, model, getMediaList(model.getTeam())));
+    public boolean isSelected(Media media) {
+        Set<Media> set = selectionMap.get(media.getTeam());
+        return set != null && set.contains(media);
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
-        return Identifiable.diff(repository.getTeamMedia(team, date), () -> source, ModelUtils::preserveList);
+    public boolean select(Media media) {
+        Set<Media> set = selectionMap.get(media.getTeam());
+        if (set == null) {
+            set = new HashSet<>();
+            set.add(media);
+            selectionMap.put(media.getTeam(), set);
+            return true;
+        }
+        if (set.contains(media)) {
+            set.remove(media);
+            return false;
+        }
+        else {
+            set.add(media);
+            return true;
+        }
     }
 
 }

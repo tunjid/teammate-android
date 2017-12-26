@@ -30,7 +30,7 @@ public class ImageMediaViewHolder extends MediaViewHolder
 
         fullResView = itemView.findViewById(R.id.image_full_res);
 
-        if (!isFullScreen) {
+        if (!adapterListener.isFullScreen()) {
             ConstraintLayout constraintLayout = (ConstraintLayout) itemView;
             ConstraintSet set = new ConstraintSet();
 
@@ -38,8 +38,6 @@ public class ImageMediaViewHolder extends MediaViewHolder
             set.setDimensionRatio(thumbnailView.getId(), UNITY_ASPECT_RATIO);
             set.setDimensionRatio(fullResView.getId(), UNITY_ASPECT_RATIO);
             set.applyTo(constraintLayout);
-
-            thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
         }
     }
 
@@ -57,7 +55,7 @@ public class ImageMediaViewHolder extends MediaViewHolder
     }
 
     private void loadImage(String url, boolean fitToSize, ImageView destination) {
-
+        boolean isFullScreen = adapterListener.isFullScreen();
         if (TextUtils.isEmpty(url)) return;
 
         RequestCreator creator = Picasso.with(itemView.getContext()).load(url);

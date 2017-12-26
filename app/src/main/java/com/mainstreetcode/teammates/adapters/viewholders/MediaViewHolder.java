@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -17,21 +18,33 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
 
     static final String UNITY_ASPECT_RATIO = "1";
 
-    final boolean isFullScreen;
     public Media media;
+    private View border;
     public ImageView thumbnailView;
 
-    MediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
+    MediaViewHolder(View itemView, @NonNull MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
-        isFullScreen = adapterListener == null;
-
+        border = itemView.findViewById(R.id.border);
         thumbnailView = itemView.findViewById(getThumbnailId());
+
+        if (!adapterListener.isFullScreen()) {
+            thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+            thumbnailView.setOnLongClickListener(view -> {
+                boolean consumed = adapterListener.onMediaLongClicked(media);
+                border.setVisibility(consumed ? View.VISIBLE : View.GONE);
+                return true;
+            });
+        }
     }
 
     public void bind(Media media) {
         this.media = media;
         setTransitionName(itemView, getTransitionName(media, R.id.fragment_media_background));
         setTransitionName(thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail));
+
+        if (!adapterListener.isFullScreen()) {
+            border.setVisibility(adapterListener.isSelected(media) ? View.VISIBLE : View.GONE);
+        }
     }
 
     public void fullBind(Media media) {

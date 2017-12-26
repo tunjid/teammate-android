@@ -35,7 +35,9 @@ import java.util.List;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 public class MediaFragment extends MainActivityFragment
-        implements ImageWorkerFragment.MediaListener {
+        implements
+        MediaAdapter.MediaAdapterListener,
+        ImageWorkerFragment.MediaListener {
 
     private static final String ARG_TEAM = "team";
 
@@ -85,7 +87,7 @@ public class MediaFragment extends MainActivityFragment
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
 
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new MediaAdapter(mediaList, media -> showFragment(MediaDetailFragment.newInstance(media))));
+        recyclerView.setAdapter(new MediaAdapter(mediaList, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -169,6 +171,26 @@ public class MediaFragment extends MainActivityFragment
                     .addSharedElement(holder.thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail));
         }
         return null;
+    }
+
+    @Override
+    public void onMediaClicked(Media item) {
+        showFragment(MediaDetailFragment.newInstance(item));
+    }
+
+    @Override
+    public boolean onMediaLongClicked(Media media) {
+        return mediaViewModel.select(media);
+    }
+
+    @Override
+    public boolean isSelected(Media media) {
+        return mediaViewModel.isSelected(media);
+    }
+
+    @Override
+    public boolean isFullScreen() {
+        return false;
     }
 
     @Override

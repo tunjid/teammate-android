@@ -11,15 +11,12 @@ import com.mainstreetcode.teammates.adapters.viewholders.ImageMediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammates.model.Media;
-import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
 /**
- * Adapter for {@link User}
- * <p>
- * Created by Shemanigans on 6/3/17.
+ * Adapter for {@link Media}
  */
 
 public class MediaAdapter extends BaseRecyclerViewAdapter<MediaViewHolder, MediaAdapter.MediaAdapterListener> {
@@ -67,5 +64,11 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<MediaViewHolder, Media
 
     public interface MediaAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
         void onMediaClicked(Media item);
+
+        boolean onMediaLongClicked(Media media);
+
+        boolean isSelected(Media media);
+
+        boolean isFullScreen();
     }
 }
