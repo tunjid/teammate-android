@@ -39,13 +39,19 @@ public class MediaViewModel extends ViewModel {
 
     public List<Media> getMediaList(Team team) {
         List<Media> media = mediaMap.get(team);
-
-        if (media == null) {
-            media = new ArrayList<>();
-            mediaMap.put(team, media);
-        }
+        if (!mediaMap.containsKey(team)) mediaMap.put(team, media = new ArrayList<>());
 
         return media;
+    }
+
+    public void clearSelections(Team team) {
+        Set<Media> set = selectionMap.get(team);
+        if (set != null) set.clear();
+    }
+
+    public boolean hasSelections(Team team) {
+        Set<Media> set = selectionMap.get(team);
+        return set != null && set.size() > 0;
     }
 
     public boolean isSelected(Media media) {
@@ -56,9 +62,8 @@ public class MediaViewModel extends ViewModel {
     public boolean select(Media media) {
         Set<Media> set = selectionMap.get(media.getTeam());
         if (set == null) {
-            set = new HashSet<>();
+            selectionMap.put(media.getTeam(), set = new HashSet<>());
             set.add(media);
-            selectionMap.put(media.getTeam(), set);
             return true;
         }
         if (set.contains(media)) {

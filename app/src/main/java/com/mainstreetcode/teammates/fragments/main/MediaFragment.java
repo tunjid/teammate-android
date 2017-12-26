@@ -5,10 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.transition.Fade;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,6 +47,7 @@ public class MediaFragment extends MainActivityFragment
 
     private Team team;
     private List<Media> mediaList;
+    private Toolbar contextBar;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -82,6 +87,7 @@ public class MediaFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_media, container, false);
 
+        contextBar = rootView.findViewById(R.id.alt_toolbar);
         recyclerView = rootView.findViewById(R.id.team_media);
 
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
@@ -102,6 +108,8 @@ public class MediaFragment extends MainActivityFragment
                 fetchMedia(getQueryDate());
             }
         });
+
+        contextBar.inflateMenu(R.menu.fragment_media_context);
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media);
 
@@ -145,6 +153,15 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
+    public boolean handledBackPress() {
+        if (!mediaViewModel.hasSelections(team)) return false;
+        mediaViewModel.clearSelections(team);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        toggleContextMenu(false);
+        return true;
+    }
+
+    @Override
     protected boolean showsFab() {
         return true;
     }
@@ -180,7 +197,11 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public boolean onMediaLongClicked(Media media) {
-        return mediaViewModel.select(media);
+        boolean result = mediaViewModel.select(media);
+        boolean hasSelections = mediaViewModel.hasSelections(team);
+
+        toggleContextMenu(hasSelections);
+        return result;
     }
 
     @Override
@@ -195,7 +216,7 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public void onFilesSelected(List<Uri> uris) {
-        MediaUploadIntentService.startActionUpload(getContext(), team, uris);
+        MediaUploadIntentService.startActionUpload(getContext(),userViewModel.getCurrentUser(), team, uris);
     }
 
     private Date getQueryDate() {
@@ -206,5 +227,18 @@ public class MediaFragment extends MainActivityFragment
         result.dispatchUpdatesTo(recyclerView.getAdapter());
         toggleProgress(false);
         emptyViewHolder.toggle(mediaList.isEmpty());
+    }
+
+    private void toggleContextMenu(boolean show) {
+        boolean current = contextBar.getVisibility() == View.VISIBLE;
+        ViewGroup root = (ViewGroup) getView();
+        if (current == show || root == null) return;
+
+        Transition transition = new Fade();
+        transition.addTarget(contextBar);
+
+        TransitionManager.beginDelayedTransition(root, transition);
+        contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        getTeammatesActivity().toggleToolbar(!show);
     }
 }

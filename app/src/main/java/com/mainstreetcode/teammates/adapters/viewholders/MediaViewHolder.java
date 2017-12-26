@@ -28,8 +28,8 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
         thumbnailView = itemView.findViewById(getThumbnailId());
 
         if (!adapterListener.isFullScreen()) {
-            thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
-            thumbnailView.setOnLongClickListener(view -> {
+            itemView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+            itemView.setOnLongClickListener(view -> {
                 boolean consumed = adapterListener.onMediaLongClicked(media);
                 border.setVisibility(consumed ? View.VISIBLE : View.GONE);
                 return true;

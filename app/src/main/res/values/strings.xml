@@ -142,6 +142,7 @@
     <string name="upload_complete">Upload complete.</string>
     <string name="upload_complete_status">%1$d failed.</string>
     <string name="pick_picture">Select Picture</string>
+    <string name="delete_media">Delete media</string>
 
     <!--Notifier-->
     <string name="roles">Roles</string>
