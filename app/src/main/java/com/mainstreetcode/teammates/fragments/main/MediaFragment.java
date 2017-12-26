@@ -199,7 +199,8 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public void onMediaClicked(Media item) {
-        showFragment(MediaDetailFragment.newInstance(item));
+        if (mediaViewModel.hasSelections(team)) longClickMedia(item);
+        else showFragment(MediaDetailFragment.newInstance(item));
     }
 
     @Override
@@ -247,5 +248,13 @@ public class MediaFragment extends MainActivityFragment
         TransitionManager.beginDelayedTransition(root, transition);
         contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
         getTeammatesActivity().toggleToolbar(!show);
+    }
+
+    private void longClickMedia(Media media) {
+        MediaViewHolder holder = (MediaViewHolder) recyclerView.findViewHolderForItemId(media.hashCode());
+        if (holder == null) return;
+
+        holder.performLongClick();
+
     }
 }

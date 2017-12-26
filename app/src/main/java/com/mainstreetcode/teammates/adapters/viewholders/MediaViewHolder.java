@@ -29,11 +29,7 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
 
         if (!adapterListener.isFullScreen()) {
             itemView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
-            itemView.setOnLongClickListener(view -> {
-                boolean consumed = adapterListener.onMediaLongClicked(media);
-                border.setVisibility(consumed ? View.VISIBLE : View.GONE);
-                return true;
-            });
+            itemView.setOnLongClickListener(view -> performLongClick());
         }
     }
 
@@ -52,6 +48,11 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
     }
 
     public void unBind() {}
+
+    public boolean performLongClick() {
+        border.setVisibility(adapterListener.onMediaLongClicked(media) ? View.VISIBLE : View.GONE);
+        return true;
+    }
 
     @IdRes
     public abstract int getThumbnailId();
