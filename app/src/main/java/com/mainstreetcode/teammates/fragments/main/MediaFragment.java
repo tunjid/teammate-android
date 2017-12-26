@@ -97,7 +97,7 @@ public class MediaFragment extends MainActivityFragment
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
-                fetchMedia();
+                fetchMedia(getQueryDate());
             }
         });
 
@@ -112,11 +112,11 @@ public class MediaFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.meda_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
         getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
-        fetchMedia();
+        fetchMedia(restoredFromBackStack() ? new Date() : getQueryDate());
     }
 
-    void fetchMedia() {
-        disposables.add(mediaViewModel.getTeamMedia(mediaList, team, getQueryDate()).subscribe(this::onMediaUpdated, defaultErrorHandler));
+    void fetchMedia(Date date) {
+        disposables.add(mediaViewModel.getTeamMedia(mediaList, team, date).subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override

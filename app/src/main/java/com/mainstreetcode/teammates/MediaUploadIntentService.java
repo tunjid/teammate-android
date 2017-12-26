@@ -15,7 +15,9 @@ import com.mainstreetcode.teammates.util.ErrorHandler;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class MediaUploadIntentService extends IntentService {
 
@@ -23,6 +25,8 @@ public class MediaUploadIntentService extends IntentService {
 
     private static final String EXTRA_TEAM = "com.mainstreetcode.teammates.extra.PARAM1";
     private static final String EXTRA_URIS = "com.mainstreetcode.teammates.extra.PARAM2";
+
+    private static UploadStats stats;
 
     public MediaUploadIntentService() {
         super("MediaUploadIntentService");
@@ -34,6 +38,10 @@ public class MediaUploadIntentService extends IntentService {
         intent.putExtra(EXTRA_TEAM, team);
         intent.putParcelableArrayListExtra(EXTRA_URIS, new ArrayList<>(mediaUris));
         context.startService(intent);
+    }
+
+    public static UploadStats getStats() {
+        return stats;
     }
 
     @Override
@@ -55,13 +63,63 @@ public class MediaUploadIntentService extends IntentService {
      * parameters.
      */
     private void handleActionUpload(Team team, List<Uri> mediaUris) {
-        ModelRepository<Media> repository = MediaRepository.getInstance();
+        if (stats == null) stats = new UploadStats();
+        for (Uri uri : mediaUris) stats.enqueue(team, uri);
+    }
 
-        for (Uri uri : mediaUris) {
-            Media media = new Media("", new File(uri.getPath()).toString(),
-                    "", "", User.empty(), team, new Date());
+    public static class UploadStats {
 
-            repository.createOrUpdate(media).subscribe(ignored -> {}, ErrorHandler.EMPTY);
+        private int numErrors = 0;
+        private int numToUpload = 0;
+        private int numAttempted = 0;
+        private boolean isOnGoing;
+
+        private final Queue<Media> uploadQueue = new LinkedList<>();
+        private final ModelRepository<Media> repository = MediaRepository.getInstance();
+
+        void enqueue(Team team, Uri uri) {
+            numToUpload++;
+            uploadQueue.add(fromUri(team, uri));
+
+            if (!isOnGoing) invoke();
+        }
+
+        private void invoke() {
+            if (uploadQueue.isEmpty()) {
+                numErrors = 0;
+                numToUpload = 0;
+                numAttempted = 0;
+                isOnGoing = false;
+                return;
+            }
+
+            numAttempted++;
+            isOnGoing = true;
+
+            repository.createOrUpdate(uploadQueue.remove())
+                    .doOnError(throwable -> numErrors++)
+                    .doFinally(this::invoke)
+                    .subscribe(ignored -> {}, ErrorHandler.EMPTY);
+        }
+
+        private Media fromUri(Team team, Uri uri) {
+            return new Media("", new File(uri.getPath()).toString(), "", "", User.empty(), team, new Date());
+        }
+
+        public int getNumErrors() {
+            return numErrors;
+        }
+
+        public int getNumToUpload() {
+            return numToUpload;
+        }
+
+        public int getNumAttempted() {
+            return numAttempted;
+        }
+
+        public boolean isComplete() {
+            return uploadQueue.isEmpty();
         }
     }
 }

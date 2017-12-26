@@ -2,12 +2,12 @@ package com.mainstreetcode.teammates.notifications;
 
 
 import android.annotation.TargetApi;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
+import com.mainstreetcode.teammates.MediaUploadIntentService;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.repository.MediaRepository;
@@ -23,9 +23,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class MediaNotifier extends Notifier<Media> {
 
-    private int uploadsInProgress;
-    private int numFailed;
-    private int numAttempted;
+    private static final long[] NO_VIBRATION_PATTERN = {-1};
 
     private static MediaNotifier INSTANCE;
 
@@ -51,38 +49,29 @@ public class MediaNotifier extends Notifier<Media> {
         if (!(requestBody instanceof ProgressRequestBody)) return mediaSingle;
 
         ProgressRequestBody progressRequestBody = (ProgressRequestBody) requestBody;
-
-        uploadsInProgress++;
-
-        mediaSingle = mediaSingle
-                .doOnSubscribe(disposable -> numAttempted++)
-                .doOnError(throwable -> numFailed++)
-                .doAfterTerminate(() -> {
-                    if (numAttempted == uploadsInProgress) {
-                        uploadsInProgress = numAttempted = numFailed = 0;
-                    }
-                });
-
         progressRequestBody.getProgressSubject().subscribe(this::updateProgress, ErrorHandler.EMPTY, () -> updateProgress(100));
 
         return mediaSingle;
     }
 
     private void updateProgress(int percentage) {
-        boolean isComplete = percentage == 100;
-        String text = isComplete
-                ? app.getString(R.string.upload_complete_status, numFailed)
-                : app.getString(R.string.upload_progress_status, numAttempted, uploadsInProgress, numFailed);
+        MediaUploadIntentService.UploadStats stats = MediaUploadIntentService.getStats();
+        boolean isComplete = stats.isComplete() && percentage > 99;
 
-        Notification notification = new NotificationCompat.Builder(app, FeedItem.MEDIA)
+        String text = isComplete
+                ? app.getString(R.string.upload_complete_status, stats.getNumErrors())
+                : app.getString(R.string.upload_progress_status, stats.getNumAttempted(), stats.getNumToUpload(), stats.getNumErrors());
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(app, FeedItem.MEDIA)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(app.getString(isComplete ? R.string.upload_complete : R.string.uploading_media))
+                .setProgress(isComplete ? 0 : 100, isComplete ? 0 : percentage, false)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setChannelId(FeedItem.MEDIA)
-                .setContentText(text)
-                .setProgress(100, percentage, false)
-                .build();
+                .setContentText(text);
+
 
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        if (notifier != null) notifier.notify(1, notification);
+        if (notifier != null) notifier.notify(1, builder.build());
     }
 }
