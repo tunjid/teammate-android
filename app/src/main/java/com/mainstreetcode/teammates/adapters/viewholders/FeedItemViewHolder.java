@@ -1,49 +1,37 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
-import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.FeedAdapter;
-import com.mainstreetcode.teammates.notifications.FeedItem;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
-import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.mainstreetcode.teammates.notifications.FeedItem;
+import com.mainstreetcode.teammates.notifications.Notifiable;
 
 /**
  * Viewholder for a {@link Team}
  */
-public class FeedItemViewHolder extends BaseViewHolder<FeedAdapter.FeedItemAdapterListener>
+public class FeedItemViewHolder<H extends Model<H> & Notifiable<H>> extends ModelCardViewHolder<H, FeedAdapter.FeedItemAdapterListener>
         implements View.OnClickListener {
 
-    private FeedItem item;
-    private ImageView teamLogo;
-    private TextView description;
-    private TextView itemType;
+    private FeedItem<H> item;
 
     public FeedItemViewHolder(View itemView, FeedAdapter.FeedItemAdapterListener listener) {
         super(itemView, listener);
-        teamLogo = itemView.findViewById(R.id.thumbnail);
-        itemType = itemView.findViewById(R.id.message);
-        description = itemView.findViewById(R.id.model);
         itemView.setOnClickListener(this);
     }
 
-    public void bind(FeedItem item) {
-
+    public void bind(FeedItem<H> item) {
         this.item = item;
-        description.setText(item.getBody());
-        itemType.setText(item.getTitle());
+        bind(item.getModel());
 
-        if (!TextUtils.isEmpty(item.getImageUrl())) {
-            Picasso.with(itemView.getContext())
-                    .load(item.getImageUrl())
-                    .fit()
-                    .centerInside()
-                    .into(teamLogo);
-        }
+        title.setText(item.getTitle());
+        subtitle.setText(item.getBody());
+    }
+
+    @Override
+    public void bind(H model) {
+        super.bind(model);
     }
 
     @Override
