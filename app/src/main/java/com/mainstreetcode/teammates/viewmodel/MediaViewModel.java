@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
+import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Identifiable;
@@ -16,9 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 public class MediaViewModel extends ViewModel {
 
@@ -38,16 +41,23 @@ public class MediaViewModel extends ViewModel {
         return Identifiable.diff(repository.getTeamMedia(team, date), () -> source, ModelUtils::preserveList);
     }
 
-    public Maybe<DiffUtil.DiffResult> deleteMedia(Team team) {
+    public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {
+        AtomicBoolean partialDelete = new AtomicBoolean();
         List<Media> source = mediaMap.get(team);
         List<Media> toDelete = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
 
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
 
-        return Identifiable.diff(repository.delete(toDelete).toFlowable(), () -> source, (sourceCopy, deleted) -> {
+        Single<List<Media>> singleSource = isAdmin ? repository.privilegedDelete(team, toDelete): repository.ownerDelete(toDelete);
+
+        return Identifiable.diff(singleSource.toFlowable(), () -> source, (sourceCopy, deleted) -> {
+            partialDelete.set(deleted.size() != toDelete.size());
             sourceCopy.removeAll(deleted);
             return sourceCopy;
-        }).firstElement().doOnSuccess(diffResult -> clearSelections(team));
+        })
+                .map(diffResult -> new Pair<>(partialDelete.get(), diffResult))
+                .firstElement()
+                .doOnSuccess(diffResult -> clearSelections(team));
     }
 
     public List<Media> getMediaList(Team team) {

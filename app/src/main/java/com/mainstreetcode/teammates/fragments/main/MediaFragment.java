@@ -9,6 +9,7 @@ import android.support.transition.Fade;
 import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,8 +30,10 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Media;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.Date;
@@ -46,6 +49,7 @@ public class MediaFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
+    private Role currentRole;
     private List<Media> mediaList;
     private Toolbar contextBar;
     private RecyclerView recyclerView;
@@ -78,6 +82,7 @@ public class MediaFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         mediaList = mediaViewModel.getMediaList(team);
+        currentRole = Role.empty();
 
         ImageWorkerFragment.attach(this);
     }
@@ -113,7 +118,6 @@ public class MediaFragment extends MainActivityFragment
         contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media);
-
         return rootView;
     }
 
@@ -123,7 +127,14 @@ public class MediaFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
         getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         fetchMedia(new Date());
+        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
+                .subscribe(currentRole::update, ErrorHandler.EMPTY));
     }
 
     void fetchMedia(Date date) {
@@ -143,10 +154,7 @@ public class MediaFragment extends MainActivityFragment
                 TeamPickerFragment.pick(getActivity(), R.id.request_media_team_pick);
                 return true;
             case R.id.action_delete:
-                mediaViewModel.deleteMedia(team).subscribe(diffResult -> {
-                    diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-                    toggleContextMenu(false);
-                }, defaultErrorHandler);
+                mediaViewModel.deleteMedia(team, currentRole.isPrivilegedRole()).subscribe(this::onMediaDeleted, defaultErrorHandler);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -238,16 +246,15 @@ public class MediaFragment extends MainActivityFragment
     }
 
     private void toggleContextMenu(boolean show) {
-        boolean current = contextBar.getVisibility() == View.VISIBLE;
+        //boolean current = contextBar.getVisibility() == View.VISIBLE;
         ViewGroup root = (ViewGroup) getView();
         if (root == null) return;
 
         contextBar.setTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
 
-        if (current == show) return;
+        //if (current == show) return;
 
-        Transition transition = new Fade();
-        transition.addTarget(contextBar);
+        Transition transition = new Fade().excludeTarget(recyclerView, true);
 
         getTeammatesActivity().toggleToolbar(!show);
 
@@ -260,5 +267,18 @@ public class MediaFragment extends MainActivityFragment
         if (holder == null) return;
 
         holder.performLongClick();
+    }
+
+    private void onMediaDeleted(Pair<Boolean, DiffUtil.DiffResult> pair) {
+        toggleContextMenu(false);
+
+        boolean partialDelete = pair.first == null ? false : pair.first;
+        DiffUtil.DiffResult diffResult = pair.second;
+
+        if (diffResult != null) diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+        if (!partialDelete) return;
+
+        recyclerView.getAdapter().notifyDataSetChanged();
+        showSnackbar(getString(R.string.partial_delete_message));
     }
 }

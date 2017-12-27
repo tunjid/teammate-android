@@ -117,8 +117,12 @@ public class MediaRepository extends ModelRepository<Media> {
         return fetchThenGet(local, remote);
     }
 
-    public Single<List<Media>> delete(List<Media> models) {
-        return api.deleteManyMedia(models).doAfterSuccess(deleted -> dao().delete(Collections.unmodifiableList(deleted)));
+    public Single<List<Media>> ownerDelete(List<Media> models) {
+        return api.deleteMedia(models).doAfterSuccess(this::delete);
+    }
+
+    public Single<List<Media>> privilegedDelete(Team team, List<Media> models) {
+        return api.adminDeleteMedia(team.getId(), models).doAfterSuccess(this::delete);
     }
 
     @Nullable
@@ -135,6 +139,10 @@ public class MediaRepository extends ModelRepository<Media> {
         RequestBody requestBody = new ProgressRequestBody(file, num, MediaType.parse(type));
 
         return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
+    }
+
+    private void delete(List<Media> list) {
+        mediaDao.delete(Collections.unmodifiableList(list));
     }
 
     private int getNumCallsToIgnore() {
