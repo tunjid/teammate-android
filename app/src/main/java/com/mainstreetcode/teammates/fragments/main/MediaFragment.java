@@ -46,6 +46,7 @@ public class MediaFragment extends MainActivityFragment
         MediaAdapter.MediaAdapterListener,
         ImageWorkerFragment.MediaListener {
 
+    private static final int MEDIA_DELETE_SNACKBAR_DELAY = 350;
     private static final String ARG_TEAM = "team";
 
     private Team team;
@@ -279,6 +280,6 @@ public class MediaFragment extends MainActivityFragment
         if (!partialDelete) return;
 
         recyclerView.getAdapter().notifyDataSetChanged();
-        showSnackbar(getString(R.string.partial_delete_message));
+        recyclerView.postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
     }
 }
