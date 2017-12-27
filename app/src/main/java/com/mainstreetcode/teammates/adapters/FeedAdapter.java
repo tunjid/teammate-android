@@ -29,11 +29,12 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<FeedItemViewHolder, Fee
     @Override
     public FeedItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_feed, viewGroup, false);
+        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_list_item, viewGroup, false);
         return new FeedItemViewHolder(itemView, adapterListener);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(FeedItemViewHolder eventViewHolder, int i) {
         eventViewHolder.bind(items.get(i));
     }
