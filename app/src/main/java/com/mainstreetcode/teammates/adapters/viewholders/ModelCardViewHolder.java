@@ -36,7 +36,7 @@ public class ModelCardViewHolder<H extends Model<H>, T extends BaseRecyclerViewA
             Picasso.with(itemView.getContext())
                     .load(imageUrl)
                     .fit()
-                    .centerInside()
+                    .centerCrop()
                     .into(thumbnail);
         }
     }
