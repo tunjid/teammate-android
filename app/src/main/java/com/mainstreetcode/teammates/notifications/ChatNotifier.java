@@ -27,7 +27,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-import static io.reactivex.schedulers.Schedulers.io;
 
 
 public class ChatNotifier extends Notifier<Chat> {

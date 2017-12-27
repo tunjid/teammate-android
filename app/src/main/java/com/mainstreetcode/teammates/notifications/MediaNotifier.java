@@ -15,6 +15,9 @@ import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.rest.ProgressRequestBody;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import okhttp3.RequestBody;
 
@@ -49,30 +52,44 @@ public class MediaNotifier extends Notifier<Media> {
         if (!(requestBody instanceof ProgressRequestBody)) return mediaSingle;
 
         ProgressRequestBody progressRequestBody = (ProgressRequestBody) requestBody;
-        progressRequestBody.getProgressSubject().subscribe(this::updateProgress, ErrorHandler.EMPTY, () -> updateProgress(100));
+        progressRequestBody.getProgressSubject()
+                .doFinally(this::onUploadComplete)
+                .subscribe(this::updateProgress, ErrorHandler.EMPTY);
 
         return mediaSingle;
     }
 
     private void updateProgress(int percentage) {
         MediaUploadIntentService.UploadStats stats = MediaUploadIntentService.getStats();
-        boolean isComplete = stats.isComplete() && percentage > 95;
 
-        String text = isComplete
-                ? app.getString(R.string.upload_complete_status, stats.getNumErrors())
-                : app.getString(R.string.upload_progress_status, stats.getNumAttempted(), stats.getNumToUpload(), stats.getNumErrors());
+        notifyOfUpload(progressNotificationBuilder()
+                .setContentText(app.getString(R.string.upload_progress_status, stats.getNumAttempted(), stats.getNumToUpload(), stats.getNumErrors()))
+                .setContentTitle(app.getString(R.string.uploading_media))
+                .setProgress(100, percentage, false));
+    }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(app, FeedItem.MEDIA)
-                .setContentTitle(app.getString(isComplete ? R.string.upload_complete : R.string.uploading_media))
-                .setProgress(isComplete ? 0 : 100, isComplete ? 0 : percentage, false)
+    private void onUploadComplete() {
+        MediaUploadIntentService.UploadStats stats = MediaUploadIntentService.getStats();
+        if (!stats.isComplete()) return;
+
+        Completable.timer(800, TimeUnit.MILLISECONDS).subscribe(
+                () -> notifyOfUpload(progressNotificationBuilder()
+                        .setContentText(app.getString(R.string.upload_complete_status, stats.getNumErrors()))
+                        .setContentTitle(app.getString(R.string.upload_complete))
+                        .setProgress(0, 0, false)),
+                ErrorHandler.EMPTY);
+    }
+
+    private NotificationCompat.Builder progressNotificationBuilder() {
+        return new NotificationCompat.Builder(app, FeedItem.MEDIA)
                 .setDefaults(NotificationCompat.DEFAULT_SOUND)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setVibrate(NO_VIBRATION_PATTERN)
-                .setChannelId(FeedItem.MEDIA)
-                .setContentText(text);
+                .setChannelId(FeedItem.MEDIA);
+    }
 
-
+    private void notifyOfUpload(NotificationCompat.Builder builder) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
         if (notifier != null) notifier.notify(1, builder.build());
     }
