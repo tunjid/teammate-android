@@ -60,6 +60,11 @@ public class DeviceDao extends EntityDao<Device> {
     }
 
     @Override
+    public void delete(List<Device> models) {
+        deleteCurrentDevice();
+    }
+
+    @Override
     Single<Integer> deleteAll() {
         return Single.fromCallable(() -> {
             deleteCurrentDevice();

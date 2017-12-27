@@ -18,6 +18,9 @@ public abstract class EntityDao<T> {
     @Delete
     public abstract void delete(T model);
 
+    @Delete
+    public abstract void delete(List<T> models);
+
     public void upsert(List<T> models) {
         insert(models);
         update(models);

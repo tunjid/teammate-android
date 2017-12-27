@@ -136,12 +136,15 @@
     <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
 
     <!--MediaFragment-->
-    <string name="meda_title">Media for %1$s</string>
+    <string name="media_title">Media for %1$s</string>
     <string name="uploading_media">Uploading files</string>
     <string name="upload_progress_status">%1$d of %2$d. %3$d failed.</string>
     <string name="upload_complete">Upload complete.</string>
     <string name="upload_complete_status">%1$d failed.</string>
     <string name="pick_picture">Select Picture</string>
+    <string name="multi_select">%1$d Selected</string>
+    <string name="delete_media">Delete media</string>
+    <string name="partial_delete_message">Could not delete all photos selected because you did not upload them.</string>
 
     <!--Notifier-->
     <string name="roles">Roles</string>

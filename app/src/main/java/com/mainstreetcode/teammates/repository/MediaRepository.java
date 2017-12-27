@@ -25,14 +25,18 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class MediaRepository extends ModelRepository<Media> {
 
+    private final int num;
     private final TeammateApi api;
     private final MediaDao mediaDao;
     private final ModelRepository<User> userRepository;
@@ -41,6 +45,7 @@ public class MediaRepository extends ModelRepository<Media> {
     private static MediaRepository ourInstance;
 
     private MediaRepository() {
+        num = getNumCallsToIgnore();
         api = TeammateService.getApiInstance();
         mediaDao = AppDatabase.getInstance().mediaDao();
         userRepository = UserRepository.getInstance();
@@ -63,8 +68,9 @@ public class MediaRepository extends ModelRepository<Media> {
 
         if (body == null) return Single.error(new TeammateException("Unable to upload media"));
 
-        Single<Media> mediaSingle = api.uploadTeamMedia(model.getTeam().getId(), body);
-        mediaSingle = mediaSingle.map(localMapper(model)).map(getSaveFunction());
+        Single<Media> mediaSingle = api.uploadTeamMedia(model.getTeam().getId(), body)
+                .map(localMapper(model))
+                .map(getSaveFunction());
 
         return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());
     }
@@ -111,6 +117,14 @@ public class MediaRepository extends ModelRepository<Media> {
         return fetchThenGet(local, remote);
     }
 
+    public Single<List<Media>> ownerDelete(List<Media> models) {
+        return api.deleteMedia(models).doAfterSuccess(this::delete);
+    }
+
+    public Single<List<Media>> privilegedDelete(Team team, List<Media> models) {
+        return api.adminDeleteMedia(team.getId(), models).doAfterSuccess(this::delete);
+    }
+
     @Nullable
     MultipartBody.Part getBody(String path, String photoKey) {
         File file = new File(path);
@@ -122,8 +136,25 @@ public class MediaRepository extends ModelRepository<Media> {
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
         if (type == null) return null;
-        RequestBody requestBody = new ProgressRequestBody(file, 1, MediaType.parse(type));
+        RequestBody requestBody = new ProgressRequestBody(file, num, MediaType.parse(type));
 
         return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
+    }
+
+    private void delete(List<Media> list) {
+        mediaDao.delete(Collections.unmodifiableList(list));
+    }
+
+    private int getNumCallsToIgnore() {
+        int callsToIgnore = 0;
+        OkHttpClient client = TeammateService.getHttpClient();
+
+        for (Interceptor i : client.interceptors()) if (logsRequestBody(i)) callsToIgnore++;
+        return callsToIgnore;
+    }
+
+    private boolean logsRequestBody(Interceptor interceptor) {
+        return interceptor instanceof HttpLoggingInterceptor
+                && ((HttpLoggingInterceptor) interceptor).getLevel().equals(HttpLoggingInterceptor.Level.BODY);
     }
 }

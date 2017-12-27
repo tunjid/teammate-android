@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageMediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.VideoMediaViewHolder;
@@ -18,7 +19,8 @@ import com.mainstreetcode.teammates.model.Media;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
-public class MediaDetailFragment extends MainActivityFragment {
+public class MediaDetailFragment extends MainActivityFragment
+        implements MediaAdapter.MediaAdapterListener {
 
     public static final String ARG_MEDIA = "media";
 
@@ -97,6 +99,26 @@ public class MediaDetailFragment extends MainActivityFragment {
         return false;
     }
 
+    @Override
+    public void onMediaClicked(Media item) {
+
+    }
+
+    @Override
+    public boolean onMediaLongClicked(Media media) {
+        return false;
+    }
+
+    @Override
+    public boolean isSelected(Media media) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullScreen() {
+        return true;
+    }
+
     private void bindViewHolder(ConstraintLayout rootView, Media media, boolean isImage) {
         ViewGroup.LayoutParams params = rootView.getLayoutParams();
         params.height = MATCH_PARENT;
@@ -104,8 +126,8 @@ public class MediaDetailFragment extends MainActivityFragment {
         rootView.setPadding(0, 0, 0, 0);
 
         mediaViewHolder = isImage
-                ? new ImageMediaViewHolder(rootView, null)
-                : new VideoMediaViewHolder(rootView, null);
+                ? new ImageMediaViewHolder(rootView, this)
+                : new VideoMediaViewHolder(rootView, this);
 
         mediaViewHolder.fullBind(media);
     }

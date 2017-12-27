@@ -88,6 +88,15 @@ dependencies {
         exclude module: 'support-v4'
         exclude module: 'design'
     }
+    compile ('com.github.chrisbanes:PhotoView:2.1.3') {
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'exifinterface'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v13'
+        exclude module: 'support-v4'
+        exclude module: 'design'
+    }
     //compile 'com.tunjid.android-bootstrap:core:1.0.0'
     compile(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.0-SNAPSHOT", changing: true) {
         exclude module: 'support-annotations'

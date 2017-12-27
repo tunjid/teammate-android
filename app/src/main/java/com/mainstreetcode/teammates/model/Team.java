@@ -206,6 +206,9 @@ public class Team extends TeamEntity
 
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive()) {
+                return new Team(json.getAsString(), "", "", "", "", "", new Date(), new LatLng(0, 0));
+            }
 
             JsonObject teamJson = json.getAsJsonObject();
 

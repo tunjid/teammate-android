@@ -21,8 +21,7 @@ public class VideoMediaViewHolder extends MediaViewHolder {
         super(itemView, adapterListener);
         videoView = itemView.findViewById(R.id.video_thumbnail);
 
-        if (adapterListener != null) {
-            thumbnailView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        if (!adapterListener.isFullScreen()) {
             videoView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
         }
     }

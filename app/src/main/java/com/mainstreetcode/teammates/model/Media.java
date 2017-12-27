@@ -5,6 +5,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.notifications.MediaNotifier;
@@ -23,7 +25,9 @@ import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
+import com.mainstreetcode.teammates.util.ObjectId;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Date;
 
@@ -74,6 +78,10 @@ public class Media implements
         team = (Team) in.readValue(Team.class.getClassLoader());
         long tmpCreated = in.readLong();
         created = tmpCreated != -1 ? new Date(tmpCreated) : null;
+    }
+
+    public static Media fromUri(User user, Team team, Uri uri) {
+        return new Media(new ObjectId().toHexString(), new File(uri.getPath()).toString(), "", "", user, team, new Date());
     }
 
     @Override
@@ -219,13 +227,13 @@ public class Media implements
 
         @Override
         public JsonElement serialize(Media src, Type typeOfSrc, JsonSerializationContext context) {
-            JsonObject media = new JsonObject();
-            media.addProperty(MIME_TYPE_KEY, src.mimeType);
-            media.addProperty(URL_KEY, src.url);
-            media.addProperty(TEAM_KEY, src.team.getId());
-            media.addProperty(USER_KEY, src.user.getId());
+//            JsonObject media = new JsonObject();
+//            media.addProperty(MIME_TYPE_KEY, src.mimeType);
+//            media.addProperty(URL_KEY, src.url);
+//            media.addProperty(TEAM_KEY, src.team.getId());
+//            media.addProperty(USER_KEY, src.user.getId());
 
-            return media;
+            return new JsonPrimitive(src.getId());
         }
     }
 }

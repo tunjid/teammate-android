@@ -3,6 +3,7 @@
 buildscript {
 
     repositories {
+        maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' }
         maven { url 'https://oss.jfrog.info/artifactory/oss-snapshot-local' }
 
@@ -19,6 +20,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' }
         maven { url 'https://oss.jfrog.info/artifactory/oss-snapshot-local' }
 
