@@ -38,8 +38,6 @@ public class Role extends RoleEntity
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
 
-    public static final int ROLE_NAME_POSITION = 3;
-
     @Ignore private final List<Item<Role>> items;
 
     @SuppressWarnings("unused")
