@@ -18,6 +18,8 @@ import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
+import java.util.concurrent.Callable;
+
 /**
  * Viewholder for editing simple text fields for an {@link Item}
  */
@@ -27,22 +29,26 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     EditText editText;
     @Nullable
-    private TextView headerText;
-    private TextInputLayout inputLayout;
+    private final TextView headerText;
+    private final TextInputLayout inputLayout;
 
-    public InputViewHolder(View itemView, boolean isEditable) {
+    private final Callable<Boolean> enabler;
+
+    public InputViewHolder(View itemView, Callable<Boolean> enabler) {
         super(itemView);
+        this.enabler = enabler;
         inputLayout = itemView.findViewById(R.id.input_layout);
         editText = inputLayout.getEditText();
         headerText = itemView.findViewById(R.id.header_name);
 
-        inputLayout.setEnabled(isEditable);
+        inputLayout.setEnabled(isEnabled());
         editText.addTextChangedListener(this);
     }
 
     @Override
     public void bind(Item item) {
         super.bind(item);
+        inputLayout.setEnabled(isEnabled());
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
         editText.setText(item.getValue());
 
@@ -64,6 +70,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         }
 
         checkForErrors();
+        setClickableState();
     }
 
     @Override
@@ -88,8 +95,13 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         }
     }
 
-    void setClickableState() {
-        int colorInt = ContextCompat.getColor(itemView.getContext(), R.color.black);
+    private void setClickableState() {
+        int colorInt = ContextCompat.getColor(itemView.getContext(), isEnabled() ? R.color.black : R.color.light_grey);
         editText.setTextColor(ColorStateList.valueOf(colorInt));
+    }
+
+    protected boolean isEnabled() {
+        try {return enabler.call();}
+        catch (Exception e) {return false;}
     }
 }

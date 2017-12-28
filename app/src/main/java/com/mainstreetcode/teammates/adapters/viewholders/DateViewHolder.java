@@ -12,6 +12,7 @@ import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.Calendar;
+import java.util.concurrent.Callable;
 
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -23,17 +24,16 @@ import static java.util.Calendar.getInstance;
 /**
  * ViewHolder for selecting {@link com.mainstreetcode.teammates.model.Role}
  */
-public class DateViewHolder extends InputViewHolder
+public class DateViewHolder extends ClickInputViewHolder
         implements
-        View.OnClickListener,
         DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener {
 
-    Calendar calendar = getInstance();
-    Calendar updatedCalendar = getInstance();
+    private Calendar calendar = getInstance();
+    private Calendar updatedCalendar = getInstance();
 
-    public DateViewHolder(View itemView) {
-        super(itemView, false);
+    public DateViewHolder(View itemView, Callable<Boolean> enabler) {
+        super(itemView, enabler, () -> {});
         itemView.findViewById(R.id.click_view).setOnClickListener(this);
     }
 
@@ -47,6 +47,8 @@ public class DateViewHolder extends InputViewHolder
 
     @Override
     public void onClick(View view) {
+        if(!isEnabled()) return;
+
         new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE))
                 .show();
     }

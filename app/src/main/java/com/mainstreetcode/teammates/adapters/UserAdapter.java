@@ -35,7 +35,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), true);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> true);
             default:
                 return new BaseItemViewHolder(itemView);
         }

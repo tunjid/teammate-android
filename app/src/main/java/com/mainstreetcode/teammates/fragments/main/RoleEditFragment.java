@@ -34,7 +34,8 @@ import java.util.List;
 
 public class RoleEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener {
+        View.OnClickListener,
+        RoleEditAdapter.RoleEditAdapterListener {
 
     public static final String ARG_ROLE = "role";
 
@@ -86,7 +87,7 @@ public class RoleEditFragment extends HeaderedFragment
         recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this::canChangeRole, this));
+        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -196,19 +197,19 @@ public class RoleEditFragment extends HeaderedFragment
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean canChangeRole() {
+        return !currentRole.isEmpty() && currentRole.isPrivilegedRole();
+    }
+
     private void onRoleUpdated(Role role) {
         currentRole.update(role);
-        recyclerView.getRecycledViewPool().clear();
-        recyclerView.getAdapter().notifyItemChanged(Role.ROLE_NAME_POSITION);
+        recyclerView.getAdapter().notifyDataSetChanged();
 
         Activity activity;
         if ((activity = getActivity()) == null) return;
 
         activity.invalidateOptionsMenu();
         toggleFab(showsFab());
-    }
-
-    private boolean canChangeRole() {
-        return !currentRole.isEmpty() && currentRole.isPrivilegedRole();
     }
 }

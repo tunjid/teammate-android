@@ -9,43 +9,34 @@ import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Role;
-import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
-import io.reactivex.functions.BooleanSupplier;
-
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
- * Adapter for {@link User}
- * <p>
- * Created by Shemanigans on 6/3/17.
+ * Adapter for {@link Role}
  */
 
-public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, RoleEditAdapter.RoleEditAdapterListener> {
 
     private final Role role;
     private final List<String> roles;
-    private final BooleanSupplier roleCheckSupplier;
 
-    public RoleEditAdapter(Role role, List<String> roles,
-                           BooleanSupplier roleCheckSupplier,
-                           ImageWorkerFragment.ImagePickerListener listener) {
+    public RoleEditAdapter(Role role, List<String> roles, RoleEditAdapter.RoleEditAdapterListener listener) {
         super(listener);
         this.role = role;
         this.roles = roles;
-        this.roleCheckSupplier = roleCheckSupplier;
     }
 
     @Override
     public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), false);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
             case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, canEditRole());
+                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::canChangeRole);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -66,8 +57,7 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
         return role.get(position).getItemType();
     }
 
-    private boolean canEditRole() {
-        try {return roleCheckSupplier.getAsBoolean();}
-        catch (Exception e) { return false;}
+    public interface RoleEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
+        boolean canChangeRole();
     }
 }

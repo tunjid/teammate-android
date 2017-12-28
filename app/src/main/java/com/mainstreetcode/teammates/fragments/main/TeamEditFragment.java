@@ -46,10 +46,9 @@ public class TeamEditFragment extends HeaderedFragment
     private static final int JOINING = 2;
 
     private static final String ARG_TEAM = "team";
-    private static final String ARG_EDITABLE = "editable";
+    private static final String ARG_STATE = "editable";
     public static final int PLACE_PICKER_REQUEST = 2;
 
-    private boolean isEditable;
     private int state;
     private Team team;
     private Role currentRole = Role.empty();
@@ -57,14 +56,26 @@ public class TeamEditFragment extends HeaderedFragment
 
     private RecyclerView recyclerView;
 
-    public static TeamEditFragment newInstance(Team team, boolean isEditable) {
+    private static TeamEditFragment newInstance(Team team, int state) {
         TeamEditFragment fragment = new TeamEditFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
-        args.putBoolean(ARG_EDITABLE, isEditable);
+        args.putInt(ARG_STATE, state);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public static TeamEditFragment newCreateInstance() {
+        return newInstance(Team.empty(), CREATING);
+    }
+
+    public static TeamEditFragment newEditInstance(Team team) {
+        return newInstance(team, EDITING);
+    }
+
+    public static TeamEditFragment newJoinInstance(Team team) {
+        return newInstance(team, JOINING);
     }
 
     @Override
@@ -81,7 +92,7 @@ public class TeamEditFragment extends HeaderedFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        isEditable = getArguments().getBoolean(ARG_EDITABLE);
+        state = getArguments().getInt(ARG_STATE);
         team = getArguments().getParcelable(ARG_TEAM);
 
         ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
@@ -97,7 +108,7 @@ public class TeamEditFragment extends HeaderedFragment
         recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamEditAdapter(team, roles, isEditable, this));
+        recyclerView.setAdapter(new TeamEditAdapter(team, roles, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -115,7 +126,7 @@ public class TeamEditFragment extends HeaderedFragment
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        setFabIcon(isEditable ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
+        setFabIcon(state == JOINING ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
 
         User user = userViewModel.getCurrentUser();
 
@@ -151,6 +162,12 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
+    public void onImageClick() {
+        if (!currentRole.isPrivilegedRole()) return;
+        super.onImageClick();
+    }
+
+    @Override
     protected HeaderedModel getHeaderedModel() {
         return team;
     }
@@ -162,6 +179,16 @@ public class TeamEditFragment extends HeaderedFragment
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {e.printStackTrace();}
+    }
+
+    @Override
+    public boolean isJoiningTeam() {
+        return state == JOINING;
+    }
+
+    @Override
+    public boolean isPrivileged() {
+        return state == CREATING || currentRole.isPrivilegedRole();
     }
 
     @Override
@@ -185,8 +212,8 @@ public class TeamEditFragment extends HeaderedFragment
             case R.id.fab:
                 String role = team.get(Team.ROLE_POSITION).getValue();
 
-                if (TextUtils.isEmpty(role)) {
-                    showSnackbar("Please select a role");
+                if (isJoiningTeam() && TextUtils.isEmpty(role)) {
+                    showSnackbar(getString(R.string.choose_role_error));
                     return;
                 }
 
@@ -231,6 +258,7 @@ public class TeamEditFragment extends HeaderedFragment
                 break;
         }
         toggleFab(showsFab());
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     private void onRolesFetched(List<String> fetchedRoles) {

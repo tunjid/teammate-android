@@ -138,7 +138,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit:
-                showFragment(TeamEditFragment.newInstance(team, true));
+                showFragment(TeamEditFragment.newEditInstance(team));
                 return true;
             case R.id.action_delete:
                 new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.delete_team_prompt, team.getName()))
@@ -284,7 +284,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
         final AtomicReference<String> roleReference = new AtomicReference<>();
 
-        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles, true);
+        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles, () -> true);
         Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, "");
 
         holder.bind(item);

@@ -18,8 +18,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Team}
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
 public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
@@ -27,24 +25,22 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     private final Team team;
     private final List<String> roles;
-    private final boolean isEditable;
 
-    public TeamEditAdapter(Team team, List<String> roles, boolean isEditable, TeamEditAdapter.TeamEditAdapterListener listener) {
+    public TeamEditAdapter(Team team, List<String> roles, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
         this.team = team;
         this.roles = roles;
-        this.isEditable = isEditable;
     }
 
     @Override
     public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), isEditable);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
             case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, true);
+                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::isJoiningTeam);
             case Item.ADDRESS:
-                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener);
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, adapterListener::onAddressClicked);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -57,7 +53,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public int getItemCount() {
-        return team.size();
+        return adapterListener.isJoiningTeam() ? team.size() : team.size() - 1;
     }
 
     @Override
@@ -67,5 +63,9 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
         void onAddressClicked();
+
+        boolean isJoiningTeam();
+
+        boolean isPrivileged();
     }
 }

@@ -29,31 +29,28 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
  * Created by Shemanigans on 6/3/17.
  */
 
-public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventEditAdapter.EditAdapterListener> {
+public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventEditAdapter.EventEditAdapterListener> {
 
     private static final int GUEST = 12;
     private static final int TEAM = 13;
 
-    private final boolean isEditable;
-
     private final Event event;
     private final List<Identifiable> things;
 
-    public EventEditAdapter(Event event, List<Identifiable> things, boolean isEditable, EditAdapterListener listener) {
+    public EventEditAdapter(Event event, List<Identifiable> things, EventEditAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
         this.event = event;
         this.things = things;
-        this.isEditable = isEditable;
     }
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), isEditable);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.DATE:
-                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
+                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.IMAGE:
                 return new HeaderedImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
             case Item.LOCATION:
@@ -98,7 +95,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
                 : GUEST;
     }
 
-    public interface EditAdapterListener extends
+    public interface EventEditAdapterListener extends
             TeamAdapter.TeamAdapterListener,
             ImageWorkerFragment.ImagePickerListener {
 
@@ -107,6 +104,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
         void onLocationClicked();
 
         void rsvpToEvent(User user);
+
+        boolean canEditEvent();
     }
 
 }

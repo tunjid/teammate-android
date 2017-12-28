@@ -41,7 +41,7 @@ import static android.app.Activity.RESULT_OK;
 public class EventEditFragment extends HeaderedFragment
         implements
         View.OnClickListener,
-        EventEditAdapter.EditAdapterListener {
+        EventEditAdapter.EventEditAdapterListener {
 
     public static final String ARG_EVENT = "event";
     public static final int PLACE_PICKER_REQUEST = 1;
@@ -100,10 +100,11 @@ public class EventEditFragment extends HeaderedFragment
             }
         });
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new EventEditAdapter(event, eventItems, true, this));
+        recyclerView.setAdapter(new EventEditAdapter(event, eventItems, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (!canEditEvent()) return;
                 if (Math.abs(dy) < 3) return;
                 toggleFab(dy < 0);
             }
@@ -183,7 +184,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     protected boolean showsFab() {
-        return currentRole.isPrivilegedRole();
+        return canEditEvent();
     }
 
     @Override
@@ -209,7 +210,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void onImageClick() {
-        if (showsFab()) fromUserPickerAction = true;
+        if (canEditEvent()) fromUserPickerAction = true;
         super.onImageClick();
     }
 
@@ -235,6 +236,11 @@ public class EventEditFragment extends HeaderedFragment
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
                 .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
                 .show();
+    }
+
+    @Override
+    public boolean canEditEvent() {
+        return currentRole.isPrivilegedRole();
     }
 
     @Override

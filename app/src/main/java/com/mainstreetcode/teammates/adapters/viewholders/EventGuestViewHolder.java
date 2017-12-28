@@ -7,10 +7,10 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.model.User;
 
-public class EventGuestViewHolder extends ModelCardViewHolder<User, EventEditAdapter.EditAdapterListener>
+public class EventGuestViewHolder extends ModelCardViewHolder<User, EventEditAdapter.EventEditAdapterListener>
         implements View.OnClickListener {
 
-    public EventGuestViewHolder(View itemView, EventEditAdapter.EditAdapterListener listener) {
+    public EventGuestViewHolder(View itemView, EventEditAdapter.EventEditAdapterListener listener) {
         super(itemView, listener);
         itemView.setOnClickListener(this);
     }

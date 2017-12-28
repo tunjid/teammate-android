@@ -17,14 +17,14 @@ import com.mainstreetcode.teammates.model.Item;
 /**
  * ViewHolder for selecting {@link com.mainstreetcode.teammates.model.Event}
  */
-public class MapInputViewHolder extends InputViewHolder<EventEditAdapter.EditAdapterListener>
+public class MapInputViewHolder extends InputViewHolder<EventEditAdapter.EventEditAdapterListener>
         implements View.OnClickListener {
 
     private final MapView mapView;
     private final Button addButton;
 
-    public MapInputViewHolder(View itemView, EventEditAdapter.EditAdapterListener listener) {
-        super(itemView, true);
+    public MapInputViewHolder(View itemView, EventEditAdapter.EventEditAdapterListener listener) {
+        super(itemView, listener::canEditEvent);
         this.adapterListener = listener;
         mapView = itemView.findViewById(R.id.map_view);
         addButton = itemView.findViewById(R.id.add);
@@ -62,7 +62,7 @@ public class MapInputViewHolder extends InputViewHolder<EventEditAdapter.EditAda
 
     @Override
     public void onClick(View view) {
-        adapterListener.onLocationClicked();
+        if (isEnabled()) adapterListener.onLocationClicked();
     }
 
 }
