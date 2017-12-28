@@ -17,9 +17,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
-import static io.reactivex.Flowable.concat;
-import static io.reactivex.Flowable.just;
-
 /**
  * ViewModel for {@link Event events}
  */
@@ -34,13 +31,17 @@ public class EventViewModel extends ViewModel {
         repository = EventRepository.getInstance();
     }
 
+    public List<Identifiable> fromEvent(Event event){
+       try {return eventListFunction.apply(event);}
+       catch (Exception e) {return new ArrayList<>();}
+    }
+
     public Flowable<DiffUtil.DiffResult> getEvents(List<Event> sourceEventList, String teamId) {
         return Identifiable.diff(repository.getEvents(teamId), () -> sourceEventList, ModelUtils::preserveList);
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {
-        Flowable<List<Identifiable>> immediate = just(event).map(eventListFunction);
-        Flowable<List<Identifiable>> sourceFlowable = concat(immediate, repository.get(event).map(eventListFunction));
+        Flowable<List<Identifiable>> sourceFlowable = repository.get(event).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList);
     }
 

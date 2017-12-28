@@ -29,7 +29,6 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -45,11 +44,12 @@ public class EventEditFragment extends HeaderedFragment
 
     public static final String ARG_EVENT = "event";
     public static final int PLACE_PICKER_REQUEST = 1;
+    private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private boolean fromUserPickerAction;
     private Role currentRole = Role.empty();
     private Event event;
-    private final List<Identifiable> eventItems = new ArrayList<>();
+    private List<Identifiable> eventItems;
 
     private RecyclerView recyclerView;
 
@@ -89,17 +89,11 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
+
+        eventItems = eventViewModel.fromEvent(event);
+
         recyclerView = rootView.findViewById(R.id.model_list);
-
-
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return position > event.size() ? 1 : 2;
-            }
-        });
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(getGridLayoutManager());
         recyclerView.setAdapter(new EventEditAdapter(event, eventItems, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -188,6 +182,11 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
+    public int[] staticViews() {
+        return EXCLUDED_VIEWS;
+    }
+
+    @Override
     protected HeaderedModel getHeaderedModel() {
         return event;
     }
@@ -240,7 +239,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public boolean canEditEvent() {
-        return currentRole.isPrivilegedRole();
+        return event.isEmpty() || currentRole.isPrivilegedRole();
     }
 
     @Override
@@ -271,7 +270,20 @@ public class EventEditFragment extends HeaderedFragment
         Activity activity;
         if ((activity = getActivity()) == null) return;
 
-        toggleFab(showsFab());
+        recyclerView.getAdapter().notifyDataSetChanged();
         activity.invalidateOptionsMenu();
+        toggleFab(canEditEvent());
+    }
+
+    @NonNull
+    private GridLayoutManager getGridLayoutManager() {
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return eventItems.get(position) instanceof User ? 1 : 2;
+            }
+        });
+        return layoutManager;
     }
 }
