@@ -161,11 +161,10 @@ public class RoleEditFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-
                 String roleName = role.getName();
 
                 if (TextUtils.isEmpty(roleName)) {
-                    showSnackbar("Please select a role");
+                    showSnackbar(getString(R.string.select_role));
                     return;
                 }
 
