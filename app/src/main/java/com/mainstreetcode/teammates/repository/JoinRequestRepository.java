@@ -80,6 +80,8 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
     }
 
     public Single<JoinRequest> dropJoinRequest(JoinRequest joinRequest) {
-        return api.declineUser(joinRequest.getId()).flatMap(this::delete);
+        return api.declineUser(joinRequest.getId())
+                .doOnError(throwable -> deleteInvalidModel(joinRequest, throwable))
+                .flatMap(this::delete);
     }
 }

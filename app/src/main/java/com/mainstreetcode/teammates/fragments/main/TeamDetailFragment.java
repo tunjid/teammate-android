@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.reactivex.Flowable;
+
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 /**
@@ -212,9 +214,11 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     private void approveUser(final JoinRequest request, final boolean approve) {
-        disposables.add(approve
-                ? roleViewModel.approveUser(request).subscribe(role -> onRoleApproved(request, role), defaultErrorHandler)
-                : roleViewModel.declineUser(request).subscribe(joinRequest -> onJoinDeclined(request, joinRequest), defaultErrorHandler));
+        Flowable<DiffUtil.DiffResult> resultFlowable = approve
+                ? roleViewModel.approveUser(request, team, teamModels)
+                : roleViewModel.declineUser(request, team, teamModels);
+
+        disposables.add(resultFlowable.subscribe(diffResult -> onJoinAction(diffResult, request, approve), defaultErrorHandler));
     }
 
     private void deleteTeam() {
@@ -247,21 +251,12 @@ public class TeamDetailFragment extends MainActivityFragment
                 .subscribe(this::onRoleUpdated, ErrorHandler.EMPTY));
     }
 
-    private void onJoinDeclined(JoinRequest request, JoinRequest joinRequest) {
-        team.getJoinRequests().remove(request);
-        recyclerView.getAdapter().notifyDataSetChanged();
+    private void onJoinAction(DiffUtil.DiffResult result, JoinRequest request, boolean approve) {
+        result.dispatchUpdatesTo(recyclerView.getAdapter());
 
-        String name = joinRequest.getUser().getFirstName();
-        showSnackbar(getString(R.string.removed_user, name));
-    }
-
-    private void onRoleApproved(JoinRequest request, Role role) {
-        team.getRoles().add(role);
-        team.getJoinRequests().remove(request);
-        recyclerView.getAdapter().notifyDataSetChanged();
-
-        String name = role.getUser().getFirstName();
-        showSnackbar(getString(R.string.added_user, name));
+        int stringResource = approve ? R.string.added_user : R.string.removed_user;
+        String name = request.getUser().getFirstName();
+        showSnackbar(getString(stringResource, name));
     }
 
     private void onRoleUpdated(Role role) {

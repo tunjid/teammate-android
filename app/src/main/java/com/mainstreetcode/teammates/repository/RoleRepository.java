@@ -91,7 +91,12 @@ public class RoleRepository extends ModelRepository<Role> {
     }
 
     public Single<Role> approveUser(JoinRequest request) {
-       return api.approveUser(request.getId()).map(getSaveFunction());
+        JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
+
+        return api.approveUser(request.getId())
+                .map(getSaveFunction())
+                .doOnSuccess(role -> joinRequestRepository.delete(request))
+                .doOnError(throwable -> joinRequestRepository.deleteInvalidModel(request, throwable));
     }
 
     public Single<Role> dropRole(Role role) {

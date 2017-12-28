@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.transition.Fade;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -186,10 +188,7 @@ public class RoleEditFragment extends HeaderedFragment
                 if ((activity = getActivity()) == null) return super.onOptionsItemSelected(item);
 
                 new AlertDialog.Builder(activity).setTitle(prompt)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.dropRole(role).subscribe(dropped -> {
-                            showSnackbar(getString(R.string.dropped_user, firstName));
-                            activity.onBackPressed();
-                        }, defaultErrorHandler)))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.dropRole(role).subscribe(this::onRoleDropped, defaultErrorHandler)))
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
@@ -211,5 +210,21 @@ public class RoleEditFragment extends HeaderedFragment
 
         activity.invalidateOptionsMenu();
         toggleFab(showsFab());
+    }
+
+    private void onRoleDropped(Role dropped) {
+        showSnackbar(getString(R.string.dropped_user, dropped.getUser().getFirstName()));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setEnterTransition(new Fade());
+            setExitTransition(new Fade());
+            setSharedElementEnterTransition(null);
+            setSharedElementReturnTransition(null);
+        }
+
+            Activity activity;
+        if ((activity = getActivity()) == null) return;
+
+        activity.onBackPressed();
     }
 }
