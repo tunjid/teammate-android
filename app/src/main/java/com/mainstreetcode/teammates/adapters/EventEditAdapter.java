@@ -5,17 +5,16 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.DateViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.EventGuestViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.GuestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.MapInputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Guest;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -25,8 +24,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammates.model.Event  }
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
 public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventEditAdapter.EventEditAdapterListener> {
@@ -34,14 +31,12 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     private static final int GUEST = 12;
     private static final int TEAM = 13;
 
-    private final Event event;
-    private final List<Identifiable> things;
+    private final List<Identifiable> items;
 
-    public EventEditAdapter(Event event, List<Identifiable> things, EventEditAdapterListener listener) {
+    public EventEditAdapter(List<Identifiable> items, EventEditAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
-        this.event = event;
-        this.things = things;
+        this.items = items;
     }
 
     @Override
@@ -56,7 +51,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             case Item.LOCATION:
                 return new MapInputViewHolder(getItemView(R.layout.viewholder_location_input, viewGroup), adapterListener);
             case GUEST:
-                return new EventGuestViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
+                return new GuestViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
             case TEAM:
                 return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), item -> adapterListener.selectTeam());
             default:
@@ -66,28 +61,26 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public void onBindViewHolder(BaseViewHolder viewHolder, int i) {
-        Object thing = things.get(i);
-        List<User> attendees = event.getAttendees();
+        Object item = items.get(i);
 
-        if (thing instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) thing);
-        else if (thing instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) thing);
-        else if (thing instanceof User)
-            ((EventGuestViewHolder) viewHolder).bind((User) thing, attendees.contains(thing));
+        if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
+        else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
+        else if (item instanceof Guest) ((GuestViewHolder) viewHolder).bind((Guest) item);
     }
 
     @Override
     public int getItemCount() {
-        return things.size();
+        return items.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return things.get(position).getId().hashCode();
+        return items.get(position).getId().hashCode();
     }
 
     @Override
     public int getItemViewType(int position) {
-        Object thing = things.get(position);
+        Object thing = items.get(position);
         return thing instanceof Item
                 ? ((Item) thing).getItemType()
                 : thing instanceof Team
@@ -103,7 +96,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
         void onLocationClicked();
 
-        void rsvpToEvent(User user);
+        void rsvpToEvent(Guest guest);
 
         boolean canEditEvent();
     }

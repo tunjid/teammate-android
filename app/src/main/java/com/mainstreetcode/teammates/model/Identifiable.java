@@ -23,6 +23,10 @@ public interface Identifiable {
         return getId().equals(other.getId());
     }
 
+    default Object getChangePayload(Identifiable other) {
+        return null;
+    }
+
     static <T extends Identifiable> Flowable<DiffUtil.DiffResult> diff(Flowable<List<T>> sourceFlowable,
                                                                        Callable<List<T>> sourceSupplier,
                                                                        BiFunction<List<T>, List<T>, List<T>> accumulator) {
@@ -80,7 +84,7 @@ public interface Identifiable {
         @Nullable
         @Override
         public Object getChangePayload(int oldItemPosition, int newItemPosition) {
-            return super.getChangePayload(oldItemPosition, newItemPosition);
+            return stale.get(oldItemPosition).getChangePayload(updated.get(newItemPosition));
         }
     }
 }

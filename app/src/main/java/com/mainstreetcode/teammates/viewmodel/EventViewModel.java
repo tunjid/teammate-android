@@ -5,9 +5,7 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
-import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.EventRepository;
-import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -23,13 +21,9 @@ import io.reactivex.functions.Function;
 
 public class EventViewModel extends ViewModel {
 
-    private final User signedInUser;
     private final EventRepository repository;
 
-    public EventViewModel() {
-        signedInUser = UserRepository.getInstance().getCurrentUser();
-        repository = EventRepository.getInstance();
-    }
+    public EventViewModel() {repository = EventRepository.getInstance();}
 
     public List<Identifiable> fromEvent(Event event){
        try {return eventListFunction.apply(event);}
@@ -51,11 +45,7 @@ public class EventViewModel extends ViewModel {
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final Event event, List<Identifiable> eventItems, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.rsvpEvent(event, attending).map(sameEvent -> {
-            if (attending) sameEvent.getAbsentees().remove(signedInUser);
-            else sameEvent.getAttendees().remove(signedInUser);
-            return sameEvent;
-        }).toFlowable().map(eventListFunction);
+        Flowable<List<Identifiable>> sourceFlowable = repository.rsvpEvent(event, attending).toFlowable().map(eventListFunction);
 
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
 
@@ -71,8 +61,7 @@ public class EventViewModel extends ViewModel {
 
         for (int i = 0; i < eventSize; i++) result.add(event.get(i));
         result.add(event.getTeam());
-        result.addAll(event.getAttendees());
-        result.addAll(event.getAbsentees());
+        result.addAll(event.getGuests());
 
         return result;
     };

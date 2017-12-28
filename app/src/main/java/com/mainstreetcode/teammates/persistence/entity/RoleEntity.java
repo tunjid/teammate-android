@@ -8,6 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -57,7 +58,7 @@ public class RoleEntity implements Parcelable {
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return TextUtils.isEmpty(imageUrl) ? user.getImageUrl() : imageUrl;
     }
 
     public Team getTeam() {

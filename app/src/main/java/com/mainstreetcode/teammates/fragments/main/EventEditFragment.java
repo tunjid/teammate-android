@@ -23,6 +23,7 @@ import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Guest;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Role;
@@ -94,7 +95,7 @@ public class EventEditFragment extends HeaderedFragment
 
         recyclerView = rootView.findViewById(R.id.model_list);
         recyclerView.setLayoutManager(getGridLayoutManager());
-        recyclerView.setAdapter(new EventEditAdapter(event, eventItems, this));
+        recyclerView.setAdapter(new EventEditAdapter(eventItems, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -227,9 +228,9 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
-    public void rsvpToEvent(User user) {
+    public void rsvpToEvent(Guest guest) {
         Activity activity;
-        if ((activity = getActivity()) == null || !user.equals(currentRole.getUser())) return;
+        if ((activity = getActivity()) == null || !guest.getUser().equals(currentRole.getUser())) return;
 
         new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
@@ -281,7 +282,7 @@ public class EventEditFragment extends HeaderedFragment
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return eventItems.get(position) instanceof User ? 1 : 2;
+                return eventItems.get(position) instanceof Guest ? 1 : 2;
             }
         });
         return layoutManager;

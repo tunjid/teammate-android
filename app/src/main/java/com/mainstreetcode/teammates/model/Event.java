@@ -42,8 +42,7 @@ public class Event extends EventEntity
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
     private static final int LOCATION_POSITION = 4;
 
-    @Ignore private List<User> attendees = new ArrayList<>();
-    @Ignore private List<User> absentees = new ArrayList<>();
+    @Ignore private List<Guest> guests = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
 
     public static Event empty() {
@@ -60,8 +59,7 @@ public class Event extends EventEntity
 
     protected Event(Parcel in) {
         super(in);
-        in.readList(attendees, User.class.getClassLoader());
-        in.readList(absentees, User.class.getClassLoader());
+        in.readList(guests, Guest.class.getClassLoader());
         items = buildItems();
     }
 
@@ -106,9 +104,7 @@ public class Event extends EventEntity
         for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
 
         location = updatedEvent.location;
-
-        ModelUtils.preserveList(attendees, updatedEvent.attendees);
-        ModelUtils.preserveList(absentees, updatedEvent.absentees);
+        ModelUtils.preserveList(guests, updatedEvent.guests);
 
         team.update(updatedEvent.team);
     }
@@ -139,12 +135,8 @@ public class Event extends EventEntity
         location = place.getLatLng();
     }
 
-    public List<User> getAttendees() {
-        return attendees;
-    }
-
-    public List<User> getAbsentees() {
-        return absentees;
+    public List<Guest> getGuests() {
+        return guests;
     }
 
     @Override
@@ -155,8 +147,7 @@ public class Event extends EventEntity
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeList(attendees);
-        dest.writeList(absentees);
+        dest.writeList(guests);
     }
 
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
@@ -209,6 +200,9 @@ public class Event extends EventEntity
 
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive()) {
+                return new Event(json.getAsString(), "", "", "", "", new Date(), new Date(), Team.empty(), null);
+            }
 
             JsonObject eventJson = json.getAsJsonObject();
 
@@ -226,8 +220,7 @@ public class Event extends EventEntity
 
             Event result = new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location);
 
-            ModelUtils.deserializeList(context, eventJson.get("attendees"), result.attendees, User.class);
-            ModelUtils.deserializeList(context, eventJson.get("absentees"), result.absentees, User.class);
+            ModelUtils.deserializeList(context, eventJson.get("guests"), result.guests, Guest.class);
 
             return result;
         }

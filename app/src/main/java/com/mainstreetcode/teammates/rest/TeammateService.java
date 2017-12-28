@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Guest;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Message;
@@ -94,12 +95,13 @@ public class TeammateService {
                 .registerTypeAdapter(Team.class, new Team.GsonAdapter())
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
                 .registerTypeAdapter(Role.class, new Role.GsonAdapter())
+                .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Media.class, new Media.GsonAdapter())
+                .registerTypeAdapter(Guest.class, new Guest.GsonAdapter())
                 .registerTypeAdapter(Device.class, new Device.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
-                .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .create();
     }
