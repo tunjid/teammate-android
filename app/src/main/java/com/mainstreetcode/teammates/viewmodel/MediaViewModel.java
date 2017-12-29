@@ -32,7 +32,7 @@ public class MediaViewModel extends ListViewModel<Media> {
     }
 
     public Flowable<Media> getMedia(Media model) {
-        return repository.get(model).doOnError(throwable -> ModelUtils.checkForInvalidObject(throwable, model, getModelList(model.getTeam())));
+        return checkForInvalidObject(repository.get(model), model, model.getTeam());
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
