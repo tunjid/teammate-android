@@ -109,7 +109,9 @@ public class TeamChatViewModel extends ViewModel {
         return throwable -> {
             int retries = previousRetries + 1;
             return retries <= 3
-                    ? Completable.timer(300, TimeUnit.MILLISECONDS).andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries))).observeOn(mainThread())
+                    ? Completable.timer(300, TimeUnit.MILLISECONDS)
+                    .andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries)))
+                    .observeOn(mainThread())
                     : Completable.error(throwable);
         };
     }
