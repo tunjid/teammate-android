@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
 
+    private int lastOffset;
     protected HeaderedImageViewHolder viewHolder;
 
     @Override
@@ -40,6 +42,17 @@ public abstract class HeaderedFragment extends MainActivityFragment
         Toolbar headerToolbar = view.findViewById(R.id.header_toolbar);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerToolbar.getLayoutParams();
         params.height += TeammatesBaseActivity.insetHeight;
+
+        AppBarLayout appBarLayout = view.findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
+            if (!showsFab() || getActivity() == null) return;
+
+            int dy = lastOffset - verticalOffset;
+            if (Math.abs(dy) < 3) return;
+
+            toggleFab(dy < 0);
+            lastOffset = verticalOffset;
+        });
     }
 
     @Override
