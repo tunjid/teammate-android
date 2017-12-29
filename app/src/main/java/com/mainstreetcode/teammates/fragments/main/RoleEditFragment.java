@@ -134,11 +134,6 @@ public class RoleEditFragment extends HeaderedFragment
         recyclerView = null;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ImageWorkerFragment.detach(this);
-    }
 
     @Override
     public boolean drawsBehindStatusBar() {

@@ -161,12 +161,6 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ImageWorkerFragment.detach(this);
-    }
-
-    @Override
     public boolean drawsBehindStatusBar() {
         return true;
     }

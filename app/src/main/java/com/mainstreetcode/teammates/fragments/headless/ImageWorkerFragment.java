@@ -93,10 +93,6 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
         else instance.startMultipleMediaPicker();
     }
 
-    public static void detach(BaseFragment host) {
-
-    }
-
     @Override
     public void onAttachFragment(Fragment childFragment) {
         super.onAttachFragment(childFragment);
@@ -110,6 +106,7 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startImagePicker();
                 }
+                break;
         }
     }
 
