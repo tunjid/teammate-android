@@ -40,15 +40,13 @@ public class EventViewModel extends ListViewModel<Event> {
     }
 
     public Single<DiffUtil.DiffResult> updateEvent(final Event event, List<Identifiable> eventItems) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.createOrUpdate(event).toFlowable().map(eventListFunction);
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(event).toFlowable(), event, event.getTeam()).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final Event event, List<Identifiable> eventItems, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.rsvpEvent(event, attending).toFlowable().map(eventListFunction);
-
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.rsvpEvent(event, attending).toFlowable(), event, event.getTeam()).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
-
     }
 
     public Single<Event> delete(final Event event) {
