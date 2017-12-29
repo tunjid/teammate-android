@@ -144,6 +144,15 @@ public class TeammatesBaseFragment extends BaseFragment {
         }
     }
 
+    protected void removeEnterExitTransitions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setEnterTransition(new Fade());
+            setExitTransition(new Fade());
+            setSharedElementEnterTransition(null);
+            setSharedElementReturnTransition(null);
+        }
+    }
+
     public int[] staticViews() {
         return new int[]{};
     }
