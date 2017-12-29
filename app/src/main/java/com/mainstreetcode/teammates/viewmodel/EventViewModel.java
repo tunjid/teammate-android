@@ -52,7 +52,9 @@ public class EventViewModel extends ListViewModel<Event> {
     }
 
     public Single<Event> delete(final Event event) {
-        return checkForInvalidObject(repository.delete(event).toFlowable(), event, event.getTeam()).firstOrError();
+        return checkForInvalidObject(repository.delete(event).toFlowable(), event, event.getTeam())
+                .firstOrError()
+                .doOnSuccess(getModelList(event.getTeam())::remove);
     }
 
     private Function<Event, List<Identifiable>> eventListFunction = event -> {
