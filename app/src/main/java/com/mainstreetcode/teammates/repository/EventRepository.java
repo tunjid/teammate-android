@@ -72,7 +72,7 @@ public class EventRepository extends ModelRepository<Event> {
     @Override
     public Single<Event> delete(Event event) {
         return api.deleteEvent(event.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(event, throwable));
     }
 

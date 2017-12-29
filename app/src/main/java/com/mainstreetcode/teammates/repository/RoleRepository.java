@@ -66,7 +66,7 @@ public class RoleRepository extends ModelRepository<Role> {
     @Override
     public Single<Role> delete(Role model) {
         return api.deleteRole(model.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 

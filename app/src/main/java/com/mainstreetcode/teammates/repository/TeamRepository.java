@@ -88,7 +88,7 @@ public class TeamRepository extends ModelRepository<Team> {
     @Override
     public Single<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(team, throwable));
     }
 

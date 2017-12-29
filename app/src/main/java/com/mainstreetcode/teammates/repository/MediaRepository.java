@@ -86,7 +86,7 @@ public class MediaRepository extends ModelRepository<Media> {
     @Override
     public Single<Media> delete(Media model) {
         return api.deleteMedia(model.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 

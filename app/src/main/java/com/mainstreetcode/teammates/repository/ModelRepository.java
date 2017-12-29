@@ -44,10 +44,9 @@ public abstract class ModelRepository<T extends Model<T>> {
     abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
     public final Flowable<T> get(T model) {
-        if (model.isEmpty()) {
-            return Flowable.error(new IllegalArgumentException("Model does not exist"));
-        }
-        return get(model.getId()).map(localMapper(model));
+        return model.isEmpty()
+                ? Flowable.error(new IllegalArgumentException("Model does not exist"))
+                : get(model.getId()).map(localMapper(model));
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {
@@ -84,8 +83,9 @@ public abstract class ModelRepository<T extends Model<T>> {
         if (message.isInvalidObject()) deleteLocally(model);
     }
 
-    final void deleteLocally(T model) {
+    final T deleteLocally(T model) {
         dao().delete(model);
+        return model;
     }
 
     @Nullable
