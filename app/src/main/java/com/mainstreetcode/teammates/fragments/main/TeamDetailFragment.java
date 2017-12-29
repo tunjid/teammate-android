@@ -240,6 +240,8 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private void onTeamDeleted() {
         showSnackbar(getString(R.string.deleted_team, team.getName()));
+        removeEnterExitTransitions();
+
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();
     }

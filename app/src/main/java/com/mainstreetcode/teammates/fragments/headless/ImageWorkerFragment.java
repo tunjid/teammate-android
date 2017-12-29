@@ -48,6 +48,7 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
     public static final String TAG = "ImageWorkerFragment";
     public static final String IMAGE_SELECTION = "image/*";
     public static final String IMAGE_VIDEO_SELECTION = "image/* video/*";
+    public static final String[] STORAGE_PERMISSIONS = {WRITE_EXTERNAL_STORAGE};
 
     public static ImageWorkerFragment newInstance() {
         return new ImageWorkerFragment();
@@ -65,40 +66,31 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
 
     public static void requestCrop(BaseFragment host) {
         ImageWorkerFragment instance = getInstance(host);
-
         if (instance == null) return;
 
-        boolean noPermit = SDK_INT >= M && ContextCompat.checkSelfPermission(host.getActivity(),
+        Activity activity = host.getActivity();
+        if (activity == null) return;
+
+        boolean noPermit = SDK_INT >= M && ContextCompat.checkSelfPermission(activity,
                 WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
 
-        if (noPermit)
-            instance.requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE}, CROP_CHOOSER);
+        if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, CROP_CHOOSER);
         else instance.startImagePicker();
     }
 
 
     public static void requestMultipleMedia(BaseFragment host) {
         ImageWorkerFragment instance = getInstance(host);
-
         if (instance == null) return;
 
-        boolean noPermit = SDK_INT >= M && ContextCompat.checkSelfPermission(host.getActivity(),
+        Activity activity = host.getActivity();
+        if (activity == null) return;
+
+        boolean noPermit = SDK_INT >= M && ContextCompat.checkSelfPermission(activity,
                 WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
 
-        if (noPermit)
-            instance.requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE}, CROP_CHOOSER);
+        if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, CROP_CHOOSER);
         else instance.startMultipleMediaPicker();
-    }
-
-    public static void detach(BaseFragment host) {
-//        if (getInstance(host) != null) return;
-//
-//        ImageWorkerFragment instance = ImageWorkerFragment.newInstance();
-//        instance.setTargetFragment(host, ImageWorkerFragment.GALLERY_CHOOSER);
-//
-//        host.getFragmentManager().beginTransaction()
-//                .remove(instance)
-//                .commit();
     }
 
     @Override
@@ -114,16 +106,20 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startImagePicker();
                 }
+                break;
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         boolean isCropListener = isCropListener();
         boolean isMediaListener = isMediaListener();
 
         Fragment target = getParentFragment();
+        if (target == null) return;
+
+        Activity activity = getActivity();
+        if (activity == null) return;
 
         if (resultCode != Activity.RESULT_OK || (!isCropListener && !isMediaListener)) return;
 
@@ -134,7 +130,7 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
                     .setMinCropWindowSize(80, 80)
                     .setMaxCropResultSize(1000, 1000)
                     .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
-                    .start(getContext(), this);
+                    .start(activity, this);
         }
         else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && isCropListener) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
@@ -143,7 +139,7 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
         }
         else if (requestCode == MULTIPLE_MEDIA_CHOOSER && isMediaListener) {
             MediaListener listener = (MediaListener) target;
-            ContentResolver contentResolver = getContext().getContentResolver();
+            ContentResolver contentResolver = activity.getContentResolver();
 
             Maybe<List<Uri>> filesMaybe = Maybe.create(new MediaQuery(data, contentResolver)).subscribeOn(io()).observeOn(mainThread());
             disposables.add(filesMaybe.subscribe(listener::onFilesSelected, ErrorHandler.EMPTY));

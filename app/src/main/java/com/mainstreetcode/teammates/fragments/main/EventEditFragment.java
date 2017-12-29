@@ -118,13 +118,7 @@ public class EventEditFragment extends HeaderedFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_delete:
-                disposables.add(eventViewModel.delete(event).subscribe(deleted -> {
-                    Activity activity;
-                    if ((activity = getActivity()) == null) return;
-
-                    showSnackbar(getString(R.string.deleted_team, event.getName()));
-                    activity.onBackPressed();
-                }, defaultErrorHandler));
+                disposables.add(eventViewModel.delete(event).subscribe(this::onEventDeleted, defaultErrorHandler));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -164,12 +158,6 @@ public class EventEditFragment extends HeaderedFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ImageWorkerFragment.detach(this);
     }
 
     @Override
@@ -230,7 +218,8 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void rsvpToEvent(Guest guest) {
         Activity activity;
-        if ((activity = getActivity()) == null || !guest.getUser().equals(currentRole.getUser())) return;
+        if ((activity = getActivity()) == null || !guest.getUser().equals(currentRole.getUser()))
+            return;
 
         new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
@@ -274,6 +263,16 @@ public class EventEditFragment extends HeaderedFragment
         recyclerView.getAdapter().notifyDataSetChanged();
         activity.invalidateOptionsMenu();
         toggleFab(canEditEvent());
+    }
+
+    private void onEventDeleted(Event deleted) {
+        showSnackbar(getString(R.string.deleted_team, deleted.getName()));
+        removeEnterExitTransitions();
+
+        Activity activity;
+        if ((activity = getActivity()) == null) return;
+
+        activity.onBackPressed();
     }
 
     @NonNull
