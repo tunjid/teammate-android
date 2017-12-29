@@ -28,7 +28,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,8 +45,8 @@ public class ChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
+    private List<Chat> chats;
     private Disposable chatDisposable;
-    private List<Chat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -77,6 +76,7 @@ public class ChatFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
+        chats = teamChatViewModel.getModelList(team);
     }
 
     @Nullable
@@ -189,7 +189,7 @@ public class ChatFragment extends MainActivityFragment
 
     private void fetchChatsBefore(Date date) {
         disposables.add(teamChatViewModel
-                .chatsBefore(chats, team, date)
+                .chatsBefore(team, date)
                 .subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 

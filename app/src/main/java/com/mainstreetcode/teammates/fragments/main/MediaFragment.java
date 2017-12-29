@@ -82,7 +82,7 @@ public class MediaFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
-        mediaList = mediaViewModel.getMediaList(team);
+        mediaList = mediaViewModel.getModelList(team);
         currentRole = Role.empty();
 
         ImageWorkerFragment.attach(this);
@@ -139,7 +139,7 @@ public class MediaFragment extends MainActivityFragment
     }
 
     void fetchMedia(Date date) {
-        disposables.add(mediaViewModel.getTeamMedia(mediaList, team, date).subscribe(this::onMediaUpdated, defaultErrorHandler));
+        disposables.add(mediaViewModel.getTeamMedia(team, date).subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override

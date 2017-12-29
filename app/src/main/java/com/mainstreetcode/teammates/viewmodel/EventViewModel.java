@@ -1,10 +1,10 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.EventRepository;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -19,7 +19,7 @@ import io.reactivex.functions.Function;
  * ViewModel for {@link Event events}
  */
 
-public class EventViewModel extends ViewModel {
+public class EventViewModel extends ListViewModel<Event> {
 
     private final EventRepository repository;
 
@@ -30,8 +30,8 @@ public class EventViewModel extends ViewModel {
        catch (Exception e) {return new ArrayList<>();}
     }
 
-    public Flowable<DiffUtil.DiffResult> getEvents(List<Event> sourceEventList, String teamId) {
-        return Identifiable.diff(repository.getEvents(teamId), () -> sourceEventList, ModelUtils::preserveList);
+    public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
+        return Identifiable.diff(repository.getEvents(team), () -> getModelList(team), ModelUtils::preserveList);
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {
