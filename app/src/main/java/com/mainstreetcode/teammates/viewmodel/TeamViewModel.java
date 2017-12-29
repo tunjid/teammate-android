@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammates.viewmodel;
 
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Model;
@@ -46,10 +45,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Flowable<DiffUtil.DiffResult> getTeam(Team team, List<Model> teamModels) {
         Flowable<List<Model>> sourceFlowable = checkForInvalidObject(repository.get(team), team, Team.class)
-                .doOnNext(team1 -> {
-                    List<Model> list = teamModels;
-                    Log.i("TEST", "List" + list);
-                })
                 .map(teamListFunction);
         return Identifiable.diff(sourceFlowable, () -> teamModels, (sourceTeamList, newTeamList) -> newTeamList);
     }
