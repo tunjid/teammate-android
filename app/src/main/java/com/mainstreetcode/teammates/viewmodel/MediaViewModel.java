@@ -22,7 +22,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
-public class MediaViewModel extends ListViewModel<Media> {
+public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     private final MediaRepository repository;
     private final Map<Team, Set<Media>> selectionMap = new HashMap<>();

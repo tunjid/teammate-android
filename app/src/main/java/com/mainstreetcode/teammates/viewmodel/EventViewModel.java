@@ -15,19 +15,21 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 /**
  * ViewModel for {@link Event events}
  */
 
-public class EventViewModel extends ListViewModel<Event> {
+public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private final EventRepository repository;
 
     public EventViewModel() {repository = EventRepository.getInstance();}
 
-    public List<Identifiable> fromEvent(Event event){
-       try {return eventListFunction.apply(event);}
-       catch (Exception e) {return new ArrayList<>();}
+    public List<Identifiable> fromEvent(Event event) {
+        try {return eventListFunction.apply(event);}
+        catch (Exception e) {return new ArrayList<>();}
     }
 
     public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
@@ -52,7 +54,8 @@ public class EventViewModel extends ListViewModel<Event> {
     public Single<Event> delete(final Event event) {
         return checkForInvalidObject(repository.delete(event).toFlowable(), event, event.getTeam())
                 .firstOrError()
-                .doOnSuccess(getModelList(event.getTeam())::remove);
+                .doOnSuccess(getModelList(event.getTeam())::remove)
+                .observeOn(mainThread());
     }
 
     private Function<Event, List<Identifiable>> eventListFunction = event -> {

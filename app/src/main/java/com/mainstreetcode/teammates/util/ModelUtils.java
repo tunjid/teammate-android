@@ -101,9 +101,10 @@ public class ModelUtils {
     }
 
     public static <T> void checkForInvalidObject(Throwable throwable, T model, List<T> list) {
-        if (!(throwable instanceof HttpException)) return;
-        Message message = new Message((HttpException) throwable);
+        if (isInvalidObject(throwable)) list.remove(model);
+    }
 
-        if (message.isInvalidObject()) list.remove(model);
+    public static boolean isInvalidObject(Throwable throwable) {
+        return throwable instanceof HttpException && new Message((HttpException) throwable).isInvalidObject();
     }
 }

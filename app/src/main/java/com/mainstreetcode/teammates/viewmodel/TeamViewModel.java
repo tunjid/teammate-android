@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.v7.util.DiffUtil;
+import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Model;
@@ -24,22 +24,33 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * ViewModel for team
  */
 
-public class TeamViewModel extends ViewModel {
+public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     private final TeamRepository repository;
     private final Team defaultTeam = Team.empty();
+    private final List<Team> teams = new ArrayList<>();
 
     public TeamViewModel() {
         repository = TeamRepository.getInstance();
         repository.getDefaultTeam().subscribe(defaultTeam::update, ErrorHandler.EMPTY);
     }
 
+    @Override
+    public List<Team> getModelList(Class<Team> key) {
+        return teams;
+    }
+
     public Single<Team> createOrUpdate(Team team) {
-        return repository.createOrUpdate(team).observeOn(mainThread());
+        return checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), team, Team.class).observeOn(mainThread()).firstOrError();
     }
 
     public Flowable<DiffUtil.DiffResult> getTeam(Team team, List<Model> teamModels) {
-        Flowable<List<Model>> sourceFlowable = repository.get(team).map(teamListFunction);
+        Flowable<List<Model>> sourceFlowable = checkForInvalidObject(repository.get(team), team, Team.class)
+                .doOnNext(team1 -> {
+                    List<Model> list = teamModels;
+                    Log.i("TEST", "List" + list);
+                })
+                .map(teamListFunction);
         return Identifiable.diff(sourceFlowable, () -> teamModels, (sourceTeamList, newTeamList) -> newTeamList);
     }
 
@@ -47,12 +58,15 @@ public class TeamViewModel extends ViewModel {
         return repository.findTeams(queryText).observeOn(mainThread());
     }
 
-    public Flowable<DiffUtil.DiffResult> getMyTeams(String userId, List<Team> teams) {
-        return Identifiable.diff(repository.getMyTeams(userId), () -> teams, ModelUtils::preserveList);
+    public Flowable<DiffUtil.DiffResult> getMyTeams(String userId) {
+        return Identifiable.diff(repository.getMyTeams(userId), () -> getModelList(Team.class), ModelUtils::preserveList);
     }
 
     public Single<Team> deleteTeam(Team team) {
-        return repository.delete(team).observeOn(mainThread());
+        return checkForInvalidObject(repository.delete(team).toFlowable(), team, Team.class).observeOn(mainThread())
+                .firstOrError()
+                .doOnSuccess(getModelList(Team.class)::remove)
+                .observeOn(mainThread());
     }
 
     public Team getDefaultTeam() {

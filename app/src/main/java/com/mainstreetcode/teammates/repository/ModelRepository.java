@@ -7,19 +7,16 @@ import android.webkit.MimeTypeMap;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.persistence.EntityDao;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -88,9 +85,7 @@ public abstract class ModelRepository<T extends Model<T>> {
     }
 
     final void deleteLocally(T model) {
-        Completable.fromRunnable(() -> dao().delete(model))
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> {}, ErrorHandler.EMPTY);
+        dao().delete(model);
     }
 
     @Nullable

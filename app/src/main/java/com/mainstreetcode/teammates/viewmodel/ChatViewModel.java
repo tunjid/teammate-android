@@ -29,7 +29,7 @@ import static io.reactivex.Flowable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 
-public class ChatViewModel extends ListViewModel<Chat> {
+public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     private static final int NO_MORE = -1;
     private static final int RETRY = -2;

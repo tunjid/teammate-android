@@ -180,7 +180,7 @@ public class RoleEditFragment extends HeaderedFragment
                 if ((activity = getActivity()) == null) return super.onOptionsItemSelected(item);
 
                 new AlertDialog.Builder(activity).setTitle(prompt)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.dropRole(role).subscribe(this::onRoleDropped, defaultErrorHandler)))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.deleteRole(role).subscribe(this::onRoleDropped, defaultErrorHandler)))
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
