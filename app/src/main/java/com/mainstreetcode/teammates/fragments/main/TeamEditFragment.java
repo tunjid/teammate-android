@@ -21,7 +21,6 @@ import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
-import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
@@ -51,7 +50,6 @@ public class TeamEditFragment extends HeaderedFragment
 
     private int state;
     private Team team;
-    private Role currentRole = Role.empty();
     private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -126,11 +124,11 @@ public class TeamEditFragment extends HeaderedFragment
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        setFabIcon(state == JOINING ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
+        setFabIcon(R.drawable.ic_check_white_24dp);
 
         User user = userViewModel.getCurrentUser();
 
-        onRoleUpdated(Role.empty());
+        onRoleUpdated();
 
         disposables.add(localRoleViewModel.getRoleInTeam(user, team)
                 .subscribe(this::onRoleUpdated, defaultErrorHandler));
@@ -152,12 +150,12 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Override
     protected boolean showsFab() {
-        return state == CREATING || state == JOINING || currentRole.isPrivilegedRole();
+        return state == CREATING || state == JOINING || localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
     public void onImageClick() {
-        if (!currentRole.isPrivilegedRole()) return;
+        if (!localRoleViewModel.hasPrivilegedRole()) return;
         super.onImageClick();
     }
 
@@ -182,7 +180,7 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Override
     public boolean isPrivileged() {
-        return state == CREATING || currentRole.isPrivilegedRole();
+        return state == CREATING || localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -235,10 +233,8 @@ public class TeamEditFragment extends HeaderedFragment
         }
     }
 
-    private void onRoleUpdated(Role updated) {
-        currentRole.update(updated);
-
-        state = team.isEmpty() ? CREATING : currentRole.isEmpty() ? JOINING : EDITING;
+    private void onRoleUpdated() {
+        state = team.isEmpty() ? CREATING : localRoleViewModel.getCurrentRole().isEmpty() ? JOINING : EDITING;
 
         switch (state) {
             case CREATING:

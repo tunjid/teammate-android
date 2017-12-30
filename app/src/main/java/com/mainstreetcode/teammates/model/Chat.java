@@ -100,6 +100,16 @@ public class Chat implements
     }
 
     @Override
+    public void reset() {
+        kind = "";
+        content = "";
+        created = new Date();
+        user.reset();
+        team.reset();
+        setSuccessful(true);
+    }
+
+    @Override
     public void update(Chat updated) {
         id = updated.id;
         kind = updated.kind;

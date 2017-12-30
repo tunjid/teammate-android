@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.util.Log;
@@ -30,7 +29,7 @@ import static io.reactivex.Flowable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 
-public class TeamChatViewModel extends ViewModel {
+public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     private static final int NO_MORE = -1;
     private static final int RETRY = -2;
@@ -40,7 +39,7 @@ public class TeamChatViewModel extends ViewModel {
 
     private final Map<Team, Integer> chatMap;
 
-    public TeamChatViewModel() {
+    public ChatViewModel() {
         repository = ChatRepository.getInstance();
         notifier = ChatNotifier.getInstance();
         chatMap = new HashMap<>();
@@ -66,7 +65,9 @@ public class TeamChatViewModel extends ViewModel {
         return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0)).observeOn(mainThread());
     }
 
-    public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final List<Chat> chats, final Team team, Date date) {
+    public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final Team team, Date date) {
+        final List<Chat> chats = getModelList(team);
+
         final Integer lastSize = chatMap.get(team);
         final Integer currentSize = chats.size();
 

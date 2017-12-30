@@ -48,9 +48,9 @@ public class EventRepository extends ModelRepository<Event> {
     @Override
     public Single<Event> createOrUpdate(Event event) {
         Single<Event> eventSingle = event.isEmpty()
-                ? api.createEvent(event).map(localMapper(event))
+                ? api.createEvent(event).map(getLocalUpdateFunction(event))
                 : api.updateEvent(event.getId(), event)
-                .map(localMapper(event))
+                .map(getLocalUpdateFunction(event))
                 .doOnError(throwable -> deleteInvalidModel(event, throwable));
 
         MultipartBody.Part body = getBody(event.getHeaderItem().getValue(), Event.PHOTO_UPLOAD_KEY);
@@ -72,20 +72,20 @@ public class EventRepository extends ModelRepository<Event> {
     @Override
     public Single<Event> delete(Event event) {
         return api.deleteEvent(event.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(event, throwable));
     }
 
-    public Flowable<List<Event>> getEvents(String teamId) {
-        Maybe<List<Event>> local = eventDao.getEvents(teamId).subscribeOn(io());
-        Maybe<List<Event>> remote = api.getEvents(teamId).map(getSaveManyFunction()).toMaybe();
+    public Flowable<List<Event>> getEvents(Team team) {
+        Maybe<List<Event>> local = eventDao.getEvents(team.getId()).subscribeOn(io());
+        Maybe<List<Event>> remote = api.getEvents(team.getId()).map(getSaveManyFunction()).toMaybe();
 
         return fetchThenGet(local, remote);
     }
 
     public Single<Event> rsvpEvent(final Event event, boolean attending) {
         return api.rsvpEvent(event.getId(), attending)
-                .map(localMapper(event))
+                .map(getLocalUpdateFunction(event))
                 .map(getSaveFunction());
     }
 

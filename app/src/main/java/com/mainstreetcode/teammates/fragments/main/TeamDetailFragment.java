@@ -56,10 +56,8 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-
-    private Role currentRole = Role.empty();
     private final List<String> availableRoles = new ArrayList<>();
-    private final List<Model> teamModels = new ArrayList<>();
+    private List<Model> teamModels;
 
     private RecyclerView recyclerView;
 
@@ -88,6 +86,7 @@ public class TeamDetailFragment extends MainActivityFragment
         setHasOptionsMenu(true);
 
         team = getArguments().getParcelable(ARG_TEAM);
+        teamModels = roleViewModel.getModelList(team);
     }
 
     @Nullable
@@ -160,7 +159,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return currentRole.isPrivilegedRole();
+        return localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -168,14 +167,14 @@ public class TeamDetailFragment extends MainActivityFragment
         View rootView = getView();
         if (rootView == null) return;
 
-        if (team.getRoles().contains(role)) showFragment(RoleEditFragment.newInstance(role));
+        if (teamModels.contains(role)) showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
     public void onJoinRequestClicked(JoinRequest request) {
         View rootView = getView();
         if (rootView == null) return;
-        if (!currentRole.isPrivilegedRole()) return;
+        if (!localRoleViewModel.hasPrivilegedRole()) return;
 
         if (request.isUserApproved() && !request.isTeamApproved()) {
             new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
@@ -215,8 +214,8 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private void approveUser(final JoinRequest request, final boolean approve) {
         Flowable<DiffUtil.DiffResult> resultFlowable = approve
-                ? roleViewModel.approveUser(request, team, teamModels)
-                : roleViewModel.declineUser(request, team, teamModels);
+                ? roleViewModel.approveUser(request, team)
+                : roleViewModel.declineUser(request, team);
 
         disposables.add(resultFlowable.subscribe(diffResult -> onJoinAction(diffResult, request, approve), defaultErrorHandler));
     }
@@ -243,7 +242,7 @@ public class TeamDetailFragment extends MainActivityFragment
         removeEnterExitTransitions();
 
         Activity activity = getActivity();
-        if (activity != null) activity.invalidateOptionsMenu();
+        if (activity != null) activity.onBackPressed();
     }
 
     private void updateCurrentRole() {
@@ -261,8 +260,7 @@ public class TeamDetailFragment extends MainActivityFragment
         showSnackbar(getString(stringResource, name));
     }
 
-    private void onRoleUpdated(Role role) {
-        currentRole.update(role);
+    private void onRoleUpdated() {
         toggleFab(showsFab());
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();

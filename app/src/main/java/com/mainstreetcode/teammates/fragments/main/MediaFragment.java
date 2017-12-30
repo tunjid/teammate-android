@@ -30,7 +30,6 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Media;
-import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -50,8 +49,8 @@ public class MediaFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private Role currentRole;
     private List<Media> mediaList;
+
     private Toolbar contextBar;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
@@ -82,8 +81,7 @@ public class MediaFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
-        mediaList = mediaViewModel.getMediaList(team);
-        currentRole = Role.empty();
+        mediaList = mediaViewModel.getModelList(team);
 
         ImageWorkerFragment.attach(this);
     }
@@ -135,11 +133,11 @@ public class MediaFragment extends MainActivityFragment
         super.onResume();
         fetchMedia(new Date());
         disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
-                .subscribe(currentRole::update, ErrorHandler.EMPTY));
+                .subscribe(() -> {}, ErrorHandler.EMPTY));
     }
 
     void fetchMedia(Date date) {
-        disposables.add(mediaViewModel.getTeamMedia(mediaList, team, date).subscribe(this::onMediaUpdated, defaultErrorHandler));
+        disposables.add(mediaViewModel.getTeamMedia(team, date).subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -155,7 +153,8 @@ public class MediaFragment extends MainActivityFragment
                 TeamPickerFragment.pick(getActivity(), R.id.request_media_team_pick);
                 return true;
             case R.id.action_delete:
-                mediaViewModel.deleteMedia(team, currentRole.isPrivilegedRole()).subscribe(this::onMediaDeleted, defaultErrorHandler);
+                mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
+                        .subscribe(this::onMediaDeleted, defaultErrorHandler);
                 return true;
         }
         return super.onOptionsItemSelected(item);

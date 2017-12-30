@@ -64,9 +64,9 @@ public class TeamRepository extends ModelRepository<Team> {
     @Override
     public Single<Team> createOrUpdate(Team model) {
         Single<Team> teamSingle = model.isEmpty()
-                ? api.createTeam(model).map(localMapper(model))
+                ? api.createTeam(model).map(getLocalUpdateFunction(model))
                 : api.updateTeam(model.getId(), model)
-                .map(localMapper(model))
+                .map(getLocalUpdateFunction(model))
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Team.PHOTO_UPLOAD_KEY);
@@ -88,7 +88,7 @@ public class TeamRepository extends ModelRepository<Team> {
     @Override
     public Single<Team> delete(Team team) {
         return api.deleteTeam(team.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(team, throwable));
     }
 

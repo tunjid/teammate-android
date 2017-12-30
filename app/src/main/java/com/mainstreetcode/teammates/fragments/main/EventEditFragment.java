@@ -26,7 +26,6 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Guest;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Identifiable;
-import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
@@ -48,7 +47,6 @@ public class EventEditFragment extends HeaderedFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private boolean fromUserPickerAction;
-    private Role currentRole = Role.empty();
     private Event event;
     private List<Identifiable> eventItems;
 
@@ -218,7 +216,9 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void rsvpToEvent(Guest guest) {
         Activity activity;
-        if ((activity = getActivity()) == null || !guest.getUser().equals(currentRole.getUser()))
+        User roleUser = localRoleViewModel.getCurrentRole().getUser();
+        User guestUser = guest.getUser();
+        if ((activity = getActivity()) == null || !guestUser.equals(roleUser))
             return;
 
         new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
@@ -229,7 +229,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public boolean canEditEvent() {
-        return event.isEmpty() || currentRole.isPrivilegedRole();
+        return event.isEmpty() || localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -254,9 +254,7 @@ public class EventEditFragment extends HeaderedFragment
         toggleProgress(false);
     }
 
-    private void onRoleUpdated(Role role) {
-        currentRole.update(role);
-
+    private void onRoleUpdated() {
         Activity activity;
         if ((activity = getActivity()) == null) return;
 

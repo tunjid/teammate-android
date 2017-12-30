@@ -45,7 +45,7 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
     @Override
     public Single<JoinRequest> createOrUpdate(JoinRequest model) {
         Single<JoinRequest> call = model.isUserApproved() ? api.joinTeam(model) : api.inviteUser(model);
-        return call.map(localMapper(model)).map(getSaveFunction());
+        return call.map(getLocalUpdateFunction(model)).map(getSaveFunction());
     }
 
     @Override

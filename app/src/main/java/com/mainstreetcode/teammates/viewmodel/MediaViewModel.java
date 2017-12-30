@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
@@ -23,10 +22,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
-public class MediaViewModel extends ViewModel {
+public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     private final MediaRepository repository;
-    private final Map<Team, List<Media>> mediaMap = new HashMap<>();
     private final Map<Team, Set<Media>> selectionMap = new HashMap<>();
 
     public MediaViewModel() {
@@ -34,16 +32,16 @@ public class MediaViewModel extends ViewModel {
     }
 
     public Flowable<Media> getMedia(Media model) {
-        return repository.get(model).doOnError(throwable -> ModelUtils.checkForInvalidObject(throwable, model, getMediaList(model.getTeam())));
+        return checkForInvalidObject(repository.get(model), model, model.getTeam());
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeamMedia(List<Media> source, Team team, Date date) {
-        return Identifiable.diff(repository.getTeamMedia(team, date), () -> source, ModelUtils::preserveList);
+    public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
+        return Identifiable.diff(repository.getTeamMedia(team, date), () -> getModelList(team), ModelUtils::preserveList);
     }
 
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {
         AtomicBoolean partialDelete = new AtomicBoolean();
-        List<Media> source = mediaMap.get(team);
+        List<Media> source = getModelList(team);
         List<Media> toDelete = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
 
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
@@ -58,13 +56,6 @@ public class MediaViewModel extends ViewModel {
                 .map(diffResult -> new Pair<>(partialDelete.get(), diffResult))
                 .firstElement()
                 .doOnSuccess(diffResult -> clearSelections(team));
-    }
-
-    public List<Media> getMediaList(Team team) {
-        List<Media> media = mediaMap.get(team);
-        if (!mediaMap.containsKey(team)) mediaMap.put(team, media = new ArrayList<>());
-
-        return media;
     }
 
     public void clearSelections(Team team) {

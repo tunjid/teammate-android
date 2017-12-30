@@ -69,7 +69,7 @@ public class MediaRepository extends ModelRepository<Media> {
         if (body == null) return Single.error(new TeammateException("Unable to upload media"));
 
         Single<Media> mediaSingle = api.uploadTeamMedia(model.getTeam().getId(), body)
-                .map(localMapper(model))
+                .map(getLocalUpdateFunction(model))
                 .map(getSaveFunction());
 
         return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());
@@ -86,7 +86,7 @@ public class MediaRepository extends ModelRepository<Media> {
     @Override
     public Single<Media> delete(Media model) {
         return api.deleteMedia(model.getId())
-                .doAfterSuccess(this::deleteLocally)
+                .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 

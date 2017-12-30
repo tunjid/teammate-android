@@ -7,14 +7,12 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.RoleRepository;
 
-import io.reactivex.Maybe;
+import io.reactivex.Completable;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
- * ViewModel for signed in team
- * <p>
- * Created by Shemanigans on 6/4/17.
+ * ViewModel for checking a role in local contexts
  */
 
 public class localRoleViewModel extends ViewModel {
@@ -27,9 +25,17 @@ public class localRoleViewModel extends ViewModel {
         repository = RoleRepository.getInstance();
     }
 
-    public Maybe<Role> getRoleInTeam(User user, Team team) {
-        return !role.isEmpty() ? Maybe.just(role) : repository.getRoleInTeam(user.getId(), team.getId())
-                .map(this::onRoleFound).observeOn(mainThread());
+    public boolean hasPrivilegedRole() {
+        return role.isPrivilegedRole();
+    }
+
+    public Role getCurrentRole() {
+        return role;
+    }
+
+    public Completable getRoleInTeam(User user, Team team) {
+        return !role.isEmpty() ? Completable.complete() : repository.getRoleInTeam(user.getId(), team.getId())
+                .map(this::onRoleFound).observeOn(mainThread()).flatMapCompletable(role1 -> Completable.complete());
     }
 
     private Role onRoleFound(Role foundRole) {

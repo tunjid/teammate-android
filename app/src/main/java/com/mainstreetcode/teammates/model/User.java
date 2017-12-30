@@ -86,6 +86,17 @@ public class User extends UserEntity implements
     }
 
     @Override
+    public void reset() {
+        firstName = "";
+        lastName = "";
+        primaryEmail = "";
+        imageUrl = "";
+
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue("");
+    }
+
+    @Override
     public void update(User updatedUser) {
         this.id = updatedUser.id;
         this.imageUrl = updatedUser.imageUrl;

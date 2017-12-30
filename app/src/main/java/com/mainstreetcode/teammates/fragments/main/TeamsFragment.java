@@ -21,7 +21,6 @@ import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Team;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ public final class TeamsFragment extends MainActivityFragment
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
-    private final List<Team> teams = new ArrayList<>();
+    private List<Team> teams;
 
     public static TeamsFragment newInstance() {
         TeamsFragment fragment = new TeamsFragment();
@@ -58,6 +57,8 @@ public final class TeamsFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        teams = teamViewModel.getModelList(Team.class);
     }
 
     @Override
@@ -88,7 +89,7 @@ public final class TeamsFragment extends MainActivityFragment
                 : R.string.my_teams));
 
         String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(teamViewModel.getMyTeams(userId, teams).subscribe(this::onTeamsUpdated, defaultErrorHandler));
+        disposables.add(teamViewModel.getMyTeams(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     @Override

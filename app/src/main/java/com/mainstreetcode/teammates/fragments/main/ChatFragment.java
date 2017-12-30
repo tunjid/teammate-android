@@ -28,7 +28,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,8 +45,8 @@ public class ChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
+    private List<Chat> chats;
     private Disposable chatDisposable;
-    private List<Chat> chats = new ArrayList<>();
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -77,6 +76,7 @@ public class ChatFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
+        chats = chatViewModel.getModelList(team);
     }
 
     @Nullable
@@ -149,8 +149,8 @@ public class ChatFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        teamChatViewModel.onChatRoomLeft(team);
-        teamChatViewModel.updateLastSeen(team);
+        chatViewModel.onChatRoomLeft(team);
+        chatViewModel.updateLastSeen(team);
         recyclerView = null;
         emptyViewHolder = null;
     }
@@ -188,13 +188,13 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void fetchChatsBefore(Date date) {
-        disposables.add(teamChatViewModel
-                .chatsBefore(chats, team, date)
+        disposables.add(chatViewModel
+                .chatsBefore(team, date)
                 .subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
     private void subscribeToChat() {
-        chatDisposable = teamChatViewModel.listenForChat(team).subscribe(chat -> {
+        chatDisposable = chatViewModel.listenForChat(team).subscribe(chat -> {
             chats.add(chat);
 
             notifyAndScrollToLast(isNearBottomOfChat());
@@ -223,8 +223,8 @@ public class ChatFragment extends MainActivityFragment
     private void postChat(Chat chat) {
         final RecyclerView.Adapter adapter = recyclerView.getAdapter();
 
-        teamChatViewModel.post(chat).subscribe(() -> {
-            teamChatViewModel.updateLastSeen(team);
+        chatViewModel.post(chat).subscribe(() -> {
+            chatViewModel.updateLastSeen(team);
             int index = chats.indexOf(chat);
 
             if (index != 0) adapter.notifyItemChanged(index);
@@ -267,7 +267,7 @@ public class ChatFragment extends MainActivityFragment
         DiffUtil.DiffResult result = resultPair.second;
 
         toggleProgress(showProgress);
-        teamChatViewModel.updateLastSeen(team);
+        chatViewModel.updateLastSeen(team);
         emptyViewHolder.toggle(chats.isEmpty());
         if (!showProgress && result != null) result.dispatchUpdatesTo(recyclerView.getAdapter());
     }

@@ -21,7 +21,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
-import static io.reactivex.Single.just;
 import static io.reactivex.schedulers.Schedulers.io;
 
 public class RoleRepository extends ModelRepository<Role> {
@@ -56,7 +55,7 @@ public class RoleRepository extends ModelRepository<Role> {
             roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
         }
 
-        return roleSingle.map(localMapper(model)).map(getSaveFunction());
+        return roleSingle.map(getLocalUpdateFunction(model)).map(getSaveFunction());
     }
 
     @Override
@@ -66,8 +65,9 @@ public class RoleRepository extends ModelRepository<Role> {
 
     @Override
     public Single<Role> delete(Role model) {
-        roleDao.delete(model);
-        return just(model);
+        return api.deleteRole(model.getId())
+                .map(this::deleteLocally)
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 
     @Override
@@ -97,10 +97,6 @@ public class RoleRepository extends ModelRepository<Role> {
                 .map(getSaveFunction())
                 .doOnSuccess(role -> joinRequestRepository.delete(request))
                 .doOnError(throwable -> joinRequestRepository.deleteInvalidModel(request, throwable));
-    }
-
-    public Single<Role> dropRole(Role role) {
-        return api.deleteRole(role.getId()).flatMap(this::delete);
     }
 
     public Maybe<Role> getRoleInTeam(String userId, String teamId) {

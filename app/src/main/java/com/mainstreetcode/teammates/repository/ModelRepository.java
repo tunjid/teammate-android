@@ -7,19 +7,18 @@ import android.webkit.MimeTypeMap;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.persistence.EntityDao;
-import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -47,10 +46,24 @@ public abstract class ModelRepository<T extends Model<T>> {
     abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
     public final Flowable<T> get(T model) {
-        if (model.isEmpty()) {
-            return Flowable.error(new IllegalArgumentException("Model does not exist"));
-        }
-        return get(model.getId()).map(localMapper(model));
+        AtomicInteger counter = new AtomicInteger(0);
+        return model.isEmpty()
+                ? Flowable.error(new IllegalArgumentException("Model does not exist"))
+                : get(model.getId())
+                .doOnNext(fetched -> counter.incrementAndGet())
+                .map(getLocalUpdateFunction(model, () -> counter.get() == 2));
+    }
+
+    private Function<T, T> getLocalUpdateFunction(T original, Callable<Boolean> shouldReset) {
+        return emitted -> {
+            if (shouldReset.call()) original.reset();
+            original.update(emitted);
+            return original;
+        };
+    }
+
+    final Function<T, T> getLocalUpdateFunction(T original) {
+        return getLocalUpdateFunction(original, () -> true);
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {
@@ -61,23 +74,12 @@ public abstract class ModelRepository<T extends Model<T>> {
         return saveFunction;
     }
 
-    final Function<T, T> localMapper(T original) {
-        return emitted -> {
-            original.update(emitted);
-            return original;
-        };
-    }
-
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
         AtomicReference<T> reference = new AtomicReference<>();
         local = local.doOnSuccess(reference::set);
         remote = remote.doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
 
         return fetchThenGet(local, remote);
-    }
-
-    static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
-        return concat(local, remote);
     }
 
     final void deleteInvalidModel(T model, Throwable throwable) {
@@ -87,10 +89,9 @@ public abstract class ModelRepository<T extends Model<T>> {
         if (message.isInvalidObject()) deleteLocally(model);
     }
 
-    final void deleteLocally(T model) {
-        Completable.fromRunnable(() -> dao().delete(model))
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> {}, ErrorHandler.EMPTY);
+    final T deleteLocally(T model) {
+        dao().delete(model);
+        return model;
     }
 
     @Nullable
@@ -107,5 +108,9 @@ public abstract class ModelRepository<T extends Model<T>> {
         RequestBody requestBody = RequestBody.create(MediaType.parse(type), file);
 
         return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
+    }
+
+    static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
+        return concat(local, remote);
     }
 }

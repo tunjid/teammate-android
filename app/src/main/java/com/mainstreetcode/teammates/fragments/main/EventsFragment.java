@@ -24,7 +24,6 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
@@ -43,7 +42,7 @@ public final class EventsFragment extends MainActivityFragment
     private Team team;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
-    private final List<Event> events = new ArrayList<>();
+    private List<Event> events;
 
     public static EventsFragment newInstance(Team team) {
         EventsFragment fragment = new EventsFragment();
@@ -71,6 +70,7 @@ public final class EventsFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
+        events = eventViewModel.getModelList(team);
     }
 
     @Override
@@ -92,7 +92,7 @@ public final class EventsFragment extends MainActivityFragment
         setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.my_events));
 
-        disposables.add(eventViewModel.getEvents(events, team.getId()).subscribe(this::onEventsUpdated, defaultErrorHandler));
+        disposables.add(eventViewModel.getEvents(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     @Override

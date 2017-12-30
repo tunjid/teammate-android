@@ -119,6 +119,21 @@ public class Team extends TeamEntity
     }
 
     @Override
+    public void reset() {
+        name = "";
+        city = "";
+        state = "";
+        zip = "";
+        imageUrl = "";
+
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue("");
+
+        roles.clear();
+        joinRequests.clear();
+    }
+
+    @Override
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
         this.imageUrl = updatedTeam.imageUrl;
