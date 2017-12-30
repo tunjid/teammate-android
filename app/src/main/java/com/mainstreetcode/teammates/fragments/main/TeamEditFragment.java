@@ -124,7 +124,7 @@ public class TeamEditFragment extends HeaderedFragment
         super.onActivityCreated(savedInstanceState);
         FloatingActionButton fab = getFab();
         fab.setOnClickListener(this);
-        setFabIcon(state == JOINING ? R.drawable.ic_check_white_24dp : R.drawable.ic_group_add_white_24dp);
+        setFabIcon(R.drawable.ic_check_white_24dp);
 
         User user = userViewModel.getCurrentUser();
 
