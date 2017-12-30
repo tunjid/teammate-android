@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.persistence.EntityDao;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -50,19 +51,19 @@ public abstract class ModelRepository<T extends Model<T>> {
                 ? Flowable.error(new IllegalArgumentException("Model does not exist"))
                 : get(model.getId())
                 .doOnNext(fetched -> counter.incrementAndGet())
-                .map(getLocalUpdateFunction(model, counter.get() == 2));
+                .map(getLocalUpdateFunction(model, () -> counter.get() == 2));
     }
 
-    private Function<T, T> getLocalUpdateFunction(T original, boolean shouldReset) {
+    private Function<T, T> getLocalUpdateFunction(T original, Callable<Boolean> shouldReset) {
         return emitted -> {
-            if (shouldReset) original.reset();
+            if (shouldReset.call()) original.reset();
             original.update(emitted);
             return original;
         };
     }
 
     final Function<T, T> getLocalUpdateFunction(T original) {
-        return getLocalUpdateFunction(original, true);
+        return getLocalUpdateFunction(original, () -> true);
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {

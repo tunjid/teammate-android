@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammates.viewmodel;
 
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
@@ -65,6 +64,7 @@ public class RoleViewModel extends TeamMappedViewModel<Model> {
     @SuppressWarnings("unchecked")
     public Flowable<DiffUtil.DiffResult> approveUser(JoinRequest request, Team team) {
         Flowable<List<Model>> sourceFlowable = repository.approveUser(request)
+
                 .cast(Model.class)
                 .map(Collections::singletonList)
                 .toFlowable();
@@ -100,12 +100,7 @@ public class RoleViewModel extends TeamMappedViewModel<Model> {
 
     public Single<Role> deleteRole(Role role) {
         return checkForInvalidObject(repository.delete(role)
-                .doOnSuccess(deleted -> {
-                    getModelList(role.getTeam()).remove(deleted);
-                    role.getTeam().getRoles().remove(deleted);
-                    List<Model> models = getModelList(role.getTeam());
-                    Log.i("Test", "Deleted role!" + models);
-                })
+                .doOnSuccess(getModelList(role.getTeam())::remove)
                 .toFlowable().cast(Model.class), role, role.getTeam())
                 .firstOrError()
                 .cast(Role.class)

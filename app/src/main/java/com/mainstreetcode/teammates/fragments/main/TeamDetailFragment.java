@@ -169,7 +169,7 @@ public class TeamDetailFragment extends MainActivityFragment
         View rootView = getView();
         if (rootView == null) return;
 
-        if (team.getRoles().contains(role)) showFragment(RoleEditFragment.newInstance(role));
+        if (teamModels.contains(role)) showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
