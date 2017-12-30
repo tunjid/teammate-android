@@ -45,10 +45,24 @@ public abstract class ModelRepository<T extends Model<T>> {
     abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
     public final Flowable<T> get(T model) {
+        AtomicInteger counter = new AtomicInteger(0);
         return model.isEmpty()
                 ? Flowable.error(new IllegalArgumentException("Model does not exist"))
                 : get(model.getId())
-                .map(localMapper(model));
+                .doOnNext(fetched -> counter.incrementAndGet())
+                .map(getLocalUpdateFunction(model, counter.get() == 2));
+    }
+
+    private Function<T, T> getLocalUpdateFunction(T original, boolean shouldReset) {
+        return emitted -> {
+            if (shouldReset) original.reset();
+            original.update(emitted);
+            return original;
+        };
+    }
+
+    final Function<T, T> getLocalUpdateFunction(T original) {
+        return getLocalUpdateFunction(original, true);
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {
@@ -57,13 +71,6 @@ public abstract class ModelRepository<T extends Model<T>> {
 
     final Function<T, T> getSaveFunction() {
         return saveFunction;
-    }
-
-    final Function<T, T> localMapper(T original) {
-        return emitted -> {
-            original.update(emitted);
-            return original;
-        };
     }
 
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {

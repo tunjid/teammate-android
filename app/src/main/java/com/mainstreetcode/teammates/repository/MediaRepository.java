@@ -69,7 +69,7 @@ public class MediaRepository extends ModelRepository<Media> {
         if (body == null) return Single.error(new TeammateException("Unable to upload media"));
 
         Single<Media> mediaSingle = api.uploadTeamMedia(model.getTeam().getId(), body)
-                .map(localMapper(model))
+                .map(getLocalUpdateFunction(model))
                 .map(getSaveFunction());
 
         return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());

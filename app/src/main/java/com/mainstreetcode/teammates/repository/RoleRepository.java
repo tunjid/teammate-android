@@ -55,7 +55,7 @@ public class RoleRepository extends ModelRepository<Role> {
             roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
         }
 
-        return roleSingle.map(localMapper(model)).map(getSaveFunction());
+        return roleSingle.map(getLocalUpdateFunction(model)).map(getSaveFunction());
     }
 
     @Override
