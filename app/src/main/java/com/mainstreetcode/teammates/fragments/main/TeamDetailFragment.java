@@ -56,8 +56,6 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-
-    private Role currentRole = Role.empty();
     private final List<String> availableRoles = new ArrayList<>();
     private List<Model> teamModels;
 
@@ -161,7 +159,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return currentRole.isPrivilegedRole();
+        return localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -176,7 +174,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onJoinRequestClicked(JoinRequest request) {
         View rootView = getView();
         if (rootView == null) return;
-        if (!currentRole.isPrivilegedRole()) return;
+        if (!localRoleViewModel.hasPrivilegedRole()) return;
 
         if (request.isUserApproved() && !request.isTeamApproved()) {
             new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
@@ -262,8 +260,7 @@ public class TeamDetailFragment extends MainActivityFragment
         showSnackbar(getString(stringResource, name));
     }
 
-    private void onRoleUpdated(Role role) {
-        currentRole.update(role);
+    private void onRoleUpdated() {
         toggleFab(showsFab());
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();

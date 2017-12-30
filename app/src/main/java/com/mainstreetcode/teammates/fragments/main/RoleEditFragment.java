@@ -40,7 +40,6 @@ public class RoleEditFragment extends HeaderedFragment
     public static final String ARG_ROLE = "role";
 
     private Role role;
-    private Role currentRole = Role.empty();
     private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
@@ -123,7 +122,7 @@ public class RoleEditFragment extends HeaderedFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         User user = userViewModel.getCurrentUser();
-        if (currentRole.isPrivilegedRole() && !role.getUser().equals(user)) {
+        if (localRoleViewModel.hasPrivilegedRole() && !role.getUser().equals(user)) {
             inflater.inflate(R.menu.fragment_user_edit, menu);
         }
     }
@@ -190,11 +189,10 @@ public class RoleEditFragment extends HeaderedFragment
 
     @Override
     public boolean canChangeRole() {
-        return !currentRole.isEmpty() && currentRole.isPrivilegedRole();
+        return localRoleViewModel.hasPrivilegedRole();
     }
 
-    private void onRoleUpdated(Role role) {
-        currentRole.update(role);
+    private void onRoleUpdated() {
         recyclerView.getAdapter().notifyDataSetChanged();
 
         Activity activity;
