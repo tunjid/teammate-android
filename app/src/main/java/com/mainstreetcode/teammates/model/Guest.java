@@ -73,6 +73,12 @@ public class Guest implements
     }
 
     @Override
+    public void reset() {
+        attending = false;
+        user.reset();
+    }
+
+    @Override
     public void update(Guest updated) {
         id = updated.id;
         created = updated.created;

@@ -96,6 +96,17 @@ public class Event extends EventEntity
     }
 
     @Override
+    public void reset() {
+        imageUrl = "";
+
+        int size = size();
+        for (int i = 0; i < size; i++) get(i).setValue("");
+
+        guests.clear();
+        team.reset();
+    }
+
+    @Override
     public void update(Event updatedEvent) {
         this.id = updatedEvent.getId();
         this.imageUrl = updatedEvent.imageUrl;

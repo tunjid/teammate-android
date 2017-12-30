@@ -11,6 +11,7 @@ import com.mainstreetcode.teammates.persistence.EntityDao;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Flowable;
@@ -46,7 +47,8 @@ public abstract class ModelRepository<T extends Model<T>> {
     public final Flowable<T> get(T model) {
         return model.isEmpty()
                 ? Flowable.error(new IllegalArgumentException("Model does not exist"))
-                : get(model.getId()).map(localMapper(model));
+                : get(model.getId())
+                .map(localMapper(model));
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {
@@ -70,10 +72,6 @@ public abstract class ModelRepository<T extends Model<T>> {
         remote = remote.doOnError(throwable -> deleteInvalidModel(reference.get(), throwable));
 
         return fetchThenGet(local, remote);
-    }
-
-    static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
-        return concat(local, remote);
     }
 
     final void deleteInvalidModel(T model, Throwable throwable) {
@@ -102,5 +100,9 @@ public abstract class ModelRepository<T extends Model<T>> {
         RequestBody requestBody = RequestBody.create(MediaType.parse(type), file);
 
         return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
+    }
+
+    static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
+        return concat(local, remote);
     }
 }

@@ -56,6 +56,15 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     @Override
+    public void reset() {
+        userApproved = false;
+        teamApproved = false;
+        roleName = "";
+        user.reset();
+        team.reset();
+    }
+
+    @Override
     public void update(JoinRequest updated) {
         this.teamApproved = updated.teamApproved;
         this.userApproved = updated.userApproved;
