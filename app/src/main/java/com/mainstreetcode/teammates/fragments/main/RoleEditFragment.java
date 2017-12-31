@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.RoleEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -67,11 +66,6 @@ public class RoleEditFragment extends HeaderedFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         role = getArguments().getParcelable(ARG_ROLE);
-
-        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
-        fragment.setTargetFragment(this, ImageWorkerFragment.CROP_CHOOSER);
-
-        ImageWorkerFragment.attach(this);
     }
 
     @Nullable

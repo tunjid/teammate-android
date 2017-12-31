@@ -57,11 +57,6 @@ public class UserEditFragment extends HeaderedFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = getArguments().getParcelable(ARG_USER);
-
-        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
-        fragment.setTargetFragment(this, ImageWorkerFragment.CROP_CHOOSER);
-
-        ImageWorkerFragment.attach(this);
     }
 
     @Nullable

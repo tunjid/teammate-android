@@ -21,7 +21,6 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Guest;
 import com.mainstreetcode.teammates.model.HeaderedModel;
@@ -80,8 +79,6 @@ public class EventEditFragment extends HeaderedFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         event = getArguments().getParcelable(ARG_EVENT);
-
-        ImageWorkerFragment.attach(this);
     }
 
     @Nullable

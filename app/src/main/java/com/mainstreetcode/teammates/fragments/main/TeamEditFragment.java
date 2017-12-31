@@ -18,7 +18,6 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
@@ -82,11 +81,6 @@ public class TeamEditFragment extends HeaderedFragment
 
         state = getArguments().getInt(ARG_STATE);
         team = getArguments().getParcelable(ARG_TEAM);
-
-        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
-        fragment.setTargetFragment(this, ImageWorkerFragment.CROP_CHOOSER);
-
-        ImageWorkerFragment.attach(this);
     }
 
     @Nullable
