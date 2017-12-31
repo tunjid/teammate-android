@@ -36,7 +36,6 @@ import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,7 +55,6 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private final List<String> availableRoles = new ArrayList<>();
     private List<Model> teamModels;
 
     private RecyclerView recyclerView;
@@ -119,8 +117,8 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
 
-        disposables.add(roleViewModel.getRoleValues().subscribe(this::onRolesUpdated, ErrorHandler.EMPTY));
         disposables.add(teamViewModel.getTeam(team, teamModels).subscribe(this::onTeamUpdated, defaultErrorHandler));
+        roleViewModel.fetchRoleValues();
     }
 
     @Override
@@ -232,11 +230,6 @@ public class TeamDetailFragment extends MainActivityFragment
         if (activity != null) activity.invalidateOptionsMenu();
     }
 
-    private void onRolesUpdated(List<String> values) {
-        availableRoles.clear();
-        availableRoles.addAll(values);
-    }
-
     private void onTeamDeleted() {
         showSnackbar(getString(R.string.deleted_team, team.getName()));
         removeEnterExitTransitions();
@@ -279,7 +272,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
         final AtomicReference<String> roleReference = new AtomicReference<>();
 
-        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, availableRoles, () -> true);
+        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, roleViewModel.getRoleNames(), () -> true);
         Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, "");
 
         holder.bind(item);

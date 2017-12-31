@@ -19,14 +19,10 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.RoleEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Edits a Team member
@@ -40,8 +36,6 @@ public class RoleEditFragment extends HeaderedFragment
     public static final String ARG_ROLE = "role";
 
     private Role role;
-    private List<String> roles = new ArrayList<>();
-
     private RecyclerView recyclerView;
 
     public static RoleEditFragment newInstance(Role role) {
@@ -72,11 +66,6 @@ public class RoleEditFragment extends HeaderedFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         role = getArguments().getParcelable(ARG_ROLE);
-
-        ImageWorkerFragment fragment = ImageWorkerFragment.newInstance();
-        fragment.setTargetFragment(this, ImageWorkerFragment.CROP_CHOOSER);
-
-        ImageWorkerFragment.attach(this);
     }
 
     @Nullable
@@ -86,7 +75,7 @@ public class RoleEditFragment extends HeaderedFragment
         recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RoleEditAdapter(role, roles, this));
+        recyclerView.setAdapter(new RoleEditAdapter(role, roleViewModel.getRoleNames(), this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -110,13 +99,8 @@ public class RoleEditFragment extends HeaderedFragment
         User user = userViewModel.getCurrentUser();
         Team team = role.getTeam();
 
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team)
-                .subscribe(this::onRoleUpdated, defaultErrorHandler));
-
-        disposables.add(roleViewModel.getRoleValues().subscribe(currentRoles -> {
-            roles.clear();
-            roles.addAll(currentRoles);
-        }, emptyErrorHandler));
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
+        roleViewModel.fetchRoleValues();
     }
 
     @Override

@@ -28,6 +28,12 @@ public abstract class HeaderedFragment extends MainActivityFragment
     protected HeaderedImageViewHolder viewHolder;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ImageWorkerFragment.attach(this);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
