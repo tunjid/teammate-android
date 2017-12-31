@@ -11,16 +11,18 @@ import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-import io.reactivex.subjects.ReplaySubject;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -30,24 +32,32 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class RoleViewModel extends TeamMappedViewModel<Model> {
 
+    private int count;
     private final RoleRepository repository;
     private final JoinRequestRepository joinRequestRepository;
 
-    private TeammateApi api = TeammateService.getApiInstance();
-    private ReplaySubject<List<String>> roleSubject;
+    private final TeammateApi api = TeammateService.getApiInstance();
+    private final List<String> roleNames = new ArrayList<>();
 
     public RoleViewModel() {
         repository = RoleRepository.getInstance();
         joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
-    public Single<List<String>> getRoleValues() {
-        // Use new subject if previous call errored out for whatever reason.
-        if (roleSubject == null || roleSubject.hasThrowable()) {
-            roleSubject = ReplaySubject.createWithSize(1);
-            api.getRoleValues().toObservable().subscribe(roleSubject);
-        }
-        return roleSubject.singleOrError();
+    public List<String> getRoleNames() {
+        return roleNames;
+    }
+
+    public void fetchRoleValues() {
+        Maybe<List<String>> listMaybe = !roleNames.isEmpty() && count++ % 5 != 0
+                ? Maybe.empty()
+                : api.getRoleValues().toMaybe();
+
+        listMaybe.observeOn(mainThread()).subscribe(names -> {
+            roleNames.clear();
+            roleNames.addAll(names);
+            count++;
+        }, ErrorHandler.EMPTY);
     }
 
     public Single<Role> updateRole(Role role) {

@@ -24,9 +24,6 @@ import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.reactivex.disposables.Disposable;
 
 import static android.app.Activity.RESULT_OK;
@@ -45,14 +42,19 @@ public class TeamEditFragment extends HeaderedFragment
     private static final int JOINING = 2;
 
     private static final String ARG_TEAM = "team";
-    private static final String ARG_STATE = "editable";
+    private static final String ARG_STATE = "state";
     public static final int PLACE_PICKER_REQUEST = 2;
 
     private int state;
     private Team team;
-    private List<String> roles = new ArrayList<>();
 
     private RecyclerView recyclerView;
+
+    public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty(), CREATING);}
+
+    public static TeamEditFragment newEditInstance(Team team) {return newInstance(team, EDITING);}
+
+    public static TeamEditFragment newJoinInstance(Team team) {return newInstance(team, JOINING);}
 
     private static TeamEditFragment newInstance(Team team, int state) {
         TeamEditFragment fragment = new TeamEditFragment();
@@ -62,18 +64,6 @@ public class TeamEditFragment extends HeaderedFragment
         args.putInt(ARG_STATE, state);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public static TeamEditFragment newCreateInstance() {
-        return newInstance(Team.empty(), CREATING);
-    }
-
-    public static TeamEditFragment newEditInstance(Team team) {
-        return newInstance(team, EDITING);
-    }
-
-    public static TeamEditFragment newJoinInstance(Team team) {
-        return newInstance(team, JOINING);
     }
 
     @Override
@@ -106,7 +96,7 @@ public class TeamEditFragment extends HeaderedFragment
         recyclerView = rootView.findViewById(R.id.model_list);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamEditAdapter(team, roles, this));
+        recyclerView.setAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -130,11 +120,8 @@ public class TeamEditFragment extends HeaderedFragment
 
         onRoleUpdated();
 
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team)
-                .subscribe(this::onRoleUpdated, defaultErrorHandler));
-
-        disposables.add(roleViewModel.getRoleValues()
-                .subscribe(this::onRolesFetched, emptyErrorHandler));
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
+        roleViewModel.fetchRoleValues();
     }
 
     @Override
@@ -249,10 +236,5 @@ public class TeamEditFragment extends HeaderedFragment
         }
         toggleFab(showsFab());
         recyclerView.getAdapter().notifyDataSetChanged();
-    }
-
-    private void onRolesFetched(List<String> fetchedRoles) {
-        roles.clear();
-        roles.addAll(fetchedRoles);
     }
 }
