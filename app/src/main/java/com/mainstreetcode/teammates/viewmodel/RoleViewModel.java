@@ -74,7 +74,6 @@ public class RoleViewModel extends TeamMappedViewModel<Model> {
     @SuppressWarnings("unchecked")
     public Flowable<DiffUtil.DiffResult> approveUser(JoinRequest request, Team team) {
         Flowable<List<Model>> sourceFlowable = repository.approveUser(request)
-
                 .cast(Model.class)
                 .map(Collections::singletonList)
                 .toFlowable();
