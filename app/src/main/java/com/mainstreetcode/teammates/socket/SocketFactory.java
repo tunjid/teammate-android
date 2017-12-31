@@ -27,7 +27,6 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.mainstreetcode.teammates.rest.TeammateService.API_BASE_URL;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_COOKIE;
 import static com.mainstreetcode.teammates.rest.TeammateService.SESSION_PREFS;
-import static com.mainstreetcode.teammates.rest.TeammateService.getHttpClient;
 import static io.socket.client.Manager.EVENT_OPEN;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
 import static io.socket.client.Socket.EVENT_ERROR;
@@ -59,7 +58,6 @@ public class SocketFactory {
     private SocketFactory() {}
 
     public Single<Socket> getTeamChatSocket() {
-        Log.i(TAG, "Getting Team Chat Socket");
         Socket current = teamChatSocket.get();
 
         if (isConnected(current)) return Single.just(current);
@@ -96,7 +94,7 @@ public class SocketFactory {
         Socket socket = null;
         OkHttpClient client = new OkHttpClient.Builder()
                 .pingInterval(10, TimeUnit.SECONDS)
-                .sslSocketFactory(getHttpClient().sslSocketFactory())
+                //.sslSocketFactory(getHttpClient().sslSocketFactory())
                 .build();
 
         IO.setDefaultOkHttpWebSocketFactory(client);

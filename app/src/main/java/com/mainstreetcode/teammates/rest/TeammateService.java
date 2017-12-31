@@ -54,7 +54,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "https://teammatesapp.org/";
+    public static final String API_BASE_URL = "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     public static final String SESSION_COOKIE = "connect.sid";
 
@@ -72,8 +72,8 @@ public class TeammateService {
                     .addInterceptor(loggingInterceptor)
                     .cookieJar(new SessionCookieJar());
 
-            SSLSocketFactory sslSocketFactory = getSSLSocketFactory();
-            if (sslSocketFactory != null) builder.sslSocketFactory(sslSocketFactory);
+//            SSLSocketFactory sslSocketFactory = getSSLSocketFactory();
+//            if (sslSocketFactory != null) builder.sslSocketFactory(sslSocketFactory);
 
             httpClient = builder.build();
 
@@ -112,8 +112,8 @@ public class TeammateService {
         return httpClient;
     }
 
+    @SuppressWarnings("unused")
     private static SSLSocketFactory getSSLSocketFactory() {
-
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             InputStream stream = Application.getInstance().getResources().openRawResource(R.raw.server);

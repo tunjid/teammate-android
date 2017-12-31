@@ -53,11 +53,11 @@ dependencies {
     compile "android.arch.persistence.room:runtime:1.0.0"
     compile "android.arch.persistence.room:rxjava2:1.0.0"
 
-    compile 'com.google.android.gms:play-services-base:11.6.2'
-    compile 'com.google.android.gms:play-services-places:11.6.2'
+    compile 'com.google.android.gms:play-services-base:11.8.0'
+    compile 'com.google.android.gms:play-services-places:11.8.0'
 
-    compile 'com.google.firebase:firebase-core:11.6.2'
-    compile 'com.google.firebase:firebase-messaging:11.6.2'
+    compile 'com.google.firebase:firebase-core:11.8.0'
+    compile 'com.google.firebase:firebase-messaging:11.8.0'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.5"
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -98,7 +98,7 @@ dependencies {
         exclude module: 'design'
     }
     //compile 'com.tunjid.android-bootstrap:core:1.0.0'
-    compile(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.0-SNAPSHOT", changing: true) {
+    compile(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.0", changing: true) {
         exclude module: 'support-annotations'
         exclude module: 'recyclerview-v7'
         exclude module: 'exifinterface'
