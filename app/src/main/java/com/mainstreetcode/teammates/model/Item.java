@@ -37,7 +37,7 @@ public class Item<T> implements Identifiable {
     private String value;
 
     public Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-                 T itemizedObject) {
+                T itemizedObject) {
         this(itemType, stringRes, 0, value, changeCallBack, itemizedObject);
     }
 
@@ -68,6 +68,17 @@ public class Item<T> implements Identifiable {
 
     @Override
     public String getId() {return id;}
+
+    @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (other instanceof Item) return value.equals(((Item) other).value);
+        return id.equals(other.getId());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
 
     public T getItemizedObject() {
         return itemizedObject;

@@ -91,6 +91,20 @@ public class Event extends EventEntity
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Event)) return id.equals(other.getId());
+        Event casted = (Event) other;
+        return name.equals(casted.name)
+                && startDate.equals(casted.getStartDate()) && endDate.equals(casted.getEndDate())
+                && locationName.equals(casted.getLocationName()) && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public boolean isEmpty() {
         return equals(empty());
     }

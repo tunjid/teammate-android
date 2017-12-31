@@ -81,6 +81,19 @@ public class User extends UserEntity implements
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof User)) return id.equals(other.getId());
+        User casted = (User) other;
+        return firstName.equals(casted.getFirstName()) && lastName.equals(casted.getLastName())
+                && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public boolean isEmpty() {
         return TextUtils.isEmpty(id);
     }

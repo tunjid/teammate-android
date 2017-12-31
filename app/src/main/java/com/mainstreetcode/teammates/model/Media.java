@@ -96,6 +96,18 @@ public class Media implements
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Media)) return id.equals(other.getId());
+        Media casted = (Media) other;
+        return thumbnail.equals(casted.thumbnail) && url.equals(casted.getUrl());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public String getImageUrl() {
         return url;
     }

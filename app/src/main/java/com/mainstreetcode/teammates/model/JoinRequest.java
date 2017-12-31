@@ -46,6 +46,18 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof JoinRequest)) return id.equals(other.getId());
+        JoinRequest casted = (JoinRequest) other;
+        return roleName.equals(casted.roleName) && user.areContentsTheSame(casted.getUser());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public boolean isEmpty() {
         return false;
     }

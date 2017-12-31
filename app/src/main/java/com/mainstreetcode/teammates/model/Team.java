@@ -114,6 +114,19 @@ public class Team extends TeamEntity
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Team)) return id.equals(other.getId());
+        Team casted = (Team) other;
+        return name.equals(casted.name) && city.equals(casted.getCity())
+                && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public boolean isEmpty() {
         return this.equals(empty());
     }

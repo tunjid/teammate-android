@@ -73,6 +73,18 @@ public class Guest implements
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Guest)) return id.equals(other.getId());
+        Guest casted = (Guest) other;
+        return attending == casted.attending;
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public void reset() {
         attending = false;
         user.reset();
@@ -115,17 +127,6 @@ public class Guest implements
 
         Guest guest = (Guest) o;
         return id.equals(guest.id);
-    }
-
-    @Override
-    public boolean areContentsTheSame(Identifiable other) {
-        if (other instanceof Guest) return attending == ((Guest) other).attending;
-        return id.equals(other.getId());
-    }
-
-    @Override
-    public Object getChangePayload(Identifiable other) {
-        return attending;
     }
 
     @Override

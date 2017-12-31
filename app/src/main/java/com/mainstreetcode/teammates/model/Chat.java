@@ -95,6 +95,18 @@ public class Chat implements
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Chat)) return id.equals(other.getId());
+        Chat casted = (Chat) other;
+        return content.equals(casted.content) && user.areContentsTheSame(casted.getUser());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public String getImageUrl() {
         return user == null ? null : user.getImageUrl();
     }

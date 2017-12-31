@@ -83,6 +83,18 @@ public class Role extends RoleEntity
     }
 
     @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Role)) return id.equals(other.getId());
+        Role casted = (Role) other;
+        return name.equals(casted.name) && user.areContentsTheSame(casted.getUser());
+    }
+
+    @Override
+    public Object getChangePayload(Identifiable other) {
+        return other;
+    }
+
+    @Override
     public boolean isEmpty() {
         return TextUtils.isEmpty(id);
     }
