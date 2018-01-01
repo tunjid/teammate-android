@@ -88,7 +88,7 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getFab().setOnClickListener(this);
+        setFabClickListener(this);
         setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.events_title, team.getName()));
 

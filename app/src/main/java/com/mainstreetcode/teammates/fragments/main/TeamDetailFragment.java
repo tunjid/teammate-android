@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -111,8 +110,7 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton fab = getFab();
-        fab.setOnClickListener(this);
+        setFabClickListener(this);
         setFabIcon(R.drawable.ic_group_add_white_24dp);
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();

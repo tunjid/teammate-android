@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewCompat;
 import android.view.KeyEvent;
@@ -63,10 +62,8 @@ public final class SignInFragment extends RegistrationActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton fab = getFab();
         setFabIcon(R.drawable.ic_check_white_24dp);
-        fab.setOnClickListener(this);
-
+        setFabClickListener(this);
         setToolbarTitle(getString(R.string.sign_in));
     }
 

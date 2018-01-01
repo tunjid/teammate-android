@@ -17,7 +17,7 @@ import com.mainstreetcode.teammates.R;
 
 import java.lang.reflect.Field;
 
-public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
+public class LoadingBar extends BaseTransientBottomBar<LoadingBar> {
 
     /**
      * Constructor for the transient bottom bar.
@@ -26,7 +26,7 @@ public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
      * @param content  The content view for this transient bottom bar.
      * @param callback The content view callback for this transient bottom bar.
      */
-    private LoadingSnackbar(ViewGroup parent, View content, ContentViewCallback callback) {
+    private LoadingBar(ViewGroup parent, View content, ContentViewCallback callback) {
         super(parent, content, callback);
 
         // Remove the default insets applied that account for the keyboard showing up
@@ -35,15 +35,15 @@ public class LoadingSnackbar extends BaseTransientBottomBar<LoadingSnackbar> {
         ViewCompat.setOnApplyWindowInsetsListener(wrapper, (view, insets) -> insets);
     }
 
-    public static LoadingSnackbar make(@NonNull View view, @Duration int duration) {
+    public static LoadingBar make(@NonNull View view, @Duration int duration) {
         final ViewGroup parent = findSuitableParent(view);
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final View content = inflater.inflate(R.layout.snackbar_loading, parent, false);
         final ContentViewCallback viewCallback = new ContentViewCallback(content);
-        final LoadingSnackbar loadingSnackbar = new LoadingSnackbar(parent, content, viewCallback);
-        loadingSnackbar.setDuration(duration);
-        forceAnimation(loadingSnackbar);
-        return loadingSnackbar;
+        final LoadingBar loadingBar = new LoadingBar(parent, content, viewCallback);
+        loadingBar.setDuration(duration);
+        forceAnimation(loadingBar);
+        return loadingBar;
     }
 
     private static ViewGroup findSuitableParent(View view) {

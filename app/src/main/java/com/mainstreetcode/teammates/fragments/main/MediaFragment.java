@@ -125,7 +125,7 @@ public class MediaFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
-        getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
+        setFabClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
     }
 
     @Override

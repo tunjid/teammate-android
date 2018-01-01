@@ -8,6 +8,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.transition.AutoTransition;
 import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.LoadingBar;
 import com.mainstreetcode.teammates.util.FabIconAnimator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
@@ -49,6 +51,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private Toolbar toolbar;
     private CoordinatorLayout root;
     private FloatingActionButton fab;
+    private LoadingBar loadingBar;
 
     @Nullable
     private ViewHider fabHider;
@@ -81,7 +84,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
     }
 
@@ -140,28 +142,38 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    @SuppressLint("Range")
+    public void toggleProgress(boolean show) {
+        if (show && loadingBar != null && loadingBar.isShown()) return;
+        if (show) (loadingBar = LoadingBar.make(root, Snackbar.LENGTH_INDEFINITE)).show();
+        else if (loadingBar != null && loadingBar.isShownOrQueued()) loadingBar.dismiss();
+    }
+
+    @Override
     public void setFabIcon(@DrawableRes int icon) {
         if (fabIconAnimator == null) return;
         fabIconAnimator.setCurrentIcon(icon);
     }
 
     @Override
-    public void setToolbarTitle(CharSequence charSequence) {
+    public void setToolbarTitle(CharSequence title) {
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setTitle(charSequence);
+        if (actionBar != null) actionBar.setTitle(title);
     }
 
-    public FloatingActionButton getFab() {
-        return fab;
+    @Override
+    public void showSnackBar(CharSequence message) {
+        toggleProgress(false);
+        Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
     }
 
-    public CoordinatorLayout getRootCoordinator() {
-        return root;
+    @Override
+    public void setFabClickListener(@Nullable View.OnClickListener clickListener) {
+        fab.setOnClickListener(clickListener);
     }
 
     protected boolean isFullscreenFragment(Fragment fragment) {
-        return fragment instanceof TeammatesBaseFragment
-                && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
+        return fragment instanceof TeammatesBaseFragment && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
     }
 
     private WindowInsetsCompat consumeToolbarInsets(WindowInsetsCompat insets) {

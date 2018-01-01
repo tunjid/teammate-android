@@ -122,7 +122,7 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getFab().setOnClickListener(this);
+        setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 

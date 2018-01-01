@@ -3,7 +3,6 @@ package com.mainstreetcode.teammates.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -78,10 +77,8 @@ public final class TeamsFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
 
         int requestCode = getTargetRequestCode();
-        FloatingActionButton fab = getFab();
         setFabIcon(R.drawable.ic_add_white_24dp);
-        fab.setOnClickListener(this);
-
+        setFabClickListener(this);
         setToolbarTitle(getString(requestCode == R.id.request_event_team_pick
                 || requestCode == R.id.request_media_team_pick
                 || requestCode == R.id.request_chat_team_pick
