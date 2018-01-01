@@ -30,11 +30,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cookie;
@@ -72,8 +74,7 @@ public class TeammateService {
                     .addInterceptor(loggingInterceptor)
                     .cookieJar(new SessionCookieJar());
 
-//            SSLSocketFactory sslSocketFactory = getSSLSocketFactory();
-//            if (sslSocketFactory != null) builder.sslSocketFactory(sslSocketFactory);
+            assignSSLSocketFactory(builder);
 
             httpClient = builder.build();
 
@@ -112,8 +113,7 @@ public class TeammateService {
         return httpClient;
     }
 
-    @SuppressWarnings("unused")
-    private static SSLSocketFactory getSSLSocketFactory() {
+    private static void assignSSLSocketFactory(OkHttpClient.Builder builder) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             InputStream stream = Application.getInstance().getResources().openRawResource(R.raw.server);
@@ -127,19 +127,25 @@ public class TeammateService {
             keyStore.setCertificateEntry("ca", certificate);
 
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm);
+            trustManagerFactory.init(keyStore);
+
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+
+            if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
+            }
+
+            X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), null);
+            sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
 
-            return sslContext.getSocketFactory();
-
+            builder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         }
-        catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException e) {
+        catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException | IllegalStateException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private static class SessionCookieJar implements CookieJar {
