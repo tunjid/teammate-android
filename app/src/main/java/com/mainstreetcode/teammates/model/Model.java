@@ -38,7 +38,7 @@ public interface Model<T> extends Identifiable, Parcelable, Comparable<T> {
 
         int a, b;
         a = b = Integer.compare(pointsA, pointsB);
-        if (modelA.getClass().equals(modelB.getClass())) b += modelA.compareTo(modelB);
+        if (modelA.getClass().equals(modelB.getClass())) a += modelA.compareTo(modelB);
 
         return Integer.compare(a, b);
     };
