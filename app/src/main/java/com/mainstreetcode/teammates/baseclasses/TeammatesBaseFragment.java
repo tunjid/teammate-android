@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
@@ -20,7 +18,6 @@ import android.transition.TransitionSet;
 import android.view.View;
 
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.adapters.viewholders.LoadingSnackbar;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.Validator;
@@ -37,29 +34,10 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     protected static final Validator validator = new Validator();
 
-    private LoadingSnackbar loadingSnackbar;
     protected CompositeDisposable disposables = new CompositeDisposable();
 
     protected Consumer<Throwable> defaultErrorHandler;
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
-
-    protected void setToolbarTitle(CharSequence charSequence) {
-        getPersistentUiController().setToolbarTitle(charSequence);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    protected FloatingActionButton getFab() {
-        return ((TeammatesBaseActivity) getActivity()).getFab();
-    }
-
-    protected void showSnackbar(String message) {
-        TeammatesBaseActivity activity = (TeammatesBaseActivity) getActivity();
-        if (activity == null || getView() == null) return;
-
-        toggleProgress(false);
-        View coordinator = activity.getRootCoordinator();
-        Snackbar.make(coordinator, message, Snackbar.LENGTH_LONG).show();
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -73,7 +51,6 @@ public class TeammatesBaseFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         toggleToolbar(showsToolBar());
         toggleFab(showsFab());
         toggleBottombar(showsBottomNav());
@@ -87,47 +64,46 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
-        getFab().setOnClickListener(null);
-
-        if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) loadingSnackbar.dismiss();
-
-        loadingSnackbar = null;
+        getPersistentUiController().setFabClickListener(null);
         disposables.clear();
         super.onDestroyView();
     }
 
-    protected void toggleProgress(boolean show) {
-        TeammatesBaseActivity activity = (TeammatesBaseActivity) getActivity();
-        if (activity == null || getView() == null) return;
-
-        View coordinator = activity.getRootCoordinator();
-
-        if (show && loadingSnackbar != null && loadingSnackbar.isShown()) return;
-
-        if (show && coordinator != null) {
-            loadingSnackbar = LoadingSnackbar.make(coordinator, Snackbar.LENGTH_INDEFINITE);
-            loadingSnackbar.show();
-        }
-        else if (loadingSnackbar != null && loadingSnackbar.isShownOrQueued()) {
-            loadingSnackbar.dismiss();
-        }
+    public int[] staticViews() {
+        return new int[]{};
     }
 
-    protected void handleErrorMessage(Message message) {
-        showSnackbar(message.getMessage());
-        toggleProgress(false);
-
-        Activity activity = getActivity();
-        if (activity != null && (message.isInvalidObject() || message.isIllegalTeamMember())) {
-            activity.onBackPressed();
-        }
+    public boolean drawsBehindStatusBar() {
+        return false;
     }
 
-    @SuppressLint("CommitTransaction")
-    @SuppressWarnings("ConstantConditions")
-    protected final FragmentTransaction beginTransaction() {
-        return getFragmentManager().beginTransaction();
+    protected boolean showsFab() {
+        return false;
     }
+
+    protected boolean showsToolBar() {
+        return true;
+    }
+
+    protected boolean showsBottomNav() {
+        return true;
+    }
+
+    protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
+
+    protected void toggleToolbar(boolean show) {getPersistentUiController().toggleToolbar(show);}
+
+    protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
+
+    private void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
+
+    protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon);}
+
+    protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
+
+    protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
+
+    protected void setFabClickListener(@Nullable View.OnClickListener clickListener) {getPersistentUiController().setFabClickListener(clickListener);}
 
     @Nullable
     @Override
@@ -163,45 +139,23 @@ public class TeammatesBaseFragment extends BaseFragment {
         }
     }
 
-    public int[] staticViews() {
-        return new int[]{};
+    protected void handleErrorMessage(Message message) {
+        showSnackbar(message.getMessage());
+        toggleProgress(false);
+
+        Activity activity = getActivity();
+        if (activity != null && (message.isInvalidObject())) activity.onBackPressed();
     }
 
-    public boolean drawsBehindStatusBar() {
-        return false;
-    }
-
-    protected boolean showsFab() {
-        return false;
-    }
-
-    protected boolean showsToolBar() {
-        return true;
-    }
-
-    protected boolean showsBottomNav() {
-        return true;
+    @SuppressLint("CommitTransaction")
+    @SuppressWarnings("ConstantConditions")
+    protected final FragmentTransaction beginTransaction() {
+        return getFragmentManager().beginTransaction();
     }
 
     private PersistentUiController getPersistentUiController() {
         Activity activity = getActivity();
         return activity == null ? DUMMY : ((PersistentUiController) activity);
-    }
-
-    protected void setFabIcon(@DrawableRes int icon) {
-        getPersistentUiController().setFabIcon(icon);
-    }
-
-    protected void toggleFab(boolean show) {
-        getPersistentUiController().toggleFab(show);
-    }
-
-    protected void toggleToolbar(boolean show) {
-        getPersistentUiController().toggleToolbar(show);
-    }
-
-    private void toggleBottombar(boolean show) {
-        getPersistentUiController().toggleBottombar(show);
     }
 
     private static final PersistentUiController DUMMY = new PersistentUiController() {
@@ -221,12 +175,27 @@ public class TeammatesBaseFragment extends BaseFragment {
         }
 
         @Override
+        public void toggleProgress(boolean show) {
+
+        }
+
+        @Override
         public void setFabIcon(int icon) {
 
         }
 
         @Override
-        public void setToolbarTitle(CharSequence charSequence) {
+        public void showSnackBar(CharSequence message) {
+
+        }
+
+        @Override
+        public void setToolbarTitle(CharSequence title) {
+
+        }
+
+        @Override
+        public void setFabClickListener(View.OnClickListener clickListener) {
 
         }
     };

@@ -88,7 +88,7 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getFab().setOnClickListener(this);
+        setFabClickListener(this);
         setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.events_title, team.getName()));
 
@@ -105,8 +105,7 @@ public final class EventsFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
-                teamViewModel.updateDefaultTeam(Team.empty());
-                TeamPickerFragment.pick(getActivity(), R.id.request_event_team_pick);
+                TeamPickerFragment.change(getActivity(), R.id.request_event_team_pick);
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -125,7 +125,7 @@ public class MediaFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
-        getFab().setOnClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
+        setFabClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
     }
 
     @Override
@@ -149,8 +149,7 @@ public class MediaFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
-                teamViewModel.updateDefaultTeam(Team.empty());
-                TeamPickerFragment.pick(getActivity(), R.id.request_media_team_pick);
+                TeamPickerFragment.change(getActivity(), R.id.request_media_team_pick);
                 return true;
             case R.id.action_delete:
                 mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())

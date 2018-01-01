@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -91,8 +90,7 @@ public class RoleEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        FloatingActionButton fab = getFab();
-        fab.setOnClickListener(this);
+        setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.edit_user));
 

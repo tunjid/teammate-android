@@ -20,52 +20,55 @@ import com.mainstreetcode.teammates.model.Team;
 public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.TeamAdapterListener {
 
     private static final String TAG = "TeamMediaPickerFragment";
+    private static final String ARGS_CHANGING = "ARGS_CHANGING";
     private static final String ARGS_REQUEST_CODE = "ARGS_REQUEST_CODE";
 
     @IdRes
     private int requestCode;
+    private boolean isChanging;
 
-    private static TeamPickerFragment newInstance(@IdRes int requestCode) {
+    public static void pick(FragmentActivity host, @IdRes int requestCode) {
+        assureInstance(host, false, requestCode);
+
+        TeamPickerFragment instance = getInstance(host, false, requestCode);
+        if (instance == null) return;
+
+        instance.pick();
+    }
+
+    public static void change(FragmentActivity host, @IdRes int requestCode) {
+        assureInstance(host, true, requestCode);
+
+        TeamPickerFragment instance = getInstance(host, true, requestCode);
+        if (instance == null) return;
+
+        instance.pick();
+    }
+
+    private static TeamPickerFragment newInstance(boolean isChanging, @IdRes int requestCode) {
         TeamPickerFragment fragment = new TeamPickerFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ARGS_CHANGING, isChanging);
         args.putInt(ARGS_REQUEST_CODE, requestCode);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static void request(FragmentActivity host, @IdRes int requestCode) {
-        assureInstance(host, requestCode);
-
-        TeamPickerFragment instance = getInstance(host, requestCode);
-        if (instance == null) return;
-
-        instance.pick();
-    }
-
-    public static void pick(FragmentActivity host, @IdRes int requestCode) {
-        assureInstance(host, requestCode);
-
-        TeamPickerFragment instance = getInstance(host, requestCode);
-        if (instance == null) return;
-
-        instance.pick();
-    }
-
-    private static void assureInstance(FragmentActivity host, @IdRes int requestCode) {
+    private static void assureInstance(FragmentActivity host, boolean isChanging, @IdRes int requestCode) {
         FragmentManager fragmentManager = host.getSupportFragmentManager();
-        Fragment instance = getInstance(host, requestCode);
+        Fragment instance = getInstance(host, isChanging, requestCode);
 
         if (instance == null) fragmentManager.beginTransaction()
-                .add(newInstance(requestCode), makeTag(requestCode))
+                .add(newInstance(isChanging, requestCode), makeTag(isChanging, requestCode))
                 .commitNow();
     }
 
-    private static TeamPickerFragment getInstance(FragmentActivity host, @IdRes int requestCode) {
-        return (TeamPickerFragment) host.getSupportFragmentManager().findFragmentByTag(makeTag(requestCode));
+    private static TeamPickerFragment getInstance(FragmentActivity host, boolean isChanging, @IdRes int requestCode) {
+        return (TeamPickerFragment) host.getSupportFragmentManager().findFragmentByTag(makeTag(isChanging, requestCode));
     }
 
-    private static String makeTag(@IdRes int requestCode) {
-        return TAG + "-" + requestCode;
+    private static String makeTag(boolean isChanging, @IdRes int requestCode) {
+        return TAG + "-" + isChanging + "-" + requestCode;
     }
 
     @Override
@@ -77,6 +80,7 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isChanging = getArguments().getBoolean(ARGS_CHANGING);
         requestCode = getArguments().getInt(ARGS_REQUEST_CODE);
     }
 
@@ -98,7 +102,7 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
 
     private void pick() {
         Team team = teamViewModel.getDefaultTeam();
-        if (!team.isEmpty()) onTeamClicked(team);
+        if (!isChanging && !team.isEmpty()) onTeamClicked(team);
         else showPicker();
     }
 

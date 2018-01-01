@@ -2,6 +2,8 @@ package com.mainstreetcode.teammates.baseclasses;
 
 
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 public interface PersistentUiController {
     void toggleToolbar(boolean show);
@@ -10,7 +12,13 @@ public interface PersistentUiController {
 
     void toggleFab(boolean show);
 
+    void toggleProgress(boolean show);
+
     void setFabIcon(@DrawableRes int icon);
 
-    void setToolbarTitle(CharSequence charSequence);
+    void showSnackBar(CharSequence message);
+
+    void setToolbarTitle(CharSequence title);
+
+    void setFabClickListener(@Nullable View.OnClickListener clickListener);
 }
