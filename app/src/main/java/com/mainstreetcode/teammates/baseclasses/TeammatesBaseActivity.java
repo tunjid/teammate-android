@@ -151,12 +151,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (actionBar != null) actionBar.setTitle(charSequence);
     }
 
-    @Override
     public FloatingActionButton getFab() {
         return fab;
     }
 
-    @Override
     public CoordinatorLayout getRootCoordinator() {
         return root;
     }
