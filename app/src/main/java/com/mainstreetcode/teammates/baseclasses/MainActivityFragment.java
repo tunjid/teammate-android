@@ -8,15 +8,16 @@ import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Message;
+import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
 import com.mainstreetcode.teammates.viewmodel.FeedViewModel;
+import com.mainstreetcode.teammates.viewmodel.LocalRoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammates.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
-import com.mainstreetcode.teammates.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
-import com.mainstreetcode.teammates.viewmodel.LocalRoleViewModel;
 
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammates.activities.MainActivity}
@@ -57,6 +58,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     @Override
     protected void handleErrorMessage(Message message) {
         if (message.isUnauthorizedUser()) signOut();
+        else if (message.isIllegalTeamMember()) {
+            teamViewModel.updateDefaultTeam(Team.empty());
+            getActivity().onBackPressed();
+        }
         else super.handleErrorMessage(message);
     }
 

@@ -118,9 +118,7 @@ public class TeammatesBaseFragment extends BaseFragment {
         toggleProgress(false);
 
         Activity activity = getActivity();
-        if (activity != null && (message.isInvalidObject() || message.isIllegalTeamMember())) {
-            activity.onBackPressed();
-        }
+        if (activity != null && (message.isInvalidObject())) activity.onBackPressed();
     }
 
     @SuppressLint("CommitTransaction")
