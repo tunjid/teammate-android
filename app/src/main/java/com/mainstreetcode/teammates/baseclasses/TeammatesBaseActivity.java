@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.transition.AutoTransition;
 import android.support.transition.Transition;
@@ -34,11 +35,10 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 
 /**
  * Base Activity for the app
- * <p>
- * Created by Shemanigans on 6/1/17.
  */
 
-public abstract class TeammatesBaseActivity extends BaseActivity {
+public abstract class TeammatesBaseActivity extends BaseActivity
+        implements PersistentUiController {
 
     public static int insetHeight;
 
@@ -47,6 +47,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity {
     private View insetView;
 
     private Toolbar toolbar;
+    private CoordinatorLayout root;
     private FloatingActionButton fab;
 
     @Nullable
@@ -92,6 +93,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity {
         keyboardPadding = findViewById(R.id.keyboard_padding);
         insetView = findViewById(R.id.inset_view);
         toolbar = findViewById(R.id.toolbar);
+        root = findViewById(R.id.coordinator);
         fab = findViewById(R.id.fab);
 
         View bottomBar = findViewById(R.id.bottom_navigation);
@@ -116,36 +118,47 @@ public abstract class TeammatesBaseActivity extends BaseActivity {
         }
     }
 
+    @Override
     public void toggleToolbar(boolean show) {
         if (toolbarHider == null) return;
         if (show) toolbarHider.show();
         else toolbarHider.hide();
     }
 
+    @Override
     public void toggleBottombar(boolean show) {
         if (bottombarHider == null) return;
         if (show) bottombarHider.show();
         else bottombarHider.hide();
     }
 
+    @Override
     public void toggleFab(boolean show) {
         if (fabHider == null) return;
         if (show) fabHider.show();
         else fabHider.hide();
     }
 
+    @Override
     public void setFabIcon(@DrawableRes int icon) {
         if (fabIconAnimator == null) return;
         fabIconAnimator.setCurrentIcon(icon);
     }
 
+    @Override
     public void setToolbarTitle(CharSequence charSequence) {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(charSequence);
     }
 
+    @Override
     public FloatingActionButton getFab() {
         return fab;
+    }
+
+    @Override
+    public CoordinatorLayout getRootCoordinator() {
+        return root;
     }
 
     protected boolean isFullscreenFragment(Fragment fragment) {

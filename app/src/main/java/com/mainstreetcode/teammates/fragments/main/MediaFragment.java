@@ -251,13 +251,11 @@ public class MediaFragment extends MainActivityFragment
         if (root == null) return;
 
         contextBar.setTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
-
         //if (current == show) return;
 
+        toggleToolbar(!show);
+
         Transition transition = new Fade().excludeTarget(recyclerView, true);
-
-        getTeammatesActivity().toggleToolbar(!show);
-
         TransitionManager.beginDelayedTransition(root, transition);
         contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.baseclasses;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,18 +44,21 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
 
     protected void setToolbarTitle(CharSequence charSequence) {
-        getTeammatesActivity().setToolbarTitle(charSequence);
+        getPersistentUiController().setToolbarTitle(charSequence);
     }
 
+    @SuppressWarnings("ConstantConditions")
     protected FloatingActionButton getFab() {
-        return getTeammatesActivity().getFab();
+        return ((TeammatesBaseActivity) getActivity()).getFab();
     }
 
     protected void showSnackbar(String message) {
-        if (getView() == null) return;
+        TeammatesBaseActivity activity = (TeammatesBaseActivity) getActivity();
+        if (activity == null || getView() == null) return;
+
         toggleProgress(false);
-        View coordinator = getTeammatesActivity().findViewById(R.id.coordinator);
-        if (coordinator != null) Snackbar.make(coordinator, message, Snackbar.LENGTH_LONG).show();
+        View coordinator = activity.getRootCoordinator();
+        Snackbar.make(coordinator, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -93,9 +97,10 @@ public class TeammatesBaseFragment extends BaseFragment {
     }
 
     protected void toggleProgress(boolean show) {
-        if (getView() == null) return;
+        TeammatesBaseActivity activity = (TeammatesBaseActivity) getActivity();
+        if (activity == null || getView() == null) return;
 
-        View coordinator = getTeammatesActivity().findViewById(R.id.coordinator);
+        View coordinator = activity.getRootCoordinator();
 
         if (show && loadingSnackbar != null && loadingSnackbar.isShown()) return;
 
@@ -111,12 +116,17 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected void handleErrorMessage(Message message) {
         showSnackbar(message.getMessage());
         toggleProgress(false);
-        if (message.isInvalidObject()) getTeammatesActivity().onBackPressed();
+
+        Activity activity = getActivity();
+        if (activity != null && (message.isInvalidObject() || message.isIllegalTeamMember())) {
+            activity.onBackPressed();
+        }
     }
 
     @SuppressLint("CommitTransaction")
+    @SuppressWarnings("ConstantConditions")
     protected final FragmentTransaction beginTransaction() {
-        return getTeammatesActivity().getSupportFragmentManager().beginTransaction();
+        return getFragmentManager().beginTransaction();
     }
 
     @Nullable
@@ -173,23 +183,51 @@ public class TeammatesBaseFragment extends BaseFragment {
         return true;
     }
 
-    protected TeammatesBaseActivity getTeammatesActivity() {
-        return ((TeammatesBaseActivity) getActivity());
+    private PersistentUiController getPersistentUiController() {
+        Activity activity = getActivity();
+        return activity == null ? DUMMY : ((PersistentUiController) activity);
     }
 
     protected void setFabIcon(@DrawableRes int icon) {
-        getTeammatesActivity().setFabIcon(icon);
+        getPersistentUiController().setFabIcon(icon);
     }
 
     protected void toggleFab(boolean show) {
-        getTeammatesActivity().toggleFab(show);
+        getPersistentUiController().toggleFab(show);
     }
 
-    private void toggleToolbar(boolean show) {
-        getTeammatesActivity().toggleToolbar(show);
+    protected void toggleToolbar(boolean show) {
+        getPersistentUiController().toggleToolbar(show);
     }
 
     private void toggleBottombar(boolean show) {
-        getTeammatesActivity().toggleBottombar(show);
+        getPersistentUiController().toggleBottombar(show);
     }
+
+    private static final PersistentUiController DUMMY = new PersistentUiController() {
+        @Override
+        public void toggleToolbar(boolean show) {
+
+        }
+
+        @Override
+        public void toggleBottombar(boolean show) {
+
+        }
+
+        @Override
+        public void toggleFab(boolean show) {
+
+        }
+
+        @Override
+        public void setFabIcon(int icon) {
+
+        }
+
+        @Override
+        public void setToolbarTitle(CharSequence charSequence) {
+
+        }
+    };
 }
