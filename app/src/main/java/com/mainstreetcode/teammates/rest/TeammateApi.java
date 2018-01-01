@@ -123,7 +123,7 @@ public interface TeammateApi {
     // Event endpoints
     // =============================================================================================
 
-    @GET("/api/teams/events/{teamId}")
+    @GET("/api/teams/{teamId}/events")
     Single<List<Event>> getEvents(@Path("teamId") String teamId);
 
     @POST("api/events")
@@ -149,13 +149,13 @@ public interface TeammateApi {
     // Team Chat endpoints
     // =============================================================================================
 
-    @GET("/api/team-chats/{id}")
+    @GET("/api/chats/{id}")
     Single<Chat> getTeamChat(@Path("id") String chatId);
 
-    @DELETE("/api/team-chats/{id}")
+    @DELETE("/api/chats/{id}")
     Single<Chat> deleteChat(@Path("id") String chatId);
 
-    @GET("/api/teams/chats/{teamId}")
+    @GET("/api/teams/{teamId}/chats")
     Single<List<Chat>> chatsBefore(@Path("teamId") String teamId, @Query("date") Date date);
 
     // =============================================================================================
@@ -168,17 +168,17 @@ public interface TeammateApi {
     @DELETE("/api/media/{mediaId}")
     Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 
-    @GET("/api/teams/media/{teamId}")
+    @GET("/api/teams/{teamId}/media")
     Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
 
     @Multipart
-    @POST("api/teams/media/{teamId}")
+    @POST("api/teams/{teamId}/media")
     Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
 
     @POST("api/media/delete")
     Single<List<Media>> deleteMedia(@Body List<Media> delete);
 
-    @POST("api/teams/media/{teamId}/delete")
+    @POST("api/teams/{teamId}/media/delete")
     Single<List<Media>> adminDeleteMedia(@Path("teamId") String teamId, @Body List<Media> delete);
 
     // =============================================================================================
