@@ -108,7 +108,7 @@
     <string name="confirm_user_drop">Drop %1$s from the team?</string>
 
     <!--EventsFragment-->
-    <string name="my_events">My Events</string>
+    <string name="events_title">Events for %1$s</string>
 
     <!--EventDetailFragment-->
     <string name="create_event">Create Event</string>
