@@ -42,6 +42,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onAttach(Context context) {
         super.onAttach(context);
         ViewModelProvider provider = ViewModelProviders.of(getActivity());
@@ -58,11 +59,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     @Override
     protected void handleErrorMessage(Message message) {
         if (message.isUnauthorizedUser()) signOut();
-        else if (message.isIllegalTeamMember()) {
-            teamViewModel.updateDefaultTeam(Team.empty());
-            getActivity().onBackPressed();
-        }
         else super.handleErrorMessage(message);
+
+        if (message.isIllegalTeamMember()) {
+            teamViewModel.updateDefaultTeam(Team.empty());
+            if (getActivity() != null) getActivity().onBackPressed();
+        }
     }
 
     protected void signOut() {
