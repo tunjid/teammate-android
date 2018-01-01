@@ -70,12 +70,7 @@ public final class HomeFragment extends MainActivityFragment
                 (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName())),
                 defaultErrorHandler
         ));
-        disposables.add(feedViewModel.getFeed().subscribe((diffResult) -> {
-                    diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-                    emptyViewHolder.toggle(feedViewModel.getFeedItems().isEmpty());
-                },
-                defaultErrorHandler
-        ));
+        disposables.add(feedViewModel.getFeed().subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -103,7 +98,7 @@ public final class HomeFragment extends MainActivityFragment
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, false)))
                     .show();
         }
-        if (model instanceof JoinRequest) {
+        else if (model instanceof JoinRequest) {
             builder.setTitle(getString(R.string.add_user_to_team, ((JoinRequest) model).getUser().getFirstName()))
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, true)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
@@ -118,11 +113,14 @@ public final class HomeFragment extends MainActivityFragment
 
     private void onFeedItemAction(Single<DiffUtil.DiffResult> diffResultSingle) {
         toggleProgress(true);
-        disposables.add(diffResultSingle.subscribe(diffResult -> {
-                    diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-                    toggleProgress(false);
-                }, defaultErrorHandler)
+        disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler)
         );
+    }
+
+    private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
+        toggleProgress(false);
+        diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+        emptyViewHolder.toggle(feedViewModel.getFeedItems().isEmpty());
     }
 
     private static String getTimeOfDay() {

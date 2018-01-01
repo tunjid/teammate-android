@@ -8,6 +8,7 @@ import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.notifications.FeedItem;
+import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.repository.EventRepository;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
@@ -17,7 +18,6 @@ import com.mainstreetcode.teammates.rest.TeammateService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -46,9 +46,8 @@ public class FeedViewModel extends ViewModel {
 
     public Flowable<DiffUtil.DiffResult> getFeed() {
         Flowable<List<FeedItem>> sourceFlowable = api.getFeed().toFlowable();
-        Callable<List<FeedItem>> listCallable = () -> feedItems;
 
-        return Identifiable.diff(sourceFlowable, listCallable, (oldFeed, newFeed) -> {
+        return Identifiable.diff(sourceFlowable, () -> feedItems, (oldFeed, newFeed) -> {
             Collections.sort(newFeed, (itemA, itemB) -> Model.COMPARATOR.compare(itemA.getModel(), itemB.getModel()));
             return newFeed;
         });
@@ -56,9 +55,7 @@ public class FeedViewModel extends ViewModel {
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
         Flowable<List<FeedItem>> sourceFlowable = eventRepository.rsvpEvent(feedItem.getModel(), attending)
-                .map(model -> feedItem)
-                .cast(FeedItem.class)
-                .map(Collections::singletonList)
+                .map(model -> Collections.singletonList(dropType(feedItem)))
                 .toFlowable();
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
@@ -68,15 +65,13 @@ public class FeedViewModel extends ViewModel {
         Flowable<List<FeedItem>> sourceFlowable = (approved
                 ? roleRepository.approveUser(feedItem.getModel())
                 : joinRequestRepository.dropJoinRequest(feedItem.getModel()))
-                .map(model -> feedItem)
-                .cast(FeedItem.class)
-                .map(Collections::singletonList)
+                .map(model -> Collections.singletonList(dropType(feedItem)))
                 .toFlowable();
 
-        final Callable<List<FeedItem>> listCallable = () -> feedItems;
-
-        return Identifiable.diff(sourceFlowable, listCallable, onFeedItemProcessed()).firstOrError();
+        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
     }
+
+    private <T extends Model<T> & Notifiable<T>> FeedItem dropType(FeedItem<T> feedItem) { return feedItem;}
 
     private BiFunction<List<FeedItem>, List<FeedItem>, List<FeedItem>> onFeedItemProcessed() {
         return (feedItems, processed) -> {
