@@ -93,13 +93,13 @@ public class MainActivity extends TeammatesBaseActivity {
                 showFragment(HomeFragment.newInstance());
                 return true;
             case R.id.action_events:
-                TeamPickerFragment.request(this, R.id.request_event_team_pick);
+                TeamPickerFragment.pick(this, R.id.request_event_team_pick);
                 return true;
             case R.id.action_messages:
-                TeamPickerFragment.request(this, R.id.request_chat_team_pick);
+                TeamPickerFragment.pick(this, R.id.request_chat_team_pick);
                 return true;
             case R.id.action_media:
-                TeamPickerFragment.request(this, R.id.request_media_team_pick);
+                TeamPickerFragment.pick(this, R.id.request_media_team_pick);
                 return true;
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());

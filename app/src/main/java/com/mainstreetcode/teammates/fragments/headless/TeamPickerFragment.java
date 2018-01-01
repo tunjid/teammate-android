@@ -33,15 +33,6 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
         return fragment;
     }
 
-    public static void request(FragmentActivity host, @IdRes int requestCode) {
-        assureInstance(host, requestCode);
-
-        TeamPickerFragment instance = getInstance(host, requestCode);
-        if (instance == null) return;
-
-        instance.pick();
-    }
-
     public static void pick(FragmentActivity host, @IdRes int requestCode) {
         assureInstance(host, requestCode);
 
