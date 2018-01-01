@@ -176,8 +176,8 @@ public class TeamDetailFragment extends MainActivityFragment
 
         if (request.isUserApproved() && !request.isTeamApproved()) {
             new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
-                    .setPositiveButton(R.string.yes, (dialog, which) -> approveUser(request, true))
-                    .setNegativeButton(R.string.no, (dialog, which) -> approveUser(request, false))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, true))
+                    .setNegativeButton(R.string.no, (dialog, which) -> processJoinRequest(request, false))
                     .show();
         }
     }
@@ -210,11 +210,8 @@ public class TeamDetailFragment extends MainActivityFragment
         return super.provideFragmentTransaction(fragmentTo);
     }
 
-    private void approveUser(final JoinRequest request, final boolean approve) {
-        Flowable<DiffUtil.DiffResult> resultFlowable = approve
-                ? roleViewModel.approveUser(request, team)
-                : roleViewModel.declineUser(request, team);
-
+    private void processJoinRequest(final JoinRequest request, final boolean approve) {
+        Flowable<DiffUtil.DiffResult> resultFlowable = roleViewModel.processJoinRequest(request, team, approve);
         disposables.add(resultFlowable.subscribe(diffResult -> onJoinAction(diffResult, request, approve), defaultErrorHandler));
     }
 

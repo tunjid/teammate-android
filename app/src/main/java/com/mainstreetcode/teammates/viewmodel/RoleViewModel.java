@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -33,14 +34,14 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class RoleViewModel extends TeamMappedViewModel<Model> {
 
     private int count;
-    private final RoleRepository repository;
+    private final RoleRepository roleRepository;
     private final JoinRequestRepository joinRequestRepository;
 
     private final TeammateApi api = TeammateService.getApiInstance();
     private final List<String> roleNames = new ArrayList<>();
 
     public RoleViewModel() {
-        repository = RoleRepository.getInstance();
+        roleRepository = RoleRepository.getInstance();
         joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
@@ -61,7 +62,7 @@ public class RoleViewModel extends TeamMappedViewModel<Model> {
     }
 
     public Single<Role> updateRole(Role role) {
-        return checkForInvalidObject(repository.createOrUpdate(role).toFlowable().cast(Model.class), role, role.getTeam())
+        return checkForInvalidObject(roleRepository.createOrUpdate(role).toFlowable().cast(Model.class), role, role.getTeam())
                 .firstOrError()
                 .cast(Role.class)
                 .observeOn(mainThread());
@@ -71,44 +72,22 @@ public class RoleViewModel extends TeamMappedViewModel<Model> {
         return joinRequestRepository.createOrUpdate(joinRequest).observeOn(mainThread());
     }
 
-    @SuppressWarnings("unchecked")
-    public Flowable<DiffUtil.DiffResult> approveUser(JoinRequest request, Team team) {
-        Flowable<List<Model>> sourceFlowable = repository.approveUser(request)
+    public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, Team team, boolean approved) {
+        Flowable<List<Model>> sourceFlowable = (approved
+                ? roleRepository.approveUser(request)
+                : joinRequestRepository.dropJoinRequest(request))
                 .cast(Model.class)
                 .map(Collections::singletonList)
                 .toFlowable();
 
         final Callable<List<Model>> listCallable = () -> getModelList(team);
 
-        return Identifiable.diff(sourceFlowable, listCallable, (teamListCopy, addedRole) -> {
-            teamListCopy.remove(request);
-            teamListCopy.addAll(addedRole);
-            Collections.sort(teamListCopy, (modelA, modelB) -> {
-                if (modelA.getClass().equals(modelB.getClass())) return modelA.compareTo(modelB);
-                if (modelA instanceof Role) return 1;
-                else return -1;
-            });
-            return teamListCopy;
-        }).onErrorResumeNext(checkForInvalidModel(listCallable, request));
-    }
-
-    public Flowable<DiffUtil.DiffResult> declineUser(JoinRequest request, Team team) {
-        Flowable<List<Model>> sourceFlowable = joinRequestRepository.dropJoinRequest(request)
-                .doOnSuccess(team.getJoinRequests()::remove)
-                .cast(Model.class)
-                .map(Collections::singletonList)
-                .toFlowable();
-
-        final Callable<List<Model>> listCallable = () -> getModelList(team);
-
-        return Identifiable.diff(sourceFlowable, listCallable, (teamListCopy, deleted) -> {
-            teamListCopy.removeAll(deleted);
-            return teamListCopy;
-        }).onErrorResumeNext(checkForInvalidModel(listCallable, request));
+        return Identifiable.diff(sourceFlowable, listCallable, onRequestProcessed(request, approved))
+                .onErrorResumeNext(checkForInvalidModel(listCallable, request));
     }
 
     public Single<Role> deleteRole(Role role) {
-        return checkForInvalidObject(repository.delete(role)
+        return checkForInvalidObject(roleRepository.delete(role)
                 .doOnSuccess(getModelList(role.getTeam())::remove)
                 .toFlowable().cast(Model.class), role, role.getTeam())
                 .firstOrError()
@@ -120,12 +99,22 @@ public class RoleViewModel extends TeamMappedViewModel<Model> {
         return throwable -> {
             Flowable<List<Model>> sourceFlowable = Flowable.just(Collections.singletonList(invalid));
 
-            if (ModelUtils.isInvalidObject(throwable))
-                return Identifiable.diff(sourceFlowable, callable, (teamListCopy, invalidList) -> {
-                    teamListCopy.removeAll(invalidList);
-                    return teamListCopy;
-                });
-            else return Flowable.error(throwable);
+            return ModelUtils.isInvalidObject(throwable)
+                    ? Identifiable.diff(sourceFlowable, callable, onRequestProcessed(invalid, false))
+                    : Flowable.error(throwable);
+        };
+    }
+
+    private BiFunction<List<Model>, List<Model>, List<Model>> onRequestProcessed(Model model, boolean approved) {
+        if (approved) return (teamMembers, added) -> {
+            teamMembers.remove(model);
+            teamMembers.addAll(added);
+            Collections.sort(teamMembers, Model.COMPARATOR);
+            return teamMembers;
+        };
+        else return (teamMembers, deleted) -> {
+            teamMembers.removeAll(deleted);
+            return teamMembers;
         };
     }
 }

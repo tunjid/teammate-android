@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Model;
@@ -25,7 +26,7 @@ import java.util.Map;
  * Notifications from a user's feed
  */
 
-public class FeedItem<T extends Model<T> & Notifiable<T>> {
+public class FeedItem<T extends Model<T> & Notifiable<T>> implements Identifiable {
 
     static final String JOIN_REQUEST = "join-request";
     static final String EVENT = "event";
@@ -61,6 +62,11 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> {
         return result;
     }
 
+    @Override
+    public String getId() {
+        return model.getId();
+    }
+
     public String getType() {
         return type;
     }
@@ -80,8 +86,6 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> {
     public T getModel() {
         return model;
     }
-
-
 
     public static class GsonAdapter<T extends Model<T> & Notifiable<T>>
             implements JsonDeserializer<FeedItem<T>> {

@@ -2,12 +2,8 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
-import com.mainstreetcode.teammates.rest.TeammateService;
-
-import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -54,10 +50,6 @@ public class UserViewModel extends ViewModel {
 
     public Single<Boolean> signOut() {
         return repository.signOut().observeOn(mainThread());
-    }
-
-    public Single<List<FeedItem>> getFeed() {
-        return TeammateService.getApiInstance().getFeed().observeOn(mainThread());
     }
 
     public Single<Void> forgotPassword(String email) {

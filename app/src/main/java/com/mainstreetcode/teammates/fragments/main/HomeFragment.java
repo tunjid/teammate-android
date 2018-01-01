@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,12 +18,13 @@ import com.mainstreetcode.teammates.adapters.FeedAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+
+import io.reactivex.Single;
 
 /**
  * Home screen
@@ -33,8 +35,6 @@ public final class HomeFragment extends MainActivityFragment
 
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
-
-    private final List<FeedItem> feed = new ArrayList<>();
 
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
@@ -55,7 +55,7 @@ public final class HomeFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = rootView.findViewById(R.id.feed_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new FeedAdapter(feed, this));
+        recyclerView.setAdapter(new FeedAdapter(feedViewModel.getFeedItems(), this));
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed);
 
@@ -67,18 +67,10 @@ public final class HomeFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
 
         disposables.add(userViewModel.getMe().subscribe(
-                (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeofDay(), user.getFirstName())),
+                (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName())),
                 defaultErrorHandler
         ));
-        disposables.add(userViewModel.getFeed().subscribe(
-                (updatedFeed) -> {
-                    feed.clear();
-                    feed.addAll(updatedFeed);
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                    emptyViewHolder.toggle(feed.isEmpty());
-                },
-                defaultErrorHandler
-        ));
+        disposables.add(feedViewModel.getFeed().subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -94,6 +86,7 @@ public final class HomeFragment extends MainActivityFragment
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onFeedItemClicked(FeedItem item) {
         Model model = item.getModel();
 
@@ -101,8 +94,14 @@ public final class HomeFragment extends MainActivityFragment
 
         if (model instanceof Event) {
             builder.setTitle(getString(R.string.attend_event))
-                    .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(item, (Event) model, true))
-                    .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(item, (Event) model, false))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, true)))
+                    .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, false)))
+                    .show();
+        }
+        else if (model instanceof JoinRequest) {
+            builder.setTitle(getString(R.string.add_user_to_team, ((JoinRequest) model).getUser().getFirstName()))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, true)))
+                    .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
                     .show();
         }
     }
@@ -112,20 +111,19 @@ public final class HomeFragment extends MainActivityFragment
         return false;
     }
 
-    private void rsvpEvent(FeedItem item, Event event, boolean attending) {
+    private void onFeedItemAction(Single<DiffUtil.DiffResult> diffResultSingle) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, new ArrayList<>(), attending).subscribe(result -> {
-                    toggleProgress(false);
-                    int index = feed.indexOf(item);
-                    if (index >= 0) {
-                        feed.remove(index);
-                        recyclerView.getAdapter().notifyItemRemoved(index);
-                    }
-                }, defaultErrorHandler)
+        disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler)
         );
     }
 
-    private static String getTimeofDay() {
+    private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
+        toggleProgress(false);
+        diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+        emptyViewHolder.toggle(feedViewModel.getFeedItems().isEmpty());
+    }
+
+    private static String getTimeOfDay() {
         int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         if (hourOfDay > 0 && hourOfDay < 12) return "morning";
         else return "evening";

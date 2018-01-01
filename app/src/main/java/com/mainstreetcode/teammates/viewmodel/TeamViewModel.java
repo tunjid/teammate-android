@@ -10,6 +10,7 @@ import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -46,7 +47,11 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     public Flowable<DiffUtil.DiffResult> getTeam(Team team, List<Model> teamModels) {
         Flowable<List<Model>> sourceFlowable = checkForInvalidObject(repository.get(team), team, Team.class)
                 .map(teamListFunction);
-        return Identifiable.diff(sourceFlowable, () -> teamModels, (sourceTeamList, newTeamList) -> newTeamList);
+
+        return Identifiable.diff(sourceFlowable, () -> teamModels, (sourceTeamList, newTeamList) -> {
+            Collections.sort(newTeamList, Model.COMPARATOR);
+            return newTeamList;
+        });
     }
 
     public Single<List<Team>> findTeams(String queryText) {
