@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Teammates</string>
-    <string name="teammates">Teammates</string>
+    <string name="app_name">Teammate</string>
+    <string name="teammates">Teammate</string>
     <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
 
     <!--Splash Fragment-->
@@ -108,7 +108,7 @@
     <string name="confirm_user_drop">Drop %1$s from the team?</string>
 
     <!--EventsFragment-->
-    <string name="my_events">My Events</string>
+    <string name="events_title">Events for %1$s</string>
 
     <!--EventDetailFragment-->
     <string name="create_event">Create Event</string>

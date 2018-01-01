@@ -90,7 +90,8 @@ public final class EventsFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         getFab().setOnClickListener(this);
         setFabIcon(R.drawable.ic_add_white_24dp);
-        setToolbarTitle(getString(R.string.my_events));
+        setToolbarTitle(getString(R.string.events_title, team.getName()));
+
 
         disposables.add(eventViewModel.getEvents(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
