@@ -12,7 +12,6 @@ import io.reactivex.Flowable;
 
 public abstract class MappedViewModel<K, V extends Model> extends ViewModel {
 
-
     public abstract List<V> getModelList(K key);
 
     Flowable<V> checkForInvalidObject(Flowable<V> sourceFlowable, V value, K key) {

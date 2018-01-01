@@ -16,6 +16,7 @@ import com.mainstreetcode.teammates.viewmodel.LocalRoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammates.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
+import com.mainstreetcode.teammates.viewmodel.TeamMemberViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
@@ -34,6 +35,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected ChatViewModel chatViewModel;
     protected LocationViewModel locationViewModel;
     protected LocalRoleViewModel localRoleViewModel;
+    protected TeamMemberViewModel teamMemberViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +56,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         mediaViewModel = provider.get(MediaViewModel.class);
         chatViewModel = provider.get(ChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
+        teamMemberViewModel = provider.get(TeamMemberViewModel.class);
     }
 
     @Override

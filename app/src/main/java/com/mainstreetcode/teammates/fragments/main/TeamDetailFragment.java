@@ -83,7 +83,7 @@ public class TeamDetailFragment extends MainActivityFragment
         setHasOptionsMenu(true);
 
         team = getArguments().getParcelable(ARG_TEAM);
-        teamModels = roleViewModel.getModelList(team);
+        teamModels = teamMemberViewModel.getModelList(team);
     }
 
     @Nullable
@@ -115,7 +115,7 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
 
-        disposables.add(teamViewModel.getTeam(team, teamModels).subscribe(this::onTeamUpdated, defaultErrorHandler));
+        disposables.add(teamMemberViewModel.getTeamMembers(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
         roleViewModel.fetchRoleValues();
     }
 
@@ -209,7 +209,7 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     private void processJoinRequest(final JoinRequest request, final boolean approve) {
-        Flowable<DiffUtil.DiffResult> resultFlowable = roleViewModel.processJoinRequest(request, team, approve);
+        Flowable<DiffUtil.DiffResult> resultFlowable = teamMemberViewModel.processJoinRequest(request, approve);
         disposables.add(resultFlowable.subscribe(diffResult -> onJoinAction(diffResult, request, approve), defaultErrorHandler));
     }
 

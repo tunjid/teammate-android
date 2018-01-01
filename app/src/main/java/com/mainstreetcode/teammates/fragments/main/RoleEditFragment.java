@@ -142,7 +142,7 @@ public class RoleEditFragment extends HeaderedFragment
                     return;
                 }
 
-                disposables.add(roleViewModel.updateRole(role).subscribe(updatedRole -> {
+                disposables.add(teamMemberViewModel.updateRole(role).subscribe(updatedRole -> {
                     showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
                     recyclerView.getAdapter().notifyDataSetChanged();
                 }, defaultErrorHandler));
@@ -161,7 +161,7 @@ public class RoleEditFragment extends HeaderedFragment
                 if ((activity = getActivity()) == null) return super.onOptionsItemSelected(item);
 
                 new AlertDialog.Builder(activity).setTitle(prompt)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(roleViewModel.deleteRole(role).subscribe(this::onRoleDropped, defaultErrorHandler)))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(teamMemberViewModel.deleteRole(role).subscribe(this::onRoleDropped, defaultErrorHandler)))
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
