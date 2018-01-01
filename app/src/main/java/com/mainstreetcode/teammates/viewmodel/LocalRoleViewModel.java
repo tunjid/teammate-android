@@ -15,13 +15,13 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * ViewModel for checking a role in local contexts
  */
 
-public class localRoleViewModel extends ViewModel {
+public class LocalRoleViewModel extends ViewModel {
 
     private Role role = Role.empty();
 
     private final RoleRepository repository;
 
-    public localRoleViewModel() {
+    public LocalRoleViewModel() {
         repository = RoleRepository.getInstance();
     }
 

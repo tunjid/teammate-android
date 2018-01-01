@@ -9,24 +9,22 @@ import android.support.annotation.Nullable;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
+import com.mainstreetcode.teammates.viewmodel.FeedViewModel;
 import com.mainstreetcode.teammates.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammates.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammates.viewmodel.RoleViewModel;
 import com.mainstreetcode.teammates.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
-import com.mainstreetcode.teammates.viewmodel.localRoleViewModel;
+import com.mainstreetcode.teammates.viewmodel.LocalRoleViewModel;
 
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammates.activities.MainActivity}
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
 public class MainActivityFragment extends TeammatesBaseFragment {
 
-    //private boolean hasPrefetchedRoles;
-
+    protected FeedViewModel feedViewModel;
     protected RoleViewModel roleViewModel;
     protected UserViewModel userViewModel;
     protected TeamViewModel teamViewModel;
@@ -34,18 +32,19 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected MediaViewModel mediaViewModel;
     protected ChatViewModel chatViewModel;
     protected LocationViewModel locationViewModel;
-    protected localRoleViewModel localRoleViewModel;
+    protected LocalRoleViewModel localRoleViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        localRoleViewModel = ViewModelProviders.of(this).get(localRoleViewModel.class);
+        localRoleViewModel = ViewModelProviders.of(this).get(LocalRoleViewModel.class);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         ViewModelProvider provider = ViewModelProviders.of(getActivity());
+        feedViewModel = provider.get(FeedViewModel.class);
         roleViewModel = provider.get(RoleViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         teamViewModel = provider.get(TeamViewModel.class);
