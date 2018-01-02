@@ -49,6 +49,7 @@ public class UserViewModel extends ViewModel {
     }
 
     public Single<Boolean> signOut() {
+        TeamViewModel.teams.clear();
         return repository.signOut().observeOn(mainThread());
     }
 
