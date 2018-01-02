@@ -19,7 +19,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "roles",
         foreignKeys = {
                 @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "role_team", onDelete = CASCADE),
-                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "role_user")
+                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "role_user", onDelete = CASCADE)
         }
 )
 public class RoleEntity implements Parcelable {

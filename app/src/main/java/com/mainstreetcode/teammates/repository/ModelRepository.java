@@ -86,7 +86,7 @@ public abstract class ModelRepository<T extends Model<T>> {
         if (model == null || !(throwable instanceof HttpException)) return;
 
         Message message = new Message((HttpException) throwable);
-        if (message.isInvalidObject()) deleteLocally(model);
+        if (message.isInvalidObject() || message.isIllegalTeamMember()) deleteLocally(model);
     }
 
     final T deleteLocally(T model) {
