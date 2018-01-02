@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.viewmodel;
 
 
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
 
@@ -18,5 +19,11 @@ public class TeamMappedViewModel<V extends Model> extends MappedViewModel<Team, 
         if (!modelListMap.containsKey(team)) modelListMap.put(team, modelList = new ArrayList<>());
 
         return modelList;
+    }
+
+    @Override
+    void onErrorMessage(Message message, Team key, V invalid) {
+        super.onErrorMessage(message, key, invalid);
+        if (message.isIllegalTeamMember()) TeamViewModel.teams.remove(key);
     }
 }

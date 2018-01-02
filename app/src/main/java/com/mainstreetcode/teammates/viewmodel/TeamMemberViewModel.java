@@ -10,7 +10,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
-import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +40,10 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMembers(Team team) {
-        Flowable<List<Model>> sourceFlowable = teamRepository.get(team).map(teamListFunction);
+        Flowable<List<Model>> sourceFlowable = checkForInvalidObject(teamRepository.get(team)
+                .cast(Model.class), team, team)
+                .cast(Team.class)
+                .map(teamListFunction);
 
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), (sourceTeamList, newTeamList) -> {
             Collections.sort(newTeamList, Model.COMPARATOR);
@@ -59,8 +61,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
 
         final Callable<List<Model>> listCallable = () -> getModelList(request.getTeam());
 
-        return Identifiable.diff(sourceFlowable, listCallable, onRequestProcessed(request, approved))
-                .onErrorResumeNext(checkForInvalidModel(listCallable, request));
+        return Identifiable.diff(sourceFlowable, listCallable, onRequestProcessed(request, approved));
     }
 
     public Single<Role> deleteRole(Role role) {
@@ -78,16 +79,6 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
                 .firstOrError()
                 .cast(Role.class)
                 .observeOn(mainThread());
-    }
-
-    private Function<Throwable, Flowable<DiffUtil.DiffResult>> checkForInvalidModel(Callable<List<Model>> callable, Model invalid) {
-        return throwable -> {
-            Flowable<List<Model>> sourceFlowable = Flowable.just(Collections.singletonList(invalid));
-
-            return ModelUtils.isInvalidObject(throwable)
-                    ? Identifiable.diff(sourceFlowable, callable, onRequestProcessed(invalid, false))
-                    : Flowable.error(throwable);
-        };
     }
 
     private BiFunction<List<Model>, List<Model>, List<Model>> onRequestProcessed(Model model, boolean approved) {
