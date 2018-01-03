@@ -29,7 +29,7 @@ import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static android.app.PendingIntent.getActivity;
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-public abstract class Notifier<T extends Model<T> & Notifiable<T>> {
+public abstract class Notifier<T extends Model<T>> {
 
     private static final int DEEP_LINK_REQ_CODE = 1;
 

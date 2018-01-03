@@ -17,9 +17,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.notifications.Notifiable;
-import com.mainstreetcode.teammates.notifications.Notifier;
-import com.mainstreetcode.teammates.notifications.TeamNotifier;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
@@ -39,7 +36,6 @@ import static com.mainstreetcode.teammates.util.ModelUtils.deserializeList;
 public class Team extends TeamEntity
         implements
         Model<Team>,
-        Notifiable<Team>,
         HeaderedModel<Team>,
         ItemListableBean<Team> {
 
@@ -164,11 +160,6 @@ public class Team extends TeamEntity
     public int compareTo(@NonNull Team o) {
         int nameComparision = name.compareTo(o.name);
         return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
-    }
-
-    @Override
-    public Notifier<Team> getNotifier() {
-        return TeamNotifier.getInstance();
     }
 
     public List<Role> getRoles() {

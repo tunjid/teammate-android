@@ -14,9 +14,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.notifications.Notifiable;
-import com.mainstreetcode.teammates.notifications.Notifier;
-import com.mainstreetcode.teammates.notifications.RoleNotifier;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -31,7 +28,6 @@ import java.util.List;
 public class Role extends RoleEntity
         implements
         Model<Role>,
-        Notifiable<Role>,
         HeaderedModel<Role>,
         ItemListableBean<Role> {
 
@@ -130,11 +126,6 @@ public class Role extends RoleEntity
                 : userComparison != 0
                 ? userComparison
                 : id.compareTo(o.id);
-    }
-
-    @Override
-    public Notifier<Role> getNotifier() {
-        return RoleNotifier.getInstance();
     }
 
     public boolean isPrivilegedRole() {

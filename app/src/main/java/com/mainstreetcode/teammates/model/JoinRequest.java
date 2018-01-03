@@ -11,9 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.mainstreetcode.teammates.notifications.JoinRequestNotifier;
-import com.mainstreetcode.teammates.notifications.Notifiable;
-import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -25,8 +22,7 @@ import java.lang.reflect.Type;
 
 public class JoinRequest extends JoinRequestEntity
         implements
-        Model<JoinRequest>,
-        Notifiable<JoinRequest> {
+        Model<JoinRequest> {
 
     public static JoinRequest join(String roleName, Team team, User user) {
         return new JoinRequest(false, true, "", roleName, team, user);
@@ -97,11 +93,6 @@ public class JoinRequest extends JoinRequestEntity
                 : userComparison != 0
                 ? userComparison
                 : id.compareTo(o.id);
-    }
-
-    @Override
-    public Notifier<JoinRequest> getNotifier() {
-        return JoinRequestNotifier.getInstance();
     }
 
     @Override
