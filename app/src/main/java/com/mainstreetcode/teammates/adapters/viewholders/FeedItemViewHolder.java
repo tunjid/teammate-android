@@ -6,12 +6,11 @@ import com.mainstreetcode.teammates.adapters.FeedAdapter;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.notifications.FeedItem;
-import com.mainstreetcode.teammates.notifications.Notifiable;
 
 /**
  * Viewholder for a {@link Team}
  */
-public class FeedItemViewHolder<H extends Model<H> & Notifiable<H>> extends ModelCardViewHolder<H, FeedAdapter.FeedItemAdapterListener>
+public class FeedItemViewHolder<H extends Model<H>> extends ModelCardViewHolder<H, FeedAdapter.FeedItemAdapterListener>
         implements View.OnClickListener {
 
     private FeedItem<H> item;

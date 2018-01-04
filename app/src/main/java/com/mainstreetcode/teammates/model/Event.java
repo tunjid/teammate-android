@@ -16,9 +16,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.notifications.EventNotifier;
-import com.mainstreetcode.teammates.notifications.Notifiable;
-import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -35,7 +32,6 @@ import java.util.List;
 public class Event extends EventEntity
         implements
         Model<Event>,
-        Notifiable<Event>,
         HeaderedModel<Event>,
         ItemListableBean<Event> {
 
@@ -144,11 +140,6 @@ public class Event extends EventEntity
                 : endDateComparison != 0
                 ? endDateComparison
                 : id.compareTo(o.id);
-    }
-
-    @Override
-    public Notifier<Event> getNotifier() {
-        return EventNotifier.getInstance();
     }
 
     public void setTeam(Team team) {

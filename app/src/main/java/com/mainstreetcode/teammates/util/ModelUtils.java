@@ -88,12 +88,23 @@ public class ModelUtils {
     }
 
     public static <T extends Comparable<? super T>> List<T> preserveList(List<T> source, List<T> additions) {
+        appendList(source, additions);
+        Collections.sort(source);
+
+        return source;
+    }
+
+    public static <T extends Comparable<? super T>> List<T> preserveListInverse(List<T> source, List<T> additions) {
+        appendList(source, additions);
+        Collections.sort(source, Collections.reverseOrder());
+
+        return source;
+    }
+
+    private static <T extends Comparable<? super T>> void appendList(List<T> source, List<T> additions) {
         Set<T> set = new HashSet<>(additions);
         set.addAll(source);
         source.clear();
         source.addAll(set);
-        Collections.sort(source);
-
-        return source;
     }
 }

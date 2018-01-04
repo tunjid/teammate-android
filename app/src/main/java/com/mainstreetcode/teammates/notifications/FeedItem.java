@@ -26,7 +26,7 @@ import java.util.Map;
  * Notifications from a user's feed
  */
 
-public class FeedItem<T extends Model<T> & Notifiable<T>> implements Identifiable {
+public class FeedItem<T extends Model<T>> implements Identifiable {
 
     static final String JOIN_REQUEST = "join-request";
     static final String EVENT = "event";
@@ -41,16 +41,18 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> implements Identifiabl
     private final String body;
     private final String type;
     private final T model;
+    final Class<T> itemClass;
 
-    FeedItem(String title, String body, String type, T model) {
+    FeedItem(String title, String body, String type, T model, Class<T> itemClass) {
         this.title = title;
         this.body = body;
         this.type = type;
         this.model = model;
+        this.itemClass = itemClass;
     }
 
     @Nullable
-    static <T extends Model<T> & Notifiable<T>> FeedItem<T> fromNotification(RemoteMessage message) {
+    static <T extends Model<T>> FeedItem<T> fromNotification(RemoteMessage message) {
         Map<String, String> data = message.getData();
         if (data == null || data.isEmpty()) return null;
 
@@ -87,7 +89,7 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> implements Identifiabl
         return model;
     }
 
-    public static class GsonAdapter<T extends Model<T> & Notifiable<T>>
+    public static class GsonAdapter<T extends Model<T>>
             implements JsonDeserializer<FeedItem<T>> {
 
         private static final String TYPE_KEY = "type";
@@ -100,6 +102,7 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> implements Identifiabl
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public FeedItem<T> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject feedItemJson = json.getAsJsonObject();
 
@@ -141,7 +144,7 @@ public class FeedItem<T extends Model<T> & Notifiable<T>> implements Identifiabl
 
             T model = context.deserialize(modelElement, typeClass);
 
-            return new FeedItem<>(title, body, type, model);
+            return new FeedItem<>(title, body, type, model, typeClass);
         }
     }
 }

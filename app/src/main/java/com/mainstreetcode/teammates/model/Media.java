@@ -19,9 +19,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.mainstreetcode.teammates.notifications.MediaNotifier;
-import com.mainstreetcode.teammates.notifications.Notifiable;
-import com.mainstreetcode.teammates.notifications.Notifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
@@ -42,8 +39,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class Media implements
         Parcelable,
-        Model<Media>,
-        Notifiable<Media> {
+        Model<Media> {
 
     public static final String UPLOAD_KEY = "team-media";
     private static final String IMAGE = "image";
@@ -143,11 +139,6 @@ public class Media implements
     @Override
     public int compareTo(@NonNull Media o) {
         return created.compareTo(o.created);
-    }
-
-    @Override
-    public Notifier<Media> getNotifier() {
-        return MediaNotifier.getInstance();
     }
 
     public User getUser() {

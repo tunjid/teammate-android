@@ -8,7 +8,6 @@ import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.notifications.FeedItem;
-import com.mainstreetcode.teammates.notifications.Notifiable;
 import com.mainstreetcode.teammates.repository.EventRepository;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
@@ -71,7 +70,7 @@ public class FeedViewModel extends ViewModel {
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
     }
 
-    private <T extends Model<T> & Notifiable<T>> FeedItem dropType(FeedItem<T> feedItem) { return feedItem;}
+    private <T extends Model<T>> FeedItem dropType(FeedItem<T> feedItem) { return feedItem;}
 
     private BiFunction<List<FeedItem>, List<FeedItem>, List<FeedItem>> onFeedItemProcessed() {
         return (feedItems, processed) -> {

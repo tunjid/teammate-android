@@ -36,7 +36,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
-        return Identifiable.diff(repository.getTeamMedia(team, date), () -> getModelList(team), ModelUtils::preserveList);
+        return Identifiable.diff(repository.getTeamMedia(team, date), () -> getModelList(team), ModelUtils::preserveListInverse);
     }
 
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {

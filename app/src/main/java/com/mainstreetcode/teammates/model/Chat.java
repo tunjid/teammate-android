@@ -19,9 +19,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.mainstreetcode.teammates.notifications.Notifiable;
-import com.mainstreetcode.teammates.notifications.Notifier;
-import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 import com.mainstreetcode.teammates.util.ObjectId;
@@ -39,8 +36,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class Chat implements
         Parcelable,
-        Model<Chat>,
-        Notifiable<Chat> {
+        Model<Chat> {
 
     @SuppressLint("SimpleDateFormat")
     private static final DateFormat CHAT_DATE_FORMAT = new SimpleDateFormat("h:mm a");
@@ -136,11 +132,6 @@ public class Chat implements
     @Override
     public int compareTo(@NonNull Chat o) {
         return created.compareTo(o.created);
-    }
-
-    @Override
-    public Notifier<Chat> getNotifier() {
-        return ChatNotifier.getInstance();
     }
 
     public String getKind() {
