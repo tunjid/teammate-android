@@ -165,7 +165,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message) {
         toggleProgress(false);
-       Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_LONG);
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
         snackbar.show();
     }
