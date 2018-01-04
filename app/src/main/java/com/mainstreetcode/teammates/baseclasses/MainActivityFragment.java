@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.baseclasses;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -64,10 +65,15 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (message.isUnauthorizedUser()) signOut();
         else super.handleErrorMessage(message);
 
-        if (message.isIllegalTeamMember()) {
-            teamViewModel.updateDefaultTeam(Team.empty());
-            if (getActivity() != null) getActivity().onBackPressed();
-        }
+        boolean isIllegalTeamMember = message.isIllegalTeamMember();
+        boolean shouldGoBack = isIllegalTeamMember || message.isInvalidObject();
+
+        if (isIllegalTeamMember) teamViewModel.updateDefaultTeam(Team.empty());
+
+        Activity activity = getActivity();
+        if (activity == null) return;
+
+        if (shouldGoBack) activity.onBackPressed();
     }
 
     protected void signOut() {

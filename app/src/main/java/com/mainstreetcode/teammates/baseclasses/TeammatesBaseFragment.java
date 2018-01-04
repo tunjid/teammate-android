@@ -142,9 +142,6 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected void handleErrorMessage(Message message) {
         showSnackbar(message.getMessage());
         toggleProgress(false);
-
-        Activity activity = getActivity();
-        if (activity != null && (message.isInvalidObject())) activity.onBackPressed();
     }
 
     @SuppressLint("CommitTransaction")
