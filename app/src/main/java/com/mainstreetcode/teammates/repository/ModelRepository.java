@@ -9,6 +9,7 @@ import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.persistence.EntityDao;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,7 +25,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.HttpException;
 
-import static io.reactivex.Maybe.concat;
+import static io.reactivex.Maybe.concatDelayError;
 
 /**
  * Repository that manages {@link Model} CRUD operations
@@ -111,6 +112,6 @@ public abstract class ModelRepository<T extends Model<T>> {
     }
 
     static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
-        return concat(local, remote);
+        return concatDelayError(Arrays.asList(local, remote));
     }
 }
