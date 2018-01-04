@@ -255,6 +255,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private boolean isNearBottomOfChat() {
+        if (recyclerView == null) return false;
         LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
