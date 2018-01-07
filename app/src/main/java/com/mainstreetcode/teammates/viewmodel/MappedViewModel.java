@@ -2,7 +2,6 @@ package com.mainstreetcode.teammates.viewmodel;
 
 
 import android.arch.lifecycle.ViewModel;
-import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Model;
@@ -10,7 +9,8 @@ import com.mainstreetcode.teammates.model.Model;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import retrofit2.HttpException;
+
+import static com.mainstreetcode.teammates.util.ModelUtils.fromThrowable;
 
 public abstract class MappedViewModel<K, V extends Model> extends ViewModel {
 
@@ -27,11 +27,5 @@ public abstract class MappedViewModel<K, V extends Model> extends ViewModel {
     private void checkForInvalidObject(Throwable throwable, V model, K key) {
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
-    }
-
-    @Nullable
-    private Message fromThrowable(Throwable throwable) {
-        if (!(throwable instanceof HttpException)) return null;
-        return new Message((HttpException) throwable);
     }
 }

@@ -113,6 +113,9 @@ public interface TeammateApi {
     @POST("api/join-requests/invite")
     Single<JoinRequest> inviteUser(@Body JoinRequest joinRequest);
 
+    @GET("api/join-requests/{requestId}")
+    Single<JoinRequest> getJoinRequest(@Path("requestId") String requestId);
+
     @GET("api/join-requests/{requestId}/approve")
     Single<Role> approveUser(@Path("requestId") String requestId);
 

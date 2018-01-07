@@ -8,7 +8,6 @@ import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.JoinRequestDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +49,7 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     @Override
     public Flowable<JoinRequest> get(String id) {
-        return Flowable.error(new TeammateException(""));
+        return api.getJoinRequest(id).toFlowable();
     }
 
     @Override
