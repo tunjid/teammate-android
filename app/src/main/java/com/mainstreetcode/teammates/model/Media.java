@@ -37,7 +37,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "media_team", onDelete = CASCADE)
         }
 )
-public class qMedia implements
+public class Media implements
         Parcelable,
         Model<Media> {
 
