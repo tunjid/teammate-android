@@ -174,6 +174,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
         boolean isInvite = request.isTeamApproved();
         AlertDialog.Builder builder = new AlertDialog.Builder(recyclerView.getContext());
+
         builder.setTitle(isInvite
                 ? getString(R.string.retract_invitation)
                 : getString(R.string.add_user_to_team, request.getUser().getFirstName()));
@@ -186,7 +187,6 @@ public class TeamDetailFragment extends MainActivityFragment
             builder.setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, true))
                     .setNegativeButton(R.string.no, (dialog, which) -> processJoinRequest(request, false));
         }
-
 
         builder.show();
     }
