@@ -46,6 +46,7 @@
     <string name="home_greeting">Good %1$s, %2$s</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
+    <string name="accept_invitation">Join %1$s?</string>
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>

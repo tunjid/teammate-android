@@ -99,17 +99,24 @@ public final class HomeFragment extends MainActivityFragment
                     .show();
         }
         else if (model instanceof JoinRequest) {
-            builder.setTitle(getString(R.string.add_user_to_team, ((JoinRequest) model).getUser().getFirstName()))
+            JoinRequest request = ((JoinRequest) model);
+            String title = request.isTeamApproved()
+                    ? getString(R.string.accept_invitation, request.getTeam().getName())
+                    : getString(R.string.add_user_to_team, request.getUser().getFirstName());
+
+            builder.setTitle(title)
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, true)))
+                    .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
                     .show();
         }
     }
 
     @Override
-    protected boolean showsFab() {
-        return false;
-    }
+    protected boolean showsFab() {return false;}
+
+    @Override
+    protected boolean showsBottomNav() {return true;}
 
     private void onFeedItemAction(Single<DiffUtil.DiffResult> diffResultSingle) {
         toggleProgress(true);

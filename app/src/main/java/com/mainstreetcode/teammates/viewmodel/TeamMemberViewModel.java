@@ -54,7 +54,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
     public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, boolean approved) {
         Flowable<List<Model>> sourceFlowable = (approved
                 ? roleRepository.approveUser(request)
-                : joinRequestRepository.dropJoinRequest(request))
+                : joinRequestRepository.delete(request))
                 .cast(Model.class)
                 .map(Collections::singletonList)
                 .toFlowable();

@@ -17,8 +17,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
-import static io.reactivex.Single.just;
-
 public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     private final TeammateApi api;
@@ -54,8 +52,9 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     @Override
     public Single<JoinRequest> delete(JoinRequest model) {
-        joinRequestDao.delete(model);
-        return just(model);
+        return api.deleteJoinRequest(model.getId())
+                .doOnError(throwable -> deleteInvalidModel(model, throwable))
+                .doOnSuccess(joinRequestDao::delete);
     }
 
     @Override
@@ -76,11 +75,5 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
             return models;
         };
-    }
-
-    public Single<JoinRequest> dropJoinRequest(JoinRequest joinRequest) {
-        return api.declineUser(joinRequest.getId())
-                .doOnError(throwable -> deleteInvalidModel(joinRequest, throwable))
-                .flatMap(this::delete);
     }
 }
