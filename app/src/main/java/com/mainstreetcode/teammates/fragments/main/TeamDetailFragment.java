@@ -172,19 +172,30 @@ public class TeamDetailFragment extends MainActivityFragment
         if (rootView == null) return;
         if (!localRoleViewModel.hasPrivilegedRole()) return;
 
-        if (request.isUserApproved() && !request.isTeamApproved()) {
-            new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.add_user_to_team, request.getUser().getFirstName()))
-                    .setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, true))
-                    .setNegativeButton(R.string.no, (dialog, which) -> processJoinRequest(request, false))
-                    .show();
+        boolean isInvite = request.isTeamApproved();
+        AlertDialog.Builder builder = new AlertDialog.Builder(recyclerView.getContext());
+
+        builder.setTitle(isInvite
+                ? getString(R.string.retract_invitation)
+                : getString(R.string.add_user_to_team, request.getUser().getFirstName()));
+
+        if (isInvite) {
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, false))
+                    .setNegativeButton(R.string.no, (dialog, which) -> {});
         }
+        else {
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, true))
+                    .setNegativeButton(R.string.no, (dialog, which) -> processJoinRequest(request, false));
+        }
+
+        builder.show();
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (showsFab()) inviteUser();
+                if (localRoleViewModel.hasPrivilegedRole()) inviteUser();
                 break;
         }
     }

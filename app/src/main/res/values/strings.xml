@@ -46,6 +46,7 @@
     <string name="home_greeting">Good %1$s, %2$s</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
+    <string name="accept_invitation">Join %1$s?</string>
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>
@@ -99,6 +100,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="add_user_to_team">Add %1$s to team?</string>
+    <string name="retract_invitation">Retract invitation?</string>
     <string name="select_role">Please select a role</string>
     <string name="updated_user">Updated %1$s!</string>
     <string name="added_user">Added %1$s!</string>

@@ -35,8 +35,9 @@ public class Device implements Model<Device> {
         return fcmToken;
     }
 
-    public void setFcmToken(String fcmToken) {
+    public Device setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+        return this;
     }
 
     @Override

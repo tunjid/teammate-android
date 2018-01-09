@@ -17,9 +17,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 
 @Entity(tableName = "events",
-        foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "event_team")
+        foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "event_team", onDelete = CASCADE)
 )
 public class EventEntity implements Parcelable {
 

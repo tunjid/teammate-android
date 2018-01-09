@@ -8,7 +8,6 @@ import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.persistence.JoinRequestDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
-import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +16,6 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
-
-import static io.reactivex.Single.just;
 
 public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
@@ -50,13 +47,14 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     @Override
     public Flowable<JoinRequest> get(String id) {
-        return Flowable.error(new TeammateException(""));
+        return api.getJoinRequest(id).toFlowable();
     }
 
     @Override
     public Single<JoinRequest> delete(JoinRequest model) {
-        joinRequestDao.delete(model);
-        return just(model);
+        return api.deleteJoinRequest(model.getId())
+                .doOnError(throwable -> deleteInvalidModel(model, throwable))
+                .doOnSuccess(joinRequestDao::delete);
     }
 
     @Override
@@ -77,11 +75,5 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
             return models;
         };
-    }
-
-    public Single<JoinRequest> dropJoinRequest(JoinRequest joinRequest) {
-        return api.declineUser(joinRequest.getId())
-                .doOnError(throwable -> deleteInvalidModel(joinRequest, throwable))
-                .flatMap(this::delete);
     }
 }

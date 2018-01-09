@@ -18,7 +18,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "join_requests",
         foreignKeys = {
                 @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "join_request_team", onDelete = CASCADE),
-                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "join_request_user")
+                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "join_request_user", onDelete = CASCADE)
         }
 )
 public class JoinRequestEntity implements Parcelable {

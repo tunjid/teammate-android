@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.notifications;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
@@ -9,13 +10,13 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
@@ -37,13 +38,15 @@ public class FeedItem<T extends Model<T>> implements Identifiable {
 
     private static final Gson gson = TeammateService.getGson();
 
+    private final String action;
     private final String title;
     private final String body;
     private final String type;
     private final T model;
     final Class<T> itemClass;
 
-    FeedItem(String title, String body, String type, T model, Class<T> itemClass) {
+    FeedItem(String action, String title, String body, String type, T model, Class<T> itemClass) {
+        this.action = action;
         this.title = title;
         this.body = body;
         this.type = type;
@@ -89,9 +92,12 @@ public class FeedItem<T extends Model<T>> implements Identifiable {
         return model;
     }
 
+    boolean isDeleteAction() {return !TextUtils.isEmpty(action) && "DELETE".equals(action);}
+
     public static class GsonAdapter<T extends Model<T>>
             implements JsonDeserializer<FeedItem<T>> {
 
+        private static final String ACTION_KEY = "action";
         private static final String TYPE_KEY = "type";
         private static final String TITLE_KEY = "title";
         private static final String BODY_KEY = "body";
@@ -106,6 +112,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable {
         public FeedItem<T> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject feedItemJson = json.getAsJsonObject();
 
+            String action = ModelUtils.asString(ACTION_KEY, feedItemJson);
             String type = ModelUtils.asString(TYPE_KEY, feedItemJson);
             String title = ModelUtils.asString(TITLE_KEY, feedItemJson);
             String body = ModelUtils.asString(BODY_KEY, feedItemJson);
@@ -144,7 +151,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable {
 
             T model = context.deserialize(modelElement, typeClass);
 
-            return new FeedItem<>(title, body, type, model, typeClass);
+            return new FeedItem<>(action, title, body, type, model, typeClass);
         }
     }
 }

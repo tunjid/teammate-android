@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.repository;
 
 import com.mainstreetcode.teammates.model.Device;
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.DeviceDao;
 import com.mainstreetcode.teammates.persistence.EntityDao;
@@ -13,7 +14,10 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+
+import static com.mainstreetcode.teammates.util.ModelUtils.fromThrowable;
 
 public class DeviceRepository extends ModelRepository<Device> {
 
@@ -40,18 +44,18 @@ public class DeviceRepository extends ModelRepository<Device> {
     @Override
     public Single<Device> createOrUpdate(Device model) {
         Device current = dao.getCurrentDevice();
+        Consumer<Device> saveFunction = device -> dao.upsert(Collections.singletonList(device));
 
-        if (current == null) return api.createDevice(model).map(device -> {
-            dao.upsert(Collections.singletonList(device));
-            return device;
-        });
-        else {
-            current.setFcmToken(model.getFcmToken());
-            return api.updateDevice(current.getId(), model).map(device -> {
-                dao.upsert(Collections.singletonList(device));
-                return device;
-            }).doOnError(throwable -> dao.deleteCurrentDevice());
-        }
+        if (current == null) return api.createDevice(model).doOnSuccess(saveFunction);
+        else return api.updateDevice(current.setFcmToken(model.getFcmToken()).getId(), model)
+                .doOnSuccess(saveFunction)
+                .doOnError(throwable -> deleteInvalidModel(current, throwable))
+                .onErrorResumeNext(throwable -> {
+                    Message message = fromThrowable(throwable);
+                    return message != null && message.isInvalidObject()
+                            ? api.createDevice(current).doOnSuccess(saveFunction)
+                            : Single.error(throwable);
+                });
     }
 
     @Override

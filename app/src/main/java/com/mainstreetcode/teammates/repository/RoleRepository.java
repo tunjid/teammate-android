@@ -90,16 +90,21 @@ public class RoleRepository extends ModelRepository<Role> {
         };
     }
 
-    public Single<Role> approveUser(JoinRequest request) {
-        JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
-
-        return api.approveUser(request.getId())
-                .map(getSaveFunction())
-                .doOnSuccess(role -> joinRequestRepository.delete(request))
-                .doOnError(throwable -> joinRequestRepository.deleteInvalidModel(request, throwable));
-    }
-
     public Maybe<Role> getRoleInTeam(String userId, String teamId) {
         return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io());
+    }
+
+    public Single<Role> acceptInvite(JoinRequest request) {
+        return apply(request, api.acceptInvite(request.getId()));
+    }
+
+    public Single<Role> approveUser(JoinRequest request) {
+        return apply(request, api.approveUser(request.getId()));
+    }
+
+    private Single<Role> apply(JoinRequest request, Single<Role> apiSingle) {
+        return apiSingle.map(getSaveFunction())
+                .doOnSuccess(role -> AppDatabase.getInstance().joinRequestDao().delete(request))
+                .doOnError(throwable -> JoinRequestRepository.getInstance().deleteInvalidModel(request, throwable));
     }
 }

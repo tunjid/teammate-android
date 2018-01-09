@@ -7,6 +7,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.repository.EventRepository;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
@@ -61,9 +62,14 @@ public class FeedViewModel extends ViewModel {
     }
 
     public Single<DiffUtil.DiffResult> processJoinRequest(FeedItem<JoinRequest> feedItem, boolean approved) {
+        JoinRequest request = feedItem.getModel();
+        Single<Role> roleSingle = (request.isTeamApproved()
+                ? roleRepository.acceptInvite(request)
+                : roleRepository.approveUser(request));
+
         Flowable<List<FeedItem>> sourceFlowable = (approved
-                ? roleRepository.approveUser(feedItem.getModel())
-                : joinRequestRepository.dropJoinRequest(feedItem.getModel()))
+                ? roleSingle
+                : joinRequestRepository.delete(request))
                 .map(model -> Collections.singletonList(dropType(feedItem)))
                 .toFlowable();
 
