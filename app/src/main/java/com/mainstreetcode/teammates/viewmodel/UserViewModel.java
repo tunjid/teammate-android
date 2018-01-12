@@ -36,6 +36,10 @@ public class UserViewModel extends ViewModel {
         return repository.signUp(firstName, lastName, primaryEmail, password).observeOn(mainThread());
     }
 
+    public Single<User> signIn(String facebookToken) {
+        return repository.signIn(facebookToken).observeOn(mainThread());
+    }
+
     public Single<User> signIn(String email, String password) {
         return repository.signIn(email, password).observeOn(mainThread());
     }

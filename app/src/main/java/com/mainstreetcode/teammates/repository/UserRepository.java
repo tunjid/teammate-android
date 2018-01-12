@@ -110,6 +110,14 @@ public class UserRepository extends ModelRepository<User> {
         return createOrUpdate(newUser);
     }
 
+    public Single<User> signIn(String facebookToken) {
+        JsonObject request = new JsonObject();
+        request.addProperty("access_token", facebookToken);
+
+        Single<User> remote = api.signIn(request).map(getSaveFunction());
+        return updateCurrent(remote);
+    }
+
     public Single<User> signIn(String email, String password) {
         JsonObject request = new JsonObject();
         request.addProperty("primaryEmail", email);
