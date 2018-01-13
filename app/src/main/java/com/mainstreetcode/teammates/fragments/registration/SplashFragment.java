@@ -152,8 +152,7 @@ public class SplashFragment extends RegistrationActivityFragment
         @Override
         public void onSuccess(LoginResult loginResult) {
             toggleProgress(true);
-            disposables.add(viewModel.signIn(loginResult.getAccessToken().getToken())
-                    .subscribe((authResult) -> RegistrationActivity.startMainActivity(getActivity()), defaultErrorHandler));
+            disposables.add(viewModel.signIn(loginResult).subscribe((authResult) -> RegistrationActivity.startMainActivity(getActivity()), defaultErrorHandler));
         }
 
         @Override

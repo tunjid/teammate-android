@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.facebook.login.LoginResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Chat;
@@ -104,6 +107,11 @@ public class TeammateService {
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
+                .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
+                    JsonObject body = new JsonObject();
+                    body.addProperty("access_token", src.getAccessToken().getToken());
+                    return body;
+                })
                 .create();
     }
 

@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
+import com.facebook.login.LoginResult;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
 
@@ -36,8 +37,8 @@ public class UserViewModel extends ViewModel {
         return repository.signUp(firstName, lastName, primaryEmail, password).observeOn(mainThread());
     }
 
-    public Single<User> signIn(String facebookToken) {
-        return repository.signIn(facebookToken).observeOn(mainThread());
+    public Single<User> signIn(LoginResult loginResult) {
+        return repository.signIn(loginResult).observeOn(mainThread());
     }
 
     public Single<User> signIn(String email, String password) {
