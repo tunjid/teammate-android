@@ -24,7 +24,6 @@ import com.mainstreetcode.teammates.persistence.entity.UserEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 import com.mainstreetcode.teammates.util.ObjectId;
 
-import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Date;
 
@@ -77,7 +76,7 @@ public class Media implements
     }
 
     public static Media fromUri(User user, Team team, Uri uri) {
-        return new Media(new ObjectId().toHexString(), new File(uri.getPath()).toString(), "", "", user, team, new Date());
+        return new Media(new ObjectId().toHexString(), uri.toString(), "", "", user, team, new Date());
     }
 
     @Override

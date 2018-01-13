@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammates.rest;
 
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import java.io.File;
-import java.io.FileInputStream;
+import com.mainstreetcode.teammates.Application;
+
 import java.io.IOException;
+import java.io.InputStream;
 
 import io.reactivex.Flowable;
 import io.reactivex.processors.PublishProcessor;
@@ -20,12 +22,12 @@ public class ProgressRequestBody extends RequestBody {
     private int numWriteToCalls;
     private final int numWriteToCallsToIgnore;
 
-    private final File file;
+    private final Uri uri;
     private final MediaType mediaType;
     private final PublishProcessor<Integer> floatPublishSubject = PublishProcessor.create();
 
-    public ProgressRequestBody(File file, int numWriteToCallsToIgnore, MediaType mediaType) {
-        this.file = file;
+    public ProgressRequestBody(Uri uri, int numWriteToCallsToIgnore, MediaType mediaType) {
+        this.uri = uri;
         this.numWriteToCallsToIgnore = numWriteToCallsToIgnore;
         this.mediaType = mediaType;
     }
@@ -40,11 +42,6 @@ public class ProgressRequestBody extends RequestBody {
     }
 
     @Override
-    public long contentLength() throws IOException {
-        return file.length();
-    }
-
-    @Override
     public void writeTo(@NonNull BufferedSink sink) throws IOException {
         numWriteToCalls++;
 
@@ -53,11 +50,25 @@ public class ProgressRequestBody extends RequestBody {
         // the second call to write to is the progress we actually want to track
         boolean isUploading = numWriteToCalls > numWriteToCallsToIgnore;
 
+        InputStream in;
+
+        try { in = Application.getInstance().getContentResolver().openInputStream(uri);}
+        catch (Exception exception) {
+            floatPublishSubject.onError(exception);
+            throw exception;
+        }
+
+        if (in == null) {
+            IOException exception = new IOException("Unable to create stream from URI");
+            floatPublishSubject.onError(exception);
+            throw exception;
+        }
+
         float uploaded = 0;
-        float fileLength = file.length();
+        float fileLength = in.available();
         byte[] buffer = new byte[UPLOAD_BUFFER_SIZE];
 
-        try (FileInputStream in = new FileInputStream(file)) {
+        try {
             float overallProgress = 0;
             int read;
             read = in.read(buffer);
