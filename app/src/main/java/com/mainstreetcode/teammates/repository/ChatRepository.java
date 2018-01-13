@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -49,14 +49,14 @@ public class ChatRepository extends ModelRepository<Chat> {
 
     private static ChatRepository ourInstance;
 
-    private final Application app;
+    private final App app;
     private final TeammateApi api;
     private final ChatDao chatDao;
     private final ModelRepository<User> userModelRepository;
     private final ModelRepository<Team> teamModelRepository;
 
     private ChatRepository() {
-        app = Application.getInstance();
+        app = App.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
         userModelRepository = UserRepository.getInstance();

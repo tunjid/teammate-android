@@ -167,7 +167,10 @@
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team! Tap the floating button to upload.</string>
 
-    <!--Empty ViewHolder-->
+    <!--Facebook-->
     <string name="facebook_app_id">2000415723539146</string>
     <string name="fb_login_protocol_scheme">fb2000415723539146</string>
+
+    <!--Admob-->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>

@@ -13,7 +13,7 @@ import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Model;
@@ -33,11 +33,11 @@ public abstract class Notifier<T extends Model<T>> {
 
     private static final int DEEP_LINK_REQ_CODE = 1;
 
-    protected final Application app;
+    protected final App app;
     private final Map<String, NotificationChannel> channelMap;
 
     public Notifier() {
-        app = Application.getInstance();
+        app = App.getInstance();
         channelMap = new HashMap<>();
 
         NotificationManager manager = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);

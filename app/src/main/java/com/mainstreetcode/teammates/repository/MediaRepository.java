@@ -3,7 +3,7 @@ package com.mainstreetcode.teammates.repository;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -128,7 +128,7 @@ public class MediaRepository extends ModelRepository<Media> {
     @Nullable
     MultipartBody.Part getBody(String path, String photoKey) {
         Uri uri =  Uri.parse(path);
-        String type = Application.getInstance().getContentResolver().getType(uri);
+        String type = App.getInstance().getContentResolver().getType(uri);
 
         if (type == null) return null;
         RequestBody requestBody = new ProgressRequestBody(uri, num, MediaType.parse(type));

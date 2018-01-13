@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -35,7 +35,7 @@ public class TeamRepository extends ModelRepository<Team> {
 
     private static TeamRepository ourInstance;
 
-    private final Application app;
+    private final App app;
     private final TeammateApi api;
     private final TeamDao teamDao;
     private final ModelRepository<User> userRepository;
@@ -43,7 +43,7 @@ public class TeamRepository extends ModelRepository<Team> {
     private final ModelRepository<JoinRequest> joinRequestRepository;
 
     private TeamRepository() {
-        app = Application.getInstance();
+        app = App.getInstance();
         api = TeammateService.getApiInstance();
         teamDao = AppDatabase.getInstance().teamDao();
         userRepository = UserRepository.getInstance();
