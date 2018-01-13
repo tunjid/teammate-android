@@ -99,6 +99,7 @@
     <string name="edit_user">Edit User</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="cancelled">Cancelled</string>
     <string name="add_user_to_team">Add %1$s to team?</string>
     <string name="retract_invitation">Retract invitation?</string>
     <string name="select_role">Please select a role</string>
@@ -166,4 +167,7 @@
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team! Tap the floating button to upload.</string>
 
+    <!--Empty ViewHolder-->
+    <string name="facebook_app_id">2000415723539146</string>
+    <string name="fb_login_protocol_scheme">fb2000415723539146</string>
 </resources>

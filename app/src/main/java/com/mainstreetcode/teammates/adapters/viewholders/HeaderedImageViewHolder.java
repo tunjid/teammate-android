@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,12 +22,6 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
         super(itemView, listener);
         picture = itemView.findViewById(R.id.image);
         picture.setOnClickListener(this);
-
-        ColorMatrix matrix = new ColorMatrix();
-        matrix.setSaturation(0);
-
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
-        picture.setColorFilter(filter);
     }
 
     public void bind(HeaderedModel model) {

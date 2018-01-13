@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Device;
@@ -110,13 +111,16 @@ public class UserRepository extends ModelRepository<User> {
         return createOrUpdate(newUser);
     }
 
+    public Single<User> signIn(LoginResult loginResult) {
+        return updateCurrent(api.signIn(loginResult).map(getSaveFunction()));
+    }
+
     public Single<User> signIn(String email, String password) {
         JsonObject request = new JsonObject();
         request.addProperty("primaryEmail", email);
         request.addProperty("password", password);
 
-        Single<User> remote = api.signIn(request).map(getSaveFunction());
-        return updateCurrent(remote);
+        return updateCurrent(api.signIn(request).map(getSaveFunction()));
     }
 
     public Flowable<User> getMe() {

@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.rest;
 
+import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Device;
@@ -43,6 +44,9 @@ public interface TeammateApi {
 
     @POST("api/signIn")
     Single<User> signIn(@Body JsonObject request);
+
+    @POST("api/signIn")
+    Single<User> signIn(@Body LoginResult loginResult);
 
     @PUT("api/users/{id}")
     Single<User> updateUser(@Path("id") String userId, @Body User user);

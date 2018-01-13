@@ -2,13 +2,11 @@ package com.mainstreetcode.teammates.fragments.headless;
 
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,7 +19,6 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +42,11 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
     public static final int CROP_CHOOSER = 1;
     public static final int MULTIPLE_MEDIA_CHOOSER = 2;
 
-    public static final String TAG = "ImageWorkerFragment";
-    public static final String IMAGE_SELECTION = "image/*";
-    public static final String IMAGE_VIDEO_SELECTION = "image/* video/*";
-    public static final String[] STORAGE_PERMISSIONS = {WRITE_EXTERNAL_STORAGE};
+    private static final String TAG = "ImageWorkerFragment";
+    private static final String IMAGE_SELECTION = "image/*";
+    private static final String IMAGE_VIDEO_SELECTION = "image/*, video/*";
+    private static final String[] MIME_TYPES = {"image/*", "video/*"};
+    private static final String[] STORAGE_PERMISSIONS = {WRITE_EXTERNAL_STORAGE};
 
     public static ImageWorkerFragment newInstance() {
         return new ImageWorkerFragment();
@@ -139,9 +137,7 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
         }
         else if (requestCode == MULTIPLE_MEDIA_CHOOSER && isMediaListener) {
             MediaListener listener = (MediaListener) target;
-            ContentResolver contentResolver = activity.getContentResolver();
-
-            Maybe<List<Uri>> filesMaybe = Maybe.create(new MediaQuery(data, contentResolver)).subscribeOn(io()).observeOn(mainThread());
+            Maybe<List<Uri>> filesMaybe = Maybe.create(new MediaQuery(data)).subscribeOn(io()).observeOn(mainThread());
             disposables.add(filesMaybe.subscribe(listener::onFilesSelected, ErrorHandler.EMPTY));
         }
     }
@@ -173,8 +169,18 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
     }
 
     private void startMultipleMediaPicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType(IMAGE_VIDEO_SELECTION);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
+        }
+        else {
+            intent.setType(IMAGE_VIDEO_SELECTION);
+        }
+
         if (SDK_INT >= JELLY_BEAN_MR2) intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
         startActivityForResult(intent, MULTIPLE_MEDIA_CHOOSER);
@@ -194,14 +200,10 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
 
     static class MediaQuery implements MaybeOnSubscribe<List<Uri>> {
 
-        static final String[] FILE_PATH_COLUMN = {MediaStore.Images.Media.DATA};
-
         private Intent data;
-        private ContentResolver contentResolver;
 
-        MediaQuery(Intent data, ContentResolver contentResolver) {
+        MediaQuery(Intent data) {
             this.data = data;
-            this.contentResolver = contentResolver;
         }
 
         @Override
@@ -210,39 +212,21 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
         }
 
         private List<Uri> onData() {
-            List<Uri> files = new ArrayList<>();
+            List<Uri> uris = new ArrayList<>();
+            ClipData clip = data.getClipData();
+            int count = clip == null ? 0 : clip.getItemCount();
 
-            if (data.getClipData() != null) {
-                ClipData clipData = data.getClipData();
-                int count = clipData.getItemCount();
 
-                for (int i = 0; i < count; i++) {
-                    File file = fromUri(clipData.getItemAt(i).getUri());
-                    if (file != null) files.add(Uri.fromFile(file));
-                }
+            if (count != 0) for (int i = 0; i < count; i++) uris.add(clip.getItemAt(i).getUri());
+            else if (data.getData() != null) uris.add(data.getData());
+
+            if (data.hasExtra("uris")) uris.addAll(data.getParcelableArrayListExtra("uris"));
+            // For Xiaomi Phones
+            if (uris.isEmpty() && data.hasExtra("pick-result-data")) {
+                uris.addAll(data.getParcelableArrayListExtra("pick-result-data"));
             }
-            else if (data.getData() != null) {
-                File file = fromUri(data.getData());
-                if (file != null) files.add(Uri.fromFile(file));
-            }
-            return files;
-        }
 
-        @Nullable
-        private File fromUri(Uri uri) {
-            Cursor cursor = contentResolver.query(uri, FILE_PATH_COLUMN, null, null, null);
-
-            if (cursor == null) return null;
-
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(FILE_PATH_COLUMN[0]);
-            String filePath = cursor.getString(columnIndex);
-
-            cursor.close();
-
-            File file = new File(filePath);
-            return file.exists() ? file : null;
+            return uris;
         }
     }
 }

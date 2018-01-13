@@ -1,8 +1,9 @@
 package com.mainstreetcode.teammates.repository;
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.webkit.MimeTypeMap;
 
+import com.mainstreetcode.teammates.Application;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -15,7 +16,6 @@ import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.TeammateException;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -127,18 +127,13 @@ public class MediaRepository extends ModelRepository<Media> {
 
     @Nullable
     MultipartBody.Part getBody(String path, String photoKey) {
-        File file = new File(path);
-
-        if (!file.exists()) return null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
-
-        if (extension == null) return null;
-        String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        Uri uri =  Uri.parse(path);
+        String type = Application.getInstance().getContentResolver().getType(uri);
 
         if (type == null) return null;
-        RequestBody requestBody = new ProgressRequestBody(file, num, MediaType.parse(type));
+        RequestBody requestBody = new ProgressRequestBody(uri, num, MediaType.parse(type));
 
-        return MultipartBody.Part.createFormData(photoKey, file.getName(), requestBody);
+        return MultipartBody.Part.createFormData(photoKey, "test.jpg", requestBody);
     }
 
     private void delete(List<Media> list) {
