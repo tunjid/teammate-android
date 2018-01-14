@@ -4,7 +4,7 @@ package com.mainstreetcode.teammates.viewmodel;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Message;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -13,6 +13,8 @@ import io.reactivex.functions.Function;
 import static com.mainstreetcode.teammates.util.ModelUtils.fromThrowable;
 
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
+
+    Function<List<V>, List<Identifiable>> toIdentifiable = ArrayList<Identifiable>::new;
 
     public abstract List<Identifiable> getModelList(K key);
 
@@ -28,6 +30,4 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
     }
-
-    Function<List<V>, List<Identifiable>> toIdentifiable = LinkedList<Identifiable>::new;
 }
