@@ -10,7 +10,6 @@ import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Ad;
 import com.mainstreetcode.teammates.model.Identifiable;
-import com.mainstreetcode.teammates.model.Model;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,7 +20,7 @@ abstract class BaseViewModel extends ViewModel {
 
     private static final int AD_THRESH = 5;
 
-    private LinkedList<Model> ads = new LinkedList<>();
+    private LinkedList<Identifiable> ads = new LinkedList<>();
 
     BaseViewModel() {fetchAds();}
 

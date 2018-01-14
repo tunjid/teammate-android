@@ -2,8 +2,6 @@ package com.mainstreetcode.teammates.model;
 
 
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.ads.formats.NativeAd;
@@ -13,7 +11,7 @@ import com.mainstreetcode.teammates.util.ObjectId;
 
 import java.util.List;
 
-public class Ad<T extends NativeAd> implements Model {
+public class Ad<T extends NativeAd> implements Identifiable {
 
     private T nativeAd;
     private final String id = new ObjectId().toHexString();
@@ -48,42 +46,6 @@ public class Ad<T extends NativeAd> implements Model {
 
     public T getNativeAd() {
         return nativeAd;
-    }
-
-    @Override
-    public void reset() {
-
-    }
-
-    @Override
-    public void update(Object updated) {
-
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public String getImageUrl() {
-        NativeAd.Image image = getImage();
-        return image == null ? "" : image.getUri().toString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-    }
-
-    @Override
-    public int compareTo(@NonNull Object o) {
-        return 0;
     }
 
     @Nullable

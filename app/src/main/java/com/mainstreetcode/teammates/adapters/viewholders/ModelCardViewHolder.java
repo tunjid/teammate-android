@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,7 +29,6 @@ public class ModelCardViewHolder<H extends Model, T extends BaseRecyclerViewAdap
 
     public void bind(H model) {
         this.model = model;
-        setImageAspectRatio(getImageAspectRatio(model));
 
         String imageUrl = model.getImageUrl();
 
@@ -46,15 +43,5 @@ public class ModelCardViewHolder<H extends Model, T extends BaseRecyclerViewAdap
 
     public ImageView getThumbnail() {
         return thumbnail;
-    }
-
-    @NonNull
-    String getImageAspectRatio(H model) {
-        return "H,1:1";
-    }
-
-    final void setImageAspectRatio(String aspectRatio){
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) thumbnail.getLayoutParams();
-        params.dimensionRatio = aspectRatio;
     }
 }
