@@ -15,19 +15,22 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CHAT;
+
 /**
  * Adapter for {@link Chat}
  */
 
 public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
-    private final List<Identifiable> chats;
+    private final List<Identifiable> items;
     private final User signedInUser;
 
-    public TeamChatAdapter(List<Identifiable> chats, User signedInUser,
+    public TeamChatAdapter(List<Identifiable> items, User signedInUser,
                            TeamChatAdapter.ChatAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
-        this.chats = chats;
+        this.items = items;
         this.signedInUser = signedInUser;
     }
 
@@ -42,11 +45,11 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
 
     @Override
     public void onBindViewHolder(TeamChatViewHolder viewHolder, int i) {
-        int size = chats.size();
+        int size = items.size();
 
-        Chat chat = forceCast(chats.get(i));
-        Chat prev = i == 0 ? null : forceCast(chats.get(i - 1));
-        Chat next = i < size - 1 ? forceCast(chats.get(i + 1)) : null;
+        Chat chat = forceCast(items.get(i));
+        Chat prev = i == 0 ? null : forceCast(items.get(i - 1));
+        Chat next = i < size - 1 ? forceCast(items.get(i + 1)) : null;
 
         User chatUser = chat.getUser();
         boolean hideDetails = (next != null && chatUser.equals(next.getUser()));
@@ -62,12 +65,17 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
 
     @Override
     public int getItemCount() {
-        return chats.size();
+        return items.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return chats.get(position).hashCode();
+        return items.get(position).hashCode();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position) instanceof Chat ? CHAT : AD;
     }
 
     public interface ChatAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

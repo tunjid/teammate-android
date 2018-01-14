@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     private View createTeam;
     private RecyclerView recyclerView;
-    private final List<Team> teams = new ArrayList<>();
+    private final List<Identifiable> teams = new ArrayList<>();
 
     private final Consumer<List<Team>> teamConsumer = (teams) -> {
         ViewGroup parent = (ViewGroup) createTeam.getParent();

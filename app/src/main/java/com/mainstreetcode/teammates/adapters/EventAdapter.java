@@ -41,8 +41,8 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
     @Override
     public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
         Identifiable item = items.get(position);
-        if(item instanceof Event) ((EventViewHolder)viewHolder).bind((Event)item);
-        else if(item instanceof Ad) ((ContentAdViewHolder)viewHolder).bind((Ad)item);
+        if (item instanceof Event) ((EventViewHolder) viewHolder).bind((Event) item);
+        else if (item instanceof Ad) ((ContentAdViewHolder) viewHolder).bind((Ad) item);
     }
 
     @Override

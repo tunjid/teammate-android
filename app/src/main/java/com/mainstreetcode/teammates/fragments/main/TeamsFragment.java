@@ -18,6 +18,7 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public final class TeamsFragment extends MainActivityFragment
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
-    private List<Team> teams;
+    private List<Identifiable> teams;
 
     public static TeamsFragment newInstance() {
         TeamsFragment fragment = new TeamsFragment();
