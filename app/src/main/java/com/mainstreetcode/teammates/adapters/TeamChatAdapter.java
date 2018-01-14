@@ -15,7 +15,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
-import static com.mainstreetcode.teammates.util.ViewHolderUtil.AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.CHAT;
 
 /**
@@ -75,7 +75,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position) instanceof Chat ? CHAT : AD;
+        return items.get(position) instanceof Chat ? CHAT : CONTENT_AD;
     }
 
     public interface ChatAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

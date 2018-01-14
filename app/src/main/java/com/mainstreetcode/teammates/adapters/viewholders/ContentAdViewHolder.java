@@ -3,13 +3,12 @@ package com.mainstreetcode.teammates.adapters.viewholders;
 
 import android.view.View;
 
-import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.NativeContentAd;
 import com.google.android.gms.ads.formats.NativeContentAdView;
-import com.mainstreetcode.teammates.model.Ad;
+import com.mainstreetcode.teammates.model.ContentAd;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
-public class ContentAdViewHolder extends AdViewHolder<NativeContentAd> {
+public class ContentAdViewHolder extends AdViewHolder<ContentAd> {
 
     private NativeContentAdView adView;
 
@@ -24,7 +23,7 @@ public class ContentAdViewHolder extends AdViewHolder<NativeContentAd> {
 
 
     @Override
-    public void bind(Ad<NativeContentAd> ad) {
+    public void bind(ContentAd ad) {
         super.bind(ad);
         //Some assets are guaranteed to be in every NativeContentAd.
         NativeContentAd nativeContentAd = ad.getNativeAd();
@@ -43,7 +42,7 @@ public class ContentAdViewHolder extends AdViewHolder<NativeContentAd> {
 //        }
 
         // Some aren't guaranteed, however, and should be checked.
-        NativeAd.Image logoImage = nativeContentAd.getLogo();
+        //NativeAd.Image logoImage = nativeContentAd.getLogo();
 
 //        if (logoImage == null) {
 //            adView.getLogoView().setVisibility(View.INVISIBLE);

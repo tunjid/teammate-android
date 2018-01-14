@@ -16,7 +16,7 @@ public class Ad<T extends NativeAd> implements Identifiable {
     private T nativeAd;
     private final String id = new ObjectId().toHexString();
 
-    public Ad(T nativeAd) {
+    Ad(T nativeAd) {
         this.nativeAd = nativeAd;
     }
 

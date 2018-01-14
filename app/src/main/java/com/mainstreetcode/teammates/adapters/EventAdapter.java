@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.EventViewHolder;
-import com.mainstreetcode.teammates.model.Ad;
+import com.mainstreetcode.teammates.model.ContentAd;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.util.ViewHolderUtil;
@@ -14,7 +14,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
-import static com.mainstreetcode.teammates.util.ViewHolderUtil.AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.EVENT;
 
 /**
@@ -33,7 +33,7 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        return viewType == AD
+        return viewType == CONTENT_AD
                 ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
                 : new EventViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_event, viewGroup), adapterListener);
     }
@@ -42,7 +42,7 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
     public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
         Identifiable item = items.get(position);
         if (item instanceof Event) ((EventViewHolder) viewHolder).bind((Event) item);
-        else if (item instanceof Ad) ((ContentAdViewHolder) viewHolder).bind((Ad) item);
+        else if (item instanceof ContentAd) ((ContentAdViewHolder) viewHolder).bind((ContentAd) item);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position) instanceof Event ? EVENT : AD;
+        return items.get(position) instanceof Event ? EVENT : CONTENT_AD;
     }
 
     public interface EventAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

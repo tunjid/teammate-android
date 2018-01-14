@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.formats.NativeAd;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Ad;
 import com.mainstreetcode.teammates.model.Team;
@@ -16,7 +15,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 /**
  * Viewholder for a {@link Team}
  */
-abstract class AdViewHolder<T extends NativeAd> extends BaseViewHolder<BaseRecyclerViewAdapter.AdapterListener> {
+abstract class AdViewHolder<T extends Ad> extends BaseViewHolder<BaseRecyclerViewAdapter.AdapterListener> {
 
     TextView title;
     TextView subtitle;
@@ -29,14 +28,14 @@ abstract class AdViewHolder<T extends NativeAd> extends BaseViewHolder<BaseRecyc
         thumbnail = itemView.findViewById(R.id.thumbnail);
     }
 
-    public void bind(Ad<T> ad) {
+    public void bind(T ad) {
         setImageAspectRatio(ad);
 
         Drawable drawable = ad.getDrawable();
         if (drawable != null) thumbnail.setImageDrawable(drawable);
     }
 
-    private void setImageAspectRatio(Ad<T> ad) {
+    private void setImageAspectRatio(Ad ad) {
         String aspectRatio = ad.getImageAspectRatio();
         if (aspectRatio != null) {
             ((ConstraintLayout.LayoutParams) thumbnail.getLayoutParams()).dimensionRatio = aspectRatio;

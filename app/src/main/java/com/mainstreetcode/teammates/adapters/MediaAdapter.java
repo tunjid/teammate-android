@@ -7,7 +7,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageMediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.VideoMediaViewHolder;
-import com.mainstreetcode.teammates.model.Ad;
+import com.mainstreetcode.teammates.model.ContentAd;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Media;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
@@ -15,7 +15,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
-import static com.mainstreetcode.teammates.util.ViewHolderUtil.AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
@@ -37,7 +37,7 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        return viewType == AD
+        return viewType == CONTENT_AD
                 ? new ContentAdViewHolder(getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
                 : viewType == IMAGE
                 ? new ImageMediaViewHolder(getItemView(R.layout.viewholder_image, viewGroup), adapterListener)
@@ -50,8 +50,8 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
         if (identifiable instanceof Media) {
             ((MediaViewHolder) viewHolder).bind((Media) identifiable);
         }
-        else if (identifiable instanceof Ad) {
-            ((ContentAdViewHolder) viewHolder).bind((Ad) identifiable);
+        else if (identifiable instanceof ContentAd) {
+            ((ContentAdViewHolder) viewHolder).bind((ContentAd) identifiable);
         }
     }
 
@@ -63,7 +63,7 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
     @Override
     public int getItemViewType(int position) {
         Identifiable identifiable = mediaList.get(position);
-        return identifiable instanceof Media ? (((Media) identifiable).isImage() ? IMAGE : VIDEO) : AD;
+        return identifiable instanceof Media ? (((Media) identifiable).isImage() ? IMAGE : VIDEO) : CONTENT_AD;
     }
 
     @Override

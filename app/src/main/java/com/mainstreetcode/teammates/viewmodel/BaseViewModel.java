@@ -8,7 +8,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
-import com.mainstreetcode.teammates.model.Ad;
+import com.mainstreetcode.teammates.model.ContentAd;
 import com.mainstreetcode.teammates.model.Identifiable;
 
 import java.util.Iterator;
@@ -28,7 +28,7 @@ abstract class BaseViewModel extends ViewModel {
         if (source.isEmpty() || ads.isEmpty()) return;
 
         Iterator<Identifiable> iterator = source.iterator();
-        while (iterator.hasNext()) if (iterator.next() instanceof Ad) iterator.remove();
+        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
 
         int adSize = ads.size();
         int sourceSize = source.size();
@@ -53,7 +53,7 @@ abstract class BaseViewModel extends ViewModel {
                     // Show the app install ad.
                 })
                 .forContentAd(contentAd -> {
-                    ads.add(new Ad<>(contentAd));
+                    ads.add(new ContentAd(contentAd));
                     if (ads.size() < 5) fetchAds();
                 })
                 .withAdListener(new AdListener() {
