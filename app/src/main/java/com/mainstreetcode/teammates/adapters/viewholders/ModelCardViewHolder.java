@@ -12,7 +12,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 
-public class ModelCardViewHolder<H extends Model<H>, T extends BaseRecyclerViewAdapter.AdapterListener> extends BaseViewHolder<T> {
+public class ModelCardViewHolder<H extends Model, T extends BaseRecyclerViewAdapter.AdapterListener> extends BaseViewHolder<T> {
 
     protected H model;
 

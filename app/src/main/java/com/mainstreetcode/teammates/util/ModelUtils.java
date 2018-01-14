@@ -8,7 +8,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Message;
+import com.mainstreetcode.teammates.model.Model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,21 +98,21 @@ public class ModelUtils {
         return new Message((HttpException) throwable);
     }
 
-    public static <T extends Comparable<? super T>> List<T> preserveList(List<T> source, List<T> additions) {
+    public static <T extends Identifiable> List<T> preserveList(List<T> source, List<T> additions) {
         appendList(source, additions);
-        Collections.sort(source);
+        Collections.sort(source, Model.COMPARATOR);
 
         return source;
     }
 
-    public static <T extends Comparable<? super T>> List<T> preserveListInverse(List<T> source, List<T> additions) {
+    public static <T extends Identifiable> List<T> preserveListInverse(List<T> source, List<T> additions) {
         appendList(source, additions);
-        Collections.sort(source, Collections.reverseOrder());
+        Collections.sort(source, (a, b) -> -Model.COMPARATOR.compare(a, b));
 
         return source;
     }
 
-    private static <T extends Comparable<? super T>> void appendList(List<T> source, List<T> additions) {
+    private static <T extends Identifiable> void appendList(List<T> source, List<T> additions) {
         Set<T> set = new HashSet<>(additions);
         set.addAll(source);
         source.clear();
