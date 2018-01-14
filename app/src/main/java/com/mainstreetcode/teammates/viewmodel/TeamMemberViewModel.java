@@ -47,6 +47,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
 
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), (sourceTeamList, newTeamList) -> {
             Collections.sort(newTeamList, Identifiable.COMPARATOR);
+            distributeAds(newTeamList);
             return newTeamList;
         });
     }

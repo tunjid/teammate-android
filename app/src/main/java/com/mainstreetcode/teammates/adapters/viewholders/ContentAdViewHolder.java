@@ -9,9 +9,7 @@ import com.google.android.gms.ads.formats.NativeContentAdView;
 import com.mainstreetcode.teammates.model.Ad;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
-import java.util.List;
-
-public class ContentAdViewHolder extends AdViewHolder {
+public class ContentAdViewHolder extends AdViewHolder<NativeContentAd> {
 
     private NativeContentAdView adView;
 
@@ -24,22 +22,25 @@ public class ContentAdViewHolder extends AdViewHolder {
         adView.setImageView(thumbnail);
     }
 
+
     @Override
-    public void bind(Ad ad) {
+    public void bind(Ad<NativeContentAd> ad) {
+        super.bind(ad);
         //Some assets are guaranteed to be in every NativeContentAd.
-        NativeContentAd nativeContentAd = (NativeContentAd) ad.getNativeAd();
+        NativeContentAd nativeContentAd = ad.getNativeAd();
 
         title.setText(nativeContentAd.getHeadline());
         subtitle.setText(nativeContentAd.getBody());
+
 //        ((TextView) adView.getCallToActionView()).setText(nativeContentAd.getCallToAction());
 //        ((TextView) adView.getAdvertiserView()).setText(nativeContentAd.getAdvertiser());
 
-        List<NativeAd.Image> images = nativeContentAd.getImages();
-
-        if (images.size() > 0) {
-            images.get(0).getScale();
-            thumbnail.setImageDrawable(images.get(0).getDrawable());
-        }
+//        List<NativeAd.Image> images = nativeContentAd.getImages();
+//
+//        if (images.size() > 0) {
+//            images.get(0).getScale();
+//            thumbnail.setImageDrawable(images.get(0).getDrawable());
+//        }
 
         // Some aren't guaranteed, however, and should be checked.
         NativeAd.Image logoImage = nativeContentAd.getLogo();
