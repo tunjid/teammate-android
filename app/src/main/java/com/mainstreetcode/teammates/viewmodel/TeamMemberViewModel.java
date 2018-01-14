@@ -46,7 +46,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
                 .map(teamListFunction);
 
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), (sourceTeamList, newTeamList) -> {
-            Collections.sort(newTeamList, Model.COMPARATOR);
+            Collections.sort(newTeamList, Identifiable.COMPARATOR);
             return newTeamList;
         });
     }
@@ -85,7 +85,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
         if (approved) return (teamMembers, added) -> {
             teamMembers.remove(model);
             teamMembers.addAll(added);
-            Collections.sort(teamMembers, Model.COMPARATOR);
+            Collections.sort(teamMembers, Identifiable.COMPARATOR);
             return teamMembers;
         };
         else return (teamMembers, deleted) -> {
