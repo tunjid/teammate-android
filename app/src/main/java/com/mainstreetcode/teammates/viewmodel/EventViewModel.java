@@ -33,28 +33,30 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
-        return Identifiable.diff(repository.getEvents(team), () -> getModelList(team), ModelUtils::preserveList);
+        Flowable<List<Identifiable>> sourceFlowable = repository.getEvents(team).map(toIdentifiable);
+        return Identifiable.diff(sourceFlowable, () -> getModelList(team), ModelUtils::preserveList);
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(event), event, event.getTeam()).map(eventListFunction);
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(event), event.getTeam(), event).cast(Event.class).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList);
     }
 
     public Single<DiffUtil.DiffResult> updateEvent(final Event event, List<Identifiable> eventItems) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(event).toFlowable(), event, event.getTeam()).map(eventListFunction);
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(event).toFlowable(), event.getTeam(), event).cast(Event.class).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final Event event, List<Identifiable> eventItems, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.rsvpEvent(event, attending).toFlowable(), event, event.getTeam()).map(eventListFunction);
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.rsvpEvent(event, attending).toFlowable(), event.getTeam(), event).cast(Event.class).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
     }
 
     public Single<Event> delete(final Event event) {
-        return checkForInvalidObject(repository.delete(event).toFlowable(), event, event.getTeam())
+        return checkForInvalidObject(repository.delete(event).toFlowable(), event.getTeam(), event)
                 .firstOrError()
                 .doOnSuccess(getModelList(event.getTeam())::remove)
+                .cast(Event.class)
                 .observeOn(mainThread());
     }
 

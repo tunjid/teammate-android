@@ -9,6 +9,7 @@ import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Ad;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Model;
 
 import java.util.Iterator;
@@ -24,10 +25,10 @@ abstract class BaseViewModel extends ViewModel {
 
     BaseViewModel() {fetchAds();}
 
-    void distributeAds(List<Model> source) {
+    void distributeAds(List<Identifiable> source) {
         if (source.isEmpty() || ads.isEmpty()) return;
 
-        Iterator<Model> iterator = source.iterator();
+        Iterator<Identifiable> iterator = source.iterator();
         while (iterator.hasNext()) if (iterator.next() instanceof Ad) iterator.remove();
 
         int adSize = ads.size();

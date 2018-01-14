@@ -1,29 +1,33 @@
 package com.mainstreetcode.teammates.viewmodel;
 
 
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Message;
-import com.mainstreetcode.teammates.model.Model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
 
 import static com.mainstreetcode.teammates.util.ModelUtils.fromThrowable;
 
-public abstract class MappedViewModel<K, V extends Model> extends BaseViewModel {
+public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
 
-    public abstract List<V> getModelList(K key);
+    public abstract List<Identifiable> getModelList(K key);
 
-    Flowable<V> checkForInvalidObject(Flowable<V> sourceFlowable, V value, K key) {
-        return sourceFlowable.doOnError(throwable -> checkForInvalidObject(throwable, value, key));
+    Flowable<Identifiable> checkForInvalidObject(Flowable<? extends Identifiable> sourceFlowable, K key, V value) {
+        return sourceFlowable.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
-    void onErrorMessage(Message message, K key, V invalid) {
+    void onErrorMessage(Message message, K key, Identifiable invalid) {
         if (message.isInvalidObject()) getModelList(key).remove(invalid);
     }
 
-    private void checkForInvalidObject(Throwable throwable, V model, K key) {
+    private void checkForInvalidObject(Throwable throwable, Identifiable model, K key) {
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
     }
+
+    Function<List<V>, List<Identifiable>> toIdentifiable = LinkedList<Identifiable>::new;
 }

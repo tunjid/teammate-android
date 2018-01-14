@@ -24,6 +24,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -45,7 +46,7 @@ public class ChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private Team team;
-    private List<Chat> chats;
+    private List<Identifiable> items;
     private Disposable chatDisposable;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
@@ -76,7 +77,7 @@ public class ChatFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
-        chats = chatViewModel.getModelList(team);
+        items = chatViewModel.getModelList(team);
     }
 
     @Nullable
@@ -95,7 +96,7 @@ public class ChatFragment extends MainActivityFragment
         linearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new TeamChatAdapter(chats, userViewModel.getCurrentUser(), this));
+        recyclerView.setAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this));
         recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
             @Override
             public void onLoadMore(int oldCount) {
@@ -168,10 +169,10 @@ public class ChatFragment extends MainActivityFragment
     public void onChatClicked(Chat chat) {
         if (chat.isSuccessful() || !chat.isEmpty()) return;
 
-        int index = chats.indexOf(chat);
+        int index = items.indexOf(chat);
         if (index == -1) return;
 
-        chats.remove(index);
+        items.remove(index);
         recyclerView.getAdapter().notifyItemRemoved(index);
 
         postChat(chat);
@@ -194,7 +195,7 @@ public class ChatFragment extends MainActivityFragment
 
     private void subscribeToChat() {
         chatDisposable = chatViewModel.listenForChat(team).subscribe(chat -> {
-            chats.add(chat);
+            items.add(chat);
 
             notifyAndScrollToLast(isNearBottomOfChat());
         }, ErrorHandler.builder()
@@ -212,7 +213,7 @@ public class ChatFragment extends MainActivityFragment
         if (isEmpty(text)) return;
 
         Chat chat = Chat.chat(text, userViewModel.getCurrentUser(), team);
-        chats.add(chat);
+        items.add(chat);
 
         notifyAndScrollToLast(true);
 
@@ -224,7 +225,7 @@ public class ChatFragment extends MainActivityFragment
 
         chatViewModel.post(chat).subscribe(() -> {
             chatViewModel.updateLastSeen(team);
-            int index = chats.indexOf(chat);
+            int index = items.indexOf(chat);
 
             if (index != 0) adapter.notifyItemChanged(index);
             if (!isSubscribedToChat()) subscribeToChat();
@@ -233,21 +234,24 @@ public class ChatFragment extends MainActivityFragment
                 .add(errorMessage -> {
                     chat.setSuccessful(false);
 
-                    int index = chats.indexOf(chat);
+                    int index = items.indexOf(chat);
                     if (index != -1) adapter.notifyItemChanged(index);
                 })
                 .build());
     }
 
     private void notifyAndScrollToLast(boolean scrollToLast) {
-        final int index = chats.size() - 1;
+        final int index = items.size() - 1;
 
         recyclerView.getAdapter().notifyItemInserted(index);
         if (scrollToLast) recyclerView.smoothScrollToPosition(index);
     }
 
     private Date getQueryDate() {
-        return chats.isEmpty() ? new Date() : chats.get(0).getCreated();
+        if (items.isEmpty()) return new Date();
+        for (Identifiable item : items)
+            if (item instanceof Chat) return ((Chat) item).getCreated();
+        return new Date();
     }
 
     private boolean isSubscribedToChat() {
@@ -259,7 +263,7 @@ public class ChatFragment extends MainActivityFragment
         LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
-        return Math.abs(chats.size() - lastVisibleItemPosition) < 4;
+        return Math.abs(items.size() - lastVisibleItemPosition) < 4;
     }
 
     private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
@@ -268,7 +272,7 @@ public class ChatFragment extends MainActivityFragment
 
         toggleProgress(showProgress);
         chatViewModel.updateLastSeen(team);
-        emptyViewHolder.toggle(chats.isEmpty());
+        emptyViewHolder.toggle(items.isEmpty());
         if (!showProgress && result != null) result.dispatchUpdatesTo(recyclerView.getAdapter());
     }
 }

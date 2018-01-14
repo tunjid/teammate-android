@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -19,10 +20,10 @@ import java.util.List;
  */
 
 public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
-    private final List<Chat> chats;
+    private final List<Identifiable> chats;
     private final User signedInUser;
 
-    public TeamChatAdapter(List<Chat> chats, User signedInUser,
+    public TeamChatAdapter(List<Identifiable> chats, User signedInUser,
                            TeamChatAdapter.ChatAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
@@ -43,9 +44,9 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     public void onBindViewHolder(TeamChatViewHolder viewHolder, int i) {
         int size = chats.size();
 
-        Chat chat = chats.get(i);
-        Chat prev = i == 0 ? null : chats.get(i - 1);
-        Chat next = i < size - 1 ? chats.get(i + 1) : null;
+        Chat chat = forceCast(chats.get(i));
+        Chat prev = i == 0 ? null : forceCast(chats.get(i - 1));
+        Chat next = i < size - 1 ? forceCast(chats.get(i + 1)) : null;
 
         User chatUser = chat.getUser();
         boolean hideDetails = (next != null && chatUser.equals(next.getUser()));
@@ -71,5 +72,9 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
 
     public interface ChatAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
         void onChatClicked(Chat chat);
+    }
+
+    private Chat forceCast(Identifiable identifiable) {
+        return (Chat) identifiable;
     }
 }
