@@ -17,6 +17,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammates.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
@@ -49,12 +50,14 @@ public class Team extends TeamEntity
 
     // Room fetches roles after setRoles is called. Since the reference of roles can't be changed,
     // store the delayed roles here and update after Room is done.
-    @Ignore private List<Role> delayed = new ArrayList<>();
+    @Ignore private List<Role> delayedRoles = new ArrayList<>();
+    @Ignore private List<JoinRequest> delayedRequests = new ArrayList<>();
 
     @Relation(parentColumn = "team_id", entityColumn = "role_team", entity = RoleEntity.class)
     private List<Role> roles = new ArrayList<>();
 
-    @Ignore private List<JoinRequest> joinRequests = new ArrayList<>();
+    @Relation(parentColumn = "team_id", entityColumn = "join_request_team", entity = JoinRequestEntity.class)
+    private List<JoinRequest> joinRequests = new ArrayList<>();
 
     @Ignore private final List<Item<Team>> items;
 
@@ -76,9 +79,11 @@ public class Team extends TeamEntity
         return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null);
     }
 
-    public static Team updateDelayedRoles(Team team) {
+    public static Team updateDelayedModels(Team team) {
         team.roles.clear();
-        team.roles.addAll(team.delayed);
+        team.roles.addAll(team.delayedRoles);
+        team.joinRequests.clear();
+        team.joinRequests.addAll(team.delayedRequests);
         return team;
     }
 
@@ -171,7 +176,11 @@ public class Team extends TeamEntity
     }
 
     public void setRoles(List<Role> roles) {
-        delayed = roles;
+        delayedRoles = roles;
+    }
+
+    public void setJoinRequests(List<JoinRequest> requests) {
+        delayedRequests = requests;
     }
 
     public void setAddress(Address address) {

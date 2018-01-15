@@ -29,7 +29,6 @@ import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
-import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
