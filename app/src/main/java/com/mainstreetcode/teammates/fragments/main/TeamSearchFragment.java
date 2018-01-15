@@ -29,8 +29,6 @@ import io.reactivex.functions.Consumer;
 
 /**
  * Searches for teams
- * <p>
- * Created by Shemanigans on 6/1/17.
  */
 
 public final class TeamSearchFragment extends MainActivityFragment
@@ -38,6 +36,8 @@ public final class TeamSearchFragment extends MainActivityFragment
         View.OnClickListener,
         SearchView.OnQueryTextListener,
         TeamAdapter.TeamAdapterListener {
+
+    private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
 
     private View createTeam;
     private RecyclerView recyclerView;
@@ -104,6 +104,9 @@ public final class TeamSearchFragment extends MainActivityFragment
         createTeam = null;
         recyclerView = null;
     }
+
+    @Override
+    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
     protected boolean showsFab() {

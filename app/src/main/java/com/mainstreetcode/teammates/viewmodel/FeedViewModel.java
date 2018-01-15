@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Event;
@@ -27,7 +26,7 @@ import io.reactivex.functions.BiFunction;
  * ViewModel for roles in a team
  */
 
-public class FeedViewModel extends ViewModel {
+public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
@@ -35,28 +34,29 @@ public class FeedViewModel extends ViewModel {
     private final EventRepository eventRepository = EventRepository.getInstance();
     private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
 
-    private final List<FeedItem> feedItems = new ArrayList<>();
+    private final List<Identifiable> feedItems = new ArrayList<>();
 
     public FeedViewModel() {
     }
 
-    public List<FeedItem> getFeedItems() {
+    @Override
+    public List<Identifiable> getModelList(Class<FeedItem> key) {
         return feedItems;
     }
 
     public Flowable<DiffUtil.DiffResult> getFeed() {
-        Flowable<List<FeedItem>> sourceFlowable = api.getFeed().toFlowable();
-
+        Flowable<List<Identifiable>> sourceFlowable = api.getFeed().toFlowable().map(toIdentifiable);
         return Identifiable.diff(sourceFlowable, () -> feedItems, (oldFeed, newFeed) -> {
-            Collections.sort(newFeed, (itemA, itemB) -> Identifiable.COMPARATOR.compare(itemA.getModel(), itemB.getModel()));
+            Collections.sort(newFeed, Identifiable.COMPARATOR);
+            distributeAds(newFeed);
             return newFeed;
         });
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
-        Flowable<List<FeedItem>> sourceFlowable = eventRepository.rsvpEvent(feedItem.getModel(), attending)
+        Flowable<List<Identifiable>> sourceFlowable = eventRepository.rsvpEvent(feedItem.getModel(), attending)
                 .map(model -> Collections.singletonList(dropType(feedItem)))
-                .toFlowable();
+                .toFlowable().map(toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
     }
@@ -67,18 +67,18 @@ public class FeedViewModel extends ViewModel {
                 ? roleRepository.acceptInvite(request)
                 : roleRepository.approveUser(request));
 
-        Flowable<List<FeedItem>> sourceFlowable = (approved
+        Flowable<List<Identifiable>> sourceFlowable = (approved
                 ? roleSingle
                 : joinRequestRepository.delete(request))
                 .map(model -> Collections.singletonList(dropType(feedItem)))
-                .toFlowable();
+                .toFlowable().map(toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
     }
 
     private <T extends Model<T>> FeedItem dropType(FeedItem<T> feedItem) { return feedItem;}
 
-    private BiFunction<List<FeedItem>, List<FeedItem>, List<FeedItem>> onFeedItemProcessed() {
+    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onFeedItemProcessed() {
         return (feedItems, processed) -> {
             feedItems.removeAll(processed);
             return feedItems;

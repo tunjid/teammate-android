@@ -55,7 +55,7 @@ public final class HomeFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = rootView.findViewById(R.id.feed_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new FeedAdapter(feedViewModel.getFeedItems(), this));
+        recyclerView.setAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this));
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed);
 
@@ -127,7 +127,7 @@ public final class HomeFragment extends MainActivityFragment
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
         toggleProgress(false);
         diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-        emptyViewHolder.toggle(feedViewModel.getFeedItems().isEmpty());
+        emptyViewHolder.toggle(feedViewModel.getModelList(FeedItem.class).isEmpty());
     }
 
     private static String getTimeOfDay() {

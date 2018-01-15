@@ -38,7 +38,7 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
-                ? new ContentAdViewHolder(getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
+                ? new ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == IMAGE
                 ? new ImageMediaViewHolder(getItemView(R.layout.viewholder_image, viewGroup), adapterListener)
                 : new VideoMediaViewHolder(getItemView(R.layout.viewholder_video, viewGroup), adapterListener);

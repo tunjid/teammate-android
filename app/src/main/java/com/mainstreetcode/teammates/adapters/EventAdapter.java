@@ -34,7 +34,7 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
-                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
+                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : new EventViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_event, viewGroup), adapterListener);
     }
 

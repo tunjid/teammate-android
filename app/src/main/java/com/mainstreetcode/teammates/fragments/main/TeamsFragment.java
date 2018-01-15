@@ -32,6 +32,8 @@ public final class TeamsFragment extends MainActivityFragment
         View.OnClickListener,
         TeamAdapter.TeamAdapterListener {
 
+    private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
+
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -111,6 +113,9 @@ public final class TeamsFragment extends MainActivityFragment
         recyclerView = null;
         emptyViewHolder = null;
     }
+
+    @Override
+    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
     protected boolean showsBottomNav() {
