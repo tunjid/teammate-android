@@ -4,6 +4,7 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.ModelUtils;
@@ -11,8 +12,10 @@ import com.mainstreetcode.teammates.util.ModelUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -71,7 +74,10 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     static Team onTeamDeleted(Team deleted) {
+        teams.remove(deleted);
         if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
+        Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
+                .delete(deleted)).subscribeOn(Schedulers.io()).subscribe(()->{}, ErrorHandler.EMPTY);
         return deleted;
     }
 }

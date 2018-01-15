@@ -32,7 +32,8 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.getEvents(team).map(toIdentifiable);
+        Flowable<List<Identifiable>> sourceFlowable = repository.getEvents(team).map(toIdentifiable)
+                .doOnError(throwable -> checkForInvalidTeam(throwable, team));
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), preserveList);
     }
 

@@ -78,7 +78,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
         Flowable<List<Identifiable>> sourceFlowable = repository.chatsBefore(team, date)
                 .map(toIdentifiable)
-                .doOnError(throwable -> chatMap.put(team, RETRY))
+                .doOnError(throwable -> checkForInvalidTeam(throwable, team))
                 .doOnCancel(() -> chatMap.put(team, RETRY));
 
         Flowable<Pair<Boolean, DiffUtil.DiffResult>> immediate = getDiffResult(true, chats);
@@ -105,6 +105,13 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
                 .observeOn(mainThread())
                 : Flowable.error(throwable)
         );
+    }
+
+    @Override
+    protected boolean checkForInvalidTeam(Throwable throwable, Team team) {
+        boolean isInvalid = super.checkForInvalidTeam(throwable, team);
+        if (!isInvalid) chatMap.put(team, RETRY);
+        return isInvalid;
     }
 
     private Function<Throwable, Completable> postRetryFunction(Chat chat, int previousRetries) {

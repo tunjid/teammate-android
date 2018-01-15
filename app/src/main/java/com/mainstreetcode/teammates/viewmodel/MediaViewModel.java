@@ -35,7 +35,8 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.getTeamMedia(team, date).map(toIdentifiable);
+        Flowable<List<Identifiable>> sourceFlowable = repository.getTeamMedia(team, date).map(toIdentifiable)
+                .doOnError(throwable -> checkForInvalidTeam(throwable, team));
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), ModelUtils::preserveListInverse);
     }
 
