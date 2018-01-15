@@ -69,8 +69,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/single_margin"
-                android:background="@color/ad_yellow"
+                android:layout_margin="@dimen/quarter_margin"
+                android:background="@drawable/bg_ad_box"
                 android:paddingBottom="@dimen/sixteenth_margin"
                 android:paddingLeft="@dimen/quarter_margin"
                 android:paddingRight="@dimen/quarter_margin"
