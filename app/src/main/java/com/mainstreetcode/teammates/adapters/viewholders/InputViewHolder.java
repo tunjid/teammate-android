@@ -90,9 +90,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     private void checkForErrors() {
-        if (TextUtils.isEmpty(editText.getText())) {
-            editText.setError(editText.getContext().getString(R.string.team_invalid_empty_field));
-        }
+        if (!TextUtils.isEmpty(editText.getText())) editText.setError(null);
+        else editText.setError(editText.getContext().getString(R.string.team_invalid_empty_field));
     }
 
     private void setClickableState() {

@@ -112,6 +112,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             fabIconAnimator = new FabIconAnimator(fab);
         }
 
+        //noinspection AndroidLintClickableViewAccessibility
+//        keyboardPadding.setOnTouchListener((view, event) -> {
+//            setKeyboardPadding(0);
+//            return true;
+//        });
+
         setSupportActionBar(toolbar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -191,17 +197,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     private WindowInsetsCompat consumeFragmentInsets(WindowInsetsCompat insets) {
-        initTransition();
-        Fragment fragment = getCurrentFragment();
-
-        int padding = insets.getSystemWindowInsetBottom();
-
-        if (fragment instanceof MainActivityFragment && padding != 0)
-            padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
-
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();
-        params.height = padding;
-
+        setKeyboardPadding(insets.getSystemWindowInsetBottom());
         return insets;
     }
 
@@ -213,5 +209,16 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
 
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
+    }
+
+    private void setKeyboardPadding(int padding) {
+        initTransition();
+        Fragment fragment = getCurrentFragment();
+
+        if (fragment instanceof MainActivityFragment && padding != 0)
+            padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();
+        params.height = padding;
     }
 }

@@ -148,7 +148,9 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
+        boolean isEmpty = teams.isEmpty();
+        emptyViewHolder.toggle(isEmpty);
         result.dispatchUpdatesTo(recyclerView.getAdapter());
-        emptyViewHolder.toggle(teams.isEmpty());
+        if (getTargetRequestCode() != 0) toggleFab(isEmpty);
     }
 }
