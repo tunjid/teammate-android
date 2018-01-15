@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
 
+import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.NativeContentAd;
 import com.google.android.gms.ads.formats.NativeContentAdView;
 import com.mainstreetcode.teammates.model.ContentAd;
@@ -54,5 +56,12 @@ public class ContentAdViewHolder extends AdViewHolder<ContentAd> {
 
         // Assign native ad object to the native view.
         adView.setNativeAd(nativeContentAd);
+    }
+
+    @Nullable
+    @Override
+    String getImageUrl() {
+        NativeAd.Image image = ad.getImage();
+        return image == null ? null : image.getUri().toString();
     }
 }

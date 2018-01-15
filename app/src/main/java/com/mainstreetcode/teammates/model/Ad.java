@@ -31,14 +31,6 @@ public class Ad<T extends NativeAd> implements Identifiable {
         return "H," + drawable.getIntrinsicWidth() + ":" + drawable.getIntrinsicHeight();
     }
 
-    @Nullable
-    public Drawable getDrawable() {
-        NativeAd.Image image = getImage();
-        if (image == null) return null;
-
-        return image.getDrawable();
-    }
-
     @Override
     public String getId() {
         return id;
@@ -49,7 +41,7 @@ public class Ad<T extends NativeAd> implements Identifiable {
     }
 
     @Nullable
-    private NativeAd.Image getImage() {
+    public NativeAd.Image getImage() {
         List<NativeAd.Image> images = null;
         if (nativeAd instanceof NativeContentAd) images = ((NativeContentAd) nativeAd).getImages();
         else if (nativeAd instanceof NativeAppInstallAd)

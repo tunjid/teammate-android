@@ -72,12 +72,11 @@ abstract class BaseViewModel extends ViewModel {
                     }
                 })
                 .withNativeAdOptions(new NativeAdOptions.Builder()
-                        // Methods in the NativeAdOptions.Builder class can be
-                        // used here to specify individual options settings.
                         .build())
                 .build();
 
         // Load the Native Express ad.
+
         adLoader.loadAd(new AdRequest.Builder().build());
     }
 }
