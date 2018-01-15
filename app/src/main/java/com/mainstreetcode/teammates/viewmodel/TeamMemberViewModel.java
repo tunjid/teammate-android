@@ -27,7 +27,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * ViewModel for roles in a team
  */
 
-public class TeamMemberViewModel extends TeamMappedViewModel {
+public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
 
     private final TeamRepository teamRepository;
     private final RoleRepository roleRepository;

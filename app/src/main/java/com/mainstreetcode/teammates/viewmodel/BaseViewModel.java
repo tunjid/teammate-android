@@ -10,15 +10,24 @@ import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.ContentAd;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.functions.BiFunction;
+
 
 abstract class BaseViewModel extends ViewModel {
 
     private static final int AD_THRESH = 5;
+
+    BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (a, b) -> {
+        ModelUtils.preserveList(a, b);
+        distributeAds(a);
+        return a;
+    };
 
     private LinkedList<Identifiable> ads = new LinkedList<>();
 

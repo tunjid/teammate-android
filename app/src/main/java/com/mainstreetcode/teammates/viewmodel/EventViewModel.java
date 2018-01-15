@@ -6,7 +6,6 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.EventRepository;
-import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
     public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
         Flowable<List<Identifiable>> sourceFlowable = repository.getEvents(team).map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> getModelList(team), ModelUtils::preserveList);
+        return Identifiable.diff(sourceFlowable, () -> getModelList(team), preserveList);
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {
