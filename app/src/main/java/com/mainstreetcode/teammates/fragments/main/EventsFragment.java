@@ -23,6 +23,7 @@ import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -93,7 +94,8 @@ public final class EventsFragment extends MainActivityFragment
         setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.events_title, team.getName()));
 
-
+        User user = userViewModel.getCurrentUser();
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
         disposables.add(eventViewModel.getEvents(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
@@ -121,7 +123,7 @@ public final class EventsFragment extends MainActivityFragment
 
     @Override
     protected boolean showsFab() {
-        return true;
+        return localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
