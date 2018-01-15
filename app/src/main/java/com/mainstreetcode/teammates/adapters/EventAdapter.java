@@ -1,41 +1,48 @@
 package com.mainstreetcode.teammates.adapters;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.EventViewHolder;
+import com.mainstreetcode.teammates.model.ContentAd;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.EVENT;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammates.model.Event}
  */
 
-public class EventAdapter extends BaseRecyclerViewAdapter<EventViewHolder, EventAdapter.EventAdapterListener> {
+public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventAdapter.EventAdapterListener> {
 
-    private final List<Event> items;
+    private final List<Identifiable> items;
 
-    public EventAdapter(List<Event> items, EventAdapterListener listener) {
+    public EventAdapter(List<Identifiable> items, EventAdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_event, viewGroup, false);
-        return new EventViewHolder(itemView, adapterListener);
+    public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        return viewType == CONTENT_AD
+                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
+                : new EventViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_event, viewGroup), adapterListener);
     }
 
     @Override
-    public void onBindViewHolder(EventViewHolder eventViewHolder, int i) {
-        eventViewHolder.bind(items.get(i));
+    public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
+        Identifiable item = items.get(position);
+        if (item instanceof Event) ((EventViewHolder) viewHolder).bind((Event) item);
+        else if (item instanceof ContentAd) ((ContentAdViewHolder) viewHolder).bind((ContentAd) item);
     }
 
     @Override
@@ -46,6 +53,11 @@ public class EventAdapter extends BaseRecyclerViewAdapter<EventViewHolder, Event
     @Override
     public long getItemId(int position) {
         return items.get(position).hashCode();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position) instanceof Event ? EVENT : CONTENT_AD;
     }
 
     public interface EventAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

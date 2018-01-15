@@ -26,9 +26,9 @@ import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
-import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -54,7 +54,7 @@ public class TeamDetailFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Model> teamModels;
+    private List<Identifiable> teamModels;
 
     private RecyclerView recyclerView;
 

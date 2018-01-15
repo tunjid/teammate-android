@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
-import io.reactivex.Single;
 
 public class MediaViewModel extends TeamMappedViewModel<Media> {
 
@@ -32,23 +31,25 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     }
 
     public Flowable<Media> getMedia(Media model) {
-        return checkForInvalidObject(repository.get(model), model, model.getTeam());
+        return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class);
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
-        return Identifiable.diff(repository.getTeamMedia(team, date), () -> getModelList(team), ModelUtils::preserveListInverse);
+        Flowable<List<Identifiable>> sourceFlowable = repository.getTeamMedia(team, date).map(toIdentifiable);
+        return Identifiable.diff(sourceFlowable, () -> getModelList(team), ModelUtils::preserveListInverse);
     }
 
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {
         AtomicBoolean partialDelete = new AtomicBoolean();
-        List<Media> source = getModelList(team);
+        List<Identifiable> source = getModelList(team);
         List<Media> toDelete = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
 
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
 
-        Single<List<Media>> singleSource = isAdmin ? repository.privilegedDelete(team, toDelete): repository.ownerDelete(toDelete);
+        Flowable<List<Identifiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete): repository.ownerDelete(toDelete))
+                .toFlowable().map(toIdentifiable);
 
-        return Identifiable.diff(singleSource.toFlowable(), () -> source, (sourceCopy, deleted) -> {
+        return Identifiable.diff(sourceFlowable, () -> source, (sourceCopy, deleted) -> {
             partialDelete.set(deleted.size() != toDelete.size());
             sourceCopy.removeAll(deleted);
             return sourceCopy;

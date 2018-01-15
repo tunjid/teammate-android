@@ -56,6 +56,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-base:11.8.0'
     implementation 'com.google.android.gms:play-services-places:11.8.0'
 
+    implementation 'com.google.firebase:firebase-ads:11.8.0'
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
 

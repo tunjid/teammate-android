@@ -1,53 +1,56 @@
 package com.mainstreetcode.teammates.adapters;
 
-import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.JoinRequestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.ModelCardViewHolder;
+import com.mainstreetcode.teammates.model.ContentAd;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
-import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.JOIN_REQUEST;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.ROLE;
 
 /**
  * Adapter for {@link Team}
  */
 
-public class TeamDetailAdapter extends BaseRecyclerViewAdapter<ModelCardViewHolder, TeamDetailAdapter.UserAdapterListener> {
-    private final List<? extends Model> teamModels;
+public class TeamDetailAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamDetailAdapter.UserAdapterListener> {
 
-    public TeamDetailAdapter(List<? extends Model> teamModels, UserAdapterListener listener) {
+    private final List<Identifiable> teamModels;
+
+    public TeamDetailAdapter(List<Identifiable> teamModels, UserAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
         this.teamModels = teamModels;
     }
 
     @Override
-    public ModelCardViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-        @LayoutRes int layoutRes = R.layout.viewholder_grid_item;
-        View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
-
-        return viewType == R.id.viewholder_role
-                ? new RoleViewHolder(itemView, adapterListener)
-                : new JoinRequestViewHolder(itemView, adapterListener);
+    public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        return viewType == CONTENT_AD
+                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
+                : viewType == ROLE
+                ? new RoleViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener)
+                : new JoinRequestViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener);
     }
 
     @Override
-    public void onBindViewHolder(ModelCardViewHolder baseTeamViewHolder, int position) {
-        Model model = teamModels.get(position);
+    public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
+        Identifiable item = teamModels.get(position);
 
-        if (model instanceof Role) ((RoleViewHolder) baseTeamViewHolder).bind((Role) model);
-        else ((JoinRequestViewHolder) baseTeamViewHolder).bind((JoinRequest) model);
+        if (item instanceof ContentAd) ((ContentAdViewHolder) viewHolder).bind((ContentAd) item);
+        else if (item instanceof Role) ((RoleViewHolder) viewHolder).bind((Role) item);
+        else ((JoinRequestViewHolder) viewHolder).bind((JoinRequest) item);
     }
 
     @Override
@@ -62,7 +65,8 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<ModelCardViewHold
 
     @Override
     public int getItemViewType(int position) {
-        return teamModels.get(position) instanceof Role ? R.id.viewholder_role : R.id.viewholder_join_request;
+        Identifiable item = teamModels.get(position);
+        return item instanceof ContentAd ? CONTENT_AD : item instanceof Role ? ROLE : JOIN_REQUEST;
     }
 
     public interface UserAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

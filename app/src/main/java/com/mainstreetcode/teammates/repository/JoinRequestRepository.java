@@ -53,8 +53,8 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
     @Override
     public Single<JoinRequest> delete(JoinRequest model) {
         return api.deleteJoinRequest(model.getId())
-                .doOnError(throwable -> deleteInvalidModel(model, throwable))
-                .doOnSuccess(joinRequestDao::delete);
+                .map(this::deleteLocally)
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 
     @Override

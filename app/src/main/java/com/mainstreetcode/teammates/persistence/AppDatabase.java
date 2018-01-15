@@ -7,7 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
@@ -44,7 +44,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static AppDatabase getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(Application.getInstance(),
+            INSTANCE = Room.databaseBuilder(App.getInstance(),
                     AppDatabase.class, "database-name").build();
         }
         return INSTANCE;

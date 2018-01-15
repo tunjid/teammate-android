@@ -1,43 +1,48 @@
 package com.mainstreetcode.teammates.adapters;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
+import com.mainstreetcode.teammates.model.ContentAd;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.TEAM;
+
 /**
  * Adapter for {@link Team}
- * <p>
- * Created by Shemanigans on 6/3/17.
  */
 
-public class TeamAdapter extends BaseRecyclerViewAdapter<TeamViewHolder, TeamAdapter.TeamAdapterListener> {
+public class TeamAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamAdapter.TeamAdapterListener> {
 
-    private final List<Team> items;
+    private final List<Identifiable> items;
 
-    public TeamAdapter(List<Team> items, TeamAdapterListener listener) {
+    public TeamAdapter(List<Identifiable> items, TeamAdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
     }
 
     @Override
-    public TeamViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_grid_item, viewGroup, false);
-        return new TeamViewHolder(itemView, adapterListener);
+    public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        return viewType == CONTENT_AD
+                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
+                : new TeamViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener);
     }
 
     @Override
-    public void onBindViewHolder(TeamViewHolder teamViewHolder, int i) {
-        teamViewHolder.bind(items.get(i));
+    public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
+        Identifiable item = items.get(position);
+        if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
+        else if (item instanceof ContentAd) ((ContentAdViewHolder) viewHolder).bind((ContentAd) item);
     }
 
     @Override
@@ -48,6 +53,11 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<TeamViewHolder, TeamAda
     @Override
     public long getItemId(int position) {
         return items.get(position).hashCode();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position) instanceof Team ? TEAM : CONTENT_AD;
     }
 
     public interface TeamAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

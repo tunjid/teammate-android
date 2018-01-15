@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
@@ -38,7 +38,7 @@ public class UserRepository extends ModelRepository<User> {
 
     private static UserRepository ourInstance;
 
-    private final Application application;
+    private final App app;
     private final TeammateApi api;
     private final UserDao userDao;
 
@@ -47,7 +47,7 @@ public class UserRepository extends ModelRepository<User> {
     private final Consumer<User> currentUserUpdater = updatedUser -> currentUser = updatedUser;
 
     private UserRepository() {
-        application = Application.getInstance();
+        app = App.getInstance();
         api = TeammateService.getApiInstance();
         userDao = AppDatabase.getInstance().userDao();
     }
@@ -148,7 +148,7 @@ public class UserRepository extends ModelRepository<User> {
 
     @Nullable
     private String getPrimaryEmail() {
-        return application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .getString(EMAIL_KEY, null);
     }
 
@@ -161,7 +161,7 @@ public class UserRepository extends ModelRepository<User> {
         String email = getPrimaryEmail();
         if (email == null) return just(false);
 
-        application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .edit()
                 .remove(EMAIL_KEY)
                 .remove(SESSION_COOKIE) // Delete cookies when signing out
@@ -183,7 +183,7 @@ public class UserRepository extends ModelRepository<User> {
                 .autoConnect(2) // wait for this and the caller to subscribe
                 .singleOrError()
                 .map(user -> {
-                    application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                             .edit()
                             .putString(EMAIL_KEY, user.getPrimaryEmail())
                             .apply();

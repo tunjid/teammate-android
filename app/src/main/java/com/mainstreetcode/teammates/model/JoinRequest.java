@@ -33,7 +33,7 @@ public class JoinRequest extends JoinRequestEntity
         return new JoinRequest(true, false, "", roleName, team, user);
     }
 
-    JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
+    public JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
         super(teamApproved, userApproved, id, roleName, team, user);
     }
 

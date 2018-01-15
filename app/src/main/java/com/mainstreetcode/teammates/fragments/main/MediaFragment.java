@@ -29,6 +29,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
@@ -37,6 +38,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
@@ -49,7 +51,7 @@ public class MediaFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Media> mediaList;
+    private List<Identifiable> items;
 
     private Toolbar contextBar;
     private RecyclerView recyclerView;
@@ -81,7 +83,7 @@ public class MediaFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
-        mediaList = mediaViewModel.getModelList(team);
+        items = mediaViewModel.getModelList(team);
 
         ImageWorkerFragment.attach(this);
     }
@@ -97,7 +99,7 @@ public class MediaFragment extends MainActivityFragment
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
 
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new MediaAdapter(mediaList, this));
+        recyclerView.setAdapter(new MediaAdapter(items, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -235,13 +237,21 @@ public class MediaFragment extends MainActivityFragment
     }
 
     private Date getQueryDate() {
-        return mediaList.isEmpty() ? new Date() : mediaList.get(mediaList.size() - 1).getCreated();
+        if (items.isEmpty()) return new Date();
+
+        ListIterator<Identifiable> li = items.listIterator(items.size());
+        while(li.hasPrevious()) {
+            Identifiable item = li.previous();
+            if (item instanceof Media) return ((Media) item).getCreated();
+        }
+
+        return new Date();
     }
 
     private void onMediaUpdated(DiffUtil.DiffResult result) {
         result.dispatchUpdatesTo(recyclerView.getAdapter());
         toggleProgress(false);
-        emptyViewHolder.toggle(mediaList.isEmpty());
+        emptyViewHolder.toggle(items.isEmpty());
     }
 
     private void toggleContextMenu(boolean show) {

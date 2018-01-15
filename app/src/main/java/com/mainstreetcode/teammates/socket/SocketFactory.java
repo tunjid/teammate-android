@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.net.URISyntaxException;
@@ -47,7 +47,7 @@ public class SocketFactory {
 
     private static SocketFactory INSTANCE;
 
-    private Application app = Application.getInstance();
+    private App app = App.getInstance();
 
     public static SocketFactory getInstance() {
         if (INSTANCE == null) INSTANCE = new SocketFactory();

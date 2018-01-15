@@ -21,6 +21,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -42,7 +43,7 @@ public final class EventsFragment extends MainActivityFragment
     private Team team;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
-    private List<Event> events;
+    private List<Identifiable> items;
 
     public static EventsFragment newInstance(Team team) {
         EventsFragment fragment = new EventsFragment();
@@ -70,7 +71,7 @@ public final class EventsFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
-        events = eventViewModel.getModelList(team);
+        items = eventViewModel.getModelList(team);
     }
 
     @Override
@@ -78,7 +79,7 @@ public final class EventsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
         recyclerView = rootView.findViewById(R.id.team_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new EventAdapter(events, this));
+        recyclerView.setAdapter(new EventAdapter(items, this));
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events);
 
@@ -161,7 +162,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {
-        emptyViewHolder.toggle(events.isEmpty());
+        emptyViewHolder.toggle(items.isEmpty());
         result.dispatchUpdatesTo(recyclerView.getAdapter());
     }
 }

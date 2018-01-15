@@ -1,50 +1,58 @@
 package com.mainstreetcode.teammates.adapters;
 
-import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ImageMediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.VideoMediaViewHolder;
+import com.mainstreetcode.teammates.model.ContentAd;
+import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Media;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
+
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Media}
  */
 
-public class MediaAdapter extends BaseRecyclerViewAdapter<MediaViewHolder, MediaAdapter.MediaAdapterListener> {
+public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaAdapter.MediaAdapterListener> {
 
-    private static final int IMAGE = 0;
-    private static final int VIDEO = 1;
+    private static final int IMAGE = 7;
+    private static final int VIDEO = 8;
 
-    private final List<Media> mediaList;
+    private final List<Identifiable> mediaList;
 
-    public MediaAdapter(List<Media> mediaList, MediaAdapterListener listener) {
+    public MediaAdapter(List<Identifiable> mediaList, MediaAdapterListener listener) {
         super(listener);
         this.mediaList = mediaList;
         setHasStableIds(true);
     }
 
     @Override
-    public MediaViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        @LayoutRes int resource = viewType == IMAGE ? R.layout.viewholder_image : R.layout.viewholder_video;
-        Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(resource, viewGroup, false);
-        return viewType == IMAGE
-                ? new ImageMediaViewHolder(itemView, adapterListener)
-                : new VideoMediaViewHolder(itemView, adapterListener);
+    public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        return viewType == CONTENT_AD
+                ? new ContentAdViewHolder(getItemView(R.layout.viewholder_content_ad, viewGroup), adapterListener)
+                : viewType == IMAGE
+                ? new ImageMediaViewHolder(getItemView(R.layout.viewholder_image, viewGroup), adapterListener)
+                : new VideoMediaViewHolder(getItemView(R.layout.viewholder_video, viewGroup), adapterListener);
     }
 
     @Override
-    public void onBindViewHolder(MediaViewHolder viewHolder, int i) {
-        viewHolder.bind(mediaList.get(i));
+    public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
+        Identifiable identifiable = mediaList.get(position);
+        if (identifiable instanceof Media) {
+            ((MediaViewHolder) viewHolder).bind((Media) identifiable);
+        }
+        else if (identifiable instanceof ContentAd) {
+            ((ContentAdViewHolder) viewHolder).bind((ContentAd) identifiable);
+        }
     }
 
     @Override
@@ -54,7 +62,8 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<MediaViewHolder, Media
 
     @Override
     public int getItemViewType(int position) {
-        return mediaList.get(position).isImage() ? IMAGE : VIDEO;
+        Identifiable identifiable = mediaList.get(position);
+        return identifiable instanceof Media ? (((Media) identifiable).isImage() ? IMAGE : VIDEO) : CONTENT_AD;
     }
 
     @Override

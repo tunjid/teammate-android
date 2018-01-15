@@ -25,7 +25,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     private final TeamRepository repository;
     private final Team defaultTeam = Team.empty();
-    static final List<Team> teams = new ArrayList<>();
+    static final List<Identifiable> teams = new ArrayList<>();
 
     public TeamViewModel() {
         repository = TeamRepository.getInstance();
@@ -33,12 +33,14 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     @Override
-    public List<Team> getModelList(Class<Team> key) {
+    public List<Identifiable> getModelList(Class<Team> key) {
         return teams;
     }
 
     public Single<Team> createOrUpdate(Team team) {
-        return checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), team, Team.class).observeOn(mainThread()).firstOrError();
+        return checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), Team.class, team).observeOn(mainThread())
+                .firstOrError()
+                .cast(Team.class);
     }
 
     public Single<List<Team>> findTeams(String queryText) {
@@ -46,12 +48,14 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Flowable<DiffUtil.DiffResult> getMyTeams(String userId) {
-        return Identifiable.diff(repository.getMyTeams(userId), () -> getModelList(Team.class), ModelUtils::preserveList);
+        Flowable<List<Identifiable>> sourceFlowable = repository.getMyTeams(userId).map(toIdentifiable);
+        return Identifiable.diff(sourceFlowable, () -> getModelList(Team.class), ModelUtils::preserveList);
     }
 
     public Single<Team> deleteTeam(Team team) {
-        return checkForInvalidObject(repository.delete(team).toFlowable(), team, Team.class).observeOn(mainThread())
+        return checkForInvalidObject(repository.delete(team).toFlowable(), Team.class, team).observeOn(mainThread())
                 .firstOrError()
+                .map(identifiable -> team)
                 .doOnSuccess(getModelList(Team.class)::remove)
                 .observeOn(mainThread());
     }

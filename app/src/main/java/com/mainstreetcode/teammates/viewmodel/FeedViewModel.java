@@ -48,7 +48,7 @@ public class FeedViewModel extends ViewModel {
         Flowable<List<FeedItem>> sourceFlowable = api.getFeed().toFlowable();
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, (oldFeed, newFeed) -> {
-            Collections.sort(newFeed, (itemA, itemB) -> Model.COMPARATOR.compare(itemA.getModel(), itemB.getModel()));
+            Collections.sort(newFeed, (itemA, itemB) -> Identifiable.COMPARATOR.compare(itemA.getModel(), itemB.getModel()));
             return newFeed;
         });
     }

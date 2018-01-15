@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Device;
 
 import java.util.List;
@@ -73,6 +73,6 @@ public class DeviceDao extends EntityDao<Device> {
     }
 
     private SharedPreferences getPreferences() {
-        return Application.getInstance().getSharedPreferences(getTableName(), Context.MODE_PRIVATE);
+        return App.getInstance().getSharedPreferences(getTableName(), Context.MODE_PRIVATE);
     }
 }

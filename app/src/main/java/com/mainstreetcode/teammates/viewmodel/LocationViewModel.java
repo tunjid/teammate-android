@@ -6,7 +6,7 @@ import android.location.Geocoder;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.util.TeammateException;
 
 import io.reactivex.Single;
@@ -29,7 +29,7 @@ public class LocationViewModel extends ViewModel {
 
     public Single<Address> fromPlace(Place place) {
         LatLng latLng = place.getLatLng();
-        Geocoder geocoder = new Geocoder(Application.getInstance());
+        Geocoder geocoder = new Geocoder(App.getInstance());
 
         return Single.fromCallable(() -> geocoder.getFromLocation(latLng.latitude, latLng.longitude, MAX_RESULTS))
                 .map(addresses -> {

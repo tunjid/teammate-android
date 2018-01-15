@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Device;
@@ -124,7 +124,7 @@ public class TeammateService {
     private static void assignSSLSocketFactory(OkHttpClient.Builder builder) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            InputStream stream = Application.getInstance().getResources().openRawResource(R.raw.server);
+            InputStream stream = App.getInstance().getResources().openRawResource(R.raw.server);
 
             Certificate certificate = certificateFactory.generateCertificate(stream);
             stream.close();
@@ -160,7 +160,7 @@ public class TeammateService {
         private static final String SIGN_IN_PATH = "/api/signIn";
         private static final String SIGN_UP_PATH = "/api/signUp";
 
-        Application application = Application.getInstance();
+        App app = App.getInstance();
 
         @Override
         public void saveFromResponse(@NonNull HttpUrl url, @NonNull List<Cookie> cookies) {
@@ -169,7 +169,7 @@ public class TeammateService {
 
             for (Cookie cookie : cookies) {
                 if (cookie.name().equals(SESSION_COOKIE)) {
-                    application.getSharedPreferences(SESSION_PREFS, Context.MODE_PRIVATE)
+                    app.getSharedPreferences(SESSION_PREFS, Context.MODE_PRIVATE)
                             .edit().putString(SESSION_COOKIE, cookie.toString()).apply();
                     break;
                 }
@@ -180,7 +180,7 @@ public class TeammateService {
         public List<Cookie> loadForRequest(@NonNull HttpUrl url) {
             List<Cookie> cookies = new ArrayList<>();
 
-            SharedPreferences preferences = application
+            SharedPreferences preferences = app
                     .getSharedPreferences(SESSION_PREFS, Context.MODE_PRIVATE);
 
             String serializedCookie = preferences.getString(SESSION_COOKIE, "");

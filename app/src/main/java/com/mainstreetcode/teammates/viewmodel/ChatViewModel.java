@@ -66,7 +66,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     }
 
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final Team team, Date date) {
-        final List<Chat> chats = getModelList(team);
+        final List<Identifiable> chats = getModelList(team);
 
         final Integer lastSize = chatMap.get(team);
         final Integer currentSize = chats.size();
@@ -76,7 +76,8 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
         chatMap.put(team, currentSize);
 
-        Flowable<List<Chat>> sourceFlowable = repository.chatsBefore(team, date)
+        Flowable<List<Identifiable>> sourceFlowable = repository.chatsBefore(team, date)
+                .map(toIdentifiable)
                 .doOnError(throwable -> chatMap.put(team, RETRY))
                 .doOnCancel(() -> chatMap.put(team, RETRY));
 
@@ -89,8 +90,8 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         return concat(immediate, fetched);
     }
 
-    private Flowable<Pair<Boolean, DiffUtil.DiffResult>> getDiffResult(boolean showProgress, List<Chat> chats) {
-        Flowable<List<Chat>> sourceFlowable = just(new ArrayList<Chat>());
+    private Flowable<Pair<Boolean, DiffUtil.DiffResult>> getDiffResult(boolean showProgress, List<Identifiable> chats) {
+        Flowable<List<Identifiable>> sourceFlowable = just(new ArrayList<Identifiable>());
         return Identifiable.diff(sourceFlowable, () -> chats, (sameChats, emptyAdditions) -> sameChats)
                 .map(diffResult -> new Pair<>(showProgress, diffResult));
     }

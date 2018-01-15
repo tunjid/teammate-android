@@ -4,7 +4,7 @@ package com.mainstreetcode.teammates.rest;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.mainstreetcode.teammates.Application;
+import com.mainstreetcode.teammates.App;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +52,7 @@ public class ProgressRequestBody extends RequestBody {
 
         InputStream in;
 
-        try { in = Application.getInstance().getContentResolver().openInputStream(uri);}
+        try { in = App.getInstance().getContentResolver().openInputStream(uri);}
         catch (Exception exception) {
             floatPublishSubject.onError(exception);
             throw exception;

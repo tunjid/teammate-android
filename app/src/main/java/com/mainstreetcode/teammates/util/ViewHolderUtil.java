@@ -9,6 +9,15 @@ import android.view.ViewGroup;
 
 public class ViewHolderUtil {
 
+    public static final int TEAM = 0;
+    public static final int CHAT = 1;
+    public static final int ROLE = 2;
+    public static final int EVENT = 3;
+    public static final int MEDIA = 4;
+    public static final int FEED_ITEM = 5;
+    public static final int CONTENT_AD = 6;
+    public static final int JOIN_REQUEST = 7;
+
     public static View getItemView(@LayoutRes int res, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);
     }

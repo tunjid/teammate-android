@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -13,10 +14,12 @@ import io.reactivex.Flowable;
 import io.reactivex.functions.BiFunction;
 
 import static android.support.v7.util.DiffUtil.calculateDiff;
+import static com.mainstreetcode.teammates.model.Identifiable.Util.getPoints;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.computation;
 
 public interface Identifiable {
+
     String getId();
 
     default boolean areContentsTheSame(Identifiable other) {
@@ -85,6 +88,33 @@ public interface Identifiable {
         @Override
         public Object getChangePayload(int oldItemPosition, int newItemPosition) {
             return stale.get(oldItemPosition).getChangePayload(updated.get(newItemPosition));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    Comparator<Identifiable> COMPARATOR = (modelA, modelB) -> {
+        int pointsA = getPoints(modelA);
+        int pointsB = getPoints(modelB);
+
+        int a, b;
+        a = b = Integer.compare(pointsA, pointsB);
+
+        if (modelA instanceof Model
+                && modelB instanceof Model
+                && modelA.getClass().equals(modelB.getClass()))
+            a += ((Model) modelA).compareTo(modelB);
+
+        return Integer.compare(a, b);
+    };
+
+    class Util {
+        static int getPoints(Identifiable identifiable) {
+            if (identifiable.getClass().equals(Item.class)) return 25;
+            if (identifiable.getClass().equals(Role.class)) return 20;
+            if (identifiable.getClass().equals(JoinRequest.class)) return 15;
+            if (identifiable.getClass().equals(Event.class)) return 10;
+            if (identifiable.getClass().equals(Media.class)) return 5;
+            return 0;
         }
     }
 }
