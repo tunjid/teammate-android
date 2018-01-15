@@ -24,7 +24,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     private final TeamRepository repository;
-    private final Team defaultTeam = Team.empty();
+    private static final Team defaultTeam = Team.empty();
     static final List<Identifiable> teams = new ArrayList<>();
 
     public TeamViewModel() {
@@ -55,7 +55,8 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     public Single<Team> deleteTeam(Team team) {
         return checkForInvalidObject(repository.delete(team).toFlowable(), Team.class, team).observeOn(mainThread())
                 .firstOrError()
-                .map(identifiable -> team)
+                .cast(Team.class)
+                .map(TeamViewModel::onTeamDeleted)
                 .doOnSuccess(getModelList(Team.class)::remove)
                 .observeOn(mainThread());
     }
@@ -67,5 +68,10 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     public void updateDefaultTeam(Team newDefault) {
         defaultTeam.update(newDefault);
         repository.saveDefaultTeam(defaultTeam);
+    }
+
+    static Team onTeamDeleted(Team deleted) {
+        if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
+        return deleted;
     }
 }

@@ -24,6 +24,6 @@ public class TeamMappedViewModel<V extends Identifiable> extends MappedViewModel
     @Override
     void onErrorMessage(Message message, Team key, Identifiable invalid) {
         super.onErrorMessage(message, key, invalid);
-        if (message.isIllegalTeamMember()) TeamViewModel.teams.remove(key);
+        if (message.isIllegalTeamMember()) TeamViewModel.onTeamDeleted(key);
     }
 }
