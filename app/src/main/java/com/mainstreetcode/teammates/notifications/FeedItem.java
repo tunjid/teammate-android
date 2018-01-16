@@ -95,6 +95,21 @@ public class FeedItem<T extends Model<T>> implements Identifiable {
 
     boolean isDeleteAction() {return !TextUtils.isEmpty(action) && "DELETE".equals(action);}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FeedItem)) return false;
+
+        FeedItem<?> feedItem = (FeedItem<?>) o;
+
+        return model.equals(feedItem.model);
+    }
+
+    @Override
+    public int hashCode() {
+        return model.hashCode();
+    }
+
     public static class GsonAdapter<T extends Model<T>>
             implements JsonDeserializer<FeedItem<T>> {
 

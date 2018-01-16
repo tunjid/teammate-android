@@ -33,6 +33,8 @@ import io.reactivex.Single;
 public final class HomeFragment extends MainActivityFragment
         implements FeedAdapter.FeedItemAdapterListener {
 
+    private static final int[] EXCLUDED_VIEWS = {R.id.feed_list};
+
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
@@ -84,6 +86,9 @@ public final class HomeFragment extends MainActivityFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_home, menu);
     }
+
+    @Override
+    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
     @SuppressWarnings("unchecked")

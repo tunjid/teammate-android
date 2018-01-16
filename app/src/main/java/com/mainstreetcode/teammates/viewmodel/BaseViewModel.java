@@ -53,6 +53,8 @@ abstract class BaseViewModel extends ViewModel {
             source.add(i, ads.get(count));
             count++;
         }
+
+        ads.add(ads.removeFirst());
     }
 
     private void fetchAds() {

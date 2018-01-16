@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,15 +40,20 @@ public abstract class AdViewHolder<T extends Ad> extends BaseViewHolder<BaseRecy
         this.ad = ad;
         setImageAspectRatio(ad);
 
-        String imageUrl = getImageUrl();
+        thumbnail.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                thumbnail.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                String imageUrl = getImageUrl();
 
-        if (!TextUtils.isEmpty(imageUrl)) {
-            Picasso.with(itemView.getContext())
-                    .load(imageUrl)
-                    .fit()
-                    .centerCrop()
-                    .into(thumbnail);
-        }
+                if (TextUtils.isEmpty(imageUrl)) return;
+                Picasso.with(itemView.getContext())
+                        .load(imageUrl)
+                        .fit()
+                        .centerCrop()
+                        .into(thumbnail);
+            }
+        });
     }
 
     private void setImageAspectRatio(Ad ad) {
