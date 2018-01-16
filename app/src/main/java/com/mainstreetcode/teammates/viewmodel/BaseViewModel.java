@@ -36,6 +36,7 @@ abstract class BaseViewModel extends ViewModel {
     void distributeAds(List<Identifiable> source) {
         if (source.isEmpty() || ads.isEmpty()) return;
 
+        int numToShuffle = 0;
         Iterator<Identifiable> iterator = source.iterator();
         while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
 
@@ -45,16 +46,17 @@ abstract class BaseViewModel extends ViewModel {
 
         if (sourceSize < AD_THRESH) {
             source.add(ads.get(0));
+            shuffleAds(++numToShuffle);
             return;
         }
 
         for (int i = AD_THRESH; i < sourceSize; i += AD_THRESH) {
             if (count > adSize) break;
             source.add(i, ads.get(count));
+            numToShuffle++;
             count++;
         }
-
-        ads.add(ads.removeFirst());
+        shuffleAds(numToShuffle);
     }
 
     private void fetchAds() {
@@ -80,5 +82,10 @@ abstract class BaseViewModel extends ViewModel {
         // Load the Native Express ad.
 
         adLoader.loadAd(new AdRequest.Builder().build());
+    }
+
+    private void shuffleAds(int count) {
+        for (int i = 0; i < count; i++) ads.add(ads.removeFirst());
+
     }
 }
