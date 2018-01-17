@@ -74,6 +74,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         recyclerView = rootView.findViewById(R.id.team_list);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setItemAnimator(null);
         recyclerView.setAdapter(new TeamAdapter(teams, this));
 
         createTeam.setOnClickListener(this);
