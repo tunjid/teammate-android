@@ -179,9 +179,11 @@ public class EventEditFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
+                toggleProgress(true);
                 boolean wasEmpty = event.isEmpty();
                 disposables.add(eventViewModel.updateEvent(event, eventItems)
                         .subscribe(diffResult -> {
+                            toggleProgress(false);
                             onEventChanged(diffResult);
                             showSnackbar(wasEmpty
                                     ? getString(R.string.added_user, event.getName())

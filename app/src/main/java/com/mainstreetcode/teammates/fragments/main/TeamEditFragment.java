@@ -187,21 +187,26 @@ public class TeamEditFragment extends HeaderedFragment
                     return;
                 }
 
+                toggleProgress(true);
                 Disposable disposable = null;
-
                 switch (state) {
                     case CREATING:
-                        disposable = teamViewModel.createOrUpdate(team)
-                                .subscribe(createdTeam -> showSnackbar(getString(R.string.created_team, createdTeam.getName())), defaultErrorHandler);
+                        disposable = teamViewModel.createOrUpdate(team).subscribe(createdTeam -> {
+                            showSnackbar(getString(R.string.created_team, createdTeam.getName()));
+                            toggleProgress(false);
+                        }, defaultErrorHandler);
                         break;
                     case JOINING:
                         JoinRequest joinRequest = JoinRequest.join(role, team, userViewModel.getCurrentUser());
-                        disposable = roleViewModel.joinTeam(joinRequest)
-                                .subscribe(request -> showSnackbar(getString(R.string.team_submitted_join_request)), defaultErrorHandler);
+                        disposable = roleViewModel.joinTeam(joinRequest).subscribe(request -> {
+                            showSnackbar(getString(R.string.team_submitted_join_request));
+                            toggleProgress(false);
+                        }, defaultErrorHandler);
                         break;
                     case EDITING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(updatedTeam -> {
                             showSnackbar(getString(R.string.updated_team));
+                            toggleProgress(false);
                             recyclerView.getAdapter().notifyDataSetChanged();
                         }, defaultErrorHandler);
                         break;

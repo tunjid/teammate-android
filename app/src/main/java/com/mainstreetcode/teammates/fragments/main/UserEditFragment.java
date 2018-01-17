@@ -114,13 +114,12 @@ public class UserEditFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-
-                disposables.add(
-                        userViewModel.updateUser(user).subscribe(updatedRole -> {
+                toggleProgress(true);
+                disposables.add(userViewModel.updateUser(user).subscribe(updatedRole -> {
                             showSnackbar(getString(R.string.updated_user, user.getFirstName()));
+                            toggleProgress(false);
                             recyclerView.getAdapter().notifyDataSetChanged();
-                        }, defaultErrorHandler)
-                );
+                        }, defaultErrorHandler));
                 break;
         }
     }

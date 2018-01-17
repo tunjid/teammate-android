@@ -44,7 +44,7 @@ abstract class BaseViewModel extends ViewModel {
         int sourceSize = source.size();
         int count = 0;
 
-        if (sourceSize < AD_THRESH) {
+        if (sourceSize <= AD_THRESH) {
             source.add(ads.get(0));
             shuffleAds(++numToShuffle);
             return;

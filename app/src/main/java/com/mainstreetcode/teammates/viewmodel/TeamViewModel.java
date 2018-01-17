@@ -7,7 +7,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Flowable<DiffUtil.DiffResult> getMyTeams(String userId) {
         Flowable<List<Identifiable>> sourceFlowable = repository.getMyTeams(userId).map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> getModelList(Team.class), ModelUtils::preserveList);
+        return Identifiable.diff(sourceFlowable, () -> getModelList(Team.class), preserveList);
     }
 
     public Single<Team> deleteTeam(Team team) {
