@@ -144,6 +144,10 @@ public class TeammatesBaseFragment extends BaseFragment {
         toggleProgress(false);
     }
 
+    protected void onKeyBoardChanged(boolean appeared) {
+
+    }
+
     @SuppressLint("CommitTransaction")
     @SuppressWarnings("ConstantConditions")
     protected final FragmentTransaction beginTransaction() {

@@ -23,10 +23,11 @@ abstract class BaseViewModel extends ViewModel {
 
     private static final int AD_THRESH = 5;
 
-    BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (a, b) -> {
-        ModelUtils.preserveList(a, b);
-        distributeAds(a);
-        return a;
+    BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (source, additions) -> {
+        filterAds(source);
+        ModelUtils.preserveList(source, additions);
+        distributeAds(source);
+        return source;
     };
 
     private LinkedList<Identifiable> ads = new LinkedList<>();
@@ -37,9 +38,6 @@ abstract class BaseViewModel extends ViewModel {
         if (source.isEmpty() || ads.isEmpty()) return;
 
         int numToShuffle = 0;
-        Iterator<Identifiable> iterator = source.iterator();
-        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
-
         int adSize = ads.size();
         int sourceSize = source.size();
         int count = 0;
@@ -67,7 +65,6 @@ abstract class BaseViewModel extends ViewModel {
                 })
                 .forContentAd(contentAd -> {
                     ads.add(new ContentAd(contentAd));
-                    if (ads.size() < 5) fetchAds();
                 })
                 .withAdListener(new AdListener() {
                     @Override
@@ -81,11 +78,15 @@ abstract class BaseViewModel extends ViewModel {
 
         // Load the Native Express ad.
 
-        adLoader.loadAd(new AdRequest.Builder().build());
+        adLoader.loadAds(new AdRequest.Builder().build(), 5);
+    }
+
+    private void filterAds(List<Identifiable> source) {
+        Iterator<Identifiable> iterator = source.iterator();
+        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
     }
 
     private void shuffleAds(int count) {
         for (int i = 0; i < count; i++) ads.add(ads.removeFirst());
-
     }
 }

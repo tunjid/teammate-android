@@ -25,6 +25,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
         ImageWorkerFragment.ImagePickerListener {
 
     private int lastOffset;
+    private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
 
     @Override
@@ -49,7 +50,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerToolbar.getLayoutParams();
         params.height += TeammatesBaseActivity.insetHeight;
 
-        AppBarLayout appBarLayout = view.findViewById(R.id.app_bar);
+        appBarLayout = view.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
             if (!showsFab() || getActivity() == null) return;
 
@@ -77,6 +78,13 @@ public abstract class HeaderedFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         viewHolder = null;
+        appBarLayout = null;
+    }
+
+    @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (appBarLayout != null && appeared) appBarLayout.setExpanded(false);
     }
 
     protected abstract HeaderedModel getHeaderedModel();

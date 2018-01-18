@@ -197,7 +197,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     private WindowInsetsCompat consumeFragmentInsets(WindowInsetsCompat insets) {
-        setKeyboardPadding(insets.getSystemWindowInsetBottom());
+        int bottomInset = insets.getSystemWindowInsetBottom();
+        setKeyboardPadding(bottomInset);
+
+        TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+        if (view != null) view.onKeyBoardChanged(bottomInset != 0);
         return insets;
     }
 
