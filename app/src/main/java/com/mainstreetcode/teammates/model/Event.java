@@ -36,7 +36,7 @@ public class Event extends EventEntity
         ItemListableBean<Event> {
 
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
-    private static final int LOCATION_POSITION = 4;
+    private static final int LOCATION_POSITION = 1;
 
     @Ignore private List<Guest> guests = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
@@ -64,10 +64,10 @@ public class Event extends EventEntity
     public List<Item<Event>> buildItems() {
         return Arrays.asList(
                 new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
+                new Item(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this),
                 new Item(Item.INPUT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
                 new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
-                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, this),
-                new Item(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this)
+                new Item(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, this)
         );
     }
 

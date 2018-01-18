@@ -2,6 +2,7 @@
     <string name="app_name">Teammate</string>
     <string name="teammates">Teammate</string>
     <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
+    <string name="empty_string"> </string>
 
     <!--Splash Fragment-->
     <string name="login_email">Sign up with email</string>

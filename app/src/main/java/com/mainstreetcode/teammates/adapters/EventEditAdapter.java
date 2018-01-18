@@ -8,7 +8,6 @@ import com.mainstreetcode.teammates.adapters.viewholders.DateViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.GuestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.MapInputViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Guest;
@@ -49,7 +48,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             case Item.IMAGE:
                 return new HeaderedImageViewHolder(getItemView(R.layout.viewholder_item_image, viewGroup), adapterListener);
             case Item.LOCATION:
-                return new MapInputViewHolder(getItemView(R.layout.viewholder_location_input, viewGroup), adapterListener);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
             case TEAM:

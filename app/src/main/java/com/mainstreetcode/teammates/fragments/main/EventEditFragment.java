@@ -195,8 +195,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void onImageClick() {
-        if (canEditEvent()) fromUserPickerAction = true;
-        super.onImageClick();
+        onLocationClicked();
     }
 
     @Override
@@ -257,6 +256,7 @@ public class EventEditFragment extends HeaderedFragment
         Activity activity;
         if ((activity = getActivity()) == null) return;
 
+        viewHolder.bind(getHeaderedModel());
         recyclerView.getAdapter().notifyDataSetChanged();
         activity.invalidateOptionsMenu();
         toggleFab(canEditEvent());
