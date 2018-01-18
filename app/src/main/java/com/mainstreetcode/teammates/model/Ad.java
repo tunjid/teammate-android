@@ -39,7 +39,7 @@ public abstract class Ad<T extends NativeAd> implements Identifiable {
         Drawable drawable = image.getDrawable();
         if (drawable == null) return null;
 
-        return "H," + drawable.getIntrinsicWidth() + ":" + drawable.getIntrinsicHeight();
+        return "W," + drawable.getIntrinsicWidth() + ":" + drawable.getIntrinsicHeight();
     }
 
     @Nullable
