@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.gms.ads.formats.NativeAppInstallAdView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/half_margin"
+    android:layout_marginLeft="@dimen/single_margin"
+    android:layout_marginRight="@dimen/single_margin"
+    android:layout_marginTop="@dimen/half_margin">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/dark_grey"
+                android:contentDescription="@string/team_logo"
+                app:layout_constraintBottom_toBottomOf="@+id/item_subtitle"
+                app:layout_constraintDimensionRatio="H,1:1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/item_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="left"
+                android:maxLines="1"
+                android:paddingLeft="@dimen/single_margin"
+                android:paddingRight="@dimen/single_margin"
+                android:paddingTop="@dimen/half_margin"
+                android:textColor="@color/dark_grey"
+                android:textSize="@dimen/small_text"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_default="wrap" />
+
+            <TextView
+                android:id="@+id/item_subtitle"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="left"
+                android:paddingBottom="@dimen/half_margin"
+                android:paddingLeft="@dimen/single_margin"
+                android:paddingRight="@dimen/single_margin"
+                android:paddingTop="@dimen/half_margin"
+                android:textColor="@color/dark_grey"
+                android:textSize="@dimen/tiny_text"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item_title"
+                app:layout_constraintWidth_default="wrap" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/quarter_margin"
+                android:background="@drawable/bg_ad_box"
+                android:paddingBottom="@dimen/sixteenth_margin"
+                android:paddingLeft="@dimen/quarter_margin"
+                android:paddingRight="@dimen/quarter_margin"
+                android:paddingTop="@dimen/sixteenth_margin"
+                android:text="@string/ad"
+                android:textColor="@color/white"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+</com.google.android.gms.ads.formats.NativeAppInstallAdView>

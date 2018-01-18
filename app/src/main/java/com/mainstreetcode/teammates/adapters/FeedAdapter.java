@@ -3,9 +3,11 @@ package com.mainstreetcode.teammates.adapters;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.AdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.FeedItemViewHolder;
-import com.mainstreetcode.teammates.model.ContentAd;
+import com.mainstreetcode.teammates.adapters.viewholders.InstallAdViewHolder;
+import com.mainstreetcode.teammates.model.Ad;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.notifications.FeedItem;
 import com.mainstreetcode.teammates.util.ViewHolderUtil;
@@ -16,6 +18,7 @@ import java.util.List;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.FEED_ITEM;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.INSTALL_AD;
 
 /**
  * Adapter for {@link FeedItem}
@@ -35,6 +38,8 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, FeedAda
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
                 ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_content_ad, viewGroup), adapterListener)
+                : viewType == INSTALL_AD
+                ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
                 : new FeedItemViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
     }
 
@@ -43,7 +48,7 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, FeedAda
     public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
         Identifiable item = items.get(position);
         if (item instanceof FeedItem) ((FeedItemViewHolder) viewHolder).bind((FeedItem) item);
-        else if (item instanceof ContentAd) ((ContentAdViewHolder) viewHolder).bind((ContentAd) item);
+        else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
     }
 
     @Override
@@ -58,7 +63,8 @@ public class FeedAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, FeedAda
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position) instanceof FeedItem ? FEED_ITEM : CONTENT_AD;
+        Identifiable item = items.get(position);
+        return item instanceof FeedItem ? FEED_ITEM : ((Ad) item).getType();
     }
 
     public interface FeedItemAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

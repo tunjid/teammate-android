@@ -10,6 +10,7 @@ import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.ContentAd;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.InstallAd;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.Iterator;
@@ -49,7 +50,7 @@ abstract class BaseViewModel extends ViewModel {
         }
 
         for (int i = AD_THRESH; i < sourceSize; i += AD_THRESH) {
-            if (count > adSize) break;
+            if (count >= adSize) break;
             source.add(i, ads.get(count));
             numToShuffle++;
             count++;
@@ -60,12 +61,8 @@ abstract class BaseViewModel extends ViewModel {
     private void fetchAds() {
         App app = App.getInstance();
         AdLoader adLoader = new AdLoader.Builder(app, app.getString(R.string.admob_ad_id))
-                .forAppInstallAd(appInstallAd -> {
-                    // Show the app install ad.
-                })
-                .forContentAd(contentAd -> {
-                    ads.add(new ContentAd(contentAd));
-                })
+                .forAppInstallAd(appInstallAd -> ads.add(new InstallAd(appInstallAd)))
+                .forContentAd(contentAd -> ads.add(new ContentAd(contentAd)))
                 .withAdListener(new AdListener() {
                     @Override
                     public void onAdFailedToLoad(int errorCode) {
@@ -76,9 +73,7 @@ abstract class BaseViewModel extends ViewModel {
                         .build())
                 .build();
 
-        // Load the Native Express ad.
-
-        adLoader.loadAds(new AdRequest.Builder().build(), 5);
+        adLoader.loadAds(new AdRequest.Builder().build(), 2);
     }
 
     private void filterAds(List<Identifiable> source) {

@@ -11,13 +11,24 @@ import com.mainstreetcode.teammates.util.ObjectId;
 
 import java.util.List;
 
-public class Ad<T extends NativeAd> implements Identifiable {
+public abstract class Ad<T extends NativeAd> implements Identifiable {
 
     private T nativeAd;
     private final String id = new ObjectId().toHexString();
 
     Ad(T nativeAd) {
         this.nativeAd = nativeAd;
+    }
+
+    public abstract int getType();
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public T getNativeAd() {
+        return nativeAd;
     }
 
     @Nullable
@@ -29,15 +40,6 @@ public class Ad<T extends NativeAd> implements Identifiable {
         if (drawable == null) return null;
 
         return "H," + drawable.getIntrinsicWidth() + ":" + drawable.getIntrinsicHeight();
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public T getNativeAd() {
-        return nativeAd;
     }
 
     @Nullable

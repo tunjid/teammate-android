@@ -16,7 +16,8 @@ public class ViewHolderUtil {
     public static final int MEDIA = 4;
     public static final int FEED_ITEM = 5;
     public static final int CONTENT_AD = 6;
-    public static final int JOIN_REQUEST = 7;
+    public static final int INSTALL_AD = 7;
+    public static final int JOIN_REQUEST = 8;
 
     public static View getItemView(@LayoutRes int res, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);

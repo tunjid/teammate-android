@@ -3,10 +3,12 @@ package com.mainstreetcode.teammates.adapters;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.adapters.viewholders.AdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.ContentAdViewHolder;
+import com.mainstreetcode.teammates.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.JoinRequestViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.RoleViewHolder;
-import com.mainstreetcode.teammates.model.ContentAd;
+import com.mainstreetcode.teammates.model.Ad;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
@@ -18,6 +20,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 import java.util.List;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.INSTALL_AD;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.JOIN_REQUEST;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.ROLE;
 
@@ -39,18 +42,22 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, T
     public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
                 ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
+                : viewType == INSTALL_AD
+                ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
                 : viewType == ROLE
                 ? new RoleViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener)
                 : new JoinRequestViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
         Identifiable item = teamModels.get(position);
 
-        if (item instanceof ContentAd) ((ContentAdViewHolder) viewHolder).bind((ContentAd) item);
+        if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof Role) ((RoleViewHolder) viewHolder).bind((Role) item);
-        else ((JoinRequestViewHolder) viewHolder).bind((JoinRequest) item);
+        else if (item instanceof JoinRequest)
+            ((JoinRequestViewHolder) viewHolder).bind((JoinRequest) item);
     }
 
     @Override
@@ -66,7 +73,7 @@ public class TeamDetailAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, T
     @Override
     public int getItemViewType(int position) {
         Identifiable item = teamModels.get(position);
-        return item instanceof ContentAd ? CONTENT_AD : item instanceof Role ? ROLE : JOIN_REQUEST;
+        return item instanceof Ad ? ((Ad) item).getType() : item instanceof Role ? ROLE : JOIN_REQUEST;
     }
 
     public interface UserAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
