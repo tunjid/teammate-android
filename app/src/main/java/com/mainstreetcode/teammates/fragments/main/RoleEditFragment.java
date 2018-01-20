@@ -142,9 +142,10 @@ public class RoleEditFragment extends HeaderedFragment
                     return;
                 }
 
+                toggleProgress(true);
                 disposables.add(teamMemberViewModel.updateRole(role).subscribe(updatedRole -> {
+                    onRoleUpdated();
                     showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));
-                    recyclerView.getAdapter().notifyDataSetChanged();
                 }, defaultErrorHandler));
                 break;
         }
@@ -175,6 +176,8 @@ public class RoleEditFragment extends HeaderedFragment
     }
 
     private void onRoleUpdated() {
+        toggleProgress(false);
+        viewHolder.bind(getHeaderedModel());
         recyclerView.getAdapter().notifyDataSetChanged();
 
         Activity activity;

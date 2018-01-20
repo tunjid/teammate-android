@@ -85,8 +85,10 @@ public class UserEditFragment extends HeaderedFragment
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.edit_user));
 
-        disposables.add(userViewModel.getMe()
-                .subscribe(ignored -> recyclerView.getAdapter().notifyDataSetChanged(), defaultErrorHandler));
+        disposables.add(userViewModel.getMe().subscribe(ignored -> {
+            viewHolder.bind(getHeaderedModel());
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }, defaultErrorHandler));
     }
 
     @Override
@@ -116,10 +118,11 @@ public class UserEditFragment extends HeaderedFragment
             case R.id.fab:
                 toggleProgress(true);
                 disposables.add(userViewModel.updateUser(user).subscribe(updatedRole -> {
-                            showSnackbar(getString(R.string.updated_user, user.getFirstName()));
-                            toggleProgress(false);
-                            recyclerView.getAdapter().notifyDataSetChanged();
-                        }, defaultErrorHandler));
+                    showSnackbar(getString(R.string.updated_user, user.getFirstName()));
+                    toggleProgress(false);
+                    viewHolder.bind(getHeaderedModel());
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }, defaultErrorHandler));
                 break;
         }
     }

@@ -179,16 +179,13 @@ public class EventEditFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                toggleProgress(true);
                 boolean wasEmpty = event.isEmpty();
-                disposables.add(eventViewModel.updateEvent(event, eventItems)
-                        .subscribe(diffResult -> {
-                            toggleProgress(false);
-                            onEventChanged(diffResult);
-                            showSnackbar(wasEmpty
-                                    ? getString(R.string.added_user, event.getName())
-                                    : getString(R.string.updated_user, event.getName()));
-                        }, defaultErrorHandler));
+                toggleProgress(true);
+                disposables.add(eventViewModel.createOrUpdateEvent(event, eventItems).subscribe(diffResult -> {
+                    int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
+                    onEventChanged(diffResult);
+                    showSnackbar(getString(stringRes, event.getName()));
+                }, defaultErrorHandler));
                 break;
         }
     }
@@ -248,8 +245,9 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     private void onEventChanged(DiffUtil.DiffResult result) {
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
         toggleProgress(false);
+        result.dispatchUpdatesTo(recyclerView.getAdapter());
+        viewHolder.bind(getHeaderedModel());
     }
 
     private void onRoleUpdated() {

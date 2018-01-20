@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -113,6 +114,9 @@ public class TeamEditFragment extends HeaderedFragment
 
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
         roleViewModel.fetchRoleValues();
+        if (!team.isEmpty()) {
+            disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
+        }
     }
 
     @Override
@@ -191,9 +195,11 @@ public class TeamEditFragment extends HeaderedFragment
                 Disposable disposable = null;
                 switch (state) {
                     case CREATING:
-                        disposable = teamViewModel.createOrUpdate(team).subscribe(createdTeam -> {
-                            showSnackbar(getString(R.string.created_team, createdTeam.getName()));
+                        disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
+                            result.dispatchUpdatesTo(recyclerView.getAdapter());
+                            viewHolder.bind(getHeaderedModel());
                             toggleProgress(false);
+                            showSnackbar(getString(R.string.created_team, team.getName()));
                         }, defaultErrorHandler);
                         break;
                     case JOINING:
@@ -204,16 +210,23 @@ public class TeamEditFragment extends HeaderedFragment
                         }, defaultErrorHandler);
                         break;
                     case EDITING:
-                        disposable = teamViewModel.createOrUpdate(team).subscribe(updatedTeam -> {
-                            showSnackbar(getString(R.string.updated_team));
+                        disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
+                            viewHolder.bind(getHeaderedModel());
+                            result.dispatchUpdatesTo(recyclerView.getAdapter());
                             toggleProgress(false);
-                            recyclerView.getAdapter().notifyDataSetChanged();
+                            showSnackbar(getString(R.string.updated_team));
                         }, defaultErrorHandler);
                         break;
                 }
 
                 if (disposable != null) disposables.add(disposable);
         }
+    }
+
+    private void onTeamChanged(DiffUtil.DiffResult result) {
+        toggleProgress(false);
+        result.dispatchUpdatesTo(recyclerView.getAdapter());
+        viewHolder.bind(getHeaderedModel());
     }
 
     private void onRoleUpdated() {

@@ -42,7 +42,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList);
     }
 
-    public Single<DiffUtil.DiffResult> updateEvent(final Event event, List<Identifiable> eventItems) {
+    public Single<DiffUtil.DiffResult> createOrUpdateEvent(final Event event, List<Identifiable> eventItems) {
         Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(event).toFlowable(), event.getTeam(), event).cast(Event.class).map(eventListFunction);
         return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
     }
