@@ -200,7 +200,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void onTeamClicked(Team team) {
-        event.setTeam(team);
+        eventViewModel.onEventTeamChanged(event, team);
     }
 
     @Override

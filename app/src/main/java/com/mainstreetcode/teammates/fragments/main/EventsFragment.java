@@ -135,7 +135,9 @@ public final class EventsFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                showFragment(EventEditFragment.newInstance(Event.empty()));
+                Event event = Event.empty();
+                event.setTeam(teamViewModel.getDefaultTeam());
+                showFragment(EventEditFragment.newInstance(event));
                 break;
         }
     }

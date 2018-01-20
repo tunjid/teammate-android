@@ -60,6 +60,11 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
                 .observeOn(mainThread());
     }
 
+    public void onEventTeamChanged(Event event, Team newTeam) {
+        getModelList(event.getTeam()).remove(event);
+        event.setTeam(newTeam);
+    }
+
     private Function<Event, List<Identifiable>> eventListFunction = event -> {
         List<Identifiable> result = new ArrayList<>();
         int eventSize = event.size();
