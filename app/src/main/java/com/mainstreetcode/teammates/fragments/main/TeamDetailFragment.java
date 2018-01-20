@@ -11,8 +11,8 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -94,7 +94,7 @@ public class TeamDetailFragment extends MainActivityFragment
         editText.setText(team.getName());
 
         recyclerView = rootView.findViewById(R.id.team_detail);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(new TeamDetailAdapter(teamModels, this));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
