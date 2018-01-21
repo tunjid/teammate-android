@@ -14,7 +14,7 @@
             app:contentScrim="@color/black_75"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <include layout="@layout/viewholder_item_image"></include>
+            <include layout="@layout/viewholder_item_image"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
