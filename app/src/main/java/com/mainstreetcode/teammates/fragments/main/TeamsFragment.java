@@ -135,13 +135,10 @@ public final class TeamsFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onTeamClicked(Team team) {
         Fragment target = getTargetFragment();
+        boolean canPick = target != null && target instanceof TeamAdapter.TeamAdapterListener;
 
-        if (target != null && target instanceof TeamAdapter.TeamAdapterListener) {
-            ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
-        }
-        else {
-            showFragment(TeamDetailFragment.newInstance(team));
-        }
+        if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
+        else showFragment(TeamDetailFragment.newInstance(team));
     }
 
     @Override
