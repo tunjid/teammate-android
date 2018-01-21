@@ -122,7 +122,7 @@ public class RoleEditFragment extends HeaderedFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return canChangeRole();
     }
 

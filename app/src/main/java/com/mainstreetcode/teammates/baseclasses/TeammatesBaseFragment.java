@@ -77,15 +77,15 @@ public class TeammatesBaseFragment extends BaseFragment {
         return false;
     }
 
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return false;
     }
 
-    protected boolean showsToolBar() {
+    public boolean showsToolBar() {
         return true;
     }
 
-    protected boolean showsBottomNav() {
+    public boolean showsBottomNav() {
         return true;
     }
 
@@ -154,7 +154,7 @@ public class TeammatesBaseFragment extends BaseFragment {
         return getFragmentManager().beginTransaction();
     }
 
-    private PersistentUiController getPersistentUiController() {
+    protected PersistentUiController getPersistentUiController() {
         Activity activity = getActivity();
         return activity == null ? DUMMY : ((PersistentUiController) activity);
     }

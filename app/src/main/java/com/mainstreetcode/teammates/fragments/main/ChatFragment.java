@@ -156,7 +156,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return false;
     }
 

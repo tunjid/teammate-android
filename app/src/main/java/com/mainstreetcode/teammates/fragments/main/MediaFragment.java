@@ -178,12 +178,12 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return true;
     }
 
     @Override
-    protected boolean showsBottomNav() {
+    public boolean showsBottomNav() {
         return false;
     }
 

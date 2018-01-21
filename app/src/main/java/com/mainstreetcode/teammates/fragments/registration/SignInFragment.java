@@ -75,7 +75,7 @@ public final class SignInFragment extends RegistrationActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return true;
     }
 

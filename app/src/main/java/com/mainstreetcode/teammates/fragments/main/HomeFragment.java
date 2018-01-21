@@ -118,10 +118,10 @@ public final class HomeFragment extends MainActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {return false;}
+    public boolean showsFab() {return false;}
 
     @Override
-    protected boolean showsBottomNav() {return true;}
+    public boolean showsBottomNav() {return true;}
 
     private void onFeedItemAction(Single<DiffUtil.DiffResult> diffResultSingle) {
         toggleProgress(true);

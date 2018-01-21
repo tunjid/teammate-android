@@ -110,7 +110,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return false;
     }
 

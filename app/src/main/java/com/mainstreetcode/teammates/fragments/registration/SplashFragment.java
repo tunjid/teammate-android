@@ -92,12 +92,12 @@ public class SplashFragment extends RegistrationActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return false;
     }
 
     @Override
-    protected boolean showsToolBar() {
+    public boolean showsToolBar() {
         return false;
     }
 

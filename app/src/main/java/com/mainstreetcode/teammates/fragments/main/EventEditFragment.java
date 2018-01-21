@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -161,7 +162,7 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return canEditEvent();
     }
 
@@ -198,14 +199,25 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void onTeamClicked(Team team) {
         eventViewModel.onEventTeamChanged(event, team);
+        toggleBottomSheet(false);
+
+        int index = eventItems.indexOf(team);
+        if (index > -1) recyclerView.getAdapter().notifyItemChanged(index);
     }
 
     @Override
     public void selectTeam() {
-        fromUserPickerAction = true;
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager == null) return;
+
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
-        showFragment(teamsFragment);
+
+        beginTransaction()
+                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
+                .commit();
+
+        toggleBottomSheet(true);
     }
 
     @Override

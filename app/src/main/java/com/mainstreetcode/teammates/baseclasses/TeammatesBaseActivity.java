@@ -67,6 +67,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
+            if (!isInMainFragmentContainer(v)) return;
+
             boolean isFullscreenFragment = isFullscreenFragment(f);
 
             ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
@@ -183,6 +185,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     protected boolean isFullscreenFragment(Fragment fragment) {
         return fragment instanceof TeammatesBaseFragment && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
+    }
+
+    protected boolean isInMainFragmentContainer(View view) {
+        View parent = (View) view.getParent();
+        return parent.getId() == R.id.main_fragment_container;
     }
 
     private WindowInsetsCompat consumeToolbarInsets(WindowInsetsCompat insets) {

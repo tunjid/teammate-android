@@ -154,7 +154,7 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return localRoleViewModel.hasPrivilegedRole();
     }
 

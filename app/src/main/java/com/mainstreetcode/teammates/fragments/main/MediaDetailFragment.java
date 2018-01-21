@@ -85,17 +85,17 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return false;
     }
 
     @Override
-    protected boolean showsBottomNav() {
+    public boolean showsBottomNav() {
         return false;
     }
 
     @Override
-    protected boolean showsToolBar() {
+    public boolean showsToolBar() {
         return false;
     }
 

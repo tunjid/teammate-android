@@ -71,7 +71,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return true;
     }
 

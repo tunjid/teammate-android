@@ -76,6 +76,13 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (shouldGoBack) activity.onBackPressed();
     }
 
+    protected void toggleBottomSheet(boolean show) {
+        PersistentUiController controller = getPersistentUiController();
+        if(controller instanceof BottomSheetController) {
+            ((BottomSheetController) controller).toggleBottomSheet(show);
+        }
+    }
+
     protected void signOut() {
         userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),

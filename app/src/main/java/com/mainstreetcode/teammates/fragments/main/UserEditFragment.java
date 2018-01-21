@@ -103,7 +103,7 @@ public class UserEditFragment extends HeaderedFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return true;
     }
 

@@ -131,7 +131,7 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return state == CREATING || state == JOINING || localRoleViewModel.hasPrivilegedRole();
     }
 

@@ -72,27 +72,19 @@ public final class TeamsFragment extends MainActivityFragment
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team);
 
-        return rootView;
-    }
+        View altToolbar = rootView.findViewById(R.id.alt_toolbar);
+        altToolbar.setVisibility(isTeamPicker() ? View.VISIBLE : View.INVISIBLE);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        //if (getTargetRequestCode() != 0 && restoredFromBackStack()) getFragmentManager().popBackStack();
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        int requestCode = getTargetRequestCode();
         setFabIcon(R.drawable.ic_add_white_24dp);
         setFabClickListener(this);
-        setToolbarTitle(getString(requestCode == R.id.request_event_team_pick
-                || requestCode == R.id.request_media_team_pick
-                || requestCode == R.id.request_chat_team_pick
-                ? R.string.pick_team
-                : R.string.my_teams));
+        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
 
         String userId = userViewModel.getCurrentUser().getId();
         disposables.add(teamViewModel.getMyTeams(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
@@ -101,6 +93,12 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_teams, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (item != null && isTeamPicker()) item.setVisible(false);
     }
 
     @Override
@@ -124,25 +122,22 @@ public final class TeamsFragment extends MainActivityFragment
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    protected boolean showsBottomNav() {
-        return getTargetRequestCode() == 0;
+    public boolean showsBottomNav() {
+        return true;
     }
 
     @Override
-    protected boolean showsFab() {
-        return getTargetRequestCode() == 0;
+    public boolean showsFab() {
+        return !isTeamPicker();
     }
 
     @Override
     @SuppressWarnings("ConstantConditions")
     public void onTeamClicked(Team team) {
-
-        int requestCode = getTargetRequestCode();
         Fragment target = getTargetFragment();
 
         if (target != null && target instanceof TeamAdapter.TeamAdapterListener) {
             ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
-            if (requestCode == R.id.request_event_edit_pick) getActivity().onBackPressed();
         }
         else {
             showFragment(TeamDetailFragment.newInstance(team));
@@ -153,6 +148,7 @@ public final class TeamsFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
+                toggleBottomSheet(false);
                 showFragment(TeamEditFragment.newCreateInstance());
                 break;
         }
@@ -162,6 +158,10 @@ public final class TeamsFragment extends MainActivityFragment
         boolean isEmpty = teams.isEmpty();
         emptyViewHolder.toggle(isEmpty);
         result.dispatchUpdatesTo(recyclerView.getAdapter());
-        if (getTargetRequestCode() != 0) toggleFab(isEmpty);
+        if (isTeamPicker()) toggleFab(isEmpty);
+    }
+
+    private boolean isTeamPicker() {
+        return getTargetRequestCode() != 0;
     }
 }

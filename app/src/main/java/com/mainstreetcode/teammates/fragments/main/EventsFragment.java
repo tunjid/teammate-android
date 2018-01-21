@@ -122,7 +122,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
-    protected boolean showsFab() {
+    public boolean showsFab() {
         return localRoleViewModel.hasPrivilegedRole();
     }
 

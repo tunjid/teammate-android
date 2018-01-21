@@ -19,7 +19,7 @@ import com.mainstreetcode.teammates.model.Team;
 
 public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.TeamAdapterListener {
 
-    private static final String TAG = "TeamMediaPickerFragment";
+    private static final String TAG = "TeamPickerFragment";
     private static final String ARGS_CHANGING = "ARGS_CHANGING";
     private static final String ARGS_REQUEST_CODE = "ARGS_REQUEST_CODE";
 
@@ -98,6 +98,7 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
                 showFragment(MediaFragment.newInstance(item));
                 break;
         }
+        toggleBottomSheet(false);
     }
 
     private void pick() {
@@ -107,9 +108,16 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     }
 
     private void showPicker() {
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager == null) return;
+
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, requestCode);
 
-        showFragment(teamsFragment);
+        fragmentManager.beginTransaction()
+                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
+                .commit();
+
+        toggleBottomSheet(true);
     }
 }
