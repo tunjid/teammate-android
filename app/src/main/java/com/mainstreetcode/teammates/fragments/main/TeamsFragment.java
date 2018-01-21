@@ -76,6 +76,12 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        //if (getTargetRequestCode() != 0 && restoredFromBackStack()) getFragmentManager().popBackStack();
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 

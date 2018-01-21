@@ -114,7 +114,7 @@ public class TeamEditFragment extends HeaderedFragment
 
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
         roleViewModel.fetchRoleValues();
-        if (!team.isEmpty()) {
+        if (!team.isEmpty() && state != JOINING) {
             disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
         }
     }

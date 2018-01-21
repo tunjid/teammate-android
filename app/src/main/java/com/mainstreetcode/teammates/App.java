@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates;
 
+import android.support.multidex.MultiDexApplication;
+
 import com.google.android.gms.ads.MobileAds;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
@@ -8,7 +10,7 @@ import com.mainstreetcode.teammates.util.ErrorHandler;
  * Application Singleton
  */
 
-public class App extends android.app.Application {
+public class App extends MultiDexApplication {
 
     static App INSTANCE;
 
