@@ -88,7 +88,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchItem.expandActionView();
-        searchView.setOnQueryTextListener(this);
+        if (searchView != null) searchView.setOnQueryTextListener(this);
     }
 
     @Override
