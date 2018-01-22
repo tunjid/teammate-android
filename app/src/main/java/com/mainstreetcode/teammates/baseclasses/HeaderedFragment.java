@@ -15,14 +15,22 @@ import com.mainstreetcode.teammates.adapters.viewholders.HeaderedImageViewHolder
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Item;
+import com.mainstreetcode.teammates.util.ErrorHandler;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Completable;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public abstract class HeaderedFragment extends MainActivityFragment
         implements
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
+
+    private static final int FAB_DELAY = 400;
 
     private int lastOffset;
     private AppBarLayout appBarLayout;
@@ -84,7 +92,11 @@ public abstract class HeaderedFragment extends MainActivityFragment
     @Override
     protected void onKeyBoardChanged(boolean appeared) {
         super.onKeyBoardChanged(appeared);
-        if (appBarLayout != null && appeared) appBarLayout.setExpanded(false);
+        if (!appeared) return;
+        if (appBarLayout != null) appBarLayout.setExpanded(false);
+        if (showsFab()) disposables.add(Completable.timer(FAB_DELAY, TimeUnit.MILLISECONDS)
+                .observeOn(mainThread())
+                .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
     }
 
     protected abstract HeaderedModel getHeaderedModel();
