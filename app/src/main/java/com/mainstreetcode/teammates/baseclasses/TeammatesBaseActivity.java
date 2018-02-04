@@ -77,7 +77,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             insetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimaryDark;
+                int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimary;
                 getWindow().setStatusBarColor(ContextCompat.getColor(TeammatesBaseActivity.this, color));
             }
 
