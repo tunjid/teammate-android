@@ -85,7 +85,7 @@ public abstract class Notifier<T extends Model<T>> {
     protected void handleNotification(FeedItem<T> item) {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         sendNotification(getNotificationBuilder(item)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_shield_white)
                 .setContentTitle(item.getTitle())
                 .setContentText(item.getBody())
                 .setAutoCancel(true)
