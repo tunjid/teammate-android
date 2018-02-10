@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -73,14 +74,15 @@ public class Message {
     }
 
     public static class GsonAdapter implements com.google.gson.JsonDeserializer<Message> {
-        private static final String MESSAGE_KEY = "message";
 
+        private static final String MESSAGE_KEY = "message";
         private static final String ERROR_CODE_KEY = "errorCode";
+
         @Override
         public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject messageJson = json.getAsJsonObject();
-            String message = messageJson.get(MESSAGE_KEY).getAsString();
-            String errorCode = messageJson.get(ERROR_CODE_KEY).getAsString();
+            String message = messageJson.has(MESSAGE_KEY) ? messageJson.get(MESSAGE_KEY).getAsString() : "Sorry, an error occurred";
+            String errorCode = ModelUtils.asString(ERROR_CODE_KEY, messageJson);
 
             return new Message(message, errorCode);
         }

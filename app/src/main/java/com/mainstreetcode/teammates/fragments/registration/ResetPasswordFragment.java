@@ -19,34 +19,45 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
  * Forgot password screen
  */
 
-public final class ForgotPasswordFragment extends RegistrationActivityFragment
+public final class ResetPasswordFragment extends RegistrationActivityFragment
         implements
         View.OnClickListener,
         TextView.OnEditorActionListener {
 
-    private static final String ARG_EMAIL = "email";
+    private static final String ARG_TOKEN = "token";
 
     private EditText emailInput;
+    private EditText tokenInput;
+    private EditText passwordInput;
 
-    public static ForgotPasswordFragment newInstance(CharSequence email) {
-        ForgotPasswordFragment fragment = new ForgotPasswordFragment();
+    public static ResetPasswordFragment newInstance(CharSequence token) {
+        ResetPasswordFragment fragment = new ResetPasswordFragment();
         Bundle args = new Bundle();
 
-        args.putCharSequence(ARG_EMAIL, email);
+        args.putCharSequence(ARG_TOKEN, token);
         fragment.setArguments(args);
         fragment.setEnterExitTransitions();
         return fragment;
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
+    public String getStableTag() {
+        return getArguments().getCharSequence(ARG_TOKEN, "").toString();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_forgot_password, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_reset_password, container, false);
         View border = rootView.findViewById(R.id.card_view_wrapper);
+
         emailInput = rootView.findViewById(R.id.email);
+        tokenInput = rootView.findViewById(R.id.token);
+        passwordInput = rootView.findViewById(R.id.password);
 
         Bundle args = getArguments();
 
-        if (args != null) emailInput.setText(args.getCharSequence(ARG_EMAIL, ""));
+        if (args != null) tokenInput.setText(args.getCharSequence(ARG_TOKEN, ""));
         emailInput.setOnEditorActionListener(this);
 
         ViewCompat.setTransitionName(emailInput, SplashFragment.TRANSITION_TITLE);
@@ -78,7 +89,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                sendForgotEmail();
+                resetPassword();
                 break;
         }
     }
@@ -87,20 +98,22 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
         if ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
                 && (event.getAction() == KeyEvent.ACTION_DOWN))) {
-            sendForgotEmail();
+            resetPassword();
             return true;
         }
         return false;
     }
 
-    private void sendForgotEmail() {
+    private void resetPassword() {
         if (validator.isValidEmail(emailInput)) {
             toggleProgress(true);
 
             String email = emailInput.getText().toString();
+            String token = tokenInput.getText().toString();
+            String password = passwordInput.getText().toString();
 
-            disposables.add(viewModel.forgotPassword(email)
-                    .subscribe(message -> showSnackbar(message.getMessage()), defaultErrorHandler));
+            disposables.add(viewModel.resetPassword(email, token, password)
+                    .subscribe(message -> showSnackbar(message.getMessage(), R.string.sign_in, view -> showFragment(SignInFragment.newInstance())), defaultErrorHandler));
         }
     }
 }

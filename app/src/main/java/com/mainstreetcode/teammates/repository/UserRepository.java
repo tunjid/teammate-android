@@ -9,6 +9,7 @@ import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Device;
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.persistence.EntityDao;
@@ -35,6 +36,9 @@ public class UserRepository extends ModelRepository<User> {
 
     private static final String PREFS = "prefs";
     private static final String EMAIL_KEY = "email_key";
+    private static final String PRIMARY_EMAIL = "primaryEmail";
+    private static final String TOKEN = "token";
+    private static final String PASSWORD = "password";
 
     private static UserRepository ourInstance;
 
@@ -117,8 +121,8 @@ public class UserRepository extends ModelRepository<User> {
 
     public Single<User> signIn(String email, String password) {
         JsonObject request = new JsonObject();
-        request.addProperty("primaryEmail", email);
-        request.addProperty("password", password);
+        request.addProperty(PRIMARY_EMAIL, email);
+        request.addProperty(PASSWORD, password);
 
         return updateCurrent(api.signIn(request).map(getSaveFunction()));
     }
@@ -152,9 +156,20 @@ public class UserRepository extends ModelRepository<User> {
                 .getString(EMAIL_KEY, null);
     }
 
-    public Single<Void> forgotPassword(String email) {
-        // TODO Implement this
-        return Single.error(new UnsupportedOperationException(email + "Not implemented"));
+    public Single<Message> forgotPassword(String email) {
+        JsonObject json = new JsonObject();
+        json.addProperty(PRIMARY_EMAIL, email);
+
+        return api.forgotPassword(json);
+    }
+
+    public Single<Message> resetPassword(String email, String token, String password) {
+        JsonObject json = new JsonObject();
+        json.addProperty(PRIMARY_EMAIL, email);
+        json.addProperty(TOKEN, token);
+        json.addProperty(PASSWORD, password);
+
+        return api.resetPassword(json);
     }
 
     private Single<Boolean> clearUser() {

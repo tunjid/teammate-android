@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.viewmodel;
 import android.arch.lifecycle.ViewModel;
 
 import com.facebook.login.LoginResult;
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.UserRepository;
 
@@ -12,9 +13,7 @@ import io.reactivex.Single;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
- * View model for registration
- * <p>
- * Created by Shemanigans on 6/4/17.
+ * View model for User and Auth
  */
 
 public class UserViewModel extends ViewModel {
@@ -58,7 +57,11 @@ public class UserViewModel extends ViewModel {
         return repository.signOut().observeOn(mainThread());
     }
 
-    public Single<Void> forgotPassword(String email) {
+    public Single<Message> forgotPassword(String email) {
         return repository.forgotPassword(email).observeOn(mainThread());
+    }
+
+    public Single<Message> resetPassword(String email, String token, String password) {
+        return repository.resetPassword(email, token, password).observeOn(mainThread());
     }
 }

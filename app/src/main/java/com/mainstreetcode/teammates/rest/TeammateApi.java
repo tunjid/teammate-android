@@ -7,6 +7,7 @@ import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Media;
+import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
@@ -29,8 +30,6 @@ import retrofit2.http.Query;
 
 /**
  * RESTful client implementation
- * <p>
- * Created by Shemanigans on 6/12/17.
  */
 
 public interface TeammateApi {
@@ -63,6 +62,12 @@ public interface TeammateApi {
 
     @GET("api/me/feed")
     Single<List<FeedItem>> getFeed();
+
+    @POST("api/forgotPassword")
+    Single<Message> forgotPassword(@Body JsonObject json);
+
+    @POST("api/resetPassword")
+    Single<Message> resetPassword(@Body JsonObject json);
 
     // =============================================================================================
     // Team endpoints

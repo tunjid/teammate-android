@@ -13,6 +13,8 @@
 
     <!--SigninFragment-->
     <string name="email">Email</string>
+    <string name="reset_token">Reset Token</string>
+    <string name="new_password">New Password</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_in_forgot_password">Forgot Password?</string>
@@ -176,4 +178,10 @@
     <string name="ad">Ad</string>
     <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
     <string name="admob_ad_id">"ca-app-pub-3940256099942544/2247696110"</string>
+
+    <!--Deep linking-->
+    <string name="deep_link_filter_name">teammateDeepLink</string>
+    <string name="deep_link_scheme">https</string>
+    <string name="deep_link_host">teammateapp.org</string>
+
 </resources>
