@@ -175,6 +175,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void showSnackBar(CharSequence message) {
         toggleProgress(false);
         Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_LONG);
+
+        // Necessary to remove snackbar padding for keyboard on older versions of Android
+        ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
+        snackbar.show();
+    }
+
+    @Override
+    public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
+        toggleProgress(false);
+        Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_INDEFINITE)
+                .setAction(stringRes, clickListener);
+
+        // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
         snackbar.show();
     }

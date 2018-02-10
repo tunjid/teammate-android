@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
@@ -103,6 +104,8 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
+    protected void showSnackbar(CharSequence message, @StringRes int stringRes, View.OnClickListener clickListener) {getPersistentUiController().showSnackBar(message, stringRes, clickListener);}
+
     protected void setFabClickListener(@Nullable View.OnClickListener clickListener) {getPersistentUiController().setFabClickListener(clickListener);}
 
     @Nullable
@@ -187,6 +190,11 @@ public class TeammatesBaseFragment extends BaseFragment {
 
         @Override
         public void showSnackBar(CharSequence message) {
+
+        }
+
+        @Override
+        public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
 
         }
 

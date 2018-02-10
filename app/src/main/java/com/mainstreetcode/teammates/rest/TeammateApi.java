@@ -30,8 +30,6 @@ import retrofit2.http.Query;
 
 /**
  * RESTful client implementation
- * <p>
- * Created by Shemanigans on 6/12/17.
  */
 
 public interface TeammateApi {
@@ -65,12 +63,10 @@ public interface TeammateApi {
     @GET("api/me/feed")
     Single<List<FeedItem>> getFeed();
 
-    @Multipart
-    @POST("api/forgotPassword}")
+    @POST("api/forgotPassword")
     Single<Message> forgotPassword(@Body JsonObject json);
 
-    @Multipart
-    @POST("api/resetPassword}")
+    @POST("api/resetPassword")
     Single<Message> resetPassword(@Body JsonObject json);
 
     // =============================================================================================

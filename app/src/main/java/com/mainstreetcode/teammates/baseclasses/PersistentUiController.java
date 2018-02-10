@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.baseclasses;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.view.View;
 
 public interface PersistentUiController {
@@ -19,6 +20,8 @@ public interface PersistentUiController {
     void showSnackBar(CharSequence message);
 
     void setToolbarTitle(CharSequence title);
+
+    void showSnackBar(CharSequence message, @StringRes int stringRes, View.OnClickListener clickListener);
 
     void setFabClickListener(@Nullable View.OnClickListener clickListener);
 }
