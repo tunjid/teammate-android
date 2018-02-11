@@ -1,10 +1,15 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,6 +29,7 @@ public class MediaDetailFragment extends MainActivityFragment
 
     public static final String ARG_MEDIA = "media";
 
+    private boolean isToolbarVisible = true;
     private Media media;
     private MediaViewHolder mediaViewHolder;
 
@@ -48,6 +54,7 @@ public class MediaDetailFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         media = getArguments().getParcelable(ARG_MEDIA);
     }
 
@@ -67,7 +74,30 @@ public class MediaDetailFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mediaViewModel.getMedia(media).subscribe(updated -> {}, defaultErrorHandler);
+        mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_media_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() != R.id.action_flag_media) return super.onOptionsItemSelected(item);
+
+        Activity activity = getActivity();
+        if (activity == null) return true;
+
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.flag_media)
+                .setMessage(R.string.flag_media_message)
+                .setPositiveButton(R.string.yes, (dialog, which) -> mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler))
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .show();
+
+        return true;
     }
 
     @Override
@@ -96,12 +126,12 @@ public class MediaDetailFragment extends MainActivityFragment
 
     @Override
     public boolean showsToolBar() {
-        return false;
+        return true;
     }
 
     @Override
     public void onMediaClicked(Media item) {
-
+        toggleToolbar(isToolbarVisible = !isToolbarVisible);
     }
 
     @Override
@@ -117,6 +147,14 @@ public class MediaDetailFragment extends MainActivityFragment
     @Override
     public boolean isFullScreen() {
         return true;
+    }
+
+    private void checkMediaFlagged(Media media) {
+        if (!media.isFlagged()) return;
+        showSnackbar(getString(R.string.media_flagged));
+
+        Activity activity = getActivity();
+        if (activity != null) activity.onBackPressed();
     }
 
     private void bindViewHolder(ConstraintLayout rootView, Media media, boolean isImage) {

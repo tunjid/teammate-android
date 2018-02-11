@@ -153,6 +153,12 @@
     <string name="delete_media">Delete media</string>
     <string name="partial_delete_message">Could not delete all photos selected because you did not upload them.</string>
 
+    <!--MediaDetailFragment-->
+    <string name="flag_media">Flag media</string>
+    <string name="flag_media_message">Flagging this item will make it unavailable until it\'s been reviewed by us and deemed safe and found not to violate our terms and services.
+    \n\nDo you want to flag it?</string>
+    <string name="media_flagged">This item has been flagged</string>
+
     <!--Notifier-->
     <string name="roles">Roles</string>
     <string name="join_requests">Join Requests</string>

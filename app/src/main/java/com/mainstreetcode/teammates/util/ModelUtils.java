@@ -38,12 +38,20 @@ public class ModelUtils {
 
     public static boolean asBoolean(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
-        return (element != null && element.isJsonPrimitive()) && element.getAsBoolean();
+        try { return (element != null && element.isJsonPrimitive()) && element.getAsBoolean();}
+        catch (Exception e) {return false;}
     }
 
     public static String asString(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
-        return element != null && element.isJsonPrimitive() ? element.getAsString() : "";
+        try { return element != null && element.isJsonPrimitive() ? element.getAsString() : "";}
+        catch (Exception e) {return "";}
+    }
+
+    public static long asLong(String key, JsonObject jsonObject) {
+        JsonElement element = jsonObject.get(key);
+        try {return element != null && element.isJsonPrimitive() ? element.getAsLong() : 0;}
+        catch (Exception e) {return 0;}
     }
 
     public static <T> void deserializeList(JsonDeserializationContext context, JsonElement listElement,

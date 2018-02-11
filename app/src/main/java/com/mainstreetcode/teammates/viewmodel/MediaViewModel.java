@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 public class MediaViewModel extends TeamMappedViewModel<Media> {
 
@@ -31,7 +32,10 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     }
 
     public Flowable<Media> getMedia(Media model) {
-        return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class);
+        return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)
+                .doOnNext(media -> {
+                    if (media.isFlagged()) getModelList(media.getTeam()).remove(media);
+                });
     }
 
     public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
@@ -47,7 +51,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
 
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
 
-        Flowable<List<Identifiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete): repository.ownerDelete(toDelete))
+        Flowable<List<Identifiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete) : repository.ownerDelete(toDelete))
                 .toFlowable().map(toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> source, (sourceCopy, deleted) -> {
@@ -58,6 +62,11 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
                 .map(diffResult -> new Pair<>(partialDelete.get(), diffResult))
                 .firstElement()
                 .doOnSuccess(diffResult -> clearSelections(team));
+    }
+
+    public Single<Media> flagMedia(Media model) {
+        return checkForInvalidObject(repository.flag(model).toFlowable(), model.getTeam(), model)
+                .firstOrError().cast(Media.class).doOnSuccess(getModelList(model.getTeam())::remove);
     }
 
     public void clearSelections(Team team) {

@@ -26,8 +26,10 @@ public class TeamEntity implements Parcelable{
     @ColumnInfo(name = "team_created") protected Date created;
     @ColumnInfo(name = "team_location") protected LatLng location;
 
+    @ColumnInfo(name = "team_storage_used") protected long storageUsed;
+
     public TeamEntity(@NonNull String id, String name, String city, String state,
-                      String zip, String imageUrl, Date created, LatLng location) {
+                      String zip, String imageUrl, Date created, LatLng location, long storageUsed) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -36,6 +38,7 @@ public class TeamEntity implements Parcelable{
         this.imageUrl = imageUrl;
         this.created = created;
         this.location = location;
+        this.storageUsed = storageUsed;
     }
 
     protected TeamEntity(Parcel in) {
@@ -47,6 +50,7 @@ public class TeamEntity implements Parcelable{
         imageUrl = in.readString();
         created = new Date(in.readLong());
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
+        storageUsed = in.readLong();
     }
 
     @NonNull
@@ -58,6 +62,10 @@ public class TeamEntity implements Parcelable{
 
     public Date getCreated() {
         return created;
+    }
+
+    public long getStorageUsed() {
+        return storageUsed;
     }
 
     @SuppressWarnings("unused")
@@ -122,6 +130,7 @@ public class TeamEntity implements Parcelable{
         dest.writeString(imageUrl);
         dest.writeLong(created.getTime());
         dest.writeValue(location);
+        dest.writeLong(storageUsed);
     }
 
     public static final Parcelable.Creator<TeamEntity> CREATOR = new Parcelable.Creator<TeamEntity>() {

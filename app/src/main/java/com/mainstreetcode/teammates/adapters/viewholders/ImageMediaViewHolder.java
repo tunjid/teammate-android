@@ -17,18 +17,15 @@ import com.squareup.picasso.RequestCreator;
 import static com.github.florent37.picassopalette.PicassoPalette.Profile.MUTED_DARK;
 
 
-public class ImageMediaViewHolder extends MediaViewHolder
+public class ImageMediaViewHolder extends MediaViewHolder<ImageView>
         implements Callback {
 
     private static final int FULL_RES_LOAD_DELAY = 400;
     private static final int THUMBNAIL_SIZE = 200;
 
-    private ImageView fullResView;
 
     public ImageMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
-
-        fullResView = itemView.findViewById(R.id.image_full_res);
 
         if (!adapterListener.isFullScreen()) {
             ConstraintLayout constraintLayout = (ConstraintLayout) itemView;
@@ -75,9 +72,10 @@ public class ImageMediaViewHolder extends MediaViewHolder
     }
 
     @Override
-    public int getThumbnailId() {
-        return R.id.image_thumbnail;
-    }
+    public int getThumbnailId() {return R.id.image_thumbnail;}
+
+    @Override
+    public int getFullViewId() {return R.id.image_full_res;}
 
     @Override
     public void onSuccess() {

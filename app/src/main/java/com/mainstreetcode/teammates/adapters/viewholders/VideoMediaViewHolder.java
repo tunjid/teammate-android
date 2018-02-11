@@ -13,16 +13,14 @@ import com.mainstreetcode.teammates.model.Media;
 import com.squareup.picasso.Picasso;
 
 
-public class VideoMediaViewHolder extends MediaViewHolder {
+public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
 
-    private VideoView videoView;
 
     public VideoMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
-        videoView = itemView.findViewById(R.id.video_thumbnail);
 
         if (!adapterListener.isFullScreen()) {
-            videoView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+            fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
         }
     }
 
@@ -51,23 +49,26 @@ public class VideoMediaViewHolder extends MediaViewHolder {
 
         if (TextUtils.isEmpty(videoUrl)) return;
 
-        videoView.setVideoPath(videoUrl);
-        videoView.setOnPreparedListener(() -> {
+        fullResView.setVideoPath(videoUrl);
+        fullResView.setOnPreparedListener(() -> {
             TransitionManager.beginDelayedTransition((ViewGroup)itemView, new Fade());
-            videoView.setVisibility(View.VISIBLE);
-            videoView.start();
+            fullResView.setVisibility(View.VISIBLE);
+            fullResView.start();
         });
     }
 
     @Override
     public void unBind() {
         super.unBind();
-        videoView.setVisibility(View.INVISIBLE);
-        videoView.release();
+        fullResView.setVisibility(View.INVISIBLE);
+        fullResView.release();
     }
 
     @Override
     public int getThumbnailId() {
         return R.id.thumbnail;
     }
+
+    @Override
+    public int getFullViewId() {return R.id.video_thumbnail;}
 }
