@@ -180,6 +180,9 @@ public interface TeammateApi {
     @GET("/api/media/{mediaId}")
     Single<Media> getMedia(@Path("mediaId") String mediaId);
 
+    @GET("/api/media/{mediaId}/flag")
+    Single<Media> flagMedia(@Path("mediaId") String mediaId);
+
     @DELETE("/api/media/{mediaId}")
     Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 

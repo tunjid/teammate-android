@@ -5,6 +5,7 @@ import android.support.transition.TransitionManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.devbrackets.android.exomedia.ui.widget.VideoView;
 import com.mainstreetcode.teammates.R;
@@ -13,17 +14,20 @@ import com.mainstreetcode.teammates.model.Media;
 import com.squareup.picasso.Picasso;
 
 
-public class VideoMediaViewHolder extends MediaViewHolder {
+public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
 
-    private VideoView videoView;
 
     public VideoMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
-        videoView = itemView.findViewById(R.id.video_thumbnail);
 
-        if (!adapterListener.isFullScreen()) {
-            videoView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        if (adapterListener.isFullScreen()) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fullResView.findViewById(R.id.exomedia_video_view).getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         }
+        else fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
     }
 
     @Override
@@ -51,23 +55,26 @@ public class VideoMediaViewHolder extends MediaViewHolder {
 
         if (TextUtils.isEmpty(videoUrl)) return;
 
-        videoView.setVideoPath(videoUrl);
-        videoView.setOnPreparedListener(() -> {
-            TransitionManager.beginDelayedTransition((ViewGroup)itemView, new Fade());
-            videoView.setVisibility(View.VISIBLE);
-            videoView.start();
+        fullResView.setVideoPath(videoUrl);
+        fullResView.setOnPreparedListener(() -> {
+            TransitionManager.beginDelayedTransition((ViewGroup) itemView, new Fade());
+            fullResView.setVisibility(View.VISIBLE);
+            fullResView.start();
         });
     }
 
     @Override
     public void unBind() {
         super.unBind();
-        videoView.setVisibility(View.INVISIBLE);
-        videoView.release();
+        fullResView.setVisibility(View.INVISIBLE);
+        fullResView.release();
     }
 
     @Override
     public int getThumbnailId() {
         return R.id.thumbnail;
     }
+
+    @Override
+    public int getFullViewId() {return R.id.video_thumbnail;}
 }

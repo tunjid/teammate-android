@@ -90,6 +90,12 @@ public class MediaRepository extends ModelRepository<Media> {
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 
+    public Single<Media> flag(Media model) {
+        return api.flagMedia(model.getId())
+                .map(getLocalUpdateFunction(model))
+                .map(getSaveFunction());
+    }
+
     @Override
     Function<List<Media>, List<Media>> provideSaveManyFunction() {
         return models -> {

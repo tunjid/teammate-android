@@ -48,13 +48,15 @@ public class Media implements
     @ColumnInfo(name = "media_url") private String url;
     @ColumnInfo(name = "media_mime_type") private String mimeType;
     @ColumnInfo(name = "media_thumbnail") private String thumbnail;
-
     @ColumnInfo(name = "media_user") private User user;
+
     @ColumnInfo(name = "media_team") private Team team;
     @ColumnInfo(name = "media_created") private Date created;
 
+    @ColumnInfo(name = "media_flagged") private boolean flagged;
+
     public Media(@NonNull String id, String url, String mimeType, String thumbnail,
-                 User user, Team team, Date created) {
+                 User user, Team team, Date created, boolean flagged) {
         this.id = id;
         this.url = url;
         this.mimeType = mimeType;
@@ -62,6 +64,7 @@ public class Media implements
         this.user = user;
         this.team = team;
         this.created = created;
+        this.flagged = flagged;
     }
 
     private Media(Parcel in) {
@@ -73,10 +76,11 @@ public class Media implements
         team = (Team) in.readValue(Team.class.getClassLoader());
         long tmpCreated = in.readLong();
         created = tmpCreated != -1 ? new Date(tmpCreated) : null;
+        flagged = in.readByte() != 0x00;
     }
 
     public static Media fromUri(User user, Team team, Uri uri) {
-        return new Media(new ObjectId().toHexString(), uri.toString(), "", "", user, team, new Date());
+        return new Media(new ObjectId().toHexString(), uri.toString(), "", "", user, team, new Date(), false);
     }
 
     @Override
@@ -115,6 +119,10 @@ public class Media implements
         return url;
     }
 
+    public boolean isFlagged() {
+        return flagged;
+    }
+
     @Override
     public void reset() {
         url = "";
@@ -133,6 +141,7 @@ public class Media implements
 
         team.update(updated.team);
         user.update(updated.user);
+        flagged = updated.flagged;
     }
 
     @Override
@@ -189,6 +198,7 @@ public class Media implements
         dest.writeValue(user);
         dest.writeValue(team);
         dest.writeLong(created != null ? created.getTime() : -1L);
+        dest.writeByte((byte) (flagged ? 0x01 : 0x00));
     }
 
     public static final Creator<Media> CREATOR = new Creator<Media>() {
@@ -215,25 +225,27 @@ public class Media implements
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
         private static final String DATE_KEY = "created";
+        private static final String FLAGGED_KEY = "flagged";
 
         @Override
         public Media deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
-            JsonObject teamJson = json.getAsJsonObject();
+            JsonObject mediaJson = json.getAsJsonObject();
 
-            String id = ModelUtils.asString(UID_KEY, teamJson);
-            String url = ModelUtils.asString(URL_KEY, teamJson);
-            String mimeType = ModelUtils.asString(MIME_TYPE_KEY, teamJson);
-            String thumbnail = ModelUtils.asString(THUMBNAIL_KEY, teamJson);
+            String id = ModelUtils.asString(UID_KEY, mediaJson);
+            String url = ModelUtils.asString(URL_KEY, mediaJson);
+            String mimeType = ModelUtils.asString(MIME_TYPE_KEY, mediaJson);
+            String thumbnail = ModelUtils.asString(THUMBNAIL_KEY, mediaJson);
 
-            User user = context.deserialize(teamJson.get(USER_KEY), User.class);
-            Team team = context.deserialize(teamJson.get(TEAM_KEY), Team.class);
+            User user = context.deserialize(mediaJson.get(USER_KEY), User.class);
+            Team team = context.deserialize(mediaJson.get(TEAM_KEY), Team.class);
 
-            Date created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, teamJson));
+            Date created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, mediaJson));
+            boolean flagged = ModelUtils.asBoolean(FLAGGED_KEY, mediaJson);
 
             if (user == null) user = User.empty();
 
-            return new Media(id, url, mimeType, thumbnail, user, team, created);
+            return new Media(id, url, mimeType, thumbnail, user, team, created, flagged);
         }
 
         @Override

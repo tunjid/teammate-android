@@ -14,23 +14,29 @@ import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 
-public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaAdapterListener> {
+public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<MediaAdapter.MediaAdapterListener> {
 
     static final String UNITY_ASPECT_RATIO = "1";
 
     public Media media;
+
+    T fullResView;
     private View border;
     public ImageView thumbnailView;
 
     MediaViewHolder(View itemView, @NonNull MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
         border = itemView.findViewById(R.id.border);
+        fullResView = itemView.findViewById(getFullViewId());
         thumbnailView = itemView.findViewById(getThumbnailId());
 
-        if (!adapterListener.isFullScreen()) {
-            itemView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        View.OnClickListener clickListener = view -> adapterListener.onMediaClicked(media);
+
+        itemView.setOnClickListener(clickListener);
+        fullResView.setOnClickListener(clickListener);
+
+        if (!adapterListener.isFullScreen())
             itemView.setOnLongClickListener(view -> performLongClick());
-        }
     }
 
     public void bind(Media media) {
@@ -38,9 +44,8 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
         setTransitionName(itemView, getTransitionName(media, R.id.fragment_media_background));
         setTransitionName(thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail));
 
-        if (!adapterListener.isFullScreen()) {
+        if (!adapterListener.isFullScreen())
             border.setVisibility(adapterListener.isSelected(media) ? View.VISIBLE : View.GONE);
-        }
     }
 
     public void fullBind(Media media) {
@@ -56,4 +61,7 @@ public abstract class MediaViewHolder extends BaseViewHolder<MediaAdapter.MediaA
 
     @IdRes
     public abstract int getThumbnailId();
+
+    @IdRes
+    public abstract int getFullViewId();
 }
