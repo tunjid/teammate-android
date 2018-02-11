@@ -5,6 +5,7 @@ import android.support.transition.TransitionManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.devbrackets.android.exomedia.ui.widget.VideoView;
 import com.mainstreetcode.teammates.R;
@@ -19,9 +20,14 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
     public VideoMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
 
-        if (!adapterListener.isFullScreen()) {
-            fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        if (adapterListener.isFullScreen()) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fullResView.findViewById(R.id.exomedia_video_view).getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         }
+        else fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
     }
 
     @Override
@@ -51,7 +57,7 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
 
         fullResView.setVideoPath(videoUrl);
         fullResView.setOnPreparedListener(() -> {
-            TransitionManager.beginDelayedTransition((ViewGroup)itemView, new Fade());
+            TransitionManager.beginDelayedTransition((ViewGroup) itemView, new Fade());
             fullResView.setVisibility(View.VISIBLE);
             fullResView.start();
         });
