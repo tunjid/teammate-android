@@ -34,6 +34,10 @@ import retrofit2.http.Query;
 
 public interface TeammateApi {
 
+    String ID_PATH = "id";
+    String TEAM_PATH = "teamId";
+    String DATE_QUERY = "date";
+
     // =============================================================================================
     // User endpoints
     // =============================================================================================
@@ -48,11 +52,11 @@ public interface TeammateApi {
     Single<User> signIn(@Body LoginResult loginResult);
 
     @PUT("api/users/{id}")
-    Single<User> updateUser(@Path("id") String userId, @Body User user);
+    Single<User> updateUser(@Path(ID_PATH) String userId, @Body User user);
 
     @Multipart
     @POST("api/users/{id}")
-    Single<User> uploadUserPhoto(@Path("id") String userId, @Part MultipartBody.Part file);
+    Single<User> uploadUserPhoto(@Path(ID_PATH) String userId, @Part MultipartBody.Part file);
 
     @GET("api/me")
     Single<User> getMe();
@@ -77,17 +81,17 @@ public interface TeammateApi {
     Single<Team> createTeam(@Body Team team);
 
     @GET("api/teams/{id}")
-    Single<Team> getTeam(@Path("id") String teamId);
+    Single<Team> getTeam(@Path(ID_PATH) String teamId);
 
     @PUT("api/teams/{id}")
-    Single<Team> updateTeam(@Path("id") String teamId, @Body Team team);
+    Single<Team> updateTeam(@Path(ID_PATH) String teamId, @Body Team team);
 
     @Multipart
     @POST("api/teams/{id}")
-    Single<Team> uploadTeamLogo(@Path("id") String teamId, @Part MultipartBody.Part file);
+    Single<Team> uploadTeamLogo(@Path(ID_PATH) String teamId, @Part MultipartBody.Part file);
 
     @DELETE("api/teams/{id}")
-    Single<Team> deleteTeam(@Path("id") String teamId);
+    Single<Team> deleteTeam(@Path(ID_PATH) String teamId);
 
     @GET("api/me/teams")
     Single<List<Team>> getMyTeams();
@@ -139,39 +143,39 @@ public interface TeammateApi {
     // =============================================================================================
 
     @GET("/api/teams/{teamId}/events")
-    Single<List<Event>> getEvents(@Path("teamId") String teamId);
+    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     @POST("api/events")
     Single<Event> createEvent(@Body Event event);
 
     @Multipart
     @POST("api/events/{id}")
-    Single<Event> uploadEventPhoto(@Path("id") String eventId, @Part MultipartBody.Part file);
+    Single<Event> uploadEventPhoto(@Path(ID_PATH) String eventId, @Part MultipartBody.Part file);
 
     @PUT("api/events/{id}")
-    Single<Event> updateEvent(@Path("id") String eventId, @Body Event event);
+    Single<Event> updateEvent(@Path(ID_PATH) String eventId, @Body Event event);
 
     @GET("api/events/{id}")
-    Single<Event> getEvent(@Path("id") String eventId);
+    Single<Event> getEvent(@Path(ID_PATH) String eventId);
 
     @DELETE("api/events/{id}")
-    Single<Event> deleteEvent(@Path("id") String eventId);
+    Single<Event> deleteEvent(@Path(ID_PATH) String eventId);
 
     @GET("api/events/{id}/rsvp")
-    Single<Event> rsvpEvent(@Path("id") String eventId, @Query("attending") boolean attending);
+    Single<Event> rsvpEvent(@Path(ID_PATH) String eventId, @Query("attending") boolean attending);
 
     // =============================================================================================
     // Team Chat endpoints
     // =============================================================================================
 
     @GET("/api/chats/{id}")
-    Single<Chat> getTeamChat(@Path("id") String chatId);
+    Single<Chat> getTeamChat(@Path(ID_PATH) String chatId);
 
     @DELETE("/api/chats/{id}")
-    Single<Chat> deleteChat(@Path("id") String chatId);
+    Single<Chat> deleteChat(@Path(ID_PATH) String chatId);
 
     @GET("/api/teams/{teamId}/chats")
-    Single<List<Chat>> chatsBefore(@Path("teamId") String teamId, @Query("date") Date date);
+    Single<List<Chat>> chatsBefore(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     // =============================================================================================
     // Team Media endpoints
@@ -187,17 +191,17 @@ public interface TeammateApi {
     Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 
     @GET("/api/teams/{teamId}/media")
-    Single<List<Media>> getTeamMedia(@Path("teamId") String teamId, @Query("date") Date date);
+    Single<List<Media>> getTeamMedia(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     @Multipart
     @POST("api/teams/{teamId}/media")
-    Single<Media> uploadTeamMedia(@Path("teamId") String teamId, @Part MultipartBody.Part file);
+    Single<Media> uploadTeamMedia(@Path(TEAM_PATH) String teamId, @Part MultipartBody.Part file);
 
     @POST("api/media/delete")
     Single<List<Media>> deleteMedia(@Body List<Media> delete);
 
     @POST("api/teams/{teamId}/media/delete")
-    Single<List<Media>> adminDeleteMedia(@Path("teamId") String teamId, @Body List<Media> delete);
+    Single<List<Media>> adminDeleteMedia(@Path(TEAM_PATH) String teamId, @Body List<Media> delete);
 
     // =============================================================================================
     // Device endpoints
@@ -207,5 +211,5 @@ public interface TeammateApi {
     Single<Device> createDevice(@Body Device device);
 
     @PUT("api/me/devices/{id}")
-    Single<Device> updateDevice(@Path("id") String deviceId, @Body Device device);
+    Single<Device> updateDevice(@Path(ID_PATH) String deviceId, @Body Device device);
 }

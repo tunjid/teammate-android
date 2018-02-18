@@ -29,7 +29,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
@@ -101,13 +100,13 @@ public class ChatFragment extends MainActivityFragment
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
-                fetchChatsBefore(getQueryDate());
+                fetchChatsBefore(false);
             }
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat())
-                    fetchChatsBefore(new Date());
+                    fetchChatsBefore(true);
             }
         });
 
@@ -121,8 +120,7 @@ public class ChatFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
 
-        Date queryDate = restoredFromBackStack() ? new Date() : getQueryDate();
-        fetchChatsBefore(queryDate);
+        fetchChatsBefore(restoredFromBackStack());
     }
 
     @Override
@@ -187,9 +185,9 @@ public class ChatFragment extends MainActivityFragment
         return false;
     }
 
-    private void fetchChatsBefore(Date date) {
+    private void fetchChatsBefore(boolean fetchLatest) {
         disposables.add(chatViewModel
-                .chatsBefore(team, date)
+                .chatsBefore(team, fetchLatest)
                 .subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
@@ -247,12 +245,7 @@ public class ChatFragment extends MainActivityFragment
         if (scrollToLast) recyclerView.smoothScrollToPosition(index);
     }
 
-    private Date getQueryDate() {
-        if (items.isEmpty()) return new Date();
-        for (Identifiable item : items)
-            if (item instanceof Chat) return ((Chat) item).getCreated();
-        return new Date();
-    }
+
 
     private boolean isSubscribedToChat() {
         return chatDisposable != null && !chatDisposable.isDisposed();

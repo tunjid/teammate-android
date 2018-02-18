@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.viewmodel;
 
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.util.Log;
@@ -65,7 +66,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0)).observeOn(mainThread());
     }
 
-    public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final Team team, Date date) {
+    public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final Team team, boolean fetchLatest) {
         final List<Identifiable> chats = getModelList(team);
 
         final Integer lastSize = chatMap.get(team);
@@ -76,7 +77,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
         chatMap.put(team, currentSize);
 
-        Flowable<List<Identifiable>> sourceFlowable = repository.chatsBefore(team, date)
+        Flowable<List<Identifiable>> sourceFlowable = repository.modelsBefore(team, getQueryDate(team, fetchLatest))
                 .map(toIdentifiable)
                 .doOnError(throwable -> checkForInvalidTeam(throwable, team))
                 .doOnCancel(() -> chatMap.put(team, RETRY));
@@ -129,5 +130,14 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         boolean retry = throwable instanceof EngineIOException && throwable.getCause() instanceof EOFException;
         if (retry) Log.i("CHAT", "Retrying because of EOF");
         return retry;
+    }
+
+    @Nullable
+    private Date getQueryDate(Team team, boolean fetchLatest) {
+        if (fetchLatest) return null;
+        List<Identifiable> items = getModelList(team);
+        if (items.isEmpty()) return null;
+        for (Identifiable item : items) if (item instanceof Chat) return ((Chat) item).getCreated();
+        return null;
     }
 }

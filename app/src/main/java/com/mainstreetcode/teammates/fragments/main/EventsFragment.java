@@ -24,6 +24,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -78,12 +79,20 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+
         recyclerView = rootView.findViewById(R.id.team_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(new EventAdapter(items, this));
+        recyclerView.addOnScrollListener(new EndlessScroller(layoutManager) {
+            @Override
+            public void onLoadMore(int oldCount) {
+                toggleProgress(true);
+                fetchEvents();
+            }
+        });
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events);
-
         return rootView;
     }
 
@@ -96,7 +105,7 @@ public final class EventsFragment extends MainActivityFragment
 
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
-        disposables.add(eventViewModel.getEvents(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
+        fetchEvents();
     }
 
     @Override
@@ -163,6 +172,10 @@ public final class EventsFragment extends MainActivityFragment
 
         }
         return superResult;
+    }
+
+    void fetchEvents() {
+        disposables.add(eventViewModel.getEvents(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {

@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import android.support.annotation.Nullable;
+
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
@@ -11,6 +13,7 @@ import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -21,7 +24,7 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends ModelRepository<Event> {
+public class EventRepository extends QueryRepository<Event> {
 
     private static EventRepository ourInstance;
 
@@ -76,11 +79,14 @@ public class EventRepository extends ModelRepository<Event> {
                 .doOnError(throwable -> deleteInvalidModel(event, throwable));
     }
 
-    public Flowable<List<Event>> getEvents(Team team) {
-        Maybe<List<Event>> local = eventDao.getEvents(team.getId()).subscribeOn(io());
-        Maybe<List<Event>> remote = api.getEvents(team.getId()).map(getSaveManyFunction()).toMaybe();
+    @Override
+    Maybe<List<Event>> localModelsBefore(Team team, Date date) {
+        return eventDao.getEvents(team.getId(), date).subscribeOn(io());
+    }
 
-        return fetchThenGet(local, remote);
+    @Override
+    Maybe<List<Event>> remoteModelsBefore(Team team, @Nullable Date date) {
+        return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
     public Single<Event> rsvpEvent(final Event event, boolean attending) {

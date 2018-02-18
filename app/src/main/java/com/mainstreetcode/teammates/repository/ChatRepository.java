@@ -39,7 +39,7 @@ import static com.mainstreetcode.teammates.socket.SocketFactory.EVENT_NEW_MESSAG
 import static io.reactivex.schedulers.Schedulers.io;
 import static io.socket.client.Socket.EVENT_ERROR;
 
-public class ChatRepository extends ModelRepository<Chat> {
+public class ChatRepository extends QueryRepository<Chat> {
 
 
     private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";
@@ -115,11 +115,14 @@ public class ChatRepository extends ModelRepository<Chat> {
         };
     }
 
-    public Flowable<List<Chat>> chatsBefore(Team team, Date date) {
-        Maybe<List<Chat>> local = chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
-        Maybe<List<Chat>> remote = api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+    @Override
+    Maybe<List<Chat>> localModelsBefore(Team team, Date date) {
+        return chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
+    }
 
-        return fetchThenGet(local, remote);
+    @Override
+    Maybe<List<Chat>> remoteModelsBefore(Team team, @Nullable Date date) {
+        return api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
     public Single<List<Chat>> fetchUnreadChats(Team team) {
