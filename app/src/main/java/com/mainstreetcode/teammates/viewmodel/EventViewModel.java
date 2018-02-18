@@ -8,7 +8,9 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.EventRepository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -32,7 +34,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.getEvents(team).map(toIdentifiable)
+        Flowable<List<Identifiable>> sourceFlowable = repository.modelsBefore(team, getQueryDate(team)).map(toIdentifiable)
                 .doOnError(throwable -> checkForInvalidTeam(throwable, team));
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), preserveList);
     }
@@ -75,4 +77,18 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
         return result;
     };
+
+    private Date getQueryDate(Team team) {
+        List<Identifiable> list = getModelList(team);
+
+        if (list.isEmpty()) return null;
+
+        ListIterator<Identifiable> li = list.listIterator(list.size());
+        while (li.hasPrevious()) {
+            Identifiable item = li.previous();
+            if (item instanceof Event) return ((Event) item).getStartDate();
+        }
+
+        return new Date();
+    }
 }

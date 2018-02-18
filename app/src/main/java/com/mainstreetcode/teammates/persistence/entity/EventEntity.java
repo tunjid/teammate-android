@@ -13,7 +13,6 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -26,7 +25,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 public class EventEntity implements Parcelable {
 
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
-    private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
+    //private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "event_id") protected String id;
@@ -103,21 +102,21 @@ public class EventEntity implements Parcelable {
     }
 
     public String getTime() {
-        String time = prettyPrinter.format(startDate) + " - ";
-        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
-        return time;
+//        String time = prettyPrinter.format(startDate) + " - ";
+//        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
+        return prettyPrinter.format(startDate);
     }
 
-    private boolean endsSameDay() {
-        Calendar start = Calendar.getInstance();
-        Calendar end = Calendar.getInstance();
-
-        start.setTime(startDate);
-        end.setTime(endDate);
-        return start.get(Calendar.YEAR) == end.get(Calendar.YEAR)
-                && start.get(Calendar.MONTH) == end.get(Calendar.MONTH)
-                && start.get(Calendar.DATE) == end.get(Calendar.DATE);
-    }
+//    private boolean endsSameDay() {
+//        Calendar start = Calendar.getInstance();
+//        Calendar end = Calendar.getInstance();
+//
+//        start.setTime(startDate);
+//        end.setTime(endDate);
+//        return start.get(Calendar.YEAR) == end.get(Calendar.YEAR)
+//                && start.get(Calendar.MONTH) == end.get(Calendar.MONTH)
+//                && start.get(Calendar.DATE) == end.get(Calendar.DATE);
+//    }
 
     public void setName(String name) {
         this.name = name;

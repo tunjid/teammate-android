@@ -10,6 +10,7 @@ import android.arch.persistence.room.Update;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.persistence.entity.EventEntity;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -27,10 +28,10 @@ public abstract class EventDao extends EntityDao<EventEntity> {
     }
 
     @Query("SELECT * FROM events as event" +
-            " INNER JOIN teams as team" +
-            " ON event.event_team = team.team_id" +
-            " WHERE :teamId = team.team_id")
-    public abstract Maybe<List<Event>> getEvents(String teamId);
+            " WHERE :teamId = event_team" +
+            " AND event_start_date < :date" +
+            " ORDER BY event_start_date DESC")
+    public abstract Maybe<List<Event>> getEvents(String teamId, Date date);
 
     @Query("SELECT * FROM events" +
             " WHERE :id = event_id")
