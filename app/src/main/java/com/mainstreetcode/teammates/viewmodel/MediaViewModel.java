@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.viewmodel;
 
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,8 +40,8 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
                 });
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, Date date) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.getTeamMedia(team, date).map(toIdentifiable)
+    public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, boolean fetchLatest) {
+        Flowable<List<Identifiable>> sourceFlowable = repository.modelsBefore(team, getQueryDate(team, fetchLatest)).map(toIdentifiable)
                 .doOnError(throwable -> checkForInvalidTeam(throwable, team));
         return Identifiable.diff(sourceFlowable, () -> getModelList(team), ModelUtils::preserveListInverse);
     }
@@ -76,6 +78,21 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     public boolean hasSelections(Team team) {
         return getNumSelected(team) != 0;
+    }
+
+    @Nullable
+    private Date getQueryDate(Team team, boolean fetchLatest) {
+        if (fetchLatest) return null;
+        List<Identifiable> items = getModelList(team);
+        if (items.isEmpty()) return null;
+
+        ListIterator<Identifiable> li = items.listIterator(items.size());
+        while (li.hasPrevious()) {
+            Identifiable item = li.previous();
+            if (item instanceof Media) return ((Media) item).getCreated();
+        }
+
+        return null;
     }
 
     public int getNumSelected(Team team) {

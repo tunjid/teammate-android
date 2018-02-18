@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammates.repository;
 
 
+import android.support.annotation.Nullable;
+
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
@@ -83,8 +85,8 @@ public class EventRepository extends QueryRepository<Event> {
     }
 
     @Override
-    Maybe<List<Event>> remoteModelsBefore(Team team, Date date) {
-        return api.getEvents(team.getId(), date, date == null).map(getSaveManyFunction()).toMaybe();
+    Maybe<List<Event>> remoteModelsBefore(Team team, @Nullable Date date) {
+        return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
     public Single<Event> rsvpEvent(final Event event, boolean attending) {

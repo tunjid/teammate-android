@@ -17,12 +17,10 @@ abstract class QueryRepository<T extends Model<T>> extends ModelRepository<T> {
     QueryRepository() {}
 
     public final Flowable<List<T>> modelsBefore(Team team, @Nullable Date date) {
-        return date == null
-                ? remoteModelsBefore(team, new Date()).onErrorResumeNext(localModelsBefore(team, new Date())).toFlowable()
-                : fetchThenGet(localModelsBefore(team, date), remoteModelsBefore(team, date));
+        return fetchThenGet(localModelsBefore(team, date), remoteModelsBefore(team, date));
     }
 
     abstract Maybe<List<T>> localModelsBefore(Team team, Date date);
 
-    abstract Maybe<List<T>> remoteModelsBefore(Team team, Date date);
+    abstract Maybe<List<T>> remoteModelsBefore(Team team, @Nullable Date date);
 }

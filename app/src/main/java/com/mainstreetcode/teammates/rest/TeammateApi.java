@@ -33,9 +33,10 @@ import retrofit2.http.Query;
  */
 
 public interface TeammateApi {
+
+    String ID_PATH = "id";
     String TEAM_PATH = "teamId";
     String DATE_QUERY = "date";
-    String ID_PATH = "id";
 
     // =============================================================================================
     // User endpoints
@@ -142,7 +143,7 @@ public interface TeammateApi {
     // =============================================================================================
 
     @GET("/api/teams/{teamId}/events")
-    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query("latest") boolean latest);
+    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     @POST("api/events")
     Single<Event> createEvent(@Body Event event);

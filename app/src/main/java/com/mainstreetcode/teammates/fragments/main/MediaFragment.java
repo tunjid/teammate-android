@@ -36,9 +36,7 @@ import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
-import java.util.Date;
 import java.util.List;
-import java.util.ListIterator;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
@@ -111,7 +109,7 @@ public class MediaFragment extends MainActivityFragment
             @Override
             public void onLoadMore(int oldCount) {
                 toggleProgress(true);
-                fetchMedia(getQueryDate());
+                fetchMedia(false);
             }
         });
 
@@ -133,13 +131,13 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        fetchMedia(new Date());
+        fetchMedia(true);
         disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
                 .subscribe(() -> {}, ErrorHandler.EMPTY));
     }
 
-    void fetchMedia(Date date) {
-        disposables.add(mediaViewModel.getTeamMedia(team, date).subscribe(this::onMediaUpdated, defaultErrorHandler));
+    void fetchMedia(boolean fetchLatest) {
+        disposables.add(mediaViewModel.getTeamMedia(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -234,18 +232,6 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void onFilesSelected(List<Uri> uris) {
         MediaUploadIntentService.startActionUpload(getContext(), userViewModel.getCurrentUser(), team, uris);
-    }
-
-    private Date getQueryDate() {
-        if (items.isEmpty()) return new Date();
-
-        ListIterator<Identifiable> li = items.listIterator(items.size());
-        while(li.hasPrevious()) {
-            Identifiable item = li.previous();
-            if (item instanceof Media) return ((Media) item).getCreated();
-        }
-
-        return new Date();
     }
 
     private void onMediaUpdated(DiffUtil.DiffResult result) {

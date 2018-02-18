@@ -34,7 +34,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class MediaRepository extends ModelRepository<Media> {
+public class MediaRepository extends QueryRepository<Media> {
 
     private final int num;
     private final TeammateApi api;
@@ -116,11 +116,14 @@ public class MediaRepository extends ModelRepository<Media> {
         };
     }
 
-    public Flowable<List<Media>> getTeamMedia(Team team, Date date) {
-        Maybe<List<Media>> local = mediaDao.getTeamMedia(team, date).subscribeOn(io());
-        Maybe<List<Media>> remote = api.getTeamMedia(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+    @Override
+    Maybe<List<Media>> localModelsBefore(Team team, Date date) {
+        return mediaDao.getTeamMedia(team, date).subscribeOn(io());
+    }
 
-        return fetchThenGet(local, remote);
+    @Override
+    Maybe<List<Media>> remoteModelsBefore(Team team, @Nullable Date date) {
+        return api.getTeamMedia(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
     public Single<List<Media>> ownerDelete(List<Media> models) {
