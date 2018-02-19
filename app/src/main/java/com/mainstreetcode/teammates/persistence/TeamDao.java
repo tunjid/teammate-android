@@ -39,13 +39,6 @@ public abstract class TeamDao extends EntityDao<TeamEntity> {
     @Query("SELECT * FROM teams")
     public abstract Maybe<List<Team>> getTeams();
 
-    @Query("SELECT *" +
-            " FROM teams as team" +
-            " INNER JOIN roles as role" +
-            " ON team.team_id = role.role_team" +
-            " WHERE :userId = role.role_user")
-    public abstract Maybe<List<Team>> myTeams(String userId);
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void insert(List<TeamEntity> teams);
 

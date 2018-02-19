@@ -69,9 +69,10 @@ public class TeamEditFragment extends HeaderedFragment
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
+        int state = getArguments().getInt(ARG_STATE);
         Team tempTeam = getArguments().getParcelable(ARG_TEAM);
 
-        return tempTeam == null ? superResult : superResult + "-" + tempTeam.hashCode();
+        return tempTeam == null ? superResult : superResult + "-" + tempTeam.hashCode() + "-" + state;
     }
 
     @Override

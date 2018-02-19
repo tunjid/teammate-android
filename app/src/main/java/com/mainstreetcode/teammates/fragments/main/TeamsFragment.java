@@ -19,6 +19,7 @@ import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public final class TeamsFragment extends MainActivityFragment
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
 
-    private List<Identifiable> teams;
+    private List<Identifiable> roles;
 
     public static TeamsFragment newInstance() {
         TeamsFragment fragment = new TeamsFragment();
@@ -60,7 +61,7 @@ public final class TeamsFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        teams = teamViewModel.getModelList(Team.class);
+        roles = roleViewModel.getModelList(Role.class);
     }
 
     @Override
@@ -68,7 +69,7 @@ public final class TeamsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
         recyclerView = rootView.findViewById(R.id.team_list);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setAdapter(new TeamAdapter(teams, this));
+        recyclerView.setAdapter(new TeamAdapter(roles, this));
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team);
 
@@ -87,7 +88,7 @@ public final class TeamsFragment extends MainActivityFragment
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
 
         String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(teamViewModel.getMyTeams(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
+        disposables.add(roleViewModel.getMyRoles(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -150,7 +151,7 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
-        boolean isEmpty = teams.isEmpty();
+        boolean isEmpty = roles.isEmpty();
         emptyViewHolder.toggle(isEmpty);
         result.dispatchUpdatesTo(recyclerView.getAdapter());
         if (isTeamPicker()) toggleFab(isEmpty);
