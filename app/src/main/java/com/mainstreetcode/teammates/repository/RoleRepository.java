@@ -107,4 +107,11 @@ public class RoleRepository extends ModelRepository<Role> {
                 .doOnSuccess(role -> AppDatabase.getInstance().joinRequestDao().delete(request))
                 .doOnError(throwable -> JoinRequestRepository.getInstance().deleteInvalidModel(request, throwable));
     }
+
+    public Flowable<List<Role>> getMyRoles(String userId) {
+        Maybe<List<Role>> local = roleDao.myRoles(userId).subscribeOn(io());
+        Maybe<List<Role>> remote = api.getMyRoles().map(getSaveManyFunction()).toMaybe();
+
+        return fetchThenGet(local, remote);
+    }
 }

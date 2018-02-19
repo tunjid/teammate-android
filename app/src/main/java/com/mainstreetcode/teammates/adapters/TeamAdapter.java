@@ -9,6 +9,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammates.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammates.model.Ad;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
@@ -47,8 +48,9 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamAda
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
         Identifiable item = items.get(position);
-        if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
-        else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
+        if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
+        else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
+        else if (item instanceof Role) ((TeamViewHolder) viewHolder).bind(((Role) item).getTeam());
     }
 
     @Override
@@ -64,7 +66,7 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamAda
     @Override
     public int getItemViewType(int position) {
         Identifiable item = items.get(position);
-        return item instanceof Team ? TEAM : ((Ad) item).getType();
+        return item instanceof Team ? TEAM : item instanceof Role ? TEAM : ((Ad) item).getType();
     }
 
     public interface TeamAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

@@ -125,13 +125,6 @@ public class TeamRepository extends ModelRepository<Team> {
         return api.findTeam(queryText);
     }
 
-    public Flowable<List<Team>> getMyTeams(String userId) {
-        Maybe<List<Team>> local = teamDao.myTeams(userId).subscribeOn(io());
-        Maybe<List<Team>> remote = api.getMyTeams().map(getSaveManyFunction()).toMaybe();
-
-        return fetchThenGet(local, remote);
-    }
-
     public Maybe<Team> getDefaultTeam() {
         SharedPreferences preferences = app.getSharedPreferences(TEAM_REPOSITORY_KEY, Context.MODE_PRIVATE);
         String defaultTeamId = preferences.getString(DEFAULT_TEAM, "");

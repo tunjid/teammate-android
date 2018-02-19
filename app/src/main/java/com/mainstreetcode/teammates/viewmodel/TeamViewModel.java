@@ -3,10 +3,12 @@ package com.mainstreetcode.teammates.viewmodel;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.TransformingSequentialList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     private final TeamRepository repository;
     private static final Team defaultTeam = Team.empty();
-    static final List<Identifiable> teams = new ArrayList<>();
+    static final List<Identifiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     public TeamViewModel() {
         repository = TeamRepository.getInstance();
@@ -58,11 +60,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return repository.findTeams(queryText).observeOn(mainThread());
     }
 
-    public Flowable<DiffUtil.DiffResult> getMyTeams(String userId) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.getMyTeams(userId).map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> getModelList(Team.class), preserveList);
-    }
-
     public Single<Team> deleteTeam(Team team) {
         return checkForInvalidObject(repository.delete(team).toFlowable(), Team.class, team).observeOn(mainThread())
                 .firstOrError()
@@ -85,13 +82,13 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         teams.remove(deleted);
         if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
         Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
-                .delete(deleted)).subscribeOn(Schedulers.io()).subscribe(()->{}, ErrorHandler.EMPTY);
+                .delete(deleted)).subscribeOn(Schedulers.io()).subscribe(() -> {}, ErrorHandler.EMPTY);
         return deleted;
     }
 
     private Function<Team, List<Identifiable>> teamListFunction = team -> {
         List<Identifiable> items = new ArrayList<>();
-        for(int i = 0; i< team.size(); i++) items.add(team.get(i));
+        for (int i = 0; i < team.size(); i++) items.add(team.get(i));
         return items;
     };
 }

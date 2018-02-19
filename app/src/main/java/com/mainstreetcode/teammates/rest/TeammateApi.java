@@ -93,9 +93,6 @@ public interface TeammateApi {
     @DELETE("api/teams/{id}")
     Single<Team> deleteTeam(@Path(ID_PATH) String teamId);
 
-    @GET("api/me/teams")
-    Single<List<Team>> getMyTeams();
-
     @GET("api/teams")
     Single<List<Team>> findTeam(@Query("name") String teamName);
 
@@ -105,6 +102,9 @@ public interface TeammateApi {
 
     @GET("api/roles/values")
     Single<List<String>> getRoleValues();
+
+    @GET("api/me/roles")
+    Single<List<Role>> getMyRoles();
 
     @Multipart
     @POST("api/roles/{roleId}")
