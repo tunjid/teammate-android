@@ -24,7 +24,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * ViewModel for roles in a team
  */
 
-public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
+public class RoleViewModel extends MappedViewModel<String, Role> {
 
     private int count;
     private final RoleRepository roleRepository;
@@ -62,11 +62,11 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
 
     public Flowable<DiffUtil.DiffResult> getMyRoles(String userId) {
         Flowable<List<Identifiable>> sourceFlowable = roleRepository.getMyRoles(userId).map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> getModelList(Role.class), preserveList);
+        return Identifiable.diff(sourceFlowable, () -> getModelList(userId), preserveList);
     }
 
     @Override
-    public List<Identifiable> getModelList(Class<Role> key) {
+    public List<Identifiable> getModelList(String key) {
         return roles;
     }
 }
