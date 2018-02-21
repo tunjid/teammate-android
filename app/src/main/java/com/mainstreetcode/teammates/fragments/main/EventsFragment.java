@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,6 +46,7 @@ public final class EventsFragment extends MainActivityFragment
     private Team team;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
+    private SwipeRefreshLayout refreshLayout;
     private List<Identifiable> items;
 
     public static EventsFragment newInstance(Team team) {
@@ -78,10 +80,12 @@ public final class EventsFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_events, container, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 
         recyclerView = rootView.findViewById(R.id.team_list);
+        refreshLayout = rootView.findViewById(R.id.refresh_layout);
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(new EventAdapter(items, this));
         recyclerView.addOnScrollListener(new EndlessScroller(layoutManager) {
@@ -91,8 +95,10 @@ public final class EventsFragment extends MainActivityFragment
                 fetchEvents();
             }
         });
+        refreshLayout.setOnRefreshListener(() -> eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler));
 
         emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events);
+
         return rootView;
     }
 
@@ -127,6 +133,7 @@ public final class EventsFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+        refreshLayout = null;
         emptyViewHolder = null;
     }
 
@@ -179,7 +186,9 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {
-        emptyViewHolder.toggle(items.isEmpty());
         result.dispatchUpdatesTo(recyclerView.getAdapter());
+        refreshLayout.setRefreshing(false);
+        emptyViewHolder.toggle(items.isEmpty());
+        toggleProgress(false);
     }
 }

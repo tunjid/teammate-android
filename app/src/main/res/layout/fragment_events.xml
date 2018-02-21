@@ -12,21 +12,20 @@
         android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/pick_team" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingLeft="@dimen/eigth_margin"
-        android:paddingRight="@dimen/eigth_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/alt_toolbar">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/team_media"
+            android:id="@+id/team_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </android.support.v4.widget.SwipeRefreshLayout>

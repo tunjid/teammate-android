@@ -44,7 +44,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     @Override
     Flowable<List<Team>> fetch(Class<Team> key, boolean fetchLatest) {
-        return null;
+        return Flowable.empty();
     }
 
     public Single<DiffUtil.DiffResult> createOrUpdate(Team team) {
