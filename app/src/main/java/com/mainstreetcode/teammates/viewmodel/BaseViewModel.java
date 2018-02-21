@@ -25,9 +25,8 @@ abstract class BaseViewModel extends ViewModel {
     private static final int AD_THRESH = 5;
 
     BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (source, additions) -> {
-        filterAds(source);
         ModelUtils.preserveList(source, additions);
-        distributeAds(source);
+        if (hasNativeAds()) distributeAds(source);
         return source;
     };
 
@@ -35,7 +34,12 @@ abstract class BaseViewModel extends ViewModel {
 
     BaseViewModel() {fetchAds();}
 
-    void distributeAds(List<Identifiable> source) {
+    boolean hasNativeAds() {
+        return true;
+    }
+
+    private void distributeAds(List<Identifiable> source) {
+        filterAds(source);
         if (source.isEmpty() || ads.isEmpty()) return;
 
         int numToShuffle = 0;

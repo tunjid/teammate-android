@@ -32,6 +32,11 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
         repository = MediaRepository.getInstance();
     }
 
+    @Override
+    boolean hasNativeAds() {
+        return false;
+    }
+
     public Flowable<Media> getMedia(Media model) {
         return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)
                 .doOnNext(media -> {

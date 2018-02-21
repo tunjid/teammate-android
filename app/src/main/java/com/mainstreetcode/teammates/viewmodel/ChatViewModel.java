@@ -45,6 +45,11 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         chatMap = new HashMap<>();
     }
 
+    @Override
+    boolean hasNativeAds() {
+        return false;
+    }
+
     public void onChatRoomLeft(Team team) {
         chatMap.put(team, RETRY);
     }

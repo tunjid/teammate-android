@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.transition.Fade;
 import android.support.transition.TransitionManager;
 import android.text.TextUtils;
@@ -27,7 +29,17 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         }
-        else fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        else {
+            ConstraintLayout constraintLayout = (ConstraintLayout) itemView;
+            ConstraintSet set = new ConstraintSet();
+
+            set.clone(constraintLayout);
+            set.setDimensionRatio(thumbnailView.getId(), UNITY_ASPECT_RATIO);
+            set.setDimensionRatio(fullResView.getId(), UNITY_ASPECT_RATIO);
+            set.applyTo(constraintLayout);
+
+            fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        }
     }
 
     @Override
