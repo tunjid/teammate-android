@@ -72,7 +72,7 @@ public final class HomeFragment extends MainActivityFragment
                 (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName())),
                 defaultErrorHandler
         ));
-        disposables.add(feedViewModel.getFeed().subscribe(this::onFeedUpdated, defaultErrorHandler));
+        disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
     @Override

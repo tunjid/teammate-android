@@ -12,6 +12,7 @@ import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -80,7 +81,8 @@ public class EventRepository extends QueryRepository<Event> {
     }
 
     @Override
-    Maybe<List<Event>> localModelsBefore(Team team, Date date) {
+    Maybe<List<Event>> localModelsBefore(Team team, @Nullable Date date) {
+        if (date == null) date = getFutureDate();
         return eventDao.getEvents(team.getId(), date).subscribeOn(io());
     }
 
@@ -106,5 +108,11 @@ public class EventRepository extends QueryRepository<Event> {
 
             return models;
         };
+    }
+
+    private Date getFutureDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, 100);
+        return calendar.getTime();
     }
 }

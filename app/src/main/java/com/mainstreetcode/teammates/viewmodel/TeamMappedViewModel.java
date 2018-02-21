@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static com.mainstreetcode.teammates.util.ModelUtils.fromThrowable;
 
-public class TeamMappedViewModel<V extends Identifiable> extends MappedViewModel<Team, V> {
+public abstract class TeamMappedViewModel<V extends Identifiable> extends MappedViewModel<Team, V> {
 
     private final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
 

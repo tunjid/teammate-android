@@ -116,7 +116,8 @@ public class ChatRepository extends QueryRepository<Chat> {
     }
 
     @Override
-    Maybe<List<Chat>> localModelsBefore(Team team, Date date) {
+    Maybe<List<Chat>> localModelsBefore(Team team, @Nullable Date date) {
+        if (date == null) date = new Date();
         return chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
     }
 

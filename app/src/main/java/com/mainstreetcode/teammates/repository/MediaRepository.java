@@ -117,7 +117,8 @@ public class MediaRepository extends QueryRepository<Media> {
     }
 
     @Override
-    Maybe<List<Media>> localModelsBefore(Team team, Date date) {
+    Maybe<List<Media>> localModelsBefore(Team team, @Nullable Date date) {
+        if (date == null) date = new Date();
         return mediaDao.getTeamMedia(team, date).subscribeOn(io());
     }
 
@@ -136,7 +137,7 @@ public class MediaRepository extends QueryRepository<Media> {
 
     @Nullable
     MultipartBody.Part getBody(String path, String photoKey) {
-        Uri uri =  Uri.parse(path);
+        Uri uri = Uri.parse(path);
         String type = App.getInstance().getContentResolver().getType(uri);
 
         if (type == null) return null;

@@ -175,7 +175,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     void fetchEvents() {
-        disposables.add(eventViewModel.getEvents(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
+        disposables.add(eventViewModel.getMore(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {

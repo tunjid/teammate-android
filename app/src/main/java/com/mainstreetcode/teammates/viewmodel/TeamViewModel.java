@@ -42,6 +42,11 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return teams;
     }
 
+    @Override
+    Flowable<List<Team>> fetch(Class<Team> key, boolean fetchLatest) {
+        return null;
+    }
+
     public Single<DiffUtil.DiffResult> createOrUpdate(Team team) {
         Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), Team.class, team)
                 .observeOn(mainThread()).cast(Team.class).map(teamListFunction);

@@ -38,6 +38,8 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 public class MediaFragment extends MainActivityFragment
@@ -137,7 +139,8 @@ public class MediaFragment extends MainActivityFragment
     }
 
     void fetchMedia(boolean fetchLatest) {
-        disposables.add(mediaViewModel.getTeamMedia(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler));
+        Flowable<DiffUtil.DiffResult> source = fetchLatest ? mediaViewModel.getLatest(team) : mediaViewModel.getMore(team);
+        disposables.add(source.subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override

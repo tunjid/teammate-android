@@ -20,7 +20,7 @@ abstract class QueryRepository<T extends Model<T>> extends ModelRepository<T> {
         return fetchThenGet(localModelsBefore(team, date), remoteModelsBefore(team, date));
     }
 
-    abstract Maybe<List<T>> localModelsBefore(Team team, Date date);
+    abstract Maybe<List<T>> localModelsBefore(Team team, @Nullable Date date);
 
     abstract Maybe<List<T>> remoteModelsBefore(Team team, @Nullable Date date);
 }

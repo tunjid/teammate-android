@@ -8,7 +8,6 @@ import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.MediaRepository;
-import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,10 +39,10 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
                 });
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeamMedia(Team team, boolean fetchLatest) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.modelsBefore(team, getQueryDate(team, fetchLatest)).map(toIdentifiable)
-                .doOnError(throwable -> checkForInvalidTeam(throwable, team));
-        return Identifiable.diff(sourceFlowable, () -> getModelList(team), ModelUtils::preserveListInverse);
+    @Override
+    Flowable<List<Media>> fetch(Team key, boolean fetchLatest) {
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
+                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
     }
 
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {

@@ -87,7 +87,7 @@ public final class TeamsFragment extends MainActivityFragment
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
 
         String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(roleViewModel.getMyRoles(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
+        disposables.add(roleViewModel.getMore(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     @Override

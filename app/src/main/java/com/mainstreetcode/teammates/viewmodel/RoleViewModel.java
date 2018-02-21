@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.support.v7.util.DiffUtil;
-
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
@@ -60,9 +58,9 @@ public class RoleViewModel extends MappedViewModel<String, Role> {
         return joinRequestRepository.createOrUpdate(joinRequest).observeOn(mainThread());
     }
 
-    public Flowable<DiffUtil.DiffResult> getMyRoles(String userId) {
-        Flowable<List<Identifiable>> sourceFlowable = roleRepository.getMyRoles(userId).map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> getModelList(userId), preserveList);
+    @Override
+    Flowable<List<Role>> fetch(String key, boolean fetchLatest) {
+        return roleRepository.getMyRoles(key);
     }
 
     @Override
