@@ -79,6 +79,13 @@ public class MediaUploadIntentService extends IntentService {
         private final ModelRepository<Media> repository = MediaRepository.getInstance();
 
         void enqueue(Media media) {
+            if (uploadQueue.isEmpty()) {
+                numErrors = 0;
+                numToUpload = 0;
+                numAttempted = 0;
+                isOnGoing = false;
+            }
+
             numToUpload++;
             uploadQueue.add(media);
 
@@ -86,13 +93,7 @@ public class MediaUploadIntentService extends IntentService {
         }
 
         private void invoke() {
-            if (uploadQueue.isEmpty()) {
-                numErrors = 0;
-                numToUpload = 0;
-                numAttempted = 0;
-                isOnGoing = false;
-                return;
-            }
+            if (uploadQueue.isEmpty()) return;
 
             numAttempted++;
             isOnGoing = true;

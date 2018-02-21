@@ -115,7 +115,7 @@ public class TeamDetailFragment extends MainActivityFragment
         setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
 
-        disposables.add(teamMemberViewModel.getTeamMembers(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
+        disposables.add(teamMemberViewModel.getMore(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
         roleViewModel.fetchRoleValues();
     }
 

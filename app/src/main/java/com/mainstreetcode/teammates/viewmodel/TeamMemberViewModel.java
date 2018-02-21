@@ -39,17 +39,12 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
         joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeamMembers(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(teamRepository.get(team)
-                .cast(Model.class), team, team)
+    @Override
+    Flowable<List<Model>> fetch(Team key, boolean fetchLatest) {
+        return checkForInvalidObject(teamRepository.get(key)
+                .cast(Model.class), key, key)
                 .cast(Team.class)
                 .map(teamListFunction);
-
-        return Identifiable.diff(sourceFlowable, () -> getModelList(team), (sourceTeamList, newTeamList) -> {
-            Collections.sort(newTeamList, Identifiable.COMPARATOR);
-            distributeAds(newTeamList);
-            return newTeamList;
-        });
     }
 
     public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, boolean approved) {
@@ -95,8 +90,8 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
         };
     }
 
-    private Function<Team, List<Identifiable>> teamListFunction = team -> {
-        List<Identifiable> teamModels = new ArrayList<>();
+    private Function<Team, List<Model>> teamListFunction = team -> {
+        List<Model> teamModels = new ArrayList<>();
         teamModels.addAll(team.getRoles());
         teamModels.addAll(team.getJoinRequests());
 

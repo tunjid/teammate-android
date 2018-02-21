@@ -10,6 +10,7 @@ import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,8 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName;
 
 public class MediaFragment extends MainActivityFragment
@@ -54,6 +57,7 @@ public class MediaFragment extends MainActivityFragment
     private Toolbar contextBar;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
+    private SwipeRefreshLayout refreshLayout;
 
     public static MediaFragment newInstance(Team team) {
         MediaFragment fragment = new MediaFragment();
@@ -93,6 +97,7 @@ public class MediaFragment extends MainActivityFragment
 
         contextBar = rootView.findViewById(R.id.alt_toolbar);
         recyclerView = rootView.findViewById(R.id.team_media);
+        refreshLayout = rootView.findViewById(R.id.refresh_layout);
 
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
 
@@ -112,6 +117,7 @@ public class MediaFragment extends MainActivityFragment
                 fetchMedia(false);
             }
         });
+        refreshLayout.setOnRefreshListener(() -> mediaViewModel.refresh(team).subscribe(MediaFragment.this::onMediaUpdated, defaultErrorHandler));
 
         contextBar.inflateMenu(R.menu.fragment_media_context);
         contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
@@ -137,7 +143,8 @@ public class MediaFragment extends MainActivityFragment
     }
 
     void fetchMedia(boolean fetchLatest) {
-        disposables.add(mediaViewModel.getTeamMedia(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler));
+        Flowable<DiffUtil.DiffResult> source = fetchLatest ? mediaViewModel.getLatest(team) : mediaViewModel.getMore(team);
+        disposables.add(source.subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -163,6 +170,7 @@ public class MediaFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         recyclerView = null;
+        refreshLayout = null;
         emptyViewHolder = null;
     }
 
@@ -236,8 +244,9 @@ public class MediaFragment extends MainActivityFragment
 
     private void onMediaUpdated(DiffUtil.DiffResult result) {
         result.dispatchUpdatesTo(recyclerView.getAdapter());
-        toggleProgress(false);
         emptyViewHolder.toggle(items.isEmpty());
+        refreshLayout.setRefreshing(false);
+        toggleProgress(false);
     }
 
     private void toggleContextMenu(boolean show) {

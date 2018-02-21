@@ -33,10 +33,11 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         catch (Exception e) {return new ArrayList<>();}
     }
 
-    public Flowable<DiffUtil.DiffResult> getEvents(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = repository.modelsBefore(team, getQueryDate(team)).map(toIdentifiable)
-                .doOnError(throwable -> checkForInvalidTeam(throwable, team));
-        return Identifiable.diff(sourceFlowable, () -> getModelList(team), preserveList);
+
+    @Override
+    Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
+                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {
@@ -78,7 +79,8 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return result;
     };
 
-    private Date getQueryDate(Team team) {
+    private Date getQueryDate(Team team, boolean fetchLatest) {
+        if (fetchLatest) return null;
         List<Identifiable> list = getModelList(team);
 
         if (list.isEmpty()) return null;

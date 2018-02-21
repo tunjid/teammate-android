@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammates.viewmodel;
 
-import android.support.v7.util.DiffUtil;
-
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
@@ -24,7 +22,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * ViewModel for roles in a team
  */
 
-public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
+public class RoleViewModel extends MappedViewModel<String, Role> {
 
     private int count;
     private final RoleRepository roleRepository;
@@ -60,13 +58,13 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
         return joinRequestRepository.createOrUpdate(joinRequest).observeOn(mainThread());
     }
 
-    public Flowable<DiffUtil.DiffResult> getMyRoles(String userId) {
-        Flowable<List<Identifiable>> sourceFlowable = roleRepository.getMyRoles(userId).map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> getModelList(Role.class), preserveList);
+    @Override
+    Flowable<List<Role>> fetch(String key, boolean fetchLatest) {
+        return roleRepository.getMyRoles(key);
     }
 
     @Override
-    public List<Identifiable> getModelList(Class<Role> key) {
+    public List<Identifiable> getModelList(String key) {
         return roles;
     }
 }

@@ -10,7 +10,6 @@ import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.repository.ChatRepository;
-import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.io.EOFException;
 import java.util.ArrayList;
@@ -66,6 +65,12 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0)).observeOn(mainThread());
     }
 
+    @Override
+    Flowable<List<Chat>> fetch(Team key, boolean fetchLatest) {
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
+                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+    }
+
     public Flowable<Pair<Boolean, DiffUtil.DiffResult>> chatsBefore(final Team team, boolean fetchLatest) {
         final List<Identifiable> chats = getModelList(team);
 
@@ -77,14 +82,12 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
         chatMap.put(team, currentSize);
 
-        Flowable<List<Identifiable>> sourceFlowable = repository.modelsBefore(team, getQueryDate(team, fetchLatest))
-                .map(toIdentifiable)
-                .doOnError(throwable -> checkForInvalidTeam(throwable, team))
-                .doOnCancel(() -> chatMap.put(team, RETRY));
+        Flowable<DiffUtil.DiffResult> source = fetchLatest ? getLatest(team) : getMore(team);
+        source.doOnCancel(() -> chatMap.put(team, RETRY));
 
         Flowable<Pair<Boolean, DiffUtil.DiffResult>> immediate = getDiffResult(true, chats);
 
-        Flowable<Pair<Boolean, DiffUtil.DiffResult>> fetched = Identifiable.diff(sourceFlowable, () -> chats, ModelUtils::preserveList)
+        Flowable<Pair<Boolean, DiffUtil.DiffResult>> fetched = source
                 .map(diffResult -> new Pair<>(false, diffResult))
                 .doOnNext(pair -> {if (chats.size() == currentSize) chatMap.put(team, NO_MORE);});
 

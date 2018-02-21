@@ -44,13 +44,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
         return feedItems;
     }
 
-    public Flowable<DiffUtil.DiffResult> getFeed() {
-        Flowable<List<Identifiable>> sourceFlowable = api.getFeed().toFlowable().map(toIdentifiable);
-        return Identifiable.diff(sourceFlowable, () -> feedItems, (oldFeed, newFeed) -> {
-            Collections.sort(newFeed, Identifiable.COMPARATOR);
-            distributeAds(newFeed);
-            return newFeed;
-        });
+    @Override
+    Flowable<List<FeedItem>> fetch(Class<FeedItem> key, boolean fetchLatest) {
+        return api.getFeed().toFlowable();
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {

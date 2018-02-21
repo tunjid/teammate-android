@@ -19,7 +19,6 @@ import com.mainstreetcode.teammates.adapters.TeamAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Identifiable;
-import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 
 import java.util.List;
@@ -61,7 +60,7 @@ public final class TeamsFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        roles = roleViewModel.getModelList(Role.class);
+        roles = roleViewModel.getModelList(userViewModel.getCurrentUser().getId());
     }
 
     @Override
@@ -88,7 +87,7 @@ public final class TeamsFragment extends MainActivityFragment
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
 
         String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(roleViewModel.getMyRoles(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
+        disposables.add(roleViewModel.getMore(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     @Override
