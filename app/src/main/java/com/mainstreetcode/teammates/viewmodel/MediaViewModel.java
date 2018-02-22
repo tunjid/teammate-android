@@ -33,9 +33,10 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     }
 
     @Override
-    boolean hasNativeAds() {
-        return false;
-    }
+    boolean hasNativeAds() {return false;}
+
+    @Override
+    boolean stacksFromEnd() {return false;}
 
     public Flowable<Media> getMedia(Media model) {
         return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)

@@ -30,7 +30,8 @@ public abstract class EventDao extends EntityDao<EventEntity> {
     @Query("SELECT * FROM events as event" +
             " WHERE :teamId = event_team" +
             " AND event_start_date < :date" +
-            " ORDER BY event_start_date DESC")
+            " ORDER BY event_start_date DESC" +
+            " LIMIT 40")
     public abstract Maybe<List<Event>> getEvents(String teamId, Date date);
 
     @Query("SELECT * FROM events" +

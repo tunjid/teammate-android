@@ -146,7 +146,7 @@ public class Media implements
 
     @Override
     public int compareTo(@NonNull Media o) {
-        return -created.compareTo(o.created);
+        return created.compareTo(o.created);
     }
 
     public User getUser() {
