@@ -66,7 +66,9 @@ public class ModelUtils {
     }
 
     public static Date parseDate(String date) {
-        return parseDate(date, dateFormatter);
+        Date result;
+        synchronized (dateFormatter) {result = parseDate(date, dateFormatter);}
+        return result;
     }
 
     @Nullable

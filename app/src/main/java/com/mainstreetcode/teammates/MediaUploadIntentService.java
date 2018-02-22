@@ -98,7 +98,6 @@ public class MediaUploadIntentService extends IntentService {
             numAttempted++;
             isOnGoing = true;
 
-            Log.i("TEST", toString());
             repository.createOrUpdate(uploadQueue.remove())
                     .doOnError(throwable -> numErrors++)
                     .doFinally(this::invoke)
