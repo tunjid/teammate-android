@@ -64,10 +64,7 @@ public class MediaDetailFragment extends MainActivityFragment
         boolean isImage = media.isImage();
         int resource = isImage ? R.layout.viewholder_image : R.layout.viewholder_video;
 
-        ConstraintLayout rootView = (ConstraintLayout) inflater.inflate(resource, container, false);
-        bindViewHolder(rootView, media, isImage);
-
-        return rootView;
+        return inflater.inflate(resource, container, false);
     }
 
     @Override
@@ -101,12 +98,22 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onResume() {
+        super.onResume();
+        boolean isImage = media.isImage();
+        bindViewHolder((ConstraintLayout) getView(), media, isImage);
+    }
 
+    @Override
+    public void onPause() {
         if (mediaViewHolder != null) mediaViewHolder.unBind();
+        super.onPause();
+    }
 
+    @Override
+    public void onDestroyView() {
         mediaViewHolder = null;
+        super.onDestroyView();
     }
 
     @Override
@@ -131,7 +138,9 @@ public class MediaDetailFragment extends MainActivityFragment
 
     @Override
     public void onMediaClicked(Media item) {
-        toggleToolbar(isToolbarVisible = !isToolbarVisible);
+        boolean status = isToolbarVisible = !isToolbarVisible;
+        toggleToolbar(status);
+        toggleStatusBar(status);
     }
 
     @Override

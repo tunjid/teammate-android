@@ -1,26 +1,31 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.transition.Fade;
 import android.support.transition.TransitionManager;
 import android.text.TextUtils;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.devbrackets.android.exomedia.ui.widget.VideoControls;
 import com.devbrackets.android.exomedia.ui.widget.VideoView;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.model.Media;
-import com.squareup.picasso.Picasso;
 
 
 public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
 
 
+    @SuppressLint("ClickableViewAccessibility")
     public VideoMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
+
+        fullResView.setOnTouchListener(new TouchListener(itemView.getContext()));
 
         if (adapterListener.isFullScreen()) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fullResView.findViewById(R.id.exomedia_video_view).getLayoutParams();
@@ -29,32 +34,7 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         }
-        else {
-            ConstraintLayout constraintLayout = (ConstraintLayout) itemView;
-            ConstraintSet set = new ConstraintSet();
-
-            set.clone(constraintLayout);
-            set.setDimensionRatio(thumbnailView.getId(), UNITY_ASPECT_RATIO);
-            set.setDimensionRatio(fullResView.getId(), UNITY_ASPECT_RATIO);
-            set.applyTo(constraintLayout);
-
-            fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
-        }
-    }
-
-    @Override
-    public void bind(Media media) {
-        super.bind(media);
-
-        String thumbnail = media.getThumbnail();
-
-        if (TextUtils.isEmpty(thumbnail)) return;
-
-        Picasso.with(itemView.getContext())
-                .load(thumbnail)
-                .fit()
-                .centerInside()
-                .into(thumbnailView);
+        else fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
     }
 
     @Override
@@ -79,7 +59,7 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
     public void unBind() {
         super.unBind();
         fullResView.setVisibility(View.INVISIBLE);
-        fullResView.release();
+        fullResView.stopPlayback();
     }
 
     @Override
@@ -89,4 +69,31 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
 
     @Override
     public int getFullViewId() {return R.id.video_thumbnail;}
+
+    private class TouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
+        GestureDetector gestureDetector;
+
+        TouchListener(Context context) {
+            gestureDetector = new GestureDetector(context, this);
+        }
+
+        @Override
+        @SuppressLint("ClickableViewAccessibility")
+        public boolean onTouch(View view, MotionEvent event) {
+            gestureDetector.onTouchEvent(event);
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event) {
+            if (fullResView == null) return true;
+            VideoControls videoControls = fullResView.getVideoControls();
+
+            if (videoControls != null && videoControls.isVisible()) videoControls.hide();
+            else fullResView.showControls();
+
+            adapterListener.onMediaClicked(media);
+            return true;
+        }
+    }
 }

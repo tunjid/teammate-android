@@ -15,6 +15,8 @@ public interface PersistentUiController {
 
     void toggleProgress(boolean show);
 
+    void toggleStatusBar(boolean show);
+
     void setFabIcon(@DrawableRes int icon);
 
     void showSnackBar(CharSequence message);

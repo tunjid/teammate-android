@@ -55,6 +55,7 @@ public class TeammatesBaseFragment extends BaseFragment {
         toggleToolbar(showsToolBar());
         toggleFab(showsFab());
         toggleBottombar(showsBottomNav());
+        toggleStatusBar(true);
     }
 
     @Override
@@ -95,6 +96,8 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected void toggleToolbar(boolean show) {getPersistentUiController().toggleToolbar(show);}
 
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
+
+    protected void toggleStatusBar(boolean show) {getPersistentUiController().toggleStatusBar(show);}
 
     private void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
@@ -180,6 +183,11 @@ public class TeammatesBaseFragment extends BaseFragment {
 
         @Override
         public void toggleProgress(boolean show) {
+
+        }
+
+        @Override
+        public void toggleStatusBar(boolean show) {
 
         }
 
