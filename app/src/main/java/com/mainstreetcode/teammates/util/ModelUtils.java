@@ -107,21 +107,17 @@ public class ModelUtils {
         return new Message((HttpException) throwable);
     }
 
-    public static <T extends Identifiable> List<T> preserveList(List<T> source, List<T> additions) {
-        cocatenateList(source, additions);
+    public static <T extends Identifiable> void preserveList(List<T> source, List<T> additions) {
+        concatenateList(source, additions);
         Collections.sort(source, Identifiable.COMPARATOR);
-
-        return source;
     }
 
-    public static <T extends Identifiable> List<T> preserveListInverse(List<T> source, List<T> additions) {
-        cocatenateList(source, additions);
+    public static <T extends Identifiable> void preserveListInverse(List<T> source, List<T> additions) {
+        concatenateList(source, additions);
         Collections.sort(source, (a, b) -> -Identifiable.COMPARATOR.compare(a, b));
-
-        return source;
     }
 
-    private static <T extends Identifiable> void cocatenateList(List<T> source, List<T> additions) {
+    private static <T extends Identifiable> void concatenateList(List<T> source, List<T> additions) {
         Set<T> set = new HashSet<>(additions);
         set.addAll(source);
         source.clear();
