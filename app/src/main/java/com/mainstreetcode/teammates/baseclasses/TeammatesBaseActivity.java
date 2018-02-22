@@ -116,10 +116,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         }
 
         //noinspection AndroidLintClickableViewAccessibility
-//        keyboardPadding.setOnTouchListener((view, event) -> {
-//            setKeyboardPadding(0);
-//            return true;
-//        });
+        keyboardPadding.setOnTouchListener((view, event) -> {
+            setKeyboardPadding(0);
+            return true;
+        });
 
         setSupportActionBar(toolbar);
 
@@ -157,6 +157,17 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (show && loadingBar != null && loadingBar.isShown()) return;
         if (show) (loadingBar = LoadingBar.make(root, Snackbar.LENGTH_INDEFINITE)).show();
         else if (loadingBar != null && loadingBar.isShownOrQueued()) loadingBar.dismiss();
+    }
+
+    @Override
+    public void toggleStatusBar(boolean show) {
+        View decorView = getWindow().getDecorView();
+        int uiOptions = decorView.getSystemUiVisibility();
+
+        if (show) uiOptions = uiOptions & ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+        else uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
