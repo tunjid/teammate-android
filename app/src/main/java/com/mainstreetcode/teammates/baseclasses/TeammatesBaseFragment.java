@@ -37,7 +37,7 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     protected CompositeDisposable disposables = new CompositeDisposable();
 
-    protected Consumer<Throwable> defaultErrorHandler;
+    protected ErrorHandler defaultErrorHandler;
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
 
     @Override

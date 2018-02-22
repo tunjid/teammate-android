@@ -2,7 +2,9 @@ package com.mainstreetcode.teammates.util;
 
 import com.mainstreetcode.teammates.model.Message;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.functions.Consumer;
@@ -19,6 +21,7 @@ public class ErrorHandler implements Consumer<Throwable> {
     private final String defaultMessage;
     private final Consumer<Message> messageConsumer;
     private final Map<String, String> messageMap;
+    private final List<Runnable> actions;
 
     private ErrorHandler(String defaultMessage,
                          Consumer<Message> messageConsumer,
@@ -26,6 +29,7 @@ public class ErrorHandler implements Consumer<Throwable> {
         this.defaultMessage = defaultMessage;
         this.messageConsumer = messageConsumer;
         this.messageMap = messageMap;
+        actions = new ArrayList<>();
     }
 
     public static Builder builder() {
@@ -41,6 +45,8 @@ public class ErrorHandler implements Consumer<Throwable> {
 
     @Override
     public void accept(Throwable throwable) throws Exception {
+        throwable.printStackTrace();
+
         String key = throwable.getClass().getName();
         Message message = messageMap.containsKey(key)
                 ? new Message(messageMap.get(key))
@@ -50,8 +56,17 @@ public class ErrorHandler implements Consumer<Throwable> {
                 ? new Message((HttpException) throwable)
                 : new Message(defaultMessage);
 
-        messageConsumer.accept(message);
-        throwable.printStackTrace();
+        try {
+            messageConsumer.accept(message);
+            for (Runnable action : actions) action.run();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addAction(Runnable action) {
+        actions.add(action);
     }
 
     private boolean isHttpException(Throwable throwable) {

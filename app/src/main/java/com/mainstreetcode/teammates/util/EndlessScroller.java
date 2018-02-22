@@ -44,5 +44,9 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
         }
     }
 
+    public void refresh() {
+        loading = false;
+    }
+
     public abstract void onLoadMore(int currentItemCount);
 }

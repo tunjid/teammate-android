@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -55,6 +56,7 @@ public class MediaFragment extends MainActivityFragment
     private List<Identifiable> items;
 
     private Toolbar contextBar;
+    private EndlessScroller scroller;
     private RecyclerView recyclerView;
     private EmptyViewHolder emptyViewHolder;
     private SwipeRefreshLayout refreshLayout;
@@ -90,6 +92,15 @@ public class MediaFragment extends MainActivityFragment
         ImageWorkerFragment.attach(this);
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        defaultErrorHandler.addAction(() -> {
+            if (scroller == null) return;
+            scroller.refresh();
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -100,21 +111,22 @@ public class MediaFragment extends MainActivityFragment
         refreshLayout = rootView.findViewById(R.id.refresh_layout);
 
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
+        scroller = new EndlessScroller(layoutManager) {
+            @Override
+            public void onLoadMore(int oldCount) {
+                toggleProgress(true);
+                fetchMedia(false);
+            }
+        };
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(new MediaAdapter(items, this));
+        recyclerView.addOnScrollListener(scroller);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (Math.abs(dy) < 3) return;
                 toggleFab(dy < 0);
-            }
-        });
-        recyclerView.addOnScrollListener(new EndlessScroller(layoutManager) {
-            @Override
-            public void onLoadMore(int oldCount) {
-                toggleProgress(true);
-                fetchMedia(false);
             }
         });
         refreshLayout.setOnRefreshListener(() -> mediaViewModel.refresh(team).subscribe(MediaFragment.this::onMediaUpdated, defaultErrorHandler));
@@ -169,6 +181,7 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        scroller = null;
         recyclerView = null;
         refreshLayout = null;
         emptyViewHolder = null;
@@ -246,6 +259,7 @@ public class MediaFragment extends MainActivityFragment
         result.dispatchUpdatesTo(recyclerView.getAdapter());
         emptyViewHolder.toggle(items.isEmpty());
         refreshLayout.setRefreshing(false);
+        scroller.refresh();
         toggleProgress(false);
     }
 

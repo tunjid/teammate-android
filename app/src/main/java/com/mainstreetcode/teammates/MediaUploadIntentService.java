@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
@@ -79,25 +80,25 @@ public class MediaUploadIntentService extends IntentService {
         private final ModelRepository<Media> repository = MediaRepository.getInstance();
 
         void enqueue(Media media) {
-            if (uploadQueue.isEmpty()) {
-                numErrors = 0;
-                numToUpload = 0;
-                numAttempted = 0;
-                isOnGoing = false;
-            }
-
             numToUpload++;
             uploadQueue.add(media);
 
+            if (uploadQueue.isEmpty()) numErrors = 0;
             if (!isOnGoing) invoke();
         }
 
         private void invoke() {
-            if (uploadQueue.isEmpty()) return;
+            if (uploadQueue.isEmpty()) {
+                numToUpload = 0;
+                numAttempted = 0;
+                isOnGoing = false;
+                return;
+            }
 
             numAttempted++;
             isOnGoing = true;
 
+            Log.i("TEST", toString());
             repository.createOrUpdate(uploadQueue.remove())
                     .doOnError(throwable -> numErrors++)
                     .doFinally(this::invoke)
@@ -118,6 +119,14 @@ public class MediaUploadIntentService extends IntentService {
 
         public boolean isComplete() {
             return uploadQueue.isEmpty();
+        }
+
+        @Override
+        public String toString() {
+            return "Queue size: " + uploadQueue.size() +
+                    ", numErrors : " + numErrors +
+                    ", numToUpload : " + numToUpload +
+                    ", numAttempted : " + numAttempted;
         }
     }
 }
