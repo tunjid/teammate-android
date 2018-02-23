@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammates.fragments.main;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,10 +10,8 @@ import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,8 +31,8 @@ import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -56,10 +53,6 @@ public class MediaFragment extends MainActivityFragment
     private List<Identifiable> items;
 
     private Toolbar contextBar;
-    private EndlessScroller scroller;
-    private RecyclerView recyclerView;
-    private EmptyViewHolder emptyViewHolder;
-    private SwipeRefreshLayout refreshLayout;
 
     public static MediaFragment newInstance(Team team) {
         MediaFragment fragment = new MediaFragment();
@@ -92,49 +85,26 @@ public class MediaFragment extends MainActivityFragment
         ImageWorkerFragment.attach(this);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        defaultErrorHandler.addAction(() -> {
-            if (scroller == null) return;
-            scroller.refresh();
-        });
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_media, container, false);
 
+        Runnable refreshAction = () -> mediaViewModel.refresh(team).subscribe(MediaFragment.this::onMediaUpdated, defaultErrorHandler);
+
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_media))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
+                .withScrollListener((dx, dy) -> {if (Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .withLayoutManager(new GridLayoutManager(getContext(), 4))
+                .withEndlessScrollCallback(() -> fetchMedia(false))
+                .withAdapter(new MediaAdapter(items, this))
+                .build();
+
         contextBar = rootView.findViewById(R.id.alt_toolbar);
-        recyclerView = rootView.findViewById(R.id.team_media);
-        refreshLayout = rootView.findViewById(R.id.refresh_layout);
-
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
-        scroller = new EndlessScroller(layoutManager) {
-            @Override
-            public void onLoadMore(int oldCount) {
-                toggleProgress(true);
-                fetchMedia(false);
-            }
-        };
-
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new MediaAdapter(items, this));
-        recyclerView.addOnScrollListener(scroller);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (Math.abs(dy) < 3) return;
-                toggleFab(dy < 0);
-            }
-        });
-        refreshLayout.setOnRefreshListener(() -> mediaViewModel.refresh(team).subscribe(MediaFragment.this::onMediaUpdated, defaultErrorHandler));
-
         contextBar.inflateMenu(R.menu.fragment_media_context);
         contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
 
-        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media);
         return rootView;
     }
 
@@ -155,6 +125,7 @@ public class MediaFragment extends MainActivityFragment
     }
 
     void fetchMedia(boolean fetchLatest) {
+        toggleProgress(true);
         Flowable<DiffUtil.DiffResult> source = fetchLatest ? mediaViewModel.getLatest(team) : mediaViewModel.getMore(team);
         disposables.add(source.subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
@@ -179,19 +150,10 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        scroller = null;
-        recyclerView = null;
-        refreshLayout = null;
-        emptyViewHolder = null;
-    }
-
-    @Override
     public boolean handledBackPress() {
         if (!mediaViewModel.hasSelections(team)) return false;
         mediaViewModel.clearSelections(team);
-        recyclerView.getAdapter().notifyDataSetChanged();
+        scrollManager.notifyDataSetChanged();
         toggleContextMenu(false);
         return true;
     }
@@ -215,7 +177,8 @@ public class MediaFragment extends MainActivityFragment
             Media media = fragmentTo.getArguments().getParcelable(MediaDetailFragment.ARG_MEDIA);
 
             if (media == null) return null;
-            MediaViewHolder holder = (MediaViewHolder) recyclerView.findViewHolderForItemId(media.hashCode());
+            MediaViewHolder holder = (MediaViewHolder) scrollManager.findViewHolderForItemId(media.hashCode());
+            if (holder == null) return null;
 
             holder.bind(media); // Rebind, to make sure transition names remain.
             return beginTransaction()
@@ -256,10 +219,7 @@ public class MediaFragment extends MainActivityFragment
     }
 
     private void onMediaUpdated(DiffUtil.DiffResult result) {
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
-        emptyViewHolder.toggle(items.isEmpty());
-        refreshLayout.setRefreshing(false);
-        scroller.refresh();
+        scrollManager.onDiff(result);
         toggleProgress(false);
     }
 
@@ -273,13 +233,13 @@ public class MediaFragment extends MainActivityFragment
 
         toggleToolbar(!show);
 
-        Transition transition = new Fade().excludeTarget(recyclerView, true);
+        Transition transition = new Fade().excludeTarget(scrollManager.getRecyclerView(), true);
         TransitionManager.beginDelayedTransition(root, transition);
         contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void longClickMedia(Media media) {
-        MediaViewHolder holder = (MediaViewHolder) recyclerView.findViewHolderForItemId(media.hashCode());
+        MediaViewHolder holder = (MediaViewHolder) scrollManager.findViewHolderForItemId(media.hashCode());
         if (holder == null) return;
 
         holder.performLongClick();
@@ -291,10 +251,10 @@ public class MediaFragment extends MainActivityFragment
         boolean partialDelete = pair.first == null ? false : pair.first;
         DiffUtil.DiffResult diffResult = pair.second;
 
-        if (diffResult != null) diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
+        if (diffResult != null) scrollManager.onDiff(diffResult);
         if (!partialDelete) return;
 
-        recyclerView.getAdapter().notifyDataSetChanged();
-        recyclerView.postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
+        scrollManager.notifyDataSetChanged();
+        contextBar.postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
     }
 }

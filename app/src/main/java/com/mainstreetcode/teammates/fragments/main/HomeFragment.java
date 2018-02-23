@@ -1,12 +1,12 @@
 package com.mainstreetcode.teammates.fragments.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +21,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.notifications.FeedItem;
+import com.mainstreetcode.teammates.util.ScrollManager;
 
 import java.util.Calendar;
 
@@ -34,9 +35,6 @@ public final class HomeFragment extends MainActivityFragment
         implements FeedAdapter.FeedItemAdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.feed_list};
-
-    private RecyclerView recyclerView;
-    private EmptyViewHolder emptyViewHolder;
 
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
@@ -55,11 +53,12 @@ public final class HomeFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        recyclerView = rootView.findViewById(R.id.feed_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this));
 
-        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed);
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.feed_list))
+                .withLayoutManager(new LinearLayoutManager(getContext()))
+                .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+                .build();
 
         return rootView;
     }
@@ -76,13 +75,6 @@ public final class HomeFragment extends MainActivityFragment
     }
 
     @Override
-    public void onDestroyView() {
-        recyclerView = null;
-        emptyViewHolder = null;
-        super.onDestroyView();
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_home, menu);
     }
@@ -94,8 +86,10 @@ public final class HomeFragment extends MainActivityFragment
     @SuppressWarnings("unchecked")
     public void onFeedItemClicked(FeedItem item) {
         Model model = item.getModel();
+        Context context = getContext();
+        if(context == null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(recyclerView.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         if (model instanceof Event) {
             builder.setTitle(getString(R.string.attend_event))
@@ -125,14 +119,12 @@ public final class HomeFragment extends MainActivityFragment
 
     private void onFeedItemAction(Single<DiffUtil.DiffResult> diffResultSingle) {
         toggleProgress(true);
-        disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler)
-        );
+        disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
         toggleProgress(false);
-        diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-        emptyViewHolder.toggle(feedViewModel.getModelList(FeedItem.class).isEmpty());
+        scrollManager.onDiff(diffResult);
     }
 
     private static String getTimeOfDay() {
