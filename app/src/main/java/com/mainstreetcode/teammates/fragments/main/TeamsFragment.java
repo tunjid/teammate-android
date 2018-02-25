@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +19,7 @@ import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.ScrollManager;
 
 import java.util.List;
 
@@ -33,9 +33,6 @@ public final class TeamsFragment extends MainActivityFragment
         TeamAdapter.TeamAdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
-
-    private RecyclerView recyclerView;
-    private EmptyViewHolder emptyViewHolder;
 
     private List<Identifiable> roles;
 
@@ -66,11 +63,12 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
-        recyclerView = rootView.findViewById(R.id.team_list);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setAdapter(new TeamAdapter(roles, this));
 
-        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team);
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team))
+                .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
+                .withAdapter(new TeamAdapter(roles, this))
+                .build();
 
         View altToolbar = rootView.findViewById(R.id.alt_toolbar);
         altToolbar.setVisibility(isTeamPicker() ? View.VISIBLE : View.INVISIBLE);
@@ -112,13 +110,6 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
-        emptyViewHolder = null;
-    }
-
-    @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
@@ -151,9 +142,8 @@ public final class TeamsFragment extends MainActivityFragment
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
         boolean isEmpty = roles.isEmpty();
-        emptyViewHolder.toggle(isEmpty);
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
         if (isTeamPicker()) toggleFab(isEmpty);
+        scrollManager.onDiff(result);
     }
 
     private boolean isTeamPicker() {

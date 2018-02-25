@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +21,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.ScrollManager;
 
 import io.reactivex.disposables.Disposable;
 
@@ -46,8 +46,6 @@ public class TeamEditFragment extends HeaderedFragment
 
     private int state;
     private Team team;
-
-    private RecyclerView recyclerView;
 
     public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty(), CREATING);}
 
@@ -88,19 +86,14 @@ public class TeamEditFragment extends HeaderedFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
-        recyclerView = rootView.findViewById(R.id.model_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (Math.abs(dy) < 3) return;
-                toggleFab(dy < 0);
-            }
-        });
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+                .withLayoutManager(new LinearLayoutManager(getContext()))
+                .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
+                .withScrollListener((dx, dy) -> {if (Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .build();
 
-        recyclerView.requestFocus();
+        scrollManager.getRecyclerView().requestFocus();
         return rootView;
     }
 
@@ -118,12 +111,6 @@ public class TeamEditFragment extends HeaderedFragment
         if (!team.isEmpty() && state != JOINING) {
             disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
     }
 
     @Override
@@ -170,12 +157,14 @@ public class TeamEditFragment extends HeaderedFragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != PLACE_PICKER_REQUEST) return;
         if (resultCode == RESULT_OK) {
+            Context context = getContext();
+            if (context == null) return;
+
             toggleProgress(true);
-            Context context = recyclerView.getContext();
             Place place = PlacePicker.getPlace(context, data);
             locationViewModel.fromPlace(place).subscribe(address -> {
                 team.setAddress(address);
-                recyclerView.getAdapter().notifyDataSetChanged();
+                scrollManager.notifyDataSetChanged();
                 toggleProgress(false);
             }, defaultErrorHandler);
         }
@@ -197,7 +186,7 @@ public class TeamEditFragment extends HeaderedFragment
                 switch (state) {
                     case CREATING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            result.dispatchUpdatesTo(recyclerView.getAdapter());
+                            scrollManager.onDiff(result);
                             viewHolder.bind(getHeaderedModel());
                             toggleProgress(false);
                             showSnackbar(getString(R.string.created_team, team.getName()));
@@ -213,7 +202,7 @@ public class TeamEditFragment extends HeaderedFragment
                     case EDITING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
                             viewHolder.bind(getHeaderedModel());
-                            result.dispatchUpdatesTo(recyclerView.getAdapter());
+                            scrollManager.onDiff(result);
                             toggleProgress(false);
                             showSnackbar(getString(R.string.updated_team));
                         }, defaultErrorHandler);
@@ -226,7 +215,7 @@ public class TeamEditFragment extends HeaderedFragment
 
     private void onTeamChanged(DiffUtil.DiffResult result) {
         toggleProgress(false);
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
+        scrollManager.onDiff(result);
         viewHolder.bind(getHeaderedModel());
     }
 
@@ -245,6 +234,6 @@ public class TeamEditFragment extends HeaderedFragment
                 break;
         }
         toggleFab(showsFab());
-        recyclerView.getAdapter().notifyDataSetChanged();
+        scrollManager.notifyDataSetChanged();
     }
 }

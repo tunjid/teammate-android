@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +21,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.ScrollManager;
 
 /**
  * Edits a Team member
@@ -35,7 +35,6 @@ public class RoleEditFragment extends HeaderedFragment
     public static final String ARG_ROLE = "role";
 
     private Role role;
-    private RecyclerView recyclerView;
 
     public static RoleEditFragment newInstance(Role role) {
         RoleEditFragment fragment = new RoleEditFragment();
@@ -71,19 +70,14 @@ public class RoleEditFragment extends HeaderedFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
-        recyclerView = rootView.findViewById(R.id.model_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RoleEditAdapter(role, roleViewModel.getRoleNames(), this));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (Math.abs(dy) < 3) return;
-                toggleFab(dy < 0);
-            }
-        });
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+                .withLayoutManager(new LinearLayoutManager(getContext()))
+                .withAdapter(new RoleEditAdapter(role, roleViewModel.getRoleNames(), this))
+                .withScrollListener((dx, dy) -> {if (Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .build();
 
-        recyclerView.requestFocus();
+        scrollManager.getRecyclerView().requestFocus();
         return rootView;
     }
 
@@ -108,13 +102,6 @@ public class RoleEditFragment extends HeaderedFragment
             inflater.inflate(R.menu.fragment_user_edit, menu);
         }
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
-    }
-
 
     @Override
     public boolean drawsBehindStatusBar() {
@@ -178,7 +165,7 @@ public class RoleEditFragment extends HeaderedFragment
     private void onRoleUpdated() {
         toggleProgress(false);
         viewHolder.bind(getHeaderedModel());
-        recyclerView.getAdapter().notifyDataSetChanged();
+        scrollManager.notifyDataSetChanged();
 
         Activity activity;
         if ((activity = getActivity()) == null) return;

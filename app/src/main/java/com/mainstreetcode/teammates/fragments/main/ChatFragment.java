@@ -26,8 +26,8 @@ import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
-import com.mainstreetcode.teammates.util.EndlessScroller;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.ScrollManager;
 
 import java.util.List;
 
@@ -47,8 +47,6 @@ public class ChatFragment extends MainActivityFragment
     private Team team;
     private List<Identifiable> items;
     private Disposable chatDisposable;
-    private RecyclerView recyclerView;
-    private EmptyViewHolder emptyViewHolder;
 
     public static ChatFragment newInstance(Team team) {
         ChatFragment fragment = new ChatFragment();
@@ -86,31 +84,22 @@ public class ChatFragment extends MainActivityFragment
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
 
-        recyclerView = rootView.findViewById(R.id.chat);
-
-        input.setOnEditorActionListener(this);
-        send.setOnClickListener(view -> sendChat(input));
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
 
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this));
-        recyclerView.addOnScrollListener(new EndlessScroller(linearLayoutManager) {
-            @Override
-            public void onLoadMore(int oldCount) {
-                toggleProgress(true);
-                fetchChatsBefore(false);
-            }
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.chat))
+                .withLayoutManager(linearLayoutManager)
+                .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
+                .withEndlessScrollCallback(() -> fetchChatsBefore(false))
+                .withStateListener(state -> {
+                    if (state == SCROLL_STATE_IDLE && isNearBottomOfChat())
+                        fetchChatsBefore(true);
+                })
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
+                .build();
 
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat())
-                    fetchChatsBefore(true);
-            }
-        });
-
-        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats);
+        input.setOnEditorActionListener(this);
+        send.setOnClickListener(view -> sendChat(input));
 
         return rootView;
     }
@@ -149,8 +138,6 @@ public class ChatFragment extends MainActivityFragment
         super.onDestroyView();
         chatViewModel.onChatRoomLeft(team);
         chatViewModel.updateLastSeen(team);
-        recyclerView = null;
-        emptyViewHolder = null;
     }
 
     @Override
@@ -171,7 +158,7 @@ public class ChatFragment extends MainActivityFragment
         if (index == -1) return;
 
         items.remove(index);
-        recyclerView.getAdapter().notifyItemRemoved(index);
+        scrollManager.notifyItemRemoved(index);
 
         postChat(chat);
     }
@@ -186,6 +173,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void fetchChatsBefore(boolean fetchLatest) {
+        toggleProgress(true);
         disposables.add(chatViewModel
                 .chatsBefore(team, fetchLatest)
                 .subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
@@ -219,13 +207,11 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void postChat(Chat chat) {
-        final RecyclerView.Adapter adapter = recyclerView.getAdapter();
-
         chatViewModel.post(chat).subscribe(() -> {
             chatViewModel.updateLastSeen(team);
             int index = items.indexOf(chat);
 
-            if (index != 0) adapter.notifyItemChanged(index);
+            if (index != 0) scrollManager.notifyItemChanged(index);
             if (!isSubscribedToChat()) subscribeToChat();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.default_error))
@@ -233,7 +219,7 @@ public class ChatFragment extends MainActivityFragment
                     chat.setSuccessful(false);
 
                     int index = items.indexOf(chat);
-                    if (index != -1) adapter.notifyItemChanged(index);
+                    if (index != -1) scrollManager.notifyItemChanged(index);
                 })
                 .build());
     }
@@ -241,10 +227,12 @@ public class ChatFragment extends MainActivityFragment
     private void notifyAndScrollToLast(boolean scrollToLast) {
         final int index = items.size() - 1;
 
+        RecyclerView recyclerView = scrollManager.getRecyclerView();
+        if (recyclerView == null) return;
+
         recyclerView.getAdapter().notifyItemInserted(index);
         if (scrollToLast) recyclerView.smoothScrollToPosition(index);
     }
-
 
 
     private boolean isSubscribedToChat() {
@@ -252,7 +240,9 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private boolean isNearBottomOfChat() {
+        RecyclerView recyclerView = scrollManager.getRecyclerView();
         if (recyclerView == null) return false;
+
         LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
@@ -265,7 +255,6 @@ public class ChatFragment extends MainActivityFragment
 
         toggleProgress(showProgress);
         chatViewModel.updateLastSeen(team);
-        emptyViewHolder.toggle(items.isEmpty());
-        if (!showProgress && result != null) result.dispatchUpdatesTo(recyclerView.getAdapter());
+        if (result != null) scrollManager.onDiff(result);
     }
 }

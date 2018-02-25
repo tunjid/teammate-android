@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.functions.BiConsumer;
+import io.reactivex.functions.Consumer;
 
 public class ScrollManager {
 
@@ -66,6 +67,14 @@ public class ScrollManager {
         if (viewHolder != null && hasAdapter) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
+    public void notifyItemChanged(int position) {
+        if (adapter != null) adapter.notifyItemChanged(position);
+    }
+
+    public void notifyItemRemoved(int position) {
+        if (adapter != null) adapter.notifyItemRemoved(position);
+    }
+
     public void refresh() {
         if (scroller != null) scroller.refresh();
     }
@@ -99,7 +108,8 @@ public class ScrollManager {
         Adapter adapter;
         LayoutManager layoutManager;
 
-        List<BiConsumer<Integer, Integer>> scrollConsumers = new ArrayList<>();
+        List<Consumer<Integer>> stateConsumers = new ArrayList<>();
+        List<BiConsumer<Integer, Integer>> displacementConsumers = new ArrayList<>();
 
         private Builder() {}
 
@@ -118,8 +128,13 @@ public class ScrollManager {
             return this;
         }
 
+        public Builder withStateListener(@NonNull Consumer<Integer> stateListener) {
+            this.stateConsumers.add(stateListener);
+            return this;
+        }
+
         public Builder withScrollListener(@NonNull BiConsumer<Integer, Integer> scrollListener) {
-            this.scrollConsumers.add(scrollListener);
+            this.displacementConsumers.add(scrollListener);
             return this;
         }
 
@@ -147,12 +162,34 @@ public class ScrollManager {
                 public void onLoadMore(int currentItemCount) {scrollCallback.run();}
             };
 
-            List<OnScrollListener> scrollListeners = new ArrayList<>(scrollConsumers.size());
-            for (BiConsumer<Integer, Integer> consumer : scrollConsumers) {
+            List<OnScrollListener> scrollListeners = new ArrayList<>(displacementConsumers.size());
+
+            int stateConsumersSize = stateConsumers.size();
+            int scrollConsumersSize = displacementConsumers.size();
+
+            int max = Math.max(stateConsumersSize, scrollConsumersSize);
+
+            for (int i = 0; i < max; i++) {
+                final Consumer<Integer> consumer;
+                final BiConsumer<Integer, Integer> biConsumer;
+
+                if (i < stateConsumersSize) consumer = stateConsumers.get(i);
+                else consumer = null;
+                if (i < scrollConsumersSize) biConsumer = displacementConsumers.get(i);
+                else biConsumer = null;
+
                 scrollListeners.add(new OnScrollListener() {
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        try { consumer.accept(dx, dy);}
+                        if (biConsumer == null) return;
+                        try { biConsumer.accept(dx, dy);}
+                        catch (Exception e) {e.printStackTrace();}
+                    }
+
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        if (consumer == null) return;
+                        try { consumer.accept(newState);}
                         catch (Exception e) {e.printStackTrace();}
                     }
                 });
