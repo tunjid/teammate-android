@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +27,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.ScrollManager;
 
 import java.util.List;
 
@@ -49,8 +49,6 @@ public class EventEditFragment extends HeaderedFragment
     private boolean fromUserPickerAction;
     private Event event;
     private List<Identifiable> eventItems;
-
-    private RecyclerView recyclerView;
 
     public static EventEditFragment newInstance(Event event) {
         EventEditFragment fragment = new EventEditFragment();
@@ -89,19 +87,13 @@ public class EventEditFragment extends HeaderedFragment
 
         eventItems = eventViewModel.fromEvent(event);
 
-        recyclerView = rootView.findViewById(R.id.model_list);
-        recyclerView.setLayoutManager(getGridLayoutManager());
-        recyclerView.setAdapter(new EventEditAdapter(eventItems, this));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (!canEditEvent()) return;
-                if (Math.abs(dy) < 3) return;
-                toggleFab(dy < 0);
-            }
-        });
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+                .withLayoutManager(getGridLayoutManager())
+                .withAdapter(new EventEditAdapter(eventItems, this))
+                .withScrollListener((dx, dy) -> {if (canEditEvent() && Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .build();
 
-        recyclerView.requestFocus();
+        scrollManager.getRecyclerView().requestFocus();
         return rootView;
     }
 
@@ -146,14 +138,8 @@ public class EventEditFragment extends HeaderedFragment
 
             Place place = PlacePicker.getPlace(activity, data);
             event.setPlace(place);
-            recyclerView.getAdapter().notifyDataSetChanged();
+            scrollManager.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
     }
 
     @Override
@@ -202,7 +188,7 @@ public class EventEditFragment extends HeaderedFragment
         toggleBottomSheet(false);
 
         int index = eventItems.indexOf(team);
-        if (index > -1) recyclerView.getAdapter().notifyItemChanged(index);
+        if (index > -1) scrollManager.notifyItemChanged(index);
     }
 
     @Override
@@ -258,7 +244,7 @@ public class EventEditFragment extends HeaderedFragment
 
     private void onEventChanged(DiffUtil.DiffResult result) {
         toggleProgress(false);
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
+        scrollManager.onDiff(result);
         viewHolder.bind(getHeaderedModel());
     }
 
@@ -267,7 +253,7 @@ public class EventEditFragment extends HeaderedFragment
         if ((activity = getActivity()) == null) return;
 
         viewHolder.bind(getHeaderedModel());
-        recyclerView.getAdapter().notifyDataSetChanged();
+        scrollManager.notifyDataSetChanged();
         activity.invalidateOptionsMenu();
         toggleFab(canEditEvent());
     }

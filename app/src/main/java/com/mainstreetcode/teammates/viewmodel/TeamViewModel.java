@@ -12,11 +12,13 @@ import com.mainstreetcode.teammates.util.TransformingSequentialList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -28,9 +30,12 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
-    private final TeamRepository repository;
+    private static final int SEARCH_DEBOUNCE = 300;
     private static final Team defaultTeam = Team.empty();
     static final List<Identifiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
+
+    private final TeamRepository repository;
+    private PublishProcessor<String> teamSearchProcessor;
 
     public TeamViewModel() {
         repository = TeamRepository.getInstance();
@@ -61,8 +66,14 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return Identifiable.diff(sourceFlowable, () -> teamListFunction.apply(team), (old, updated) -> updated);
     }
 
-    public Single<List<Team>> findTeams(String queryText) {
-        return repository.findTeams(queryText).observeOn(mainThread());
+    public Flowable<List<Team>> findTeams() {
+        if (teamSearchProcessor == null) teamSearchProcessor = PublishProcessor.create();
+        return teamSearchProcessor
+                .debounce(SEARCH_DEBOUNCE, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .switchMap(query -> repository.findTeams(query).toFlowable())
+                .doOnTerminate(() -> teamSearchProcessor = null)
+                .observeOn(mainThread());
     }
 
     public Single<Team> deleteTeam(Team team) {
@@ -72,6 +83,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .map(TeamViewModel::onTeamDeleted)
                 .doOnSuccess(getModelList(Team.class)::remove)
                 .observeOn(mainThread());
+    }
+
+    public boolean postSearch(String queryText) {
+        if (teamSearchProcessor == null) return false;
+        teamSearchProcessor.onNext(queryText);
+        return true;
     }
 
     public Team getDefaultTeam() {

@@ -132,8 +132,8 @@ public class Event extends EventEntity
 
     @Override
     public int compareTo(@NonNull Event o) {
-        int startDateComparison = -startDate.compareTo(o.startDate);
-        int endDateComparison = -endDate.compareTo(o.endDate);
+        int startDateComparison = startDate.compareTo(o.startDate);
+        int endDateComparison = endDate.compareTo(o.endDate);
 
         return startDateComparison != 0
                 ? startDateComparison

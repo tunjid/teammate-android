@@ -11,7 +11,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +32,7 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ErrorHandler;
+import com.mainstreetcode.teammates.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -55,8 +55,6 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private Team team;
     private List<Identifiable> teamModels;
-
-    private RecyclerView recyclerView;
 
     public static TeamDetailFragment newInstance(Team team) {
         TeamDetailFragment fragment = new TeamDetailFragment();
@@ -93,17 +91,13 @@ public class TeamDetailFragment extends MainActivityFragment
         EditText editText = rootView.findViewById(R.id.team_name);
         editText.setText(team.getName());
 
-        recyclerView = rootView.findViewById(R.id.team_detail);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setAdapter(new TeamDetailAdapter(teamModels, this));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (!showsFab()) return;
-                if (Math.abs(dy) < 3) return;
-                toggleFab(dy < 0);
-            }
-        });
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
+                .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
+                .withAdapter(new TeamDetailAdapter(teamModels, this))
+                .withScrollListener((dx, dy) -> {
+                    if (showsFab() && Math.abs(dy) > 3) toggleFab(dy < 0);
+                })
+                .build();
         return rootView;
     }
 
@@ -138,19 +132,15 @@ public class TeamDetailFragment extends MainActivityFragment
                 showFragment(TeamEditFragment.newEditInstance(team));
                 return true;
             case R.id.action_delete:
-                new AlertDialog.Builder(recyclerView.getContext()).setTitle(getString(R.string.delete_team_prompt, team.getName()))
+                Context context = getContext();
+                if (context == null) return true;
+                new AlertDialog.Builder(context).setTitle(getString(R.string.delete_team_prompt, team.getName()))
                         .setPositiveButton(R.string.yes, (dialog, which) -> deleteTeam())
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
     }
 
     @Override
@@ -173,7 +163,7 @@ public class TeamDetailFragment extends MainActivityFragment
         if (!localRoleViewModel.hasPrivilegedRole()) return;
 
         boolean isInvite = request.isTeamApproved();
-        AlertDialog.Builder builder = new AlertDialog.Builder(recyclerView.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
 
         builder.setTitle(isInvite
                 ? getString(R.string.retract_invitation)
@@ -209,7 +199,7 @@ public class TeamDetailFragment extends MainActivityFragment
             Role role = fragmentTo.getArguments().getParcelable(RoleEditFragment.ARG_ROLE);
             if (role == null) return null;
 
-            ModelCardViewHolder holder = (ModelCardViewHolder) recyclerView.findViewHolderForItemId(role.hashCode());
+            ModelCardViewHolder holder = (ModelCardViewHolder) scrollManager.findViewHolderForItemId(role.hashCode());
             if (holder == null) return null;
 
             return beginTransaction()
@@ -230,8 +220,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     private void onTeamUpdated(DiffUtil.DiffResult diffResult) {
         updateCurrentRole();
-        diffResult.dispatchUpdatesTo(recyclerView.getAdapter());
-
+        scrollManager.onDiff(diffResult);
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();
     }
@@ -252,8 +241,7 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     private void onJoinAction(DiffUtil.DiffResult result, JoinRequest request, boolean approve) {
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
-
+        scrollManager.onDiff(result);
         int stringResource = approve ? R.string.added_user : R.string.removed_user;
         String name = request.getUser().getFirstName();
         showSnackbar(getString(stringResource, name));
@@ -267,7 +255,9 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @SuppressLint("InflateParams")
     private void inviteUser() {
-        Context context = recyclerView.getContext();
+        Context context = getContext();
+        if (context == null) return;
+
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_invite_user, null);
         View inviteButton = dialogView.findViewById(R.id.invite);
 

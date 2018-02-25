@@ -3,6 +3,11 @@ package com.mainstreetcode.teammates.util;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
 
@@ -12,11 +17,11 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
     private int previousTotal = 0; // The total number of items in the dataset after the last load
     private boolean loading = true; // True if we are still waiting for the last set of data to load.
 
-    private LinearLayoutManager mLinearLayoutManager;
+    private RecyclerView.LayoutManager layoutManager;
 
-    protected EndlessScroller(LinearLayoutManager linearLayoutManager) {
-        this.mLinearLayoutManager = linearLayoutManager;
-        isReverse = mLinearLayoutManager.getStackFromEnd();
+    protected EndlessScroller(RecyclerView.LayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
+        isReverse = isReverse();
     }
 
     @Override
@@ -26,8 +31,8 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
         if (dy == 0) return;
 
         int visibleItemCount = recyclerView.getChildCount();
-        int totalItemCount = mLinearLayoutManager.getItemCount();
-        int firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+        int totalItemCount = layoutManager.getItemCount();
+        int firstVisibleItem = getFirstVisiblePosition();
 
         int numScrolled = totalItemCount - visibleItemCount;
         int refreshTrigger = isReverse ? totalItemCount - firstVisibleItem : firstVisibleItem;
@@ -44,5 +49,34 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
         }
     }
 
+    public void refresh() {
+        loading = false;
+    }
+
     public abstract void onLoadMore(int currentItemCount);
+
+    private boolean isReverse() {
+        if (layoutManager instanceof LinearLayoutManager) {
+            return ((LinearLayoutManager) layoutManager).getStackFromEnd();
+        }
+        else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            return ((StaggeredGridLayoutManager) layoutManager).getReverseLayout();
+        }
+        return false;
+    }
+
+    private int getFirstVisiblePosition() {
+        if (layoutManager instanceof LinearLayoutManager) {
+            return ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+        }
+        else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            StaggeredGridLayoutManager gridLayoutManager = ((StaggeredGridLayoutManager) layoutManager);
+            int[] store = new int[gridLayoutManager.getSpanCount()];
+            gridLayoutManager.findFirstVisibleItemPositions(store);
+            List<Integer> list = new ArrayList<>(store.length);
+            for (int value : store) list.add(value);
+            return Collections.min(list);
+        }
+        return 0;
+    }
 }

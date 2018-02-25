@@ -34,7 +34,10 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         }
-        else fullResView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        else {
+            fullResView.setVisibility(View.GONE);
+            itemView.setOnClickListener(view -> adapterListener.onMediaClicked(media));
+        }
     }
 
     @Override

@@ -4,10 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,7 +23,7 @@ import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
-import com.mainstreetcode.teammates.util.EndlessScroller;
+import com.mainstreetcode.teammates.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -44,9 +42,6 @@ public final class EventsFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private RecyclerView recyclerView;
-    private EmptyViewHolder emptyViewHolder;
-    private SwipeRefreshLayout refreshLayout;
     private List<Identifiable> items;
 
     public static EventsFragment newInstance(Team team) {
@@ -81,23 +76,14 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_events, container, false);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 
-        recyclerView = rootView.findViewById(R.id.team_list);
-        refreshLayout = rootView.findViewById(R.id.refresh_layout);
-
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new EventAdapter(items, this));
-        recyclerView.addOnScrollListener(new EndlessScroller(layoutManager) {
-            @Override
-            public void onLoadMore(int oldCount) {
-                toggleProgress(true);
-                fetchEvents();
-            }
-        });
-        refreshLayout.setOnRefreshListener(() -> eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler));
-
-        emptyViewHolder = new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events);
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+                .withLayoutManager(new LinearLayoutManager(getContext()))
+                .withAdapter(new EventAdapter(items, this))
+                .withEndlessScrollCallback(this::fetchEvents)
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), () -> eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events))
+                .build();
 
         return rootView;
     }
@@ -127,14 +113,6 @@ public final class EventsFragment extends MainActivityFragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
-        refreshLayout = null;
-        emptyViewHolder = null;
     }
 
     @Override
@@ -170,7 +148,7 @@ public final class EventsFragment extends MainActivityFragment
             Event event = args.getParcelable(EventEditFragment.ARG_EVENT);
             if (event == null) return superResult;
 
-            EventViewHolder viewHolder = (EventViewHolder) recyclerView.findViewHolderForItemId(event.hashCode());
+            EventViewHolder viewHolder = (EventViewHolder) scrollManager.findViewHolderForItemId(event.hashCode());
             if (viewHolder == null) return superResult;
 
             return beginTransaction()
@@ -182,13 +160,12 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     void fetchEvents() {
+        toggleProgress(true);
         disposables.add(eventViewModel.getMore(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {
-        result.dispatchUpdatesTo(recyclerView.getAdapter());
-        refreshLayout.setRefreshing(false);
-        emptyViewHolder.toggle(items.isEmpty());
+        scrollManager.onDiff(result);
         toggleProgress(false);
     }
 }

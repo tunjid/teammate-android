@@ -13,11 +13,6 @@ public class DateTypeConverter {
 
     @TypeConverter
     public Long dateToTimestamp(Date date) {
-        if (date == null) {
-            return null;
-        }
-        else {
-            return date.getTime();
-        }
+        return date == null ? null : date.getTime();
     }
 }

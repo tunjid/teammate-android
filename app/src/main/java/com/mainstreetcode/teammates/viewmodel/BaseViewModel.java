@@ -25,7 +25,9 @@ abstract class BaseViewModel extends ViewModel {
     private static final int AD_THRESH = 5;
 
     BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (source, additions) -> {
-        ModelUtils.preserveList(source, additions);
+        if (stacksFromEnd()) ModelUtils.preserveList(source, additions);
+        else ModelUtils.preserveListInverse(source, additions);
+
         if (hasNativeAds()) distributeAds(source);
         return source;
     };
@@ -34,9 +36,9 @@ abstract class BaseViewModel extends ViewModel {
 
     BaseViewModel() {fetchAds();}
 
-    boolean hasNativeAds() {
-        return true;
-    }
+    boolean hasNativeAds() {return true;}
+
+    boolean stacksFromEnd() {return true;}
 
     private void distributeAds(List<Identifiable> source) {
         filterAds(source);
