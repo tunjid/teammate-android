@@ -66,12 +66,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return Identifiable.diff(sourceFlowable, () -> teamListFunction.apply(team), (old, updated) -> updated);
     }
 
-    public boolean postSearch(String queryText) {
-        if (teamSearchProcessor == null) return false;
-        teamSearchProcessor.onNext(queryText);
-        return true;
-    }
-
     public Flowable<List<Team>> findTeams() {
         if (teamSearchProcessor == null) teamSearchProcessor = PublishProcessor.create();
         return teamSearchProcessor
@@ -89,6 +83,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .map(TeamViewModel::onTeamDeleted)
                 .doOnSuccess(getModelList(Team.class)::remove)
                 .observeOn(mainThread());
+    }
+
+    public boolean postSearch(String queryText) {
+        if (teamSearchProcessor == null) return false;
+        teamSearchProcessor.onNext(queryText);
+        return true;
     }
 
     public Team getDefaultTeam() {
