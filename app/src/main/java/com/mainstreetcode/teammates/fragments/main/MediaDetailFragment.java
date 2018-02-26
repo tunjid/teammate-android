@@ -177,5 +177,6 @@ public class MediaDetailFragment extends MainActivityFragment
                 : new VideoMediaViewHolder(rootView, this);
 
         mediaViewHolder.fullBind(media);
+        onMediaClicked(media);
     }
 }

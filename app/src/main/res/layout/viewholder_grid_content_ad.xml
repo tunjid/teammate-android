@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/half_margin"
-    android:layout_marginLeft="@dimen/single_margin"
-    android:layout_marginRight="@dimen/single_margin"
+    android:layout_marginLeft="@dimen/half_margin"
+    android:layout_marginRight="@dimen/half_margin"
     android:layout_marginTop="@dimen/half_margin">
 
     <android.support.v7.widget.CardView
