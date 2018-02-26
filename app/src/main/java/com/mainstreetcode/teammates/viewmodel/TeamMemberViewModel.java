@@ -40,7 +40,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
     }
 
     @Override
-    boolean stacksFromEnd() {
+    boolean sortsAscending() {
         return true;
     }
 

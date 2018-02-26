@@ -51,7 +51,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     }
 
     @Override
-    boolean stacksFromEnd() {return true;}
+    boolean sortsAscending() {return true;}
 
     public void onChatRoomLeft(Team team) {
         chatMap.put(team, RETRY);

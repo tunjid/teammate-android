@@ -107,12 +107,12 @@ public class ModelUtils {
         return new Message((HttpException) throwable);
     }
 
-    public static <T extends Identifiable> void preserveList(List<T> source, List<T> additions) {
+    public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
         Collections.sort(source, Identifiable.COMPARATOR);
     }
 
-    public static <T extends Identifiable> void preserveListInverse(List<T> source, List<T> additions) {
+    public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
         Collections.sort(source, (a, b) -> -Identifiable.COMPARATOR.compare(a, b));
     }

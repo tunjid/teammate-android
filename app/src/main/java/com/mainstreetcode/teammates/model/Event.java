@@ -125,7 +125,7 @@ public class Event extends EventEntity
         for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
 
         location = updatedEvent.location;
-        ModelUtils.preserveList(guests, updatedEvent.guests);
+        ModelUtils.preserveAscending(guests, updatedEvent.guests);
 
         team.update(updatedEvent.team);
     }

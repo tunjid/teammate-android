@@ -38,6 +38,11 @@ public class RoleViewModel extends MappedViewModel<String, Role> {
         joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
+    @Override
+    boolean sortsAscending() {
+        return true;
+    }
+
     public List<String> getRoleNames() {
         return roleNames;
     }
