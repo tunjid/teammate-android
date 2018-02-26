@@ -90,7 +90,7 @@ public class EventEditFragment extends HeaderedFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withLayoutManager(getGridLayoutManager())
                 .withAdapter(new EventEditAdapter(eventItems, this))
-                .withScrollListener((dx, dy) -> {if (canEditEvent() && Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .withScrollListener(this::updateFabOnScroll)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

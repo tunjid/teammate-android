@@ -90,7 +90,7 @@ public class TeamEditFragment extends HeaderedFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
-                .withScrollListener((dx, dy) -> {if (Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .withScrollListener(this::updateFabOnScroll)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

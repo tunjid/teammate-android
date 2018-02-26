@@ -74,7 +74,7 @@ public class RoleEditFragment extends HeaderedFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new RoleEditAdapter(role, roleViewModel.getRoleNames(), this))
-                .withScrollListener((dx, dy) -> {if (Math.abs(dy) > 3) toggleFab(dy < 0);})
+                .withScrollListener(this::updateFabOnScroll)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

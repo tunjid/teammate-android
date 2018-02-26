@@ -94,9 +94,7 @@ public class TeamDetailFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
                 .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
                 .withAdapter(new TeamDetailAdapter(teamModels, this))
-                .withScrollListener((dx, dy) -> {
-                    if (showsFab() && Math.abs(dy) > 3) toggleFab(dy < 0);
-                })
+                .withScrollListener(this::updateFabOnScroll)
                 .build();
         return rootView;
     }

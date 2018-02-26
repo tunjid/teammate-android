@@ -156,6 +156,11 @@ public class TeammatesBaseFragment extends BaseFragment {
         toggleProgress(false);
     }
 
+    @SuppressWarnings("unused")
+    protected void updateFabOnScroll(int dx, int dy) {
+        if (showsFab() && Math.abs(dy) > 3) toggleFab(dy < 0);
+    }
+
     protected void onKeyBoardChanged(boolean appeared) {
 
     }

@@ -94,11 +94,11 @@ public class MediaFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_media))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
-                .withScrollListener((dx, dy) -> {if (Math.abs(dy) > 3) toggleFab(dy < 0);})
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withLayoutManager(new GridLayoutManager(getContext(), 4))
                 .withEndlessScrollCallback(() -> fetchMedia(false))
                 .withAdapter(new MediaAdapter(items, this))
+                .withScrollListener(this::updateFabOnScroll)
                 .build();
 
         contextBar = rootView.findViewById(R.id.alt_toolbar);
