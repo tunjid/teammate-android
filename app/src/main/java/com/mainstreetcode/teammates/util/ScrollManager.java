@@ -162,12 +162,12 @@ public class ScrollManager {
                 public void onLoadMore(int currentItemCount) {scrollCallback.run();}
             };
 
-            List<OnScrollListener> scrollListeners = new ArrayList<>(displacementConsumers.size());
-
             int stateConsumersSize = stateConsumers.size();
             int scrollConsumersSize = displacementConsumers.size();
-
             int max = Math.max(stateConsumersSize, scrollConsumersSize);
+
+            List<OnScrollListener> scrollListeners = new ArrayList<>(max);
+
 
             for (int i = 0; i < max; i++) {
                 final Consumer<Integer> consumer;
@@ -195,7 +195,9 @@ public class ScrollManager {
                 });
             }
 
-            scrollListeners.clear();
+            stateConsumers.clear();
+            displacementConsumers.clear();
+
             return new ScrollManager(scroller, emptyViewholder, refreshLayout, recyclerView, adapter, layoutManager, scrollListeners);
         }
     }
