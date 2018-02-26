@@ -62,8 +62,8 @@ public class Team extends TeamEntity
     @Ignore private final List<Item<Team>> items;
 
     public Team(String id, String name, String city, String state, String zip, String imageUrl,
-                Date created, LatLng location, long storageUsed) {
-        super(id, name, city, state, zip, imageUrl, created, location, storageUsed);
+                Date created, LatLng location, long storageUsed, long maxStorage) {
+        super(id, name, city, state, zip, imageUrl, created, location, storageUsed, maxStorage);
 
         items = buildItems();
     }
@@ -76,7 +76,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null, 0);
+        return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null, 0, 0);
     }
 
     public static Team updateDelayedModels(Team team) {
@@ -95,6 +95,7 @@ public class Team extends TeamEntity
                 new Item(Item.ADDRESS, R.string.city, city == null ? "" : city, this::setCity, this),
                 new Item(Item.ADDRESS, R.string.state, state == null ? "" : state, this::setState, this),
                 new Item(Item.ADDRESS, R.string.zip, zip == null ? "" : zip, this::setZip, this),
+                new Item(Item.INFO, R.string.team_storage_used, storageUsed + "/" + maxStorage + " MB", null, this),
                 new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, this)
         );
     }
@@ -233,12 +234,12 @@ public class Team extends TeamEntity
         private static final String LOCATION_KEY = "location";
         private static final String JOIN_REQUEST_KEY = "joinRequests";
         private static final String STORAGE_USED_KEY = "storageUsed";
-
+        private static final String MAX_STORAGE_KEY = "maxStorage";
 
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Team(json.getAsString(), "", "", "", "", "", new Date(), new LatLng(0, 0), 0);
+                return new Team(json.getAsString(), "", "", "", "", "", new Date(), new LatLng(0, 0), 0, 0);
             }
 
             JsonObject teamJson = json.getAsJsonObject();
@@ -251,9 +252,10 @@ public class Team extends TeamEntity
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
-            long storageUsed = ModelUtils.asLong(STORAGE_USED_KEY, teamJson);
+            long storageUsed = (long) ModelUtils.asFloat(STORAGE_USED_KEY, teamJson);
+            long maxStorage = (long) ModelUtils.asFloat(MAX_STORAGE_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip, logoUrl, created, location, storageUsed);
+            Team team = new Team(id, name, city, state, zip, logoUrl, created, location, storageUsed, maxStorage);
 
             if (teamJson.has(ROLES_KEY)) {
                 deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);

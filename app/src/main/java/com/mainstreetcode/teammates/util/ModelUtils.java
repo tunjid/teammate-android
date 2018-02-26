@@ -48,9 +48,9 @@ public class ModelUtils {
         catch (Exception e) {return "";}
     }
 
-    public static long asLong(String key, JsonObject jsonObject) {
+    public static float asFloat(String key, JsonObject jsonObject) {
         JsonElement element = jsonObject.get(key);
-        try {return element != null && element.isJsonPrimitive() ? element.getAsLong() : 0;}
+        try {return element != null && element.isJsonPrimitive() ? element.getAsFloat() : 0;}
         catch (Exception e) {return 0;}
     }
 

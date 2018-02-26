@@ -82,6 +82,7 @@
     <string name="team_invalid_empty_field">Field must not be empty</string>
     <string name="created_team">Created team "%1$s"</string>
     <string name="updated_team">Updated team</string>
+    <string name="team_storage_used">Storage Used</string>
 
     <!--TeamsFragment-->
     <string name="pick_team">Pick a Team</string>

@@ -35,6 +35,8 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     @Override
     public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         switch (viewType) {
+            case Item.INFO:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
             case Item.ROLE:
