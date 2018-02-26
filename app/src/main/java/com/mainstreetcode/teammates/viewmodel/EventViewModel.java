@@ -33,10 +33,6 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         catch (Exception e) {return new ArrayList<>();}
     }
 
-
-    @Override
-    boolean stacksFromEnd() {return false;}
-
     @Override
     Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
         return repository.modelsBefore(key, getQueryDate(key, fetchLatest))

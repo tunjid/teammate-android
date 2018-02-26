@@ -38,7 +38,7 @@ abstract class BaseViewModel extends ViewModel {
 
     boolean hasNativeAds() {return true;}
 
-    boolean stacksFromEnd() {return true;}
+    boolean stacksFromEnd() {return false;}
 
     private void distributeAds(List<Identifiable> source) {
         filterAds(source);

@@ -40,6 +40,11 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
     }
 
     @Override
+    boolean stacksFromEnd() {
+        return true;
+    }
+
+    @Override
     Flowable<List<Model>> fetch(Team key, boolean fetchLatest) {
         return checkForInvalidObject(teamRepository.get(key)
                 .cast(Model.class), key, key)

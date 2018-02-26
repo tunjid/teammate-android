@@ -15,6 +15,7 @@ import io.reactivex.functions.BiFunction;
 
 import static android.support.v7.util.DiffUtil.calculateDiff;
 import static com.mainstreetcode.teammates.model.Identifiable.Util.getPoints;
+import static com.mainstreetcode.teammates.model.Identifiable.Util.isSameModel;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.computation;
 
@@ -96,16 +97,16 @@ public interface Identifiable {
         int pointsA = getPoints(modelA);
         int pointsB = getPoints(modelB);
 
-        int a, b;
-        a = b = Integer.compare(pointsA, pointsB);
+        int a, b, modelComparison;
+        a = b = modelComparison = Integer.compare(pointsA, pointsB);
 
-        if (modelA instanceof Model
-                && modelB instanceof Model
-                && modelA.getClass().equals(modelB.getClass()))
-            a += ((Model) modelA).compareTo(modelB);
+
+        if (!isSameModel(modelA, modelB)) return modelComparison;
+        else a += ((Model) modelA).compareTo(modelB);
 
         return Integer.compare(a, b);
     };
+
 
     class Util {
         static int getPoints(Identifiable identifiable) {
@@ -115,6 +116,12 @@ public interface Identifiable {
             if (identifiable.getClass().equals(Event.class)) return 10;
             if (identifiable.getClass().equals(Media.class)) return 5;
             return 0;
+        }
+
+        static boolean isSameModel(Identifiable modelA, Identifiable modelB) {
+            return modelA instanceof Model
+                    && modelB instanceof Model
+                    && modelA.getClass().equals(modelB.getClass());
         }
     }
 }

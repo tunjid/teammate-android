@@ -120,11 +120,14 @@ public class Role extends RoleEntity
     public int compareTo(@NonNull Role o) {
         int roleComparison = name.compareTo(o.name);
         int userComparison = user.compareTo(o.user);
+        int teamComparison = team.compareTo(o.team);
 
         return roleComparison != 0
                 ? roleComparison
                 : userComparison != 0
                 ? userComparison
+                : teamComparison != 0
+                ? teamComparison
                 : id.compareTo(o.id);
     }
 

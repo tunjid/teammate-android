@@ -50,6 +50,9 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         return false;
     }
 
+    @Override
+    boolean stacksFromEnd() {return true;}
+
     public void onChatRoomLeft(Team team) {
         chatMap.put(team, RETRY);
     }
