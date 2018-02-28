@@ -125,7 +125,7 @@ public class MediaFragment extends MainActivityFragment
     }
 
     void fetchMedia(boolean fetchLatest) {
-        toggleProgress(true);
+        if (!fetchLatest) toggleProgress(true);
         Flowable<DiffUtil.DiffResult> source = fetchLatest ? mediaViewModel.getLatest(team) : mediaViewModel.getMore(team);
         disposables.add(source.subscribe(this::onMediaUpdated, defaultErrorHandler));
     }
