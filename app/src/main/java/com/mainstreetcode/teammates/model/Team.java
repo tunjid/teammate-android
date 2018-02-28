@@ -43,7 +43,7 @@ public class Team extends TeamEntity
     private static final int CITY_POSITION = 1;
     private static final int STATE_POSITION = 2;
     public static final int ZIP_POSITION = 3;
-    public static final int ROLE_POSITION = 4;
+    public static final int ROLE_POSITION = 5;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
