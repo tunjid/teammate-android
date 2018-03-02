@@ -136,6 +136,7 @@ public class Media implements
     public void update(Media updated) {
         id = updated.id;
         url = updated.url;
+        thumbnail = updated.thumbnail;
         mimeType = updated.mimeType;
         created = updated.created;
 
