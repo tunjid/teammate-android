@@ -47,22 +47,24 @@ public class ScrollManager {
         for (OnScrollListener listener : listeners) recyclerView.addOnScrollListener(listener);
     }
 
-    public void onDiff(DiffUtil.DiffResult result) {
-        boolean hasAdapter = adapter != null;
-        if (hasAdapter) result.dispatchUpdatesTo(adapter);
-        if (refreshLayout != null) refreshLayout.setRefreshing(false);
-        if (viewHolder != null && hasAdapter) viewHolder.toggle(adapter.getItemCount() == 0);
-    }
-
     public static Builder withRecyclerView(RecyclerView recyclerView) {
         Builder builder = new Builder();
         builder.recyclerView = recyclerView;
         return builder;
     }
 
+    public void onDiff(DiffUtil.DiffResult result) {
+        boolean hasAdapter = adapter != null;
+        if (hasAdapter) result.dispatchUpdatesTo(adapter);
+        if (scroller != null) scroller.refresh();
+        if (refreshLayout != null) refreshLayout.setRefreshing(false);
+        if (viewHolder != null && hasAdapter) viewHolder.toggle(adapter.getItemCount() == 0);
+    }
+
     public void notifyDataSetChanged() {
         boolean hasAdapter = adapter != null;
         if (hasAdapter) adapter.notifyDataSetChanged();
+        if (scroller != null) scroller.refresh();
         if (refreshLayout != null) refreshLayout.setRefreshing(false);
         if (viewHolder != null && hasAdapter) viewHolder.toggle(adapter.getItemCount() == 0);
     }
