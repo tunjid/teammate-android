@@ -10,7 +10,7 @@ import com.mainstreetcode.teammates.model.Media;
 
 public class ImageMediaViewHolder extends MediaViewHolder<ImageView> {
 
-    private static final int FULL_RES_LOAD_DELAY = 250;
+    private static final int FULL_RES_LOAD_DELAY = 100;
 
     public ImageMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
