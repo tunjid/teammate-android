@@ -52,12 +52,11 @@
             android:layout_margin="@dimen/single_margin" />
 
         <FrameLayout
-            app:behavior_peekHeight="0dp"
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorPrimary"
-            app:behavior_hideable="false"
+            app:behavior_hideable="true"
             app:layout_behavior="android.support.design.widget.BottomSheetBehavior" />
     </android.support.design.widget.CoordinatorLayout>
 

@@ -35,6 +35,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
 public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
@@ -137,13 +138,13 @@ public class MainActivity extends TeammatesBaseActivity
 
     @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior.getState() != STATE_COLLAPSED) toggleBottomSheet(false);
+        if (bottomSheetBehavior.getState() != STATE_HIDDEN) toggleBottomSheet(false);
         else super.onBackPressed();
     }
 
     @Override
     public void toggleBottomSheet(boolean show) {
-        bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_COLLAPSED);
+        bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_HIDDEN);
         if (!show) restoreHiddenViewState();
         else bottomSheetContainer.setPadding(0, TeammatesBaseActivity.insetHeight, 0, 0);
     }
