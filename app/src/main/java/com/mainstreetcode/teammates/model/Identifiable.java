@@ -4,6 +4,8 @@ package com.mainstreetcode.teammates.model;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammates.notifications.FeedItem;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -110,6 +112,7 @@ public interface Identifiable {
 
     class Util {
         static int getPoints(Identifiable identifiable) {
+            if (identifiable instanceof FeedItem) identifiable = ((FeedItem) identifiable).getModel();
             if (identifiable.getClass().equals(Item.class)) return 25;
             if (identifiable.getClass().equals(Role.class)) return 20;
             if (identifiable.getClass().equals(JoinRequest.class)) return 15;
