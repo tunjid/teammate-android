@@ -105,7 +105,7 @@ public class TeammatesBaseFragment extends BaseFragment {
 
     protected void toggleStatusBar(boolean show) {getPersistentUiController().toggleStatusBar(show);}
 
-    private void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
+    protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
     protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon);}
 

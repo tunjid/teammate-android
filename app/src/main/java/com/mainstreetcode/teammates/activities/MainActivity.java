@@ -36,15 +36,21 @@ import com.mainstreetcode.teammates.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.core.view.ViewHider;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+import static android.view.View.GONE;
+import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
 
 public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
 
     public static final String FEED_DEEP_LINK = "feed-deep-link";
+
+    @Nullable
+    private ViewHider bottombarHider;
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -110,6 +116,23 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+
+        View bottomBar = findViewById(R.id.bottom_navigation);
+        bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
+                .addStartRunnable(() -> {
+                    TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+                    if (view != null && !view.showsBottomNav()) bottomBar.setVisibility(GONE);
+                })
+                .addEndRunnable(() -> {
+                    TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+                    if (view != null && view.showsBottomNav()) initTransition();
+                })
+                .build();
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         route(null, intent);
@@ -144,6 +167,13 @@ public class MainActivity extends TeammatesBaseActivity
     public void onBackPressed() {
         if (bottomSheetBehavior.getState() != STATE_HIDDEN) toggleBottomSheet(false);
         else super.onBackPressed();
+    }
+
+    @Override
+    public void toggleBottombar(boolean show) {
+        if (bottombarHider == null) return;
+        if (show) bottombarHider.show();
+        else bottombarHider.hide();
     }
 
     @Override
