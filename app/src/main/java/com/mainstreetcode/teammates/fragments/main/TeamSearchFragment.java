@@ -125,8 +125,9 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     private void postSearch(String queryText) {
         if (teamViewModel.postSearch(queryText)) return;
-        disposables.add(teamViewModel.findTeams().subscribe(this::onTeamsUpdated, defaultErrorHandler));
-        postSearch(queryText);
+        disposables.add(teamViewModel.findTeams()
+                .doOnSubscribe(subscription -> postSearch(queryText))
+                .subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     private void onTeamsUpdated(List<Team> teams) {

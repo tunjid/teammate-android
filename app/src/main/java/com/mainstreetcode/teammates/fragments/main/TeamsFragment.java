@@ -55,8 +55,6 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
         roles = roleViewModel.getModelList(userViewModel.getCurrentUser().getId());
     }
 
@@ -80,7 +78,7 @@ public final class TeamsFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setFabIcon(R.drawable.ic_add_white_24dp);
+        setFabIcon(R.drawable.ic_search_white_24dp);
         setFabClickListener(this);
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
 
@@ -135,7 +133,7 @@ public final class TeamsFragment extends MainActivityFragment
         switch (view.getId()) {
             case R.id.fab:
                 toggleBottomSheet(false);
-                showFragment(TeamEditFragment.newCreateInstance());
+                showFragment(TeamSearchFragment.newInstance());
                 break;
         }
     }
