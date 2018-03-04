@@ -65,7 +65,7 @@ public class Event extends EventEntity
         return Arrays.asList(
                 new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
                 new Item(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this),
-                new Item(Item.INPUT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
+                new Item(Item.TEXT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
                 new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
                 new Item(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, this)
         );

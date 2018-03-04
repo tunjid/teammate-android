@@ -43,6 +43,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
         switch (viewType) {
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
+            case Item.TEXT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, () -> false);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.IMAGE:

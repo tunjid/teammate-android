@@ -17,8 +17,7 @@ import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
-
-import java.util.concurrent.Callable;
+import com.mainstreetcode.teammates.util.Supplier;
 
 /**
  * Viewholder for editing simple text fields for an {@link Item}
@@ -31,18 +30,23 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     @Nullable
     private final TextView headerText;
     private final TextInputLayout inputLayout;
+    private final Supplier<Boolean> errorChecker;
+    private final Supplier<Boolean> enabler;
 
-    private final Callable<Boolean> enabler;
-
-    public InputViewHolder(View itemView, Callable<Boolean> enabler) {
+    public InputViewHolder(View itemView, Supplier<Boolean> enabler, @Nullable Supplier<Boolean> errorChecker) {
         super(itemView);
         this.enabler = enabler;
+        this.errorChecker = errorChecker == null ? this::hasText : errorChecker;
         inputLayout = itemView.findViewById(R.id.input_layout);
         editText = inputLayout.getEditText();
         headerText = itemView.findViewById(R.id.header_name);
 
         inputLayout.setEnabled(isEnabled());
         editText.addTextChangedListener(this);
+    }
+
+    public InputViewHolder(View itemView, Supplier<Boolean> enabler) {
+        this(itemView, enabler, null);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     private void checkForErrors() {
-        if (!TextUtils.isEmpty(editText.getText())) editText.setError(null);
+        if (!errorChecker.get()) editText.setError(null);
         else editText.setError(editText.getContext().getString(R.string.team_invalid_empty_field));
     }
 
@@ -99,8 +103,12 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         editText.setTextColor(ColorStateList.valueOf(colorInt));
     }
 
+    private boolean hasText() {
+        return TextUtils.isEmpty(editText.getText());
+    }
+
     protected boolean isEnabled() {
-        try {return enabler.call();}
+        try {return enabler.get();}
         catch (Exception e) {return false;}
     }
 }

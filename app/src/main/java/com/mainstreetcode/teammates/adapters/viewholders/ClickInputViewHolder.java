@@ -4,8 +4,7 @@ import android.view.View;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Item;
-
-import java.util.concurrent.Callable;
+import com.mainstreetcode.teammates.util.Supplier;
 
 /**
  * ViewHolder for selecting {@link com.mainstreetcode.teammates.model.Role}
@@ -15,7 +14,7 @@ public class ClickInputViewHolder extends InputViewHolder
 
     private final Runnable clickAction;
 
-    public ClickInputViewHolder(View itemView, Callable<Boolean> enabler, Runnable clickAction) {
+    public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction) {
         super(itemView, enabler);
         this.clickAction = clickAction;
     }

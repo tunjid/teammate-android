@@ -56,7 +56,6 @@ public class ScrollManager {
     public void onDiff(DiffUtil.DiffResult result) {
         boolean hasAdapter = adapter != null;
         if (hasAdapter) result.dispatchUpdatesTo(adapter);
-        if (scroller != null) scroller.refresh();
         if (refreshLayout != null) refreshLayout.setRefreshing(false);
         if (viewHolder != null && hasAdapter) viewHolder.toggle(adapter.getItemCount() == 0);
     }
@@ -64,7 +63,6 @@ public class ScrollManager {
     public void notifyDataSetChanged() {
         boolean hasAdapter = adapter != null;
         if (hasAdapter) adapter.notifyDataSetChanged();
-        if (scroller != null) scroller.refresh();
         if (refreshLayout != null) refreshLayout.setRefreshing(false);
         if (viewHolder != null && hasAdapter) viewHolder.toggle(adapter.getItemCount() == 0);
     }
@@ -77,8 +75,8 @@ public class ScrollManager {
         if (adapter != null) adapter.notifyItemRemoved(position);
     }
 
-    public void refresh() {
-        if (scroller != null) scroller.refresh();
+    public void reset() {
+        if (scroller != null) scroller.reset();
     }
 
     public void clear() {
