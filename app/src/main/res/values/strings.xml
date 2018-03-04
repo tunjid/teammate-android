@@ -156,8 +156,7 @@
 
     <!--MediaDetailFragment-->
     <string name="flag_media">Flag media</string>
-    <string name="flag_media_message">Flagging this item will make it unavailable until it\'s been reviewed by us and deemed safe and found not to violate our terms and services.
-    \n\nDo you want to flag it?</string>
+    <string name="flag_media_message">Do you want to report this post as inappropriate? The post will be temporarily removed and will be reviewed by our compliance team.</string>
     <string name="media_flagged">This item has been flagged</string>
 
     <!--Notifier-->
