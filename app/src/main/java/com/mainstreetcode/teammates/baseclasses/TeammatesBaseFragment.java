@@ -50,7 +50,7 @@ public class TeammatesBaseFragment extends BaseFragment {
                 .build();
 
         defaultErrorHandler.addAction(() -> {
-            if (scrollManager != null) scrollManager.refresh();
+            if (scrollManager != null) scrollManager.reset();
         });
     }
 

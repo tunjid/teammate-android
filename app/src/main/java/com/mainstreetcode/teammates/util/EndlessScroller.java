@@ -19,7 +19,7 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
 
     private RecyclerView.LayoutManager layoutManager;
 
-    protected EndlessScroller(RecyclerView.LayoutManager layoutManager) {
+    EndlessScroller(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
         isReverse = isReverse();
     }
@@ -28,7 +28,7 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        if (dy == 0) return;
+        if (Math.abs(dy) < 3) return;
 
         int visibleItemCount = recyclerView.getChildCount();
         int totalItemCount = layoutManager.getItemCount();
@@ -49,9 +49,7 @@ public abstract class EndlessScroller extends RecyclerView.OnScrollListener {
         }
     }
 
-    public void refresh() {
-        loading = false;
-    }
+    void reset() {loading = false;}
 
     public abstract void onLoadMore(int currentItemCount);
 
