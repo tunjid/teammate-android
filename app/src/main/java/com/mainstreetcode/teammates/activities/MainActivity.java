@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammates.activities;
 
 import android.app.Activity;
+import android.arch.core.util.Function;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,21 +26,31 @@ import com.mainstreetcode.teammates.fragments.main.EventsFragment;
 import com.mainstreetcode.teammates.fragments.main.HomeFragment;
 import com.mainstreetcode.teammates.fragments.main.MediaFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
+import com.mainstreetcode.teammates.fragments.main.TeamDetailFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.notifications.TeammatesInstanceIdService;
+import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.core.view.ViewHider;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+import static android.view.View.GONE;
+import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
 
 public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
 
     public static final String FEED_DEEP_LINK = "feed-deep-link";
+
+    @Nullable
+    private ViewHider bottombarHider;
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -105,6 +116,23 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+
+        View bottomBar = findViewById(R.id.bottom_navigation);
+        bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
+                .addStartRunnable(() -> {
+                    TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+                    if (view != null && !view.showsBottomNav()) bottomBar.setVisibility(GONE);
+                })
+                .addEndRunnable(() -> {
+                    TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+                    if (view != null && view.showsBottomNav()) initTransition();
+                })
+                .build();
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         route(null, intent);
@@ -137,13 +165,20 @@ public class MainActivity extends TeammatesBaseActivity
 
     @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior.getState() != STATE_COLLAPSED) toggleBottomSheet(false);
+        if (bottomSheetBehavior.getState() != STATE_HIDDEN) toggleBottomSheet(false);
         else super.onBackPressed();
     }
 
     @Override
+    public void toggleBottombar(boolean show) {
+        if (bottombarHider == null) return;
+        if (show) bottombarHider.show();
+        else bottombarHider.hide();
+    }
+
+    @Override
     public void toggleBottomSheet(boolean show) {
-        bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_COLLAPSED);
+        bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_HIDDEN);
         if (!show) restoreHiddenViewState();
         else bottomSheetContainer.setPadding(0, TeammatesBaseActivity.insetHeight, 0, 0);
     }
@@ -158,13 +193,15 @@ public class MainActivity extends TeammatesBaseActivity
         Model model = intent.getParcelableExtra(FEED_DEEP_LINK);
         BaseFragment route = null;
 
-        if (model != null) {
-            if (model instanceof Event) route = EventEditFragment.newInstance((Event) model);
-            if (model instanceof Chat) route = ChatFragment.newInstance(((Chat) model).getTeam());
-        }
+        if (model != null) route = route(
+                () -> route(model, Chat.class, Chat::getTeam, ChatFragment::newInstance),
+                () -> route(model, Event.class, event -> event, EventEditFragment::newInstance),
+                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamDetailFragment::newInstance)
+        );
+
         else if (savedInstanceState == null) route = HomeFragment.newInstance();
 
-        if (route != null) showFragment(route);
+        showFragment(route != null ? route : HomeFragment.newInstance());
     }
 
     private void restoreHiddenViewState() {
@@ -180,5 +217,27 @@ public class MainActivity extends TeammatesBaseActivity
         Intent main = new Intent(activity, RegistrationActivity.class);
         activity.startActivity(main);
         activity.finish();
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    private <T, S> BaseFragment route(Model model, Class<T> modelClass, Function<T, S> function, Function<S, BaseFragment> fragmentFunction) {
+        if (!model.getClass().equals(modelClass)) return null;
+        return fragmentFunction.apply(function.apply((T) model));
+    }
+
+    @Nullable
+    @SafeVarargs
+    private final BaseFragment route(Supplier<BaseFragment>... suppliers) {
+        for (Supplier<BaseFragment> supplier : suppliers) {
+            BaseFragment fragment = supplier.get();
+            if (fragment != null) return fragment;
+        }
+        return null;
+    }
+
+    @FunctionalInterface
+    private interface Supplier<T> {
+        T get();
     }
 }

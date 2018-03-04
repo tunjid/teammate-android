@@ -36,6 +36,7 @@ import com.mainstreetcode.teammates.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Flowable;
 
@@ -51,6 +52,7 @@ public class MediaFragment extends MainActivityFragment
 
     private Team team;
     private List<Identifiable> items;
+    private AtomicBoolean bottomBarState;
 
     private Toolbar contextBar;
 
@@ -81,6 +83,7 @@ public class MediaFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         items = mediaViewModel.getModelList(team);
+        bottomBarState = new AtomicBoolean();
 
         ImageWorkerFragment.attach(this);
     }
@@ -104,6 +107,8 @@ public class MediaFragment extends MainActivityFragment
         contextBar = rootView.findViewById(R.id.alt_toolbar);
         contextBar.inflateMenu(R.menu.fragment_media_context);
         contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
+        bottomBarState.set(true);
 
         return rootView;
     }
@@ -165,7 +170,7 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public boolean showsBottomNav() {
-        return false;
+        return bottomBarState.get();
     }
 
     @Override
@@ -191,7 +196,11 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void onMediaClicked(Media item) {
         if (mediaViewModel.hasSelections(team)) longClickMedia(item);
-        else showFragment(MediaDetailFragment.newInstance(item));
+        else {
+            bottomBarState.set(false);
+            toggleBottombar(false);
+            showFragment(MediaDetailFragment.newInstance(item));
+        }
     }
 
     @Override

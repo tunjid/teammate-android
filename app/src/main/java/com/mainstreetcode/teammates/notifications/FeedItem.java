@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.notifications;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -28,7 +29,7 @@ import java.util.Map;
  * Notifications from a user's feed
  */
 
-public class FeedItem<T extends Model<T>> implements Identifiable {
+public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<FeedItem> {
 
     static final String JOIN_REQUEST = "join-request";
     static final String EVENT = "event";
@@ -94,6 +95,11 @@ public class FeedItem<T extends Model<T>> implements Identifiable {
     }
 
     boolean isDeleteAction() {return !TextUtils.isEmpty(action) && "DELETE".equals(action);}
+
+    @Override
+    public int compareTo(@NonNull FeedItem o) {
+        return Identifiable.COMPARATOR.compare(model, o.getModel());
+    }
 
     @Override
     public boolean equals(Object o) {

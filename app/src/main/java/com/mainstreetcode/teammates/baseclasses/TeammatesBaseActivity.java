@@ -60,8 +60,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Nullable
     private ViewHider toolbarHider;
     @Nullable
-    private ViewHider bottombarHider;
-    @Nullable
     private FabIconAnimator fabIconAnimator;
 
 
@@ -102,14 +100,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         root = findViewById(R.id.coordinator);
         fab = findViewById(R.id.fab);
 
-        View bottomBar = findViewById(R.id.bottom_navigation);
 
         if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
 
-        if (bottomBar != null) {
-            bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
-                    .addEndRunnable(this::initTransition).build();
-        }
         if (fab != null) {
             fabHider = ViewHider.of(fab).setDirection(BOTTOM).build();
             fabIconAnimator = new FabIconAnimator(fab);
@@ -138,11 +131,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void toggleBottombar(boolean show) {
-        if (bottombarHider == null) return;
-        if (show) bottombarHider.show();
-        else bottombarHider.hide();
-    }
+    public void toggleBottombar(boolean show) {}
 
     @Override
     public void toggleFab(boolean show) {
@@ -217,6 +206,17 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return parent.getId() == R.id.main_fragment_container;
     }
 
+    protected void initTransition() {
+        Transition transition = new AutoTransition();
+        transition.setDuration(200);
+
+        TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+        if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
+        transition.excludeTarget(RecyclerView.class, true);
+
+        TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
+    }
+
     private WindowInsetsCompat consumeToolbarInsets(WindowInsetsCompat insets) {
         if (insetsApplied) return insets;
 
@@ -235,17 +235,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
         if (view != null) view.onKeyBoardChanged(bottomInset != 0);
         return insets;
-    }
-
-    private void initTransition() {
-        Transition transition = new AutoTransition();
-        transition.setDuration(200);
-
-        TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
-        if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
-        transition.excludeTarget(RecyclerView.class, true);
-
-        TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }
 
     private void setKeyboardPadding(int padding) {
