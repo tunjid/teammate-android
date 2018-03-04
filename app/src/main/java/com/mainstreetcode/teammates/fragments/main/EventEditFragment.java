@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.EventEditAdapter;
 import com.mainstreetcode.teammates.baseclasses.HeaderedFragment;
@@ -29,7 +31,10 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.util.ScrollManager;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Flowable;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -98,13 +103,46 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_rsvp);
+        if (item == null) return;
+
+        if (canEditEvent()) menu.findItem(R.id.action_delete).setVisible(true);
+
+        User current = userViewModel.getCurrentUser();
+        List<User> users = new ArrayList<>();
+        disposables.add(Flowable.fromIterable(event.getGuests())
+                .filter(Guest::isAttending)
+                .map(Guest::getUser)
+                .filter(current::equals)
+                .collectInto(users, List::add)
+                .map(List::isEmpty)
+                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp)
+                .subscribe(item::setIcon, emptyErrorHandler));
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (showsFab()) inflater.inflate(R.menu.fragment_event_edit, menu);
+        inflater.inflate(R.menu.fragment_event_edit, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_navigate:
+                Uri uri = getEventUri();
+                if (uri == null) {
+                    showSnackbar(getString(R.string.event_no_location));
+                    return true;
+                }
+
+                Intent maps = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(maps);
+                return true;
+            case R.id.action_rsvp:
+                rsvpToEvent(userViewModel.getCurrentUser());
+                return true;
             case R.id.action_delete:
                 disposables.add(eventViewModel.delete(event).subscribe(this::onEventDeleted, defaultErrorHandler));
                 return true;
@@ -207,17 +245,8 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
-    public void rsvpToEvent(Guest guest) {
-        Activity activity;
-        User roleUser = localRoleViewModel.getCurrentRole().getUser();
-        User guestUser = guest.getUser();
-        if ((activity = getActivity()) == null || !guestUser.equals(roleUser))
-            return;
-
-        new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
-                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
-                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
-                .show();
+    public void onGuestClicked(Guest guest) {
+        rsvpToEvent(guest.getUser());
     }
 
     @Override
@@ -246,6 +275,8 @@ public class EventEditFragment extends HeaderedFragment
         toggleProgress(false);
         scrollManager.onDiff(result);
         viewHolder.bind(getHeaderedModel());
+        Activity activity;
+        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
     }
 
     private void onRoleUpdated() {
@@ -266,6 +297,34 @@ public class EventEditFragment extends HeaderedFragment
         if ((activity = getActivity()) == null) return;
 
         activity.onBackPressed();
+    }
+
+    private void rsvpToEvent(User user) {
+        Activity activity;
+        User roleUser = localRoleViewModel.getCurrentRole().getUser();
+        if ((activity = getActivity()) == null || !user.equals(roleUser))
+            return;
+
+        new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
+                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
+                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
+                .show();
+    }
+
+    @Nullable
+    private Uri getEventUri() {
+        LatLng latLng = event.getLocation();
+        if (latLng == null) return null;
+
+        return new Uri.Builder()
+                .scheme("https")
+                .authority("www.google.com")
+                .appendPath("maps")
+                .appendPath("dir")
+                .appendPath("")
+                .appendQueryParameter("api", "1")
+                .appendQueryParameter("destination", latLng.latitude + "," + latLng.longitude)
+                .build();
     }
 
     @NonNull

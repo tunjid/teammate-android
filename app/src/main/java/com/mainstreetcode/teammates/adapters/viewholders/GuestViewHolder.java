@@ -27,6 +27,6 @@ public class GuestViewHolder extends ModelCardViewHolder<Guest, EventEditAdapter
 
     @Override
     public void onClick(View view) {
-        adapterListener.rsvpToEvent(model);
+        adapterListener.onGuestClicked(model);
     }
 }

@@ -97,7 +97,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
         void onLocationClicked();
 
-        void rsvpToEvent(Guest guest);
+        void onGuestClicked(Guest guest);
 
         boolean canEditEvent();
     }
