@@ -26,6 +26,7 @@ public class Item<T> implements Identifiable {
     public static final int ADDRESS = 6;
     public static final int LOCATION = 7;
     public static final int INFO = 8;
+    public static final int TEXT = 9;
 
     private @ItemType final int itemType;
     private @StringRes final int stringRes;

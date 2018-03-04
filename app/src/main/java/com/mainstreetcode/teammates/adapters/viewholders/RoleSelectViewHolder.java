@@ -4,9 +4,9 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.mainstreetcode.teammates.R;
+import com.mainstreetcode.teammates.util.Supplier;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * ViewHolder for selecting {@link com.mainstreetcode.teammates.model.Role}
@@ -16,7 +16,7 @@ public class RoleSelectViewHolder extends ClickInputViewHolder
 
     private final List<String> roles;
 
-    public RoleSelectViewHolder(View itemView, List<String> roles, Callable<Boolean> enabler) {
+    public RoleSelectViewHolder(View itemView, List<String> roles, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
         this.roles = roles;
     }

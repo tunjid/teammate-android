@@ -34,6 +34,7 @@ import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
+import com.mainstreetcode.teammates.util.Supplier;
 import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
@@ -236,8 +237,4 @@ public class MainActivity extends TeammatesBaseActivity
         return null;
     }
 
-    @FunctionalInterface
-    private interface Supplier<T> {
-        T get();
-    }
 }

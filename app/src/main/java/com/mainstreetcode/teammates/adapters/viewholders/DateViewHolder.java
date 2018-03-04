@@ -10,9 +10,9 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.util.ModelUtils;
+import com.mainstreetcode.teammates.util.Supplier;
 
 import java.util.Calendar;
-import java.util.concurrent.Callable;
 
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -32,7 +32,7 @@ public class DateViewHolder extends ClickInputViewHolder
     private Calendar calendar = getInstance();
     private Calendar updatedCalendar = getInstance();
 
-    public DateViewHolder(View itemView, Callable<Boolean> enabler) {
+    public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
         itemView.findViewById(R.id.click_view).setOnClickListener(this);
     }
