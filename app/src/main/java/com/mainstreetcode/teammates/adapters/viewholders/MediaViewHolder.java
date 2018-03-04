@@ -12,6 +12,7 @@ import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.model.Media;
+import com.mainstreetcode.teammates.util.ViewHolderUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -25,7 +26,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName
 public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<MediaAdapter.MediaAdapterListener>
         implements Callback {
 
-    private static final int THUMBNAIL_SIZE = 200;
     private static final String UNITY_ASPECT_RATIO = "1";
 
     public Media media;
@@ -87,7 +87,7 @@ public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<Med
 
         if (!isFullScreen) creator.placeholder(R.drawable.bg_image_placeholder);
 
-        creator = fitToSize ? creator.fit() : creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        creator = fitToSize ? creator.fit() : creator.resize(ViewHolderUtil.THUMBNAIL_SIZE, ViewHolderUtil.THUMBNAIL_SIZE);
         creator = creator.centerInside();
 
         Callback callBack = isFullScreen && fitToSize

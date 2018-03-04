@@ -23,7 +23,7 @@ import com.mainstreetcode.teammates.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammates.fragments.main.ChatFragment;
 import com.mainstreetcode.teammates.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammates.fragments.main.EventsFragment;
-import com.mainstreetcode.teammates.fragments.main.HomeFragment;
+import com.mainstreetcode.teammates.fragments.main.FeedFragment;
 import com.mainstreetcode.teammates.fragments.main.MediaFragment;
 import com.mainstreetcode.teammates.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammates.fragments.main.TeamDetailFragment;
@@ -67,7 +67,7 @@ public class MainActivity extends TeammatesBaseActivity
             if (t == null) return;
             int id = 0;
 
-            if (t.contains(HomeFragment.class.getSimpleName())) id = R.id.action_home;
+            if (t.contains(FeedFragment.class.getSimpleName())) id = R.id.action_home;
             else if (t.contains(EventsFragment.class.getSimpleName())) id = R.id.action_events;
             else if (t.contains(ChatFragment.class.getSimpleName())) id = R.id.action_messages;
             else if (t.contains(MediaFragment.class.getSimpleName())) id = R.id.action_media;
@@ -142,7 +142,7 @@ public class MainActivity extends TeammatesBaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_home:
-                showFragment(HomeFragment.newInstance());
+                showFragment(FeedFragment.newInstance());
                 return true;
             case R.id.action_events:
                 TeamPickerFragment.pick(this, R.id.request_event_team_pick);
@@ -199,9 +199,9 @@ public class MainActivity extends TeammatesBaseActivity
                 () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamDetailFragment::newInstance)
         );
 
-        else if (savedInstanceState == null) route = HomeFragment.newInstance();
+        else if (savedInstanceState == null) route = FeedFragment.newInstance();
 
-        showFragment(route != null ? route : HomeFragment.newInstance());
+        showFragment(route != null ? route : FeedFragment.newInstance());
     }
 
     private void restoreHiddenViewState() {

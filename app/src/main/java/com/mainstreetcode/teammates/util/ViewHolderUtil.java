@@ -18,6 +18,7 @@ public class ViewHolderUtil {
     public static final int CONTENT_AD = 6;
     public static final int INSTALL_AD = 7;
     public static final int JOIN_REQUEST = 8;
+    public static final int THUMBNAIL_SIZE = 200;
 
     public static View getItemView(@LayoutRes int res, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);

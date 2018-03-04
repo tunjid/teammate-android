@@ -108,7 +108,7 @@ public class Media implements
 
     @Override
     public String getImageUrl() {
-        return url;
+        return thumbnail;
     }
 
     public String getThumbnail() {
