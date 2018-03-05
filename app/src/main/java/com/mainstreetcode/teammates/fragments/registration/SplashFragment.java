@@ -61,7 +61,7 @@ public class SplashFragment extends RegistrationActivityFragment
         login.setText(new SpanBuilder(context, getString(R.string.login_have_account))
                 .appendNewLine()
                 .appendCharsequence(new SpanBuilder(context, getString(R.string.login_sign_in))
-                        .color(R.color.colorAccent)
+                        .color(R.color.white)
                         .build())
                 .build());
 
