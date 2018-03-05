@@ -126,6 +126,7 @@
     <string name="location">Location</string>
     <string name="map_pick">Pick On Map</string>
     <string name="notes">Notes</string>
+    <string name="event_details">Details</string>
     <string name="rsvp_event">R.S.V.P</string>
     <string name="event_no_location">This event does not have a location</string>
     <string name="navigate_event">Navigate</string>

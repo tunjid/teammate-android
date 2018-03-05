@@ -106,6 +106,7 @@ public final class FeedFragment extends MainActivityFragment
             builder.setTitle(getString(R.string.attend_event))
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, true)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, false)))
+                    .setNeutralButton(R.string.event_details, ((dialog, which) -> showFragment(EventEditFragment.newInstance((Event) model))))
                     .show();
         }
         else if (model instanceof JoinRequest) {
@@ -116,7 +117,6 @@ public final class FeedFragment extends MainActivityFragment
 
             builder.setTitle(title)
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, true)))
-                    .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
                     .show();
         }
@@ -145,10 +145,24 @@ public final class FeedFragment extends MainActivityFragment
             FeedItemViewHolder holder = (FeedItemViewHolder) scrollManager.findViewHolderForItemId(media.hashCode());
             if (holder == null) return null;
 
-            //holder.bind(media); // Rebind, to make sure transition names remain.
             return beginTransaction()
                     .addSharedElement(holder.itemView, getTransitionName(media, R.id.fragment_media_background))
                     .addSharedElement(holder.thumbnail, getTransitionName(media, R.id.fragment_media_thumbnail));
+        }
+        else if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
+            Bundle args = fragmentTo.getArguments();
+            if (args == null) return super.provideFragmentTransaction(fragmentTo);
+
+            Event event = args.getParcelable(EventEditFragment.ARG_EVENT);
+            if (event == null) return super.provideFragmentTransaction(fragmentTo);
+
+            FeedItemViewHolder holder = (FeedItemViewHolder) scrollManager.findViewHolderForItemId(event.hashCode());
+            if (holder == null) return super.provideFragmentTransaction(fragmentTo);
+
+            return beginTransaction()
+                    .addSharedElement(holder.itemView, getTransitionName(event, R.id.fragment_header_background))
+                    .addSharedElement(holder.thumbnail, getTransitionName(event, R.id.fragment_header_thumbnail));
+
         }
         return super.provideFragmentTransaction(fragmentTo);
     }

@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.support.v4.view.ViewCompat;
 import android.view.View;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.FeedAdapter;
+import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
@@ -39,6 +41,10 @@ public class FeedItemViewHolder<H extends Model<H>> extends ModelCardViewHolder<
         if (model instanceof Media) {
             setTransitionName(itemView, getTransitionName(model, R.id.fragment_media_background));
             setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_media_thumbnail));
+        }
+        else if(model instanceof Event){
+            ViewCompat.setTransitionName(itemView, getTransitionName(item, R.id.fragment_header_background));
+            ViewCompat.setTransitionName(thumbnail, getTransitionName(item, R.id.fragment_header_thumbnail));
         }
     }
 
