@@ -46,19 +46,21 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
 
     @Override
     Flowable<List<Model>> fetch(Team key, boolean fetchLatest) {
-        return checkForInvalidObject(teamRepository.get(key)
-                .cast(Model.class), key, key)
+        return teamRepository.get(key)
+                .doOnError(throwable -> checkForInvalidTeam(throwable, key))
                 .cast(Team.class)
                 .map(teamListFunction);
     }
 
     public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, boolean approved) {
-        Flowable<List<Identifiable>> sourceFlowable = (approved
+        Single<? extends Identifiable> sourceSingle = approved
                 ? roleRepository.approveUser(request)
-                : joinRequestRepository.delete(request))
+                : joinRequestRepository.delete(request);
+
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(sourceSingle
+                .toFlowable().cast(Model.class), request.getTeam(), request)
                 .cast(Identifiable.class)
-                .map(Collections::singletonList)
-                .toFlowable();
+                .map(Collections::singletonList);
 
         final Callable<List<Identifiable>> listCallable = () -> getModelList(request.getTeam());
 
