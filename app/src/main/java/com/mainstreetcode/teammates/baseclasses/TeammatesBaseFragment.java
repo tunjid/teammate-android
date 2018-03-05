@@ -21,7 +21,6 @@ import android.view.View;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.util.ErrorHandler;
-import com.mainstreetcode.teammates.util.ScrollManager;
 import com.mainstreetcode.teammates.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -39,7 +38,6 @@ public class TeammatesBaseFragment extends BaseFragment {
     protected CompositeDisposable disposables = new CompositeDisposable();
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
     protected ErrorHandler defaultErrorHandler;
-    protected ScrollManager scrollManager;
 
     @Override
     public void onAttach(Context context) {
@@ -48,10 +46,6 @@ public class TeammatesBaseFragment extends BaseFragment {
                 .defaultMessage(getString(R.string.default_error))
                 .add(this::handleErrorMessage)
                 .build();
-
-        defaultErrorHandler.addAction(() -> {
-            if (scrollManager != null) scrollManager.reset();
-        });
     }
 
     @Override
@@ -72,7 +66,6 @@ public class TeammatesBaseFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         disposables.clear();
-        if (scrollManager != null) scrollManager.clear();
         getPersistentUiController().setFabClickListener(null);
         super.onDestroyView();
     }

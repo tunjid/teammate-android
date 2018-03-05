@@ -94,6 +94,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
 
+        View keyboardPaddingWrapper = findViewById(R.id.keyboard_padding_wrapper);
         keyboardPadding = findViewById(R.id.keyboard_padding);
         insetView = findViewById(R.id.inset_view);
         toolbar = findViewById(R.id.toolbar);
@@ -109,7 +110,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         }
 
         //noinspection AndroidLintClickableViewAccessibility
-        keyboardPadding.setOnTouchListener((view, event) -> {
+        keyboardPaddingWrapper.setOnTouchListener((view, event) -> {
             setKeyboardPadding(0);
             return true;
         });

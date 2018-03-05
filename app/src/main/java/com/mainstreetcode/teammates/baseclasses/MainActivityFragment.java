@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.ScrollManager;
 import com.mainstreetcode.teammates.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
 import com.mainstreetcode.teammates.viewmodel.FeedViewModel;
@@ -27,6 +28,7 @@ import com.mainstreetcode.teammates.viewmodel.UserViewModel;
 
 public class MainActivityFragment extends TeammatesBaseFragment {
 
+    protected ScrollManager scrollManager;
     protected FeedViewModel feedViewModel;
     protected RoleViewModel roleViewModel;
     protected UserViewModel userViewModel;
@@ -58,6 +60,14 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         chatViewModel = provider.get(ChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
         teamMemberViewModel = provider.get(TeamMemberViewModel.class);
+
+        defaultErrorHandler.addAction(() -> {if (scrollManager != null) scrollManager.reset();});
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (scrollManager != null) scrollManager.clear();
     }
 
     @Override
@@ -78,7 +88,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
 
     protected void toggleBottomSheet(boolean show) {
         PersistentUiController controller = getPersistentUiController();
-        if(controller instanceof BottomSheetController) {
+        if (controller instanceof BottomSheetController) {
             ((BottomSheetController) controller).toggleBottomSheet(show);
         }
     }
