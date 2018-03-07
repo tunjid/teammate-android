@@ -64,7 +64,7 @@ public class MediaRepository extends QueryRepository<Media> {
 
     @Override
     public Single<Media> createOrUpdate(Media model) {
-        MultipartBody.Part body = getBody(model.getImageUrl(), Media.UPLOAD_KEY);
+        MultipartBody.Part body = getBody(model.getUrl(), Media.UPLOAD_KEY);
 
         if (body == null) return Single.error(new TeammateException("Unable to upload media"));
 
