@@ -75,6 +75,7 @@ public class RoleEditFragment extends HeaderedFragment
                 .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new RoleEditAdapter(role, roleViewModel.getRoleNames(), this))
                 .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

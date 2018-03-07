@@ -102,6 +102,7 @@ public class MediaFragment extends MainActivityFragment
                 .withEndlessScrollCallback(() -> fetchMedia(false))
                 .withAdapter(new MediaAdapter(items, this))
                 .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         contextBar = rootView.findViewById(R.id.alt_toolbar);

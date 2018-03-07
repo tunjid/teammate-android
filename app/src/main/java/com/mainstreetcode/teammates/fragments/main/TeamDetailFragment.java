@@ -95,6 +95,7 @@ public class TeamDetailFragment extends MainActivityFragment
                 .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
                 .withAdapter(new TeamDetailAdapter(teamModels, this))
                 .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
         return rootView;
     }

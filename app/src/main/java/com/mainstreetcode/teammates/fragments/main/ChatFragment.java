@@ -96,6 +96,7 @@ public class ChatFragment extends MainActivityFragment
                         fetchChatsBefore(true);
                 })
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         input.setOnEditorActionListener(this);

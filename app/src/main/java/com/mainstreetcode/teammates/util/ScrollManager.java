@@ -20,6 +20,8 @@ import io.reactivex.functions.Consumer;
 
 public class ScrollManager {
 
+    private static final String TAG = "ScrollManager";
+
     @Nullable private EndlessScroller scroller;
     @Nullable private EmptyViewHolder viewHolder;
     @Nullable private SwipeRefreshLayout refreshLayout;
@@ -30,6 +32,7 @@ public class ScrollManager {
     private ScrollManager(@Nullable EndlessScroller scroller,
                           @Nullable EmptyViewHolder viewHolder,
                           @Nullable SwipeRefreshLayout refreshLayout,
+                          @Nullable InconsistentDelegate.InconsistencyHandler handler,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
                           List<OnScrollListener> listeners) {
 
@@ -40,7 +43,7 @@ public class ScrollManager {
         this.recyclerView = recyclerView;
         this.adapter = adapter;
 
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(handler != null ? InconsistentDelegate.wrap(layoutManager, handler) : layoutManager);
         recyclerView.setAdapter(adapter);
 
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
@@ -103,6 +106,7 @@ public class ScrollManager {
         Runnable scrollCallback;
         SwipeRefreshLayout refreshLayout;
         EmptyViewHolder emptyViewholder;
+        InconsistentDelegate.InconsistencyHandler handler;
 
         RecyclerView recyclerView;
         Adapter adapter;
@@ -135,6 +139,11 @@ public class ScrollManager {
 
         public Builder withScrollListener(@NonNull BiConsumer<Integer, Integer> scrollListener) {
             this.displacementConsumers.add(scrollListener);
+            return this;
+        }
+
+        public Builder withInconsistencyHandler(@NonNull InconsistentDelegate.InconsistencyHandler handler) {
+            this.handler = handler;
             return this;
         }
 
@@ -183,14 +192,14 @@ public class ScrollManager {
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         if (biConsumer == null) return;
                         try { biConsumer.accept(dx, dy);}
-                        catch (Exception e) {e.printStackTrace();}
+                        catch (Exception e) {Logger.log(TAG, "Unable to dispatch scroll callback", e);}
                     }
 
                     @Override
                     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                         if (consumer == null) return;
                         try { consumer.accept(newState);}
-                        catch (Exception e) {e.printStackTrace();}
+                        catch (Exception e) {Logger.log(TAG, "Unable to dispatch scroll changed callback", e);}
                     }
                 });
             }
@@ -198,7 +207,7 @@ public class ScrollManager {
             stateConsumers.clear();
             displacementConsumers.clear();
 
-            return new ScrollManager(scroller, emptyViewholder, refreshLayout, recyclerView, adapter, layoutManager, scrollListeners);
+            return new ScrollManager(scroller, emptyViewholder, refreshLayout, handler, recyclerView, adapter, layoutManager, scrollListeners);
         }
     }
 }

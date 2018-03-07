@@ -29,6 +29,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ScrollManager;
 
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ public class EventEditFragment extends HeaderedFragment
                 .withLayoutManager(getGridLayoutManager())
                 .withAdapter(new EventEditAdapter(eventItems, this))
                 .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -263,7 +265,7 @@ public class EventEditFragment extends HeaderedFragment
         if ((activity = getActivity()) == null) return;
 
         try {startActivityForResult(builder.build(activity), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
     private void rsvpEvent(Event event, boolean attending) {

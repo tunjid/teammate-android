@@ -22,6 +22,7 @@ import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.notifications.FeedItem;
+import com.mainstreetcode.teammates.util.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,8 +62,9 @@ public class TeammateService {
 
     public static final String API_BASE_URL = "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
-    public static final String SESSION_COOKIE = "connect.sid";
+    private static final String TAG = "API Service";
 
+    public static final String SESSION_COOKIE = "connect.sid";
     private static final Gson GSON = getGson();
 
     private static TeammateApi api;
@@ -152,7 +154,7 @@ public class TeammateService {
             builder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         }
         catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException | IllegalStateException e) {
-            e.printStackTrace();
+            Logger.log(TAG, "Unable to parse SSL cert", e);
         }
     }
 

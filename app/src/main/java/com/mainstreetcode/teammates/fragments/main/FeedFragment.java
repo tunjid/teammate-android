@@ -68,6 +68,7 @@ public final class FeedFragment extends MainActivityFragment
                 .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         bottomBarState.set(true);

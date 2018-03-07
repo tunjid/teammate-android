@@ -66,6 +66,7 @@ public final class TeamsFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team))
                 .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
                 .withAdapter(new TeamAdapter(roles, this))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         View altToolbar = rootView.findViewById(R.id.alt_toolbar);

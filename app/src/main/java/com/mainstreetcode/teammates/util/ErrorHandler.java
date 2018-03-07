@@ -11,12 +11,14 @@ import io.reactivex.functions.Consumer;
 import retrofit2.HttpException;
 
 /**
- * An Error handler
- * <p>
- * Created by Shemanigans on 6/4/17.
+ * A Error handler
  */
 
 public class ErrorHandler implements Consumer<Throwable> {
+
+    private static final String TAG = "ErrorHandler";
+    private static final String ERROR_HANDLER_RECEIVED_ERROR = "Received Error";
+    private static final String ERROR_HANDLER_DISPATCH_ERROR = "Dispatch Error to callback";
 
     private final String defaultMessage;
     private final Consumer<Message> messageConsumer;
@@ -39,13 +41,13 @@ public class ErrorHandler implements Consumer<Throwable> {
     public static ErrorHandler EMPTY = new ErrorHandler(null, null, null) {
         @Override
         public void accept(Throwable throwable) throws Exception {
-            throwable.printStackTrace();
+            Logger.log(TAG, ERROR_HANDLER_RECEIVED_ERROR, throwable);
         }
     };
 
     @Override
     public void accept(Throwable throwable) throws Exception {
-        throwable.printStackTrace();
+        Logger.log(TAG, ERROR_HANDLER_RECEIVED_ERROR, throwable);
 
         String key = throwable.getClass().getName();
         Message message = messageMap.containsKey(key)
@@ -61,7 +63,7 @@ public class ErrorHandler implements Consumer<Throwable> {
             for (Runnable action : actions) action.run();
         }
         catch (Exception e) {
-            e.printStackTrace();
+            Logger.log(TAG, ERROR_HANDLER_DISPATCH_ERROR, e);
         }
     }
 

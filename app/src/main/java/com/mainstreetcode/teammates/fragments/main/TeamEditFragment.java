@@ -21,6 +21,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ScrollManager;
 
 import io.reactivex.disposables.Disposable;
@@ -91,6 +92,7 @@ public class TeamEditFragment extends HeaderedFragment
                 .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
                 .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -140,7 +142,7 @@ public class TeamEditFragment extends HeaderedFragment
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
     @Override

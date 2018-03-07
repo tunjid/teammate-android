@@ -83,6 +83,7 @@ public final class EventsFragment extends MainActivityFragment
                 .withEndlessScrollCallback(this::fetchEvents)
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), () -> eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         return rootView;

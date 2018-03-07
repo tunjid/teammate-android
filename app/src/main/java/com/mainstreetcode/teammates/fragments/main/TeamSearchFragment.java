@@ -63,6 +63,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
                 .withAdapter(new TeamAdapter(teams, this))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .build();
 
         createTeam.setOnClickListener(this);
