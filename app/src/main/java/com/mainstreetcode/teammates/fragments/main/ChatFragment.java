@@ -33,8 +33,8 @@ import java.util.List;
 
 import io.reactivex.disposables.Disposable;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.text.TextUtils.isEmpty;
-import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
 
 public class ChatFragment extends MainActivityFragment
         implements
@@ -43,6 +43,8 @@ public class ChatFragment extends MainActivityFragment
 
     private static final String ARG_TEAM = "team";
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
+
+    private boolean wasScrolling;
 
     private Team team;
     private List<Identifiable> items;
@@ -91,6 +93,7 @@ public class ChatFragment extends MainActivityFragment
                 .withEndlessScrollCallback(() -> fetchChatsBefore(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addStateListener(this::onScrollStateChanged)
+                .addScrollListener(this::onScroll)
                 .withLinearLayoutManager()
                 .build();
 
@@ -197,7 +200,6 @@ public class ChatFragment extends MainActivityFragment
         items.add(chat);
 
         notifyAndScrollToLast(true);
-
         postChat(chat);
     }
 
@@ -253,7 +255,13 @@ public class ChatFragment extends MainActivityFragment
         if (result != null) scrollManager.onDiff(result);
     }
 
+    @SuppressWarnings("unused")
+    private void onScroll(int dx, int dy) {
+        wasScrolling = Math.abs(dy) > getResources().getDimensionPixelSize(R.dimen.quintdecuple_margin);
+    }
+
     private void onScrollStateChanged(int newState) {
+        if (!wasScrolling) return;
         if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) fetchChatsBefore(true);
     }
 }
