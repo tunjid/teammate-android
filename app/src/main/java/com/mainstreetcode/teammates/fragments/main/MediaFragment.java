@@ -100,7 +100,7 @@ public class MediaFragment extends MainActivityFragment
                 .withEndlessScrollCallback(() -> fetchMedia(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new MediaAdapter(items, this))
-                .withScrollListener(this::updateFabOnScroll)
+                .addScrollListener(this::updateFabOnScroll)
                 .withGridLayoutManager(4)
                 .build();
 

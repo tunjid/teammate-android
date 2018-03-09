@@ -86,14 +86,11 @@ public class ChatFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.chat))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
-                .onLayoutManager(layoutManager -> ((LinearLayoutManager)layoutManager).setStackFromEnd(true))
+                .onLayoutManager(layoutManager -> ((LinearLayoutManager) layoutManager).setStackFromEnd(true))
                 .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
                 .withEndlessScrollCallback(() -> fetchChatsBefore(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withStateListener(state -> {
-                    if (state == SCROLL_STATE_IDLE && isNearBottomOfChat())
-                    fetchChatsBefore(true);
-                })
+                .addStateListener(this::onScrollStateChanged)
                 .withLinearLayoutManager()
                 .build();
 
@@ -107,7 +104,6 @@ public class ChatFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
-
         fetchChatsBefore(restoredFromBackStack());
     }
 
@@ -255,5 +251,9 @@ public class ChatFragment extends MainActivityFragment
         toggleProgress(showProgress);
         chatViewModel.updateLastSeen(team);
         if (result != null) scrollManager.onDiff(result);
+    }
+
+    private void onScrollStateChanged(int newState) {
+        if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) fetchChatsBefore(true);
     }
 }

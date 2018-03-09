@@ -163,12 +163,12 @@ public class ScrollManager {
             return this;
         }
 
-        public Builder withStateListener(@NonNull Consumer<Integer> stateListener) {
+        public Builder addStateListener(@NonNull Consumer<Integer> stateListener) {
             this.stateConsumers.add(stateListener);
             return this;
         }
 
-        public Builder withScrollListener(@NonNull BiConsumer<Integer, Integer> scrollListener) {
+        public Builder addScrollListener(@NonNull BiConsumer<Integer, Integer> scrollListener) {
             this.displacementConsumers.add(scrollListener);
             return this;
         }

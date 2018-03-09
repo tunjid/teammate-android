@@ -97,7 +97,7 @@ public class EventEditFragment extends HeaderedFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withAdapter(new EventEditAdapter(eventItems, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withScrollListener(this::updateFabOnScroll)
+                .addScrollListener(this::updateFabOnScroll)
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
                 .build();

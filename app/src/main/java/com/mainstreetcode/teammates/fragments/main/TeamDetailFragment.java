@@ -93,7 +93,7 @@ public class TeamDetailFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
                 .withAdapter(new TeamDetailAdapter(teamModels, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withScrollListener(this::updateFabOnScroll)
+                .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
                 .build();
         return rootView;
