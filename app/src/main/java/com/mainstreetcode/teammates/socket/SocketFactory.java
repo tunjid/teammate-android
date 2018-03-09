@@ -3,9 +3,9 @@ package com.mainstreetcode.teammates.socket;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.mainstreetcode.teammates.App;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.TeammateException;
 
 import java.net.URISyntaxException;
@@ -31,7 +31,6 @@ import static com.mainstreetcode.teammates.rest.TeammateService.getHttpClient;
 import static io.socket.client.Manager.EVENT_OPEN;
 import static io.socket.client.Manager.EVENT_TRANSPORT;
 import static io.socket.client.Socket.EVENT_ERROR;
-import static io.socket.client.Socket.EVENT_RECONNECT_ATTEMPT;
 import static io.socket.client.Socket.EVENT_RECONNECT_ERROR;
 import static io.socket.engineio.client.Transport.EVENT_REQUEST_HEADERS;
 
@@ -81,7 +80,6 @@ public class SocketFactory {
             teamChatSocket.set(pending);
             processor.onNext(pending);
             processor.onComplete();
-            Log.i(TAG, "Connected to socket");
         });
 
         pending.once(EVENT_ERROR, this::onError);
@@ -105,7 +103,7 @@ public class SocketFactory {
         options.reconnectionAttempts = RECONNECTION_ATTEMPTS;
 
         try {socket = IO.socket(API_BASE_URL, options);}
-        catch (URISyntaxException e) {e.printStackTrace();}
+        catch (URISyntaxException e) {Logger.log(TAG, "Unable to build Socket", e);}
 
         return socket;
     }
@@ -122,7 +120,7 @@ public class SocketFactory {
 //            manager.on(EVENT_CLOSE, i -> onDisconnection());
 
             socket.on(EVENT_RECONNECT_ERROR, this::onReconnectionError);
-            socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
+            //socket.on(EVENT_RECONNECT_ATTEMPT, this::onReconnectionAttempt);
         }
         return socket;
     }
@@ -146,18 +144,14 @@ public class SocketFactory {
         headers.put(COOKIE, Collections.singletonList(serializedCookie));
     }
 
-    private void onReconnectionAttempt(Object... args) {
-        Log.i(TAG, "Reconnection attempt: " + args[0]);
-    }
+//    private void onReconnectionAttempt(Object... args) {}
 
     private void onReconnectionError(Object... args) {
-        Log.i(TAG, "Error reconnecting: " + args[0]);
-        ((Exception) args[0]).printStackTrace();
+        Logger.log(TAG, "Reconnection Error", ((Exception) args[0]));
     }
 
     private void onError(Object... args) {
-        Log.i(TAG, "Socket Error: " + args[0]);
-        ((Exception) args[0]).printStackTrace();
+        Logger.log(TAG, "Socket Error", ((Exception) args[0]));
 
         Socket socket = teamChatSocket.get();
 

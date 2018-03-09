@@ -33,6 +33,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     private static final int NO_MORE = -1;
     private static final int RETRY = -2;
+    private static final String XHR_POST_ERROR = "xhr post error";
 
     private final ChatRepository repository;
     private final ChatNotifier notifier;
@@ -138,8 +139,9 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     }
 
     private boolean shouldRetry(Throwable throwable) {
-        boolean retry = throwable instanceof EngineIOException && throwable.getCause() instanceof EOFException;
-        if (retry) Log.i("CHAT", "Retrying because of EOF");
+        boolean retry = XHR_POST_ERROR.equals(throwable.getMessage()) ||
+                (throwable instanceof EngineIOException && throwable.getCause() instanceof EOFException);
+        if (retry) Log.i("CHAT", "Retrying because of predictable error");
         return retry;
     }
 

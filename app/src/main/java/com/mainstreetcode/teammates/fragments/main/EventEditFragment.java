@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +30,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ScrollManager;
 
 import java.util.ArrayList;
@@ -93,9 +95,11 @@ public class EventEditFragment extends HeaderedFragment
         eventItems = eventViewModel.fromEvent(event);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withLayoutManager(getGridLayoutManager())
                 .withAdapter(new EventEditAdapter(eventItems, this))
-                .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .addScrollListener(this::updateFabOnScroll)
+                .onLayoutManager(this::setSpanSizeLookUp)
+                .withGridLayoutManager(2)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -263,7 +267,7 @@ public class EventEditFragment extends HeaderedFragment
         if ((activity = getActivity()) == null) return;
 
         try {startActivityForResult(builder.build(activity), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
     private void rsvpEvent(Event event, boolean attending) {
@@ -327,15 +331,12 @@ public class EventEditFragment extends HeaderedFragment
                 .build();
     }
 
-    @NonNull
-    private GridLayoutManager getGridLayoutManager() {
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+    private void setSpanSizeLookUp(RecyclerView.LayoutManager layoutManager){
+        ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 return eventItems.get(position) instanceof Guest ? 1 : 2;
             }
         });
-        return layoutManager;
     }
 }

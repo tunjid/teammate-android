@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +20,7 @@ import com.mainstreetcode.teammates.model.HeaderedModel;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ScrollManager;
 
 import io.reactivex.disposables.Disposable;
@@ -88,9 +88,10 @@ public class TeamEditFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
-                .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .addScrollListener(this::updateFabOnScroll)
+                .withLinearLayoutManager()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -140,7 +141,7 @@ public class TeamEditFragment extends HeaderedFragment
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
     @Override

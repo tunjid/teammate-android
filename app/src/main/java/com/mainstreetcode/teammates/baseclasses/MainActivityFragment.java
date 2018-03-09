@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import com.mainstreetcode.teammates.activities.MainActivity;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ScrollManager;
 import com.mainstreetcode.teammates.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammates.viewmodel.EventViewModel;
@@ -91,6 +92,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (controller instanceof BottomSheetController) {
             ((BottomSheetController) controller).toggleBottomSheet(show);
         }
+    }
+
+    protected void onInconsistencyDetected(IndexOutOfBoundsException exception) {
+        Logger.log(getStableTag(), "Inconsistent Recyclerview", exception);
+        Activity activity = getActivity();
+        if (activity != null) activity.onBackPressed();
     }
 
     protected void signOut() {

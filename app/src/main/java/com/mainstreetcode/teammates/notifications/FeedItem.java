@@ -20,6 +20,7 @@ import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -64,7 +65,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
         FeedItem<T> result = null;
 
         try {result = gson.<FeedItem<T>>fromJson(gson.toJson(data), FeedItem.class);}
-        catch (Exception e) {e.printStackTrace();}
+        catch (Exception e) {Logger.log("FeedItem", "Failed to parse feed item", e);}
 
         return result;
     }

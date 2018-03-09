@@ -4,7 +4,10 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mainstreetcode.teammates.App;
+import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -68,9 +71,9 @@ public class Message {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            Logger.log("ApiMessage", "Unable to read API error message", e);
         }
-        return new Message("");
+        return new Message(App.getInstance().getString(R.string.default_error));
     }
 
     public static class GsonAdapter implements com.google.gson.JsonDeserializer<Message> {

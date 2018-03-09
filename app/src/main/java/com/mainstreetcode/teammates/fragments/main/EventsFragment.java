@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,11 +77,12 @@ public final class EventsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_events, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withLayoutManager(new LinearLayoutManager(getContext()))
-                .withAdapter(new EventAdapter(items, this))
-                .withEndlessScrollCallback(this::fetchEvents)
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), () -> eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withAdapter(new EventAdapter(items, this))
+                .withEndlessScrollCallback(this::fetchEvents)
+                .withLinearLayoutManager()
                 .build();
 
         return rootView;

@@ -11,7 +11,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,9 +91,10 @@ public class TeamDetailFragment extends MainActivityFragment
         editText.setText(team.getName());
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
-                .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
                 .withAdapter(new TeamDetailAdapter(teamModels, this))
-                .withScrollListener(this::updateFabOnScroll)
+                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .addScrollListener(this::updateFabOnScroll)
+                .withLinearLayoutManager()
                 .build();
         return rootView;
     }
