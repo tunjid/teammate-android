@@ -7,7 +7,6 @@ import android.support.transition.AutoTransition;
 import android.support.transition.TransitionManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -61,9 +60,9 @@ public final class TeamSearchFragment extends MainActivityFragment
         createTeam = rootView.findViewById(R.id.create_team);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL))
-                .withAdapter(new TeamAdapter(teams, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withAdapter(new TeamAdapter(teams, this))
+                .withStaggeredGridLayoutManager(2)
                 .build();
 
         createTeam.setOnClickListener(this);
@@ -140,4 +139,5 @@ public final class TeamSearchFragment extends MainActivityFragment
         this.teams.addAll(teams);
         scrollManager.notifyDataSetChanged();
     }
+
 }

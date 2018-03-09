@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,10 +88,10 @@ public class TeamEditFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withLayoutManager(new LinearLayoutManager(getContext()))
                 .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
-                .withScrollListener(this::updateFabOnScroll)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withScrollListener(this::updateFabOnScroll)
+                .withLinearLayoutManager()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

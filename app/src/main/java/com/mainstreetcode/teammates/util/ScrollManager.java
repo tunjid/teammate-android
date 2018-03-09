@@ -5,10 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 
 import com.mainstreetcode.teammates.adapters.viewholders.EmptyViewHolder;
 
@@ -16,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.functions.BiConsumer;
-import io.reactivex.functions.Consumer;
 
 public class ScrollManager {
 
@@ -32,7 +34,6 @@ public class ScrollManager {
     private ScrollManager(@Nullable EndlessScroller scroller,
                           @Nullable EmptyViewHolder viewHolder,
                           @Nullable SwipeRefreshLayout refreshLayout,
-                          @Nullable InconsistentDelegate.InconsistencyHandler handler,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
                           List<OnScrollListener> listeners) {
 
@@ -43,7 +44,7 @@ public class ScrollManager {
         this.recyclerView = recyclerView;
         this.adapter = adapter;
 
-        recyclerView.setLayoutManager(handler != null ? InconsistentDelegate.wrap(layoutManager, handler) : layoutManager);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
@@ -103,15 +104,23 @@ public class ScrollManager {
 
     public static class Builder {
 
+        private static final int LINEAR_LAYOUT_MANAGER = 0;
+        private static final int GRID_LAYOUT_MANAGER = 1;
+        private static final int STAGGERED_GRID_LAYOUT_MANAGER = 2;
+
+        int spanCount;
+        int layoutManagerType;
+
         Runnable scrollCallback;
         SwipeRefreshLayout refreshLayout;
         EmptyViewHolder emptyViewholder;
-        InconsistentDelegate.InconsistencyHandler handler;
 
         RecyclerView recyclerView;
         Adapter adapter;
         LayoutManager layoutManager;
 
+        Consumer<LayoutManager> layoutManagerConsumer;
+        Consumer<IndexOutOfBoundsException> handler;
         List<Consumer<Integer>> stateConsumers = new ArrayList<>();
         List<BiConsumer<Integer, Integer>> displacementConsumers = new ArrayList<>();
 
@@ -122,8 +131,30 @@ public class ScrollManager {
             return this;
         }
 
-        public Builder withLayoutManager(@NonNull LayoutManager layoutManager) {
-            this.layoutManager = layoutManager;
+        public Builder onLayoutManager(Consumer<LayoutManager> layoutManagerConsumer) {
+            this.layoutManagerConsumer = layoutManagerConsumer;
+            return this;
+        }
+
+        public Builder withLinearLayoutManager() {
+            layoutManagerType = LINEAR_LAYOUT_MANAGER;
+            return this;
+        }
+
+        public Builder withGridLayoutManager(int spanCount) {
+            layoutManagerType = GRID_LAYOUT_MANAGER;
+            this.spanCount = spanCount;
+            return this;
+        }
+
+        public Builder withStaggeredGridLayoutManager(int spanCount) {
+            layoutManagerType = STAGGERED_GRID_LAYOUT_MANAGER;
+            this.spanCount = spanCount;
+            return this;
+        }
+
+        public Builder withInconsistencyHandler(Consumer<IndexOutOfBoundsException> handler) {
+            this.handler = handler;
             return this;
         }
 
@@ -142,11 +173,6 @@ public class ScrollManager {
             return this;
         }
 
-        public Builder withInconsistencyHandler(@NonNull InconsistentDelegate.InconsistencyHandler handler) {
-            this.handler = handler;
-            return this;
-        }
-
         public Builder withRefreshLayout(@NonNull SwipeRefreshLayout refreshLayout, Runnable refreshAction) {
             this.refreshLayout = refreshLayout;
             refreshLayout.setOnRefreshListener(refreshAction::run);
@@ -159,12 +185,46 @@ public class ScrollManager {
         }
 
         public ScrollManager build() {
+            switch (layoutManagerType) {
+                case STAGGERED_GRID_LAYOUT_MANAGER:
+                    layoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL) {
+                        @Override
+                        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                            try { super.onLayoutChildren(recycler, state);}
+                            catch (IndexOutOfBoundsException e) {handler.accept(e);}
+                        }
+                    };
+                    break;
+                case GRID_LAYOUT_MANAGER:
+                    layoutManager = new GridLayoutManager(recyclerView.getContext(), spanCount) {
+                        @Override
+                        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                            try { super.onLayoutChildren(recycler, state);}
+                            catch (IndexOutOfBoundsException e) {handler.accept(e);}
+                        }
+                    };
+                    break;
+                case LINEAR_LAYOUT_MANAGER:
+                    layoutManager = new LinearLayoutManager(recyclerView.getContext()) {
+                        @Override
+                        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                            try { super.onLayoutChildren(recycler, state);}
+                            catch (IndexOutOfBoundsException e) {handler.accept(e);}
+                        }
+                    };
+                    break;
+            }
+
             if (recyclerView == null)
                 throw new IllegalArgumentException("RecyclerView must be provided");
             if (layoutManager == null)
                 throw new IllegalArgumentException("RecyclerView LayoutManager must be provided");
             if (adapter == null)
                 throw new IllegalArgumentException("RecyclerView Adapter must be provided");
+            if (handler == null)
+                throw new IllegalArgumentException("InconsistencyHandler must be provided");
+
+            if (layoutManagerConsumer != null) layoutManagerConsumer.accept(layoutManager);
 
             EndlessScroller scroller = scrollCallback == null ? null : new EndlessScroller(layoutManager) {
                 @Override
@@ -192,14 +252,18 @@ public class ScrollManager {
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         if (biConsumer == null) return;
                         try { biConsumer.accept(dx, dy);}
-                        catch (Exception e) {Logger.log(TAG, "Unable to dispatch scroll callback", e);}
+                        catch (Exception e) {
+                            Logger.log(TAG, "Unable to dispatch scroll callback", e);
+                        }
                     }
 
                     @Override
                     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                         if (consumer == null) return;
                         try { consumer.accept(newState);}
-                        catch (Exception e) {Logger.log(TAG, "Unable to dispatch scroll changed callback", e);}
+                        catch (Exception e) {
+                            Logger.log(TAG, "Unable to dispatch scroll changed callback", e);
+                        }
                     }
                 });
             }
@@ -207,7 +271,12 @@ public class ScrollManager {
             stateConsumers.clear();
             displacementConsumers.clear();
 
-            return new ScrollManager(scroller, emptyViewholder, refreshLayout, handler, recyclerView, adapter, layoutManager, scrollListeners);
+            return new ScrollManager(scroller, emptyViewholder, refreshLayout, recyclerView, adapter, layoutManager, scrollListeners);
         }
+    }
+
+    @FunctionalInterface
+    public interface Consumer<T> {
+        void accept(T t);
     }
 }

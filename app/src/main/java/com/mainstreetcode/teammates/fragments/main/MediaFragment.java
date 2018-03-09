@@ -11,7 +11,6 @@ import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -98,11 +97,11 @@ public class MediaFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_media))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withLayoutManager(new GridLayoutManager(getContext(), 4))
                 .withEndlessScrollCallback(() -> fetchMedia(false))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new MediaAdapter(items, this))
                 .withScrollListener(this::updateFabOnScroll)
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withGridLayoutManager(4)
                 .build();
 
         contextBar = rootView.findViewById(R.id.alt_toolbar);

@@ -84,19 +84,17 @@ public class ChatFragment extends MainActivityFragment
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setStackFromEnd(true);
-
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.chat))
-                .withLayoutManager(linearLayoutManager)
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
+                .onLayoutManager(layoutManager -> ((LinearLayoutManager)layoutManager).setStackFromEnd(true))
                 .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
                 .withEndlessScrollCallback(() -> fetchChatsBefore(false))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withStateListener(state -> {
                     if (state == SCROLL_STATE_IDLE && isNearBottomOfChat())
-                        fetchChatsBefore(true);
+                    fetchChatsBefore(true);
                 })
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withLinearLayoutManager()
                 .build();
 
         input.setOnEditorActionListener(this);

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,10 +64,10 @@ public final class FeedFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.feed_list))
-                .withLayoutManager(new LinearLayoutManager(getContext()))
-                .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+                .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withLinearLayoutManager()
                 .build();
 
         bottomBarState.set(true);
