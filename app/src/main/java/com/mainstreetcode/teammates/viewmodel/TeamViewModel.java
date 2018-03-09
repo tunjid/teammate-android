@@ -13,6 +13,7 @@ import com.mainstreetcode.teammates.util.TransformingSequentialList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -35,9 +36,10 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     static final List<Identifiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepository repository;
-    private PublishProcessor<String> teamSearchProcessor;
+    private AtomicReference<PublishProcessor<String>> searchRef;
 
     public TeamViewModel() {
+        searchRef = new AtomicReference<>();
         repository = TeamRepository.getInstance();
         repository.getDefaultTeam().subscribe(defaultTeam::update, ErrorHandler.EMPTY);
     }
@@ -67,12 +69,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Flowable<List<Team>> findTeams() {
-        if (teamSearchProcessor == null) teamSearchProcessor = PublishProcessor.create();
-        return teamSearchProcessor
+        if (searchRef.get() == null) searchRef.set(PublishProcessor.create());
+        return searchRef.get()
                 .debounce(SEARCH_DEBOUNCE, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
                 .switchMap(query -> repository.findTeams(query).toFlowable())
-                .doFinally(() -> teamSearchProcessor = null)
+                .doFinally(() -> searchRef.set(null))
                 .observeOn(mainThread());
     }
 
@@ -86,8 +88,8 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public boolean postSearch(String queryText) {
-        if (teamSearchProcessor == null) return false;
-        teamSearchProcessor.onNext(queryText);
+        if (searchRef.get() == null) return false;
+        searchRef.get().onNext(queryText);
         return true;
     }
 
