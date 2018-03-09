@@ -72,7 +72,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .debounce(SEARCH_DEBOUNCE, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
                 .switchMap(query -> repository.findTeams(query).toFlowable())
-                .doOnTerminate(() -> teamSearchProcessor = null)
+                .doFinally(() -> teamSearchProcessor = null)
                 .observeOn(mainThread());
     }
 
