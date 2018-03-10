@@ -7,7 +7,12 @@ import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.RoleRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -38,6 +43,14 @@ public class LocalRoleViewModel extends ViewModel {
                 .map(this::onRoleFound).observeOn(mainThread()).flatMapCompletable(role1 -> Completable.complete());
     }
 
+    public Single<Boolean> hasRoles() {
+        List<Role> roles = new ArrayList<>();
+        return Flowable.fromIterable(RoleViewModel.roles)
+                .filter(identifiable -> identifiable instanceof Role)
+                .cast(Role.class)
+                .collectInto(roles, List::add)
+                .map(list -> !list.isEmpty());
+    }
     private Role onRoleFound(Role foundRole) {
         role.update(foundRole);
         return role;

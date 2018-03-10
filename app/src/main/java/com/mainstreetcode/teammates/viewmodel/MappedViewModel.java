@@ -26,6 +26,7 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
                 @Override
                 public List<Identifiable> apply(List<Identifiable> stale, List<Identifiable> fetched) throws Exception {
                     if (++count == 1) stale.clear();
+                    if (count >= 2) count = 0;
                     preserveList.apply(stale, fetched);
                     return stale;
                 }

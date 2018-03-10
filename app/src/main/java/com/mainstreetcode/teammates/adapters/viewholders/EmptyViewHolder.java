@@ -24,14 +24,18 @@ public class EmptyViewHolder {
         text = itemView.findViewById(R.id.item_title);
         icon = itemView.findViewById(R.id.icon);
 
-        text.setText(stringRes);
-        icon.setImageDrawable(getIcon(iconRes));
+        update(iconRes, stringRes);
     }
 
     public void toggle(boolean visible) {
         int visibility = visible ? View.VISIBLE : View.GONE;
         icon.setVisibility(visibility);
         text.setVisibility(visibility);
+    }
+
+    public void update(@DrawableRes int iconRes, @StringRes int stringRes) {
+        text.setText(stringRes);
+        icon.setImageDrawable(getIcon(iconRes));
     }
 
     @Nullable
