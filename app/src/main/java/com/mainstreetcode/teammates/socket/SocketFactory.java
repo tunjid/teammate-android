@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammates.App;
+import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.TeammateException;
 
@@ -68,11 +69,11 @@ public class SocketFactory {
             if (!isConnected) teamChatSocket.set(null);
 
             if (isConnected) return delayed;
-            else throw new TeammateException("Unable to connect");
+            else throw new TeammateException(app.getString(R.string.error_socket));
         });
 
         Socket pending = buildTeamChatSocket();
-        if (pending == null) return Single.error(new TeammateException("Unable to connect"));
+        if (pending == null) return Single.error(new TeammateException(app.getString(R.string.error_socket)));
 
         PublishProcessor<Socket> processor = PublishProcessor.create();
 

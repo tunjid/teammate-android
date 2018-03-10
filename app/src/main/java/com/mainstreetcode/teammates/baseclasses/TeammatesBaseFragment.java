@@ -43,7 +43,7 @@ public class TeammatesBaseFragment extends BaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         defaultErrorHandler = ErrorHandler.builder()
-                .defaultMessage(getString(R.string.default_error))
+                .defaultMessage(getString(R.string.error_default))
                 .add(this::handleErrorMessage)
                 .build();
     }

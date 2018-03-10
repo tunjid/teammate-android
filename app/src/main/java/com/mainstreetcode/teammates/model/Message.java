@@ -73,7 +73,7 @@ public class Message {
         catch (Exception e) {
             Logger.log("ApiMessage", "Unable to read API error message", e);
         }
-        return new Message(App.getInstance().getString(R.string.default_error));
+        return new Message(App.getInstance().getString(R.string.error_default));
     }
 
     public static class GsonAdapter implements com.google.gson.JsonDeserializer<Message> {

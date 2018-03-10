@@ -164,7 +164,7 @@ public class SplashFragment extends RegistrationActivityFragment
         @Override
         public void onError(FacebookException error) {
             toggleProgress(false);
-            showSnackbar(getString(R.string.default_error));
+            showSnackbar(getString(R.string.error_default));
         }
     };
 }

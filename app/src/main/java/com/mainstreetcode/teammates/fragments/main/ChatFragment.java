@@ -7,6 +7,8 @@ import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -97,8 +99,18 @@ public class ChatFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
-        input.setOnEditorActionListener(this);
         send.setOnClickListener(view -> sendChat(input));
+        input.setOnEditorActionListener(this);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {wasScrolling = false;}
+        });
 
         return rootView;
     }
@@ -183,7 +195,7 @@ public class ChatFragment extends MainActivityFragment
 
             notifyAndScrollToLast(isNearBottomOfChat());
         }, ErrorHandler.builder()
-                .defaultMessage(getString(R.string.default_error))
+                .defaultMessage(getString(R.string.error_default))
                 .add(message -> showSnackbar(message.getMessage()))
                 .build());
 
@@ -199,6 +211,7 @@ public class ChatFragment extends MainActivityFragment
         Chat chat = Chat.chat(text, userViewModel.getCurrentUser(), team);
         items.add(chat);
 
+        wasScrolling = false;
         notifyAndScrollToLast(true);
         postChat(chat);
     }
@@ -211,7 +224,7 @@ public class ChatFragment extends MainActivityFragment
             if (index != 0) scrollManager.notifyItemChanged(index);
             if (!isSubscribedToChat()) subscribeToChat();
         }, ErrorHandler.builder()
-                .defaultMessage(getString(R.string.default_error))
+                .defaultMessage(getString(R.string.error_default))
                 .add(errorMessage -> {
                     chat.setSuccessful(false);
 
@@ -257,7 +270,7 @@ public class ChatFragment extends MainActivityFragment
 
     @SuppressWarnings("unused")
     private void onScroll(int dx, int dy) {
-        wasScrolling = Math.abs(dy) > getResources().getDimensionPixelSize(R.dimen.quintdecuple_margin);
+        if (Math.abs(dy) > 8) wasScrolling = true;
     }
 
     private void onScrollStateChanged(int newState) {
