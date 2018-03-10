@@ -45,11 +45,12 @@
     <!--Main Activity Options Menu-->
     <string name="settings">Settings</string>
 
-    <!--HomeFragment-->
+    <!--FeedFragment-->
     <string name="home_greeting">Good %1$s, %2$s</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
     <string name="accept_invitation">Join %1$s?</string>
+    <string name="no_team_feed">You aren\'t part of any teams. Go to the team tab to find or create yours!</string>
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>
@@ -58,7 +59,8 @@
 
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
-    <string name="default_error">Sorry, an error occurred</string>
+    <string name="error_default">Sorry, an error occurred</string>
+    <string name="error_socket">Unable to connect</string>
 
     <!--TeamSearchFragment-->
     <string name="team_search">Team Search</string>

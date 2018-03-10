@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammates.App;
+import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.util.Logger;
 import com.mainstreetcode.teammates.util.TeammateException;
 
@@ -21,6 +22,7 @@ import io.socket.client.IO;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.engineio.client.Transport;
+import io.socket.engineio.client.transports.WebSocket;
 import okhttp3.OkHttpClient;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -68,11 +70,11 @@ public class SocketFactory {
             if (!isConnected) teamChatSocket.set(null);
 
             if (isConnected) return delayed;
-            else throw new TeammateException("Unable to connect");
+            else throw new TeammateException(app.getString(R.string.error_socket));
         });
 
         Socket pending = buildTeamChatSocket();
-        if (pending == null) return Single.error(new TeammateException("Unable to connect"));
+        if (pending == null) return Single.error(new TeammateException(app.getString(R.string.error_socket)));
 
         PublishProcessor<Socket> processor = PublishProcessor.create();
 
@@ -100,6 +102,7 @@ public class SocketFactory {
         options.secure = true;
         options.forceNew = true;
         options.reconnection = false;
+        options.transports = new String[] {WebSocket.NAME};
         options.reconnectionAttempts = RECONNECTION_ATTEMPTS;
 
         try {socket = IO.socket(API_BASE_URL, options);}

@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammates.util;
 
 
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -55,6 +57,10 @@ public class ScrollManager {
         Builder builder = new Builder();
         builder.recyclerView = recyclerView;
         return builder;
+    }
+
+    public void updateForEmptyList(@DrawableRes int iconRes, @StringRes int stringRes) {
+        if (viewHolder != null) viewHolder.update(iconRes, stringRes);
     }
 
     public void onDiff(DiffUtil.DiffResult result) {

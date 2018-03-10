@@ -175,6 +175,9 @@ public final class FeedFragment extends MainActivityFragment
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
         toggleProgress(false);
         scrollManager.onDiff(diffResult);
+        localRoleViewModel.hasRoles().subscribe(hasRoles -> scrollManager.updateForEmptyList(
+                hasRoles ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
+                hasRoles ? R.string.no_feed : R.string.no_team_feed), emptyErrorHandler);
     }
 
     private static String getTimeOfDay() {

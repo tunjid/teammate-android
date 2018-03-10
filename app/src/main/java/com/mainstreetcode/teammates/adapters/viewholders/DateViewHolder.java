@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.adapters.viewholders;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.view.View;
@@ -47,10 +48,12 @@ public class DateViewHolder extends ClickInputViewHolder
 
     @Override
     public void onClick(View view) {
-        if(!isEnabled()) return;
+        if (!isEnabled()) return;
 
-        new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE))
-                .show();
+        AlertDialog dialog = new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
+
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.show();
     }
 
     @Override
@@ -59,7 +62,10 @@ public class DateViewHolder extends ClickInputViewHolder
         updatedCalendar.set(MONTH, month);
         updatedCalendar.set(DATE, day);
 
-        new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true).show();
+        AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
+
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.show();
     }
 
     @Override

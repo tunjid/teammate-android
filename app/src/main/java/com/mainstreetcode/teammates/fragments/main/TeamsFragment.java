@@ -111,7 +111,7 @@ public final class TeamsFragment extends MainActivityFragment
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    public boolean showsBottomNav() {return getTargetRequestCode() != R.id.request_media_team_pick;}
+    public boolean showsBottomNav() {return true;}
 
     @Override
     public boolean showsFab() {
