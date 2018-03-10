@@ -22,6 +22,7 @@ import io.socket.client.IO;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.engineio.client.Transport;
+import io.socket.engineio.client.transports.WebSocket;
 import okhttp3.OkHttpClient;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -101,6 +102,7 @@ public class SocketFactory {
         options.secure = true;
         options.forceNew = true;
         options.reconnection = false;
+        options.transports = new String[] {WebSocket.NAME};
         options.reconnectionAttempts = RECONNECTION_ATTEMPTS;
 
         try {socket = IO.socket(API_BASE_URL, options);}
