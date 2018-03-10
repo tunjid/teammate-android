@@ -1,8 +1,13 @@
 package com.mainstreetcode.teammates.util;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,5 +31,15 @@ public class ViewHolderUtil {
 
     public static String getTransitionName(Object item, @IdRes int id) {
         return item.hashCode() + "-" + id;
+    }
+
+    @Nullable
+    public static Activity getActivity(RecyclerView.ViewHolder viewHolder) {
+        Context context = viewHolder.itemView.getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) return (Activity)context;
+            context = ((ContextWrapper)context).getBaseContext();
+        }
+        return null;
     }
 }

@@ -198,6 +198,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         fab.setOnClickListener(clickListener);
     }
 
+    public void onDialogDismissed() {
+        TeammatesBaseFragment fragment = (TeammatesBaseFragment) getCurrentFragment();
+        boolean showFab = fragment != null && fragment.showsFab();
+
+        if (showFab) toggleFab(true);
+    }
+
     protected boolean isFullscreenFragment(Fragment fragment) {
         return fragment instanceof TeammatesBaseFragment && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
     }
