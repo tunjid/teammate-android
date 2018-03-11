@@ -20,7 +20,7 @@ import io.reactivex.Single;
 @Dao
 public abstract class SharedPreferencesDao<T> extends EntityDao<T> {
 
-    private static final String KEY = "current_device_key";
+    private static final String KEY = "SharedPreferencesDao";
 
     @Override
     protected String getTableName() {

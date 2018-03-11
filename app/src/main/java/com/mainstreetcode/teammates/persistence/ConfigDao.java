@@ -16,7 +16,7 @@ public class ConfigDao extends SharedPreferencesDao<Config> {
     String preferenceName() {return "config";}
 
     @Override
-    String to(Config device) {return device.getId();}
+    String to(Config device) {return TeammateService.getGson().toJson(device);}
 
     @Override
     Config from(String json) {return TeammateService.getGson().fromJson(json, Config.class);}
