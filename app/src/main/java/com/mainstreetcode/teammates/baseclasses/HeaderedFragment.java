@@ -52,7 +52,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
         viewHolder.bind(model);
 
         setTransitionName(view, getTransitionName(model, R.id.fragment_header_background));
-        setTransitionName(viewHolder.getPicture(), getTransitionName(model, R.id.fragment_header_thumbnail));
+        setTransitionName(viewHolder.getThumbnail(), getTransitionName(model, R.id.fragment_header_thumbnail));
 
         Toolbar headerToolbar = view.findViewById(R.id.header_toolbar);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerToolbar.getLayoutParams();

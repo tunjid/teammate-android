@@ -18,6 +18,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_photo_dark_grey_24dp" />
 
+    <ImageView
+        android:id="@+id/image_full_res"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/team_logo"
+        android:src="@drawable/bg_image_placeholder"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/image"
+        app:layout_constraintLeft_toLeftOf="@+id/image"
+        app:layout_constraintRight_toRightOf="@+id/image"
+        app:layout_constraintTop_toTopOf="@+id/image" />
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"

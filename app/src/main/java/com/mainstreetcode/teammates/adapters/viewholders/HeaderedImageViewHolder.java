@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammates.model.HeaderedModel;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -20,33 +21,30 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.THUMBNAIL_SIZE;
 public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.ImagePickerListener>
         implements View.OnClickListener {
 
-    private ImageView picture;
+    private ImageView fullRes;
+    private ImageView thumbnail;
     private HeaderedModel model;
 
     public HeaderedImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
         super(itemView, listener);
-        picture = itemView.findViewById(R.id.image);
-        picture.setOnClickListener(this);
+        fullRes = itemView.findViewById(R.id.image_full_res);
+        thumbnail = itemView.findViewById(R.id.image);
+        thumbnail.setOnClickListener(this);
     }
 
     public void bind(HeaderedModel model) {
         this.model = model;
         RequestCreator creator = getCreator();
-
         if (creator == null) return;
 
-        creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(picture);
-
-        picture.postDelayed(() -> {
-                    RequestCreator delayed = getCreator();
-                    if (delayed != null) delayed.fit().centerCrop().into(picture);
-                }, FULL_RES_LOAD_DELAY);
+        creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(thumbnail);
+        fullRes.postDelayed(new DeferredImageLoader(), FULL_RES_LOAD_DELAY);
     }
 
     @Override
     public void onClick(View view) {adapterListener.onImageClick();}
 
-    public ImageView getPicture() {return picture;}
+    public ImageView getThumbnail() {return thumbnail;}
 
     @Nullable
     private RequestCreator getCreator() {
@@ -58,5 +56,19 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
         File file = new File(pathOrUrl);
         Picasso picasso = Picasso.with(itemView.getContext());
         return file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
+    }
+
+    private final class DeferredImageLoader implements Runnable, Callback {
+        @Override
+        public void run() {
+            RequestCreator delayed = getCreator();
+            if (delayed != null) delayed.fit().centerCrop().into(fullRes, this);
+        }
+
+        @Override
+        public void onSuccess() {fullRes.setVisibility(View.VISIBLE);}
+
+        @Override
+        public void onError() {}
     }
 }
