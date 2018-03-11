@@ -20,6 +20,8 @@ import java.util.List;
 
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.INSTALL_AD;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.MEDIA_IMAGE;
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.MEDIA_VIDEO;
 import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
 
 /**
@@ -27,9 +29,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getItemView;
  */
 
 public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaAdapter.MediaAdapterListener> {
-
-    private static final int IMAGE = 10;
-    private static final int VIDEO = 11;
 
     private final List<Identifiable> mediaList;
 
@@ -45,7 +44,7 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
                 ? new ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
                 ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : viewType == IMAGE
+                : viewType == MEDIA_IMAGE
                 ? new ImageMediaViewHolder(getItemView(R.layout.viewholder_image, viewGroup), adapterListener)
                 : new VideoMediaViewHolder(getItemView(R.layout.viewholder_video, viewGroup), adapterListener);
     }
@@ -66,7 +65,7 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
     @Override
     public int getItemViewType(int position) {
         Identifiable identifiable = mediaList.get(position);
-        return identifiable instanceof Media ? (((Media) identifiable).isImage() ? IMAGE : VIDEO) : ((Ad) identifiable).getType();
+        return identifiable instanceof Media ? (((Media) identifiable).isImage() ? MEDIA_IMAGE : MEDIA_VIDEO) : ((Ad) identifiable).getType();
     }
 
     @Override

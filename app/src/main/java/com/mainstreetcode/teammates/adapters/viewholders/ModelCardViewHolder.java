@@ -53,5 +53,5 @@ public class ModelCardViewHolder<H extends Model, T extends BaseRecyclerViewAdap
         return thumbnail;
     }
 
-    public boolean isThumbnail() {return false;}
+    public boolean isThumbnail() {return true;}
 }

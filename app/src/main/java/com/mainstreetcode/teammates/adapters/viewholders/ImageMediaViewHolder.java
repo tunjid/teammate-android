@@ -7,10 +7,10 @@ import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.MediaAdapter;
 import com.mainstreetcode.teammates.model.Media;
 
+import static com.mainstreetcode.teammates.util.ViewHolderUtil.FULL_RES_LOAD_DELAY;
+
 
 public class ImageMediaViewHolder extends MediaViewHolder<ImageView> {
-
-    private static final int FULL_RES_LOAD_DELAY = 100;
 
     public ImageMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);

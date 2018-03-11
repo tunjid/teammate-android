@@ -52,7 +52,4 @@ public class FeedItemViewHolder<H extends Model<H>> extends ModelCardViewHolder<
     public void onClick(View view) {
         adapterListener.onFeedItemClicked(item);
     }
-
-    @Override
-    public boolean isThumbnail() {return true;}
 }

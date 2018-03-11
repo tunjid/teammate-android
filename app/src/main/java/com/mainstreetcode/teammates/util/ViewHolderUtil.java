@@ -18,12 +18,14 @@ public class ViewHolderUtil {
     public static final int CHAT = 1;
     public static final int ROLE = 2;
     public static final int EVENT = 3;
-    public static final int MEDIA = 4;
-    public static final int FEED_ITEM = 5;
-    public static final int CONTENT_AD = 6;
-    public static final int INSTALL_AD = 7;
-    public static final int JOIN_REQUEST = 8;
+    public static final int FEED_ITEM = 4;
+    public static final int CONTENT_AD = 5;
+    public static final int INSTALL_AD = 6;
+    public static final int MEDIA_IMAGE = 7;
+    public static final int MEDIA_VIDEO = 8;
+    public static final int JOIN_REQUEST = 9;
     public static final int THUMBNAIL_SIZE = 200;
+    public static final int FULL_RES_LOAD_DELAY = 200;
 
     public static View getItemView(@LayoutRes int res, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);
