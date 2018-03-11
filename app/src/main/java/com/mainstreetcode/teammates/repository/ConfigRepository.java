@@ -6,8 +6,10 @@ import com.mainstreetcode.teammates.persistence.ConfigDao;
 import com.mainstreetcode.teammates.persistence.EntityDao;
 import com.mainstreetcode.teammates.rest.TeammateApi;
 import com.mainstreetcode.teammates.rest.TeammateService;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.TeammateException;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -16,6 +18,9 @@ import io.reactivex.functions.Function;
 
 public class ConfigRepository extends ModelRepository<Config> {
 
+    private static final int REFRESH_THRESHOLD = 10;
+
+    private int numRefreshes = 0;
     private final TeammateApi api;
     private final ConfigDao dao;
 
@@ -46,7 +51,7 @@ public class ConfigRepository extends ModelRepository<Config> {
         Config device = dao.getCurrent();
         return device == null
                 ? api.getConfig().map(getSaveFunction()).toFlowable()
-                : Flowable.just(device);
+                : Flowable.just(device).doFinally(this::refreshConfig);
     }
 
     @Override
@@ -61,5 +66,11 @@ public class ConfigRepository extends ModelRepository<Config> {
             dao.upsert(devices);
             return devices;
         };
+    }
+
+    private void refreshConfig() {
+        if (++numRefreshes < REFRESH_THRESHOLD) return;
+        numRefreshes = 0;
+        api.getConfig().map(getSaveFunction()).map(Collections::singletonList).subscribe(dao::upsert, ErrorHandler.EMPTY);
     }
 }

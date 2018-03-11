@@ -13,12 +13,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.repository.ConfigRepository;
+import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
 
 @SuppressLint("ParcelCreator")
 public class Config implements Model<Config> {
+
+    private static final String EMPTY_STRING = "";
+    private static Config currentConfig = new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
 
     private String defaultTeamLogo;
     private String defaultEventLogo;
@@ -30,11 +35,26 @@ public class Config implements Model<Config> {
         this.defaultUserAvatar = defaultUserAvatar;
     }
 
+    static String getDefaultTeamLogo() {
+        if (currentConfig.isEmpty()) fetchConfig();
+        return currentConfig.defaultTeamLogo;
+    }
+
+    static String getDefaultEventLogo() {
+        if (currentConfig.isEmpty()) fetchConfig();
+        return currentConfig.defaultEventLogo;
+    }
+
+    static String getDefaultUserAvatar() {
+        if (currentConfig.isEmpty()) fetchConfig();
+        return currentConfig.defaultUserAvatar;
+    }
+
     @Override
     public void reset() {
-        defaultTeamLogo = "";
-        defaultEventLogo = "";
-        defaultUserAvatar = "";
+        defaultTeamLogo = EMPTY_STRING;
+        defaultEventLogo = EMPTY_STRING;
+        defaultUserAvatar = EMPTY_STRING;
     }
 
     @Override
@@ -74,6 +94,10 @@ public class Config implements Model<Config> {
 
     }
 
+    private static void fetchConfig() {
+        ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(currentConfig::update, ErrorHandler.EMPTY);
+    }
+
     public static class GsonAdapter
             implements
             JsonSerializer<Config>,
@@ -100,7 +124,7 @@ public class Config implements Model<Config> {
 
             String defaultTeamLogo = ModelUtils.asString(TEAM_LOGO_KEY, deviceJson);
             String defaultEventLogo = ModelUtils.asString(EVENT_LOGO_KEY, deviceJson);
-            String defaultUserAvatar = ModelUtils.asString(EVENT_LOGO_KEY, deviceJson);
+            String defaultUserAvatar = ModelUtils.asString(USER_AVATAR_KEY, deviceJson);
 
             return new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar);
         }

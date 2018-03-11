@@ -43,7 +43,7 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", "", "", "", "", date, date, Team.empty(), null);
+        return new Event("", "", "", Config.getDefaultEventLogo(), "", date, date, Team.empty(), null);
     }
 
     public Event(String id, String name, String notes, String imageUrl, String locationName,

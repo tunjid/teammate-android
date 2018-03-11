@@ -52,7 +52,7 @@ public class User extends UserEntity implements
     }
 
     public static User empty() {
-        return new User("", "", "", "", "");
+        return new User("", "", "", "", Config.getDefaultUserAvatar());
     }
 
     @Override
