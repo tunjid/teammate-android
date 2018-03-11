@@ -139,5 +139,4 @@ public final class TeamSearchFragment extends MainActivityFragment
         this.teams.addAll(teams);
         scrollManager.notifyDataSetChanged();
     }
-
 }

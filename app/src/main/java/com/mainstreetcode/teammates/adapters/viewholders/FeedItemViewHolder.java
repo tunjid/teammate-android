@@ -42,7 +42,7 @@ public class FeedItemViewHolder<H extends Model<H>> extends ModelCardViewHolder<
             setTransitionName(itemView, getTransitionName(model, R.id.fragment_media_background));
             setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_media_thumbnail));
         }
-        else if(model instanceof Event){
+        else if (model instanceof Event) {
             ViewCompat.setTransitionName(itemView, getTransitionName(item, R.id.fragment_header_background));
             ViewCompat.setTransitionName(thumbnail, getTransitionName(item, R.id.fragment_header_thumbnail));
         }

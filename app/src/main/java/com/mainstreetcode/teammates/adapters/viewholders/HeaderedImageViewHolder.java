@@ -41,17 +41,12 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
                     RequestCreator delayed = getCreator();
                     if (delayed != null) delayed.fit().centerCrop().into(picture);
                 }, FULL_RES_LOAD_DELAY);
-
     }
 
     @Override
-    public void onClick(View view) {
-        adapterListener.onImageClick();
-    }
+    public void onClick(View view) {adapterListener.onImageClick();}
 
-    public ImageView getPicture() {
-        return picture;
-    }
+    public ImageView getPicture() {return picture;}
 
     @Nullable
     private RequestCreator getCreator() {
