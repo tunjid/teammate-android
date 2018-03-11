@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.rest;
 import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Config;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.JoinRequest;
@@ -37,6 +38,9 @@ public interface TeammateApi {
     String ID_PATH = "id";
     String TEAM_PATH = "teamId";
     String DATE_QUERY = "date";
+
+    @GET("api/config")
+    Single<Config> getConfig();
 
     // =============================================================================================
     // User endpoints

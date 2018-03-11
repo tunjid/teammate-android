@@ -137,7 +137,7 @@ public class UserRepository extends ModelRepository<User> {
     public Single<Boolean> signOut() {
         AppDatabase database = AppDatabase.getInstance();
         Single<Boolean> local = database.clearTables().flatMap(result -> clearUser());
-        Device device = database.deviceDao().getCurrentDevice();
+        Device device = database.deviceDao().getCurrent();
         String deviceId = device != null ? device.getId() : "";
 
         return api.signOut(deviceId)

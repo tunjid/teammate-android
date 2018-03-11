@@ -43,7 +43,7 @@ public class DeviceRepository extends ModelRepository<Device> {
 
     @Override
     public Single<Device> createOrUpdate(Device model) {
-        Device current = dao.getCurrentDevice();
+        Device current = dao.getCurrent();
         Consumer<Device> saveFunction = device -> dao.upsert(Collections.singletonList(device));
 
         if (current == null) return api.createDevice(model).doOnSuccess(saveFunction);
@@ -60,7 +60,7 @@ public class DeviceRepository extends ModelRepository<Device> {
 
     @Override
     public Flowable<Device> get(String id) {
-        Device device = dao.getCurrentDevice();
+        Device device = dao.getCurrent();
         return device == null
                 ? Flowable.error(new TeammateException("No stored device"))
                 : Flowable.just(device);
@@ -68,7 +68,7 @@ public class DeviceRepository extends ModelRepository<Device> {
 
     @Override
     public Single<Device> delete(Device model) {
-        dao.deleteCurrentDevice();
+        dao.deleteCurrent();
         return Single.just(model);
     }
 

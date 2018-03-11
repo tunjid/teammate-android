@@ -76,7 +76,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "", new Date(), null, 0, 0);
+        return new Team(NEW_TEAM, "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, 0, 0);
     }
 
     public static Team updateDelayedModels(Team team) {

@@ -66,6 +66,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public DeviceDao deviceDao() {return new DeviceDao();}
 
+    public ConfigDao configDao() {return new ConfigDao();}
+
     public Single<List<Pair<String, Integer>>> clearTables() {
         final List<Single<Pair<String, Integer>>> singles = new ArrayList<>();
         final List<Pair<String, Integer>> collector = new ArrayList<>();
@@ -78,6 +80,8 @@ public abstract class AppDatabase extends RoomDatabase {
         singles.add(clearTable(teamDao()));
         singles.add(clearTable(userDao()));
         singles.add(clearTable(deviceDao()));
+        singles.add(clearTable(deviceDao()));
+        singles.add(clearTable(configDao()));
 
         return Single.concat(singles).collectInto(collector, List::add);
     }
