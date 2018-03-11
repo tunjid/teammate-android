@@ -12,6 +12,7 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Config;
 import com.mainstreetcode.teammates.model.Device;
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Guest;
@@ -105,6 +106,7 @@ public class TeammateService {
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Media.class, new Media.GsonAdapter())
                 .registerTypeAdapter(Guest.class, new Guest.GsonAdapter())
+                .registerTypeAdapter(Config.class, new Config.GsonAdapter())
                 .registerTypeAdapter(Device.class, new Device.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
