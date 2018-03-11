@@ -46,6 +46,8 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
 
     @Override
     Flowable<List<Model>> fetch(Team key, boolean fetchLatest) {
+        key.getRoles().clear();
+        key.getJoinRequests().clear();
         return teamRepository.get(key)
                 .doOnError(throwable -> checkForInvalidTeam(throwable, key))
                 .cast(Team.class)
