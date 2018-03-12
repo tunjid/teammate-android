@@ -32,6 +32,7 @@ import com.tunjid.androidbootstrap.core.view.ViewHider;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
 import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
@@ -48,12 +49,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     private boolean insetsApplied;
     private View keyboardPadding;
-    private View insetView;
+    private View topInsetView;
+    private View bottomInsetView;
 
-    private Toolbar toolbar;
-    private CoordinatorLayout root;
+    private CoordinatorLayout coordinatorLayout;
     private FloatingActionButton fab;
     private LoadingBar loadingBar;
+    private Toolbar toolbar;
 
     @Nullable
     private ViewHider fabHider;
@@ -72,7 +74,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
             ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
             params.topMargin = isFullscreenFragment ? insetHeight : 0;
-            insetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
+            topInsetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimary;
@@ -96,11 +98,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         View keyboardPaddingWrapper = findViewById(R.id.keyboard_padding_wrapper);
         keyboardPadding = findViewById(R.id.keyboard_padding);
-        insetView = findViewById(R.id.inset_view);
+        coordinatorLayout = findViewById(R.id.coordinator);
+        bottomInsetView = findViewById(R.id.bottom_inset);
+        topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
-        root = findViewById(R.id.coordinator);
         fab = findViewById(R.id.fab);
-
 
         if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
 
@@ -119,8 +121,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            setOnApplyWindowInsetsListener(findViewById(R.id.content_view), (view, insets) -> consumeToolbarInsets(insets));
+            decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            setOnApplyWindowInsetsListener(findViewById(R.id.content_view), (view, insets) -> consumeSystemInsets(insets));
         }
     }
 
@@ -145,7 +147,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressLint("Range")
     public void toggleProgress(boolean show) {
         if (show && loadingBar != null && loadingBar.isShown()) return;
-        if (show) (loadingBar = LoadingBar.make(root, Snackbar.LENGTH_INDEFINITE)).show();
+        if (show) (loadingBar = LoadingBar.make(coordinatorLayout, Snackbar.LENGTH_INDEFINITE)).show();
         else if (loadingBar != null && loadingBar.isShownOrQueued()) loadingBar.dismiss();
     }
 
@@ -175,7 +177,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
@@ -185,7 +187,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_INDEFINITE)
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_INDEFINITE)
                 .setAction(stringRes, clickListener);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
@@ -225,12 +227,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }
 
-    private WindowInsetsCompat consumeToolbarInsets(WindowInsetsCompat insets) {
+    private WindowInsetsCompat consumeSystemInsets(WindowInsetsCompat insets) {
         if (insetsApplied) return insets;
 
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) insetView.getLayoutParams();
+        ViewGroup.MarginLayoutParams topParams = fromView(topInsetView);
         insetHeight = insets.getSystemWindowInsetTop();
-        params.height = insetHeight;
+        topParams.height = insetHeight;
+        fromView(bottomInsetView).height = insets.getSystemWindowInsetBottom();
 
         insetsApplied = true;
         return insets;
@@ -254,5 +257,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();
         params.height = padding;
+    }
+
+    private ViewGroup.MarginLayoutParams fromView(View view) {
+        return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
     }
 }
