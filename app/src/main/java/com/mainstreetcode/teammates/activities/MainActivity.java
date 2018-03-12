@@ -209,6 +209,7 @@ public class MainActivity extends TeammatesBaseActivity
         TeammatesBaseFragment fragment = (TeammatesBaseFragment) getCurrentFragment();
         if (fragment == null) return;
 
+        setFabClickListener(fragment);
         toggleFab(fragment.showsFab());
         toggleToolbar(fragment.showsToolBar());
         toggleBottombar(fragment.showsBottomNav());

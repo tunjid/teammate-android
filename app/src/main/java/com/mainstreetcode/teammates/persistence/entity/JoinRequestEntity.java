@@ -77,6 +77,10 @@ public class JoinRequestEntity implements Parcelable {
         return userApproved;
     }
 
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

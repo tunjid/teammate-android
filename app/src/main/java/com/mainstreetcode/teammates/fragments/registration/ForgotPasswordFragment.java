@@ -21,7 +21,6 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 
 public final class ForgotPasswordFragment extends RegistrationActivityFragment
         implements
-        View.OnClickListener,
         TextView.OnEditorActionListener {
 
     private static final String ARG_EMAIL = "email";

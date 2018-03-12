@@ -92,12 +92,15 @@
 
     <!--TeamDetailFragment-->
     <string name="invite">invite</string>
-    <string name="user_invite_sent">Invite sent</string>
     <string name="user_invited">Has been invited as a %1$s</string>
     <string name="user_requests_join">Has requested to join as a %1$s</string>
     <string name="delete_team">Delete team</string>
     <string name="delete_team_prompt">Delete %1$s?</string>
     <string name="deleted_team">Deleted %1$s</string>
+
+    <!--JoinRequestFragment-->
+    <string name="invite_user">Invite User</string>
+    <string name="user_invite_sent">Invite sent</string>
 
     <!--UserEditFragment-->
     <string name="profile_picture">Profile Picture</string>

@@ -31,7 +31,7 @@ import io.reactivex.functions.Consumer;
  * Base Fragment for this app
  */
 
-public class TeammatesBaseFragment extends BaseFragment {
+public class TeammatesBaseFragment extends BaseFragment implements View.OnClickListener {
 
     protected static final Validator validator = new Validator();
 
@@ -69,6 +69,9 @@ public class TeammatesBaseFragment extends BaseFragment {
         getPersistentUiController().setFabClickListener(null);
         super.onDestroyView();
     }
+
+    @Override
+    public void onClick(View v) {}
 
     public int[] staticViews() {
         return new int[]{};

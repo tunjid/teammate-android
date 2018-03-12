@@ -118,7 +118,7 @@ public class MediaFragment extends MainActivityFragment
         super.onActivityCreated(savedInstanceState);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
-        setFabClickListener(view -> ImageWorkerFragment.requestMultipleMedia(this));
+        setFabClickListener(this);
     }
 
     @Override
@@ -171,6 +171,15 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public boolean showsBottomNav() {
         return bottomBarState.get();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab:
+                ImageWorkerFragment.requestMultipleMedia(this);
+                break;
+        }
     }
 
     @Override

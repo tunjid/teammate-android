@@ -28,7 +28,6 @@ import java.util.List;
 
 public final class TeamsFragment extends MainActivityFragment
         implements
-        View.OnClickListener,
         TeamAdapter.TeamAdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.team_list};

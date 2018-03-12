@@ -28,7 +28,6 @@ import com.mainstreetcode.teammates.util.ScrollManager;
 
 public class RoleEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener,
         RoleEditAdapter.RoleEditAdapterListener {
 
     public static final String ARG_ROLE = "role";

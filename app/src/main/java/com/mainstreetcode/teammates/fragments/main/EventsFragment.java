@@ -35,7 +35,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName
 
 public final class EventsFragment extends MainActivityFragment
         implements
-        View.OnClickListener,
         EventAdapter.EventAdapterListener {
 
     private static final String ARG_TEAM = "team";

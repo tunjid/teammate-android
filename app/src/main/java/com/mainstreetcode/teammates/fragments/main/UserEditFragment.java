@@ -22,7 +22,6 @@ import com.mainstreetcode.teammates.model.User;
 
 public class UserEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener,
         ImageWorkerFragment.ImagePickerListener {
 
     private static final String ARG_USER = "user";

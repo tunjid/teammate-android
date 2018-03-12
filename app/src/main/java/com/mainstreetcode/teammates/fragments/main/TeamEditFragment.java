@@ -33,7 +33,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class TeamEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener,
         TeamEditAdapter.TeamEditAdapterListener {
 
     private static final int CREATING = 0;

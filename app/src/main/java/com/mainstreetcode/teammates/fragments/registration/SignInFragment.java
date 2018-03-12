@@ -27,7 +27,6 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 public final class SignInFragment extends RegistrationActivityFragment
         implements
-        View.OnClickListener,
         TextView.OnEditorActionListener {
 
     private EditText emailInput;

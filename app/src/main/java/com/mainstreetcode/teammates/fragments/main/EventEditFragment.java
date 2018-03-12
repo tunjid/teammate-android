@@ -46,7 +46,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class EventEditFragment extends HeaderedFragment
         implements
-        View.OnClickListener,
         EventEditAdapter.EventEditAdapterListener {
 
     public static final String ARG_EVENT = "event";

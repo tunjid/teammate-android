@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammates.model;
 
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -11,10 +12,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammates.util.ModelUtils;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Join request for a {@link Team}
@@ -22,23 +26,56 @@ import java.lang.reflect.Type;
 
 public class JoinRequest extends JoinRequestEntity
         implements
-        Model<JoinRequest> {
+        Model<JoinRequest>,
+        HeaderedModel<JoinRequest>,
+        ItemListableBean<JoinRequest> {
+
+    @Ignore private final List<Item<JoinRequest>> items;
 
     public static JoinRequest join(String roleName, Team team, User user) {
         return new JoinRequest(false, true, "", roleName, team, user);
     }
 
-    public static JoinRequest invite(String roleName, Team team, String firstName, String lastName, String email) {
-        User user = new User("", firstName, lastName, email, "");
-        return new JoinRequest(true, false, "", roleName, team, user);
+    public static JoinRequest invite(Team team) {
+        User user = new User("", "", "", "", Config.getDefaultUserAvatar());
+        return new JoinRequest(true, false, "", "", team, user);
     }
 
     public JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
         super(teamApproved, userApproved, id, roleName, team, user);
+        items = buildItems();
     }
 
     protected JoinRequest(Parcel in) {
         super(in);
+        items = buildItems();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Item<JoinRequest>> buildItems() {
+        User user = getUser();
+        return Arrays.asList(
+                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
+                new Item(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
+                new Item(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, this),
+                new Item(Item.ROLE, R.string.team_role, R.string.team_role, roleName, this::setRoleName, this)
+        );
+    }
+
+    @Override
+    public int size() {
+        return items.size();
+    }
+
+    @Override
+    public Item get(int position) {
+        return items.get(position);
+    }
+
+    @Override
+    public Item<JoinRequest> getHeaderItem() {
+        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, user.getImageUrl(), imageUrl -> {}, this);
     }
 
     @Override

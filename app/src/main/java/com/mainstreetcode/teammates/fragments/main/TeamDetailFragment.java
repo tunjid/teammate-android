@@ -2,12 +2,10 @@ package com.mainstreetcode.teammates.fragments.main;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
@@ -22,10 +20,8 @@ import android.widget.EditText;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.adapters.TeamDetailAdapter;
 import com.mainstreetcode.teammates.adapters.viewholders.ModelCardViewHolder;
-import com.mainstreetcode.teammates.adapters.viewholders.RoleSelectViewHolder;
 import com.mainstreetcode.teammates.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammates.model.Identifiable;
-import com.mainstreetcode.teammates.model.Item;
 import com.mainstreetcode.teammates.model.JoinRequest;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
@@ -35,7 +31,6 @@ import com.mainstreetcode.teammates.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Flowable;
 
@@ -47,7 +42,6 @@ import static com.mainstreetcode.teammates.util.ViewHolderUtil.getTransitionName
 
 public class TeamDetailFragment extends MainActivityFragment
         implements
-        View.OnClickListener,
         TeamDetailAdapter.UserAdapterListener {
 
     private static final String ARG_TEAM = "team";
@@ -183,7 +177,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (localRoleViewModel.hasPrivilegedRole()) inviteUser();
+                if (localRoleViewModel.hasPrivilegedRole()) showFragment(JoinRequestFragment.newInstance(team));
                 break;
         }
     }
@@ -249,47 +243,5 @@ public class TeamDetailFragment extends MainActivityFragment
         toggleFab(showsFab());
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();
-    }
-
-    @SuppressLint("InflateParams")
-    private void inviteUser() {
-        Context context = getContext();
-        if (context == null) return;
-
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_invite_user, null);
-        View inviteButton = dialogView.findViewById(R.id.invite);
-
-        final EditText firstNameText = dialogView.findViewById(R.id.first_name);
-        final EditText lastNameText = dialogView.findViewById(R.id.last_name);
-        final EditText emailText = dialogView.findViewById(R.id.email);
-        final TextInputLayout roleText = dialogView.findViewById(R.id.input_layout);
-
-        final AtomicReference<String> roleReference = new AtomicReference<>();
-
-        RoleSelectViewHolder holder = new RoleSelectViewHolder(dialogView, roleViewModel.getRoleNames(), () -> true);
-        Item<String> item = new Item<>(Item.ROLE, R.string.team_role, R.string.team_role, "", roleReference::set, "");
-
-        holder.bind(item);
-
-        final Dialog dialog = new AlertDialog.Builder(context).setTitle("").setView(dialogView).show();
-
-        inviteButton.setOnClickListener(view -> {
-
-            if (!validator.isNotEmpty(firstNameText)
-                    || !validator.isNotEmpty(lastNameText)
-                    || !validator.isValidEmail(emailText)
-                    || !validator.isNotEmpty(roleText.getEditText())) return;
-
-            String firstName = firstNameText.getText().toString();
-            String lastName = lastNameText.getText().toString();
-            String email = emailText.getText().toString();
-
-            JoinRequest joinRequest = JoinRequest.invite(roleReference.get(), team, firstName, lastName, email);
-
-            disposables.add(roleViewModel.joinTeam(joinRequest)
-                    .subscribe(request -> showSnackbar(getString(R.string.user_invite_sent)), defaultErrorHandler));
-
-            dialog.dismiss();
-        });
     }
 }

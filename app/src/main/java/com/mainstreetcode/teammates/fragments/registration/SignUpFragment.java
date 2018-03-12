@@ -24,7 +24,6 @@ import com.mainstreetcode.teammates.baseclasses.RegistrationActivityFragment;
 
 public class SignUpFragment extends RegistrationActivityFragment
         implements
-        View.OnClickListener,
         TextView.OnEditorActionListener {
 
     private EditText firstNameInput;
