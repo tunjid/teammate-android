@@ -85,7 +85,7 @@ public class RoleEditFragment extends HeaderedFragment
         super.onActivityCreated(savedInstanceState);
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.edit_user));
+        setToolbarTitle(getString(R.string.edit_role));
 
         User user = userViewModel.getCurrentUser();
         Team team = role.getTeam();
@@ -95,11 +95,15 @@ public class RoleEditFragment extends HeaderedFragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_kick);
+        item.setVisible(canChangeRole() || userViewModel.getCurrentUser().equals(role.getUser()));
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        User user = userViewModel.getCurrentUser();
-        if (localRoleViewModel.hasPrivilegedRole() && !role.getUser().equals(user)) {
-            inflater.inflate(R.menu.fragment_user_edit, menu);
-        }
+        inflater.inflate(R.menu.fragment_user_edit, menu);
     }
 
     @Override

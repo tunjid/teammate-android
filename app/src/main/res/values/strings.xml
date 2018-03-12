@@ -98,6 +98,9 @@
     <string name="delete_team_prompt">Delete %1$s?</string>
     <string name="deleted_team">Deleted %1$s</string>
 
+    <!--RoleEditFragment-->
+    <string name="edit_role">Edit Role</string>
+
     <!--JoinRequestFragment-->
     <string name="invite_user">Invite User</string>
     <string name="user_invite_sent">Invite sent</string>
