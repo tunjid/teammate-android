@@ -48,9 +48,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public static int insetHeight;
 
     private boolean insetsApplied;
+
+    private View bottomInsetView;
     private View keyboardPadding;
     private View topInsetView;
-    private View bottomInsetView;
 
     private CoordinatorLayout coordinatorLayout;
     private FloatingActionButton fab;
