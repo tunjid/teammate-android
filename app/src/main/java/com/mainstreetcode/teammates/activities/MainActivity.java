@@ -181,7 +181,7 @@ public class MainActivity extends TeammatesBaseActivity
     public void toggleBottomSheet(boolean show) {
         bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_HIDDEN);
         if (!show) restoreHiddenViewState();
-        else bottomSheetContainer.setPadding(0, TeammatesBaseActivity.insetHeight, 0, 0);
+        else bottomSheetContainer.setPadding(0, TeammatesBaseActivity.topInset, 0, 0);
     }
 
     @Override

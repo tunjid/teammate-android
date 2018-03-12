@@ -48,7 +48,10 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
-    public static int insetHeight;
+    public static int topInset;
+    private static int leftInset;
+    private static int rightInset;
+    private static int bottomInset;
 
     private boolean insetsApplied;
 
@@ -76,8 +79,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
             boolean isFullscreenFragment = isFullscreenFragment(f);
 
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
-            params.topMargin = isFullscreenFragment ? insetHeight : 0;
+            ViewGroup.MarginLayoutParams params = fromView(toolbar);
+            params.topMargin = isFullscreenFragment ? topInset : 0;
             topInsetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -230,21 +233,25 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private WindowInsetsCompat consumeSystemInsets(WindowInsetsCompat insets) {
         if (insetsApplied) return insets;
 
+        topInset = insets.getSystemWindowInsetTop();
+        leftInset = insets.getSystemWindowInsetLeft();
+        rightInset = insets.getSystemWindowInsetRight();
+        bottomInset = insets.getSystemWindowInsetBottom();
+
         ViewGroup.MarginLayoutParams topParams = fromView(topInsetView);
-        insetHeight = insets.getSystemWindowInsetTop();
-        topParams.height = insetHeight;
-        fromView(bottomInsetView).height = insets.getSystemWindowInsetBottom();
+        topParams.height = topInset;
+        fromView(bottomInsetView).height = bottomInset;
 
         insetsApplied = true;
         return insets;
     }
 
     private WindowInsetsCompat consumeFragmentInsets(WindowInsetsCompat insets) {
-        int bottomInset = insets.getSystemWindowInsetBottom();
-        setKeyboardPadding(bottomInset);
+        int keyboardPadding = insets.getSystemWindowInsetBottom();
+        setKeyboardPadding(keyboardPadding);
 
         TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
-        if (view != null) view.onKeyBoardChanged(bottomInset != 0);
+        if (view != null) view.onKeyBoardChanged(keyboardPadding != bottomInset);
         return insets;
     }
 
@@ -252,7 +259,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         initTransition();
         Fragment fragment = getCurrentFragment();
 
-        if (fragment instanceof MainActivityFragment && padding != 0)
+        padding -= bottomInset;
+        if (fragment instanceof MainActivityFragment && padding != bottomInset)
             padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();

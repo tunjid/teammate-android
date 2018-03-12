@@ -56,7 +56,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
 
         Toolbar headerToolbar = view.findViewById(R.id.header_toolbar);
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerToolbar.getLayoutParams();
-        params.height += TeammatesBaseActivity.insetHeight;
+        params.height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
