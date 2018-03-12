@@ -200,9 +200,8 @@ public class MainActivity extends TeammatesBaseActivity
                 () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamDetailFragment::newInstance)
         );
 
-        else if (savedInstanceState == null) route = FeedFragment.newInstance();
-
-        showFragment(route != null ? route : FeedFragment.newInstance());
+        if (route != null) showFragment(route);
+        else if (savedInstanceState == null) showFragment(FeedFragment.newInstance());
     }
 
     private void restoreHiddenViewState() {

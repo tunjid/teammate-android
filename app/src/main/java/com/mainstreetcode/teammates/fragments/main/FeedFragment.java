@@ -56,7 +56,7 @@ public final class FeedFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        bottomBarState = new AtomicBoolean();
+        bottomBarState = new AtomicBoolean(true);
     }
 
     @Override
