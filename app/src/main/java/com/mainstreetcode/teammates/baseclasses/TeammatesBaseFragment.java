@@ -54,7 +54,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         toggleToolbar(showsToolBar());
         toggleFab(showsFab());
         toggleBottombar(showsBottomNav());
-        toggleStatusBar(true);
+        toggleSystemUI(true);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
 
-    protected void toggleStatusBar(boolean show) {getPersistentUiController().toggleStatusBar(show);}
+    protected void toggleSystemUI(boolean show) {getPersistentUiController().toggleSystemUI(show);}
 
     protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
@@ -186,7 +186,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         }
 
         @Override
-        public void toggleStatusBar(boolean show) {
+        public void toggleSystemUI(boolean show) {
 
         }
 

@@ -157,16 +157,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void toggleStatusBar(boolean show) {
+    public void toggleSystemUI(boolean show) {
         if (show) showSystemUI();
         else hideSystemUI();
-//        View decorView = getWindow().getDecorView();
-//        int uiOptions = decorView.getSystemUiVisibility();
-//
-//        if (show) uiOptions = uiOptions & ~View.SYSTEM_UI_FLAG_FULLSCREEN;
-//        else uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-//
-//        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override

@@ -142,7 +142,7 @@ public class MediaDetailFragment extends MainActivityFragment
 
         int visibility = activity.getWindow().getDecorView().getSystemUiVisibility();
         boolean status = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-        toggleStatusBar(status);
+        toggleSystemUI(status);
     }
 
     @Override
