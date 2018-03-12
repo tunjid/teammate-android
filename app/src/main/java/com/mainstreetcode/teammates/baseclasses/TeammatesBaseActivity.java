@@ -29,8 +29,11 @@ import com.mainstreetcode.teammates.util.FabIconAnimator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.View.GONE;
+import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
@@ -119,10 +122,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         });
 
         setSupportActionBar(toolbar);
+        getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            showSystemUI();
             setOnApplyWindowInsetsListener(findViewById(R.id.content_view), (view, insets) -> consumeSystemInsets(insets));
         }
     }
@@ -148,19 +151,22 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressLint("Range")
     public void toggleProgress(boolean show) {
         if (show && loadingBar != null && loadingBar.isShown()) return;
-        if (show) (loadingBar = LoadingBar.make(coordinatorLayout, Snackbar.LENGTH_INDEFINITE)).show();
+        if (show)
+            (loadingBar = LoadingBar.make(coordinatorLayout, Snackbar.LENGTH_INDEFINITE)).show();
         else if (loadingBar != null && loadingBar.isShownOrQueued()) loadingBar.dismiss();
     }
 
     @Override
     public void toggleStatusBar(boolean show) {
-        View decorView = getWindow().getDecorView();
-        int uiOptions = decorView.getSystemUiVisibility();
-
-        if (show) uiOptions = uiOptions & ~View.SYSTEM_UI_FLAG_FULLSCREEN;
-        else uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-
-        decorView.setSystemUiVisibility(uiOptions);
+        if (show) showSystemUI();
+        else hideSystemUI();
+//        View decorView = getWindow().getDecorView();
+//        int uiOptions = decorView.getSystemUiVisibility();
+//
+//        if (show) uiOptions = uiOptions & ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        else uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+//
+//        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -263,4 +269,28 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ViewGroup.MarginLayoutParams fromView(View view) {
         return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
     }
+
+    // This snippet hides the system bars.
+    private void hideSystemUI() {
+        int orientation = getResources().getConfiguration().orientation;
+        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | SYSTEM_UI_FLAG_FULLSCREEN;
+
+
+        if (orientation == ORIENTATION_LANDSCAPE)
+            visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    private void showSystemUI() {
+        getDecorView().setSystemUiVisibility(
+                SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    }
+
+    private View getDecorView() {return getWindow().getDecorView();}
 }

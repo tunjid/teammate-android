@@ -164,14 +164,10 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean showsFab() {
-        return true;
-    }
+    public boolean showsFab() {return true;}
 
     @Override
-    public boolean showsBottomNav() {
-        return bottomBarState.get();
-    }
+    public boolean showsBottomNav() {return bottomBarState.get();}
 
     @Override
     public void onClick(View v) {
