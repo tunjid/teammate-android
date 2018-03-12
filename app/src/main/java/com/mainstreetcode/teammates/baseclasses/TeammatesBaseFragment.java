@@ -77,21 +77,13 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         return new int[]{};
     }
 
-    public boolean drawsBehindStatusBar() {
-        return false;
-    }
+    public boolean drawsBehindStatusBar() {return false;}
 
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() {return false;}
 
-    public boolean showsToolBar() {
-        return true;
-    }
+    public boolean showsToolBar() {return true;}
 
-    public boolean showsBottomNav() {
-        return true;
-    }
+    public boolean showsBottomNav() {return true;}
 
     protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
 
