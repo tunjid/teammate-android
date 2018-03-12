@@ -30,6 +30,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -64,13 +65,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private LoadingBar loadingBar;
     private Toolbar toolbar;
 
-    @Nullable
-    private ViewHider fabHider;
-    @Nullable
-    private ViewHider toolbarHider;
-    @Nullable
-    private FabIconAnimator fabIconAnimator;
-
+    @Nullable private ViewHider fabHider;
+    @Nullable private ViewHider toolbarHider;
+    @Nullable private FabIconAnimator fabIconAnimator;
 
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -120,7 +117,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPaddingWrapper.setOnTouchListener((view, event) -> {
-            setKeyboardPadding(0);
+            setKeyboardPadding(bottomInset);
             return true;
         });
 
@@ -154,8 +151,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressLint("Range")
     public void toggleProgress(boolean show) {
         if (show && loadingBar != null && loadingBar.isShown()) return;
-        if (show)
-            (loadingBar = LoadingBar.make(coordinatorLayout, Snackbar.LENGTH_INDEFINITE)).show();
+        if (show) (loadingBar = LoadingBar.make(coordinatorLayout, LENGTH_INDEFINITE)).show();
         else if (loadingBar != null && loadingBar.isShownOrQueued()) loadingBar.dismiss();
     }
 
@@ -167,8 +163,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabIcon(@DrawableRes int icon) {
-        if (fabIconAnimator == null) return;
-        fabIconAnimator.setCurrentIcon(icon);
+        if (fabIconAnimator != null) fabIconAnimator.setCurrentIcon(icon);
     }
 
     @Override
@@ -190,7 +185,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_INDEFINITE)
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_INDEFINITE)
                 .setAction(stringRes, clickListener);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
