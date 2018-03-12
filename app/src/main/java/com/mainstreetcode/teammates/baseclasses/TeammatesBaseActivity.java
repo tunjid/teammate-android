@@ -270,26 +270,20 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
     }
 
-    // This snippet hides the system bars.
     private void hideSystemUI() {
         int orientation = getResources().getConfiguration().orientation;
-        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | SYSTEM_UI_FLAG_FULLSCREEN;
+        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        visibility = visibility | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_FULLSCREEN;
 
-
-        if (orientation == ORIENTATION_LANDSCAPE)
-            visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        boolean isInLandscape = orientation == ORIENTATION_LANDSCAPE;
+        if (isInLandscape) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 
         getDecorView().setSystemUiVisibility(visibility);
     }
 
     private void showSystemUI() {
-        getDecorView().setSystemUiVisibility(
-                SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        getDecorView().setSystemUiVisibility(visibility);
     }
 
     private View getDecorView() {return getWindow().getDecorView();}
