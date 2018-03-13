@@ -116,24 +116,16 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return NONE;}
 
     @Override
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() {return false;}
 
     @Override
-    public boolean showsBottomNav() {
-        return false;
-    }
+    public boolean showsBottomNav() {return false;}
 
     @Override
-    public boolean showsToolBar() {
-        return true;
-    }
+    public boolean showsToolBar() {return true;}
 
     @Override
     public void onMediaClicked(Media item) {

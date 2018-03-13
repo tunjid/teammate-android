@@ -107,19 +107,13 @@ public class RoleEditFragment extends HeaderedFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {
-        return canChangeRole();
-    }
+    public boolean showsFab() {return canChangeRole();}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {
-        return role;
-    }
+    protected HeaderedModel getHeaderedModel() {return role;}
 
     @Override
     public void onClick(View view) {

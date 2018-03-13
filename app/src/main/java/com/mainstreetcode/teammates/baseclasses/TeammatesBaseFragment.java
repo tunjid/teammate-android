@@ -33,7 +33,11 @@ import io.reactivex.functions.Consumer;
 
 public class TeammatesBaseFragment extends BaseFragment implements View.OnClickListener {
 
-    protected static final Validator validator = new Validator();
+    protected static final boolean[] DEFAULT = {true, false, true, false};
+    protected static final boolean[] VERTICAL = {true, true, true, false};
+    protected static final boolean[] NONE = {false, true, false, false};
+
+    protected static final Validator VALIDATOR = new Validator();
 
     protected CompositeDisposable disposables = new CompositeDisposable();
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
@@ -77,7 +81,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         return new int[]{};
     }
 
-    public boolean drawsBehindStatusBar() {return false;}
+    public boolean[] insetState() {
+        return DEFAULT;
+    }
 
     public boolean showsFab() {return false;}
 

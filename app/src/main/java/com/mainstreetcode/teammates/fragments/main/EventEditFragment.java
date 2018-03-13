@@ -184,24 +184,16 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {
-        return canEditEvent();
-    }
+    public boolean showsFab() {return canEditEvent();}
 
     @Override
-    public int[] staticViews() {
-        return EXCLUDED_VIEWS;
-    }
+    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {
-        return event;
-    }
+    protected HeaderedModel getHeaderedModel() {return event;}
 
     @Override
     public void onClick(View view) {

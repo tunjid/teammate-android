@@ -104,7 +104,7 @@ public final class ResetPasswordFragment extends RegistrationActivityFragment
     }
 
     private void resetPassword() {
-        if (validator.isValidEmail(emailInput)) {
+        if (VALIDATOR.isValidEmail(emailInput)) {
             toggleProgress(true);
 
             String email = emailInput.getText().toString();

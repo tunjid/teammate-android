@@ -114,9 +114,7 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {
@@ -130,9 +128,7 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    protected HeaderedModel getHeaderedModel() {
-        return team;
-    }
+    protected HeaderedModel getHeaderedModel() {return team;}
 
     @Override
     public void onAddressClicked() {

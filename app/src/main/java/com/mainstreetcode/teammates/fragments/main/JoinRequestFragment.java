@@ -98,19 +98,13 @@ public class JoinRequestFragment extends HeaderedFragment
     public void onImageClick() {}
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {
-        return true;
-    }
+    public boolean showsFab() {return true;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {
-        return joinRequest;
-    }
+    protected HeaderedModel getHeaderedModel() {return joinRequest;}
 
     @Override
     public void onClick(View view) {

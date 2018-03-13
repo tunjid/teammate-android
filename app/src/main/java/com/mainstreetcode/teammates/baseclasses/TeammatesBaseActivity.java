@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -49,10 +50,14 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
+    private static final int TOP_INSET = 1;
+    private static final int LEFT_INSET = 0;
+    private static final int RIGHT_INSET = 2;
+
     public static int topInset;
-    private static int leftInset;
-    private static int rightInset;
-    private static int bottomInset;
+    private int leftInset;
+    private int rightInset;
+    private int bottomInset;
 
     private boolean insetsApplied;
 
@@ -61,6 +66,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private View topInsetView;
 
     private CoordinatorLayout coordinatorLayout;
+    private ConstraintLayout constraintLayout;
     private FloatingActionButton fab;
     private LoadingBar loadingBar;
     private Toolbar toolbar;
@@ -74,17 +80,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
             if (!isInMainFragmentContainer(v)) return;
 
-            boolean isFullscreenFragment = isFullscreenFragment(f);
-
-            ViewGroup.MarginLayoutParams params = fromView(toolbar);
-            params.topMargin = isFullscreenFragment ? topInset : 0;
-            topInsetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimary;
-                getWindow().setStatusBarColor(ContextCompat.getColor(TeammatesBaseActivity.this, color));
-            }
-
+            adjustSystemInsets(f);
             setOnApplyWindowInsetsListener(v, (view, insets) -> consumeFragmentInsets(insets));
         }
     };
@@ -93,6 +89,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
     }
 
     @Override
@@ -103,6 +101,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         View keyboardPaddingWrapper = findViewById(R.id.keyboard_padding_wrapper);
         keyboardPadding = findViewById(R.id.keyboard_padding);
         coordinatorLayout = findViewById(R.id.coordinator);
+        constraintLayout = findViewById(R.id.content_view);
         bottomInsetView = findViewById(R.id.bottom_inset);
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
@@ -126,7 +125,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             showSystemUI();
-            setOnApplyWindowInsetsListener(findViewById(R.id.content_view), (view, insets) -> consumeSystemInsets(insets));
+            setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
     }
 
@@ -205,10 +204,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (showFab) toggleFab(true);
     }
 
-    protected boolean isFullscreenFragment(Fragment fragment) {
-        return fragment instanceof TeammatesBaseFragment && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
-    }
-
     protected boolean isInMainFragmentContainer(View view) {
         View parent = (View) view.getParent();
         return parent.getId() == R.id.main_fragment_container;
@@ -233,9 +228,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         rightInset = insets.getSystemWindowInsetRight();
         bottomInset = insets.getSystemWindowInsetBottom();
 
-        ViewGroup.MarginLayoutParams topParams = fromView(topInsetView);
-        topParams.height = topInset;
-        fromView(bottomInsetView).height = bottomInset;
+        getLayoutParams(topInsetView).height = topInset;
+        getLayoutParams(bottomInsetView).height = bottomInset;
+        adjustSystemInsets(getCurrentFragment());
 
         insetsApplied = true;
         return insets;
@@ -262,17 +257,23 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         params.height = padding;
     }
 
-    private ViewGroup.MarginLayoutParams fromView(View view) {
+    private void adjustSystemInsets(Fragment fragment) {
+        if (!(fragment instanceof TeammatesBaseFragment)) return;
+        boolean[] insetState = ((TeammatesBaseFragment) fragment).insetState();
+
+        getLayoutParams(toolbar).topMargin = insetState[TOP_INSET] ? topInset : 0;
+        topInsetView.setVisibility(insetState[TOP_INSET] ? GONE : VISIBLE);
+        constraintLayout.setPadding(insetState[LEFT_INSET] ? leftInset : 0, 0, insetState[RIGHT_INSET] ? rightInset : 0, 0);
+    }
+
+    private ViewGroup.MarginLayoutParams getLayoutParams(View view) {
         return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
     }
 
     private void hideSystemUI() {
-        int orientation = getResources().getConfiguration().orientation;
         int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
         visibility = visibility | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_FULLSCREEN;
-
-        boolean isInLandscape = orientation == ORIENTATION_LANDSCAPE;
-        if (isInLandscape) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        if (isInLandscape()) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 
         getDecorView().setSystemUiVisibility(visibility);
     }
@@ -280,6 +281,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private void showSystemUI() {
         int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    private boolean isInLandscape() {
+        return getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE;
     }
 
     private View getDecorView() {return getWindow().getDecorView();}

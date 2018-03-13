@@ -93,7 +93,7 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     }
 
     private void sendForgotEmail() {
-        if (validator.isValidEmail(emailInput)) {
+        if (VALIDATOR.isValidEmail(emailInput)) {
             toggleProgress(true);
 
             String email = emailInput.getText().toString();

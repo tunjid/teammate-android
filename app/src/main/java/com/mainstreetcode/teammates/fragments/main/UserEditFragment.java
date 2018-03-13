@@ -97,19 +97,13 @@ public class UserEditFragment extends HeaderedFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {
-        return true;
-    }
+    public boolean showsFab() {return true;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {
-        return user;
-    }
+    protected HeaderedModel getHeaderedModel() {return user;}
 
     @Override
     public void onClick(View view) {
