@@ -29,7 +29,6 @@ public class MediaDetailFragment extends MainActivityFragment
 
     public static final String ARG_MEDIA = "media";
 
-    private boolean isToolbarVisible = true;
     private Media media;
     private MediaViewHolder mediaViewHolder;
 
@@ -70,7 +69,7 @@ public class MediaDetailFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        setToolbarTitle("");
         mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler);
     }
 
@@ -117,30 +116,25 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return NONE;}
 
     @Override
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() {return false;}
 
     @Override
-    public boolean showsBottomNav() {
-        return false;
-    }
+    public boolean showsBottomNav() {return false;}
 
     @Override
-    public boolean showsToolBar() {
-        return true;
-    }
+    public boolean showsToolBar() {return true;}
 
     @Override
     public void onMediaClicked(Media item) {
-        boolean status = isToolbarVisible = !isToolbarVisible;
-        toggleToolbar(status);
-        toggleStatusBar(status);
+        Activity activity = getActivity();
+        if (activity == null) return;
+
+        int visibility = activity.getWindow().getDecorView().getSystemUiVisibility();
+        boolean status = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
+        toggleSystemUI(status);
     }
 
     @Override

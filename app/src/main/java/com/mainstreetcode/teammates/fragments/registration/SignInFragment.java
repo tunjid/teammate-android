@@ -113,7 +113,7 @@ public final class SignInFragment extends RegistrationActivityFragment
     }
 
     private void signIn() {
-        if (validator.isValidEmail(emailInput) && validator.isValidPassword(passwordInput)) {
+        if (VALIDATOR.isValidEmail(emailInput) && VALIDATOR.isValidPassword(passwordInput)) {
             toggleProgress(true);
 
             String email = emailInput.getText().toString();

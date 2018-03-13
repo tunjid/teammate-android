@@ -87,19 +87,13 @@ public class SplashFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public boolean drawsBehindStatusBar() {
-        return true;
-    }
+    public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() {return false;}
 
     @Override
-    public boolean showsToolBar() {
-        return false;
-    }
+    public boolean showsToolBar() {return false;}
 
     @Nullable
     @Override

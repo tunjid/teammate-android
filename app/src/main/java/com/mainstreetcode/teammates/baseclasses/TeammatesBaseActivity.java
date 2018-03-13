@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,9 +30,14 @@ import com.mainstreetcode.teammates.util.FabIconAnimator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.View.GONE;
+import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
 import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
@@ -44,41 +50,37 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
-    public static int insetHeight;
+    private static final int TOP_INSET = 1;
+    private static final int LEFT_INSET = 0;
+    private static final int RIGHT_INSET = 2;
+
+    public static int topInset;
+    private int leftInset;
+    private int rightInset;
+    private int bottomInset;
 
     private boolean insetsApplied;
-    private View keyboardPadding;
-    private View insetView;
 
-    private Toolbar toolbar;
-    private CoordinatorLayout root;
+    private View bottomInsetView;
+    private View keyboardPadding;
+    private View topInsetView;
+
+    private CoordinatorLayout coordinatorLayout;
+    private ConstraintLayout constraintLayout;
     private FloatingActionButton fab;
     private LoadingBar loadingBar;
+    private Toolbar toolbar;
 
-    @Nullable
-    private ViewHider fabHider;
-    @Nullable
-    private ViewHider toolbarHider;
-    @Nullable
-    private FabIconAnimator fabIconAnimator;
-
+    @Nullable private ViewHider fabHider;
+    @Nullable private ViewHider toolbarHider;
+    @Nullable private FabIconAnimator fabIconAnimator;
 
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
             if (!isInMainFragmentContainer(v)) return;
 
-            boolean isFullscreenFragment = isFullscreenFragment(f);
-
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
-            params.topMargin = isFullscreenFragment ? insetHeight : 0;
-            insetView.setVisibility(isFullscreenFragment ? GONE : VISIBLE);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int color = isFullscreenFragment ? R.color.transparent : R.color.colorPrimary;
-                getWindow().setStatusBarColor(ContextCompat.getColor(TeammatesBaseActivity.this, color));
-            }
-
+            adjustSystemInsets(f);
             setOnApplyWindowInsetsListener(v, (view, insets) -> consumeFragmentInsets(insets));
         }
     };
@@ -87,6 +89,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
     }
 
     @Override
@@ -96,11 +100,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         View keyboardPaddingWrapper = findViewById(R.id.keyboard_padding_wrapper);
         keyboardPadding = findViewById(R.id.keyboard_padding);
-        insetView = findViewById(R.id.inset_view);
+        coordinatorLayout = findViewById(R.id.coordinator);
+        constraintLayout = findViewById(R.id.content_view);
+        bottomInsetView = findViewById(R.id.bottom_inset);
+        topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
-        root = findViewById(R.id.coordinator);
         fab = findViewById(R.id.fab);
-
 
         if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
 
@@ -111,16 +116,16 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPaddingWrapper.setOnTouchListener((view, event) -> {
-            setKeyboardPadding(0);
+            setKeyboardPadding(bottomInset);
             return true;
         });
 
         setSupportActionBar(toolbar);
+        getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            setOnApplyWindowInsetsListener(findViewById(R.id.content_view), (view, insets) -> consumeToolbarInsets(insets));
+            showSystemUI();
+            setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
     }
 
@@ -145,25 +150,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressLint("Range")
     public void toggleProgress(boolean show) {
         if (show && loadingBar != null && loadingBar.isShown()) return;
-        if (show) (loadingBar = LoadingBar.make(root, Snackbar.LENGTH_INDEFINITE)).show();
+        if (show) (loadingBar = LoadingBar.make(coordinatorLayout, LENGTH_INDEFINITE)).show();
         else if (loadingBar != null && loadingBar.isShownOrQueued()) loadingBar.dismiss();
     }
 
     @Override
-    public void toggleStatusBar(boolean show) {
-        View decorView = getWindow().getDecorView();
-        int uiOptions = decorView.getSystemUiVisibility();
-
-        if (show) uiOptions = uiOptions & ~View.SYSTEM_UI_FLAG_FULLSCREEN;
-        else uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-
-        decorView.setSystemUiVisibility(uiOptions);
+    public void toggleSystemUI(boolean show) {
+        if (show) showSystemUI();
+        else hideSystemUI();
     }
 
     @Override
     public void setFabIcon(@DrawableRes int icon) {
-        if (fabIconAnimator == null) return;
-        fabIconAnimator.setCurrentIcon(icon);
+        if (fabIconAnimator != null) fabIconAnimator.setCurrentIcon(icon);
     }
 
     @Override
@@ -175,7 +174,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
@@ -185,7 +184,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(root, message, Snackbar.LENGTH_INDEFINITE)
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_INDEFINITE)
                 .setAction(stringRes, clickListener);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
@@ -205,10 +204,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (showFab) toggleFab(true);
     }
 
-    protected boolean isFullscreenFragment(Fragment fragment) {
-        return fragment instanceof TeammatesBaseFragment && ((TeammatesBaseFragment) fragment).drawsBehindStatusBar();
-    }
-
     protected boolean isInMainFragmentContainer(View view) {
         View parent = (View) view.getParent();
         return parent.getId() == R.id.main_fragment_container;
@@ -225,23 +220,28 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }
 
-    private WindowInsetsCompat consumeToolbarInsets(WindowInsetsCompat insets) {
+    private WindowInsetsCompat consumeSystemInsets(WindowInsetsCompat insets) {
         if (insetsApplied) return insets;
 
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) insetView.getLayoutParams();
-        insetHeight = insets.getSystemWindowInsetTop();
-        params.height = insetHeight;
+        topInset = insets.getSystemWindowInsetTop();
+        leftInset = insets.getSystemWindowInsetLeft();
+        rightInset = insets.getSystemWindowInsetRight();
+        bottomInset = insets.getSystemWindowInsetBottom();
+
+        getLayoutParams(topInsetView).height = topInset;
+        getLayoutParams(bottomInsetView).height = bottomInset;
+        adjustSystemInsets(getCurrentFragment());
 
         insetsApplied = true;
         return insets;
     }
 
     private WindowInsetsCompat consumeFragmentInsets(WindowInsetsCompat insets) {
-        int bottomInset = insets.getSystemWindowInsetBottom();
-        setKeyboardPadding(bottomInset);
+        int keyboardPadding = insets.getSystemWindowInsetBottom();
+        setKeyboardPadding(keyboardPadding);
 
         TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
-        if (view != null) view.onKeyBoardChanged(bottomInset != 0);
+        if (view != null) view.onKeyBoardChanged(keyboardPadding != bottomInset);
         return insets;
     }
 
@@ -249,10 +249,43 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         initTransition();
         Fragment fragment = getCurrentFragment();
 
-        if (fragment instanceof MainActivityFragment && padding != 0)
+        padding -= bottomInset;
+        if (fragment instanceof MainActivityFragment && padding != bottomInset)
             padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();
         params.height = padding;
     }
+
+    private void adjustSystemInsets(Fragment fragment) {
+        if (!(fragment instanceof TeammatesBaseFragment)) return;
+        boolean[] insetState = ((TeammatesBaseFragment) fragment).insetState();
+
+        getLayoutParams(toolbar).topMargin = insetState[TOP_INSET] ? topInset : 0;
+        topInsetView.setVisibility(insetState[TOP_INSET] ? GONE : VISIBLE);
+        constraintLayout.setPadding(insetState[LEFT_INSET] ? leftInset : 0, 0, insetState[RIGHT_INSET] ? rightInset : 0, 0);
+    }
+
+    private ViewGroup.MarginLayoutParams getLayoutParams(View view) {
+        return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+    }
+
+    private void hideSystemUI() {
+        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        visibility = visibility | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_FULLSCREEN;
+        if (isInLandscape()) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    private void showSystemUI() {
+        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    private boolean isInLandscape() {
+        return getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE;
+    }
+
+    private View getDecorView() {return getWindow().getDecorView();}
 }

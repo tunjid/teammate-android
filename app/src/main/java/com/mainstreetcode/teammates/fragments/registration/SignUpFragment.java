@@ -105,9 +105,9 @@ public class SignUpFragment extends RegistrationActivityFragment
     }
 
     private void signUp() {
-        if (validator.isNotEmpty(firstNameInput)
-                && validator.isValidEmail(emailInput)
-                && validator.isValidPassword(passwordInput)) {
+        if (VALIDATOR.isNotEmpty(firstNameInput)
+                && VALIDATOR.isValidEmail(emailInput)
+                && VALIDATOR.isValidPassword(passwordInput)) {
 
             String firstName = firstNameInput.getText().toString();
             String lastname = lastNameInput.getText().toString();

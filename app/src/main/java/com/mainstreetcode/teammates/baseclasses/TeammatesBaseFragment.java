@@ -33,7 +33,11 @@ import io.reactivex.functions.Consumer;
 
 public class TeammatesBaseFragment extends BaseFragment implements View.OnClickListener {
 
-    protected static final Validator validator = new Validator();
+    protected static final boolean[] DEFAULT = {true, false, true, false};
+    protected static final boolean[] VERTICAL = {true, true, true, false};
+    protected static final boolean[] NONE = {false, true, false, false};
+
+    protected static final Validator VALIDATOR = new Validator();
 
     protected CompositeDisposable disposables = new CompositeDisposable();
     protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
@@ -54,7 +58,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         toggleToolbar(showsToolBar());
         toggleFab(showsFab());
         toggleBottombar(showsBottomNav());
-        toggleStatusBar(true);
+        toggleSystemUI(true);
     }
 
     @Override
@@ -77,21 +81,15 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         return new int[]{};
     }
 
-    public boolean drawsBehindStatusBar() {
-        return false;
+    public boolean[] insetState() {
+        return DEFAULT;
     }
 
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() {return false;}
 
-    public boolean showsToolBar() {
-        return true;
-    }
+    public boolean showsToolBar() {return true;}
 
-    public boolean showsBottomNav() {
-        return true;
-    }
+    public boolean showsBottomNav() {return true;}
 
     protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
 
@@ -99,7 +97,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
 
-    protected void toggleStatusBar(boolean show) {getPersistentUiController().toggleStatusBar(show);}
+    protected void toggleSystemUI(boolean show) {getPersistentUiController().toggleSystemUI(show);}
 
     protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
@@ -194,7 +192,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         }
 
         @Override
-        public void toggleStatusBar(boolean show) {
+        public void toggleSystemUI(boolean show) {
 
         }
 
