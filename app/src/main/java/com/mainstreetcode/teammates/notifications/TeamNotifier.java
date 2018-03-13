@@ -26,9 +26,10 @@ public class TeamNotifier extends Notifier<Team> {
     }
 
     @Override
-    protected ModelRepository<Team> getRepository() {
-        return TeamRepository.getInstance();
-    }
+    String getNotifyId() {return FeedItem.TEAM;}
+
+    @Override
+    protected ModelRepository<Team> getRepository() {return TeamRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

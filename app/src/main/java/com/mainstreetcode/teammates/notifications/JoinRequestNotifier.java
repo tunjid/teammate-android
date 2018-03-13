@@ -26,9 +26,10 @@ public class JoinRequestNotifier extends Notifier<JoinRequest> {
     }
 
     @Override
-    protected ModelRepository<JoinRequest> getRepository() {
-        return JoinRequestRepository.getInstance();
-    }
+    String getNotifyId() {return FeedItem.JOIN_REQUEST;}
+
+    @Override
+    protected ModelRepository<JoinRequest> getRepository() {return JoinRequestRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

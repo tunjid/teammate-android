@@ -46,7 +46,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
     private final String body;
     private final String type;
     private final T model;
-    final Class<T> itemClass;
+    private final Class<T> itemClass;
 
     FeedItem(String action, String title, String body, String type, T model, Class<T> itemClass) {
         this.action = action;
@@ -58,7 +58,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
     }
 
     @Nullable
-    static <T extends Model<T>> FeedItem<T> fromNotification(RemoteMessage message) {
+    public static <T extends Model<T>> FeedItem<T> fromNotification(RemoteMessage message) {
         Map<String, String> data = message.getData();
         if (data == null || data.isEmpty()) return null;
 
@@ -71,31 +71,21 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
     }
 
     @Override
-    public String getId() {
-        return model.getId();
-    }
+    public String getId() {return model.getId();}
 
-    public String getType() {
-        return type;
-    }
+    public String getType() {return type;}
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() {return title;}
 
-    public String getBody() {
-        return body;
-    }
+    public String getBody() {return body;}
 
-    public String getImageUrl() {
-        return model.getImageUrl();
-    }
+    public String getImageUrl() {return model.getImageUrl();}
 
-    public T getModel() {
-        return model;
-    }
+    public T getModel() {return model;}
 
-    boolean isDeleteAction() {return !TextUtils.isEmpty(action) && "DELETE".equals(action);}
+    public Class<T> getItemClass() {return itemClass;}
+
+    public boolean isDeleteAction() {return !TextUtils.isEmpty(action) && "DELETE".equals(action);}
 
     @Override
     public int compareTo(@NonNull FeedItem o) {

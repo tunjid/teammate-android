@@ -46,9 +46,10 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     @Override
-    protected ModelRepository<Chat> getRepository() {
-        return ChatRepository.getInstance();
-    }
+    String getNotifyId() {return FeedItem.CHAT;}
+
+    @Override
+    protected ModelRepository<Chat> getRepository() {return ChatRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

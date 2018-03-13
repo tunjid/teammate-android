@@ -24,7 +24,7 @@
             android:name=".MediaUploadIntentService"
             android:exported="false" />
         <service
-            android:name=".notifications.TeammateMessagingService"
+            android:name=".services.TeammateMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

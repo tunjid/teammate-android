@@ -38,9 +38,10 @@ public class MediaNotifier extends Notifier<Media> {
     }
 
     @Override
-    protected ModelRepository<Media> getRepository() {
-        return MediaRepository.getInstance();
-    }
+    String getNotifyId() {return FeedItem.MEDIA;}
+
+    @Override
+    protected ModelRepository<Media> getRepository() {return MediaRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

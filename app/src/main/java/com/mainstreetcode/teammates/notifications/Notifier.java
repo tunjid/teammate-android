@@ -10,13 +10,20 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 
 import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.activities.MainActivity;
+import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.Role;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.ModelRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
@@ -54,7 +61,12 @@ public abstract class Notifier<T extends Model<T>> {
         }
     }
 
-    final void notify(FeedItem<T> item) {
+    public void clearNotifications() {
+        NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
+        if (notifier != null) notifier.cancel(getNotifyId().hashCode());
+    }
+
+    public final void notify(FeedItem<T> item) {
         getRepository().get(item.getModel()).lastElement()
                 .filter(getNotificationFilter())
                 .map(model -> item)
@@ -79,7 +91,7 @@ public abstract class Notifier<T extends Model<T>> {
 
     void sendNotification(Notification notification) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        if (notifier != null) notifier.notify(0, notification);
+        if (notifier != null) notifier.notify(getNotifyId().hashCode(), notification);
     }
 
     protected void handleNotification(FeedItem<T> item) {
@@ -102,11 +114,32 @@ public abstract class Notifier<T extends Model<T>> {
         return channel;
     }
 
+    abstract String getNotifyId();
+
     protected abstract ModelRepository<T> getRepository();
 
     protected abstract NotificationChannel[] getNotificationChannels();
 
     public Predicate<T> getNotificationFilter() {
         return t -> true;
+    }
+
+    public static class NotifierFactory {
+
+        @Nullable
+        @SuppressWarnings("unchecked")
+        public <T extends Model<T>> Notifier<T> forFeedItem(Class<T> itemClass) {
+
+            Notifier notifier = null;
+
+            if (itemClass.equals(Team.class)) notifier = TeamNotifier.getInstance();
+            if (itemClass.equals(Role.class)) notifier = RoleNotifier.getInstance();
+            if (itemClass.equals(Chat.class)) notifier = ChatNotifier.getInstance();
+            if (itemClass.equals(Media.class)) notifier = MediaNotifier.getInstance();
+            if (itemClass.equals(Event.class)) notifier = EventNotifier.getInstance();
+            if (itemClass.equals(JoinRequest.class)) notifier = JoinRequestNotifier.getInstance();
+
+            return (Notifier<T>) notifier;
+        }
     }
 }
