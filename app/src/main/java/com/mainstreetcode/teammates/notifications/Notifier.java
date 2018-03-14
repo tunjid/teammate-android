@@ -61,9 +61,16 @@ public abstract class Notifier<T extends Model<T>> {
         }
     }
 
-    public void clearNotifications() {
+    public void clearNotifications(@Nullable T model) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        if (notifier != null) notifier.cancel(getNotifyId().hashCode());
+        if (notifier == null) return;
+
+        if (model == null) notifier.cancel(getNotifyId().hashCode());
+        else notifier.cancel(getNotificationTag(model), getNotifyId().hashCode());
+    }
+
+    public void clearNotifications() {
+        clearNotifications(null);
     }
 
     public final void notify(FeedItem<T> item) {
@@ -89,9 +96,10 @@ public abstract class Notifier<T extends Model<T>> {
         return getActivity(app, DEEP_LINK_REQ_CODE, intent, FLAG_ONE_SHOT);
     }
 
-    void sendNotification(Notification notification) {
+    void sendNotification(Notification notification, T model) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        if (notifier != null) notifier.notify(getNotifyId().hashCode(), notification);
+        if (notifier != null)
+            notifier.notify(getNotificationTag(model), getNotifyId().hashCode(), notification);
     }
 
     protected void handleNotification(FeedItem<T> item) {
@@ -103,7 +111,7 @@ public abstract class Notifier<T extends Model<T>> {
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(getDeepLinkIntent(item))
-                .build());
+                .build(), item.getModel());
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -115,6 +123,8 @@ public abstract class Notifier<T extends Model<T>> {
     }
 
     abstract String getNotifyId();
+
+    String getNotificationTag(T model) {return model.getId();}
 
     protected abstract ModelRepository<T> getRepository();
 

@@ -154,6 +154,12 @@ public class EventEditFragment extends HeaderedFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        eventViewModel.clearNotifications(event);
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setFabClickListener(this);

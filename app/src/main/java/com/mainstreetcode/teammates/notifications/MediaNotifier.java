@@ -46,7 +46,7 @@ public class MediaNotifier extends Notifier<Media> {
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
-        return new NotificationChannel[]{buildNotificationChannel(FeedItem.MEDIA, R.string.media, R.string.media_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
+        return new NotificationChannel[]{buildNotificationChannel(FeedItem.MEDIA, R.string.media, R.string.media_notifier_description, NotificationManager.IMPORTANCE_MIN)};
     }
 
     public Single<Media> notifyOfUploads(Single<Media> mediaSingle, RequestBody requestBody) {

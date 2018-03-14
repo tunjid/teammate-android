@@ -49,6 +49,9 @@ public class ChatNotifier extends Notifier<Chat> {
     String getNotifyId() {return FeedItem.CHAT;}
 
     @Override
+    String getNotificationTag(Chat model) {return model.getTeam().getId();}
+
+    @Override
     protected ModelRepository<Chat> getRepository() {return ChatRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -74,7 +77,7 @@ public class ChatNotifier extends Notifier<Chat> {
         teamRepository.get(chat.getTeam()).firstOrError()
                 .flatMap(team -> fetchUnreadChats(item, team))
                 .map(unreadChats -> buildNotification(item, unreadChats))
-                .subscribe(this::sendNotification, ErrorHandler.EMPTY);
+                .subscribe(notification -> sendNotification(notification, chat), ErrorHandler.EMPTY);
     }
 
     public void setChatVisibility(Team team, boolean visible) {

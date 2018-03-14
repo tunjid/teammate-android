@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -115,6 +116,24 @@ public class ModelUtils {
     public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
         Collections.sort(source, (a, b) -> -Identifiable.COMPARATOR.compare(a, b));
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public static <T> T findFirst(List<Identifiable> list, Class<T> typeClass) {
+        for (Identifiable item : list) if (item.getClass().equals(typeClass)) return (T) item;
+        return null;
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public static <T> T findLast(List<Identifiable> list, Class<T> typeClass) {
+        ListIterator<Identifiable> li = list.listIterator(list.size());
+        while (li.hasPrevious()) {
+            Identifiable item = li.previous();
+            if (item.getClass().equals(typeClass)) return ((T) item);
+        }
+        return null;
     }
 
     private static <T extends Identifiable> void concatenateList(List<T> source, List<T> additions) {

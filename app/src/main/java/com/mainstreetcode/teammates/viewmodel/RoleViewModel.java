@@ -2,6 +2,7 @@ package com.mainstreetcode.teammates.viewmodel;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.repository.JoinRequestRepository;
 import com.mainstreetcode.teammates.repository.RoleRepository;
@@ -10,6 +11,7 @@ import com.mainstreetcode.teammates.rest.TeammateService;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -41,6 +43,12 @@ public class RoleViewModel extends MappedViewModel<String, Role> {
     @Override
     boolean sortsAscending() {
         return true;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {
+        return Collections.singletonList((Class<T>) Role.class);
     }
 
     public List<String> getRoleNames() {

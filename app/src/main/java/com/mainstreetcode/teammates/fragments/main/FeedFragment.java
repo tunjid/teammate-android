@@ -75,6 +75,13 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        eventViewModel.clearNotifications();
+        teamMemberViewModel.clearNotifications();
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 

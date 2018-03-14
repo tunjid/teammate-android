@@ -45,6 +45,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     @Override
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {return Collections.emptyList();}
+
+    @Override
     Flowable<List<FeedItem>> fetch(Class<FeedItem> key, boolean fetchLatest) {
         return api.getFeed().toFlowable();
     }

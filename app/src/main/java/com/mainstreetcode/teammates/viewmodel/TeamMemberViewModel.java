@@ -12,6 +12,7 @@ import com.mainstreetcode.teammates.repository.RoleRepository;
 import com.mainstreetcode.teammates.repository.TeamRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -42,6 +43,12 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
     @Override
     boolean sortsAscending() {
         return true;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {
+        return Arrays.asList((Class<T>) Role.class, (Class<T>) JoinRequest.class);
     }
 
     @Override
