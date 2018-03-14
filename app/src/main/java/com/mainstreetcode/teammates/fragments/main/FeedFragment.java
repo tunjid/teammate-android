@@ -75,13 +75,6 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        eventViewModel.clearNotifications();
-        teamMemberViewModel.clearNotifications();
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -182,6 +175,8 @@ public final class FeedFragment extends MainActivityFragment
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
         toggleProgress(false);
         scrollManager.onDiff(diffResult);
+        eventViewModel.clearNotifications();
+        teamMemberViewModel.clearNotifications();
         localRoleViewModel.hasRoles().subscribe(hasRoles -> scrollManager.updateForEmptyList(
                 hasRoles ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
                 hasRoles ? R.string.no_feed : R.string.no_team_feed), emptyErrorHandler);
