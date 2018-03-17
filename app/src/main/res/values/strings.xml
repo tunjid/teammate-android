@@ -151,12 +151,15 @@
     <string name="message_hint">Type a message…</string>
     <string name="team_chat_rooms">Team Chat Rooms</string>
     <string name="team_chat_title">%1$s chat</string>
+    <string name="chat_notification_group_summary">Chats from %1$d teams</string>
     <string name="chat_notification_multiline_item">%1$s: %2$s</string>
     <string name="chat_notification_multiline_summary">+%1$d more</string>
     <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
 
     <!--MediaFragment-->
     <string name="media_title">Media for %1$s</string>
+    <string name="media_upload_channel_name">Media upload</string>
+    <string name="media_upload_channel_description">Notifications for media uploads</string>
     <string name="uploading_media">Uploading files</string>
     <string name="upload_progress_status">%1$d of %2$d. %3$d failed.</string>
     <string name="upload_complete">Upload complete.</string>
@@ -174,6 +177,7 @@
     <!--Notifier-->
     <string name="roles">Roles</string>
     <string name="join_requests">Join Requests</string>
+    <string name="chats_notification_title">%1$s • %2$s</string>
     <string name="chats_notifier_description">Notifications for team chats</string>
     <string name="team_notifier_description">Notifications for media</string>
     <string name="role_notifier_description">Notifications for media</string>

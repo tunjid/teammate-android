@@ -26,7 +26,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class MediaNotifier extends Notifier<Media> {
 
-    private static final long[] NO_VIBRATION_PATTERN = {0L};
+    private static final String MEDIA_UPLOADS = "media_uploads";
 
     private static MediaNotifier INSTANCE;
 
@@ -46,7 +46,9 @@ public class MediaNotifier extends Notifier<Media> {
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
-        return new NotificationChannel[]{buildNotificationChannel(FeedItem.MEDIA, R.string.media, R.string.media_notifier_description, NotificationManager.IMPORTANCE_MIN)};
+        return new NotificationChannel[]{
+                buildNotificationChannel(FeedItem.MEDIA, R.string.media, R.string.media_notifier_description, NotificationManager.IMPORTANCE_MIN),
+                buildNotificationChannel(MEDIA_UPLOADS, R.string.media_upload_channel_name, R.string.media_upload_channel_description, NotificationManager.IMPORTANCE_LOW)};
     }
 
     public Single<Media> notifyOfUploads(Single<Media> mediaSingle, RequestBody requestBody) {
@@ -84,10 +86,9 @@ public class MediaNotifier extends Notifier<Media> {
     private NotificationCompat.Builder progressNotificationBuilder() {
         return new NotificationCompat.Builder(app, FeedItem.MEDIA)
                 .setDefaults(NotificationCompat.DEFAULT_SOUND)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setVibrate(NO_VIBRATION_PATTERN)
-                .setChannelId(FeedItem.MEDIA);
+                .setChannelId(MEDIA_UPLOADS);
     }
 
     private void notifyOfUpload(NotificationCompat.Builder builder) {

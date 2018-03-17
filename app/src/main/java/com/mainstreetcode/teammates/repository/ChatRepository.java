@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.repository;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammates.App;
 import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
@@ -75,7 +77,7 @@ public class ChatRepository extends QueryRepository<Chat> {
 
     @Override
     public Single<Chat> createOrUpdate(Chat model) {
-        return Single.error(new TeammateException("Chats are created via socket IO"));
+        return Single.just(model).map(getSaveFunction()).subscribeOn(io());
     }
 
     @Override
@@ -126,11 +128,16 @@ public class ChatRepository extends QueryRepository<Chat> {
         return api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
-    public Single<List<Chat>> fetchUnreadChats(Team team) {
+    public Flowable<List<Chat>> fetchUnreadChats() {
         User currentUser = UserRepository.getInstance().getCurrentUser();
-        return chatDao.unreadChats(team.getId(), currentUser, getLastTeamSeen(team))
-                .subscribeOn(io())
-                .toSingle();
+        return RoleRepository.getInstance().getMyRoles(currentUser.getId())
+                .firstElement()
+                .toFlowable()
+                .flatMap(Flowable::fromIterable)
+                .map(Role::getTeam)
+                .map(team -> new Pair<>(team.getId(), getLastTeamSeen(team)))
+                .flatMapMaybe(teamDatePair -> chatDao.unreadChats(teamDatePair.first, currentUser, teamDatePair.second))
+                .filter(chats -> !chats.isEmpty());
     }
 
     public Flowable<Chat> listenForChat(Team team) {
@@ -177,8 +184,11 @@ public class ChatRepository extends QueryRepository<Chat> {
     private Date getLastTeamSeen(Team team) {
         SharedPreferences preferences = app.getSharedPreferences(TEAM_SEEN_TIMES, Context.MODE_PRIVATE);
         long timeStamp = preferences.getLong(team.getId(), TEAM_NOT_SEEN);
-        if (timeStamp == TEAM_NOT_SEEN) updateLastSeen(team);
-        return timeStamp == TEAM_NOT_SEEN ? new Date() : new Date(timeStamp);
+        if (timeStamp == TEAM_NOT_SEEN) {
+            updateLastSeen(team);
+            timeStamp = new Date().getTime() - (1000 * 60 * 2);
+        }
+        return new Date(timeStamp);
     }
 
     @Nullable

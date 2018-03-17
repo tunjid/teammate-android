@@ -65,7 +65,7 @@ public class TeammateService {
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 
-    public static final String SESSION_COOKIE = "connect.sid";
+    public static final String SESSION_COOKIE = "linesman.id";
     private static final Gson GSON = getGson();
 
     private static TeammateApi api;

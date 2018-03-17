@@ -5,25 +5,28 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.util.Pair;
 
 import com.mainstreetcode.teammates.R;
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Team;
+import com.mainstreetcode.teammates.model.User;
 import com.mainstreetcode.teammates.repository.ChatRepository;
 import com.mainstreetcode.teammates.repository.ModelRepository;
-import com.mainstreetcode.teammates.repository.TeamRepository;
 import com.mainstreetcode.teammates.repository.UserRepository;
 import com.mainstreetcode.teammates.util.ErrorHandler;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -31,12 +34,13 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class ChatNotifier extends Notifier<Chat> {
 
+    private static final String NOTIFICATION_GROUP = "com.mainstreetcode.teammates.notifications.ChatNotifier";
+
     private static final int MAX_LINES = 5;
     private static ChatNotifier INSTANCE;
 
     private final Map<Team, Boolean> visibleChatMap = new HashMap<>();
     private final UserRepository userRepository;
-    private Team sender = Team.empty();
 
     private ChatNotifier() {userRepository = UserRepository.getInstance();}
 
@@ -57,7 +61,11 @@ public class ChatNotifier extends Notifier<Chat> {
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
-        return new NotificationChannel[]{buildNotificationChannel(FeedItem.CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH)};
+        NotificationChannel channel = buildNotificationChannel(FeedItem.CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH);
+        channel.setLightColor(Color.GREEN);
+        channel.enableVibration(true);
+        channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+        return new NotificationChannel[]{channel};
     }
 
     @Override
@@ -71,38 +79,40 @@ public class ChatNotifier extends Notifier<Chat> {
 
     @Override
     protected void handleNotification(FeedItem<Chat> item) {
-        TeamRepository teamRepository = TeamRepository.getInstance();
-        Chat chat = item.getModel();
-
-        teamRepository.get(chat.getTeam()).firstOrError()
-                .flatMap(team -> fetchUnreadChats(item, team))
-                .map(unreadChats -> buildNotification(item, unreadChats))
-                .subscribe(notification -> sendNotification(notification, chat), ErrorHandler.EMPTY);
+        ChatRepository repository = ChatRepository.getInstance();
+        AtomicInteger count = new AtomicInteger(0);
+        repository.createOrUpdate(item.getModel())
+                .toFlowable()
+                .flatMap(chat -> repository.fetchUnreadChats())
+                .doOnNext(chats -> count.incrementAndGet())
+                .map(unreadChats -> new Pair<>(buildNotification(item, unreadChats, count.get()), unreadChats.get(0)))
+                .observeOn(mainThread())
+                .subscribe(notificationChatPair -> sendNotification(notificationChatPair.first, notificationChatPair.second),
+                        ErrorHandler.EMPTY,
+                        () -> buildSummary(item, count.get()));
     }
 
     public void setChatVisibility(Team team, boolean visible) {
         visibleChatMap.put(team, visible);
     }
 
-    private Single<List<Chat>> fetchUnreadChats(FeedItem<Chat> item, Team team) {
-        sender.update(team);
-        ChatRepository repository = ChatRepository.getInstance();
-        return repository.fetchUnreadChats(item.getModel().getTeam())
-                .observeOn(mainThread());
-    }
-
-    private Notification buildNotification(FeedItem<Chat> item, List<Chat> chats) {
+    private Notification buildNotification(FeedItem<Chat> item, List<Chat> chats, int count) {
         int size = chats.size();
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder(item)
                 .setContentIntent(getDeepLinkIntent(item))
-                .setSound(defaultSoundUri)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setGroup(NOTIFICATION_GROUP)
                 .setAutoCancel(true);
 
+        Chat first = chats.get(0);
+        String teamName = first.getTeam().getName();
+
+        notificationBuilder.setSound(getNotificationSound(count));
+        setGroupAlertSummary(notificationBuilder);
+
         if (size < 2) return notificationBuilder
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(item.getTitle())
-                .setContentText(item.getBody())
+                .setContentTitle(app.getString(R.string.chats_notification_title, teamName, first.getUser().getFirstName()))
+                .setContentText(first.getContent())
                 .build();
 
         int min = Math.min(size, MAX_LINES);
@@ -110,8 +120,7 @@ public class ChatNotifier extends Notifier<Chat> {
 
         for (int i = 0; i < min; i++) {
             Chat chat = chats.get(i);
-            style.addLine(app.getString(R.string.chat_notification_multiline_item,
-                    chat.getUser().getFirstName(), chat.getContent()));
+            style.addLine(getChatLine(chat));
         }
 
         if (size > MAX_LINES) {
@@ -119,9 +128,42 @@ public class ChatNotifier extends Notifier<Chat> {
         }
 
         return notificationBuilder
-                .setContentTitle(app.getString(R.string.chat_notification_multiline_title, size, sender.getName()))
-                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(app.getString(R.string.chat_notification_multiline_title, size, teamName))
+                .setContentText(getChatLine(first))
                 .setStyle(style)
                 .build();
+    }
+
+    private void buildSummary(FeedItem<Chat> item, int count) {
+        NotificationCompat.Builder notificationBuilder = getNotificationBuilder(item);
+
+        setGroupAlertSummary(notificationBuilder);
+
+        sendNotification(notificationBuilder
+                .setContentTitle(app.getString(R.string.chat_notification_group_summary, count))
+                .setContentText(app.getString(R.string.chat_notification_group_summary, count))
+                .setSmallIcon(R.drawable.ic_notification)
+                .setGroup(NOTIFICATION_GROUP)
+                .setGroupSummary(true)
+                .setAutoCancel(true)
+                .build(), Chat.chat("", User.empty(), Team.empty()));
+    }
+
+    private void setGroupAlertSummary(NotificationCompat.Builder notificationBuilder) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationBuilder.setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY);
+        }
+    }
+
+    private Uri getNotificationSound(int count) {
+        return count == 1
+                ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                : Uri.parse("android.resource://" + app.getPackageName() + "/" + R.raw.silent);
+    }
+
+    @NonNull
+    private String getChatLine(Chat chat) {
+        String firstName = chat.getUser().getFirstName();
+        return app.getString(R.string.chat_notification_multiline_item, firstName, chat.getContent());
     }
 }
