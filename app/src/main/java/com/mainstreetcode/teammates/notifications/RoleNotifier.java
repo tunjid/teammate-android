@@ -26,9 +26,10 @@ public class RoleNotifier extends Notifier<Role> {
     }
 
     @Override
-    protected ModelRepository<Role> getRepository() {
-        return RoleRepository.getInstance();
-    }
+    String getNotifyId() {return FeedItem.ROLE;}
+
+    @Override
+    protected ModelRepository<Role> getRepository() {return RoleRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

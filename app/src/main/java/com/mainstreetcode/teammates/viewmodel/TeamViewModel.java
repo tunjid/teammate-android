@@ -3,6 +3,7 @@ package com.mainstreetcode.teammates.viewmodel;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Role;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.AppDatabase;
@@ -11,6 +12,7 @@ import com.mainstreetcode.teammates.util.ErrorHandler;
 import com.mainstreetcode.teammates.util.TransformingSequentialList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,6 +44,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         searchRef = new AtomicReference<>();
         repository = TeamRepository.getInstance();
         repository.getDefaultTeam().subscribe(defaultTeam::update, ErrorHandler.EMPTY);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {
+        return Collections.singletonList((Class<T>) Team.class);
     }
 
     @Override

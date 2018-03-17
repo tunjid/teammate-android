@@ -7,12 +7,14 @@ import android.util.Log;
 
 import com.mainstreetcode.teammates.model.Chat;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.notifications.ChatNotifier;
 import com.mainstreetcode.teammates.repository.ChatRepository;
 
 import java.io.EOFException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,7 @@ import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
 import io.socket.engineio.client.EngineIOException;
 
+import static com.mainstreetcode.teammates.util.ModelUtils.findFirst;
 import static io.reactivex.Flowable.concat;
 import static io.reactivex.Flowable.just;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -54,12 +57,19 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     @Override
     boolean sortsAscending() {return true;}
 
-    public void onChatRoomLeft(Team team) {
-        chatMap.put(team, RETRY);
+    @Override
+    @SuppressWarnings("unchecked")
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {
+        return Collections.singletonList((Class<T>) Chat.class);
     }
+
+    public void onChatRoomLeft(Team team) {chatMap.put(team, RETRY);}
 
     public void updateLastSeen(Team team) {
         repository.updateLastSeen(team);
+
+        Chat chat = findFirst(getModelList(team), Chat.class);
+        if (chat != null) clearNotifications(chat);
     }
 
     public Flowable<Chat> listenForChat(Team team) {
@@ -148,9 +158,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     @Nullable
     private Date getQueryDate(Team team, boolean fetchLatest) {
         if (fetchLatest) return null;
-        List<Identifiable> items = getModelList(team);
-        if (items.isEmpty()) return null;
-        for (Identifiable item : items) if (item instanceof Chat) return ((Chat) item).getCreated();
-        return null;
+        Chat chat = findFirst(getModelList(team), Chat.class);
+        return chat == null ? null : chat.getCreated();
     }
 }

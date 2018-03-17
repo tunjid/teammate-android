@@ -5,6 +5,8 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Message;
+import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.notifications.Notifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,11 @@ import io.reactivex.functions.Function;
 import static com.mainstreetcode.teammates.util.ModelUtils.fromThrowable;
 
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
+
+    private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
+
+
+    MappedViewModel() {}
 
     Function<List<V>, List<Identifiable>> toIdentifiable = ArrayList<Identifiable>::new;
 
@@ -48,6 +55,26 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     abstract Flowable<List<V>> fetch(K key, boolean fetchLatest);
+
+    abstract <T extends Model<T>> List<Class<T>> notifiedClasses();
+
+    @SuppressWarnings("unchecked")
+    public void clearNotifications(V v) {
+        if (!(v instanceof Model)) return;
+        Model model = (Model) v;
+
+        Notifier notifier = factory.forFeedItem(model.getClass());
+        if (notifier != null) notifier.clearNotifications(model);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Model<T>> void clearNotifications() {
+        for (Class notifiedClass : notifiedClasses()) {
+            Class<T> casted = (Class<T>) notifiedClass;
+            Notifier notifier = factory.forFeedItem(casted);
+            if (notifier != null) notifier.clearNotifications();
+        }
+    }
 
     public Flowable<DiffUtil.DiffResult> getMore(K key) {
         return Identifiable.diff(fetch(key, false).map(toIdentifiable), () -> getModelList(key), preserveList);

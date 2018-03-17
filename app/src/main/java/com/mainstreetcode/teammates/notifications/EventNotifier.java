@@ -26,9 +26,10 @@ public class EventNotifier extends Notifier<Event> {
     }
 
     @Override
-    protected ModelRepository<Event> getRepository() {
-        return EventRepository.getInstance();
-    }
+    String getNotifyId() {return FeedItem.EVENT;}
+
+    @Override
+    protected ModelRepository<Event> getRepository() {return EventRepository.getInstance();}
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

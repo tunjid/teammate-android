@@ -6,15 +6,16 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Identifiable;
 import com.mainstreetcode.teammates.model.Media;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.MediaRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+
+import static com.mainstreetcode.teammates.util.ModelUtils.findLast;
 
 public class MediaViewModel extends TeamMappedViewModel<Media> {
 
@@ -34,6 +37,12 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     @Override
     boolean hasNativeAds() {return false;}
+
+    @Override
+    @SuppressWarnings("unchecked")
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {
+        return Collections.singletonList((Class<T>) Media.class);
+    }
 
     public Flowable<Media> getMedia(Media model) {
         return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)
@@ -85,16 +94,9 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     @Nullable
     private Date getQueryDate(Team team, boolean fetchLatest) {
         if (fetchLatest) return null;
-        List<Identifiable> items = getModelList(team);
-        if (items.isEmpty()) return null;
 
-        ListIterator<Identifiable> li = items.listIterator(items.size());
-        while (li.hasPrevious()) {
-            Identifiable item = li.previous();
-            if (item instanceof Media) return ((Media) item).getCreated();
-        }
-
-        return null;
+        Media media = findLast(getModelList(team), Media.class);
+        return media == null ? null : media.getCreated();
     }
 
     public int getNumSelected(Team team) {

@@ -4,8 +4,14 @@ package com.mainstreetcode.teammates.repository;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
+import com.mainstreetcode.teammates.model.Chat;
+import com.mainstreetcode.teammates.model.Event;
+import com.mainstreetcode.teammates.model.JoinRequest;
+import com.mainstreetcode.teammates.model.Media;
 import com.mainstreetcode.teammates.model.Message;
 import com.mainstreetcode.teammates.model.Model;
+import com.mainstreetcode.teammates.model.Role;
+import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.persistence.EntityDao;
 
 import java.io.File;
@@ -113,5 +119,25 @@ public abstract class ModelRepository<T extends Model<T>> {
 
     static <R> Flowable<R> fetchThenGet(Maybe<R> local, Maybe<R> remote) {
         return concatDelayError(Arrays.asList(local, remote));
+    }
+
+    public static class RepositoryFactory {
+
+        @Nullable
+        @SuppressWarnings("unchecked")
+        public <T extends Model<T>> ModelRepository<T> forFeedItem(Class<T> itemClass) {
+
+            ModelRepository repository = null;
+
+            if (itemClass.equals(Team.class)) repository = TeamRepository.getInstance();
+            if (itemClass.equals(Role.class)) repository = RoleRepository.getInstance();
+            if (itemClass.equals(Chat.class)) repository = ChatRepository.getInstance();
+            if (itemClass.equals(Media.class)) repository = MediaRepository.getInstance();
+            if (itemClass.equals(Event.class)) repository = EventRepository.getInstance();
+            if (itemClass.equals(JoinRequest.class))
+                repository = JoinRequestRepository.getInstance();
+
+            return (ModelRepository<T>) repository;
+        }
     }
 }

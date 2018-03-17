@@ -4,18 +4,20 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammates.model.Event;
 import com.mainstreetcode.teammates.model.Identifiable;
+import com.mainstreetcode.teammates.model.Model;
 import com.mainstreetcode.teammates.model.Team;
 import com.mainstreetcode.teammates.repository.EventRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.ListIterator;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
+import static com.mainstreetcode.teammates.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
@@ -31,6 +33,12 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     public List<Identifiable> fromEvent(Event event) {
         try {return eventListFunction.apply(event);}
         catch (Exception e) {return new ArrayList<>();}
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    <T extends Model<T>> List<Class<T>> notifiedClasses() {
+        return Collections.singletonList((Class<T>) Event.class);
     }
 
     @Override
@@ -80,16 +88,8 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private Date getQueryDate(Team team, boolean fetchLatest) {
         if (fetchLatest) return null;
-        List<Identifiable> list = getModelList(team);
 
-        if (list.isEmpty()) return null;
-
-        ListIterator<Identifiable> li = list.listIterator(list.size());
-        while (li.hasPrevious()) {
-            Identifiable item = li.previous();
-            if (item instanceof Event) return ((Event) item).getStartDate();
-        }
-
-        return new Date();
+        Event event = findLast(getModelList(team), Event.class);
+        return event == null ? null : event.getStartDate();
     }
 }
