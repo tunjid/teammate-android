@@ -63,7 +63,7 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
         if (!(v instanceof Model)) return;
         Model model = (Model) v;
 
-        Notifier notifier = factory.forFeedItem(model.getClass());
+        Notifier notifier = factory.forClass(model.getClass());
         if (notifier != null) notifier.clearNotifications(model);
     }
 
@@ -71,7 +71,7 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     public <T extends Model<T>> void clearNotifications() {
         for (Class notifiedClass : notifiedClasses()) {
             Class<T> casted = (Class<T>) notifiedClass;
-            Notifier notifier = factory.forFeedItem(casted);
+            Notifier notifier = factory.forClass(casted);
             if (notifier != null) notifier.clearNotifications();
         }
     }

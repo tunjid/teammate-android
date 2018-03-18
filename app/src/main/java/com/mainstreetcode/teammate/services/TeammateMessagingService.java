@@ -23,11 +23,11 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         if (item == null) return;
 
         if (item.isDeleteAction()) {
-            ModelRepository<T> repository = repositoryFactory.forFeedItem(item.getItemClass());
+            ModelRepository<T> repository = repositoryFactory.forClass(item.getItemClass());
             if (repository != null) repository.delete(item.getModel());
         }
         else {
-            Notifier<T> notifier = factory.forFeedItem(item.getItemClass());
+            Notifier<T> notifier = factory.forClass(item.getItemClass());
             if (notifier != null) notifier.notify(item);
         }
     }

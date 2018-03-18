@@ -48,4 +48,7 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
             " FROM roles as role" +
             " WHERE :userId = role.role_user")
     public abstract Maybe<List<Role>> myRoles(String userId);
+
+    @Query("DELETE FROM roles WHERE role_team = :teamId")
+    abstract void deleteByTeam(long teamId);
 }

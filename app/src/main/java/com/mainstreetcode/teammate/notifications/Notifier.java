@@ -138,7 +138,7 @@ public abstract class Notifier<T extends Model<T>> {
 
         @Nullable
         @SuppressWarnings("unchecked")
-        public <T extends Model<T>> Notifier<T> forFeedItem(Class<T> itemClass) {
+        public <T extends Model<T>> Notifier<T> forClass(Class<T> itemClass) {
 
             Notifier notifier = null;
 

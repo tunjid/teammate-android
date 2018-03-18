@@ -125,7 +125,7 @@ public abstract class ModelRepository<T extends Model<T>> {
 
         @Nullable
         @SuppressWarnings("unchecked")
-        public <T extends Model<T>> ModelRepository<T> forFeedItem(Class<T> itemClass) {
+        public <T extends Model<T>> ModelRepository<T> forClass(Class<T> itemClass) {
 
             ModelRepository repository = null;
 

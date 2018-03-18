@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
@@ -30,4 +31,7 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
 
     @Delete
     public abstract void delete(List<JoinRequestEntity> roles);
+
+    @Query("DELETE FROM join_requests WHERE join_request_team = :teamId")
+    abstract void deleteByTeam(long teamId);
 }
