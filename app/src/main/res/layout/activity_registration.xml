@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mainstreetcode.teammates.activities.RegistrationActivity">
+    tools:context="com.mainstreetcode.teammate.activities.RegistrationActivity">
 
     <View
         android:id="@+id/top_inset"
