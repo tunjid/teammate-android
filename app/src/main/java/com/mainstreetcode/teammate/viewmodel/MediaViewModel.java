@@ -38,12 +38,6 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     @Override
     boolean hasNativeAds() {return false;}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {
-        return Collections.singletonList((Class<T>) Media.class);
-    }
-
     public Flowable<Media> getMedia(Media model) {
         return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)
                 .doOnNext(media -> {

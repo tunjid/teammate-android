@@ -36,12 +36,6 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {
-        return Collections.singletonList((Class<T>) Event.class);
-    }
-
-    @Override
     Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
         return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
                 .doOnError(throwable -> checkForInvalidTeam(throwable, key));

@@ -69,10 +69,6 @@ public abstract class Notifier<T extends Model<T>> {
         else notifier.cancel(getNotificationTag(model), getNotifyId().hashCode());
     }
 
-    public void clearNotifications() {
-        clearNotifications(null);
-    }
-
     public final void notify(FeedItem<T> item) {
         getRepository().get(item.getModel()).lastElement()
                 .filter(getNotificationFilter())
@@ -138,7 +134,7 @@ public abstract class Notifier<T extends Model<T>> {
 
         @Nullable
         @SuppressWarnings("unchecked")
-        public <T extends Model<T>> Notifier<T> forClass(Class<T> itemClass) {
+        public <T extends Model<T>> Notifier<T> forClass(Class itemClass) {
 
             Notifier notifier = null;
 

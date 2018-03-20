@@ -47,12 +47,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {
-        return Collections.singletonList((Class<T>) Team.class);
-    }
-
-    @Override
     public List<Identifiable> getModelList(Class<Team> key) {
         return teams;
     }

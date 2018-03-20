@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Event;
@@ -45,7 +46,11 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     @Override
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {return Collections.emptyList();}
+    Pair<Model, Class> notificationCancelMap(Identifiable identifiable) {
+        if (!(identifiable instanceof FeedItem)) return new Pair<>(null, null);
+        FeedItem feedItem = (FeedItem) identifiable;
+        return new Pair<>(feedItem.getModel(), feedItem.getItemClass());
+    }
 
     @Override
     Flowable<List<FeedItem>> fetch(Class<FeedItem> key, boolean fetchLatest) {

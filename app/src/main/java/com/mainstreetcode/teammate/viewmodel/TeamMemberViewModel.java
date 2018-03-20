@@ -46,12 +46,6 @@ public class TeamMemberViewModel extends TeamMappedViewModel<Model> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {
-        return Arrays.asList((Class<T>) Role.class, (Class<T>) JoinRequest.class);
-    }
-
-    @Override
     Flowable<List<Model>> fetch(Team key, boolean fetchLatest) {
         key.getRoles().clear();
         key.getJoinRequests().clear();

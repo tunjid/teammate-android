@@ -1,12 +1,14 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 
+import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.Notifier;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,6 @@ import static com.mainstreetcode.teammate.util.ModelUtils.fromThrowable;
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
 
     private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
-
 
     MappedViewModel() {}
 
@@ -41,39 +42,10 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
 
     public abstract List<Identifiable> getModelList(K key);
 
-    Flowable<Identifiable> checkForInvalidObject(Flowable<? extends Identifiable> sourceFlowable, K key, V value) {
-        return sourceFlowable.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
-    }
-
-    void onErrorMessage(Message message, K key, Identifiable invalid) {
-        if (message.isInvalidObject()) getModelList(key).remove(invalid);
-    }
-
-    private void checkForInvalidObject(Throwable throwable, Identifiable model, K key) {
-        Message message = fromThrowable(throwable);
-        if (message != null) onErrorMessage(message, key, model);
-    }
-
     abstract Flowable<List<V>> fetch(K key, boolean fetchLatest);
 
-    abstract <T extends Model<T>> List<Class<T>> notifiedClasses();
-
-    @SuppressWarnings("unchecked")
-    public void clearNotifications(V v) {
-        if (!(v instanceof Model)) return;
-        Model model = (Model) v;
-
-        Notifier notifier = factory.forClass(model.getClass());
-        if (notifier != null) notifier.clearNotifications(model);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Model<T>> void clearNotifications() {
-        for (Class notifiedClass : notifiedClasses()) {
-            Class<T> casted = (Class<T>) notifiedClass;
-            Notifier notifier = factory.forClass(casted);
-            if (notifier != null) notifier.clearNotifications();
-        }
+    Flowable<Identifiable> checkForInvalidObject(Flowable<? extends Identifiable> sourceFlowable, K key, V value) {
+        return sourceFlowable.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
     public Flowable<DiffUtil.DiffResult> getMore(K key) {
@@ -86,5 +58,37 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
 
     public Flowable<DiffUtil.DiffResult> refresh(K key) {
         return Identifiable.diff(fetch(key, true).map(toIdentifiable), () -> getModelList(key), pullToRefreshFunction);
+    }
+
+    public void clearNotifications(V value) {
+        clearNotification(notificationCancelMap(value));
+    }
+
+    public void clearNotifications(K key) {
+        Flowable.fromIterable(getModelList(key))
+                .map(this::notificationCancelMap)
+                .subscribe(this::clearNotification, ErrorHandler.EMPTY);
+    }
+
+    void onErrorMessage(Message message, K key, Identifiable invalid) {
+        if (message.isInvalidObject()) getModelList(key).remove(invalid);
+    }
+
+    Pair<Model, Class> notificationCancelMap(Identifiable identifiable) {
+        if (!(identifiable instanceof Model)) return new Pair<>(null, null);
+        Model model = (Model) identifiable;
+        return new Pair<>(model, model.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void clearNotification(Pair<Model, Class> pair) {
+        if (pair.first == null || pair.second == null) return;
+        Notifier notifier = factory.forClass(pair.second);
+        if (notifier != null) notifier.clearNotifications(pair.first);
+    }
+
+    private void checkForInvalidObject(Throwable throwable, Identifiable model, K key) {
+        Message message = fromThrowable(throwable);
+        if (message != null) onErrorMessage(message, key, model);
     }
 }

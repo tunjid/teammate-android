@@ -45,12 +45,6 @@ public class RoleViewModel extends MappedViewModel<String, Role> {
         return true;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {
-        return Collections.singletonList((Class<T>) Role.class);
-    }
-
     public List<String> getRoleNames() {
         return roleNames;
     }

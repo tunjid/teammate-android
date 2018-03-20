@@ -57,12 +57,6 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     @Override
     boolean sortsAscending() {return true;}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    <T extends Model<T>> List<Class<T>> notifiedClasses() {
-        return Collections.singletonList((Class<T>) Chat.class);
-    }
-
     public void onChatRoomLeft(Team team) {chatMap.put(team, RETRY);}
 
     public void updateLastSeen(Team team) {
