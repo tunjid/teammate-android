@@ -12,6 +12,7 @@ import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.repository.JoinRequestRepository;
 import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 
@@ -59,30 +60,40 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
         Flowable<List<Identifiable>> sourceFlowable = eventRepository.rsvpEvent(feedItem.getModel(), attending)
-                .map(model -> Collections.singletonList(dropType(feedItem)))
+                .map(model -> feedItem)
+                .cast(FeedItem.class)
+                .map(Collections::singletonList)
                 .toFlowable().map(toIdentifiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
+        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(false)).firstOrError();
     }
 
     public Single<DiffUtil.DiffResult> processJoinRequest(FeedItem<JoinRequest> feedItem, boolean approved) {
+        boolean leaveUnchanged = UserRepository.getInstance().getCurrentUser().equals(feedItem.getModel().getUser()) && approved;
         JoinRequest request = feedItem.getModel();
+
         Single<Role> roleSingle = (request.isTeamApproved()
                 ? roleRepository.acceptInvite(request)
                 : roleRepository.approveUser(request));
 
-        Flowable<List<Identifiable>> sourceFlowable = (approved
+        Single<? extends Model> sourceSingle = leaveUnchanged
+                ? Single.just(request)
+                : approved
                 ? roleSingle
-                : joinRequestRepository.delete(request))
-                .map(model -> Collections.singletonList(dropType(feedItem)))
+                : joinRequestRepository.delete(request);
+
+        Flowable<List<Identifiable>> sourceFlowable = sourceSingle
+                .map(model -> feedItem)
+                .cast(FeedItem.class)
+                .map(Collections::singletonList)
                 .toFlowable().map(toIdentifiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed()).firstOrError();
+        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged)).firstOrError();
     }
 
-    private <T extends Model<T>> FeedItem dropType(FeedItem<T> feedItem) { return feedItem;}
+    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onFeedItemProcessed(boolean leaveUnchanged) {
+        if (leaveUnchanged) return (feedItems, ignored) -> feedItems;
 
-    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onFeedItemProcessed() {
         return (feedItems, processed) -> {
             feedItems.removeAll(processed);
             return feedItems;

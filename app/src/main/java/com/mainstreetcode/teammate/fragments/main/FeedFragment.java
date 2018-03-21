@@ -111,7 +111,9 @@ public final class FeedFragment extends MainActivityFragment
         }
         else if (model instanceof JoinRequest) {
             JoinRequest request = ((JoinRequest) model);
-            String title = request.isTeamApproved()
+            String title = userViewModel.getCurrentUser().equals(request.getUser())
+                    ? getString(R.string.clarify_invitation, request.getTeam().getName())
+                    : request.isTeamApproved()
                     ? getString(R.string.accept_invitation, request.getTeam().getName())
                     : getString(R.string.add_user_to_team, request.getUser().getFirstName());
 
