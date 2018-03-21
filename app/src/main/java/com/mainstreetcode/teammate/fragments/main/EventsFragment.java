@@ -76,7 +76,7 @@ public final class EventsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_events, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), () -> eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler))
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), () -> disposables.add(eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler)))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))

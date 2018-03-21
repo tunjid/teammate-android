@@ -92,7 +92,7 @@ public class MediaFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_media, container, false);
 
-        Runnable refreshAction = () -> mediaViewModel.refresh(team).subscribe(MediaFragment.this::onMediaUpdated, defaultErrorHandler);
+        Runnable refreshAction = () -> disposables.add(mediaViewModel.refresh(team).subscribe(MediaFragment.this::onMediaUpdated, defaultErrorHandler));
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_media))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))

@@ -63,9 +63,12 @@ public final class FeedFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
 
+        Runnable refreshAction = () -> disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
+
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.feed_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
