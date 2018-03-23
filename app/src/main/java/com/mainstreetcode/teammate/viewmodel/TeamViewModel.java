@@ -98,7 +98,9 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         repository.saveDefaultTeam(defaultTeam);
     }
 
-    public boolean isOnATeam() {return !teams.isEmpty();}
+    public boolean isOnATeam() {
+        return !teams.isEmpty() || !defaultTeam.isEmpty();
+    }
 
     public Team getDefaultTeam() {return defaultTeam;}
 
