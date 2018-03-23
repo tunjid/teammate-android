@@ -100,7 +100,6 @@ public class TeamRepository extends ModelRepository<Team> {
             List<JoinRequest> requests = new ArrayList<>();
 
             for (Team team : models) {
-
                 List<Role> teamRoles = team.getRoles();
                 List<JoinRequest> teamRequests = team.getJoinRequests();
 
@@ -109,6 +108,11 @@ public class TeamRepository extends ModelRepository<Team> {
 
                 for (Role role : teamRoles) users.add(role.getUser());
                 for (JoinRequest request : teamRequests) users.add(request.getUser());
+
+                // Clear stale join requests and roles
+                AppDatabase database = AppDatabase.getInstance();
+                database.roleDao().deleteByTeam(team.getId());
+                database.joinRequestDao().deleteByTeam(team.getId());
             }
 
             teamDao.upsert(Collections.unmodifiableList(models));
