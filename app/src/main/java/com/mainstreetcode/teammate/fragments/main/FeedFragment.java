@@ -179,11 +179,12 @@ public final class FeedFragment extends MainActivityFragment
 
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
         toggleProgress(false);
+        boolean isOnATeam = teamViewModel.isOnATeam();
         scrollManager.onDiff(diffResult);
         feedViewModel.clearNotifications(FeedItem.class);
-        localRoleViewModel.hasRoles().subscribe(hasRoles -> scrollManager.updateForEmptyList(
-                hasRoles ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
-                hasRoles ? R.string.no_feed : R.string.no_team_feed), emptyErrorHandler);
+        scrollManager.updateForEmptyList(
+                isOnATeam ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
+                isOnATeam ? R.string.no_feed : R.string.no_team_feed);
     }
 
     private static String getTimeOfDay() {

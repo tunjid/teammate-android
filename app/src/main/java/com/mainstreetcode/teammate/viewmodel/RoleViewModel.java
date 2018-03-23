@@ -22,7 +22,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
  * ViewModel for roles in a team
  */
 
-public class RoleViewModel extends MappedViewModel<String, Role> {
+public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
 
     private int count;
     private final RoleRepository roleRepository;
@@ -31,7 +31,6 @@ public class RoleViewModel extends MappedViewModel<String, Role> {
     private final TeammateApi api = TeammateService.getApiInstance();
     private final List<String> roleNames = new ArrayList<>();
     static final List<Identifiable> roles = new ArrayList<>();
-
 
     public RoleViewModel() {
         roleRepository = RoleRepository.getInstance();
@@ -64,12 +63,12 @@ public class RoleViewModel extends MappedViewModel<String, Role> {
     }
 
     @Override
-    Flowable<List<Role>> fetch(String key, boolean fetchLatest) {
-        return roleRepository.getMyRoles(key);
+    Flowable<List<Role>> fetch(Class<Role> roleClass, boolean fetchLatest) {
+        return roleRepository.getMyRoles();
     }
 
     @Override
-    public List<Identifiable> getModelList(String key) {
+    public List<Identifiable> getModelList(Class<Role> roleClass) {
         return roles;
     }
 }

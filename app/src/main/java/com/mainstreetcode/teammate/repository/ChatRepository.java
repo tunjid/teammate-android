@@ -130,7 +130,7 @@ public class ChatRepository extends QueryRepository<Chat> {
 
     public Flowable<List<Chat>> fetchUnreadChats() {
         User currentUser = UserRepository.getInstance().getCurrentUser();
-        return RoleRepository.getInstance().getMyRoles(currentUser.getId())
+        return RoleRepository.getInstance().getMyRoles()
                 .firstElement()
                 .toFlowable()
                 .flatMap(Flowable::fromIterable)

@@ -27,7 +27,7 @@ public class App extends MultiDexApplication {
 
         userRepository.getMe()
                 .lastOrError()
-                .flatMap(user -> RoleRepository.getInstance().getMyRoles(user.getId()).lastOrError())
+                .flatMap(user -> RoleRepository.getInstance().getMyRoles().lastOrError())
                 .subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 

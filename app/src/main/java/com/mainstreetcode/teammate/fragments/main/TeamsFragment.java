@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
@@ -53,7 +54,7 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        roles = roleViewModel.getModelList(userViewModel.getCurrentUser().getId());
+        roles = roleViewModel.getModelList(Role.class);
     }
 
     @Override
@@ -81,8 +82,7 @@ public final class TeamsFragment extends MainActivityFragment
         setFabClickListener(this);
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
 
-        String userId = userViewModel.getCurrentUser().getId();
-        disposables.add(roleViewModel.getMore(userId).subscribe(this::onTeamsUpdated, defaultErrorHandler));
+        disposables.add(roleViewModel.getMore(Role.class).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     @Override

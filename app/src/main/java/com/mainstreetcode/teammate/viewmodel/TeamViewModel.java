@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
@@ -12,7 +11,6 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TransformingSequentialList;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -95,14 +93,14 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return true;
     }
 
-    public Team getDefaultTeam() {
-        return defaultTeam;
-    }
-
     public void updateDefaultTeam(Team newDefault) {
         defaultTeam.update(newDefault);
         repository.saveDefaultTeam(defaultTeam);
     }
+
+    public boolean isOnATeam() {return !teams.isEmpty();}
+
+    public Team getDefaultTeam() {return defaultTeam;}
 
     static Team onTeamDeleted(Team deleted) {
         teams.remove(deleted);
