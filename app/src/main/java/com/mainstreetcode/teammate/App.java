@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate;
 import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.ads.MobileAds;
+import com.mainstreetcode.teammate.repository.RoleRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
@@ -21,7 +22,13 @@ public class App extends MultiDexApplication {
         MobileAds.initialize(this, getString(R.string.admob_app_id));
 
         // Load user from cache if they exist
-        UserRepository.getInstance().getMe().subscribe(ignored -> {}, ErrorHandler.EMPTY);
+        UserRepository userRepository = UserRepository.getInstance();
+        if (!userRepository.isSignedIn()) return;
+
+        userRepository.getMe()
+                .lastOrError()
+                .flatMap(user -> RoleRepository.getInstance().getMyRoles(user.getId()).lastOrError())
+                .subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 
     public static App getInstance() {

@@ -2,7 +2,6 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
-import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.repository.JoinRequestRepository;
 import com.mainstreetcode.teammate.repository.RoleRepository;
@@ -11,7 +10,6 @@ import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Flowable;
