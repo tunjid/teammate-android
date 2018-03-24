@@ -28,9 +28,6 @@ public abstract class UserDao extends EntityDao<UserEntity> {
         return "users";
     }
 
-    @Query("SELECT * FROM users WHERE user_primary_email LIKE :primaryEmail LIMIT 1")
-    public abstract Maybe<User> findByEmail(String primaryEmail );
-
     @Query("SELECT * FROM users WHERE :id = user_id")
     public abstract Maybe<User> get(String id );
 

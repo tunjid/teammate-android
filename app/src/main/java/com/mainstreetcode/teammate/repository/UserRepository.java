@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
 
-import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -16,6 +16,7 @@ import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.UserDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.Collections;
@@ -28,6 +29,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import okhttp3.MultipartBody;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.mainstreetcode.teammate.rest.TeammateService.SESSION_COOKIE;
 import static io.reactivex.Single.just;
 import static io.reactivex.schedulers.Schedulers.io;
@@ -35,7 +37,7 @@ import static io.reactivex.schedulers.Schedulers.io;
 public class UserRepository extends ModelRepository<User> {
 
     private static final String PREFS = "prefs";
-    private static final String EMAIL_KEY = "email_key";
+    private static final String USER_ID = "user_id_key";
     private static final String PRIMARY_EMAIL = "primaryEmail";
     private static final String TOKEN = "token";
     private static final String PASSWORD = "password";
@@ -83,8 +85,8 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     @Override
-    public Flowable<User> get(String primaryEmail) {
-        Maybe<User> local = userDao.findByEmail(primaryEmail).subscribeOn(io());
+    public Flowable<User> get(String id) {
+        Maybe<User> local = userDao.get(id).subscribeOn(io());
         Single<User> remote = api.getMe().map(getSaveFunction());
 
         return fetchThenGetModel(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
@@ -128,10 +130,10 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Flowable<User> getMe() {
-        String primaryEmail = getPrimaryEmail();
-        return TextUtils.isEmpty(primaryEmail)
+        String userId = getUserId();
+        return TextUtils.isEmpty(userId)
                 ? Flowable.error(new TeammateException("No signed in user"))
-                : get(primaryEmail);
+                : get(userId);
     }
 
     public Single<Boolean> signOut() {
@@ -147,13 +149,13 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public boolean isSignedIn() {
-        return getPrimaryEmail() != null;
+        return getUserId() != null;
     }
 
     @Nullable
-    private String getPrimaryEmail() {
-        return app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .getString(EMAIL_KEY, null);
+    private String getUserId() {
+        return app.getSharedPreferences(PREFS, MODE_PRIVATE)
+                .getString(USER_ID, null);
     }
 
     public Single<Message> forgotPassword(String email) {
@@ -173,21 +175,27 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     private Single<Boolean> clearUser() {
-        String email = getPrimaryEmail();
-        if (email == null) return just(false);
+        String userId = getUserId();
+        if (userId == null) return just(false);
 
-        app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        app.getSharedPreferences(PREFS, MODE_PRIVATE)
                 .edit()
-                .remove(EMAIL_KEY)
+                .remove(USER_ID)
                 .remove(SESSION_COOKIE) // Delete cookies when signing out
                 .apply();
 
-        return userDao.findByEmail(email)
+        return userDao.get(userId)
                 .flatMapSingle(this::delete)
                 .flatMap(deleted -> {
                     currentUser = User.empty();
                     return just(true);
                 });
+    }
+
+    @NonNull
+    private User saveUserId(User user) {
+        app.getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(USER_ID, user.getId()).apply();
+        return user;
     }
 
     /**
@@ -197,15 +205,9 @@ public class UserRepository extends ModelRepository<User> {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe
                 .singleOrError()
-                .map(user -> {
-                    app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                            .edit()
-                            .putString(EMAIL_KEY, user.getPrimaryEmail())
-                            .apply();
-                    return user;
-                });
+                .map(this::saveUserId);
 
-        result.subscribe(currentUserUpdater, throwable -> {});
+        result.subscribe(currentUserUpdater, ErrorHandler.EMPTY);
         return result;
     }
 }
