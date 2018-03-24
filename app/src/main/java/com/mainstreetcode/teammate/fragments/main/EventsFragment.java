@@ -27,6 +27,8 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
@@ -75,12 +77,14 @@ public final class EventsFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_events, container, false);
 
+        Runnable refreshAction = () -> disposables.add(eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler));
+
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), () -> disposables.add(eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler)))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events))
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .withEndlessScrollCallback(() -> fetchEvents(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
-                .withEndlessScrollCallback(this::fetchEvents)
                 .withLinearLayoutManager()
                 .build();
 
@@ -93,7 +97,7 @@ public final class EventsFragment extends MainActivityFragment
 
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
-        fetchEvents();
+        fetchEvents(true);
     }
 
     @Override
@@ -163,9 +167,10 @@ public final class EventsFragment extends MainActivityFragment
         return superResult;
     }
 
-    void fetchEvents() {
-        toggleProgress(true);
-        disposables.add(eventViewModel.getMore(team).subscribe(this::onEventsUpdated, defaultErrorHandler));
+    void fetchEvents(boolean fetchLatest) {
+        if (!fetchLatest) toggleProgress(true);
+        Flowable<DiffUtil.DiffResult> source = fetchLatest ? eventViewModel.getLatest(team) : eventViewModel.getMore(team);
+        disposables.add(source.subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {
