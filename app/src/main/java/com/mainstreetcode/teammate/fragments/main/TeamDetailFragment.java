@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamDetailAdapter;
@@ -81,15 +80,17 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
-        EditText editText = rootView.findViewById(R.id.team_name);
-        editText.setText(team.getName());
+
+        Runnable refreshAction = () -> disposables.add(teamMemberViewModel.refresh(team).subscribe(TeamDetailFragment.this::onTeamUpdated, defaultErrorHandler));
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withAdapter(new TeamDetailAdapter(teamModels, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addScrollListener(this::updateFabOnScroll)
                 .withStaggeredGridLayoutManager(2)
                 .build();
+
         return rootView;
     }
 
