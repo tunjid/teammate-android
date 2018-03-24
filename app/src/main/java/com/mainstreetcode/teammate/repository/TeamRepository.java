@@ -80,7 +80,14 @@ public class TeamRepository extends ModelRepository<Team> {
     @Override
     public Flowable<Team> get(String id) {
         Maybe<Team> local = teamDao.get(id).map(Team::updateDelayedModels).subscribeOn(io());
-        Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
+        Maybe<Team> remote = api.getTeam(id)
+                .doOnSuccess(team -> {
+                    // Clear stale join requests and roles because the api version has the latest
+                    AppDatabase database = AppDatabase.getInstance();
+                    database.roleDao().deleteByTeam(team.getId());
+                    database.joinRequestDao().deleteByTeam(team.getId());
+                })
+                .map(getSaveFunction()).toMaybe();
 
         return fetchThenGetModel(local, remote);
     }
@@ -108,11 +115,6 @@ public class TeamRepository extends ModelRepository<Team> {
 
                 for (Role role : teamRoles) users.add(role.getUser());
                 for (JoinRequest request : teamRequests) users.add(request.getUser());
-
-                // Clear stale join requests and roles
-                AppDatabase database = AppDatabase.getInstance();
-                database.roleDao().deleteByTeam(team.getId());
-                database.joinRequestDao().deleteByTeam(team.getId());
             }
 
             teamDao.upsert(Collections.unmodifiableList(models));
