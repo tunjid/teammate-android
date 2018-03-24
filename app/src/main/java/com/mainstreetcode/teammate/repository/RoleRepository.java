@@ -110,7 +110,7 @@ public class RoleRepository extends ModelRepository<Role> {
 
     public Flowable<List<Role>> getMyRoles() {
         String userId = UserRepository.getInstance().getCurrentUser().getId();
-        Maybe<List<Role>> local = roleDao.myRoles(userId).subscribeOn(io());
+        Maybe<List<Role>> local = roleDao.userRoles(userId).subscribeOn(io());
         Maybe<List<Role>> remote = api.getMyRoles().map(getSaveManyFunction()).toMaybe();
 
         return fetchThenGet(local, remote);

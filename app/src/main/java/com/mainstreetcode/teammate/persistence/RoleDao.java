@@ -45,9 +45,9 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
     public abstract Maybe<Role> getRoleInTeam(String userId, String teamId);
 
     @Query("SELECT *" +
-            " FROM roles as role" +
-            " WHERE :userId = role.role_user")
-    public abstract Maybe<List<Role>> myRoles(String userId);
+            " FROM roles" +
+            " WHERE :userId = role_user")
+    public abstract Maybe<List<Role>> userRoles(String userId);
 
     @Query("DELETE FROM roles WHERE role_team = :teamId")
     public abstract void deleteByTeam(String teamId);
