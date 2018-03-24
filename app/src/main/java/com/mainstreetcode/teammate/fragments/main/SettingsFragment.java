@@ -51,15 +51,9 @@ public final class SettingsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
         setToolbarTitle(getString(R.string.settings));
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
     }
 
     @Override

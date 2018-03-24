@@ -77,11 +77,6 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        setFabIcon(R.drawable.ic_search_white_24dp);
-        setFabClickListener(this);
-        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
-
         disposables.add(roleViewModel.getMore(Role.class).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
@@ -104,6 +99,14 @@ public final class TeamsFragment extends MainActivityFragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabIcon(R.drawable.ic_search_white_24dp);
+        setFabClickListener(this);
+        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
     }
 
     @Override

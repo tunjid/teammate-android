@@ -31,7 +31,6 @@ public class SignUpFragment extends RegistrationActivityFragment
     private EditText emailInput;
     private EditText passwordInput;
 
-
     public static SignUpFragment newInstance() {
         SignUpFragment fragment = new SignUpFragment();
         Bundle args = new Bundle();
@@ -64,8 +63,8 @@ public class SignUpFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
         setFabIcon(R.drawable.ic_check_white_24dp);
         setFabClickListener(this);
         setToolbarTitle(getString(R.string.sign_up));

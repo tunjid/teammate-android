@@ -59,8 +59,8 @@ public final class SignInFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
         setFabIcon(R.drawable.ic_check_white_24dp);
         setFabClickListener(this);
         setToolbarTitle(getString(R.string.sign_in));

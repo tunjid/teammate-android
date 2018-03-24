@@ -82,7 +82,6 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(getString(R.string.team_search));
 
         postSearch("");
     }
@@ -91,6 +90,12 @@ public final class TeamSearchFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         createTeam = null;
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setToolbarTitle(getString(R.string.team_search));
     }
 
     @Override

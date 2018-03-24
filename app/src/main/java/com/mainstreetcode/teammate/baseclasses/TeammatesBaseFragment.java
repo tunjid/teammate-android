@@ -4,9 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
@@ -53,12 +51,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        toggleToolbar(showsToolBar());
-        toggleFab(showsFab());
-        toggleBottombar(showsBottomNav());
-        toggleSystemUI(true);
+    public void onResume() {
+        super.onResume();
+        if (getView() != null) togglePersistentUi();
     }
 
     @Override
@@ -155,8 +150,13 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         if (showsFab() && Math.abs(dy) > 3) toggleFab(dy < 0);
     }
 
-    protected void onKeyBoardChanged(boolean appeared) {
+    protected void onKeyBoardChanged(boolean appeared) {}
 
+    public void togglePersistentUi() {
+        toggleFab(showsFab());
+        toggleSystemUI(true);
+        toggleToolbar(showsToolBar());
+        toggleBottombar(showsBottomNav());
     }
 
     @SuppressLint("CommitTransaction")

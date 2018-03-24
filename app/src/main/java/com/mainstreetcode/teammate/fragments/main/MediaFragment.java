@@ -107,18 +107,9 @@ public class MediaFragment extends MainActivityFragment
         contextBar = rootView.findViewById(R.id.alt_toolbar);
         contextBar.inflateMenu(R.menu.fragment_media_context);
         contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-
         bottomBarState.set(true);
 
         return rootView;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(getString(R.string.media_title, team.getName()));
-        setFabIcon(R.drawable.ic_add_white_24dp);
-        setFabClickListener(this);
     }
 
     @Override
@@ -127,6 +118,14 @@ public class MediaFragment extends MainActivityFragment
         fetchMedia(true);
         disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
                 .subscribe(() -> {}, ErrorHandler.EMPTY));
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setToolbarTitle(getString(R.string.media_title, team.getName()));
+        setFabIcon(R.drawable.ic_add_white_24dp);
+        setFabClickListener(this);
     }
 
     void fetchMedia(boolean fetchLatest) {

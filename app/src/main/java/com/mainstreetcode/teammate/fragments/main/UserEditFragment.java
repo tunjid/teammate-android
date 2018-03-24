@@ -80,14 +80,18 @@ public class UserEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.edit_user));
-
         disposables.add(userViewModel.getMe().subscribe(ignored -> {
             viewHolder.bind(getHeaderedModel());
             recyclerView.getAdapter().notifyDataSetChanged();
         }, defaultErrorHandler));
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_check_white_24dp);
+        setToolbarTitle(getString(R.string.edit_user));
     }
 
     @Override

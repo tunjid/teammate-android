@@ -83,9 +83,6 @@ public class RoleEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.edit_role));
 
         User user = userViewModel.getCurrentUser();
         Team team = role.getTeam();
@@ -104,6 +101,14 @@ public class RoleEditFragment extends HeaderedFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_user_edit, menu);
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_check_white_24dp);
+        setToolbarTitle(getString(R.string.edit_role));
     }
 
     @Override

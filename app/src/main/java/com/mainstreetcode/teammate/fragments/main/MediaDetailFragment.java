@@ -69,7 +69,6 @@ public class MediaDetailFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setToolbarTitle("");
         mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler);
     }
 
@@ -101,6 +100,12 @@ public class MediaDetailFragment extends MainActivityFragment
         super.onResume();
         boolean isImage = media.isImage();
         bindViewHolder((ConstraintLayout) getView(), media, isImage);
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setToolbarTitle("");
     }
 
     @Override

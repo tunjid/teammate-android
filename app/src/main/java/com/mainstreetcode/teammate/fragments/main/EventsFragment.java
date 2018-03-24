@@ -90,9 +90,6 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_add_white_24dp);
-        setToolbarTitle(getString(R.string.events_title, team.getName()));
 
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
@@ -112,6 +109,14 @@ public final class EventsFragment extends MainActivityFragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_add_white_24dp);
+        setToolbarTitle(getString(R.string.events_title, team.getName()));
     }
 
     @Override

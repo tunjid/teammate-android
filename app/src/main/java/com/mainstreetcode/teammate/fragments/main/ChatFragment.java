@@ -118,7 +118,6 @@ public class ChatFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
         fetchChatsBefore(restoredFromBackStack());
     }
 
@@ -148,6 +147,12 @@ public class ChatFragment extends MainActivityFragment
         super.onDestroyView();
         chatViewModel.onChatRoomLeft(team);
         chatViewModel.updateLastSeen(team);
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
     }
 
     @Override

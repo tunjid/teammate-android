@@ -79,10 +79,6 @@ public class JoinRequestFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.invite_user));
-
         roleViewModel.fetchRoleValues();
     }
 
@@ -95,13 +91,21 @@ public class JoinRequestFragment extends HeaderedFragment
     }
 
     @Override
-    public void onImageClick() {}
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_check_white_24dp);
+        setToolbarTitle(getString(R.string.invite_user));
+    }
 
     @Override
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return true;}
+
+    @Override
+    public void onImageClick() {}
 
     @Override
     protected HeaderedModel getHeaderedModel() {return joinRequest;}

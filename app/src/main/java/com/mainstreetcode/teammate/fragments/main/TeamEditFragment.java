@@ -100,9 +100,6 @@ public class TeamEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        onRoleUpdated();
 
         User user = userViewModel.getCurrentUser();
 
@@ -111,6 +108,14 @@ public class TeamEditFragment extends HeaderedFragment
         if (!team.isEmpty() && state != JOINING) {
             disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
         }
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_check_white_24dp);
+        onRoleUpdated();
     }
 
     @Override

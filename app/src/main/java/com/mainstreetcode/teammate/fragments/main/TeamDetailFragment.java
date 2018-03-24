@@ -96,9 +96,6 @@ public class TeamDetailFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_group_add_white_24dp);
-        setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
         updateCurrentRole();
 
         disposables.add(teamMemberViewModel.getMore(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
@@ -133,6 +130,14 @@ public class TeamDetailFragment extends MainActivityFragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_group_add_white_24dp);
+        setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
     }
 
     @Override

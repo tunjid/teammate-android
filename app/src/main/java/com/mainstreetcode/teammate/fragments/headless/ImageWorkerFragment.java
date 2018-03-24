@@ -92,11 +92,6 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
     }
 
     @Override
-    public void onAttachFragment(Fragment childFragment) {
-        super.onAttachFragment(childFragment);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case CROP_CHOOSER:

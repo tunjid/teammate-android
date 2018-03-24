@@ -162,9 +162,6 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
 
         User user = userViewModel.getCurrentUser();
 
@@ -187,6 +184,14 @@ public class EventEditFragment extends HeaderedFragment
             event.setPlace(place);
             scrollManager.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_check_white_24dp);
+        setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
     }
 
     @Override
