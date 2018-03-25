@@ -6,12 +6,10 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Media;
-import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.repository.MediaRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;

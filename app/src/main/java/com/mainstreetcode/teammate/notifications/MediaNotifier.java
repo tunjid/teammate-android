@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
 import com.mainstreetcode.teammate.MediaUploadIntentService;
@@ -77,8 +78,8 @@ public class MediaNotifier extends Notifier<Media> {
 
         Completable.timer(800, TimeUnit.MILLISECONDS).subscribe(
                 () -> notifyOfUpload(progressNotificationBuilder()
-                        .setContentText(app.getString(R.string.upload_complete_status, stats.getNumErrors()))
-                        .setContentTitle(app.getString(R.string.upload_complete))
+                        .setContentText(getUploadCompletionContentText(stats))
+                        .setContentTitle(getUploadCompletionContentTitle(stats))
                         .setProgress(0, 0, false)),
                 ErrorHandler.EMPTY);
     }
@@ -94,5 +95,15 @@ public class MediaNotifier extends Notifier<Media> {
     private void notifyOfUpload(NotificationCompat.Builder builder) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
         if (notifier != null) notifier.notify(1, builder.build());
+    }
+
+    @NonNull
+    private String getUploadCompletionContentTitle(MediaUploadIntentService.UploadStats stats) {
+        return stats.isAtMaxStorage() ? app.getString(R.string.upload_failed): app.getString(R.string.upload_complete);
+    }
+
+    @NonNull
+    private String getUploadCompletionContentText(MediaUploadIntentService.UploadStats stats) {
+        return stats.isAtMaxStorage() ? stats.getMaxStorageMessage() : app.getString(R.string.upload_complete_status, stats.getNumErrors());
     }
 }

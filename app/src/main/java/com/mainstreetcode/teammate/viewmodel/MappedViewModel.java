@@ -17,7 +17,7 @@ import io.reactivex.Flowable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.fromThrowable;
+import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
 

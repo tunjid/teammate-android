@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.model;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,6 +29,7 @@ import retrofit2.HttpException;
 public class Message {
 
     private static final String UNKNOWN_ERROR_CODE = "unknown.error";
+    private static final String MAX_STORAGE_ERROR_CODE = "maximum.storage.error";
     private static final String ILLEGAL_TEAM_MEMBER_ERROR_CODE = "illegal.team.member.error";
     private static final String UNAUTHENTICATED_USER_ERROR_CODE = "unauthenticated.user.error";
     private static final String INVALID_OBJECT_REFERENCE_ERROR_CODE = "invalid.object.reference.error";
@@ -50,13 +53,19 @@ public class Message {
         this.errorCode = parsed.errorCode;
     }
 
+    @Nullable
+    public static Message fromThrowable(Throwable throwable) {
+        if (!(throwable instanceof HttpException)) return null;
+        return new Message((HttpException) throwable);
+    }
+
     public boolean isInvalidObject() { return INVALID_OBJECT_REFERENCE_ERROR_CODE.equals(errorCode);}
 
     public boolean isIllegalTeamMember() { return ILLEGAL_TEAM_MEMBER_ERROR_CODE.equals(errorCode);}
 
-    public boolean isUnauthorizedUser() {
-        return UNAUTHENTICATED_USER_ERROR_CODE.equals(errorCode);
-    }
+    public boolean isUnauthorizedUser() {return UNAUTHENTICATED_USER_ERROR_CODE.equals(errorCode);}
+
+    public boolean isAtMaxStorage() {return MAX_STORAGE_ERROR_CODE.equals(errorCode);}
 
     private Message getMessage(HttpException throwable) {
         try {
