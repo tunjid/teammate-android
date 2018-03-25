@@ -17,19 +17,12 @@ import com.mainstreetcode.teammate.model.SettingsItem;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Settings screen
- * <p>
- * Created by Shemanigans on 6/1/17.
- */
-
 public final class SettingsFragment extends MainActivityFragment
         implements SettingsAdapter.SettingsAdapterListener {
 
     private static final List<SettingsItem> items = Arrays.asList(
-            new SettingsItem(R.string.join_team),
-            new SettingsItem(R.string.my_profile),
-            new SettingsItem(R.string.sign_out)
+            new SettingsItem(R.string.my_profile,R.drawable.ic_account_white_24dp),
+            new SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp)
     );
 
     public static SettingsFragment newInstance() {
@@ -63,12 +56,9 @@ public final class SettingsFragment extends MainActivityFragment
 
     @Override
     public void onSettingsItemClicked(SettingsItem item) {
-        switch (item.getStringResorce()) {
+        switch (item.getStringRes()) {
             case R.string.sign_out:
                 signOut();
-                break;
-            case R.string.join_team:
-                showFragment(TeamSearchFragment.newInstance());
                 break;
             case R.string.my_profile:
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));

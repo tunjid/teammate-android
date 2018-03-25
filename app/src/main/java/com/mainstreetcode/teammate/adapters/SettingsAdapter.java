@@ -13,11 +13,6 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
-/**
- * Adapter for {@link com.mainstreetcode.teammate.model.SettingsItem}
- * <p>
- * Created by Shemanigans on 6/3/17.
- */
 
 public class SettingsAdapter extends BaseRecyclerViewAdapter<SettingsAdapter.SettingsViewHolder, SettingsAdapter.SettingsAdapterListener> {
 
@@ -63,7 +58,8 @@ public class SettingsAdapter extends BaseRecyclerViewAdapter<SettingsAdapter.Set
 
         void bind(SettingsItem item) {
             this.item = item;
-            itemName.setText(item.getStringResorce());
+            itemName.setText(item.getStringRes());
+            itemName.setCompoundDrawablesWithIntrinsicBounds(item.getDrawableRes(), 0, 0, 0);
         }
 
         @Override

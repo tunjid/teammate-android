@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:paddingBottom="@dimen/half_margin"
+    android:paddingBottom="@dimen/single_margin"
     android:paddingLeft="@dimen/single_margin"
     android:paddingRight="@dimen/single_margin"
-    android:paddingTop="@dimen/half_margin"
+    android:paddingTop="@dimen/single_margin"
     android:textColor="@color/white"
+    android:drawablePadding="@dimen/single_margin"
     android:textSize="@dimen/regular_text" />
