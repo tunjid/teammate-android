@@ -56,12 +56,12 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
         return Identifiable.diff(fetch(key, false).map(toIdentifiable), () -> getModelList(key), preserveList);
     }
 
-    public Flowable<DiffUtil.DiffResult> getLatest(K key) {
-        return Identifiable.diff(fetch(key, true).map(toIdentifiable), () -> getModelList(key), preserveList);
-    }
-
     public Flowable<DiffUtil.DiffResult> refresh(K key) {
         return Identifiable.diff(fetch(key, true).map(toIdentifiable), () -> getModelList(key), pullToRefreshFunction);
+    }
+
+    private Flowable<DiffUtil.DiffResult> getLatest(K key) {
+        return Identifiable.diff(fetch(key, true).map(toIdentifiable), () -> getModelList(key), preserveList);
     }
 
     public void clearNotifications(V value) {

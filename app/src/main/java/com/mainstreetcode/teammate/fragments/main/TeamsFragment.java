@@ -61,8 +61,11 @@ public final class TeamsFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
 
+        Runnable refreshAction = () -> disposables.add(roleViewModel.refresh(Role.class).subscribe(TeamsFragment.this::onTeamsUpdated, defaultErrorHandler));
+
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team))
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
                 .withStaggeredGridLayoutManager(2)
@@ -75,9 +78,9 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        disposables.add(roleViewModel.getMore(Role.class).subscribe(this::onTeamsUpdated, defaultErrorHandler));
+    public void onResume() {
+        super.onResume();
+        fetchTeams();
     }
 
     @Override
@@ -138,6 +141,11 @@ public final class TeamsFragment extends MainActivityFragment
                 showFragment(TeamSearchFragment.newInstance());
                 break;
         }
+    }
+
+    private void fetchTeams() {
+        scrollManager.setRefreshing();
+        disposables.add(roleViewModel.getMore(Role.class).subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
