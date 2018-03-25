@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mainstreetcode.teammates.activities.MainActivity">
+    tools:context="com.mainstreetcode.teammate.activities.MainActivity">
 
     <View
         android:id="@+id/top_inset"
