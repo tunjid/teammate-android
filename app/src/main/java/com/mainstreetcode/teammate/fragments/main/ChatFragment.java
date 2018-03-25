@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +32,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
@@ -145,7 +145,6 @@ public class ChatFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        chatViewModel.onChatRoomLeft(team);
         chatViewModel.updateLastSeen(team);
     }
 
@@ -189,9 +188,8 @@ public class ChatFragment extends MainActivityFragment
 
     private void fetchChatsBefore(boolean fetchLatest) {
         toggleProgress(true);
-        disposables.add(chatViewModel
-                .chatsBefore(team, fetchLatest)
-                .subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
+        Flowable<DiffUtil.DiffResult> source = fetchLatest ? chatViewModel.getLatest(team) : chatViewModel.getMore(team);
+        disposables.add(source.subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
     private void subscribeToChat() {
@@ -264,11 +262,8 @@ public class ChatFragment extends MainActivityFragment
         return Math.abs(items.size() - lastVisibleItemPosition) < 4;
     }
 
-    private void onChatsUpdated(Pair<Boolean, DiffUtil.DiffResult> resultPair) {
-        boolean showProgress = resultPair.first != null ? resultPair.first : false;
-        DiffUtil.DiffResult result = resultPair.second;
-
-        toggleProgress(showProgress);
+    private void onChatsUpdated(DiffUtil.DiffResult result) {
+        toggleProgress(false);
         chatViewModel.updateLastSeen(team);
         if (result != null) scrollManager.onDiff(result);
     }
