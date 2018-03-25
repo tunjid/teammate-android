@@ -27,8 +27,6 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
-
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
@@ -168,9 +166,10 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     void fetchEvents(boolean fetchLatest) {
-        if (!fetchLatest) toggleProgress(true);
-        Flowable<DiffUtil.DiffResult> source = fetchLatest ? eventViewModel.getLatest(team) : eventViewModel.getMore(team);
-        disposables.add(source.subscribe(this::onEventsUpdated, defaultErrorHandler));
+        if (fetchLatest) scrollManager.setRefreshing();
+        else toggleProgress(true);
+
+        disposables.add(eventViewModel.getMany(team, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler));
     }
 
     private void onEventsUpdated(DiffUtil.DiffResult result) {

@@ -87,6 +87,10 @@ public class ScrollManager {
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
+    public void setRefreshing() {
+        if (refreshLayout != null) refreshLayout.setRefreshing(true);
+    }
+
     public void reset() {
         if (scroller != null) scroller.reset();
     }

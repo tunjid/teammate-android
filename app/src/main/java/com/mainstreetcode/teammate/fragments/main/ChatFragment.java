@@ -32,7 +32,6 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
@@ -187,9 +186,10 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void fetchChatsBefore(boolean fetchLatest) {
-        toggleProgress(true);
-        Flowable<DiffUtil.DiffResult> source = fetchLatest ? chatViewModel.getLatest(team) : chatViewModel.getMore(team);
-        disposables.add(source.subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
+        if (fetchLatest) scrollManager.setRefreshing();
+        else toggleProgress(true);
+
+        disposables.add(chatViewModel.getMany(team, fetchLatest).subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
     private void subscribeToChat() {

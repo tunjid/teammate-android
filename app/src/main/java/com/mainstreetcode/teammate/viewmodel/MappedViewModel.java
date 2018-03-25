@@ -48,6 +48,10 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
         return sourceFlowable.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
+    public Flowable<DiffUtil.DiffResult> getMany(K key, boolean fetchLatest) {
+        return fetchLatest ? getLatest(key) : getMore(key);
+    }
+
     public Flowable<DiffUtil.DiffResult> getMore(K key) {
         return Identifiable.diff(fetch(key, false).map(toIdentifiable), () -> getModelList(key), preserveList);
     }
