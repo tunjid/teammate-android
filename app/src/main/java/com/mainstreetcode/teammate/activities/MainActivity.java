@@ -55,7 +55,6 @@ public class MainActivity extends TeammatesBaseActivity
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
-    private View bottomSheetContainer;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -97,8 +96,7 @@ public class MainActivity extends TeammatesBaseActivity
         TeammatesInstanceIdService.updateFcmToken();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomSheetContainer = findViewById(R.id.bottom_sheet);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
+        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
 
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -181,7 +179,6 @@ public class MainActivity extends TeammatesBaseActivity
     public void toggleBottomSheet(boolean show) {
         bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_HIDDEN);
         if (!show) restoreHiddenViewState();
-        else bottomSheetContainer.setPadding(0, TeammatesBaseActivity.topInset, 0, 0);
     }
 
     @Override

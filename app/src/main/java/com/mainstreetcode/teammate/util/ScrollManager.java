@@ -93,6 +93,7 @@ public class ScrollManager {
 
     public void reset() {
         if (scroller != null) scroller.reset();
+        if (refreshLayout != null) refreshLayout.setRefreshing(false);
     }
 
     public void clear() {
