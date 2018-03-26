@@ -23,6 +23,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -80,11 +81,12 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        disposables.add(userViewModel.getMe().subscribe(this::setToolbarTitle, defaultErrorHandler));
+    }
 
-        disposables.add(userViewModel.getMe().subscribe(
-                (user) -> setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName())),
-                defaultErrorHandler
-        ));
+    @Override
+    public void onResume() {
+        super.onResume();
         disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
@@ -185,6 +187,10 @@ public final class FeedFragment extends MainActivityFragment
         scrollManager.updateForEmptyList(
                 isOnATeam ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
                 isOnATeam ? R.string.no_feed : R.string.no_team_feed);
+    }
+
+    private void setToolbarTitle(User user) {
+        setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName()));
     }
 
     private static String getTimeOfDay() {
