@@ -5,7 +5,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion "26.0.3"
     defaultConfig {
-        applicationId "com.mainstreetcode.teammates"
+        applicationId "com.mainstreetcode.teammate"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
@@ -21,9 +21,40 @@ android {
             }
         }
     }
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
+            def keystoreProps = new Properties()
+            def propertiesFile = file("keystore.properties")
+            keystoreProps.load(new FileInputStream(propertiesFile))
+            storeFile file("release.keystore")
+            keyAlias keystoreProps['alias']
+            keyPassword keystoreProps['aliasPassword']
+            storePassword keystoreProps['keystorePassword']
+        }
+        staging {
+            def keystoreProps = new Properties()
+            def propertiesFile = file("keystore.properties")
+            keystoreProps.load(new FileInputStream(propertiesFile))
+            storeFile file("release.keystore")
+            keyAlias keystoreProps['alias']
+            keyPassword keystoreProps['aliasPassword']
+            storePassword keystoreProps['keystorePassword']
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+            buildConfigField "boolean", "DEV", "true"
+        }
+        staging {
+            debuggable true
+            signingConfig signingConfigs.staging
+            buildConfigField "boolean", "DEV", "false"
+        }
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            buildConfigField "boolean", "DEV", "false"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

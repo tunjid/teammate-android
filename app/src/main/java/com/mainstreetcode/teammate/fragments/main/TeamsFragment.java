@@ -71,9 +71,6 @@ public final class TeamsFragment extends MainActivityFragment
                 .withStaggeredGridLayoutManager(2)
                 .build();
 
-        View altToolbar = rootView.findViewById(R.id.alt_toolbar);
-        altToolbar.setVisibility(isTeamPicker() ? View.VISIBLE : View.INVISIBLE);
-
         return rootView;
     }
 
@@ -107,9 +104,9 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
-        setFabIcon(R.drawable.ic_search_white_24dp);
         setFabClickListener(this);
-        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
+        setFabIcon(R.drawable.ic_search_white_24dp);
+        setToolbarTitle(getString(isTeamPicker() ? R.string.pick_team : R.string.my_teams));
     }
 
     @Override
