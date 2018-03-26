@@ -4,8 +4,10 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.model.Media;
+import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.MediaRepository;
@@ -13,9 +15,9 @@ import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MediaUploadIntentService extends IntentService {
 
@@ -74,8 +76,9 @@ public class MediaUploadIntentService extends IntentService {
         private int numToUpload = 0;
         private int numAttempted = 0;
         private boolean isOnGoing;
+        private String maxStorageMessage = "";
 
-        private final Queue<Media> uploadQueue = new LinkedList<>();
+        private final Queue<Media> uploadQueue = new ConcurrentLinkedQueue<>();
         private final ModelRepository<Media> repository = MediaRepository.getInstance();
 
         void enqueue(Media media) {
@@ -98,26 +101,23 @@ public class MediaUploadIntentService extends IntentService {
             isOnGoing = true;
 
             repository.createOrUpdate(uploadQueue.remove())
-                    .doOnError(throwable -> numErrors++)
+                    .doOnSuccess(media -> maxStorageMessage = "")
+                    .doOnError(this::onError)
                     .doFinally(this::invoke)
                     .subscribe(ignored -> {}, ErrorHandler.EMPTY);
         }
 
-        public int getNumErrors() {
-            return numErrors;
-        }
+        public int getNumErrors() {return numErrors;}
 
-        public int getNumToUpload() {
-            return numToUpload;
-        }
+        public int getNumToUpload() {return numToUpload;}
 
-        public int getNumAttempted() {
-            return numAttempted;
-        }
+        public int getNumAttempted() {return numAttempted;}
 
-        public boolean isComplete() {
-            return uploadQueue.isEmpty();
-        }
+        public boolean isComplete() {return uploadQueue.isEmpty();}
+
+        public boolean isAtMaxStorage() {return !TextUtils.isEmpty(maxStorageMessage);}
+
+        public String getMaxStorageMessage() {return maxStorageMessage;}
 
         @Override
         public String toString() {
@@ -125,6 +125,14 @@ public class MediaUploadIntentService extends IntentService {
                     ", numErrors : " + numErrors +
                     ", numToUpload : " + numToUpload +
                     ", numAttempted : " + numAttempted;
+        }
+
+        private void onError(Throwable throwable) {
+            numErrors++;
+            Message message = Message.fromThrowable(throwable);
+            if (message == null || !message.isAtMaxStorage()) return;
+
+            maxStorageMessage = message.getMessage();
         }
     }
 }

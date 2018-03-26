@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.transition.Fade;
 import android.support.transition.TransitionManager;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -33,6 +34,15 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+            VideoControls videoControls = fullResView.getVideoControls();
+            if (videoControls == null || videoControls.getChildCount() < 1) return;
+
+            View inner = videoControls.getChildAt(0);
+            ViewCompat.setOnApplyWindowInsetsListener(inner, (controls, insets) -> {
+                controls.setPadding(0, 0, 0, 0);
+                return insets;
+            });
         }
         else {
             fullResView.setVisibility(View.GONE);
@@ -55,6 +65,10 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
             TransitionManager.beginDelayedTransition((ViewGroup) itemView, new Fade());
             fullResView.setVisibility(View.VISIBLE);
             fullResView.start();
+        });
+        fullResView.setOnCompletionListener(() -> {
+            fullResView.setOnPreparedListener(null);
+            fullResView.setVideoPath(videoUrl);
         });
     }
 

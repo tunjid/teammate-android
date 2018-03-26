@@ -9,7 +9,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Message;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,8 +20,6 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
-
-import retrofit2.HttpException;
 
 /**
  * Static methods for models
@@ -100,12 +97,6 @@ public class ModelUtils {
         catch (ParseException e) {
             return new Date();
         }
-    }
-
-    @Nullable
-    public static Message fromThrowable(Throwable throwable) {
-        if (!(throwable instanceof HttpException)) return null;
-        return new Message((HttpException) throwable);
     }
 
     public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {

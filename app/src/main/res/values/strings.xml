@@ -164,6 +164,7 @@
     <string name="uploading_media">Uploading files</string>
     <string name="upload_progress_status">%1$d of %2$d. %3$d failed.</string>
     <string name="upload_complete">Upload complete.</string>
+    <string name="upload_failed">Upload failed.</string>
     <string name="upload_complete_status">%1$d failed.</string>
     <string name="pick_picture">Select Picture</string>
     <string name="multi_select">%1$d Selected</string>

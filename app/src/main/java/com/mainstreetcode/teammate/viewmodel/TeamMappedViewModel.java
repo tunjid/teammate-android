@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.fromThrowable;
+import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public abstract class TeamMappedViewModel<V extends Identifiable> extends MappedViewModel<Team, V> {
 

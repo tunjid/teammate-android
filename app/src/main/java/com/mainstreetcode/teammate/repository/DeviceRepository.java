@@ -17,7 +17,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.fromThrowable;
+import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public class DeviceRepository extends ModelRepository<Device> {
 
