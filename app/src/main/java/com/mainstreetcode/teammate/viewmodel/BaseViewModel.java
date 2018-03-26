@@ -2,18 +2,9 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdLoader;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.formats.NativeAdOptions;
-import com.mainstreetcode.teammate.App;
-import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.ContentAd;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.InstallAd;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,7 +32,7 @@ abstract class BaseViewModel extends ViewModel {
     boolean sortsAscending() {return false;}
 
     private void distributeAds(List<Identifiable> source) {
-        filterAds(source);
+        //filterAds(source);
         if (source.isEmpty() || ads.isEmpty()) return;
 
         int numToShuffle = 0;
@@ -65,27 +56,27 @@ abstract class BaseViewModel extends ViewModel {
     }
 
     private void fetchAds() {
-        App app = App.getInstance();
-        AdLoader adLoader = new AdLoader.Builder(app, app.getString(R.string.admob_ad_id))
-                .forAppInstallAd(appInstallAd -> ads.add(new InstallAd(appInstallAd)))
-                .forContentAd(contentAd -> ads.add(new ContentAd(contentAd)))
-                .withAdListener(new AdListener() {
-                    @Override
-                    public void onAdFailedToLoad(int errorCode) {
-                        // Handle the failure by logging, altering the UI, and so on.
-                    }
-                })
-                .withNativeAdOptions(new NativeAdOptions.Builder()
-                        .build())
-                .build();
-
-        adLoader.loadAds(new AdRequest.Builder().build(), 2);
+//        App app = App.getInstance();
+//        AdLoader adLoader = new AdLoader.Builder(app, app.getString(R.string.admob_ad_id))
+//                .forAppInstallAd(appInstallAd -> ads.add(new InstallAd(appInstallAd)))
+//                .forContentAd(contentAd -> ads.add(new ContentAd(contentAd)))
+//                .withAdListener(new AdListener() {
+//                    @Override
+//                    public void onAdFailedToLoad(int errorCode) {
+//                        // Handle the failure by logging, altering the UI, and so on.
+//                    }
+//                })
+//                .withNativeAdOptions(new NativeAdOptions.Builder()
+//                        .build())
+//                .build();
+//
+//        adLoader.loadAds(new AdRequest.Builder().build(), 2);
     }
 
-    private void filterAds(List<Identifiable> source) {
-        Iterator<Identifiable> iterator = source.iterator();
-        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
-    }
+//    private void filterAds(List<Identifiable> source) {
+//        Iterator<Identifiable> iterator = source.iterator();
+//        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
+//    }
 
     private void shuffleAds(int count) {
         for (int i = 0; i < count; i++) ads.add(ads.removeFirst());
