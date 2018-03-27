@@ -114,6 +114,7 @@ public class MediaFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchMedia(true);
+        toggleContextMenu(mediaViewModel.hasSelections(team));
         disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
                 .subscribe(() -> {}, ErrorHandler.EMPTY));
     }
