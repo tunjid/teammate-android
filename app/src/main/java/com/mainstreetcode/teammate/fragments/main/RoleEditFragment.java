@@ -144,8 +144,10 @@ public class RoleEditFragment extends HeaderedFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_kick:
-                final String firstName = role.getUser().getFirstName();
-                final String prompt = getString(R.string.confirm_user_drop, firstName);
+                User roleUser = role.getUser();
+                final String prompt = userViewModel.getCurrentUser().equals(roleUser)
+                        ? getString(R.string.confirm_user_leave)
+                        : getString(R.string.confirm_user_drop, roleUser.getFirstName());
 
                 Activity activity;
                 if ((activity = getActivity()) == null) return super.onOptionsItemSelected(item);

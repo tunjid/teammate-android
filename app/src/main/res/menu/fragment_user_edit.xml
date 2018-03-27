@@ -4,7 +4,7 @@
     <item
         android:id="@+id/action_kick"
         android:enabled="true"
-        android:icon="@drawable/ic_directions_run_white_24dp"
+        android:icon="@drawable/ic_remove_role_white_24dp"
         android:title="@string/drop_user"
         app:showAsAction="ifRoom" />
 </menu>
