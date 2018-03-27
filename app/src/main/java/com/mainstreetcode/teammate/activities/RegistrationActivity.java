@@ -21,6 +21,7 @@ public class RegistrationActivity extends TeammatesBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+        toggleToolbar(false);
 
         if (savedInstanceState == null) {
             UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
@@ -51,5 +52,10 @@ public class RegistrationActivity extends TeammatesBaseActivity {
         Intent main = new Intent(activity, MainActivity.class);
         activity.startActivity(main);
         activity.finish();
+    }
+
+    @Override
+    public void toggleToolbar(boolean show) {
+        super.toggleToolbar(false);
     }
 }
