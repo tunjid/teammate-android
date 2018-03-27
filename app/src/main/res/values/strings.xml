@@ -141,6 +141,7 @@
     <string name="event_no_location">This event does not have a location</string>
     <string name="navigate_event">Navigate</string>
     <string name="delete_event">Delete event</string>
+    <string name="delete_event_prompt">Delete event?</string>
     <string name="attend_event">Attending this event?</string>
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
