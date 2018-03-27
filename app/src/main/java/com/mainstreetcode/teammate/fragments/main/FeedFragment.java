@@ -91,6 +91,12 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setToolbarTitle(userViewModel.getCurrentUser());
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_feed, menu);
     }
