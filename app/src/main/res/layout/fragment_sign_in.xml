@@ -27,6 +27,7 @@
         android:layout_marginLeft="@dimen/single_margin"
         android:layout_marginRight="@dimen/single_margin"
         android:layout_marginTop="@dimen/half_margin"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="@+id/card_view_wrapper"
         app:layout_constraintRight_toRightOf="@+id/card_view_wrapper"
         app:layout_constraintTop_toTopOf="@+id/card_view_wrapper">
@@ -47,6 +48,7 @@
         android:layout_marginRight="@dimen/single_margin"
         android:layout_marginTop="@dimen/half_margin"
         android:paddingBottom="@dimen/single_and_half_margin"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="@+id/card_view_wrapper"
         app:layout_constraintRight_toRightOf="@+id/card_view_wrapper"
         app:layout_constraintTop_toBottomOf="@+id/email_wrapper">
