@@ -64,7 +64,6 @@ public class ChatNotifier extends Notifier<Chat> {
         NotificationChannel channel = buildNotificationChannel(FeedItem.CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH);
         channel.setLightColor(Color.GREEN);
         channel.enableVibration(true);
-        channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
         return new NotificationChannel[]{channel};
     }
 

@@ -77,8 +77,8 @@ public class JoinRequestFragment extends HeaderedFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         roleViewModel.fetchRoleValues();
     }
 

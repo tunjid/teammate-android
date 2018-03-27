@@ -90,12 +90,11 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
+    public void onResume() {
+        super.onResume();
+        fetchEvents(true);
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
-        fetchEvents(true);
     }
 
     @Override

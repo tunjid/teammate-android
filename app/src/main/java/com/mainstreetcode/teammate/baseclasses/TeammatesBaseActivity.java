@@ -33,6 +33,7 @@ import com.tunjid.androidbootstrap.core.view.ViewHider;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
+import static android.view.MotionEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -116,7 +117,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPaddingWrapper.setOnTouchListener((view, event) -> {
-            setKeyboardPadding(bottomInset);
+            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
             return true;
         });
 

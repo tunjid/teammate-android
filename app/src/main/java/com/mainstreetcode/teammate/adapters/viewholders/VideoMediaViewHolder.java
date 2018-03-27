@@ -26,6 +26,7 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
     public VideoMediaViewHolder(View itemView, MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
 
+        //noinspection AndroidLintClickableViewAccessibility
         fullResView.setOnTouchListener(new TouchListener(itemView.getContext()));
 
         if (adapterListener.isFullScreen()) {
