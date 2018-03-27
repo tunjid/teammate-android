@@ -23,6 +23,11 @@ public class ClickInputViewHolder extends InputViewHolder
         this.clickAction = clickAction;
     }
 
+    public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Supplier<Boolean> errorChecker) {
+        super(itemView, enabler, errorChecker);
+        this.clickAction = clickAction;
+    }
+
     @Override
     public void bind(Item item) {
         super.bind(item);

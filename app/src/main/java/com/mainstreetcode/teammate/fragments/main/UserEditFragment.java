@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ScrollManager;
 
 /**
  * Edits a Team member
@@ -61,28 +61,26 @@ public class UserEditFragment extends HeaderedFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
-        recyclerView = rootView.findViewById(R.id.model_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new UserAdapter(user, this));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (Math.abs(dy) < 3) return;
-                toggleFab(dy < 0);
-            }
-        });
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withAdapter(new UserAdapter(user, this))
+                .addScrollListener(this::updateFabOnScroll)
+                .withLinearLayoutManager()
 
-        recyclerView.requestFocus();
+                .build();
+
+        scrollManager.getRecyclerView().requestFocus();
+
         return rootView;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         disposables.add(userViewModel.getMe().subscribe(ignored -> {
             viewHolder.bind(getHeaderedModel());
-            recyclerView.getAdapter().notifyDataSetChanged();
+            scrollManager.notifyDataSetChanged();
         }, defaultErrorHandler));
     }
 

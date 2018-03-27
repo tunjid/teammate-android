@@ -33,6 +33,7 @@ import com.tunjid.androidbootstrap.core.view.ViewHider;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
+import static android.view.MotionEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -40,6 +41,7 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 
@@ -116,7 +118,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPaddingWrapper.setOnTouchListener((view, event) -> {
-            setKeyboardPadding(bottomInset);
+            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
             return true;
         });
 
@@ -253,8 +255,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (fragment instanceof MainActivityFragment && padding != bottomInset)
             padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) keyboardPadding.getLayoutParams();
-        params.height = padding;
+        getLayoutParams(keyboardPadding).height = padding;
     }
 
     private void adjustSystemInsets(Fragment fragment) {
@@ -264,10 +265,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         getLayoutParams(toolbar).topMargin = insetState[TOP_INSET] ? topInset : 0;
         topInsetView.setVisibility(insetState[TOP_INSET] ? GONE : VISIBLE);
         constraintLayout.setPadding(insetState[LEFT_INSET] ? leftInset : 0, 0, insetState[RIGHT_INSET] ? rightInset : 0, 0);
-    }
-
-    private ViewGroup.MarginLayoutParams getLayoutParams(View view) {
-        return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
     }
 
     private void hideSystemUI() {

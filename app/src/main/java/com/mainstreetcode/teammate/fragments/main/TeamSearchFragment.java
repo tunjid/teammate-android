@@ -80,9 +80,8 @@ public final class TeamSearchFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
+    public void onResume() {
+        super.onResume();
         postSearch("");
     }
 

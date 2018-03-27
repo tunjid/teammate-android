@@ -92,9 +92,9 @@ public class Team extends TeamEntity
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, this),
-                new Item(Item.ADDRESS, R.string.city, city == null ? "" : city, this::setCity, this),
-                new Item(Item.ADDRESS, R.string.state, state == null ? "" : state, this::setState, this),
-                new Item(Item.ADDRESS, R.string.zip, zip == null ? "" : zip, this::setZip, this),
+                new Item(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
+                new Item(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
+                new Item(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
                 new Item(Item.INFO, R.string.team_storage_used, storageUsed + "/" + maxStorage + " MB", null, this),
                 new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, this)
         );

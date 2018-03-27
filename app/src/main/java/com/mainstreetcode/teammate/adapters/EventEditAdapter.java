@@ -47,7 +47,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.LOCATION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, () -> false);
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
             case TEAM:

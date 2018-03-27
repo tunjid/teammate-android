@@ -3,8 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +11,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.SettingsAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.SettingsItem;
+import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,10 +35,13 @@ public final class SettingsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-        RecyclerView recyclerView = rootView.findViewById(R.id.settings_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new SettingsAdapter(items, this));
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.settings_list))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withAdapter(new SettingsAdapter(items, this))
+                .withLinearLayoutManager()
+                .build();
+
         return rootView;
     }
 

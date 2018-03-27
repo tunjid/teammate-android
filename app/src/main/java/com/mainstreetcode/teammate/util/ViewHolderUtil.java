@@ -35,6 +35,10 @@ public class ViewHolderUtil {
         return item.hashCode() + "-" + id;
     }
 
+    public static ViewGroup.MarginLayoutParams getLayoutParams(View view) {
+        return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+    }
+
     @Nullable
     public static Activity getActivity(RecyclerView.ViewHolder viewHolder) {
         Context context = viewHolder.itemView.getContext();

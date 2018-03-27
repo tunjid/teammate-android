@@ -41,8 +41,11 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
             case Item.ROLE:
                 return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::isJoiningTeam);
-            case Item.ADDRESS:
+            case Item.CITY:
+            case Item.STATE:
                 return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, adapterListener::onAddressClicked);
+            case Item.ZIP:
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, adapterListener::onAddressClicked, () -> false);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,8 +19,6 @@ import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Media;
-
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
 public class MediaDetailFragment extends MainActivityFragment
@@ -98,8 +95,11 @@ public class MediaDetailFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
+        View root = getView();
+        if (root == null) return;
+
         boolean isImage = media.isImage();
-        bindViewHolder((ConstraintLayout) getView(), media, isImage);
+        bindViewHolder(root, media, isImage);
     }
 
     @Override
@@ -165,12 +165,7 @@ public class MediaDetailFragment extends MainActivityFragment
         if (activity != null) activity.onBackPressed();
     }
 
-    private void bindViewHolder(ConstraintLayout rootView, Media media, boolean isImage) {
-        ViewGroup.LayoutParams params = rootView.getLayoutParams();
-        params.height = MATCH_PARENT;
-
-        rootView.setPadding(0, 0, 0, 0);
-
+    private void bindViewHolder(View rootView, Media media, boolean isImage) {
         mediaViewHolder = isImage
                 ? new ImageMediaViewHolder(rootView, this)
                 : new VideoMediaViewHolder(rootView, this);
