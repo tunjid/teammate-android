@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.HeaderedImageViewHolder;
@@ -22,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Completable;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -55,8 +55,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
         setTransitionName(viewHolder.getThumbnail(), getTransitionName(model, R.id.fragment_header_thumbnail));
 
         Toolbar headerToolbar = view.findViewById(R.id.header_toolbar);
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerToolbar.getLayoutParams();
-        params.height += TeammatesBaseActivity.topInset;
+        getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {

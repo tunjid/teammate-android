@@ -37,8 +37,9 @@ public final class SettingsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.settings_list))
-                .withLinearLayoutManager()
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new SettingsAdapter(items, this))
+                .withLinearLayoutManager()
                 .build();
 
         return rootView;

@@ -68,6 +68,7 @@
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_title"
+            app:layout_constrainedWidth="true"
             app:layout_constraintWidth_default="wrap"
             tools:text="Hi I'm some very interesting text." />
     </android.support.constraint.ConstraintLayout>

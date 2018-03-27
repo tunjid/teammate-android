@@ -63,9 +63,11 @@ public class UserEditFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withLinearLayoutManager()
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new UserAdapter(user, this))
                 .addScrollListener(this::updateFabOnScroll)
+                .withLinearLayoutManager()
+
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

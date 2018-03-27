@@ -1,11 +1,15 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.arch.core.util.Function;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.github.florent37.picassopalette.PicassoPalette;
@@ -19,7 +23,9 @@ import com.squareup.picasso.RequestCreator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.florent37.picassopalette.PicassoPalette.Profile.MUTED_DARK;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 
@@ -27,16 +33,23 @@ public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<Med
         implements Callback {
 
     private static final String UNITY_ASPECT_RATIO = "1";
+    private static final String SCALE_X_PROPERTY = "scaleX";
+    private static final String SCALE_Y_PROPERTY = "scaleY";
+    private static final float FULL_SCALE = 1F;
+    private static final float FOUR_FIFTH_SCALE = 0.8F;
+    private static final int DURATION = 200;
 
     public Media media;
 
     T fullResView;
     private View border;
+    private ConstraintLayout container;
     public ImageView thumbnailView;
 
     MediaViewHolder(View itemView, @NonNull MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
         border = itemView.findViewById(R.id.border);
+        container = itemView.findViewById(R.id.container);
         fullResView = itemView.findViewById(getFullViewId());
         thumbnailView = itemView.findViewById(getThumbnailId());
 
@@ -49,6 +62,12 @@ public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<Med
             itemView.setOnLongClickListener(view -> performLongClick());
             thumbnailView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             setUnityAspectRatio();
+        }
+        else {
+            getLayoutParams(container).height = MATCH_PARENT;
+            ViewGroup.MarginLayoutParams params = getLayoutParams(itemView);
+            params.height = MATCH_PARENT;
+            params.leftMargin = params.topMargin = params.rightMargin = params.bottomMargin = 0;
         }
     }
 
@@ -64,8 +83,7 @@ public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<Med
         setTransitionName(thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail));
 
         loadImage(media.getThumbnail(), false, thumbnailView);
-        if (!adapterListener.isFullScreen())
-            border.setVisibility(adapterListener.isSelected(media) ? View.VISIBLE : View.GONE);
+        if (!adapterListener.isFullScreen()) highlightViewHolder(adapterListener::isSelected);
     }
 
     public void fullBind(Media media) {
@@ -75,7 +93,7 @@ public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<Med
     public void unBind() {}
 
     public boolean performLongClick() {
-        border.setVisibility(adapterListener.onMediaLongClicked(media) ? View.VISIBLE : View.GONE);
+        highlightViewHolder(adapterListener::onMediaLongClicked);
         return true;
     }
 
@@ -100,13 +118,34 @@ public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<Med
     }
 
     private void setUnityAspectRatio() {
-        ConstraintLayout constraintLayout = (ConstraintLayout) itemView;
         ConstraintSet set = new ConstraintSet();
 
-        set.clone(constraintLayout);
+        set.clone(container);
         set.setDimensionRatio(thumbnailView.getId(), UNITY_ASPECT_RATIO);
         set.setDimensionRatio(fullResView.getId(), UNITY_ASPECT_RATIO);
-        set.applyTo(constraintLayout);
+        set.applyTo(container);
+    }
+
+    private void highlightViewHolder(Function<Media, Boolean> selectionFunction) {
+        boolean isSelected = selectionFunction.apply(media);
+        border.setVisibility(isSelected ? View.VISIBLE : View.GONE);
+        scale(isSelected);
+    }
+
+    private void scale(boolean isSelected) {
+        float end = isSelected ? FOUR_FIFTH_SCALE : FULL_SCALE;
+
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator scaleDownX = animateProperty(SCALE_X_PROPERTY, container.getScaleX(), end);
+        ObjectAnimator scaleDownY = animateProperty(SCALE_Y_PROPERTY, container.getScaleY(), end);
+
+        set.playTogether(scaleDownX, scaleDownY);
+        set.start();
+    }
+
+    @NonNull
+    private ObjectAnimator animateProperty(String property, float start, float end) {
+        return ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION);
     }
 
     @Override
