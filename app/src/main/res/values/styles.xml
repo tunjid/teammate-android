@@ -8,10 +8,20 @@
         <item name ="android:windowBackground">@color/colorPrimary</item>
     </style>
 
-    <style name="ThemeOverlay.AccentSecondary" parent="ThemeOverlay.AppCompat">
-        <item name="colorAccent">@color/black</item>
-        <item name="colorControlNormal">@color/black</item>
-    </style>
+    <!--<style name="TextLabel" parent="ThemeOverlay.AppCompat.Light">-->
+        <!--&lt;!&ndash; Hint color and label color in FALSE state &ndash;&gt;-->
+
+        <!--<item name="android:textColorHint">@color/colorPrimary</item>-->
+        <!--&lt;!&ndash; Label color in TRUE state and bar color FALSE and TRUE State &ndash;&gt;-->
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
+        <!--<item name="colorControlNormal">@color/colorPrimary</item>-->
+    <!--</style>-->
+
+    <!--<style name="ThemeOverlay.AccentSecondary" parent="ThemeOverlay.AppCompat">-->
+        <!--<item name="colorAccent">@color/black</item>-->
+        <!--<item name="colorControlNormal">@color/black</item>-->
+    <!--</style>-->
+
     <!--<style name="DarkEditText" parent="Theme.AppCompat.Light.DarkActionBar">-->
     <!--<item name="colorControlNormal">@color/dark_grey</item>-->
     <!--<item name="colorControlActivated">@color/accent</item>-->

@@ -9,6 +9,7 @@
         android:id="@+id/chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/quarter_margin"
         app:layout_constraintBottom_toTopOf="@+id/footer_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

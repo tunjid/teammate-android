@@ -17,7 +17,14 @@ import android.widget.TextView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.RegistrationActivity;
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Completable;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * Splash screen
@@ -54,6 +61,11 @@ public final class SignInFragment extends RegistrationActivityFragment
         ViewCompat.setTransitionName(emailInput, SplashFragment.TRANSITION_TITLE);
         ViewCompat.setTransitionName(passwordInput, SplashFragment.TRANSITION_SUBTITLE);
         ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND);
+
+        disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe(() -> {
+            rootView.findViewById(R.id.email_wrapper).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.password_wrapper).setVisibility(View.VISIBLE);
+        }, ErrorHandler.EMPTY));
 
         return rootView;
     }

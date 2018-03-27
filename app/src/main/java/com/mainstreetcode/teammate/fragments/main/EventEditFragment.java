@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -147,7 +148,12 @@ public class EventEditFragment extends HeaderedFragment
                 rsvpToEvent(userViewModel.getCurrentUser());
                 return true;
             case R.id.action_delete:
-                disposables.add(eventViewModel.delete(event).subscribe(this::onEventDeleted, defaultErrorHandler));
+                Context context = getContext();
+                if (context == null) return true;
+                new AlertDialog.Builder(context).setTitle(getString(R.string.delete_event_prompt))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteEvent())
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                        .show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -293,6 +299,10 @@ public class EventEditFragment extends HeaderedFragment
         scrollManager.notifyDataSetChanged();
         activity.invalidateOptionsMenu();
         toggleFab(canEditEvent());
+    }
+
+    private void deleteEvent() {
+        disposables.add(eventViewModel.delete(event).subscribe(this::onEventDeleted, defaultErrorHandler));
     }
 
     private void onEventDeleted(Event deleted) {

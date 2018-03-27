@@ -62,6 +62,7 @@ public class SplashFragment extends RegistrationActivityFragment
                 .appendNewLine()
                 .appendCharsequence(new SpanBuilder(context, getString(R.string.login_sign_in))
                         .color(R.color.white)
+                        .underline()
                         .build())
                 .build());
 
