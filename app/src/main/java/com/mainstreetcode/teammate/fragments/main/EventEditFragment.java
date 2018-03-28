@@ -223,7 +223,7 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void onImageClick() {
-        onLocationClicked();
+        if (showsFab()) onLocationClicked();
     }
 
     @Override
@@ -337,7 +337,7 @@ public class EventEditFragment extends HeaderedFragment
                 .build();
     }
 
-    private void setSpanSizeLookUp(RecyclerView.LayoutManager layoutManager){
+    private void setSpanSizeLookUp(RecyclerView.LayoutManager layoutManager) {
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
