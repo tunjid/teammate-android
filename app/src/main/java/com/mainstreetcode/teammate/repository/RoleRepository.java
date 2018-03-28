@@ -48,11 +48,12 @@ public class RoleRepository extends ModelRepository<Role> {
     @Override
     public Single<Role> createOrUpdate(Role model) {
         Single<Role> roleSingle = api.updateRole(model.getId(), model)
+                .map(getLocalUpdateFunction(model))
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Role.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body));
+            roleSingle = roleSingle.flatMap(put -> api.uploadRolePhoto(model.getId(), body).map(getLocalUpdateFunction(model)));
         }
 
         return roleSingle.map(getLocalUpdateFunction(model)).map(getSaveFunction());

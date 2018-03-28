@@ -3,6 +3,7 @@
     <string name="teammates">Teammate</string>
     <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
     <string name="empty_string"> </string>
+    <string name="no_permission">You don\'t have permission to edit this item</string>
 
     <!--Splash Fragment-->
     <string name="login_email">Sign up with email</string>
@@ -95,6 +96,7 @@
     <string name="invite">invite</string>
     <string name="user_invited">Has been invited as a %1$s</string>
     <string name="user_requests_join">Has requested to join as a %1$s</string>
+    <string name="create_team_first">Please create the team first</string>
     <string name="delete_team">Delete team</string>
     <string name="delete_team_prompt">Delete %1$s?</string>
     <string name="deleted_team">Deleted %1$s</string>
