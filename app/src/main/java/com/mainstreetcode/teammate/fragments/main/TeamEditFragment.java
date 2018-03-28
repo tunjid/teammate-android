@@ -105,9 +105,9 @@ public class TeamEditFragment extends HeaderedFragment
         roleViewModel.fetchRoleValues();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
 
-        if (!team.isEmpty() && state != JOINING) {
-            disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
-        }
+//        if (!team.isEmpty() && state != JOINING) {
+//            disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
+//        }
     }
 
     @Override
@@ -187,9 +187,8 @@ public class TeamEditFragment extends HeaderedFragment
                 switch (state) {
                     case CREATING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            scrollManager.onDiff(result);
+                            onTeamChanged(result);
                             viewHolder.bind(getHeaderedModel());
-                            toggleProgress(false);
                             showSnackbar(getString(R.string.created_team, team.getName()));
                         }, defaultErrorHandler);
                         break;
@@ -202,9 +201,8 @@ public class TeamEditFragment extends HeaderedFragment
                         break;
                     case EDITING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
+                            onTeamChanged(result);
                             viewHolder.bind(getHeaderedModel());
-                            scrollManager.onDiff(result);
-                            toggleProgress(false);
                             showSnackbar(getString(R.string.updated_team));
                         }, defaultErrorHandler);
                         break;
@@ -217,7 +215,6 @@ public class TeamEditFragment extends HeaderedFragment
     private void onTeamChanged(DiffUtil.DiffResult result) {
         toggleProgress(false);
         scrollManager.onDiff(result);
-        viewHolder.bind(getHeaderedModel());
     }
 
     private void onRoleUpdated() {
