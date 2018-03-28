@@ -142,22 +142,8 @@
 -dontwarn com.google.zxing.**
 -dontwarn com.intouch.dev.alacards.**
 
--optimizations !code/simplification/cast,!field/*,!class/merging/*,!class/unboxing/enum,!code/allocation/variable,!method/marking/private
--optimizationpasses 5
--allowaccessmodification
--dontpreverify
-
-# The remainder of this file is identical to the non-optimized version
-# of the Proguard configuration file (except that the other file has
-# flags to turn off optimization).
-
--dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
--verbose
 
 # ADDED
--dontshrink
--dontobfuscate
 
 -keepattributes *Annotation*
 -keep public class com.google.vending.licensing.ILicensingService
