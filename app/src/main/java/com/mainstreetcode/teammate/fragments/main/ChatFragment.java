@@ -219,7 +219,7 @@ public class ChatFragment extends MainActivityFragment
             chatViewModel.updateLastSeen(team);
             int index = items.indexOf(chat);
 
-            if (index != 0) scrollManager.notifyItemChanged(index);
+            if (index != -1) scrollManager.notifyItemChanged(index);
             if (!isSubscribedToChat()) subscribeToChat();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
