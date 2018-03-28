@@ -82,6 +82,11 @@ public class ScrollManager {
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
+    public void notifyItemInserted(int position) {
+        if (adapter != null) adapter.notifyItemInserted(position);
+        if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
+    }
+
     public void notifyItemRemoved(int position) {
         if (adapter != null) adapter.notifyItemRemoved(position);
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);

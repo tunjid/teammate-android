@@ -72,6 +72,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
     @Override
     public void onImageClick() {
         if (showsFab()) ImageWorkerFragment.requestCrop(this);
+        else showSnackbar(getString(R.string.no_permission));
     }
 
     @Override
