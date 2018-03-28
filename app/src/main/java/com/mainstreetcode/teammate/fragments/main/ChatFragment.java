@@ -115,15 +115,10 @@ public class ChatFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        fetchChatsBefore(restoredFromBackStack());
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         subscribeToChat();
+        fetchChatsBefore(restoredFromBackStack());
     }
 
     @Override

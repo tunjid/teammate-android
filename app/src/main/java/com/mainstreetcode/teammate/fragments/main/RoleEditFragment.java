@@ -80,10 +80,8 @@ public class RoleEditFragment extends HeaderedFragment
         return rootView;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
+    public void onResume() {
+        super.onResume();
         User user = userViewModel.getCurrentUser();
         Team team = role.getTeam();
 

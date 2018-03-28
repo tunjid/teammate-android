@@ -98,13 +98,13 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
+    public void onResume() {
+        super.onResume();
         User user = userViewModel.getCurrentUser();
 
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
         roleViewModel.fetchRoleValues();
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
+
         if (!team.isEmpty() && state != JOINING) {
             disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
         }
