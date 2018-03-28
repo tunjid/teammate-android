@@ -1,20 +1,60 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
-    compileSdkVersion "android-O"
-    buildToolsVersion "26.0.0-rc2"
+    compileSdkVersion 27
+    buildToolsVersion "26.0.3"
     defaultConfig {
-        applicationId "com.mainstreetcode.teammates"
-        minSdkVersion 16
-        targetSdkVersion 25
+        applicationId "com.mainstreetcode.teammate"
+        minSdkVersion 21
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true  //add this line
+
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    signingConfigs {
+        release {
+            def keystoreProps = new Properties()
+            def propertiesFile = file("keystore.properties")
+            keystoreProps.load(new FileInputStream(propertiesFile))
+            storeFile file("release.keystore")
+            keyAlias keystoreProps['alias']
+            keyPassword keystoreProps['aliasPassword']
+            storePassword keystoreProps['keystorePassword']
+        }
+        staging {
+            def keystoreProps = new Properties()
+            def propertiesFile = file("keystore.properties")
+            keystoreProps.load(new FileInputStream(propertiesFile))
+            storeFile file("release.keystore")
+            keyAlias keystoreProps['alias']
+            keyPassword keystoreProps['aliasPassword']
+            storePassword keystoreProps['keystorePassword']
+        }
     }
     buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+            buildConfigField "boolean", "DEV", "true"
+        }
+        staging {
+            debuggable true
+            signingConfig signingConfigs.staging
+            buildConfigField "boolean", "DEV", "false"
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            buildConfigField "boolean", "DEV", "false"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -26,20 +66,103 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    provided 'org.projectlombok:lombok:1.14.4'
+    annotationProcessor 'org.projectlombok:lombok:1.14.4'
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:multidex:1.0.1'
+
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:exifinterface:27.0.2'
+    implementation 'com.android.support:cardview-v7:27.0.2'
+    implementation 'com.android.support:palette-v7:27.0.2'
+    implementation 'com.android.support:design:27.0.2'
+
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
+
+    implementation "android.arch.lifecycle:runtime:1.0.3"
+    implementation "android.arch.lifecycle:extensions:1.0.0"
+    implementation "android.arch.persistence.room:runtime:1.0.0"
+    implementation "android.arch.persistence.room:rxjava2:1.0.0"
+
+    implementation ('com.google.android.gms:play-services-places:11.8.0') {
+        exclude group: 'com.android.support', module: 'support-media-compat'
+    }
+
+    implementation 'com.google.firebase:firebase-ads:11.8.0'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
+
+    implementation "io.reactivex.rxjava2:rxjava:2.1.5"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+
+    implementation 'com.github.florent37:picassopalette:2.0.0'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation ('com.facebook.android:facebook-login:4.29.0'){
+        exclude module: 'support-media-compat'
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'exifinterface'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v13'
+        exclude module: 'support-v4'
+        exclude module: 'customtabs'
+        exclude module: 'design'
+        exclude group: 'com.google.zxing', module: 'core'
+    }
+    implementation('com.devbrackets.android:exomedia:4.1.0') {
+        exclude module: 'support-media-compat'
+        exclude module: 'appcompat-v7'
+    }
+    implementation('io.socket:socket.io-client:1.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+    //implementation 'com.theartofdev.edmodo:android-image-cropper:2.5.0'
+    implementation('com.theartofdev.edmodo:android-image-cropper:2.6.0') {
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'exifinterface'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v13'
+        exclude module: 'support-v4'
+        exclude module: 'design'
+    }
+    implementation ('com.github.chrisbanes:PhotoView:2.1.3') {
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'exifinterface'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v13'
+        exclude module: 'support-v4'
+        exclude module: 'design'
+    }
+    //implementation 'com.tunjid.android-bootstrap:core:1.0.0'
+    implementation(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.0", changing: true) {
+        exclude module: 'support-annotations'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'exifinterface'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-v13'
+        exclude module: 'support-v4'
+        exclude module: 'design'
+    }
+
+    testCompile 'junit:junit:4.12'
+
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.0.0-beta1'
-    compile 'com.android.support:cardview-v7:26.0.0-beta1'
-    compile 'com.google.firebase:firebase-database:10.2.6'
-    //compile 'com.tunjid.android-bootstrap:core:1.0.0-SNAPSHOT'
-    compile group: "com.tunjid.android-bootstrap", name: "core", version: "1.0.0-SNAPSHOT", changing: true
-
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    exclude group: 'com.android.support', module: 'support-media-compat'
 }
+apply plugin: 'com.google.gms.google-services'

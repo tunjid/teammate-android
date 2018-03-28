@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/action_bar_height"
-    android:background="@color/colorPrimaryDark">
+    android:layout_marginTop="@dimen/action_bar_height">
 
     <FrameLayout
         android:id="@+id/card_view_wrapper"
@@ -28,6 +27,7 @@
         android:layout_marginLeft="@dimen/single_margin"
         android:layout_marginRight="@dimen/single_margin"
         android:layout_marginTop="@dimen/half_margin"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="@+id/card_view_wrapper"
         app:layout_constraintRight_toRightOf="@+id/card_view_wrapper"
         app:layout_constraintTop_toTopOf="@+id/card_view_wrapper">
@@ -36,7 +36,8 @@
             android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email" />
+            android:hint="@string/email"
+            android:inputType="textEmailAddress" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -47,6 +48,7 @@
         android:layout_marginRight="@dimen/single_margin"
         android:layout_marginTop="@dimen/half_margin"
         android:paddingBottom="@dimen/single_and_half_margin"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="@+id/card_view_wrapper"
         app:layout_constraintRight_toRightOf="@+id/card_view_wrapper"
         app:layout_constraintTop_toBottomOf="@+id/email_wrapper">
@@ -55,6 +57,21 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password" />
+            android:hint="@string/password"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword" />
     </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/double_margin"
+        android:gravity="center"
+        android:text="@string/sign_in_forgot_password"
+        android:textColor="@color/white"
+        android:textSize="@dimen/regular_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card_view_wrapper" />
 </android.support.constraint.ConstraintLayout>

@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">Teammates</string>
-    <string name="teammates">Teammates</string>
+    <string name="app_name">Teammate</string>
+    <string name="teammates">Teammate</string>
     <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
+    <string name="empty_string"> </string>
 
     <!--Splash Fragment-->
     <string name="login_email">Sign up with email</string>
@@ -10,7 +11,203 @@
     <string name="login_have_account">Already have an account?</string>
     <string name="login_sign_in">Sign in</string>
 
-    <!--SignUpFragment-->
+    <!--SigninFragment-->
     <string name="email">Email</string>
+    <string name="reset_token">Reset Token</string>
+    <string name="new_password">New Password</string>
     <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_in_forgot_password">Forgot Password?</string>
+    <string name="sign_in_error_default">Error signing in, please try again later</string>
+    <string name="sign_in_error_invalid_password">Please review your credentials</string>
+    <string name="sign_in_error_invalid_email">Sorry, this account does not exist</string>
+
+    <!--SignUpFragment-->
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="member_information">Member Information</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_up_error_default">Error signing up, please try again later</string>
+    <string name="sign_up_error_weak_password">Your password is too weak, please try again</string>
+    <string name="sign_up_error_invalid_credentials">The credentials provided don\'t match our records, please try again</string>
+    <string name="sign_up_error_duplicate_credentials">A user already exists with the credentials provided, please try again</string>
+
+    <!--Main Activity Navigation Menu-->
+    <string name="home">Home</string>
+    <string name="events">Events</string>
+    <string name="chats">Chats</string>
+    <string name="media">Media</string>
+    <string name="my_teams">My Teams</string>
+
+    <string name="team">Team</string>
+    <string name="teams">Teams</string>
+
+    <!--Main Activity Options Menu-->
+    <string name="settings">Settings</string>
+
+    <!--FeedFragment-->
+    <string name="home_greeting">Good %1$s, %2$s</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="clarify_invitation">Do you still want to join %1$s?</string>
+    <string name="accept_invitation">Join %1$s?</string>
+    <string name="no_team_feed">You aren\'t part of any teams. Go to the team tab to find or create yours!</string>
+
+    <!--SettingsFragment-->
+    <string name="sign_out">Sign Out</string>
+    <string name="join_team">Join Team</string>
+    <string name="my_profile">My Profile</string>
+
+    <!--ForgotPasswordFragment-->
+    <string name="email_sent">Email sent!</string>
+    <string name="error_default">Sorry, an error occurred</string>
+    <string name="error_socket">Unable to connect</string>
+
+    <!--TeamSearchFragment-->
+    <string name="team_search">Team Search</string>
+    <string name="team_search_hint">Search</string>
+    <string name="team_logo">Team Logo</string>
+    <string name="create_team_prompt">Can\'t find your team? Create a new team</string>
+    <string name="team_name">Team Name</string>
+    <string name="team_info">Team Info</string>
+    <string name="city">City</string>
+    <string name="state">State</string>
+    <string name="zip">Zip</string>
+
+    <!--TeamEditFragment-->
+    <string name="team_role">Team Role</string>
+    <string name="create_team">Create Team</string>
+    <string name="edit_team">Edit Team</string>
+    <string name="choose_role">Pick your Role</string>
+    <string name="choose_role_error">Please select your Role</string>
+    <string name="team_error_duplicate_join_request">You\'ve already asked to join this team</string>
+    <string name="team_submitted_join_request">Join request submitted</string>
+    <string name="team_invalid_empty_field">Field must not be empty</string>
+    <string name="created_team">Created team "%1$s"</string>
+    <string name="updated_team">Updated team</string>
+    <string name="team_storage_used">Storage Used</string>
+
+    <!--TeamsFragment-->
+    <string name="pick_team">Pick a Team</string>
+    <string name="team_name_prefix">Team: %1$s</string>
+
+    <!--TeamDetailFragment-->
+    <string name="invite">invite</string>
+    <string name="user_invited">Has been invited as a %1$s</string>
+    <string name="user_requests_join">Has requested to join as a %1$s</string>
+    <string name="delete_team">Delete team</string>
+    <string name="delete_team_prompt">Delete %1$s?</string>
+    <string name="deleted_team">Deleted %1$s</string>
+
+    <!--RoleEditFragment-->
+    <string name="edit_role">Edit Role</string>
+
+    <!--JoinRequestFragment-->
+    <string name="invite_user">Invite User</string>
+    <string name="user_invite_sent">Invite sent</string>
+
+    <!--UserEditFragment-->
+    <string name="profile_picture">Profile Picture</string>
+    <string name="user_info">User Info</string>
+    <string name="edit_user">Edit User</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="add_user_to_team">Add %1$s to team?</string>
+    <string name="retract_invitation">Retract invitation?</string>
+    <string name="select_role">Please select a role</string>
+    <string name="updated_user">Updated %1$s!</string>
+    <string name="added_user">Added %1$s!</string>
+    <string name="removed_user">Removed %1$s</string>
+    <string name="drop_user">Drop User</string>
+    <string name="dropped_user">Dropped %1$s</string>
+    <string name="confirm_user_drop">Drop %1$s from the team?</string>
+    <string name="confirm_user_leave">Leave this team?</string>
+
+    <!--EventsFragment-->
+    <string name="events_title">Events for %1$s</string>
+
+    <!--EventDetailFragment-->
+    <string name="create_event">Create Event</string>
+    <string name="edit_event">Edit Event</string>
+    <string name="event_name">Event Name</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="location">Location</string>
+    <string name="map_pick">Pick On Map</string>
+    <string name="notes">Notes</string>
+    <string name="event_details">Details</string>
+    <string name="rsvp_event">R.S.V.P</string>
+    <string name="event_no_location">This event does not have a location</string>
+    <string name="navigate_event">Navigate</string>
+    <string name="delete_event">Delete event</string>
+    <string name="delete_event_prompt">Delete event?</string>
+    <string name="attend_event">Attending this event?</string>
+    <string name="event_attending">Going</string>
+    <string name="event_not_attending">Not Going</string>
+
+    <!--TeamChatFragment-->
+    <string name="chat_sending">Sending…</string>
+    <string name="chat_failed">Failed</string>
+    <string name="chat_details">%1$s · %2$s</string>
+    <string name="image_description">image</string>
+    <string name="message_hint">Type a message…</string>
+    <string name="team_chat_rooms">Team Chat Rooms</string>
+    <string name="team_chat_title">%1$s chat</string>
+    <string name="chat_notification_group_summary">Chats from %1$d teams</string>
+    <string name="chat_notification_multiline_item">%1$s: %2$s</string>
+    <string name="chat_notification_multiline_summary">+%1$d more</string>
+    <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
+
+    <!--MediaFragment-->
+    <string name="media_title">Media for %1$s</string>
+    <string name="media_upload_channel_name">Media upload</string>
+    <string name="media_upload_channel_description">Notifications for media uploads</string>
+    <string name="uploading_media">Uploading files</string>
+    <string name="upload_progress_status">%1$d of %2$d. %3$d failed.</string>
+    <string name="upload_complete">Upload complete.</string>
+    <string name="upload_failed">Upload failed.</string>
+    <string name="upload_complete_status">%1$d failed.</string>
+    <string name="pick_picture">Select Picture</string>
+    <string name="multi_select">%1$d Selected</string>
+    <string name="delete_media">Delete media</string>
+    <string name="partial_delete_message">Could not delete all photos selected because you did not upload them.</string>
+
+    <!--MediaDetailFragment-->
+    <string name="flag_media">Flag media</string>
+    <string name="flag_media_message">Do you want to report this post as inappropriate? The post will be temporarily removed and will be reviewed by our compliance team.</string>
+    <string name="media_flagged">This item has been flagged</string>
+
+    <!--Notifier-->
+    <string name="roles">Roles</string>
+    <string name="join_requests">Join Requests</string>
+    <string name="chats_notification_title">%1$s • %2$s</string>
+    <string name="chats_notifier_description">Notifications for team chats</string>
+    <string name="team_notifier_description">Notifications for media</string>
+    <string name="role_notifier_description">Notifications for media</string>
+    <string name="events_notifier_description">Notifications for events</string>
+    <string name="media_notifier_description">Notifications for media</string>
+    <string name="join_requests_notifier_description">Notifications for join requests</string>
+
+    <!--Empty ViewHolder-->
+    <string name="no_events">Organize. Plan. Strategize. Your team\'s events live here.</string>
+    <string name="no_feed">You\'re all caught up!</string>
+    <string name="no_team">You aren\'t part of any teams. Tap the floating button to create one or search for your team.</string>
+    <string name="no_chats">Say hi to your teammates!</string>
+    <string name="no_media">Share the highlights of your team! Tap the floating button to upload.</string>
+
+    <!--Facebook-->
+    <string name="facebook_app_id">2000415723539146</string>
+    <string name="fb_login_protocol_scheme">fb2000415723539146</string>
+
+    <!--Admob-->
+    <string name="ad">Ad</string>
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="admob_ad_id">"ca-app-pub-3940256099942544/2247696110"</string>
+
+    <!--Deep linking-->
+    <string name="deep_link_filter_name">teammateDeepLink</string>
+    <string name="deep_link_scheme">https</string>
+    <string name="deep_link_host">teammateapp.org</string>
+
 </resources>
