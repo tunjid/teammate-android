@@ -71,7 +71,7 @@ public class TeamRepository extends ModelRepository<Team> {
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Team.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            teamSingle = teamSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body));
+            teamSingle = teamSingle.flatMap(put -> api.uploadTeamLogo(model.getId(), body).map(getLocalUpdateFunction(model)));
         }
 
         return teamSingle.map(getSaveFunction());

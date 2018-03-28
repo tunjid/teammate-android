@@ -238,7 +238,7 @@ public class ChatFragment extends MainActivityFragment
         RecyclerView recyclerView = scrollManager.getRecyclerView();
         if (recyclerView == null) return;
 
-        recyclerView.getAdapter().notifyItemInserted(index);
+        scrollManager.notifyItemInserted(index);
         if (scrollToLast) recyclerView.smoothScrollToPosition(index);
     }
 

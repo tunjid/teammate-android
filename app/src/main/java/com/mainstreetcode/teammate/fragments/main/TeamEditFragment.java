@@ -128,7 +128,14 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Override
     public void onImageClick() {
-        if (!localRoleViewModel.hasPrivilegedRole()) return;
+        if(state == CREATING) {
+            showSnackbar(getString(R.string.create_team_first));
+            return;
+        }
+        if (!localRoleViewModel.hasPrivilegedRole()) {
+            showSnackbar(getString(R.string.no_permission));
+            return;
+        }
         super.onImageClick();
     }
 
