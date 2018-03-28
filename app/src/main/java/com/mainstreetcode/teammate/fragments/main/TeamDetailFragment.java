@@ -95,8 +95,8 @@ public class TeamDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         updateCurrentRole();
 
         disposables.add(teamMemberViewModel.getMore(team).subscribe(this::onTeamUpdated, defaultErrorHandler));

@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +26,6 @@ public class UserEditFragment extends HeaderedFragment
     private static final String ARG_USER = "user";
 
     private User user;
-
-    private RecyclerView recyclerView;
 
     public static UserEditFragment newInstance(User user) {
         UserEditFragment fragment = new UserEditFragment();
@@ -67,7 +64,6 @@ public class UserEditFragment extends HeaderedFragment
                 .withAdapter(new UserAdapter(user, this))
                 .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
-
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -93,12 +89,6 @@ public class UserEditFragment extends HeaderedFragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        recyclerView = null;
-    }
-
-    @Override
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
@@ -116,7 +106,7 @@ public class UserEditFragment extends HeaderedFragment
                     showSnackbar(getString(R.string.updated_user, user.getFirstName()));
                     toggleProgress(false);
                     viewHolder.bind(getHeaderedModel());
-                    recyclerView.getAdapter().notifyDataSetChanged();
+                    scrollManager.notifyDataSetChanged();
                 }, defaultErrorHandler));
                 break;
         }

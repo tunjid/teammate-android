@@ -162,20 +162,14 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void onResume() {
         super.onResume();
-        eventViewModel.clearNotifications(event);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
         User user = userViewModel.getCurrentUser();
-
         disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
 
         if (!event.isEmpty() && !fromUserPickerAction) {
             disposables.add(eventViewModel.getEvent(event, eventItems).subscribe(this::onEventChanged, defaultErrorHandler));
         }
+
+        eventViewModel.clearNotifications(event);
         fromUserPickerAction = false;
     }
 
