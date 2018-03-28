@@ -93,7 +93,7 @@ public class RoleEditFragment extends HeaderedFragment
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         MenuItem item = menu.findItem(R.id.action_kick);
-        item.setVisible(canChangeRole() || userViewModel.getCurrentUser().equals(role.getUser()));
+        item.setVisible(canChangeRole());
     }
 
     @Override
@@ -161,7 +161,7 @@ public class RoleEditFragment extends HeaderedFragment
 
     @Override
     public boolean canChangeRole() {
-        return localRoleViewModel.hasPrivilegedRole();
+        return localRoleViewModel.hasPrivilegedRole() || userViewModel.getCurrentUser().equals(role.getUser());
     }
 
     private void onRoleUpdated() {
