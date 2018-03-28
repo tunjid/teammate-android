@@ -24,10 +24,21 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep class com.tunjid.androidbootstrap.** { *; }
+-keep class android.support.design.** { *; }
+-keep class android.support.v7.widget.** { *; }
+-keep class android.support.v7.internal.widget.** { *; }
+-keep class android.support.v7.internal.view.menu.** { *; }
+
 -keep class com.theartofdev.edmodo.cropper.*
 -dontwarn com.theartofdev.edmodo.cropper.R$id
 -dontwarn com.theartofdev.edmodo.cropper.**
 -dontwarn com.squareup.okhttp.**
+-dontwarn okio.**
+
+-keep public class * extends android.support.v4.view.ActionProvider {
+    public <init>(android.content.Context);
+}
 
 # Facebook
 
@@ -127,6 +138,10 @@
 # be complete or up to date. (The "arithmetic" optimization can be
 # used if you are only targeting Android 2.0 or later.)  Make sure you
 # test thoroughly if you go this route.
+
+-dontwarn com.google.zxing.**
+-dontwarn com.intouch.dev.alacards.**
+
 -optimizations !code/simplification/cast,!field/*,!class/merging/*,!class/unboxing/enum,!code/allocation/variable,!method/marking/private
 -optimizationpasses 5
 -allowaccessmodification
