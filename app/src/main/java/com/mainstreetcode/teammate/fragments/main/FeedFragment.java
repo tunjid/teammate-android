@@ -122,7 +122,7 @@ public final class FeedFragment extends MainActivityFragment
         }
         else if (model instanceof JoinRequest) {
             JoinRequest request = ((JoinRequest) model);
-            String title = userViewModel.getCurrentUser().equals(request.getUser())
+            String title = userViewModel.getCurrentUser().equals(request.getUser()) && request.isUserApproved()
                     ? getString(R.string.clarify_invitation, request.getTeam().getName())
                     : request.isTeamApproved()
                     ? getString(R.string.accept_invitation, request.getTeam().getName())
