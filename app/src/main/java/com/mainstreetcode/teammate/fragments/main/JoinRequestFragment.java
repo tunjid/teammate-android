@@ -49,7 +49,7 @@ public class JoinRequestFragment extends HeaderedFragment
         JoinRequest temp = getArguments().getParcelable(ARG_JOIN_REQUEST);
 
         return (temp != null)
-                ? superResult + "-" + temp.hashCode()
+                ? superResult + "-" + temp.getTeam().hashCode()
                 : superResult;
     }
 
