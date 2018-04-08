@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
@@ -76,9 +77,9 @@ public class TeammateService {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-            OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .addInterceptor(loggingInterceptor)
-                    .cookieJar(new SessionCookieJar());
+            OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
+
+            if (BuildConfig.DEV) builder.addInterceptor(loggingInterceptor);
 
             assignSSLSocketFactory(builder);
 

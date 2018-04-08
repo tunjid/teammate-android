@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mainstreetcode.teammate.MediaUploadIntentService;
+import com.mainstreetcode.teammate.MediaTransferIntentService;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.MediaAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
@@ -42,7 +42,8 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 public class MediaFragment extends MainActivityFragment
         implements
         MediaAdapter.MediaAdapterListener,
-        ImageWorkerFragment.MediaListener {
+        ImageWorkerFragment.MediaListener,
+        ImageWorkerFragment.DownloadRequester {
 
     private static final int MEDIA_DELETE_SNACKBAR_DELAY = 350;
     private static final String ARG_TEAM = "team";
@@ -149,6 +150,10 @@ public class MediaFragment extends MainActivityFragment
                 mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
                         .subscribe(this::onMediaDeleted, defaultErrorHandler);
                 return true;
+            case R.id.action_download:
+                if (ImageWorkerFragment.requestDownload(this, team))
+                    scrollManager.notifyDataSetChanged();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -228,7 +233,18 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public void onFilesSelected(List<Uri> uris) {
-        MediaUploadIntentService.startActionUpload(getContext(), userViewModel.getCurrentUser(), team, uris);
+        MediaTransferIntentService.startActionUpload(getContext(), userViewModel.getCurrentUser(), team, uris);
+    }
+
+    @Override
+    public Team requestedTeam() {
+        return team;
+    }
+
+    @Override
+    public void startedDownLoad(boolean started) {
+        toggleContextMenu(!started);
+        if (started) scrollManager.notifyDataSetChanged();
     }
 
     private void onMediaUpdated(DiffUtil.DiffResult result) {

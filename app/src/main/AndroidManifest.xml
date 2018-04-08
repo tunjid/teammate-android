@@ -21,7 +21,7 @@
             android:value="@string/facebook_app_id" />
 
         <service
-            android:name="com.mainstreetcode.teammate.MediaUploadIntentService"
+            android:name="com.mainstreetcode.teammate.MediaTransferIntentService"
             android:exported="false" />
         <service
             android:name="com.mainstreetcode.teammate.services.TeammateMessagingService"

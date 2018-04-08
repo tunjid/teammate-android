@@ -6,14 +6,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment;
+import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -25,11 +25,13 @@ import java.util.List;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeEmitter;
 import io.reactivex.MaybeOnSubscribe;
+import io.reactivex.functions.BiConsumer;
+import io.reactivex.functions.BiFunction;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.M;
+import static com.mainstreetcode.teammate.util.Logger.log;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
 
@@ -37,14 +39,14 @@ import static io.reactivex.schedulers.Schedulers.io;
  * Inner fragment hosting code for interacting with image and cropping APIs
  */
 
-public class ImageWorkerFragment extends TeammatesBaseFragment {
+public class ImageWorkerFragment extends MainActivityFragment {
 
     public static final int CROP_CHOOSER = 1;
     public static final int MULTIPLE_MEDIA_CHOOSER = 2;
+    public static final int MEDIA_DOWNLOAD_CHOOSER = 3;
 
     private static final String TAG = "ImageWorkerFragment";
     private static final String IMAGE_SELECTION = "image/*";
-    private static final String IMAGE_VIDEO_SELECTION = "image/*, video/*";
     private static final String[] MIME_TYPES = {"image/*", "video/*"};
     private static final String[] STORAGE_PERMISSIONS = {WRITE_EXTERNAL_STORAGE};
 
@@ -63,41 +65,65 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
     }
 
     public static void requestCrop(BaseFragment host) {
-        ImageWorkerFragment instance = getInstance(host);
-        if (instance == null) return;
+        requireInstanceWithActivity(host, (instance, activity) -> {
+            boolean noPermit = noStoragePermission(activity);
 
-        Activity activity = host.getActivity();
-        if (activity == null) return;
-
-        boolean noPermit = SDK_INT >= M && ContextCompat.checkSelfPermission(activity,
-                WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
-
-        if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, CROP_CHOOSER);
-        else instance.startImagePicker();
+            if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, CROP_CHOOSER);
+            else instance.startImagePicker();
+        });
     }
 
 
     public static void requestMultipleMedia(BaseFragment host) {
-        ImageWorkerFragment instance = getInstance(host);
-        if (instance == null) return;
+        requireInstanceWithActivity(host, (instance, activity) -> {
+            boolean noPermit = noStoragePermission(activity);
 
-        Activity activity = host.getActivity();
-        if (activity == null) return;
+            if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, MULTIPLE_MEDIA_CHOOSER);
+            else instance.startMultipleMediaPicker();
+        });
+    }
 
-        boolean noPermit = SDK_INT >= M && ContextCompat.checkSelfPermission(activity,
+    public static boolean requestDownload(BaseFragment host, Team team) {
+        return requireInstanceWithActivity(host, (instance, activity) -> {
+            boolean noPermit = noStoragePermission(activity);
+            boolean started = false;
+
+            if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, MEDIA_DOWNLOAD_CHOOSER);
+            else started = instance.mediaViewModel.downloadMedia(team);
+
+            if (started) instance.showSnackbar(activity.getString(R.string.media_download_started));
+
+            return started;
+        }, false);
+    }
+
+    private static boolean noStoragePermission(Activity activity) {
+        return SDK_INT >= M && ContextCompat.checkSelfPermission(activity,
                 WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
-
-        if (noPermit) instance.requestPermissions(STORAGE_PERMISSIONS, CROP_CHOOSER);
-        else instance.startMultipleMediaPicker();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        boolean gotPermission = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+        if (!gotPermission) return;
+
         switch (requestCode) {
             case CROP_CHOOSER:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startImagePicker();
+                startImagePicker();
+                break;
+            case MULTIPLE_MEDIA_CHOOSER:
+                startMultipleMediaPicker();
+                break;
+            case MEDIA_DOWNLOAD_CHOOSER:
+                Fragment target = getParentFragment();
+                if (target == null) return;
+                if (target instanceof DownloadRequester) {
+                    DownloadRequester requester = ((DownloadRequester) target);
+                    Team team = requester.requestedTeam();
+                    boolean started = mediaViewModel.downloadMedia(team);
+
+                    requester.startedDownLoad(started);
+                    if (started) showSnackbar(getString(R.string.media_download_started));
                 }
                 break;
         }
@@ -165,20 +191,33 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
 
     private void startMultipleMediaPicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            intent.setType("*/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
-        }
-        else {
-            intent.setType(IMAGE_VIDEO_SELECTION);
-        }
-
-        if (SDK_INT >= JELLY_BEAN_MR2) intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
         startActivityForResult(intent, MULTIPLE_MEDIA_CHOOSER);
+    }
+
+    private static void requireInstanceWithActivity(BaseFragment host, BiConsumer<ImageWorkerFragment, Activity> biConsumer) {
+        requireInstanceWithActivity(host, (instance, activity) -> {
+            try {biConsumer.accept(instance, activity);}
+            catch (Exception e) {log(TAG, "Could not get Instance", e);}
+            return Void.TYPE;
+        }, Void.TYPE);
+    }
+
+    private static <T> T requireInstanceWithActivity(BaseFragment host, BiFunction<ImageWorkerFragment, Activity, T> biFunction, T defaultValue) {
+        ImageWorkerFragment instance = getInstance(host);
+        if (instance == null) return defaultValue;
+
+        Activity activity = host.getActivity();
+        if (activity == null) return defaultValue;
+
+        try {return biFunction.apply(instance, activity);}
+        catch (Exception e) {log(TAG, "Could not get Instance", e);}
+        return defaultValue;
     }
 
     public interface CropListener {
@@ -187,6 +226,12 @@ public class ImageWorkerFragment extends TeammatesBaseFragment {
 
     public interface MediaListener {
         void onFilesSelected(List<Uri> uris);
+    }
+
+    public interface DownloadRequester {
+        Team requestedTeam();
+
+        void startedDownLoad(boolean started);
     }
 
     public interface ImagePickerListener extends BaseRecyclerViewAdapter.AdapterListener {

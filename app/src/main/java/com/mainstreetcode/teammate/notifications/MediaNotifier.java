@@ -8,7 +8,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
-import com.mainstreetcode.teammate.MediaUploadIntentService;
+import com.mainstreetcode.teammate.MediaTransferIntentService;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.repository.MediaRepository;
@@ -64,7 +64,7 @@ public class MediaNotifier extends Notifier<Media> {
     }
 
     private void updateProgress(int percentage) {
-        MediaUploadIntentService.UploadStats stats = MediaUploadIntentService.getStats();
+        MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getStats();
 
         notifyOfUpload(progressNotificationBuilder()
                 .setContentText(app.getString(R.string.upload_progress_status, stats.getNumAttempted(), stats.getNumToUpload(), stats.getNumErrors()))
@@ -73,7 +73,7 @@ public class MediaNotifier extends Notifier<Media> {
     }
 
     private void onUploadComplete() {
-        MediaUploadIntentService.UploadStats stats = MediaUploadIntentService.getStats();
+        MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getStats();
         if (!stats.isComplete()) return;
 
         Completable.timer(800, TimeUnit.MILLISECONDS).subscribe(
@@ -98,12 +98,12 @@ public class MediaNotifier extends Notifier<Media> {
     }
 
     @NonNull
-    private String getUploadCompletionContentTitle(MediaUploadIntentService.UploadStats stats) {
+    private String getUploadCompletionContentTitle(MediaTransferIntentService.UploadStats stats) {
         return stats.isAtMaxStorage() ? app.getString(R.string.upload_failed): app.getString(R.string.upload_complete);
     }
 
     @NonNull
-    private String getUploadCompletionContentText(MediaUploadIntentService.UploadStats stats) {
+    private String getUploadCompletionContentText(MediaTransferIntentService.UploadStats stats) {
         return stats.isAtMaxStorage() ? stats.getMaxStorageMessage() : app.getString(R.string.upload_complete_status, stats.getNumErrors());
     }
 }
