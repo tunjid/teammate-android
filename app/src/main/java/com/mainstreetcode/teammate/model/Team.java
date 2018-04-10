@@ -6,6 +6,7 @@ import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
@@ -42,7 +43,7 @@ public class Team extends TeamEntity
 
     private static final int CITY_POSITION = 1;
     private static final int STATE_POSITION = 2;
-    public static final int ZIP_POSITION = 3;
+    private static final int ZIP_POSITION = 3;
     public static final int ROLE_POSITION = 5;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
@@ -61,10 +62,11 @@ public class Team extends TeamEntity
 
     @Ignore private final List<Item<Team>> items;
 
-    public Team(String id, String name, String city, String state, String zip, String imageUrl,
-                Date created, LatLng location, long storageUsed, long maxStorage) {
-        super(id, name, city, state, zip, imageUrl, created, location, storageUsed, maxStorage);
-
+    public Team(@NonNull String id, String name, String city, String state, String zip,
+                String sport, String description, String imageUrl,
+                Date created, LatLng location,
+                long storageUsed, long maxStorage, int minAge, int maxAge) {
+        super(id, name, city, state, zip, sport, description, imageUrl, created, location, storageUsed, maxStorage, minAge, maxAge);
         items = buildItems();
     }
 
@@ -76,7 +78,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, 0, 0);
+        return new Team(NEW_TEAM, "", "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, 0, 0, 0, 0);
     }
 
     public static Team updateDelayedModels(Team team) {
@@ -92,9 +94,13 @@ public class Team extends TeamEntity
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, this),
+                new Item(Item.ZIP, R.string.team_sport, sport == null ? "" : sport, this::setSport, this),
                 new Item(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
                 new Item(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
                 new Item(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
+                new Item(Item.INPUT, R.string.team_description, description == null ? "" : description, this::setDescription, this),
+                new Item(Item.NUMBER, R.string.team_min_age, String.valueOf(minAge), this::setMinAge, this),
+                new Item(Item.NUMBER, R.string.team_max_age, String.valueOf(maxAge), this::setMaxAge, this),
                 new Item(Item.INFO, R.string.team_storage_used, storageUsed + "/" + maxStorage + " MB", null, this),
                 new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, this)
         );
@@ -228,6 +234,8 @@ public class Team extends TeamEntity
         private static final String CITY_KEY = "city";
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
+        private static final String SPORT_KEY = "sport";
+        private static final String DESCRIPTION_KEY = "description";
         private static final String LOGO_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
         private static final String ROLES_KEY = "roles";
@@ -235,11 +243,13 @@ public class Team extends TeamEntity
         private static final String JOIN_REQUEST_KEY = "joinRequests";
         private static final String STORAGE_USED_KEY = "storageUsed";
         private static final String MAX_STORAGE_KEY = "maxStorage";
+        private static final String MIN_AGE_KEY = "minAge";
+        private static final String MAX_AGE_KEY = "maxAge";
 
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Team(json.getAsString(), "", "", "", "", "", new Date(), new LatLng(0, 0), 0, 0);
+                return new Team(json.getAsString(), "", "", "", "", "", "", "", new Date(), new LatLng(0, 0), 0, 0, 0, 0);
             }
 
             JsonObject teamJson = json.getAsJsonObject();
@@ -249,13 +259,17 @@ public class Team extends TeamEntity
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
+            String sport = ModelUtils.asString(SPORT_KEY, teamJson);
+            String description = ModelUtils.asString(DESCRIPTION_KEY, teamJson);
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
             long storageUsed = (long) ModelUtils.asFloat(STORAGE_USED_KEY, teamJson);
             long maxStorage = (long) ModelUtils.asFloat(MAX_STORAGE_KEY, teamJson);
+            int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
+            int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip, logoUrl, created, location, storageUsed, maxStorage);
+            Team team = new Team(id, name, city, state, zip, sport, description, logoUrl, created, location, storageUsed, maxStorage, minAge, maxAge);
 
             if (teamJson.has(ROLES_KEY)) {
                 deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
@@ -274,6 +288,10 @@ public class Team extends TeamEntity
             team.addProperty(CITY_KEY, src.city);
             team.addProperty(STATE_KEY, src.state);
             team.addProperty(ZIP_KEY, src.zip);
+            team.addProperty(DESCRIPTION_KEY, src.description);
+            team.addProperty(MIN_AGE_KEY, src.minAge);
+            team.addProperty(MAX_AGE_KEY, src.maxAge);
+            if (!TextUtils.isEmpty(src.sport)) team.addProperty(SPORT_KEY, src.sport);
 
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();

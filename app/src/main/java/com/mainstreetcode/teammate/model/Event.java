@@ -43,12 +43,13 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", "", "", Config.getDefaultEventLogo(), "", date, date, Team.empty(), null);
+        return new Event("", "", "", Config.getDefaultEventLogo(), "private", "", date, date, Team.empty(), null);
     }
 
-    public Event(String id, String name, String notes, String imageUrl, String locationName,
+    public Event(String id, String name, String notes, String imageUrl,
+                 String visibility, String locationName,
                  Date startDate, Date endDate, Team team, LatLng location) {
-        super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location);
+        super(id, name, notes, imageUrl, visibility, locationName, startDate, endDate, team, location);
         this.team = team;
         items = buildItems();
     }
@@ -64,6 +65,7 @@ public class Event extends EventEntity
     public List<Item<Event>> buildItems() {
         return Arrays.asList(
                 new Item(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
+                new Item(Item.LOCATION, R.string.event_visibility, visibility == null ? "" : visibility, this::setVisibility, this),
                 new Item(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this),
                 new Item(Item.TEXT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
                 new Item(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
@@ -188,6 +190,7 @@ public class Event extends EventEntity
         private static final String TEAM_KEY = "team";
         private static final String NOTES_KEY = "notes";
         private static final String IMAGE_KEY = "imageUrl";
+        private static final String VISIBILITY_KEY = "visibility";
         private static final String LOCATION_NAME_KEY = "locationName";
         private static final String START_DATE_KEY = "startDate";
         private static final String END_DATE_KEY = "endDate";
@@ -199,6 +202,7 @@ public class Event extends EventEntity
 
             serialized.addProperty(NAME_KEY, src.name);
             serialized.addProperty(NOTES_KEY, src.notes);
+            serialized.addProperty(VISIBILITY_KEY, src.visibility);
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName);
             serialized.addProperty(TEAM_KEY, src.team.getId());
             serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
@@ -217,7 +221,7 @@ public class Event extends EventEntity
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Event(json.getAsString(), "", "", "", "", new Date(), new Date(), Team.empty(), null);
+                return new Event(json.getAsString(), "", "", "", "private", "", new Date(), new Date(), Team.empty(), null);
             }
 
             JsonObject eventJson = json.getAsJsonObject();
@@ -226,6 +230,7 @@ public class Event extends EventEntity
             String name = ModelUtils.asString(NAME_KEY, eventJson);
             String notes = ModelUtils.asString(NOTES_KEY, eventJson);
             String imageUrl = ModelUtils.asString(IMAGE_KEY, eventJson);
+            String visibility = ModelUtils.asString(VISIBILITY_KEY, eventJson);
             String locationName = ModelUtils.asString(LOCATION_NAME_KEY, eventJson);
             String startDate = ModelUtils.asString(START_DATE_KEY, eventJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, eventJson);
@@ -234,7 +239,7 @@ public class Event extends EventEntity
 
             if (team == null) team = Team.empty();
 
-            Event result = new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location);
+            Event result = new Event(id, name, notes, imageUrl, visibility, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location);
 
             ModelUtils.deserializeList(context, eventJson.get("guests"), result.guests, Guest.class);
 

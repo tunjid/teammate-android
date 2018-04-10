@@ -62,7 +62,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "https://teammateapp.org/";
+    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.192.118.254:8080/" : "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 
@@ -80,6 +80,7 @@ public class TeammateService {
             OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
 
             if (BuildConfig.DEV) builder.addInterceptor(loggingInterceptor);
+            if (BuildConfig.DEV) builder.hostnameVerifier((hostname, session) -> true);
 
             assignSSLSocketFactory(builder);
 
@@ -129,7 +130,7 @@ public class TeammateService {
     private static void assignSSLSocketFactory(OkHttpClient.Builder builder) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            InputStream stream = App.getInstance().getResources().openRawResource(R.raw.server);
+            InputStream stream = App.getInstance().getResources().openRawResource(BuildConfig.DEV ? R.raw.dev : R.raw.prod);
 
             Certificate certificate = certificateFactory.generateCertificate(stream);
             stream.close();

@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
+import com.mainstreetcode.teammate.persistence.migrations.Migration12;
 import com.mainstreetcode.teammate.persistence.typeconverters.DateTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.LatLngTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.TeamTypeConverter;
@@ -32,7 +33,7 @@ import static com.mainstreetcode.teammate.BuildConfig.DEBUG;
  */
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
-        RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class}, version = 1)
+        RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class}, version = 2)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class,
         TeamTypeConverter.class, UserTypeConverter.class})
@@ -44,8 +45,10 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static AppDatabase getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(App.getInstance(),
-                    AppDatabase.class, "database-name").build();
+            INSTANCE = Room.databaseBuilder(App.getInstance(), AppDatabase.class, "database-name")
+                    .addMigrations(new Migration12())
+                    .fallbackToDestructiveMigration()
+                    .build();
         }
         return INSTANCE;
     }

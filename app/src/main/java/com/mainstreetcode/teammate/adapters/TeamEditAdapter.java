@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -32,12 +33,14 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
         this.roles = roles;
     }
 
+    @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INFO:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
             case Item.INPUT:
+            case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
             case Item.ROLE:
                 return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::isJoiningTeam);
@@ -52,7 +55,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     }
 
     @Override
-    public void onBindViewHolder(BaseItemViewHolder baseTeamViewHolder, int i) {
+    public void onBindViewHolder(@NonNull BaseItemViewHolder baseTeamViewHolder, int i) {
         baseTeamViewHolder.bind(team.get(i));
     }
 

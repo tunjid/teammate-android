@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Supplier;
 
@@ -59,7 +58,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         int position = getAdapterPosition();
         Class itemizedClass = item.getItemizedObject().getClass();
 
-        editText.setInputType(itemizedClass.equals(Team.class) && position == Team.ZIP_POSITION
+        editText.setInputType(item.getItemType() == Item.NUMBER
                 ? InputType.TYPE_CLASS_NUMBER
                 : itemizedClass.equals(User.class) && position == User.EMAIL_POSITION
                 ? InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS

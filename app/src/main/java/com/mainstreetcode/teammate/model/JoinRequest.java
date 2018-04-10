@@ -37,8 +37,7 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     public static JoinRequest invite(Team team) {
-        User user = new User("", "", "", "", Config.getDefaultUserAvatar());
-        return new JoinRequest(true, false, "", "", team, user);
+        return new JoinRequest(true, false, "", "", team, User.empty());
     }
 
     public JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {

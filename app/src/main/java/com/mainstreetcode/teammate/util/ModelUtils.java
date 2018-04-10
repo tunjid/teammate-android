@@ -27,6 +27,7 @@ import java.util.TimeZone;
 
 public class ModelUtils {
 
+    public static final String EMPTY_STRING = "";
     public static final SimpleDateFormat dateFormatter;
 
     static {

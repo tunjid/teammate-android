@@ -32,6 +32,7 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_name") protected String name;
     @ColumnInfo(name = "event_notes") protected String notes;
     @ColumnInfo(name = "event_image_url") protected String imageUrl;
+    @ColumnInfo(name = "event_visibility") protected String visibility;
     @ColumnInfo(name = "event_location_name") protected String locationName;
 
     @ColumnInfo(name = "event_team") protected Team team;
@@ -39,12 +40,14 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_end_date") protected Date endDate;
     @ColumnInfo(name = "event_location") protected LatLng location;
 
-    public EventEntity(@NonNull String id, String name, String notes, String imageUrl, String locationName,
+    public EventEntity(@NonNull String id, String name, String notes, String imageUrl,
+                       String visibility, String locationName,
                        Date startDate, Date endDate, Team team, LatLng location) {
         this.id = id;
         this.name = name;
         this.notes = notes;
         this.imageUrl = imageUrl;
+        this.visibility = visibility;
         this.locationName = locationName;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -57,6 +60,7 @@ public class EventEntity implements Parcelable {
         name = in.readString();
         notes = in.readString();
         imageUrl = in.readString();
+        visibility = in.readString();
         locationName = in.readString();
         startDate = new Date(in.readLong());
         endDate = new Date(in.readLong());
@@ -79,6 +83,10 @@ public class EventEntity implements Parcelable {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getVisibility() {
+        return visibility;
     }
 
     public String getLocationName() {
@@ -124,6 +132,10 @@ public class EventEntity implements Parcelable {
 
     protected void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
     }
 
     protected void setLocationName(String locationName) {
@@ -173,6 +185,7 @@ public class EventEntity implements Parcelable {
         dest.writeString(name);
         dest.writeString(notes);
         dest.writeString(imageUrl);
+        dest.writeString(visibility);
         dest.writeString(locationName);
         dest.writeLong(startDate.getTime());
         dest.writeLong(endDate.getTime());

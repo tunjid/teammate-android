@@ -21,6 +21,9 @@ android {
             }
         }
     }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
     signingConfigs {
         release {
             def keystoreProps = new Properties()
@@ -91,6 +94,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-media-compat'
     }
 
+    implementation 'com.google.code.gson:gson:2.8.0'
     implementation 'com.google.firebase:firebase-ads:12.0.1'
     implementation 'com.google.firebase:firebase-messaging:12.0.1'
 
@@ -156,8 +160,10 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
+    androidTestImplementation "android.arch.persistence.room:testing:1.0.0"
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.gson'
     })
 }
 
