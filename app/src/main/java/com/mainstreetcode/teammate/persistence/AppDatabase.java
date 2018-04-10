@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.persistence.migrations.Migration12;
 import com.mainstreetcode.teammate.persistence.typeconverters.DateTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.LatLngTypeConverter;
+import com.mainstreetcode.teammate.persistence.typeconverters.SportTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.TeamTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.UserTypeConverter;
 
@@ -36,7 +37,7 @@ import static com.mainstreetcode.teammate.BuildConfig.DEBUG;
         RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class}, version = 2)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class,
-        TeamTypeConverter.class, UserTypeConverter.class})
+        TeamTypeConverter.class, UserTypeConverter.class, SportTypeConverter.class})
 
 public abstract class AppDatabase extends RoomDatabase {
 

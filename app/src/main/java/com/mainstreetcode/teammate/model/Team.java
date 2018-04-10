@@ -63,10 +63,10 @@ public class Team extends TeamEntity
     @Ignore private final List<Item<Team>> items;
 
     public Team(@NonNull String id, String name, String city, String state, String zip,
-                String sport, String description, String imageUrl,
-                Date created, LatLng location,
+                String description, String imageUrl,
+                Date created, LatLng location, Sport sport,
                 long storageUsed, long maxStorage, int minAge, int maxAge) {
-        super(id, name, city, state, zip, sport, description, imageUrl, created, location, storageUsed, maxStorage, minAge, maxAge);
+        super(id, name, city, state, zip, description, imageUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         items = buildItems();
     }
 
@@ -78,7 +78,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, 0, 0, 0, 0);
+        return new Team(NEW_TEAM, "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
     public static Team updateDelayedModels(Team team) {
@@ -94,7 +94,7 @@ public class Team extends TeamEntity
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
                 new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, this),
-                new Item(Item.ZIP, R.string.team_sport, sport == null ? "" : sport, this::setSport, this),
+                new Item(Item.ZIP, R.string.team_sport, sport == null ? "" : sport.getCode(), this::setSport, this),
                 new Item(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
                 new Item(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
                 new Item(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
@@ -249,7 +249,7 @@ public class Team extends TeamEntity
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Team(json.getAsString(), "", "", "", "", "", "", "", new Date(), new LatLng(0, 0), 0, 0, 0, 0);
+                return new Team(json.getAsString(), "", "", "", "", "", "", new Date(), new LatLng(0, 0), Sport.empty(), 0, 0, 0, 0);
             }
 
             JsonObject teamJson = json.getAsJsonObject();
@@ -259,17 +259,18 @@ public class Team extends TeamEntity
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
-            String sport = ModelUtils.asString(SPORT_KEY, teamJson);
+            String sportCode = ModelUtils.asString(SPORT_KEY, teamJson);
             String description = ModelUtils.asString(DESCRIPTION_KEY, teamJson);
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
+            Sport sport = Config.sportFromCode(sportCode);
             long storageUsed = (long) ModelUtils.asFloat(STORAGE_USED_KEY, teamJson);
             long maxStorage = (long) ModelUtils.asFloat(MAX_STORAGE_KEY, teamJson);
             int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
             int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip, sport, description, logoUrl, created, location, storageUsed, maxStorage, minAge, maxAge);
+            Team team = new Team(id, name, city, state, zip, description, logoUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
 
             if (teamJson.has(ROLES_KEY)) {
                 deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
@@ -291,7 +292,9 @@ public class Team extends TeamEntity
             team.addProperty(DESCRIPTION_KEY, src.description);
             team.addProperty(MIN_AGE_KEY, src.minAge);
             team.addProperty(MAX_AGE_KEY, src.maxAge);
-            if (!TextUtils.isEmpty(src.sport)) team.addProperty(SPORT_KEY, src.sport);
+
+            String sportCode = src.sport != null ? src.sport.getCode() : "";
+            if (TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);
 
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();

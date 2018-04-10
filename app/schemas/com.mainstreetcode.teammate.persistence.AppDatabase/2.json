@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "411a1f304955245fc145cf350244817b",
+    "identityHash": "d13852a660a0a10af5d9c8509f0f9457",
     "entities": [
       {
         "tableName": "users",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "teams",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`team_id` TEXT NOT NULL, `team_name` TEXT, `team_city` TEXT, `team_state` TEXT, `team_zip` TEXT, `team_sport` TEXT, `team_description` TEXT, `team_image_url` TEXT, `team_created` INTEGER, `team_location` TEXT, `team_storage_used` INTEGER NOT NULL, `team_max_storage` INTEGER NOT NULL, `team_min_age` INTEGER NOT NULL, `team_max_age` INTEGER NOT NULL, PRIMARY KEY(`team_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`team_id` TEXT NOT NULL, `team_name` TEXT, `team_city` TEXT, `team_state` TEXT, `team_zip` TEXT, `team_description` TEXT, `team_image_url` TEXT, `team_sport` TEXT, `team_created` INTEGER, `team_location` TEXT, `team_storage_used` INTEGER NOT NULL, `team_max_storage` INTEGER NOT NULL, `team_min_age` INTEGER NOT NULL, `team_max_age` INTEGER NOT NULL, PRIMARY KEY(`team_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -89,12 +89,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "sport",
-            "columnName": "team_sport",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "description",
             "columnName": "team_description",
             "affinity": "TEXT",
@@ -103,6 +97,12 @@
           {
             "fieldPath": "imageUrl",
             "columnName": "team_image_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sport",
+            "columnName": "team_sport",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -528,7 +528,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"411a1f304955245fc145cf350244817b\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d13852a660a0a10af5d9c8509f0f9457\")"
     ]
   }
 }

@@ -6,9 +6,10 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.Sport;
 import com.mainstreetcode.teammate.util.Logger;
 
 import java.util.Date;
@@ -23,10 +24,10 @@ public class TeamEntity implements Parcelable {
     @ColumnInfo(name = "team_city") protected String city;
     @ColumnInfo(name = "team_state") protected String state;
     @ColumnInfo(name = "team_zip") protected String zip;
-    @ColumnInfo(name = "team_sport") protected String sport;
     @ColumnInfo(name = "team_description") protected String description;
     @ColumnInfo(name = "team_image_url") protected String imageUrl;
 
+    @ColumnInfo(name = "team_sport") protected Sport sport;
     @ColumnInfo(name = "team_created") protected Date created;
     @ColumnInfo(name = "team_location") protected LatLng location;
 
@@ -36,8 +37,8 @@ public class TeamEntity implements Parcelable {
     @ColumnInfo(name = "team_max_age") protected int maxAge;
 
     public TeamEntity(@NonNull String id, String name, String city, String state,
-                      String zip, String sport, String description, String imageUrl,
-                      Date created, LatLng location,
+                      String zip, String description, String imageUrl,
+                      Date created, LatLng location, Sport sport,
                       long storageUsed, long maxStorage,
                       int minAge, int maxAge) {
         this.id = id;
@@ -62,11 +63,11 @@ public class TeamEntity implements Parcelable {
         city = in.readString();
         state = in.readString();
         zip = in.readString();
-        sport = in.readString();
         description = in.readString();
         imageUrl = in.readString();
         created = new Date(in.readLong());
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
+        sport = Config.sportFromCode(in.readString());
         storageUsed = in.readLong();
         maxStorage = in.readLong();
         minAge = in.readInt();
@@ -108,8 +109,7 @@ public class TeamEntity implements Parcelable {
         return zip;
     }
 
-    @Nullable
-    public String getSport() {
+    public Sport getSport() {
         return sport;
     }
 
@@ -139,8 +139,8 @@ public class TeamEntity implements Parcelable {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public void setSport(String sport) {
-        this.sport = sport;
+    public void setSport(String code) {
+        this.sport = Config.sportFromCode(code);
     }
 
     public void setDescription(String description) {
@@ -186,11 +186,11 @@ public class TeamEntity implements Parcelable {
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zip);
-        dest.writeString(sport);
         dest.writeString(description);
         dest.writeString(imageUrl);
         dest.writeLong(created.getTime());
         dest.writeValue(location);
+        dest.writeString(sport.getCode());
         dest.writeLong(storageUsed);
         dest.writeLong(maxStorage);
         dest.writeInt(minAge);

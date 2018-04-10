@@ -21,6 +21,7 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Sport;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
@@ -108,6 +109,7 @@ public class TeammateService {
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Media.class, new Media.GsonAdapter())
                 .registerTypeAdapter(Guest.class, new Guest.GsonAdapter())
+                .registerTypeAdapter(Sport.class, new Sport.GsonAdapter())
                 .registerTypeAdapter(Config.class, new Config.GsonAdapter())
                 .registerTypeAdapter(Device.class, new Device.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())

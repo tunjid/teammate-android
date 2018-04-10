@@ -18,6 +18,10 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Flowable;
 
 @SuppressLint("ParcelCreator")
 public class Config implements Model<Config> {
@@ -28,6 +32,7 @@ public class Config implements Model<Config> {
     private String defaultTeamLogo;
     private String defaultEventLogo;
     private String defaultUserAvatar;
+    private List<Sport> sports = new ArrayList<>();
 
     Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
         this.defaultTeamLogo = defaultTeamLogo;
@@ -48,6 +53,15 @@ public class Config implements Model<Config> {
     static String getDefaultUserAvatar() {
         if (currentConfig.isEmpty()) fetchConfig();
         return currentConfig.defaultUserAvatar;
+    }
+
+    public static Sport sportFromCode(String code) {
+        if (currentConfig.isEmpty()) fetchConfig();
+        String matcher = code != null ? code : "";
+        return Flowable.fromIterable(currentConfig.sports)
+                .filter(sport -> matcher.equals(sport.getCode()))
+                .first(Sport.empty())
+                .blockingGet();
     }
 
     @Override
@@ -106,6 +120,7 @@ public class Config implements Model<Config> {
         private static final String TEAM_LOGO_KEY = "defaultTeamLogo";
         private static final String EVENT_LOGO_KEY = "defaultEventLogo";
         private static final String USER_AVATAR_KEY = "defaultUserAvatar";
+        private static final String SPORTS_KEY = "sports";
 
         @Override
         public JsonElement serialize(Config src, Type typeOfSrc, JsonSerializationContext context) {
@@ -126,7 +141,11 @@ public class Config implements Model<Config> {
             String defaultEventLogo = ModelUtils.asString(EVENT_LOGO_KEY, deviceJson);
             String defaultUserAvatar = ModelUtils.asString(USER_AVATAR_KEY, deviceJson);
 
-            return new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar);
+            Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar);
+
+            ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
+
+            return config;
         }
     }
 }

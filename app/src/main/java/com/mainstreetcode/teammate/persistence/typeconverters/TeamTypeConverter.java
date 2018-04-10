@@ -18,8 +18,8 @@ public class TeamTypeConverter {
     public Team fromId(String id) {
         TeamEntity entity = AppDatabase.getInstance().teamDao().getAsEntity(id).blockingGet();
         return new Team(entity.getId(), entity.getName(), entity.getCity(), entity.getState(),
-                entity.getZip(), entity.getSport(), entity.getDescription(), entity.getImageUrl(),
-                entity.getCreated(), entity.getLocation(),
+                entity.getZip(), entity.getDescription(), entity.getImageUrl(),
+                entity.getCreated(), entity.getLocation(), entity.getSport(),
                 entity.getStorageUsed(), entity.getMaxStorage(), entity.getMinAge(), entity.getMaxAge());
     }
 }
