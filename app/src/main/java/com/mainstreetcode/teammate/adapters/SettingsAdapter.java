@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +24,16 @@ public class SettingsAdapter extends BaseRecyclerViewAdapter<SettingsAdapter.Set
         this.items = items;
     }
 
+    @NonNull
     @Override
-    public SettingsViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public SettingsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         Context context = viewGroup.getContext();
         View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_settings, viewGroup, false);
         return new SettingsViewHolder(itemView, adapterListener);
     }
 
     @Override
-    public void onBindViewHolder(SettingsViewHolder settingsViewHolder, int i) {
+    public void onBindViewHolder(@NonNull SettingsViewHolder settingsViewHolder, int i) {
         settingsViewHolder.bind(items.get(i));
     }
 

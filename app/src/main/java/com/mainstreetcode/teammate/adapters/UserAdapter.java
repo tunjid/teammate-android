@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +29,9 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
         this.user = user;
     }
 
+    @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_simple_input, viewGroup, false);
 
@@ -42,7 +44,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
     }
 
     @Override
-    public void onBindViewHolder(BaseItemViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
         viewHolder.bind(user.get(i));
     }
 

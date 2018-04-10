@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -38,8 +39,9 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
         setHasStableIds(true);
     }
 
+    @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
                 ? new ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
@@ -51,7 +53,7 @@ public class MediaAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, MediaA
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
         Identifiable item = mediaList.get(position);
         if (item instanceof Media) ((MediaViewHolder) viewHolder).bind((Media) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);

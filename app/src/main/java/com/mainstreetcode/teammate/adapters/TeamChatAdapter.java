@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.adapters;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +35,9 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
         this.signedInUser = signedInUser;
     }
 
+    @NonNull
     @Override
-    public TeamChatViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public TeamChatViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         @LayoutRes int layoutRes = R.layout.viewholder_chat;
         View itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false);
@@ -44,7 +46,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     }
 
     @Override
-    public void onBindViewHolder(TeamChatViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull TeamChatViewHolder viewHolder, int i) {
         int size = items.size();
 
         Chat chat = forceCast(items.get(i));
@@ -59,7 +61,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
     }
 
     @Override
-    public void onViewRecycled(TeamChatViewHolder holder) {
+    public void onViewRecycled(@NonNull TeamChatViewHolder holder) {
         super.onViewRecycled(holder);
     }
 
