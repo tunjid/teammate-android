@@ -74,7 +74,7 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, user.getImageUrl(), imageUrl -> {}, this);
+        return Item.text(Item.IMAGE, R.string.profile_picture, user.getImageUrl(), imageUrl -> {}, this);
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.model.Config;
@@ -79,6 +80,8 @@ public class TeamEntity implements Parcelable {
 
     public String getName() {return this.name;}
 
+    public String getSportAndName() {return sport.appendEmoji(name);}
+
     public String getCity() {return this.city;}
 
     public Date getCreated() {
@@ -149,12 +152,14 @@ public class TeamEntity implements Parcelable {
 
     @SuppressWarnings("WeakerAccess")
     public void setMinAge(String minAge) {
+        if (TextUtils.isEmpty(minAge)) return;
         try { this.minAge = Integer.valueOf(minAge); }
         catch (Exception e) { Logger.log("Team", "Number Format Exception", e);}
     }
 
     @SuppressWarnings("WeakerAccess")
     public void setMaxAge(String maxAge) {
+        if (TextUtils.isEmpty(maxAge)) return;
         try { this.minAge = Integer.valueOf(maxAge); }
         catch (Exception e) { Logger.log("Team", "Number Format Exception", e);}
     }

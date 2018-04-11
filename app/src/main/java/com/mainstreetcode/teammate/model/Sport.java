@@ -11,6 +11,8 @@ import java.lang.reflect.Type;
 
 public class Sport {
 
+    private static final String THONK = "\uD83E\uDD14";
+
     private String code;
     private String name;
     private String emoji;
@@ -22,11 +24,25 @@ public class Sport {
     }
 
     public static Sport empty() {
-        return new Sport("", "", "\uD83E\uDD14");
+        return new Sport("", "", THONK);
     }
 
-    public String getCode() {
-        return code;
+    public String appendEmoji(String text) { return emoji + "   " + text; }
+
+    public String getName() { return appendEmoji(name); }
+
+    public String getCode() { return code; }
+
+    public void reset() {
+        this.code = "";
+        this.name = "";
+        this.emoji = THONK;
+    }
+
+    public void update(Sport updated) {
+        this.code = updated.code;
+        this.name = updated.name;
+        this.emoji = updated.emoji;
     }
 
     public static class GsonAdapter implements JsonDeserializer<Sport> {

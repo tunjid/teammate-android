@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -27,7 +28,8 @@ import io.reactivex.Flowable;
 public class Config implements Model<Config> {
 
     private static final String EMPTY_STRING = "";
-    private static Config currentConfig = new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+
+    public static Config empty() {return new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);}
 
     private String defaultTeamLogo;
     private String defaultEventLogo;
@@ -41,27 +43,35 @@ public class Config implements Model<Config> {
     }
 
     static String getDefaultTeamLogo() {
-        if (currentConfig.isEmpty()) fetchConfig();
-        return currentConfig.defaultTeamLogo;
+        if (getCurrentConfig().isEmpty()) fetchConfig();
+        return getCurrentConfig().defaultTeamLogo;
     }
 
     static String getDefaultEventLogo() {
-        if (currentConfig.isEmpty()) fetchConfig();
-        return currentConfig.defaultEventLogo;
+        if (getCurrentConfig().isEmpty()) fetchConfig();
+        return getCurrentConfig().defaultEventLogo;
     }
 
     static String getDefaultUserAvatar() {
-        if (currentConfig.isEmpty()) fetchConfig();
-        return currentConfig.defaultUserAvatar;
+        if (getCurrentConfig().isEmpty()) fetchConfig();
+        return getCurrentConfig().defaultUserAvatar;
+    }
+
+    public static List<Sport> getSports() {
+        return getCurrentConfig() == null ? new ArrayList<>() : getCurrentConfig().sports;
     }
 
     public static Sport sportFromCode(String code) {
-        if (currentConfig.isEmpty()) fetchConfig();
+        if (getCurrentConfig().isEmpty()) fetchConfig();
         String matcher = code != null ? code : "";
-        return Flowable.fromIterable(currentConfig.sports)
+        return Flowable.fromIterable(getCurrentConfig().sports)
                 .filter(sport -> matcher.equals(sport.getCode()))
                 .first(Sport.empty())
                 .blockingGet();
+    }
+
+    private static Config getCurrentConfig() {
+        return ConfigRepository.getInstance().getCurrent();
     }
 
     @Override
@@ -69,6 +79,7 @@ public class Config implements Model<Config> {
         defaultTeamLogo = EMPTY_STRING;
         defaultEventLogo = EMPTY_STRING;
         defaultUserAvatar = EMPTY_STRING;
+        sports.clear();
     }
 
     @Override
@@ -76,6 +87,7 @@ public class Config implements Model<Config> {
         this.defaultTeamLogo = updated.defaultTeamLogo;
         this.defaultEventLogo = updated.defaultEventLogo;
         this.defaultUserAvatar = updated.defaultUserAvatar;
+        sports.addAll(updated.sports);
     }
 
     @Override
@@ -85,7 +97,7 @@ public class Config implements Model<Config> {
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(defaultTeamLogo);
+        return TextUtils.isEmpty(defaultTeamLogo) || sports.isEmpty();
     }
 
     @Override
@@ -109,7 +121,7 @@ public class Config implements Model<Config> {
     }
 
     private static void fetchConfig() {
-        ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(currentConfig::update, ErrorHandler.EMPTY);
+        ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
     }
 
     public static class GsonAdapter
@@ -130,6 +142,10 @@ public class Config implements Model<Config> {
             serialized.addProperty(EVENT_LOGO_KEY, src.defaultEventLogo);
             serialized.addProperty(USER_AVATAR_KEY, src.defaultUserAvatar);
 
+            JsonArray sportsArray = new JsonArray();
+            for (Sport sport : src.sports) sportsArray.add(context.serialize(sport));
+
+            serialized.add(SPORTS_KEY, sportsArray);
             return serialized;
         }
 

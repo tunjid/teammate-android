@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class Item<T> implements Identifiable {
 
     @Retention(SOURCE)
-    @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER})
+    @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT})
     @interface ItemType {}
 
     public static final int INPUT = 2;
@@ -28,6 +28,7 @@ public class Item<T> implements Identifiable {
     public static final int CITY = 6;
     public static final int ZIP = 8;
     public static final int STATE = 7;
+    public static final int SPORT = 13;
 
     public static final int LOCATION = 9;
 

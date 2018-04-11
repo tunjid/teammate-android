@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.RoleSelectViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
@@ -38,7 +38,7 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
             case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::canChangeRole);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, roles, String::valueOf, String::valueOf, adapterListener::canChangeRole);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

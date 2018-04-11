@@ -63,7 +63,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.192.118.254:8080/" : "https://teammateapp.org/";
+    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.184.53.1:8080/" : "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 

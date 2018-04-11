@@ -41,10 +41,11 @@ public class Team extends TeamEntity
         HeaderedModel<Team>,
         ItemListableBean<Team> {
 
-    private static final int CITY_POSITION = 1;
-    private static final int STATE_POSITION = 2;
-    private static final int ZIP_POSITION = 3;
-    public static final int ROLE_POSITION = 5;
+    private static final int SPORT_POSITION = 1;
+    private static final int CITY_POSITION = 2;
+    private static final int STATE_POSITION = 3;
+    private static final int ZIP_POSITION = 4;
+    public static final int ROLE_POSITION = 9;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
@@ -94,7 +95,7 @@ public class Team extends TeamEntity
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
                 Item.text(Item.INPUT, R.string.team_name, name == null ? "" : name, this::setName, this),
-                Item.text(Item.ZIP, R.string.team_sport, sport == null ? "" : sport.getCode(), this::setSport, this),
+                Item.text(Item.SPORT, R.string.team_sport, sport == null ? "" : sport.getName(), this::setSport, this),
                 Item.text(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
                 Item.text(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
                 Item.text(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
@@ -148,8 +149,9 @@ public class Team extends TeamEntity
         imageUrl = "";
 
         int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue("");
+        for (int i = 0; i < size; i++) if (i != SPORT_POSITION) get(i).setValue("");
 
+        sport.reset();
         roles.clear();
         joinRequests.clear();
     }
@@ -161,9 +163,10 @@ public class Team extends TeamEntity
         this.storageUsed = updatedTeam.storageUsed;
 
         int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
+        for (int i = 0; i < size; i++) if (i != SPORT_POSITION) get(i).setValue(updatedTeam.get(i).getValue());
 
         location = updatedTeam.location;
+        sport.update(updatedTeam.sport);
 
         ModelUtils.preserveAscending(roles, updatedTeam.roles);
         ModelUtils.preserveAscending(joinRequests, updatedTeam.joinRequests);
@@ -294,7 +297,7 @@ public class Team extends TeamEntity
             team.addProperty(MAX_AGE_KEY, src.maxAge);
 
             String sportCode = src.sport != null ? src.sport.getCode() : "";
-            if (TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);
+            if (!TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);
 
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();

@@ -7,9 +7,11 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.ClickInputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.RoleSelectViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.model.Sport;
 import com.mainstreetcode.teammate.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -43,7 +45,9 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
             case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::isJoiningTeam);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, roles, String::valueOf, String::valueOf, adapterListener::isJoiningTeam);
+            case Item.SPORT:
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::isPrivileged, () -> false);
             case Item.CITY:
             case Item.STATE:
                 return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, adapterListener::onAddressClicked);

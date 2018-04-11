@@ -36,6 +36,11 @@ public class ConfigRepository extends ModelRepository<Config> {
         return ourInstance;
     }
 
+    public Config getCurrent() {
+        Config current = dao.getCurrent();
+        return current == null ? Config.empty() : current;
+    }
+
     @Override
     public EntityDao<? super Config> dao() {
         return dao;
@@ -48,10 +53,10 @@ public class ConfigRepository extends ModelRepository<Config> {
 
     @Override
     public Flowable<Config> get(String ignored) {
-        Config device = dao.getCurrent();
-        return device == null
+        Config config = dao.getCurrent();
+        return config == null || config.isEmpty()
                 ? api.getConfig().map(getSaveFunction()).toFlowable()
-                : Flowable.just(device).doFinally(this::refreshConfig);
+                : Flowable.just(config).doFinally(this::refreshConfig);
     }
 
     @Override

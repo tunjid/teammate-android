@@ -80,6 +80,7 @@
     <string name="create_team">Create Team</string>
     <string name="edit_team">Edit Team</string>
     <string name="choose_role">Pick your Role</string>
+    <string name="choose_sport">Pick your Sport</string>
     <string name="choose_role_error">Please select your Role</string>
     <string name="team_error_duplicate_join_request">You\'ve already asked to join this team</string>
     <string name="team_submitted_join_request">Join request submitted</string>

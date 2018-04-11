@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.RoleSelectViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
@@ -39,7 +39,7 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> true);
             case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, () -> true);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, roles, String::valueOf, String::valueOf, () -> true);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
