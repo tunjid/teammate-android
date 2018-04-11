@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.model;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.text.InputType;
 
 import com.mainstreetcode.teammate.util.ObjectId;
 
@@ -34,9 +35,9 @@ public class Item<T> implements Identifiable {
     public static final int TEXT = 11;
     public static final int NUMBER = 12;
 
+    private final int inputType;
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
-    private @StringRes final int headerStringRes;
     private @Nullable final ValueChangeCallBack changeCallBack;
 
     private final T itemizedObject;
@@ -44,19 +45,29 @@ public class Item<T> implements Identifiable {
 
     private String value;
 
-    public Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+    private Item(int inputType, int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
                 T itemizedObject) {
-        this(itemType, stringRes, 0, value, changeCallBack, itemizedObject);
-    }
-
-    public Item(int itemType, int stringRes, int headerStringRes,
-                String value, @Nullable ValueChangeCallBack changeCallBack, T itemizedObject) {
+        this.inputType = inputType;
         this.itemType = itemType;
         this.stringRes = stringRes;
-        this.headerStringRes = headerStringRes;
         this.value = value;
         this.changeCallBack = changeCallBack;
         this.itemizedObject = itemizedObject;
+    }
+
+    public static <T> Item<T> number(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+                                     T itemizedObject) {
+        return new Item<>(InputType.TYPE_CLASS_NUMBER, itemType, stringRes, value, changeCallBack, itemizedObject);
+    }
+
+    public static <T> Item<T> text(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+                                     T itemizedObject) {
+        return new Item<>(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, value, changeCallBack, itemizedObject);
+    }
+
+    public static <T> Item<T> email(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+                                     T itemizedObject) {
+        return new Item<>(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, value, changeCallBack, itemizedObject);
     }
 
     public void setValue(String value) {
@@ -64,13 +75,11 @@ public class Item<T> implements Identifiable {
         if (changeCallBack != null) changeCallBack.onValueChanged(value);
     }
 
+    public int getInputType() { return inputType; }
+
     public int getItemType() {return this.itemType;}
 
     public int getStringRes() {return this.stringRes;}
-
-    public int getHeaderStringRes() {
-        return headerStringRes;
-    }
 
     public String getValue() {return this.value;}
 

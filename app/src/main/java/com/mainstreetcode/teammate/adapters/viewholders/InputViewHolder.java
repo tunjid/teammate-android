@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Supplier;
 
 /**
@@ -54,23 +52,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         inputLayout.setEnabled(isEnabled());
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
         editText.setText(item.getValue());
+        editText.setInputType(item.getInputType());
 
-        int position = getAdapterPosition();
-        Class itemizedClass = item.getItemizedObject().getClass();
-
-        editText.setInputType(item.getItemType() == Item.NUMBER
-                ? InputType.TYPE_CLASS_NUMBER
-                : itemizedClass.equals(User.class) && position == User.EMAIL_POSITION
-                ? InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-                : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-
-        if (item.getHeaderStringRes() != 0 && headerText != null) {
-            headerText.setText(item.getHeaderStringRes());
-            headerText.setVisibility(View.VISIBLE);
-        }
-        else if (headerText != null) {
-            headerText.setVisibility(View.GONE);
-        }
+        if (headerText != null) headerText.setVisibility(View.GONE);
 
         checkForErrors();
         setClickableState();

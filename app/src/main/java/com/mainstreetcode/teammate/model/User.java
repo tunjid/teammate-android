@@ -27,11 +27,9 @@ public class User extends UserEntity implements
         HeaderedModel<User>,
         ItemListableBean<User> {
 
-    public static final int EMAIL_POSITION = 2;
     public static final String PHOTO_UPLOAD_KEY = "user-photo";
 
     @Ignore private transient String password;
-
     @Ignore private final List<Item<User>> items;
 
     public User(String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
@@ -53,10 +51,10 @@ public class User extends UserEntity implements
     @SuppressWarnings("unchecked")
     public List<Item<User>> buildItems() {
         return Arrays.asList(
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, firstName == null ? "" : firstName, this::setFirstName, this),
-                new Item(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, this),
-                new Item(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, this),
-                new Item(Item.INPUT, R.string.user_about, about == null ? "" : about, this::setAbout, this)
+                Item.text(Item.INPUT, R.string.first_name, firstName == null ? "" : firstName, this::setFirstName, this),
+                Item.text(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, this),
+                Item.email(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, this),
+                Item.text(Item.INPUT, R.string.user_about, about == null ? "" : about, this::setAbout, this)
         );
     }
 
@@ -72,7 +70,7 @@ public class User extends UserEntity implements
 
     @Override
     public Item<User> getHeaderItem() {
-        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, this::setImageUrl, this);
+        return Item.text(Item.IMAGE, R.string.profile_picture, imageUrl, this::setImageUrl, this);
     }
 
     @Override

@@ -56,10 +56,9 @@ public class Role extends RoleEntity
     public List<Item<Role>> buildItems() {
         User user = getUser();
         return Arrays.asList(
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
-                new Item(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
-                //new Item(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, this),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, name, this::setName, this)
+                Item.text(Item.INPUT, R.string.first_name, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
+                Item.text(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
+                Item.text(Item.ROLE, R.string.team_role, name, this::setName, this)
         );
     }
 
