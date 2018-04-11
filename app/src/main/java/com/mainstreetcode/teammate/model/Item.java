@@ -6,6 +6,7 @@ import android.support.annotation.StringRes;
 import android.text.InputType;
 
 import com.mainstreetcode.teammate.util.ObjectId;
+import com.mainstreetcode.teammate.util.Supplier;
 
 import java.lang.annotation.Retention;
 
@@ -35,6 +36,9 @@ public class Item<T> implements Identifiable {
     public static final int INFO = 10;
     public static final int TEXT = 11;
     public static final int NUMBER = 12;
+    public static final int DESCRIPTION = 14;
+
+    public static final Supplier<Boolean> OPTIONAL_FIELD = () -> false;
 
     private final int inputType;
     private @ItemType final int itemType;

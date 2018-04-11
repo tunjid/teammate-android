@@ -99,7 +99,7 @@ public class Team extends TeamEntity
                 Item.text(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
                 Item.text(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
                 Item.text(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
-                Item.text(Item.INPUT, R.string.team_description, description == null ? "" : description, this::setDescription, this),
+                Item.text(Item.DESCRIPTION, R.string.team_description, description == null ? "" : description, this::setDescription, this),
                 Item.number(Item.NUMBER, R.string.team_min_age, String.valueOf(minAge), this::setMinAge, this),
                 Item.number(Item.NUMBER, R.string.team_max_age, String.valueOf(maxAge), this::setMaxAge, this),
                 Item.text(Item.INFO, R.string.team_storage_used, storageUsed + "/" + maxStorage + " MB", null, this),
