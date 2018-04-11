@@ -8,6 +8,7 @@ import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 public class Sport {
 
@@ -43,6 +44,19 @@ public class Sport {
         this.code = updated.code;
         this.name = updated.name;
         this.emoji = updated.emoji;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Sport)) return false;
+        Sport sport = (Sport) o;
+        return Objects.equals(code, sport.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
     }
 
     public static class GsonAdapter implements JsonDeserializer<Sport> {

@@ -81,7 +81,9 @@ public class Role extends RoleEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Role)) return id.equals(other.getId());
         Role casted = (Role) other;
-        return name.equals(casted.name) && user.areContentsTheSame(casted.getUser());
+        return name.equals(casted.name)
+                && user.areContentsTheSame(casted.getUser())
+                && team.areContentsTheSame(casted.team);
     }
 
     @Override

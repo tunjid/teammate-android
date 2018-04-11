@@ -126,8 +126,10 @@ public class Team extends TeamEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Team)) return id.equals(other.getId());
         Team casted = (Team) other;
-        return name.equals(casted.name) && city.equals(casted.getCity())
+        boolean same = name.equals(casted.name) && city.equals(casted.getCity())
                 && imageUrl.equals(casted.getImageUrl());
+
+        return same && (sport == null || sport.equals(casted.sport));
     }
 
     @Override
@@ -163,7 +165,8 @@ public class Team extends TeamEntity
         this.storageUsed = updatedTeam.storageUsed;
 
         int size = size();
-        for (int i = 0; i < size; i++) if (i != SPORT_POSITION) get(i).setValue(updatedTeam.get(i).getValue());
+        for (int i = 0; i < size; i++)
+            if (i != SPORT_POSITION) get(i).setValue(updatedTeam.get(i).getValue());
 
         location = updatedTeam.location;
         sport.update(updatedTeam.sport);
