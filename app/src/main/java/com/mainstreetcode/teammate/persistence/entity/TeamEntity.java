@@ -160,7 +160,7 @@ public class TeamEntity implements Parcelable {
     @SuppressWarnings("WeakerAccess")
     public void setMaxAge(String maxAge) {
         if (TextUtils.isEmpty(maxAge)) return;
-        try { this.minAge = Integer.valueOf(maxAge); }
+        try { this.maxAge = Integer.valueOf(maxAge); }
         catch (Exception e) { Logger.log("Team", "Number Format Exception", e);}
     }
 
