@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,7 +65,7 @@ public class JoinRequestFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new JoinRequestAdapter(joinRequest, roleViewModel.getRoleNames(), this))
+                .withAdapter(new JoinRequestAdapter(joinRequest, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
@@ -79,7 +78,6 @@ public class JoinRequestFragment extends HeaderedFragment
     @Override
     public void onResume() {
         super.onResume();
-        roleViewModel.fetchRoleValues();
     }
 
     @Override
@@ -114,9 +112,7 @@ public class JoinRequestFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String roleName = joinRequest.getRoleName();
-
-                if (TextUtils.isEmpty(roleName)) {
+                if (joinRequest.getPosition().isInvalid()) {
                     showSnackbar(getString(R.string.select_role));
                     return;
                 }

@@ -8,11 +8,11 @@ import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.enums.Position;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-
-import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -23,12 +23,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, RoleEditAdapter.RoleEditAdapterListener> {
 
     private final Role role;
-    private final List<String> roles;
 
-    public RoleEditAdapter(Role role, List<String> roles, RoleEditAdapter.RoleEditAdapterListener listener) {
+    public RoleEditAdapter(Role role, RoleEditAdapter.RoleEditAdapterListener listener) {
         super(listener);
         this.role = role;
-        this.roles = roles;
     }
 
     @NonNull
@@ -38,7 +36,7 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
             case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, roles, String::valueOf, String::valueOf, adapterListener::canChangeRole);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canChangeRole);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

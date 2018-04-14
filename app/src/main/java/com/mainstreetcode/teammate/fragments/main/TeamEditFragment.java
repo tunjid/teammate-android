@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +15,12 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
@@ -87,7 +88,7 @@ public class TeamEditFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
+                .withAdapter(new TeamEditAdapter(team, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
@@ -101,8 +102,6 @@ public class TeamEditFragment extends HeaderedFragment
     public void onResume() {
         super.onResume();
         User user = userViewModel.getCurrentUser();
-
-        roleViewModel.fetchRoleValues();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
 
 //        if (!team.isEmpty() && state != JOINING) {
@@ -170,11 +169,11 @@ public class TeamEditFragment extends HeaderedFragment
 
             toggleProgress(true);
             Place place = PlacePicker.getPlace(context, data);
-            locationViewModel.fromPlace(place).subscribe(address -> {
+            disposables.add(locationViewModel.fromPlace(place).subscribe(address -> {
                 team.setAddress(address);
                 scrollManager.notifyDataSetChanged();
                 toggleProgress(false);
-            }, defaultErrorHandler);
+            }, defaultErrorHandler));
         }
     }
 
@@ -182,9 +181,9 @@ public class TeamEditFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                String role = team.get(Team.ROLE_POSITION).getValue();
+                Position position = Config.positionFromCode(team.get(Team.ROLE_POSITION).getValue());
 
-                if (isJoiningTeam() && TextUtils.isEmpty(role)) {
+                if (isJoiningTeam() && position.isInvalid()) {
                     showSnackbar(getString(R.string.choose_role_error));
                     return;
                 }
@@ -200,7 +199,7 @@ public class TeamEditFragment extends HeaderedFragment
                         }, defaultErrorHandler);
                         break;
                     case JOINING:
-                        JoinRequest joinRequest = JoinRequest.join(role, team, userViewModel.getCurrentUser());
+                        JoinRequest joinRequest = JoinRequest.join(position, team, userViewModel.getCurrentUser());
                         disposable = roleViewModel.joinTeam(joinRequest).subscribe(request -> {
                             showSnackbar(getString(R.string.team_submitted_join_request));
                             toggleProgress(false);

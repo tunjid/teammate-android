@@ -24,7 +24,7 @@ public class RoleViewHolder extends ModelCardViewHolder<Role, TeamDetailAdapter.
         User user = model.getUser();
 
         title.setText(user.getFirstName());
-        subtitle.setText(model.getName());
+        subtitle.setText(model.getPosition().getName());
 
         setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background));
         setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail));

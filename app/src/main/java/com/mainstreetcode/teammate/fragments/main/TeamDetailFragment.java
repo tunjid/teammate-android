@@ -100,7 +100,6 @@ public class TeamDetailFragment extends MainActivityFragment
         updateCurrentRole();
 
         disposables.add(teamMemberViewModel.getMore(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
-        roleViewModel.fetchRoleValues();
     }
 
     @Override

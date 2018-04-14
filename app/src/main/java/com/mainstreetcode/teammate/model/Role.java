@@ -14,6 +14,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -37,8 +38,8 @@ public class Role extends RoleEntity
     @Ignore private final List<Item<Role>> items;
 
     @SuppressWarnings("unused")
-    public Role(String id, String name, String imageUrl, Team team, User user) {
-        super(id, name, imageUrl, team, user);
+    public Role(String id, String imageUrl, Position position, Team team, User user) {
+        super(id, imageUrl, position, team, user);
         items = buildItems();
     }
 
@@ -48,7 +49,7 @@ public class Role extends RoleEntity
     }
 
     public static Role empty() {
-        return new Role("", "", Config.getDefaultUserAvatar(), Team.empty(), User.empty());
+        return new Role("", Config.getDefaultUserAvatar(), Position.empty(), Team.empty(), User.empty());
     }
 
     @Override
@@ -58,7 +59,7 @@ public class Role extends RoleEntity
         return Arrays.asList(
                 Item.text(Item.INPUT, R.string.first_name, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
                 Item.text(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
-                Item.text(Item.ROLE, R.string.team_role, name, this::setName, this)
+                Item.text(Item.ROLE, R.string.team_role, position == null ? "" : position.getName(), this::setPosition, this)
         );
     }
 
@@ -81,7 +82,7 @@ public class Role extends RoleEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Role)) return id.equals(other.getId());
         Role casted = (Role) other;
-        return name.equals(casted.name)
+        return position.equals(casted.position)
                 && user.areContentsTheSame(casted.getUser())
                 && team.areContentsTheSame(casted.team);
     }
@@ -98,7 +99,7 @@ public class Role extends RoleEntity
 
     @Override
     public void reset() {
-        name = "";
+        position.reset();
         imageUrl = "";
         team.reset();
         user.reset();
@@ -107,19 +108,19 @@ public class Role extends RoleEntity
     @Override
     public void update(Role updated) {
         this.id = updated.getId();
-        this.name = updated.name;
         this.imageUrl = updated.imageUrl;
 
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue(updated.get(i).getValue());
 
+        this.position.update(updated.position);
         this.team.update(updated.team);
         this.user.update(updated.user);
     }
 
     @Override
     public int compareTo(@NonNull Role o) {
-        int roleComparison = name.compareTo(o.name);
+        int roleComparison = position.getCode().compareTo(o.position.getCode());
         int userComparison = user.compareTo(o.user);
         int teamComparison = team.compareTo(o.team);
 
@@ -133,7 +134,8 @@ public class Role extends RoleEntity
     }
 
     public boolean isPrivilegedRole() {
-        return !TextUtils.isEmpty(name) && !isEmpty() && PRIVILEGED_ROLES.contains(name);
+        String positionCode = position != null ? position.getCode() : "";
+        return !TextUtils.isEmpty(positionCode) && !isEmpty() && PRIVILEGED_ROLES.contains(positionCode);
     }
 
     @Override
@@ -175,9 +177,10 @@ public class Role extends RoleEntity
             JsonObject serialized = new JsonObject();
 
             serialized.addProperty(ID_KEY, src.getId());
-            serialized.addProperty(NAME_KEY, src.getName());
-
             serialized.add(USER_KEY, context.serialize(src.user));
+
+            String positionCode = src.position != null ? src.position.getCode() : "";
+            if (!TextUtils.isEmpty(positionCode)) serialized.addProperty(NAME_KEY, positionCode);
 
             return serialized;
         }
@@ -188,14 +191,16 @@ public class Role extends RoleEntity
             JsonObject roleJson = json.getAsJsonObject();
 
             String id = ModelUtils.asString(ID_KEY, roleJson);
-            String name = ModelUtils.asString(NAME_KEY, roleJson);
             String imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson);
+            String positionName = ModelUtils.asString(NAME_KEY, roleJson);
+
+            Position position = Config.positionFromCode(positionName);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(roleJson.get(USER_KEY), User.class);
 
             if (user == null) user = User.empty();
 
-            return new Role(id, name, imageUrl, team, user);
+            return new Role(id, imageUrl, position, team, user);
         }
     }
 }

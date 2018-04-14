@@ -25,8 +25,8 @@ public class JoinRequestViewHolder extends ModelCardViewHolder<JoinRequest, Team
 
         title.setText(item.getFirstName());
         subtitle.setText(model.isTeamApproved() && !model.isUserApproved()
-                ? context.getString(R.string.user_invited, model.getRoleName())
-                : context.getString(R.string.user_requests_join, model.getRoleName()));
+                ? context.getString(R.string.user_invited, model.getPosition().getName())
+                : context.getString(R.string.user_requests_join, model.getPosition().getName()));
     }
 
     @Override

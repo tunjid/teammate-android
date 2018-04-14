@@ -115,6 +115,7 @@ public class Event extends EventEntity
         int size = size();
         for (int i = 0; i < size; i++) get(i).setValue("");
 
+        visibility.reset();
         guests.clear();
         team.reset();
     }
@@ -130,6 +131,7 @@ public class Event extends EventEntity
         location = updatedEvent.location;
         ModelUtils.preserveAscending(guests, updatedEvent.guests);
 
+        visibility.update(updatedEvent.visibility);
         team.update(updatedEvent.team);
     }
 

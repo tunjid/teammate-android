@@ -9,8 +9,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Position;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -28,17 +30,17 @@ public class JoinRequestEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "join_request_id") protected String id;
-    @ColumnInfo(name = "join_request_role_name") protected String roleName;
+    @ColumnInfo(name = "join_request_role_name") protected Position position;
 
     @ColumnInfo(name = "join_request_team") protected Team team;
     @ColumnInfo(name = "join_request_user") protected User user;
 
     protected JoinRequestEntity(boolean teamApproved, boolean userApproved,
-                                @NonNull String id, String roleName, Team team, User user) {
+                                @NonNull String id, Position position, Team team, User user) {
         this.teamApproved = teamApproved;
         this.userApproved = userApproved;
         this.id = id;
-        this.roleName = roleName;
+        this.position = position;
         this.team = team;
         this.user = user;
     }
@@ -47,7 +49,7 @@ public class JoinRequestEntity implements Parcelable {
         teamApproved = in.readByte() != 0x00;
         userApproved = in.readByte() != 0x00;
         id = in.readString();
-        roleName = in.readString();
+        position = Config.positionFromCode(in.readString());
         team = (Team) in.readValue(Team.class.getClassLoader());
         user = (User) in.readValue(User.class.getClassLoader());
     }
@@ -57,8 +59,8 @@ public class JoinRequestEntity implements Parcelable {
         return id;
     }
 
-    public String getRoleName() {
-        return roleName;
+    public Position getPosition() {
+        return position;
     }
 
     public Team getTeam() {
@@ -77,8 +79,8 @@ public class JoinRequestEntity implements Parcelable {
         return userApproved;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public void setPosition(String position) {
+        this.position = Config.positionFromCode(position);
     }
 
     @Override
@@ -106,7 +108,7 @@ public class JoinRequestEntity implements Parcelable {
         dest.writeByte((byte) (teamApproved ? 0x01 : 0x00));
         dest.writeByte((byte) (userApproved ? 0x01 : 0x00));
         dest.writeString(id);
-        dest.writeString(roleName);
+        dest.writeString(position.getCode());
         dest.writeValue(team);
         dest.writeValue(user);
     }

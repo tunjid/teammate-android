@@ -4,6 +4,7 @@ import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -13,6 +14,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -32,16 +34,16 @@ public class JoinRequest extends JoinRequestEntity
 
     @Ignore private final List<Item<JoinRequest>> items;
 
-    public static JoinRequest join(String roleName, Team team, User user) {
-        return new JoinRequest(false, true, "", roleName, team, user);
+    public static JoinRequest join(Position position, Team team, User user) {
+        return new JoinRequest(false, true, "", position, team, user);
     }
 
     public static JoinRequest invite(Team team) {
-        return new JoinRequest(true, false, "", "", team, User.empty());
+        return new JoinRequest(true, false, "", Position.empty(), team, User.empty());
     }
 
-    public JoinRequest(boolean teamApproved, boolean userApproved, String id, String roleName, Team team, User user) {
-        super(teamApproved, userApproved, id, roleName, team, user);
+    public JoinRequest(boolean teamApproved, boolean userApproved, String id, Position position, Team team, User user) {
+        super(teamApproved, userApproved, id, position, team, user);
         items = buildItems();
     }
 
@@ -58,7 +60,7 @@ public class JoinRequest extends JoinRequestEntity
                 Item.text(Item.INPUT, R.string.first_name, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
                 Item.text(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
                 Item.email(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, this),
-                Item.text(Item.ROLE, R.string.team_role, roleName, this::setRoleName, this)
+                Item.text(Item.ROLE, R.string.team_role, position != null ? position.getName() : "", this::setPosition, this)
         );
     }
 
@@ -81,7 +83,7 @@ public class JoinRequest extends JoinRequestEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof JoinRequest)) return id.equals(other.getId());
         JoinRequest casted = (JoinRequest) other;
-        return roleName.equals(casted.roleName) && user.areContentsTheSame(casted.getUser());
+        return position.equals(casted.position) && user.areContentsTheSame(casted.getUser());
     }
 
     @Override
@@ -103,7 +105,7 @@ public class JoinRequest extends JoinRequestEntity
     public void reset() {
         userApproved = false;
         teamApproved = false;
-        roleName = "";
+        position.reset();
         user.reset();
         team.reset();
     }
@@ -113,15 +115,15 @@ public class JoinRequest extends JoinRequestEntity
         this.teamApproved = updated.teamApproved;
         this.userApproved = updated.userApproved;
         this.id = updated.id;
-        this.roleName = updated.roleName;
 
+        position.update(updated.position);
         team.update(updated.team);
         user.update(updated.user);
     }
 
     @Override
     public int compareTo(@NonNull JoinRequest o) {
-        int roleComparison = roleName.compareTo(o.roleName);
+        int roleComparison = position.getCode().compareTo(o.position.getCode());
         int userComparison = user.compareTo(o.user);
 
         return roleComparison != 0
@@ -172,7 +174,6 @@ public class JoinRequest extends JoinRequestEntity
         public JsonElement serialize(JoinRequest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
 
-            result.addProperty(NAME_KEY, src.roleName);
             result.addProperty(TEAM_KEY, src.team.getId());
             result.addProperty(TEAM_APPROVAL_KEY, src.teamApproved);
             result.addProperty(USER_APPROVAL_KEY, src.userApproved);
@@ -188,6 +189,9 @@ public class JoinRequest extends JoinRequestEntity
                 result.addProperty(USER_KEY, src.getUser().getId());
             }
 
+            String positionCode = src.position != null ? src.position.getCode() : "";
+            if (!TextUtils.isEmpty(positionCode)) result.addProperty(NAME_KEY, positionCode);
+
             return result;
         }
 
@@ -200,14 +204,16 @@ public class JoinRequest extends JoinRequestEntity
             boolean userApproved = ModelUtils.asBoolean(USER_APPROVAL_KEY, requestJson);
 
             String id = ModelUtils.asString(ID_KEY, requestJson);
-            String roleName = ModelUtils.asString(NAME_KEY, requestJson);
+            String positionName = ModelUtils.asString(NAME_KEY, requestJson);
+            Position position = Config.positionFromCode(positionName);
+
             Team team = context.deserialize(requestJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(requestJson.get(USER_KEY), User.class);
 
             if (team == null) team = Team.empty();
             if (user == null) user = User.empty();
 
-            return new JoinRequest(teamApproved, userApproved, id, roleName, team, user);
+            return new JoinRequest(teamApproved, userApproved, id, position, team, user);
         }
     }
 }

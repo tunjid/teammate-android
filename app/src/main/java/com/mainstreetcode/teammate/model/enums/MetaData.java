@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.model.enums;
 
+import android.text.TextUtils;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -18,6 +20,10 @@ public class MetaData {
     MetaData(String code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public boolean isInvalid() {
+        return TextUtils.isEmpty(code);
     }
 
     public String getName() { return name; }

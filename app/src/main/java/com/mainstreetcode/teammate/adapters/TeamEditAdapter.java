@@ -11,11 +11,10 @@ import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.enums.Position;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-
-import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.OPTIONAL_FIELD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
@@ -26,14 +25,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
-
     private final Team team;
-    private final List<String> roles;
 
-    public TeamEditAdapter(Team team, List<String> roles, TeamEditAdapter.TeamEditAdapterListener listener) {
+    public TeamEditAdapter(Team team, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
         this.team = team;
-        this.roles = roles;
     }
 
     @NonNull
@@ -48,7 +44,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.DESCRIPTION:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, OPTIONAL_FIELD);
             case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, roles, String::valueOf, String::valueOf, adapterListener::isJoiningTeam);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::isJoiningTeam);
             case Item.SPORT:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::isPrivileged, OPTIONAL_FIELD);
             case Item.CITY:
