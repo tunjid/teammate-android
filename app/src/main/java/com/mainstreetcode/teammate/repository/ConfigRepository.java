@@ -77,8 +77,7 @@ public class ConfigRepository extends ModelRepository<Config> {
 
     @SuppressLint("CheckResult")
     private void refreshConfig() {
-        if (++numRefreshes < REFRESH_THRESHOLD && numRefreshes != 0) return;
-        numRefreshes = 0;
+        if (numRefreshes++ % REFRESH_THRESHOLD != 0) return;
         api.getConfig().map(getSaveFunction()).map(Collections::singletonList).subscribe(dao::upsert, ErrorHandler.EMPTY);
     }
 }
