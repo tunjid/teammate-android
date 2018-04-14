@@ -57,10 +57,10 @@ public class JoinRequest extends JoinRequestEntity
     public List<Item<JoinRequest>> buildItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.first_name, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
-                Item.text(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
-                Item.email(Item.INPUT, R.string.email, user.getPrimaryEmail() == null ? "" : user.getPrimaryEmail(), user::setPrimaryEmail, this),
-                Item.text(Item.ROLE, R.string.team_role, position != null ? position.getName() : "", this::setPosition, this)
+                Item.text(Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.email(Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
+                Item.text(Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
         );
     }
 
@@ -76,7 +76,7 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.profile_picture, user.getImageUrl(), imageUrl -> {}, this);
+        return Item.text(Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override

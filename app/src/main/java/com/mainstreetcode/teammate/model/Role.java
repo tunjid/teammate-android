@@ -57,9 +57,9 @@ public class Role extends RoleEntity
     public List<Item<Role>> buildItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.first_name, user.getFirstName() == null ? "" : user.getFirstName(), user::setFirstName, this),
-                Item.text(Item.INPUT, R.string.last_name, user.getLastName() == null ? "" : user.getLastName(), user::setLastName, this),
-                Item.text(Item.ROLE, R.string.team_role, position == null ? "" : position.getName(), this::setPosition, this)
+                Item.text(Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.text(Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
         );
     }
 
@@ -75,7 +75,7 @@ public class Role extends RoleEntity
 
     @Override
     public Item<Role> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.profile_picture, imageUrl, this::setImageUrl, this);
+        return Item.text(Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override

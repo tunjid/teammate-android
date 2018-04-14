@@ -65,12 +65,12 @@ public class Event extends EventEntity
     @SuppressWarnings("unchecked")
     public List<Item<Event>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
-                Item.text(Item.VISIBILITY, R.string.event_visibility, visibility == null ? "" : visibility.getName(), this::setVisibility, this),
-                Item.text(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this),
-                Item.text(Item.TEXT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
-                Item.text(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
-                Item.text(Item.DATE, R.string.end_date, prettyPrinter.format(endDate), this::setEndDate, this)
+                Item.text(Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
+                Item.text(Item.VISIBILITY, R.string.event_visibility, visibility::getName, this::setVisibility, this),
+                Item.text(Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
+                Item.text(Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
+                Item.text(Item.DATE, R.string.start_date, () -> prettyPrinter.format(startDate), this::setStartDate, this),
+                Item.text(Item.DATE, R.string.end_date, () -> prettyPrinter.format(endDate), this::setEndDate, this)
         );
     }
 
@@ -86,7 +86,7 @@ public class Event extends EventEntity
 
     @Override
     public Item<Event> getHeaderItem() {
-        return  Item.text(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this);
+        return  Item.text(Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override

@@ -95,16 +95,16 @@ public class Team extends TeamEntity
     @SuppressWarnings("unchecked")
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.team_name, name == null ? "" : name, this::setName, this),
-                Item.text(Item.SPORT, R.string.team_sport, sport == null ? "" : sport.getName(), this::setSport, this),
-                Item.text(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
-                Item.text(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
-                Item.text(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
-                Item.text(Item.DESCRIPTION, R.string.team_description, description == null ? "" : description, this::setDescription, this),
-                Item.number(Item.NUMBER, R.string.team_min_age, String.valueOf(minAge), this::setMinAge, this),
-                Item.number(Item.NUMBER, R.string.team_max_age, String.valueOf(maxAge), this::setMaxAge, this),
-                Item.text(Item.INFO, R.string.team_storage_used, storageUsed + "/" + maxStorage + " MB", null, this),
-                Item.text(Item.ROLE, R.string.team_role, "", null, this)
+                Item.text(Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
+                Item.text(Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this),
+                Item.text(Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
+                Item.text(Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
+                Item.text(Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
+                Item.text(Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
+                Item.number(Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
+                Item.number(Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
+                Item.text(Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this),
+                Item.text(Item.ROLE, R.string.team_role, Item.nullToEmpty(""), null, this)
         );
     }
 
@@ -120,7 +120,7 @@ public class Team extends TeamEntity
 
     @Override
     public Item<Team> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this);
+        return Item.text(Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override

@@ -51,10 +51,10 @@ public class User extends UserEntity implements
     @SuppressWarnings("unchecked")
     public List<Item<User>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.first_name, firstName == null ? "" : firstName, this::setFirstName, this),
-                Item.text(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, this),
-                Item.email(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, this),
-                Item.text(Item.INPUT, R.string.user_about, about == null ? "" : about, this::setAbout, this)
+                Item.text(Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
+                Item.text(Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
+                Item.email(Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.text(Item.INPUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 
@@ -70,7 +70,7 @@ public class User extends UserEntity implements
 
     @Override
     public Item<User> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.profile_picture, imageUrl, this::setImageUrl, this);
+        return Item.text(Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override

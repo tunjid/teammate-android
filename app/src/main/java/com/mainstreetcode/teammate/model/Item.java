@@ -52,7 +52,7 @@ public class Item<T> implements Identifiable {
     private String value;
 
     private Item(int inputType, int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-                T itemizedObject) {
+                 T itemizedObject) {
         this.inputType = inputType;
         this.itemType = itemType;
         this.stringRes = stringRes;
@@ -61,19 +61,24 @@ public class Item<T> implements Identifiable {
         this.itemizedObject = itemizedObject;
     }
 
-    public static <T> Item<T> number(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
+    public static <T> Item<T> number(int itemType, int stringRes, Supplier<String> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                      T itemizedObject) {
-        return new Item<>(InputType.TYPE_CLASS_NUMBER, itemType, stringRes, value, changeCallBack, itemizedObject);
+        return new Item<>(InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static <T> Item<T> text(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-                                     T itemizedObject) {
-        return new Item<>(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, value, changeCallBack, itemizedObject);
+    public static <T> Item<T> text(int itemType, int stringRes, Supplier<String> supplier, @Nullable ValueChangeCallBack changeCallBack,
+                                   T itemizedObject) {
+        return new Item<>(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static <T> Item<T> email(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-                                     T itemizedObject) {
-        return new Item<>(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, value, changeCallBack, itemizedObject);
+    public static <T> Item<T> email(int itemType, int stringRes, Supplier<String> supplier, @Nullable ValueChangeCallBack changeCallBack,
+                                    T itemizedObject) {
+        return new Item<>(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+    }
+
+    public static Supplier<String> nullToEmpty(@Nullable String source) {
+        String finalSource = source == null ? "" : source;
+        return () -> finalSource;
     }
 
     public void setValue(String value) {
