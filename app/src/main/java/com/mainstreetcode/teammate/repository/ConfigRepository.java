@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
+import android.annotation.SuppressLint;
+
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.ConfigDao;
@@ -73,8 +75,9 @@ public class ConfigRepository extends ModelRepository<Config> {
         };
     }
 
+    @SuppressLint("CheckResult")
     private void refreshConfig() {
-        if (++numRefreshes < REFRESH_THRESHOLD) return;
+        if (++numRefreshes < REFRESH_THRESHOLD && numRefreshes != 0) return;
         numRefreshes = 0;
         api.getConfig().map(getSaveFunction()).map(Collections::singletonList).subscribe(dao::upsert, ErrorHandler.EMPTY);
     }

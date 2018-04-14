@@ -18,6 +18,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;

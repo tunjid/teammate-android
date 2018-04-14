@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.model;
 
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -14,6 +15,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.model.enums.MetaData;
+import com.mainstreetcode.teammate.model.enums.Position;
+import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.repository.ConfigRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -35,6 +40,8 @@ public class Config implements Model<Config> {
     private String defaultEventLogo;
     private String defaultUserAvatar;
     private List<Sport> sports = new ArrayList<>();
+    private List<Position> positions = new ArrayList<>();
+    private List<Visibility> visibilities = new ArrayList<>();
 
     Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
         this.defaultTeamLogo = defaultTeamLogo;
@@ -58,20 +65,45 @@ public class Config implements Model<Config> {
     }
 
     public static List<Sport> getSports() {
-        return getCurrentConfig() == null ? new ArrayList<>() : getCurrentConfig().sports;
+        return getList(config -> config.sports);
+    }
+
+    public static List<Position> getPositions() {
+        return getList(config -> config.positions);
+    }
+
+    public static List<Visibility> getVisibilities() {
+        return getList(config -> config.visibilities);
     }
 
     public static Sport sportFromCode(String code) {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        String matcher = code != null ? code : "";
-        return Flowable.fromIterable(getCurrentConfig().sports)
-                .filter(sport -> matcher.equals(sport.getCode()))
-                .first(Sport.empty())
-                .blockingGet();
+        return getFromCode(code, config -> config.sports, Sport.empty());
+    }
+
+    public static Position positionFromCode(String code) {
+        return getFromCode(code, config -> config.positions, Position.empty());
+    }
+
+    public static Visibility visibilityFromCode(String code) {
+        return getFromCode(code, config -> config.visibilities, Visibility.empty());
     }
 
     private static Config getCurrentConfig() {
         return ConfigRepository.getInstance().getCurrent();
+    }
+
+    private static <T> List<T> getList(Function<Config, List<T>> function) {
+        Config config = getCurrentConfig();
+        return config == null ? new ArrayList<>() : function.apply(config);
+    }
+
+    private static <T extends MetaData> T getFromCode(String code, Function<Config, List<T>> function, T defaultItem) {
+        Config config = getCurrentConfig();
+        String matcher = code != null ? code : "";
+        return Flowable.fromIterable(function.apply(config))
+                .filter(metaData -> matcher.equals(metaData.getCode()))
+                .first(defaultItem)
+                .blockingGet();
     }
 
     @Override
@@ -80,6 +112,8 @@ public class Config implements Model<Config> {
         defaultEventLogo = EMPTY_STRING;
         defaultUserAvatar = EMPTY_STRING;
         sports.clear();
+        positions.clear();
+        visibilities.clear();
     }
 
     @Override
@@ -88,6 +122,8 @@ public class Config implements Model<Config> {
         this.defaultEventLogo = updated.defaultEventLogo;
         this.defaultUserAvatar = updated.defaultUserAvatar;
         sports.addAll(updated.sports);
+        positions.addAll(updated.positions);
+        visibilities.addAll(updated.visibilities);
     }
 
     @Override
@@ -97,7 +133,7 @@ public class Config implements Model<Config> {
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(defaultTeamLogo) || sports.isEmpty();
+        return TextUtils.isEmpty(defaultTeamLogo) || sports.isEmpty() |positions.isEmpty()||visibilities.isEmpty();
     }
 
     @Override
@@ -120,6 +156,7 @@ public class Config implements Model<Config> {
 
     }
 
+    @SuppressLint("CheckResult")
     private static void fetchConfig() {
         ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
     }
@@ -133,6 +170,8 @@ public class Config implements Model<Config> {
         private static final String EVENT_LOGO_KEY = "defaultEventLogo";
         private static final String USER_AVATAR_KEY = "defaultUserAvatar";
         private static final String SPORTS_KEY = "sports";
+        private static final String POSITIONS_KEY = "roles";
+        private static final String VISIBILITIES_KEY = "visibility";
 
         @Override
         public JsonElement serialize(Config src, Type typeOfSrc, JsonSerializationContext context) {
@@ -143,9 +182,17 @@ public class Config implements Model<Config> {
             serialized.addProperty(USER_AVATAR_KEY, src.defaultUserAvatar);
 
             JsonArray sportsArray = new JsonArray();
-            for (Sport sport : src.sports) sportsArray.add(context.serialize(sport));
+            JsonArray positionArray = new JsonArray();
+            JsonArray visibilityArray = new JsonArray();
+
+            for (Sport item : src.sports) sportsArray.add(context.serialize(item));
+            for (Position item : src.positions) positionArray.add(context.serialize(item));
+            for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
 
             serialized.add(SPORTS_KEY, sportsArray);
+            serialized.add(POSITIONS_KEY, positionArray);
+            serialized.add(VISIBILITIES_KEY, visibilityArray);
+
             return serialized;
         }
 
@@ -160,6 +207,8 @@ public class Config implements Model<Config> {
             Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar);
 
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
+            ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
+            ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
 
             return config;
         }

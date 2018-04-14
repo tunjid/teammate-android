@@ -4,6 +4,7 @@ import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
@@ -16,6 +17,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -43,13 +45,12 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", "", "", Config.getDefaultEventLogo(), "private", "", date, date, Team.empty(), null);
+        return new Event("", "", "", Config.getDefaultEventLogo(), "", date, date, Team.empty(), null, Visibility.empty());
     }
 
-    public Event(String id, String name, String notes, String imageUrl,
-                 String visibility, String locationName,
-                 Date startDate, Date endDate, Team team, LatLng location) {
-        super(id, name, notes, imageUrl, visibility, locationName, startDate, endDate, team, location);
+    public Event(String id, String name, String notes, String imageUrl,String locationName,
+                 Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
+        super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location, visibility);
         this.team = team;
         items = buildItems();
     }
@@ -65,7 +66,7 @@ public class Event extends EventEntity
     public List<Item<Event>> buildItems() {
         return Arrays.asList(
                 Item.text(Item.INPUT, R.string.event_name, name == null ? "" : name, this::setName, this),
-                Item.text(Item.LOCATION, R.string.event_visibility, visibility == null ? "" : visibility, this::setVisibility, this),
+                Item.text(Item.VISIBILITY, R.string.event_visibility, visibility == null ? "" : visibility.getName(), this::setVisibility, this),
                 Item.text(Item.LOCATION, R.string.location, locationName == null ? "" : locationName, this::setLocationName, this),
                 Item.text(Item.TEXT, R.string.notes, notes == null ? "" : notes, this::setNotes, this),
                 Item.text(Item.DATE, R.string.start_date, prettyPrinter.format(startDate), this::setStartDate, this),
@@ -202,11 +203,13 @@ public class Event extends EventEntity
 
             serialized.addProperty(NAME_KEY, src.name);
             serialized.addProperty(NOTES_KEY, src.notes);
-            serialized.addProperty(VISIBILITY_KEY, src.visibility);
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName);
             serialized.addProperty(TEAM_KEY, src.team.getId());
             serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
             serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
+
+            String visibilityCode = src.visibility != null ? src.visibility.getCode() : "";
+            if (!TextUtils.isEmpty(visibilityCode)) serialized.addProperty(VISIBILITY_KEY, visibilityCode);
 
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();
@@ -221,7 +224,7 @@ public class Event extends EventEntity
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Event(json.getAsString(), "", "", "", "private", "", new Date(), new Date(), Team.empty(), null);
+                return new Event(json.getAsString(), "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.empty());
             }
 
             JsonObject eventJson = json.getAsJsonObject();
@@ -230,16 +233,17 @@ public class Event extends EventEntity
             String name = ModelUtils.asString(NAME_KEY, eventJson);
             String notes = ModelUtils.asString(NOTES_KEY, eventJson);
             String imageUrl = ModelUtils.asString(IMAGE_KEY, eventJson);
-            String visibility = ModelUtils.asString(VISIBILITY_KEY, eventJson);
+            String visibilityCode = ModelUtils.asString(VISIBILITY_KEY, eventJson);
             String locationName = ModelUtils.asString(LOCATION_NAME_KEY, eventJson);
             String startDate = ModelUtils.asString(START_DATE_KEY, eventJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, eventJson);
             Team team = context.deserialize(eventJson.get(TEAM_KEY), Team.class);
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, eventJson);
+            Visibility visibility = Config.visibilityFromCode(visibilityCode);
 
             if (team == null) team = Team.empty();
 
-            Event result = new Event(id, name, notes, imageUrl, visibility, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location);
+            Event result = new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
 
             ModelUtils.deserializeList(context, eventJson.get("guests"), result.guests, Guest.class);
 

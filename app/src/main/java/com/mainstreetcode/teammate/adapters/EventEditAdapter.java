@@ -8,12 +8,15 @@ import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.DateViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.GuestViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -50,6 +53,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.LOCATION:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, () -> false);
+            case Item.VISIBILITY:
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.event_visibility_selection, Config.getVisibilities(), Visibility::getName, Visibility::getCode, adapterListener::canEditEvent);
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_event_guest, viewGroup), adapterListener);
             case TEAM:

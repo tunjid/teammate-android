@@ -11,7 +11,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.Sport;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 

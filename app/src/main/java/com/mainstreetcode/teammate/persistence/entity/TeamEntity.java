@@ -10,7 +10,7 @@ import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Sport;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.Logger;
 
 import java.util.Date;

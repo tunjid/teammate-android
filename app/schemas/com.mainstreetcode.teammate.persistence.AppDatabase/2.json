@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "d13852a660a0a10af5d9c8509f0f9457",
+    "identityHash": "5dbc8c967a17fab8797b16fc4af9d809",
     "entities": [
       {
         "tableName": "users",
@@ -154,7 +154,7 @@
       },
       {
         "tableName": "events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `event_name` TEXT, `event_notes` TEXT, `event_image_url` TEXT, `event_visibility` TEXT, `event_location_name` TEXT, `event_team` TEXT, `event_start_date` INTEGER, `event_end_date` INTEGER, `event_location` TEXT, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `event_name` TEXT, `event_notes` TEXT, `event_image_url` TEXT, `event_location_name` TEXT, `event_team` TEXT, `event_start_date` INTEGER, `event_end_date` INTEGER, `event_location` TEXT, `event_visibility` TEXT, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -177,12 +177,6 @@
           {
             "fieldPath": "imageUrl",
             "columnName": "event_image_url",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "visibility",
-            "columnName": "event_visibility",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -213,6 +207,12 @@
           {
             "fieldPath": "location",
             "columnName": "event_location",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "visibility",
+            "columnName": "event_visibility",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -528,7 +528,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d13852a660a0a10af5d9c8509f0f9457\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"5dbc8c967a17fab8797b16fc4af9d809\")"
     ]
   }
 }

@@ -21,9 +21,11 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.model.Sport;
+import com.mainstreetcode.teammate.model.enums.Position;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.Logger;
 
@@ -63,7 +65,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.184.53.1:8080/" : "https://teammateapp.org/";
+    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.192.107.59:8080/" : "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 
@@ -114,6 +116,8 @@ public class TeammateService {
                 .registerTypeAdapter(Device.class, new Device.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
+                .registerTypeAdapter(Position.class, new Position.GsonAdapter())
+                .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();
