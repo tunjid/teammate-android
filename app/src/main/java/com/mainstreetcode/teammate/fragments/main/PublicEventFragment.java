@@ -161,7 +161,8 @@ public class PublicEventFragment extends MainActivityFragment {
     }
 
     private void onCameraMoveStarted(int reason) {
-        changeVisibility(true, searchTitle, scrollManager.getRecyclerView());
+        if (scrollManager.getRecyclerView().getVisibility() == View.VISIBLE)
+            changeVisibility(true, searchTitle, scrollManager.getRecyclerView());
 
         switch (reason) {
             case GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION:
@@ -192,17 +193,17 @@ public class PublicEventFragment extends MainActivityFragment {
         }
     }
 
-    private void changeVisibility(boolean visible, TextView clicked, View... changing) {
+    private void changeVisibility(boolean inVisible, TextView clicked, View... changing) {
         TransitionManager.beginDelayedTransition((ViewGroup) scrollManager.getRecyclerView().getParent(), new AutoTransition());
 
-        setIcons(visible, clicked);
+        setIcons(inVisible, clicked);
 
         AnimatedVectorDrawableCompat animatedDrawable = (AnimatedVectorDrawableCompat)
                 TextViewCompat.getCompoundDrawablesRelative(clicked)[2];
 
         animatedDrawable.start();
 
-        int visibility = visible ? View.GONE : View.VISIBLE;
+        int visibility = inVisible ? View.GONE : View.VISIBLE;
         for (View view : changing) view.setVisibility(visibility);
     }
 
