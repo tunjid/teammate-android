@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.model;
 
+import android.support.annotation.Nullable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -54,9 +56,10 @@ public class PublicEventRequest implements ItemListableBean<PublicEventRequest> 
 
     public void setLocation(LatLng location) { this.location = location; }
 
-    private CharSequence getDistance() {
-        return App.getInstance().getString(R.string.event_public_distance, distance);
-    }
+    @Nullable
+    public LatLng getLocation() { return location; }
+
+    private CharSequence getDistance() { return App.getInstance().getString(R.string.event_public_distance, distance); }
 
     private CharSequence getSport() { return sport.getName(); }
 

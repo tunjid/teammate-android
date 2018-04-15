@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
@@ -64,13 +65,13 @@ public class PublicEventFragment extends MainActivityFragment {
                 .build();
 
         searchTitle = root.findViewById(R.id.search_title);
-        searchTitle.setOnClickListener(clicked -> changeVisibility(searchTitle, scrollManager.getRecyclerView()));
+        searchTitle.setOnClickListener(clicked -> changeVisibility());
 
         mapView = root.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this::onMapReady);
 
-        setIcons(false, searchTitle);
+        setTitleIcon(false);
         return root;
     }
 
@@ -139,8 +140,18 @@ public class PublicEventFragment extends MainActivityFragment {
     }
 
     private void requestLocation() {
-        disposables.add(locationViewModel.getLastLocation(this)
-                .subscribe(latLng -> mapView.getMapAsync(map -> map.animateCamera(newLatLngZoom(latLng, MAP_ZOOM))), defaultErrorHandler));
+        LatLng lastLocation = eventViewModel.getEventRequest().getLocation();
+
+        if (lastLocation != null) onLocationFound(lastLocation, false);
+        else disposables.add(locationViewModel.getLastLocation(this)
+                .subscribe(location -> onLocationFound(location, true), defaultErrorHandler));
+    }
+
+    private void onLocationFound(LatLng location, boolean animate) {
+        mapView.getMapAsync(map -> {
+            if (animate) map.animateCamera(newLatLngZoom(location, MAP_ZOOM));
+            else map.moveCamera(newLatLngZoom(location, MAP_ZOOM));
+        });
     }
 
     private void onMapReady(GoogleMap map) {
@@ -162,7 +173,7 @@ public class PublicEventFragment extends MainActivityFragment {
 
     private void onCameraMoveStarted(int reason) {
         if (scrollManager.getRecyclerView().getVisibility() == View.VISIBLE)
-            changeVisibility(true, searchTitle, scrollManager.getRecyclerView());
+            changeVisibility(true);
 
         switch (reason) {
             case GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION:
@@ -182,33 +193,32 @@ public class PublicEventFragment extends MainActivityFragment {
     }
 
     @SuppressLint("ResourceAsColor")
-    private void setIcons(boolean isDown, TextView... textViews) {
+    private void setTitleIcon(boolean isDown) {
         int resVal = isDown ? R.drawable.anim_vect_down_to_right_arrow : R.drawable.anim_vect_right_to_down_arrow;
 
-        for (TextView textView : textViews) {
-            Drawable icon = AnimatedVectorDrawableCompat.create(textView.getContext(), resVal);
-            if (icon != null) {
-                TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(textView, null, null, icon, null);
-            }
-        }
+        Drawable icon = AnimatedVectorDrawableCompat.create(searchTitle.getContext(), resVal);
+        if (icon == null) return;
+
+        TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(searchTitle, null, null, icon, null);
     }
 
-    private void changeVisibility(boolean inVisible, TextView clicked, View... changing) {
+    private void changeVisibility(boolean inVisible) {
         TransitionManager.beginDelayedTransition((ViewGroup) scrollManager.getRecyclerView().getParent(), new AutoTransition());
 
-        setIcons(inVisible, clicked);
+        setTitleIcon(inVisible);
 
         AnimatedVectorDrawableCompat animatedDrawable = (AnimatedVectorDrawableCompat)
-                TextViewCompat.getCompoundDrawablesRelative(clicked)[2];
+                TextViewCompat.getCompoundDrawablesRelative(searchTitle)[2];
 
         animatedDrawable.start();
 
         int visibility = inVisible ? View.GONE : View.VISIBLE;
-        for (View view : changing) view.setVisibility(visibility);
+        scrollManager.getRecyclerView().setVisibility(visibility);
     }
 
-    private void changeVisibility(TextView clicked, View... changing) {
-        boolean visible = changing[0].getVisibility() == View.VISIBLE;
-        changeVisibility(visible, clicked, changing);
+    private void changeVisibility() {
+        View view = scrollManager.getRecyclerView();
+        boolean visible = view.getVisibility() == View.VISIBLE;
+        changeVisibility(visible);
     }
 }

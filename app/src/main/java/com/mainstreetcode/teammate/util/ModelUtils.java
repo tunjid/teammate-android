@@ -142,4 +142,9 @@ public class ModelUtils {
         catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
         return 0;
     }
+
+    @FunctionalInterface
+    public interface Consumer<T> {
+        void accept(T t);
+    }
 }
