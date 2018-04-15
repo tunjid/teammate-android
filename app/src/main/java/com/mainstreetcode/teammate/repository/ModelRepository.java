@@ -102,11 +102,12 @@ public abstract class ModelRepository<T extends Model<T>> {
     }
 
     @Nullable
-    MultipartBody.Part getBody(String path, String photoKey) {
-        File file = new File(path);
+    MultipartBody.Part getBody(CharSequence path, String photoKey) {
+        String pathString = path.toString();
+        File file = new File(pathString);
 
         if (!file.exists()) return null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        String extension = MimeTypeMap.getFileExtensionFromUrl(pathString);
 
         if (extension == null) return null;
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);

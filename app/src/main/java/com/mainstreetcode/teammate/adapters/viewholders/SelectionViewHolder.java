@@ -31,7 +31,6 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
         this.items = items;
         this.textTransformer = textTransformer;
         this.stringTransformer = stringTransformer;
-        editText.removeTextChangedListener(this);
     }
 
     public SelectionViewHolder(View itemView,
@@ -45,7 +44,6 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
         this.items = items;
         this.textTransformer = textTransformer;
         this.stringTransformer = stringTransformer;
-        editText.removeTextChangedListener(this);
     }
 
     @Override

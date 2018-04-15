@@ -83,7 +83,7 @@ dependencies {
     implementation 'com.android.support:palette-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta6'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
     implementation "android.arch.lifecycle:runtime:1.1.1"
     implementation "android.arch.lifecycle:extensions:1.1.1"
@@ -91,6 +91,9 @@ dependencies {
     implementation "android.arch.persistence.room:rxjava2:1.0.0"
 
     implementation ('com.google.android.gms:play-services-places:12.0.1') {
+        exclude group: 'com.android.support', module: 'support-media-compat'
+    }
+    implementation ('com.google.android.gms:play-services-location:12.0.1') {
         exclude group: 'com.android.support', module: 'support-media-compat'
     }
 

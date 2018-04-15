@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.annotation.SuppressLint;
 import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,7 +8,9 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -19,6 +22,8 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
+import com.mainstreetcode.teammate.util.TextBitmapUtil;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -26,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import io.reactivex.Flowable;
 
 /**
  * Event events
@@ -38,7 +45,6 @@ public class Event extends EventEntity
         ItemListableBean<Event> {
 
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
-    private static final int LOCATION_POSITION = 1;
 
     @Ignore private List<Guest> guests = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
@@ -48,7 +54,7 @@ public class Event extends EventEntity
         return new Event("", "", "", Config.getDefaultEventLogo(), "", date, date, Team.empty(), null, Visibility.empty());
     }
 
-    public Event(String id, String name, String notes, String imageUrl,String locationName,
+    public Event(String id, String name, String notes, String imageUrl, String locationName,
                  Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
         super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location, visibility);
         this.team = team;
@@ -86,7 +92,7 @@ public class Event extends EventEntity
 
     @Override
     public Item<Event> getHeaderItem() {
-        return  Item.text(Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -151,9 +157,21 @@ public class Event extends EventEntity
         this.team.update(team);
     }
 
+    @SuppressLint("CheckResult")
     public void setPlace(Place place) {
-        items.get(LOCATION_POSITION).setValue(place.getName().toString());
+        Flowable.fromIterable(items)
+                .filter(eventItem -> eventItem.getItemType() == Item.LOCATION)
+                .firstElement()
+                .subscribe(eventItem -> eventItem.setValue(place.getName().toString()), ErrorHandler.EMPTY);
         location = place.getLatLng();
+    }
+
+    public MarkerOptions getMarkerOptions() {
+        return new MarkerOptions().alpha(1)
+                .icon(BitmapDescriptorFactory.fromBitmap(TextBitmapUtil.getBitmapMarker(team.getSport().getEmoji())))
+                .position(location)
+                .title(name)
+                .snippet(locationName);
     }
 
     public List<Guest> getGuests() {
@@ -211,7 +229,8 @@ public class Event extends EventEntity
             serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
 
             String visibilityCode = src.visibility != null ? src.visibility.getCode() : "";
-            if (!TextUtils.isEmpty(visibilityCode)) serialized.addProperty(VISIBILITY_KEY, visibilityCode);
+            if (!TextUtils.isEmpty(visibilityCode))
+                serialized.addProperty(VISIBILITY_KEY, visibilityCode);
 
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();

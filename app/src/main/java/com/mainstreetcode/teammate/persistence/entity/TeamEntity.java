@@ -80,7 +80,7 @@ public class TeamEntity implements Parcelable {
 
     public String getName() {return this.name;}
 
-    public String getSportAndName() {return sport.appendEmoji(name);}
+    public CharSequence getSportAndName() {return sport.appendEmoji(name);}
 
     public String getCity() {return this.city;}
 

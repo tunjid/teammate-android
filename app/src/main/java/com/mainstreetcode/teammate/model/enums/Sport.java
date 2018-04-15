@@ -18,9 +18,13 @@ public class Sport extends MetaData {
         return new Sport("", "", THONK);
     }
 
-    public String appendEmoji(String text) { return emoji + "   " + text; }
+    public CharSequence appendEmoji(String text) { return getEmoji() + "   " + text; }
 
-    public String getName() { return appendEmoji(name); }
+    public CharSequence getName() { return appendEmoji(name); }
+
+    public CharSequence getEmoji() {
+        return emoji;
+    }
 
     public void reset() {
         super.reset();

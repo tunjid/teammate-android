@@ -2,14 +2,19 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.support.v7.util.DiffUtil;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.model.PublicEventRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +22,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
+import static android.location.Location.distanceBetween;
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
+import static io.reactivex.Single.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
@@ -27,6 +34,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private final EventRepository repository;
+    private final List<Event> publicEvents = new ArrayList<>();
 
     public EventViewModel() {repository = EventRepository.getInstance();}
 
@@ -64,6 +72,15 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
                 .observeOn(mainThread());
     }
 
+
+    public Flowable<List<Event>> getPublicEvents(GoogleMap map) {
+        Single<List<Event>> fetched = TeammateService.getApiInstance()
+                .getPublicEvents(fromMap(map))
+                .map(this::collatePublicEvents);
+
+        return concat(Single.just(publicEvents), fetched).observeOn(mainThread());
+    }
+
     public void onEventTeamChanged(Event event, Team newTeam) {
         getModelList(event.getTeam()).remove(event);
         event.setTeam(newTeam);
@@ -85,5 +102,26 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
         Event event = findLast(getModelList(team), Event.class);
         return event == null ? null : event.getStartDate();
+    }
+
+    private PublicEventRequest fromMap(GoogleMap map) {
+        float[] distance = new float[1];
+        LatLng location = map.getCameraPosition().target;
+
+        VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
+        LatLngBounds bounds = visibleRegion.latLngBounds;
+        LatLng southwest = bounds.southwest;
+        LatLng northeast = bounds.northeast;
+
+        distanceBetween(southwest.latitude, southwest.longitude, northeast.latitude, northeast.longitude, distance);
+
+        int miles = (int) (distance[0] * 0.000621371);
+
+        return PublicEventRequest.builder().setLocation(location).setDistance(miles).build();
+    }
+
+    private List<Event> collatePublicEvents(List<Event> newEvents) {
+        ModelUtils.preserveAscending(publicEvents, newEvents);
+        return publicEvents;
     }
 }

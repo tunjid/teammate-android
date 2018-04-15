@@ -41,7 +41,7 @@ public class DateViewHolder extends ClickInputViewHolder
     @Override
     public void bind(Item item) {
         super.bind(item);
-        String time = item.getValue();
+        String time = item.getValue().toString();
         editText.setText(time);
         calendar.setTime(ModelUtils.parseDate(time, Event.prettyPrinter));
     }

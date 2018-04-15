@@ -26,7 +26,7 @@ public class MetaData {
         return TextUtils.isEmpty(code);
     }
 
-    public String getName() { return name; }
+    public CharSequence getName() { return name; }
 
     public String getCode() { return code; }
 

@@ -9,6 +9,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.PublicEventRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -104,9 +105,6 @@ public interface TeammateApi {
     // Role endpoints
     // =============================================================================================
 
-    @GET("api/roles/values")
-    Single<List<String>> getRoleValues();
-
     @GET("api/me/roles")
     Single<List<Role>> getMyRoles();
 
@@ -148,6 +146,9 @@ public interface TeammateApi {
 
     @GET("/api/teams/{teamId}/events")
     Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+
+    @POST("/api/events/public")
+    Single<List<Event>> getPublicEvents(@Body PublicEventRequest request);
 
     @POST("api/events")
     Single<Event> createEvent(@Body Event event);

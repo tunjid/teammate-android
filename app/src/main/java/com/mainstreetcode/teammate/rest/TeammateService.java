@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.PublicEventRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -65,7 +66,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.192.107.59:8080/" : "https://teammateapp.org/";
+    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.188.218.103:8080/" : "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 
@@ -119,6 +120,7 @@ public class TeammateService {
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
+                .registerTypeAdapter(PublicEventRequest.class, new PublicEventRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();
                     body.addProperty("access_token", src.getAccessToken().getToken());
