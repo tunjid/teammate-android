@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.Marker;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
 import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION;
 
 public class PublicEventFragment extends MainActivityFragment {
@@ -33,6 +37,7 @@ public class PublicEventFragment extends MainActivityFragment {
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
+        fragment.setEnterExitTransitions();
         return fragment;
     }
 
@@ -40,6 +45,8 @@ public class PublicEventFragment extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_public_event, container, false);
+        getLayoutParams(root.findViewById(R.id.status_bar_dimmer)).height = MainActivity.topInset;
+
         mapView = root.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this::onMapReady);
@@ -93,7 +100,16 @@ public class PublicEventFragment extends MainActivityFragment {
     public boolean showsToolBar() { return false; }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public boolean showsBottomNav() { return false; }
+
+    @Override
+    public boolean[] insetState() {return NONE;}
+
+    @Nullable
+    @Override
+    public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
+        return super.provideFragmentTransaction(fragmentTo);
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
@@ -117,9 +133,13 @@ public class PublicEventFragment extends MainActivityFragment {
 
     @SuppressLint("MissingPermission")
     private void onMapReady(GoogleMap map) {
+        int padding = getResources().getDimensionPixelSize(R.dimen.single_and_half_margin);
+
+        map.setPadding(0, padding, 0, padding);
         map.setOnCameraIdleListener(() -> onMapIdle(map));
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted);
         map.setOnInfoWindowClickListener(this::onMarkerInfoWindowClicked);
+
         if (locationViewModel.hasPermission(this)) map.setMyLocationEnabled(true);
     }
 
