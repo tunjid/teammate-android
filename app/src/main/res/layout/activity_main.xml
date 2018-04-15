@@ -18,7 +18,7 @@
         android:id="@+id/coordinator"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding_wrapper"
+        app:layout_constraintBottom_toTopOf="@+id/keyboard_padding"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/top_inset">
@@ -44,11 +44,10 @@
             app:layout_behavior="android.support.design.widget.BottomSheetBehavior" />
     </android.support.design.widget.CoordinatorLayout>
 
-    <include
-        android:id="@+id/keyboard_padding_wrapper"
-        layout="@layout/keyboard_padding"
+    <View
+        android:id="@+id/keyboard_padding"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintLeft_toRightOf="parent" />

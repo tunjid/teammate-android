@@ -33,7 +33,7 @@ import com.tunjid.androidbootstrap.core.view.ViewHider;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
-import static android.view.MotionEvent.ACTION_UP;
+import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -80,7 +80,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
-            if (!isInMainFragmentContainer(v)) return;
+            if (isNotInMainFragmentContainer(v)) return;
 
             adjustSystemInsets(f);
             setOnApplyWindowInsetsListener(v, (view, insets) -> consumeFragmentInsets(insets));
@@ -100,7 +100,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
 
-        View keyboardPaddingWrapper = findViewById(R.id.keyboard_padding_wrapper);
         keyboardPadding = findViewById(R.id.keyboard_padding);
         coordinatorLayout = findViewById(R.id.coordinator);
         constraintLayout = findViewById(R.id.content_view);
@@ -117,7 +116,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         }
 
         //noinspection AndroidLintClickableViewAccessibility
-        keyboardPaddingWrapper.setOnTouchListener((view, event) -> {
+        keyboardPadding.setOnTouchListener((view, event) -> {
             if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
             return true;
         });
@@ -206,9 +205,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         if (showFab) toggleFab(true);
     }
 
-    protected boolean isInMainFragmentContainer(View view) {
+    protected boolean isNotInMainFragmentContainer(View view) {
         View parent = (View) view.getParent();
-        return parent.getId() == R.id.main_fragment_container;
+        return parent.getId() != R.id.main_fragment_container;
     }
 
     protected void initTransition() {
