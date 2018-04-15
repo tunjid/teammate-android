@@ -13,4 +13,29 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/single_margin"
         android:background="@color/black_50" />
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginLeft="@dimen/single_margin"
+        android:layout_marginRight="@dimen/single_margin"
+        android:layout_marginTop="@dimen/quadruple_margin">
+
+        <TextView
+            android:id="@+id/search_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/single_margin"
+            android:padding="@dimen/single_margin"
+            android:text="@string/event_public_search"
+            android:textSize="@dimen/small_text" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/search_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/triple_margin"
+            android:visibility="gone" />
+    </android.support.v7.widget.CardView>
 </FrameLayout>

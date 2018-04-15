@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
@@ -18,6 +17,7 @@ import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.MediaRepository;
 import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -195,7 +195,7 @@ public class MediaTransferIntentService extends IntentService {
         }
 
         private String getMediaTitle(Media media, App app) {
-            return app.getString(R.string.media_download_title, media.getTeam().getName(), Event.prettyPrinter.format(media.getCreated()));
+            return app.getString(R.string.media_download_title, media.getTeam().getName(), ModelUtils.prettyPrinter.format(media.getCreated()));
         }
 
         private boolean isExternalStorageWritable() {

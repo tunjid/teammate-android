@@ -14,9 +14,7 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -26,7 +24,6 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class EventEntity implements Parcelable {
 
-    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
     //private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
     @NonNull @PrimaryKey
@@ -113,7 +110,7 @@ public class EventEntity implements Parcelable {
     public String getTime() {
 //        String time = prettyPrinter.format(startDate) + " - ";
 //        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
-        return prettyPrinter.format(startDate);
+        return ModelUtils.prettyPrinter.format(startDate);
     }
 
 //    private boolean endsSameDay() {
@@ -152,11 +149,11 @@ public class EventEntity implements Parcelable {
 //    }
 
     protected void setStartDate(String startDate) {
-        this.startDate = ModelUtils.parseDate(startDate, prettyPrinter);
+        this.startDate = ModelUtils.parseDate(startDate, ModelUtils.prettyPrinter);
     }
 
     protected void setEndDate(String endDate) {
-        this.endDate = ModelUtils.parseDate(endDate, prettyPrinter);
+        this.endDate = ModelUtils.parseDate(endDate, ModelUtils.prettyPrinter);
     }
 
     @Override

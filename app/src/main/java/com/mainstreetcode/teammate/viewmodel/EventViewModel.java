@@ -35,6 +35,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private final EventRepository repository;
     private final List<Event> publicEvents = new ArrayList<>();
+    private final PublicEventRequest eventRequest = PublicEventRequest.empty();
 
     public EventViewModel() {repository = EventRepository.getInstance();}
 
@@ -72,13 +73,16 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
                 .observeOn(mainThread());
     }
 
-
     public Flowable<List<Event>> getPublicEvents(GoogleMap map) {
         Single<List<Event>> fetched = TeammateService.getApiInstance()
                 .getPublicEvents(fromMap(map))
                 .map(this::collatePublicEvents);
 
         return concat(Single.just(publicEvents), fetched).observeOn(mainThread());
+    }
+
+    public PublicEventRequest getEventRequest() {
+        return eventRequest;
     }
 
     public void onEventTeamChanged(Event event, Team newTeam) {
@@ -117,7 +121,10 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
         int miles = (int) (distance[0] * 0.000621371);
 
-        return PublicEventRequest.builder().setLocation(location).setDistance(miles).build();
+        eventRequest.setDistance(String.valueOf(miles));
+        eventRequest.setLocation(location);
+
+        return eventRequest;
     }
 
     private List<Event> collatePublicEvents(List<Event> newEvents) {

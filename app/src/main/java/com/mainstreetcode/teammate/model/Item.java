@@ -39,7 +39,8 @@ public class Item<T> implements Identifiable {
     public static final int DESCRIPTION = 14;
     public static final int VISIBILITY = 15;
 
-    public static final Supplier<Boolean> OPTIONAL_FIELD = () -> false;
+    public static final Supplier<Boolean> TRUE = () -> true;
+    public static final Supplier<Boolean> FALSE = () -> false;
 
     private final int inputType;
     private @ItemType final int itemType;

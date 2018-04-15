@@ -6,50 +6,80 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class PublicEventRequest {
+import static com.mainstreetcode.teammate.util.ModelUtils.parse;
+import static com.mainstreetcode.teammate.util.ModelUtils.prettyPrinter;
+
+public class PublicEventRequest implements ItemListableBean<PublicEventRequest> {
 
     private int distance;
     private Sport sport;
+    private Date endDate;
     private LatLng location;
 
-    PublicEventRequest(int distance, Sport sport, LatLng location) {
+    private final List<Item<PublicEventRequest>> items;
+
+    private PublicEventRequest(int distance, Sport sport, Date endDate, LatLng location) {
         this.distance = distance;
+        this.endDate = endDate;
         this.location = location;
         this.sport = sport;
+        items = buildItems();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static PublicEventRequest empty() {
+        return new PublicEventRequest(5, Sport.empty(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)), null);
     }
 
-    public static class Builder {
+    public void setDistance(String distance) {
+        this.distance = parse(distance);
+        items.get(0).setValue(getDistance());
+    }
 
-        private int distance;
-        private Sport sport;
-        private LatLng location;
+    public void setSport(String sport) { this.sport = Config.sportFromCode(sport); }
 
-        public Builder setDistance(int distance) {
-            this.distance = distance;
-            return this;
-        }
+    private void setEndDate(String endDate) {
+        this.endDate = ModelUtils.parseDate(endDate, prettyPrinter);
+    }
 
-        public Builder setSport(Sport sport) {
-            this.sport = sport;
-            return this;
-        }
+    public void setLocation(LatLng location) { this.location = location; }
 
-        public Builder setLocation(LatLng location) {
-            this.location = location;
-            return this;
-        }
+    private CharSequence getDistance() {
+        return App.getInstance().getString(R.string.event_public_distance, distance);
+    }
 
-        public PublicEventRequest build() {
-            return new PublicEventRequest(distance, sport, location);
-        }
+    private CharSequence getSport() { return sport.getName(); }
+
+    private CharSequence getEndDate() { return ModelUtils.prettyPrinter.format(endDate); }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Item<PublicEventRequest>> buildItems() {
+        return Arrays.asList(
+                Item.text(Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
+                Item.text(Item.SPORT, R.string.team_sport, this::getSport, this::setSport, this),
+                Item.text(Item.DATE, R.string.start_date, this::getEndDate, this::setEndDate, this)
+        );
+    }
+
+    @Override
+    public int size() {
+        return items.size();
+    }
+
+    @Override
+    public Item get(int position) {
+        return items.get(position);
     }
 
     public static class GsonAdapter implements JsonSerializer<PublicEventRequest> {

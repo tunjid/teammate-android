@@ -8,7 +8,6 @@ import android.widget.DatePicker;
 import android.widget.TimePicker;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Supplier;
@@ -43,7 +42,7 @@ public class DateViewHolder extends ClickInputViewHolder
         super.bind(item);
         String time = item.getValue().toString();
         editText.setText(time);
-        calendar.setTime(ModelUtils.parseDate(time, Event.prettyPrinter));
+        calendar.setTime(ModelUtils.parseDate(time, ModelUtils.prettyPrinter));
     }
 
     @Override
@@ -73,7 +72,7 @@ public class DateViewHolder extends ClickInputViewHolder
         updatedCalendar.set(HOUR_OF_DAY, hourOfDay);
         updatedCalendar.set(MINUTE, minute);
 
-        String updatedDate = Event.prettyPrinter.format(updatedCalendar.getTime());
+        String updatedDate = ModelUtils.prettyPrinter.format(updatedCalendar.getTime());
 
         item.setValue(updatedDate);
         editText.setText(updatedDate);

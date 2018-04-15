@@ -29,6 +29,7 @@ public class ModelUtils {
 
     public static final String EMPTY_STRING = "";
     public static final SimpleDateFormat dateFormatter;
+    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
     static {
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
@@ -133,5 +134,12 @@ public class ModelUtils {
         set.addAll(source);
         source.clear();
         source.addAll(set);
+    }
+
+    public static int parse(String number) {
+        if (TextUtils.isEmpty(number)) return 0;
+        try { return Integer.valueOf(number); }
+        catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
+        return 0;
     }
 }
