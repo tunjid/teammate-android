@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
-import com.mainstreetcode.teammate.model.PublicEventRequest;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -148,7 +148,7 @@ public interface TeammateApi {
     Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     @POST("/api/events/public")
-    Single<List<Event>> getPublicEvents(@Body PublicEventRequest request);
+    Single<List<Event>> getPublicEvents(@Body EventSearchRequest request);
 
     @POST("api/events")
     Single<Event> createEvent(@Body Event event);

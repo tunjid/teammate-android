@@ -22,16 +22,16 @@ import java.util.concurrent.TimeUnit;
 import static com.mainstreetcode.teammate.util.ModelUtils.parse;
 import static com.mainstreetcode.teammate.util.ModelUtils.prettyPrinter;
 
-public class PublicEventRequest implements ItemListableBean<PublicEventRequest> {
+public class EventSearchRequest implements ItemListableBean<EventSearchRequest> {
 
     private int distance;
     private Sport sport;
     private Date endDate;
     private LatLng location;
 
-    private final List<Item<PublicEventRequest>> items;
+    private final List<Item<EventSearchRequest>> items;
 
-    private PublicEventRequest(int distance, Sport sport, Date endDate, LatLng location) {
+    private EventSearchRequest(int distance, Sport sport, Date endDate, LatLng location) {
         this.distance = distance;
         this.endDate = endDate;
         this.location = location;
@@ -39,8 +39,8 @@ public class PublicEventRequest implements ItemListableBean<PublicEventRequest> 
         items = buildItems();
     }
 
-    public static PublicEventRequest empty() {
-        return new PublicEventRequest(5, Sport.empty(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)), null);
+    public static EventSearchRequest empty() {
+        return new EventSearchRequest(5, Sport.empty(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)), null);
     }
 
     public void setDistance(String distance) {
@@ -67,7 +67,7 @@ public class PublicEventRequest implements ItemListableBean<PublicEventRequest> 
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Item<PublicEventRequest>> buildItems() {
+    public List<Item<EventSearchRequest>> buildItems() {
         return Arrays.asList(
                 Item.text(Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
                 Item.text(Item.SPORT, R.string.team_sport, this::getSport, this::setSport, this),
@@ -85,7 +85,7 @@ public class PublicEventRequest implements ItemListableBean<PublicEventRequest> 
         return items.get(position);
     }
 
-    public static class GsonAdapter implements JsonSerializer<PublicEventRequest> {
+    public static class GsonAdapter implements JsonSerializer<EventSearchRequest> {
 
         private static final String DISTANCE_KEY = "maxDistance";
         private static final String SPORT_KEY = "sport";
@@ -93,7 +93,7 @@ public class PublicEventRequest implements ItemListableBean<PublicEventRequest> 
         private static final String LOCATION_KEY = "location";
 
         @Override
-        public JsonElement serialize(PublicEventRequest src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(EventSearchRequest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
             serialized.addProperty(DISTANCE_KEY, src.distance);

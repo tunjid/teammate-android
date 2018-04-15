@@ -11,7 +11,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.PublicEventRequest;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -26,9 +26,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class PublicEventRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
 
-    private final PublicEventRequest request;
+    private final EventSearchRequest request;
 
-    public PublicEventRequestAdapter(PublicEventRequest request) {
+    public PublicEventRequestAdapter(EventSearchRequest request) {
         super(new BaseRecyclerViewAdapter.AdapterListener() {});
         this.request = request;
         setHasStableIds(true);

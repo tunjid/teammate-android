@@ -109,7 +109,7 @@ public final class EventsFragment extends MainActivityFragment
                 TeamPickerFragment.change(getActivity(), R.id.request_event_team_pick);
                 return true;
             case R.id.action_public_events:
-                showFragment(PublicEventFragment.newInstance());
+                showFragment(EventSearchFragment.newInstance());
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.PublicEventRequest;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.rest.TeammateService;
@@ -35,7 +35,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private final EventRepository repository;
     private final List<Event> publicEvents = new ArrayList<>();
-    private final PublicEventRequest eventRequest = PublicEventRequest.empty();
+    private final EventSearchRequest eventRequest = EventSearchRequest.empty();
 
     public EventViewModel() {repository = EventRepository.getInstance();}
 
@@ -81,7 +81,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return concat(Single.just(publicEvents), fetched).observeOn(mainThread());
     }
 
-    public PublicEventRequest getEventRequest() {
+    public EventSearchRequest getEventRequest() {
         return eventRequest;
     }
 
@@ -108,7 +108,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return event == null ? null : event.getStartDate();
     }
 
-    private PublicEventRequest fromMap(GoogleMap map) {
+    private EventSearchRequest fromMap(GoogleMap map) {
         float[] distance = new float[1];
         LatLng location = map.getCameraPosition().target;
 

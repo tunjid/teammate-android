@@ -34,7 +34,7 @@ import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION;
 
-public class PublicEventFragment extends MainActivityFragment {
+public class EventSearchFragment extends MainActivityFragment {
 
     public static final int MAP_ZOOM = 10;
 
@@ -43,8 +43,8 @@ public class PublicEventFragment extends MainActivityFragment {
     private MapView mapView;
     private TextView searchTitle;
 
-    public static PublicEventFragment newInstance() {
-        PublicEventFragment fragment = new PublicEventFragment();
+    public static EventSearchFragment newInstance() {
+        EventSearchFragment fragment = new EventSearchFragment();
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
