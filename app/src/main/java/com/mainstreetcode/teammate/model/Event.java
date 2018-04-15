@@ -168,10 +168,10 @@ public class Event extends EventEntity
 
     public MarkerOptions getMarkerOptions() {
         return new MarkerOptions().alpha(1)
-                .icon(BitmapDescriptorFactory.fromBitmap(TextBitmapUtil.getBitmapMarker(team.getSport().getEmoji())))
-                .position(location)
                 .title(name)
-                .snippet(locationName);
+                .position(location)
+                .snippet(locationName)
+                .icon(BitmapDescriptorFactory.fromBitmap(TextBitmapUtil.getBitmapMarker(team.getSport().getEmoji())));
     }
 
     public List<Guest> getGuests() {

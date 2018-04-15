@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.Marker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
@@ -23,6 +24,8 @@ import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSION
 public class PublicEventFragment extends MainActivityFragment {
 
     public static final int MAP_ZOOM = 10;
+
+    private boolean leaveMap;
     private MapView mapView;
 
     public static PublicEventFragment newInstance() {
@@ -75,6 +78,12 @@ public class PublicEventFragment extends MainActivityFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        mapView.onDestroy();
+        super.onDestroyView();
+    }
+
+    @Override
     public void onLowMemory() {
         mapView.onLowMemory();
         super.onLowMemory();
@@ -109,15 +118,36 @@ public class PublicEventFragment extends MainActivityFragment {
     @SuppressLint("MissingPermission")
     private void onMapReady(GoogleMap map) {
         map.setOnCameraIdleListener(() -> onMapIdle(map));
+        map.setOnCameraMoveStartedListener(this::onCameraMoveStarted);
+        map.setOnInfoWindowClickListener(this::onMarkerInfoWindowClicked);
         if (locationViewModel.hasPermission(this)) map.setMyLocationEnabled(true);
+    }
+
+    private void populateMap(GoogleMap map, List<Event> events) {
+        if (leaveMap) return;
+        map.clear();
+        for (Event event : events) map.addMarker(event.getMarkerOptions()).setTag(event);
     }
 
     private void onMapIdle(GoogleMap map) {
         disposables.add(eventViewModel.getPublicEvents(map).subscribe(events -> populateMap(map, events), defaultErrorHandler));
     }
 
-    private void populateMap(GoogleMap map, List<Event> events) {
-        map.clear();
-        for (Event event : events) map.addMarker(event.getMarkerOptions());
+    private void onCameraMoveStarted(int reason) {
+        switch (reason) {
+            case GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION:
+                leaveMap = true;
+                break;
+            case GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE:
+            case GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION:
+                leaveMap = false;
+                break;
+        }
+    }
+
+    private void onMarkerInfoWindowClicked(Marker marker) {
+        Object tag = marker.getTag();
+        if (tag == null || !(tag instanceof Event)) return;
+        showFragment(EventEditFragment.newInstance((Event) tag));
     }
 }
