@@ -73,8 +73,8 @@ public class LocationViewModel extends ViewModel {
 
     private void explainPermission(Fragment fragment) {
         new AlertDialog.Builder(fragment.getActivity())
-                .setTitle("Need Location")
-                .setMessage("Need it")
+                .setTitle(R.string.event_public_location_prompt)
+                .setMessage(R.string.event_public_location_rationale)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> requestPermission(fragment))
                 .create()
                 .show();

@@ -157,6 +157,10 @@
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
 
+    <!--PublicEventFragment-->
+    <string name="event_public_location_prompt">Location permission required</string>
+    <string name="event_public_location_rationale">Your current location is used only to show events nearest to you.\n\nYou can still move the map manually to view public events without providing your location.</string>
+
     <!--TeamChatFragment-->
     <string name="chat_sending">Sending…</string>
     <string name="chat_failed">Failed</string>
@@ -223,5 +227,4 @@
     <string name="deep_link_filter_name">teammateDeepLink</string>
     <string name="deep_link_scheme">https</string>
     <string name="deep_link_host">teammateapp.org</string>
-
 </resources>
