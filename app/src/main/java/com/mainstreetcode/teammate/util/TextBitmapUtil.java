@@ -7,12 +7,20 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.App;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TextBitmapUtil {
 
+    private static Map<String, Bitmap> cache = new HashMap<>();
+
     public static Bitmap getBitmapMarker(CharSequence text) {
+        String key = text.toString();
+        Bitmap bitmap = cache.get(key);
+        if (bitmap != null) return bitmap;
+
         TextView textView = new TextView(App.getInstance());
 
-        textView.setAlpha(1);
         textView.setText(text);
         textView.measure(unSpecifiedMeasureSpec(), unSpecifiedMeasureSpec());
 
@@ -21,10 +29,11 @@ public class TextBitmapUtil {
 
         textView.layout(0, 0, measuredWidth, measuredHeight);
 
-        Bitmap bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
         textView.draw(canvas);
+        cache.put(key, bitmap);
 
         return bitmap;
     }
