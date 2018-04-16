@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
@@ -112,6 +113,8 @@ public class MainActivity extends TeammatesBaseActivity
             }
         });
         route(savedInstanceState, getIntent());
+
+        App.prime();
     }
 
     @Override

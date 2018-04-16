@@ -11,9 +11,10 @@ import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TeammateException;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
@@ -23,6 +24,8 @@ public class ConfigRepository extends ModelRepository<Config> {
     private static final int REFRESH_THRESHOLD = 10;
 
     private int numRefreshes = 0;
+    private int retryPeriod = 3;
+
     private final TeammateApi api;
     private final ConfigDao dao;
 
@@ -78,6 +81,18 @@ public class ConfigRepository extends ModelRepository<Config> {
     @SuppressLint("CheckResult")
     private void refreshConfig() {
         if (numRefreshes++ % REFRESH_THRESHOLD != 0) return;
-        api.getConfig().map(getSaveFunction()).map(Collections::singletonList).subscribe(dao::upsert, ErrorHandler.EMPTY);
+        api.getConfig().map(getSaveFunction())
+                .onErrorResumeNext(retryConfig()::apply)
+                .subscribe(ignored -> {}, ErrorHandler.EMPTY);
+    }
+
+    private Function<Throwable, Single<Config>> retryConfig() {
+        return throwable -> {
+            numRefreshes = 0;
+            retryPeriod *= retryPeriod;
+            retryPeriod = Math.min(retryPeriod, 60);
+            return Completable.timer(retryPeriod, TimeUnit.SECONDS)
+                    .andThen(api.getConfig().map(getSaveFunction()).onErrorResumeNext(retryConfig()::apply));
+        };
     }
 }
