@@ -54,14 +54,17 @@ public class EventSearchRequest implements ItemListableBean<EventSearchRequest> 
         this.endDate = ModelUtils.parseDate(endDate, prettyPrinter);
     }
 
+
     public void setLocation(LatLng location) { this.location = location; }
 
     @Nullable
     public LatLng getLocation() { return location; }
 
-    private CharSequence getDistance() { return App.getInstance().getString(R.string.event_public_distance, distance); }
+    public Sport getSport() { return sport; }
 
-    private CharSequence getSport() { return sport.getName(); }
+    private CharSequence getSportName() { return sport.getName(); }
+
+    private CharSequence getDistance() { return App.getInstance().getString(R.string.event_public_distance, distance); }
 
     private CharSequence getEndDate() { return ModelUtils.prettyPrinter.format(endDate); }
 
@@ -70,7 +73,8 @@ public class EventSearchRequest implements ItemListableBean<EventSearchRequest> 
     public List<Item<EventSearchRequest>> buildItems() {
         return Arrays.asList(
                 Item.text(Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
-                Item.text(Item.SPORT, R.string.team_sport, this::getSport, this::setSport, this),
+                Item.text(Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
+                        .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
                 Item.text(Item.DATE, R.string.start_date, this::getEndDate, this::setEndDate, this)
         );
     }

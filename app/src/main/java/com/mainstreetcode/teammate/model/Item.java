@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.arch.core.util.Function;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -46,6 +47,7 @@ public class Item<T> implements Identifiable {
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
     private @Nullable final ValueChangeCallBack changeCallBack;
+    private @Nullable Function<CharSequence, CharSequence> textTransformer;
 
     private final T itemizedObject;
     private final String id = new ObjectId().toHexString();
@@ -87,13 +89,18 @@ public class Item<T> implements Identifiable {
         if (changeCallBack != null) changeCallBack.onValueChanged(value.toString());
     }
 
+    public Item textTransformer(Function<CharSequence, CharSequence> textTransformer) {
+        this.textTransformer = textTransformer;
+        return this;
+    }
+
     public int getInputType() { return inputType; }
 
     public int getItemType() {return this.itemType;}
 
     public int getStringRes() {return this.stringRes;}
 
-    public CharSequence getValue() {return this.value;}
+    public CharSequence getValue() {return textTransformer == null ? value : textTransformer.apply(value);}
 
     @Override
     public String getId() {return id;}

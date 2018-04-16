@@ -96,7 +96,8 @@ public class Team extends TeamEntity
     public List<Item<Team>> buildItems() {
         return Arrays.asList(
                 Item.text(Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this),
+                Item.text(Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
+                        .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
                 Item.text(Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
                 Item.text(Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
                 Item.text(Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),

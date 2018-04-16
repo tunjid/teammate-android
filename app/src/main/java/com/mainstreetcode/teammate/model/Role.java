@@ -60,6 +60,7 @@ public class Role extends RoleEntity
                 Item.text(Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
                 Item.text(Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
+                        .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 

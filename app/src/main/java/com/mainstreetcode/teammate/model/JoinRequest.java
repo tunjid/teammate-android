@@ -61,6 +61,7 @@ public class JoinRequest extends JoinRequestEntity
                 Item.text(Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
                 Item.email(Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
                 Item.text(Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
+                        .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 

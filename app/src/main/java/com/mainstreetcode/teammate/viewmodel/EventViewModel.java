@@ -10,6 +10,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -76,9 +77,10 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     public Flowable<List<Event>> getPublicEvents(GoogleMap map) {
         Single<List<Event>> fetched = TeammateService.getApiInstance()
                 .getPublicEvents(fromMap(map))
-                .map(this::collatePublicEvents);
+                .map(this::collatePublicEvents)
+                .map(this::filterPublicEvents);
 
-        return concat(Single.just(publicEvents), fetched).observeOn(mainThread());
+        return concat(Single.just(publicEvents).map(this::filterPublicEvents), fetched).observeOn(mainThread());
     }
 
     public EventSearchRequest getEventRequest() {
@@ -130,5 +132,16 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     private List<Event> collatePublicEvents(List<Event> newEvents) {
         ModelUtils.preserveAscending(publicEvents, newEvents);
         return publicEvents;
+    }
+
+    private List<Event> filterPublicEvents(List<Event> source) {
+        Sport sport = eventRequest.getSport();
+        if (sport.isInvalid()) return source;
+
+        List<Event> filtered = new ArrayList<>();
+
+        return Flowable.fromIterable(publicEvents).filter(event -> event.getTeam().getSport().equals(sport))
+                .collect(() -> filtered, List::add)
+                .blockingGet();
     }
 }
