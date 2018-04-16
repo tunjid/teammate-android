@@ -2,17 +2,16 @@ package com.mainstreetcode.teammate.util;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.support.v4.util.LruCache;
 import android.view.View;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.App;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TextBitmapUtil {
 
-    private static Map<String, Bitmap> cache = new HashMap<>();
+    private static LruCache<String, Bitmap> cache = buildCache();
 
     public static Bitmap getBitmapMarker(CharSequence text) {
         String key = text.toString();
@@ -21,6 +20,7 @@ public class TextBitmapUtil {
 
         TextView textView = new TextView(App.getInstance());
 
+        textView.setTextColor(Color.BLACK);
         textView.setText(text);
         textView.measure(unSpecifiedMeasureSpec(), unSpecifiedMeasureSpec());
 
@@ -40,5 +40,17 @@ public class TextBitmapUtil {
 
     private static int unSpecifiedMeasureSpec() {
         return View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+    }
+
+    private static LruCache<String, Bitmap> buildCache() {
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = Math.min(maxMemory / 2056, 128);
+
+        return new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 }
