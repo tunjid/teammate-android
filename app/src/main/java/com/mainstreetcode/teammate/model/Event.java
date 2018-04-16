@@ -167,7 +167,7 @@ public class Event extends EventEntity
     }
 
     public MarkerOptions getMarkerOptions() {
-        return new MarkerOptions().alpha(1)
+        return new MarkerOptions()
                 .title(name)
                 .position(location)
                 .snippet(locationName)
