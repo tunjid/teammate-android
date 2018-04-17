@@ -30,7 +30,7 @@ public class Role extends RoleEntity
         implements
         Model<Role>,
         HeaderedModel<Role>,
-        ItemListableBean<Role> {
+        ListableModel<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
@@ -52,31 +52,23 @@ public class Role extends RoleEntity
         return new Role("", Config.getDefaultUserAvatar(), Position.empty(), Team.empty(), User.empty());
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<Role>> buildItems() {
+    private List<Item<Role>> buildItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
+                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.text(2, Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<Role>> asItems() { return items; }
 
     @Override
     public Item<Role> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -100,10 +92,11 @@ public class Role extends RoleEntity
 
     @Override
     public void reset() {
-        position.reset();
         imageUrl = "";
+        position.reset();
         team.reset();
         user.reset();
+        restItemList();
     }
 
     @Override
@@ -111,12 +104,10 @@ public class Role extends RoleEntity
         this.id = updated.getId();
         this.imageUrl = updated.imageUrl;
 
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updated.get(i).getValue());
-
         this.position.update(updated.position);
         this.team.update(updated.team);
         this.user.update(updated.user);
+        updateItemList(updated);
     }
 
     @Override

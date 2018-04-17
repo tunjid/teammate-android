@@ -22,15 +22,16 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
-import com.mainstreetcode.teammate.util.TextBitmapUtil;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.util.TextBitmapUtil;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 
@@ -42,12 +43,13 @@ public class Event extends EventEntity
         implements
         Model<Event>,
         HeaderedModel<Event>,
-        ItemListableBean<Event> {
+        ListableModel<Event> {
 
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
 
     @Ignore private List<Guest> guests = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
+    @Ignore private final List<Identifiable> identifiables;
 
     public static Event empty() {
         Date date = new Date();
@@ -59,41 +61,45 @@ public class Event extends EventEntity
         super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location, visibility);
         this.team = team;
         items = buildItems();
+        identifiables = buildIdentifiables();
     }
 
     protected Event(Parcel in) {
         super(in);
         in.readList(guests, Guest.class.getClassLoader());
         items = buildItems();
+        identifiables = buildIdentifiables();
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<Event>> buildItems() {
+    private List<Item<Event>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(Item.VISIBILITY, R.string.event_visibility, visibility::getName, this::setVisibility, this)
+                Item.text(0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
+                Item.text(1, Item.VISIBILITY, R.string.event_visibility, visibility::getName, this::setVisibility, this)
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
-                Item.text(Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-                Item.text(Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
-                Item.text(Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
-                Item.text(Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this)
+                Item.text(2, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
+                Item.text(3, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
+                Item.text(4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
+                Item.text(5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this)
         );
     }
 
-    @Override
-    public int size() {
-        return items.size();
+    private List<Identifiable> buildIdentifiables() {
+        List<Identifiable> result = new ArrayList<>(items);
+        result.add(team);
+        result.addAll(guests);
+        return result;
     }
 
     @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<Event>> asItems() { return items; }
+
+    @Override
+    public List<Identifiable> asIdentifiables() { return identifiables; }
 
     @Override
     public Item<Event> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -118,28 +124,33 @@ public class Event extends EventEntity
     @Override
     public void reset() {
         imageUrl = "";
-
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue("");
-
         visibility.reset();
         guests.clear();
         team.reset();
+        restItemList();
     }
 
     @Override
+    @SuppressLint("CheckResult")
     public void update(Event updatedEvent) {
         this.id = updatedEvent.getId();
         this.imageUrl = updatedEvent.imageUrl;
-
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedEvent.get(i).getValue());
 
         location = updatedEvent.location;
         ModelUtils.preserveAscending(guests, updatedEvent.guests);
 
         visibility.update(updatedEvent.visibility);
         team.update(updatedEvent.team);
+        updateItemList(updatedEvent);
+
+        ModelUtils.preserveAscending(identifiables, filterOutItems(updatedEvent));
+    }
+
+    private List<Identifiable> filterOutItems(Event updatedEvent) {
+        return Flowable.fromIterable(updatedEvent.identifiables)
+                .concatWith(Flowable.fromIterable(updatedEvent.guests))
+                .filter(identifiable -> !(identifiable instanceof Item))
+                .collect((Callable<ArrayList<Identifiable>>) ArrayList::new, List::add).blockingGet();
     }
 
     @Override

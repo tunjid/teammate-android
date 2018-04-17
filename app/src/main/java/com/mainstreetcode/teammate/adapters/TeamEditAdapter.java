@@ -59,17 +59,17 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseTeamViewHolder, int i) {
-        baseTeamViewHolder.bind(team.get(i));
+        baseTeamViewHolder.bind(team.asItems().get(i));
     }
 
     @Override
     public int getItemCount() {
-        return adapterListener.isJoiningTeam() ? team.size() : team.size() - 1;
+        return adapterListener.isJoiningTeam() ? team.asItems().size() : team.asItems().size() - 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return team.get(position).getItemType();
+        return team.asItems().get(position).getItemType();
     }
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {

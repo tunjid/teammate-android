@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.model;
 
 import android.arch.core.util.Function;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.InputType;
@@ -14,9 +15,9 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Item for listing properties of a {@link com.mainstreetcode.teammate.util.ListableBean}
+ * Item for listing properties of a {@link Model}
  */
-public class Item<T> implements Identifiable {
+public class Item<T> implements Identifiable, Comparable<Item> {
 
     @Retention(SOURCE)
     @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY})
@@ -43,6 +44,7 @@ public class Item<T> implements Identifiable {
     public static final Supplier<Boolean> TRUE = () -> true;
     public static final Supplier<Boolean> FALSE = () -> false;
 
+    private final int sortPosition;
     private final int inputType;
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
@@ -54,8 +56,9 @@ public class Item<T> implements Identifiable {
 
     private CharSequence value;
 
-    private Item(int inputType, int itemType, int stringRes, CharSequence value, @Nullable ValueChangeCallBack changeCallBack,
-                 T itemizedObject) {
+    Item(int sortPosition, int inputType, int itemType, int stringRes,
+         CharSequence value, @Nullable ValueChangeCallBack changeCallBack, T itemizedObject) {
+        this.sortPosition = sortPosition;
         this.inputType = inputType;
         this.itemType = itemType;
         this.stringRes = stringRes;
@@ -64,19 +67,20 @@ public class Item<T> implements Identifiable {
         this.itemizedObject = itemizedObject;
     }
 
-    public static <T> Item<T> number(int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+
+    public static <T> Item<T> number(int sortPosition, int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                      T itemizedObject) {
-        return new Item<>(InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+        return new Item<>(sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static <T> Item<T> text(int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+    public static <T> Item<T> text(int sortPosition, int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                    T itemizedObject) {
-        return new Item<>(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+        return new Item<>(sortPosition, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static <T> Item<T> email(int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+    public static <T> Item<T> email(int sortPosition, int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                     T itemizedObject) {
-        return new Item<>(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+        return new Item<>(sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
     public static Supplier<CharSequence> nullToEmpty(@Nullable String source) {
@@ -104,6 +108,9 @@ public class Item<T> implements Identifiable {
 
     @Override
     public String getId() {return id;}
+
+    @Override
+    public int compareTo(@NonNull Item o) { return Integer.compare(sortPosition, o.sortPosition); }
 
     @Override
     public boolean areContentsTheSame(Identifiable other) {
@@ -139,4 +146,6 @@ public class Item<T> implements Identifiable {
     public interface ValueChangeCallBack {
         void onValueChanged(String value);
     }
+
+
 }

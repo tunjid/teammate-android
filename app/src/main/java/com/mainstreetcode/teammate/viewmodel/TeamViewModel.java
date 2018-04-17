@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -10,7 +11,6 @@ import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TransformingSequentialList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
@@ -38,6 +37,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     private final TeamRepository repository;
     private AtomicReference<PublishProcessor<String>> searchRef;
 
+    @SuppressLint("CheckResult")
     public TeamViewModel() {
         searchRef = new AtomicReference<>();
         repository = TeamRepository.getInstance();
@@ -56,16 +56,16 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Single<DiffUtil.DiffResult> createOrUpdate(Team team) {
         Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), Team.class, team)
-                .observeOn(mainThread()).cast(Team.class).map(teamListFunction);
+                .observeOn(mainThread()).cast(Team.class).map(Team::asIdentifiables);
 
-        return Identifiable.diff(sourceFlowable, () -> teamListFunction.apply(team), (old, updated) -> updated).firstOrError();
+        return Identifiable.diff(sourceFlowable, team::asIdentifiables, (old, updated) -> updated).firstOrError();
     }
 
     public Flowable<DiffUtil.DiffResult> getTeam(Team team) {
         Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(team), Team.class, team)
-                .observeOn(mainThread()).cast(Team.class).map(teamListFunction);
+                .observeOn(mainThread()).cast(Team.class).map(Team::asIdentifiables);
 
-        return Identifiable.diff(sourceFlowable, () -> teamListFunction.apply(team), (old, updated) -> updated);
+        return Identifiable.diff(sourceFlowable, team::asIdentifiables, (old, updated) -> updated);
     }
 
     public Flowable<List<Team>> findTeams() {
@@ -104,6 +104,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Team getDefaultTeam() {return defaultTeam;}
 
+    @SuppressLint("CheckResult")
     static Team onTeamDeleted(Team deleted) {
         teams.remove(deleted);
         if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
@@ -111,10 +112,4 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .delete(deleted)).subscribeOn(Schedulers.io()).subscribe(() -> {}, ErrorHandler.EMPTY);
         return deleted;
     }
-
-    private Function<Team, List<Identifiable>> teamListFunction = team -> {
-        List<Identifiable> items = new ArrayList<>();
-        for (int i = 0; i < team.size(); i++) items.add(team.get(i));
-        return items;
-    };
 }

@@ -181,7 +181,7 @@ public class TeamEditFragment extends HeaderedFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                Position position = Config.positionFromCode(team.get(Team.ROLE_POSITION).getValue().toString());
+                Position position = Config.positionFromCode(team.asItems().get(Team.ROLE_POSITION).getValue().toString());
 
                 if (isJoiningTeam() && position.isInvalid()) {
                     showSnackbar(getString(R.string.choose_role_error));

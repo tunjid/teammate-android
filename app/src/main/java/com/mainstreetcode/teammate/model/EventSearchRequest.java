@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import static com.mainstreetcode.teammate.util.ModelUtils.parse;
 import static com.mainstreetcode.teammate.util.ModelUtils.prettyPrinter;
 
-public class EventSearchRequest implements ItemListableBean<EventSearchRequest> {
+public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
     private int distance;
     private Sport sport;
@@ -68,26 +68,18 @@ public class EventSearchRequest implements ItemListableBean<EventSearchRequest> 
 
     private CharSequence getEndDate() { return ModelUtils.prettyPrinter.format(endDate); }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<EventSearchRequest>> buildItems() {
+    private List<Item<EventSearchRequest>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
-                Item.text(Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
+                Item.text(0, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
+                Item.text(1, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(Item.DATE, R.string.start_date, this::getEndDate, this::setEndDate, this)
+                Item.text(2, Item.DATE, R.string.start_date, this::getEndDate, this::setEndDate, this)
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<EventSearchRequest>> asItems() { return items; }
 
     public static class GsonAdapter implements JsonSerializer<EventSearchRequest> {
 

@@ -25,7 +25,7 @@ import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 public class User extends UserEntity implements
         Model<User>,
         HeaderedModel<User>,
-        ItemListableBean<User> {
+        ListableModel<User> {
 
     public static final String PHOTO_UPLOAD_KEY = "user-photo";
 
@@ -34,7 +34,6 @@ public class User extends UserEntity implements
 
     public User(String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
         super(id, firstName, lastName, primaryEmail, about, imageUrl);
-
         items = buildItems();
     }
 
@@ -47,30 +46,22 @@ public class User extends UserEntity implements
         return new User("", "", "", "", "", Config.getDefaultUserAvatar());
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<User>> buildItems() {
+    private List<Item<User>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
-                Item.text(Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-                Item.email(Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.text(Item.INPUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+                Item.text(0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
+                Item.text(1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
+                Item.email(2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.text(3, Item.INPUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<User>> asItems() { return items; }
 
     @Override
     public Item<User> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -98,8 +89,7 @@ public class User extends UserEntity implements
         primaryEmail = "";
         imageUrl = "";
 
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue("");
+        restItemList();
     }
 
     @Override
@@ -107,8 +97,7 @@ public class User extends UserEntity implements
         this.id = updatedUser.id;
         this.imageUrl = updatedUser.imageUrl;
 
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
+        updateItemList(updatedUser);
     }
 
     @Override

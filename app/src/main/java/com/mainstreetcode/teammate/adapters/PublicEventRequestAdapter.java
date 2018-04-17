@@ -52,22 +52,22 @@ public class PublicEventRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
-        Item item = request.get(position);
+        Item item = request.asItems().get(position);
         ((BaseItemViewHolder) viewHolder).bind(item);
     }
 
     @Override
     public int getItemCount() {
-        return request.size();
+        return request.asItems().size();
     }
 
     @Override
     public long getItemId(int position) {
-        return request.get(position).hashCode();
+        return request.asItems().get(position).hashCode();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return request.get(position).getItemType();
+        return request.asItems().get(position).getItemType();
     }
 }

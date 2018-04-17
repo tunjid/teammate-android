@@ -45,22 +45,22 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
-        viewHolder.bind(user.get(i));
+        viewHolder.bind(user.asItems().get(i));
     }
 
     @Override
     public int getItemCount() {
-        return user.size();
+        return user.asItems().size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return user.get(position).getItemType();
+        return user.asItems().get(position).getItemType();
     }
 
     @Override
     public long getItemId(int position) {
-        return user.get(position).hashCode();
+        return user.asItems().get(position).hashCode();
     }
 
 }

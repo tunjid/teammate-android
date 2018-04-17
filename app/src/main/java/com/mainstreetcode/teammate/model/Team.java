@@ -40,9 +40,9 @@ public class Team extends TeamEntity
         implements
         Model<Team>,
         HeaderedModel<Team>,
-        ItemListableBean<Team> {
+        ListableModel<Team> {
 
-    private static final int SPORT_POSITION = 1;
+    //    private static final int SPORT_POSITION = 1;
     private static final int CITY_POSITION = 2;
     private static final int STATE_POSITION = 3;
     private static final int ZIP_POSITION = 4;
@@ -91,37 +91,29 @@ public class Team extends TeamEntity
         return team;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<Team>> buildItems() {
+    private List<Item<Team>> buildItems() {
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
+                Item.text(0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
+                Item.text(1, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
-                Item.text(Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
-                Item.text(Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
-                Item.text(Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
-                Item.number(Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
-                Item.number(Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
-                Item.text(Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this),
-                Item.text(Item.ROLE, R.string.team_role, Item.nullToEmpty(""), null, this)
+                Item.text(CITY_POSITION, Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
+                Item.text(STATE_POSITION, Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
+                Item.text(ZIP_POSITION, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
+                Item.text(5, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
+                Item.number(6, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
+                Item.number(7, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
+                Item.text(8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this),
+                Item.text(ROLE_POSITION, Item.ROLE, R.string.team_role, Item.nullToEmpty(""), null, this)
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<Team>> asItems() { return items; }
 
     @Override
     public Item<Team> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -146,18 +138,11 @@ public class Team extends TeamEntity
 
     @Override
     public void reset() {
-        name = "";
-        city = "";
-        state = "";
-        zip = "";
-        imageUrl = "";
-
-        int size = size();
-        for (int i = 0; i < size; i++) if (i != SPORT_POSITION) get(i).setValue("");
-
+        name = city = state = zip = imageUrl = "";
         sport.reset();
         roles.clear();
         joinRequests.clear();
+        restItemList();
     }
 
     @Override
@@ -166,9 +151,7 @@ public class Team extends TeamEntity
         this.imageUrl = updatedTeam.imageUrl;
         this.storageUsed = updatedTeam.storageUsed;
 
-        int size = size();
-        for (int i = 0; i < size; i++)
-            if (i != SPORT_POSITION) get(i).setValue(updatedTeam.get(i).getValue());
+        updateItemList(updatedTeam);
 
         location = updatedTeam.location;
         sport.update(updatedTeam.sport);

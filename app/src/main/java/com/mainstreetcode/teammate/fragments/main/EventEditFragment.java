@@ -28,7 +28,6 @@ import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.HeaderedModel;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
@@ -55,7 +54,6 @@ public class EventEditFragment extends HeaderedFragment
 
     private boolean fromUserPickerAction;
     private Event event;
-    private List<Identifiable> eventItems;
 
     public static EventEditFragment newInstance(Event event) {
         EventEditFragment fragment = new EventEditFragment();
@@ -92,10 +90,8 @@ public class EventEditFragment extends HeaderedFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        eventItems = eventViewModel.fromEvent(event);
-
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new EventEditAdapter(eventItems, this))
+                .withAdapter(new EventEditAdapter(event, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addScrollListener(this::updateFabOnScroll)
                 .onLayoutManager(this::setSpanSizeLookUp)
@@ -166,7 +162,7 @@ public class EventEditFragment extends HeaderedFragment
         disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
 
         if (!event.isEmpty() && !fromUserPickerAction) {
-            disposables.add(eventViewModel.getEvent(event, eventItems).subscribe(this::onEventChanged, defaultErrorHandler));
+            disposables.add(eventViewModel.getEvent(event).subscribe(this::onEventChanged, defaultErrorHandler));
         }
 
         eventViewModel.clearNotifications(event);
@@ -212,7 +208,7 @@ public class EventEditFragment extends HeaderedFragment
             case R.id.fab:
                 boolean wasEmpty = event.isEmpty();
                 toggleProgress(true);
-                disposables.add(eventViewModel.createOrUpdateEvent(event, eventItems).subscribe(diffResult -> {
+                disposables.add(eventViewModel.createOrUpdateEvent(event).subscribe(diffResult -> {
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     onEventChanged(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
@@ -231,7 +227,7 @@ public class EventEditFragment extends HeaderedFragment
         eventViewModel.onEventTeamChanged(event, team);
         toggleBottomSheet(false);
 
-        int index = eventItems.indexOf(team);
+        int index = event.asIdentifiables().indexOf(team);
         if (index > -1) scrollManager.notifyItemChanged(index);
     }
 
@@ -278,7 +274,7 @@ public class EventEditFragment extends HeaderedFragment
 
     private void rsvpEvent(Event event, boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, eventItems, attending).subscribe(this::onEventChanged, defaultErrorHandler));
+        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(this::onEventChanged, defaultErrorHandler));
     }
 
     private void onEventChanged(DiffUtil.DiffResult result) {
@@ -345,7 +341,7 @@ public class EventEditFragment extends HeaderedFragment
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return eventItems.get(position) instanceof Guest ? 1 : 2;
+                return event.asIdentifiables().get(position) instanceof Guest ? 1 : 2;
             }
         });
     }

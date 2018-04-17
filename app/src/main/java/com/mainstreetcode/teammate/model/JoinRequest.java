@@ -30,7 +30,7 @@ public class JoinRequest extends JoinRequestEntity
         implements
         Model<JoinRequest>,
         HeaderedModel<JoinRequest>,
-        ItemListableBean<JoinRequest> {
+        ListableModel<JoinRequest> {
 
     @Ignore private final List<Item<JoinRequest>> items;
 
@@ -52,32 +52,24 @@ public class JoinRequest extends JoinRequestEntity
         items = buildItems();
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<JoinRequest>> buildItems() {
+    private List<Item<JoinRequest>> buildItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.email(Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
-                Item.text(Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
+                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.email(2, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
+                Item.text(3, Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<JoinRequest>> asItems() { return items; }
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        return Item.text(Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        return Item.text(0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
@@ -109,6 +101,7 @@ public class JoinRequest extends JoinRequestEntity
         position.reset();
         user.reset();
         team.reset();
+        restItemList();
     }
 
     @Override
@@ -120,6 +113,7 @@ public class JoinRequest extends JoinRequestEntity
         position.update(updated.position);
         team.update(updated.team);
         user.update(updated.user);
+        updateItemList(updated);
     }
 
     @Override

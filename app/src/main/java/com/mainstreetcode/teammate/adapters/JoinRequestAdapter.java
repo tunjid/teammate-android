@@ -45,17 +45,17 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(joinRequest.get(i));
+        baseItemViewHolder.bind(joinRequest.asItems().get(i));
     }
 
     @Override
     public int getItemCount() {
-        return joinRequest.size();
+        return joinRequest.asItems().size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return joinRequest.get(position).getItemType();
+        return joinRequest.asItems().get(position).getItemType();
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {}

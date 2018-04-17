@@ -41,6 +41,11 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     @Override
+    boolean sortsAscending() {
+        return true;
+    }
+
+    @Override
     Pair<Model, Class> notificationCancelMap(Identifiable identifiable) {
         if (!(identifiable instanceof FeedItem)) return new Pair<>(null, null);
         FeedItem feedItem = (FeedItem) identifiable;

@@ -44,17 +44,17 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(role.get(i));
+        baseItemViewHolder.bind(role.asItems().get(i));
     }
 
     @Override
     public int getItemCount() {
-        return role.size();
+        return role.asItems().size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return role.get(position).getItemType();
+        return role.asItems().get(position).getItemType();
     }
 
     public interface RoleEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
