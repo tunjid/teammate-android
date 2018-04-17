@@ -29,12 +29,13 @@ public abstract class TeamMappedViewModel<V extends Identifiable> extends Mapped
         if (message.isIllegalTeamMember()) TeamViewModel.onTeamDeleted(key);
     }
 
-    protected boolean checkForInvalidTeam(Throwable throwable, Team team) {
+    boolean checkForInvalidTeam(Throwable throwable, Team team) {
         Message message = fromThrowable(throwable);
-        if (message != null && (message.isInvalidObject() || message.isIllegalTeamMember())) {
-            TeamViewModel.onTeamDeleted(team);
-            return true;
-        }
-        return false;
+        boolean isValidModel = message == null || message.isValidModel();
+
+        if (isValidModel) return false;
+
+        TeamViewModel.onTeamDeleted(team);
+        return true;
     }
 }
