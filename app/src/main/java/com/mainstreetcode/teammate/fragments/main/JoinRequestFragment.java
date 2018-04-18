@@ -67,7 +67,6 @@ public class JoinRequestFragment extends HeaderedFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withAdapter(new JoinRequestAdapter(joinRequest, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
                 .build();
 

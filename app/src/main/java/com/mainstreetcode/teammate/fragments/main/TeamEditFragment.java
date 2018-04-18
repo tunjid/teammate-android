@@ -90,7 +90,6 @@ public class TeamEditFragment extends HeaderedFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withAdapter(new TeamEditAdapter(team, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
                 .build();
 

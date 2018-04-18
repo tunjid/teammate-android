@@ -16,14 +16,12 @@ import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Completable;
-
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
+import static io.reactivex.Completable.timer;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public abstract class HeaderedFragment extends MainActivityFragment
         implements
@@ -32,7 +30,6 @@ public abstract class HeaderedFragment extends MainActivityFragment
 
     private static final int FAB_DELAY = 400;
 
-    private int lastOffset;
     private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
 
@@ -58,15 +55,6 @@ public abstract class HeaderedFragment extends MainActivityFragment
         getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
-        appBarLayout.addOnOffsetChangedListener((appBarLayout1, verticalOffset) -> {
-            if (!showsFab() || getActivity() == null) return;
-
-            int dy = lastOffset - verticalOffset;
-            if (Math.abs(dy) < 3) return;
-
-            toggleFab(dy < 0);
-            lastOffset = verticalOffset;
-        });
     }
 
     @Override
@@ -94,7 +82,7 @@ public abstract class HeaderedFragment extends MainActivityFragment
         super.onKeyBoardChanged(appeared);
         if (!appeared) return;
         if (appBarLayout != null) appBarLayout.setExpanded(false);
-        if (showsFab()) disposables.add(Completable.timer(FAB_DELAY, TimeUnit.MILLISECONDS)
+        if (showsFab()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
                 .observeOn(mainThread())
                 .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
     }
