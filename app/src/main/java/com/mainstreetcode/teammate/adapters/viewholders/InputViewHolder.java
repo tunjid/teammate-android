@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.content.res.ColorStateList;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
@@ -9,12 +10,14 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.Supplier;
+
+import static android.view.View.*;
 
 /**
  * Viewholder for editing simple text fields for an {@link Item}
@@ -24,8 +27,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         TextWatcher {
 
     EditText editText;
-    @Nullable
-    private final TextView headerText;
+    private final ImageButton button;
     private final TextInputLayout inputLayout;
     private final Supplier<Boolean> errorChecker;
     private final Supplier<Boolean> enabler;
@@ -35,8 +37,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         this.enabler = enabler;
         this.errorChecker = errorChecker == null ? this::hasText : errorChecker;
         inputLayout = itemView.findViewById(R.id.input_layout);
+        button = itemView.findViewById(R.id.button);
         editText = inputLayout.getEditText();
-        headerText = itemView.findViewById(R.id.header_name);
 
         inputLayout.setEnabled(isEnabled());
         editText.addTextChangedListener(this);
@@ -46,6 +48,13 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         this(itemView, enabler, null);
     }
 
+    public InputViewHolder setButtonRunnable(@DrawableRes int icon, Runnable clickRunnable) {
+        button.setVisibility(VISIBLE);
+        button.setImageResource(icon);
+        button.setOnClickListener(clicked -> clickRunnable.run());
+        return this;
+    }
+
     @Override
     public void bind(Item item) {
         super.bind(item);
@@ -53,8 +62,6 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
         editText.setText(item.getValue());
         editText.setInputType(item.getInputType());
-
-        if (headerText != null) headerText.setVisibility(View.GONE);
 
         checkForErrors();
         setClickableState();
