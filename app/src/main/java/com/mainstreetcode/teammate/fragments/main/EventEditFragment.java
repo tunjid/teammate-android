@@ -107,7 +107,7 @@ public class EventEditFragment extends HeaderedFragment
         MenuItem item = menu.findItem(R.id.action_rsvp);
         if (item == null) return;
 
-        if (canEditEvent()) menu.findItem(R.id.action_delete).setVisible(true);
+        if (canEditEvent() || event.isPublic()) menu.findItem(R.id.action_delete).setVisible(true);
 
         User current = userViewModel.getCurrentUser();
         List<User> users = new ArrayList<>();

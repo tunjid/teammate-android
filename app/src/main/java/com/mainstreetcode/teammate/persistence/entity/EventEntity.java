@@ -108,21 +108,12 @@ public class EventEntity implements Parcelable {
     }
 
     public String getTime() {
-//        String time = prettyPrinter.format(startDate) + " - ";
-//        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
         return ModelUtils.prettyPrinter.format(startDate);
     }
 
-//    private boolean endsSameDay() {
-//        Calendar start = Calendar.getInstance();
-//        Calendar end = Calendar.getInstance();
-//
-//        start.setTime(startDate);
-//        end.setTime(endDate);
-//        return start.get(Calendar.YEAR) == end.get(Calendar.YEAR)
-//                && start.get(Calendar.MONTH) == end.get(Calendar.MONTH)
-//                && start.get(Calendar.DATE) == end.get(Calendar.DATE);
-//    }
+    public boolean isPublic(){
+        return visibility.isPublic();
+    }
 
     public void setName(String name) {
         this.name = name;
