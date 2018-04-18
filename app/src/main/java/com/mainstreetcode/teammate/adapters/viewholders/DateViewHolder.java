@@ -47,8 +47,6 @@ public class DateViewHolder extends ClickInputViewHolder
 
     @Override
     public void onClick(View view) {
-        if (!isEnabled()) return;
-
         showDate();
     }
 
@@ -70,12 +68,14 @@ public class DateViewHolder extends ClickInputViewHolder
     }
 
     private void showDate() {
+        if (!isEnabled()) return;
         AlertDialog dialog = new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
         dialog.show();
     }
 
     private void showTime() {
+        if (!isEnabled()) return;
         AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
         dialog.show();
