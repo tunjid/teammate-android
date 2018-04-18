@@ -35,6 +35,7 @@ public class DateViewHolder extends ClickInputViewHolder
     public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
         itemView.findViewById(R.id.click_view).setOnClickListener(this);
+        setButtonRunnable(R.drawable.ic_time_lapse_white_24dp, this::showTime);
     }
 
     @Override
@@ -49,10 +50,7 @@ public class DateViewHolder extends ClickInputViewHolder
     public void onClick(View view) {
         if (!isEnabled()) return;
 
-        AlertDialog dialog = new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
-
-        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
-        dialog.show();
+        showDate();
     }
 
     @Override
@@ -61,10 +59,7 @@ public class DateViewHolder extends ClickInputViewHolder
         updatedCalendar.set(MONTH, month);
         updatedCalendar.set(DATE, day);
 
-        AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
-
-        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
-        dialog.show();
+        updateTime();
     }
 
     @Override
@@ -72,6 +67,23 @@ public class DateViewHolder extends ClickInputViewHolder
         updatedCalendar.set(HOUR_OF_DAY, hourOfDay);
         updatedCalendar.set(MINUTE, minute);
 
+        updateTime();
+    }
+
+    private void showDate() {
+        AlertDialog dialog = new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.show();
+    }
+
+    private void showTime() {
+        AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
+
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.show();
+    }
+
+    private void updateTime() {
         String updatedDate = ModelUtils.prettyPrinter.format(updatedCalendar.getTime());
 
         item.setValue(updatedDate);
