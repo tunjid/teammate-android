@@ -52,7 +52,6 @@ public class JoinRequest extends JoinRequestEntity
         items = buildItems();
     }
 
-    @SuppressWarnings("unchecked")
     private List<Item<JoinRequest>> buildItems() {
         User user = getUser();
         return Arrays.asList(

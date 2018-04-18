@@ -267,6 +267,7 @@ public class Event extends EventEntity
             List<Guest> guestList = new ArrayList<>();
             ModelUtils.deserializeList(context, eventJson.get(GUESTS_KEY), guestList, Guest.class);
 
+            for (Guest guest : guestList) guest.getEvent().update(result);
             result.identifiables.addAll(guestList);
 
             return result;

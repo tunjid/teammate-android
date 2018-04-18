@@ -11,22 +11,22 @@ import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.Guest;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
- * Adapter for {@link User}
+ * Adapter for {@link Guest}
  */
 
-public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private final User user;
+    private final Guest guest;
 
-    public UserAdapter(User user, ImageWorkerFragment.ImagePickerListener listener) {
+    public GuestAdapter(Guest guest, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
-        this.user = user;
+        this.guest = guest;
     }
 
     @NonNull
@@ -37,7 +37,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.TRUE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
             default:
                 return new BaseItemViewHolder(itemView);
         }
@@ -45,22 +45,22 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
-        viewHolder.bind(user.asItems().get(i));
+        viewHolder.bind(guest.asItems().get(i));
     }
 
     @Override
     public int getItemCount() {
-        return user.asItems().size();
+        return guest.asItems().size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return user.asItems().get(position).getItemType();
+        return guest.asItems().get(position).getItemType();
     }
 
     @Override
     public long getItemId(int position) {
-        return user.asItems().get(position).hashCode();
+        return guest.asItems().get(position).hashCode();
     }
 
 }

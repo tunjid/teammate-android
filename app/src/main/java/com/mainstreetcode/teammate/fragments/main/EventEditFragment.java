@@ -142,7 +142,7 @@ public class EventEditFragment extends HeaderedFragment
                 startActivity(maps);
                 return true;
             case R.id.action_rsvp:
-                rsvpToEvent(userViewModel.getCurrentUser());
+                rsvpToEvent();
                 return true;
             case R.id.action_delete:
                 Context context = getContext();
@@ -253,7 +253,9 @@ public class EventEditFragment extends HeaderedFragment
 
     @Override
     public void onGuestClicked(Guest guest) {
-        rsvpToEvent(guest.getUser());
+        User current = userViewModel.getCurrentUser();
+        if (current.equals(guest.getUser())) rsvpToEvent();
+        else showFragment(GuestViewFragment.newInstance(guest));
     }
 
     @Override
@@ -310,11 +312,9 @@ public class EventEditFragment extends HeaderedFragment
         activity.onBackPressed();
     }
 
-    private void rsvpToEvent(User user) {
+    private void rsvpToEvent() {
         Activity activity;
-        User roleUser = localRoleViewModel.getCurrentRole().getUser();
-        if ((activity = getActivity()) == null || !user.equals(roleUser))
-            return;
+        if ((activity = getActivity()) == null) return;
 
         new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))

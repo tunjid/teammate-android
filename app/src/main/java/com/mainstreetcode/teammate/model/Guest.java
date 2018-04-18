@@ -4,6 +4,7 @@ package com.mainstreetcode.teammate.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,12 +18,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -35,7 +39,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class Guest implements
         Parcelable,
-        Model<Guest> {
+        Model<Guest>,
+        HeaderedModel<Guest>,
+        ListableModel<Guest> {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "guest_id") private String id;
@@ -44,12 +50,15 @@ public class Guest implements
     @ColumnInfo(name = "guest_created") private Date created;
     @ColumnInfo(name = "guest_attending") private boolean attending;
 
+    @Ignore private final List<Item<Guest>> items;
+
     Guest(@NonNull String id, User user, Event event, Date created, boolean attending) {
         this.id = id;
         this.user = user;
         this.event = event;
         this.created = created;
         this.attending = attending;
+        items = buildItems();
     }
 
     private Guest(Parcel in) {
@@ -59,6 +68,26 @@ public class Guest implements
         long tmpCreated = in.readLong();
         created = tmpCreated != -1 ? new Date(tmpCreated) : null;
         attending = in.readByte() != 0x00;
+        items = buildItems();
+    }
+
+    private List<Item<Guest>> buildItems() {
+        User user = getUser();
+        return Arrays.asList(
+                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, ignored -> {}, this),
+                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, ignored -> {}, this),
+                Item.email(2, Item.INPUT, R.string.user_about, user::getAbout, ignored -> {}, this)
+        );
+    }
+
+    @Override
+    public Item<Guest> getHeaderItem() {
+        return Item.text(0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+    }
+
+    @Override
+    public List<Item<Guest>> asItems() {
+        return items;
     }
 
     @Override
@@ -105,6 +134,10 @@ public class Guest implements
 
     public User getUser() {
         return user;
+    }
+
+    public Event getEvent() {
+        return event;
     }
 
     public Date getCreated() {

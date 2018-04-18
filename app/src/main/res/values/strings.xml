@@ -164,6 +164,10 @@
     <string name="event_public_location_prompt">Location permission required</string>
     <string name="event_public_location_rationale">Your current location is used only to show events nearest to you.\n\nYou can still move the map manually to view public events without providing your location.</string>
 
+    <!--GuestViewFragment-->
+    <string name="event_guest">Event Guest</string>
+    <string name="user_block">Block User</string>
+
     <!--TeamChatFragment-->
     <string name="chat_sending">Sending…</string>
     <string name="chat_failed">Failed</string>
