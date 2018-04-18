@@ -112,7 +112,9 @@ public class EventEditFragment extends HeaderedFragment
 
         User current = userViewModel.getCurrentUser();
         List<User> users = new ArrayList<>();
-        disposables.add(Flowable.fromIterable(event.getGuests())
+        disposables.add(Flowable.fromIterable(event.asIdentifiables())
+                .filter(identifiable -> identifiable instanceof Guest)
+                .cast(Guest.class)
                 .filter(Guest::isAttending)
                 .map(Guest::getUser)
                 .filter(current::equals)

@@ -47,7 +47,6 @@ public class Event extends EventEntity
 
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
 
-    @Ignore private List<Guest> guests = new ArrayList<>();
     @Ignore private final List<Item<Event>> items;
     @Ignore private final List<Identifiable> identifiables;
 
@@ -66,7 +65,6 @@ public class Event extends EventEntity
 
     protected Event(Parcel in) {
         super(in);
-        in.readList(guests, Guest.class.getClassLoader());
         items = buildItems();
         identifiables = buildIdentifiables();
     }
@@ -87,7 +85,6 @@ public class Event extends EventEntity
     private List<Identifiable> buildIdentifiables() {
         List<Identifiable> result = new ArrayList<>(items);
         result.add(team);
-        result.addAll(guests);
         return result;
     }
 
@@ -125,7 +122,6 @@ public class Event extends EventEntity
     public void reset() {
         imageUrl = "";
         visibility.reset();
-        guests.clear();
         team.reset();
         restItemList();
     }
@@ -137,7 +133,6 @@ public class Event extends EventEntity
         this.imageUrl = updatedEvent.imageUrl;
 
         location = updatedEvent.location;
-        ModelUtils.preserveAscending(guests, updatedEvent.guests);
 
         visibility.update(updatedEvent.visibility);
         team.update(updatedEvent.team);
@@ -146,9 +141,8 @@ public class Event extends EventEntity
         ModelUtils.preserveAscending(identifiables, filterOutItems(updatedEvent));
     }
 
-    private List<Identifiable> filterOutItems(Event updatedEvent) {
-        return Flowable.fromIterable(updatedEvent.identifiables)
-                .concatWith(Flowable.fromIterable(updatedEvent.guests))
+    private List<Identifiable> filterOutItems(Event event) {
+        return Flowable.fromIterable(event.identifiables)
                 .filter(identifiable -> !(identifiable instanceof Item))
                 .collect((Callable<ArrayList<Identifiable>>) ArrayList::new, List::add).blockingGet();
     }
@@ -186,19 +180,9 @@ public class Event extends EventEntity
                 .icon(BitmapDescriptorFactory.fromBitmap(TextBitmapUtil.getBitmapMarker(team.getSport().getEmoji())));
     }
 
-    public List<Guest> getGuests() {
-        return guests;
-    }
-
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeList(guests);
     }
 
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
@@ -228,6 +212,7 @@ public class Event extends EventEntity
         private static final String START_DATE_KEY = "startDate";
         private static final String END_DATE_KEY = "endDate";
         private static final String LOCATION_KEY = "location";
+        private static final String GUESTS_KEY = "guests";
 
         @Override
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
@@ -270,6 +255,7 @@ public class Event extends EventEntity
             String locationName = ModelUtils.asString(LOCATION_NAME_KEY, eventJson);
             String startDate = ModelUtils.asString(START_DATE_KEY, eventJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, eventJson);
+
             Team team = context.deserialize(eventJson.get(TEAM_KEY), Team.class);
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, eventJson);
             Visibility visibility = Config.visibilityFromCode(visibilityCode);
@@ -278,7 +264,10 @@ public class Event extends EventEntity
 
             Event result = new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
 
-            ModelUtils.deserializeList(context, eventJson.get("guests"), result.guests, Guest.class);
+            List<Guest> guestList = new ArrayList<>();
+            ModelUtils.deserializeList(context, eventJson.get(GUESTS_KEY), guestList, Guest.class);
+
+            result.identifiables.addAll(guestList);
 
             return result;
         }
