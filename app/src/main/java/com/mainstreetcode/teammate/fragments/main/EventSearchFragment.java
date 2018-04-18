@@ -22,7 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
-import com.mainstreetcode.teammate.adapters.PublicEventRequestAdapter;
+import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -59,7 +59,7 @@ public class EventSearchFragment extends MainActivityFragment {
         getLayoutParams(root.findViewById(R.id.status_bar_dimmer)).height = MainActivity.topInset;
 
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
-                .withAdapter(new PublicEventRequestAdapter(eventViewModel.getEventRequest()))
+                .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest()))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();

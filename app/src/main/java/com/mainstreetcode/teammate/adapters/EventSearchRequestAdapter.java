@@ -16,6 +16,9 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
@@ -24,14 +27,17 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
  * Adapter for {@link Event}
  */
 
-public class PublicEventRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
 
     private final EventSearchRequest request;
+    private final List<Sport> sports;
 
-    public PublicEventRequestAdapter(EventSearchRequest request) {
+    public EventSearchRequestAdapter(EventSearchRequest request) {
         super(new BaseRecyclerViewAdapter.AdapterListener() {});
-        this.request = request;
         setHasStableIds(true);
+        this.request = request;
+        this.sports = new ArrayList<>(Config.getSports());
+        sports.add(0, Sport.empty());
     }
 
     @NonNull
@@ -41,7 +47,7 @@ public class PublicEventRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
             case Item.INFO:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, TRUE, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, FALSE);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             default:
