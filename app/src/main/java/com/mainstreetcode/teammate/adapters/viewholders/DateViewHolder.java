@@ -30,7 +30,6 @@ public class DateViewHolder extends ClickInputViewHolder
         TimePickerDialog.OnTimeSetListener {
 
     private Calendar calendar = getInstance();
-    private Calendar updatedCalendar = getInstance();
 
     public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
@@ -55,17 +54,17 @@ public class DateViewHolder extends ClickInputViewHolder
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        updatedCalendar.set(YEAR, year);
-        updatedCalendar.set(MONTH, month);
-        updatedCalendar.set(DATE, day);
+        calendar.set(YEAR, year);
+        calendar.set(MONTH, month);
+        calendar.set(DATE, day);
 
         updateTime();
     }
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-        updatedCalendar.set(HOUR_OF_DAY, hourOfDay);
-        updatedCalendar.set(MINUTE, minute);
+        calendar.set(HOUR_OF_DAY, hourOfDay);
+        calendar.set(MINUTE, minute);
 
         updateTime();
     }
@@ -78,18 +77,13 @@ public class DateViewHolder extends ClickInputViewHolder
 
     private void showTime() {
         AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
-
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
         dialog.show();
     }
 
     private void updateTime() {
-        String updatedDate = ModelUtils.prettyPrinter.format(updatedCalendar.getTime());
-
+        String updatedDate = ModelUtils.prettyPrinter.format(calendar.getTime());
         item.setValue(updatedDate);
         editText.setText(updatedDate);
-
-        calendar = updatedCalendar;
-        updatedCalendar = Calendar.getInstance();
     }
 }
