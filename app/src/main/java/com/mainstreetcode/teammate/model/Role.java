@@ -58,7 +58,7 @@ public class Role extends RoleEntity
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(2, Item.ROLE, R.string.team_role, position::getName, this::setPosition, this)
+                Item.text(2, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }

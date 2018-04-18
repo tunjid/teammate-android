@@ -18,32 +18,32 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
 
     private final int titleRes;
     private final List<T> items;
-    private final Function<T, CharSequence> textTransformer;
-    private final Function<T, String> stringTransformer;
+    private final Function<T, CharSequence> displayFunction;
+    private final Function<T, String> valueFunction;
 
     public SelectionViewHolder(View itemView,
                                @StringRes int titleRes,  List<T> items,
-                               Function<T, CharSequence> textTransformer,
-                               Function<T, String> stringTransformer,
+                               Function<T, CharSequence> displayFunction,
+                               Function<T, String> valueFunction,
                                Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
         this.titleRes = titleRes;
         this.items = items;
-        this.textTransformer = textTransformer;
-        this.stringTransformer = stringTransformer;
+        this.displayFunction = displayFunction;
+        this.valueFunction = valueFunction;
     }
 
     public SelectionViewHolder(View itemView,
                                @StringRes int titleRes,  List<T> items,
-                               Function<T, CharSequence> textTransformer,
-                               Function<T, String> stringTransformer,
+                               Function<T, CharSequence> displayFunction,
+                               Function<T, String> valueFunction,
                                Supplier<Boolean> enabler,
                                Supplier<Boolean> errorChecker) {
         super(itemView, enabler, () -> {}, errorChecker);
         this.titleRes = titleRes;
         this.items = items;
-        this.textTransformer = textTransformer;
-        this.stringTransformer = stringTransformer;
+        this.displayFunction = displayFunction;
+        this.valueFunction = valueFunction;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
         List<CharSequence> sequences = new ArrayList<>();
 
         Flowable.fromIterable(items)
-                .map(textTransformer::apply)
+                .map(displayFunction::apply)
                 .collectInto(sequences, List::add)
                 .subscribe();
 
@@ -61,7 +61,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
                 .setTitle(titleRes)
                 .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialogInterface, position) -> {
                     T type = items.get(position);
-                    item.setValue(stringTransformer.apply(type));
+                    item.setValue(valueFunction.apply(type));
                     editText.setText(sequences.get(position).toString());
                     editText.setError(null);
                 })

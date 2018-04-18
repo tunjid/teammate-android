@@ -21,6 +21,6 @@ public interface ListableModel<T> {
         List<Item<T>> otherItems = other.asItems();
 
         int size = items.size();
-        for (int i = 0; i < size; i++) items.get(i).setValue(otherItems.get(i).getValue());
+        for (int i = 0; i < size; i++) items.get(i).setValue(otherItems.get(i).getRawValue());
     }
 }

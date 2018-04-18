@@ -104,6 +104,8 @@ public class Item<T> implements Identifiable, Comparable<Item> {
 
     public int getStringRes() {return this.stringRes;}
 
+    public CharSequence getRawValue() {return value;}
+
     public CharSequence getValue() {return textTransformer == null ? value : textTransformer.apply(value);}
 
     @Override

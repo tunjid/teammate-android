@@ -73,7 +73,7 @@ public class Event extends EventEntity
     private List<Item<Event>> buildItems() {
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(1, Item.VISIBILITY, R.string.event_visibility, visibility::getName, this::setVisibility, this)
+                Item.text(1, Item.VISIBILITY, R.string.event_visibility, visibility::getCode, this::setVisibility, this)
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
                 Item.text(2, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
                 Item.text(3, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
