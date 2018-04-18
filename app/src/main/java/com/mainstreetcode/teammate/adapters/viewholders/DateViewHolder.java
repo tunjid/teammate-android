@@ -35,7 +35,7 @@ public class DateViewHolder extends ClickInputViewHolder
     public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
         itemView.findViewById(R.id.click_view).setOnClickListener(this);
-        setButtonRunnable(R.drawable.ic_time_lapse_white_24dp, this::showTime);
+        setButtonRunnable(R.drawable.ic_access_time_white_24dp, this::showTime);
     }
 
     @Override
