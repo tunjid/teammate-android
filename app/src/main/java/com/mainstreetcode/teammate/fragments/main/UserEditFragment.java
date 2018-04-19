@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +12,16 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+
+import io.reactivex.Flowable;
 
 /**
  * Edits a Team member
  */
 
-public class UserEditFragment extends HeaderedFragment
+public class UserEditFragment extends HeaderedFragment<User>
         implements
         ImageWorkerFragment.ImagePickerListener {
 
@@ -94,7 +96,17 @@ public class UserEditFragment extends HeaderedFragment
     public boolean showsFab() {return true;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return user;}
+    protected User getHeaderedModel() {return user;}
+
+    @Override
+    protected Flowable<DiffUtil.DiffResult> fetch(User model) {
+        return userViewModel.getMe(user);
+    }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        scrollManager.onDiff(result);
+    }
 
     @Override
     public void onClick(View view) {

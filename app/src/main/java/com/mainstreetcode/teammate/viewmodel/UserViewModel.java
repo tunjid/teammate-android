@@ -1,11 +1,15 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
+import android.support.v7.util.DiffUtil;
 
 import com.facebook.login.LoginResult;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.UserRepository;
+
+import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -50,6 +54,13 @@ public class UserViewModel extends ViewModel {
 
     public Flowable<User> getMe() {
         return repository.getMe().observeOn(mainThread());
+    }
+
+    public Flowable<DiffUtil.DiffResult> getMe(User current) {
+        Flowable<List<Identifiable>> sourceFlowable = repository.getMe()
+                .observeOn(mainThread()).map(User::asIdentifiables);
+
+        return Identifiable.diff(sourceFlowable, current::asIdentifiables, (old, updated) -> updated);
     }
 
     public Single<Boolean> signOut() {

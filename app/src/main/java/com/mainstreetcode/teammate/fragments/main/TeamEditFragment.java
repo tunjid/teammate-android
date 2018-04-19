@@ -16,7 +16,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -24,6 +23,7 @@ import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
+import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
 
 import static android.app.Activity.RESULT_OK;
@@ -32,7 +32,7 @@ import static android.app.Activity.RESULT_OK;
  * Creates, edits or lets a {@link com.mainstreetcode.teammate.model.User} join a {@link Team}
  */
 
-public class TeamEditFragment extends HeaderedFragment
+public class TeamEditFragment extends HeaderedFragment<Team>
         implements
         TeamEditAdapter.TeamEditAdapterListener {
 
@@ -102,10 +102,6 @@ public class TeamEditFragment extends HeaderedFragment
         super.onResume();
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
-
-//        if (!team.isEmpty() && state != JOINING) {
-//            disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
-//        }
     }
 
     @Override
@@ -126,7 +122,7 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Override
     public void onImageClick() {
-        if(state == CREATING) {
+        if (state == CREATING) {
             showSnackbar(getString(R.string.create_team_first));
             return;
         }
@@ -138,7 +134,18 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return team;}
+    protected Team getHeaderedModel() {return team;}
+
+    @Override
+    protected Flowable<DiffUtil.DiffResult> fetch(Team model) {
+        return state == JOINING ? Flowable.empty() : teamViewModel.getTeam(model);
+    }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        toggleProgress(false);
+        scrollManager.onDiff(result);
+    }
 
     @Override
     public void onAddressClicked() {
@@ -192,7 +199,7 @@ public class TeamEditFragment extends HeaderedFragment
                 switch (state) {
                     case CREATING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            onTeamChanged(result);
+                            onModelUpdated(result);
                             viewHolder.bind(getHeaderedModel());
                             showSnackbar(getString(R.string.created_team, team.getName()));
                         }, defaultErrorHandler);
@@ -206,7 +213,7 @@ public class TeamEditFragment extends HeaderedFragment
                         break;
                     case EDITING:
                         disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            onTeamChanged(result);
+                            onModelUpdated(result);
                             viewHolder.bind(getHeaderedModel());
                             showSnackbar(getString(R.string.updated_team));
                         }, defaultErrorHandler);
@@ -215,11 +222,6 @@ public class TeamEditFragment extends HeaderedFragment
 
                 if (disposable != null) disposables.add(disposable);
         }
-    }
-
-    private void onTeamChanged(DiffUtil.DiffResult result) {
-        toggleProgress(false);
-        scrollManager.onDiff(result);
     }
 
     private void onRoleUpdated() {

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,17 +13,18 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.JoinRequestAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
+import io.reactivex.Flowable;
+
 /**
  * Invites a Team member
  */
 
-public class JoinRequestFragment extends HeaderedFragment
+public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         implements
         JoinRequestAdapter.AdapterListener {
 
@@ -105,7 +107,13 @@ public class JoinRequestFragment extends HeaderedFragment
     public void onImageClick() {}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return joinRequest;}
+    protected JoinRequest getHeaderedModel() {return joinRequest;}
+
+    @Override
+    protected Flowable<DiffUtil.DiffResult> fetch(JoinRequest model) { return Flowable.empty(); }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) { }
 
     @Override
     public void onClick(View view) {

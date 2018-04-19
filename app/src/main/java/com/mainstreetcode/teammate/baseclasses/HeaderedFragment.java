@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -16,6 +17,8 @@ import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
+import io.reactivex.Flowable;
+
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
@@ -23,12 +26,14 @@ import static io.reactivex.Completable.timer;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public abstract class HeaderedFragment extends MainActivityFragment
+public abstract class HeaderedFragment<T extends HeaderedModel<T>> extends MainActivityFragment
         implements
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
 
     private static final int FAB_DELAY = 400;
+
+    protected boolean fromUserPickerAction;
 
     private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
@@ -58,7 +63,18 @@ public abstract class HeaderedFragment extends MainActivityFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        T model = getHeaderedModel();
+        if (!model.isEmpty() && !fromUserPickerAction) {
+            disposables.add(fetch(model).subscribe(this::onModelUpdated, defaultErrorHandler));
+        }
+        fromUserPickerAction = false;
+    }
+
+    @Override
     public void onImageClick() {
+        fromUserPickerAction = true;
         if (showsFab()) ImageWorkerFragment.requestCrop(this);
         else showSnackbar(getString(R.string.no_permission));
     }
@@ -87,5 +103,9 @@ public abstract class HeaderedFragment extends MainActivityFragment
                 .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
     }
 
-    protected abstract HeaderedModel getHeaderedModel();
+    protected abstract T getHeaderedModel();
+
+    protected abstract Flowable<DiffUtil.DiffResult> fetch(T model);
+
+    protected abstract void onModelUpdated(DiffUtil.DiffResult result);
 }

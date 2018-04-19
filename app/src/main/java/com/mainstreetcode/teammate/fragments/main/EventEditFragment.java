@@ -27,7 +27,6 @@ import com.mainstreetcode.teammate.adapters.EventEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
@@ -44,7 +43,7 @@ import static android.app.Activity.RESULT_OK;
  * Edits a Team member
  */
 
-public class EventEditFragment extends HeaderedFragment
+public class EventEditFragment extends HeaderedFragment<Event>
         implements
         EventEditAdapter.EventEditAdapterListener {
 
@@ -52,7 +51,6 @@ public class EventEditFragment extends HeaderedFragment
     public static final int PLACE_PICKER_REQUEST = 1;
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
-    private boolean fromUserPickerAction;
     private Event event;
 
     public static EventEditFragment newInstance(Event event) {
@@ -162,12 +160,7 @@ public class EventEditFragment extends HeaderedFragment
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
 
-        if (!event.isEmpty() && !fromUserPickerAction) {
-            disposables.add(eventViewModel.getEvent(event).subscribe(this::onEventChanged, defaultErrorHandler));
-        }
-
         eventViewModel.clearNotifications(event);
-        fromUserPickerAction = false;
     }
 
     @Override
@@ -201,7 +194,21 @@ public class EventEditFragment extends HeaderedFragment
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return event;}
+    protected Event getHeaderedModel() {return event;}
+
+    @Override
+    protected Flowable<DiffUtil.DiffResult> fetch(Event model) {
+        return eventViewModel.getEvent(model);
+    }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        toggleProgress(false);
+        scrollManager.onDiff(result);
+        viewHolder.bind(getHeaderedModel());
+        Activity activity;
+        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
+    }
 
     @Override
     public void onClick(View view) {
@@ -211,7 +218,7 @@ public class EventEditFragment extends HeaderedFragment
                 toggleProgress(true);
                 disposables.add(eventViewModel.createOrUpdateEvent(event).subscribe(diffResult -> {
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
-                    onEventChanged(diffResult);
+                    onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
                 }, defaultErrorHandler));
                 break;
@@ -277,15 +284,7 @@ public class EventEditFragment extends HeaderedFragment
 
     private void rsvpEvent(Event event, boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(this::onEventChanged, defaultErrorHandler));
-    }
-
-    private void onEventChanged(DiffUtil.DiffResult result) {
-        toggleProgress(false);
-        scrollManager.onDiff(result);
-        viewHolder.bind(getHeaderedModel());
-        Activity activity;
-        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
+        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 
     private void onRoleUpdated() {

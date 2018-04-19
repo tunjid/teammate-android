@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,12 +15,13 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GuestAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
-public class GuestViewFragment extends HeaderedFragment {
+import io.reactivex.Flowable;
+
+public class GuestViewFragment extends HeaderedFragment<Guest> {
 
     private static final String ARG_GUEST = "guest";
 
@@ -72,10 +74,6 @@ public class GuestViewFragment extends HeaderedFragment {
     @Override
     public void onResume() {
         super.onResume();
-        disposables.add(userViewModel.getMe().subscribe(ignored -> {
-            viewHolder.bind(getHeaderedModel());
-            scrollManager.notifyDataSetChanged();
-        }, defaultErrorHandler));
         disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), guest.getEvent().getTeam())
                 .subscribe(requireActivity()::invalidateOptionsMenu, ErrorHandler.EMPTY));
     }
@@ -109,10 +107,18 @@ public class GuestViewFragment extends HeaderedFragment {
     public boolean showsFab() {return false;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return guest;}
-
-    @Override
     public void onImageClick() {
         showSnackbar(getString(R.string.no_permission));
     }
+
+    @Override
+    protected Guest getHeaderedModel() {return guest;}
+
+    @Override
+    protected Flowable<DiffUtil.DiffResult> fetch(Guest model) {
+        return Flowable.empty();
+    }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {}
 }

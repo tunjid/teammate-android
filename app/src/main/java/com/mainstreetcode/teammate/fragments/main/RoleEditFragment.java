@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,17 +16,18 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.RoleEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
+import io.reactivex.Flowable;
+
 /**
  * Edits a Team member
  */
 
-public class RoleEditFragment extends HeaderedFragment
+public class RoleEditFragment extends HeaderedFragment<Role>
         implements
         RoleEditAdapter.RoleEditAdapterListener {
 
@@ -113,7 +115,13 @@ public class RoleEditFragment extends HeaderedFragment
     public boolean showsFab() {return canChangeRole();}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return role;}
+    protected Role getHeaderedModel() {return role;}
+
+    @Override
+    protected Flowable<DiffUtil.DiffResult> fetch(Role model) { return Flowable.empty(); }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) { }
 
     @Override
     public void onClick(View view) {
