@@ -13,6 +13,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 
@@ -101,6 +102,9 @@ public interface TeammateApi {
 
     @GET("api/teams")
     Single<List<Team>> findTeam(@Query("name") String teamName);
+
+    @GET("api/teams/{id}/members")
+    Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     @POST("api/teams/{id}/block")
     Single<JsonObject> blockUser(@Path(ID_PATH) String teamId, @Body JsonObject blockedUserRequest);

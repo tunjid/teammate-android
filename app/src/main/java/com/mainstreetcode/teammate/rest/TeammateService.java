@@ -22,6 +22,7 @@ import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
@@ -119,6 +120,7 @@ public class TeammateService {
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
+                .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {

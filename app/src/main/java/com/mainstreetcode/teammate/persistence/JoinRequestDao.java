@@ -7,9 +7,13 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 
+import java.util.Date;
 import java.util.List;
+
+import io.reactivex.Maybe;
 
 /**
  * DAO for {@link com.mainstreetcode.teammate.model.JoinRequest}
@@ -34,4 +38,11 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
 
     @Query("DELETE FROM join_requests WHERE join_request_team = :teamId")
     public abstract void deleteByTeam(String teamId);
+
+    @Query("SELECT * FROM join_requests as request" +
+            " WHERE :teamId = join_request_team" +
+            " AND join_request_created < :date" +
+            " ORDER BY join_request_created DESC" +
+            " LIMIT 40")
+    public abstract Maybe<List<JoinRequest>> getRequests(String teamId, Date date);
 }

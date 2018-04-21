@@ -14,6 +14,8 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Position;
 
+import java.util.Date;
+
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
@@ -34,15 +36,17 @@ public class JoinRequestEntity implements Parcelable {
 
     @ColumnInfo(name = "join_request_team") protected Team team;
     @ColumnInfo(name = "join_request_user") protected User user;
+    @ColumnInfo(name = "join_request_created") protected Date created;
 
     protected JoinRequestEntity(boolean teamApproved, boolean userApproved,
-                                @NonNull String id, Position position, Team team, User user) {
+                                @NonNull String id, Position position, Team team, User user, Date created) {
         this.teamApproved = teamApproved;
         this.userApproved = userApproved;
         this.id = id;
         this.position = position;
         this.team = team;
         this.user = user;
+        this.created = created;
     }
 
     protected JoinRequestEntity(Parcel in) {
@@ -52,6 +56,7 @@ public class JoinRequestEntity implements Parcelable {
         position = Config.positionFromCode(in.readString());
         team = (Team) in.readValue(Team.class.getClassLoader());
         user = (User) in.readValue(User.class.getClassLoader());
+        created = new Date(in.readLong());
     }
 
     @NonNull
@@ -70,6 +75,11 @@ public class JoinRequestEntity implements Parcelable {
     public User getUser() {
         return user;
     }
+
+    public Date getCreated() {
+        return created;
+    }
+
 
     public boolean isTeamApproved() {
         return teamApproved;
@@ -111,6 +121,7 @@ public class JoinRequestEntity implements Parcelable {
         dest.writeString(position.getCode());
         dest.writeValue(team);
         dest.writeValue(user);
+        dest.writeValue(created.getTime());
     }
 
     public static final Creator<JoinRequestEntity> CREATOR = new Creator<JoinRequestEntity>() {

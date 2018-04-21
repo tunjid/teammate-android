@@ -4,6 +4,8 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.migration.Migration;
 import android.support.annotation.NonNull;
 
+import java.util.Date;
+
 public class Migration12 extends Migration {
 
     public Migration12() {
@@ -12,12 +14,18 @@ public class Migration12 extends Migration {
 
     @Override
     public void migrate(@NonNull SupportSQLiteDatabase database) {
+        long now = new Date().getTime();
+
         database.execSQL("ALTER TABLE users ADD COLUMN user_about TEXT DEFAULT ''");
 
         database.execSQL("ALTER TABLE teams ADD COLUMN team_sport TEXT DEFAULT ''");
         database.execSQL("ALTER TABLE teams ADD COLUMN team_description TEXT DEFAULT ''");
         database.execSQL("ALTER TABLE teams ADD COLUMN team_min_age INTEGER NOT NULL DEFAULT 0");
         database.execSQL("ALTER TABLE teams ADD COLUMN team_max_age INTEGER NOT NULL DEFAULT 0");
+
+        database.execSQL("ALTER TABLE roles ADD COLUMN role_created INTEGER DEFAULT " + now);
+
+        database.execSQL("ALTER TABLE join_requests ADD COLUMN join_request_created INTEGER DEFAULT " + now);
 
         database.execSQL("ALTER TABLE events ADD COLUMN event_visibility TEXT DEFAULT ''");
     }

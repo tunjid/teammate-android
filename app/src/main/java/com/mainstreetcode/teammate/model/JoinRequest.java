@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,15 +36,15 @@ public class JoinRequest extends JoinRequestEntity
     @Ignore private final List<Item<JoinRequest>> items;
 
     public static JoinRequest join(Position position, Team team, User user) {
-        return new JoinRequest(false, true, "", position, team, user);
+        return new JoinRequest(false, true, "", position, team, user, new Date());
     }
 
     public static JoinRequest invite(Team team) {
-        return new JoinRequest(true, false, "", Position.empty(), team, User.empty());
+        return new JoinRequest(true, false, "", Position.empty(), team, User.empty(), new Date());
     }
 
-    public JoinRequest(boolean teamApproved, boolean userApproved, String id, Position position, Team team, User user) {
-        super(teamApproved, userApproved, id, position, team, user);
+    public JoinRequest(boolean teamApproved, boolean userApproved, String id, Position position, Team team, User user, Date created) {
+        super(teamApproved, userApproved, id, position, team, user, created);
         items = buildItems();
     }
 
@@ -164,6 +165,7 @@ public class JoinRequest extends JoinRequestEntity
         private static final String TEAM_KEY = "team";
         private static final String TEAM_APPROVAL_KEY = "teamApproved";
         private static final String USER_APPROVAL_KEY = "userApproved";
+        private static final String CREATED_KEY = "created";
 
         @Override
         public JsonElement serialize(JoinRequest src, Type typeOfSrc, JsonSerializationContext context) {
@@ -204,11 +206,12 @@ public class JoinRequest extends JoinRequestEntity
 
             Team team = context.deserialize(requestJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(requestJson.get(USER_KEY), User.class);
+            Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, requestJson));
 
             if (team == null) team = Team.empty();
             if (user == null) user = User.empty();
 
-            return new JoinRequest(teamApproved, userApproved, id, position, team, user);
+            return new JoinRequest(teamApproved, userApproved, id, position, team, user, created);
         }
     }
 }

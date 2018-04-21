@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,8 +39,8 @@ public class Role extends RoleEntity
     @Ignore private final List<Item<Role>> items;
 
     @SuppressWarnings("unused")
-    public Role(String id, String imageUrl, Position position, Team team, User user) {
-        super(id, imageUrl, position, team, user);
+    public Role(String id, String imageUrl, Position position, Team team, User user, Date created) {
+        super(id, imageUrl, position, team, user, created);
         items = buildItems();
     }
 
@@ -49,7 +50,7 @@ public class Role extends RoleEntity
     }
 
     public static Role empty() {
-        return new Role("", Config.getDefaultUserAvatar(), Position.empty(), Team.empty(), User.empty());
+        return new Role("", Config.getDefaultUserAvatar(), Position.empty(), Team.empty(), User.empty(), new Date());
     }
 
     @SuppressWarnings("unchecked")
@@ -163,6 +164,7 @@ public class Role extends RoleEntity
         private static final String USER_KEY = "user";
         private static final String TEAM_KEY = "team";
         private static final String IMAGE_KEY = "imageUrl";
+        private static final String CREATED_KEY = "created";
 
         @Override
         public JsonElement serialize(Role src, Type typeOfSrc, JsonSerializationContext context) {
@@ -189,10 +191,11 @@ public class Role extends RoleEntity
             Position position = Config.positionFromCode(positionName);
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(roleJson.get(USER_KEY), User.class);
+            Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, roleJson));
 
             if (user == null) user = User.empty();
 
-            return new Role(id, imageUrl, position, team, user);
+            return new Role(id, imageUrl, position, team, user, created);
         }
     }
 }

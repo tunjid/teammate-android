@@ -15,6 +15,8 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Position;
 
+import java.util.Date;
+
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
@@ -32,13 +34,15 @@ public class RoleEntity implements Parcelable {
     @ColumnInfo(name = "role_name") protected Position position;
     @ColumnInfo(name = "role_team") protected Team team;
     @ColumnInfo(name = "role_user") protected User user;
+    @ColumnInfo(name = "role_created") protected Date created;
 
-    public RoleEntity(@NonNull String id, String imageUrl, Position position, Team team, User user) {
+    public RoleEntity(@NonNull String id, String imageUrl, Position position, Team team, User user, Date created) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.position = position;
         this.team = team;
         this.user = user;
+        this.created = created;
     }
 
     protected RoleEntity(Parcel in) {
@@ -47,6 +51,7 @@ public class RoleEntity implements Parcelable {
         position = Config.positionFromCode(in.readString());
         team = (Team) in.readValue(Team.class.getClassLoader());
         user = (User) in.readValue(User.class.getClassLoader());
+        created = new Date(in.readLong());
     }
 
     @NonNull
@@ -68,6 +73,10 @@ public class RoleEntity implements Parcelable {
 
     public User getUser() {
         return user;
+    }
+
+    public Date getCreated() {
+        return created;
     }
 
     public void setPosition(String position) {
@@ -105,6 +114,7 @@ public class RoleEntity implements Parcelable {
         dest.writeString(position.getCode());
         dest.writeValue(team);
         dest.writeValue(user);
+        dest.writeValue(created.getTime());
     }
 
     public static final Creator<RoleEntity> CREATOR = new Creator<RoleEntity>() {
