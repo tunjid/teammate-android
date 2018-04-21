@@ -12,13 +12,15 @@ import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+
+import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -31,12 +33,12 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     private static final int GUEST = 12;
     private static final int TEAM = 13;
 
-    private final Event event;
+    private final List<Identifiable> identifiables;
 
-    public EventEditAdapter(Event event, EventEditAdapterListener listener) {
+    public EventEditAdapter(List<Identifiable> identifiables, EventEditAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
-        this.event = event;
+        this.identifiables = identifiables;
     }
 
     @NonNull
@@ -65,7 +67,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
-        Object item = event.asIdentifiables().get(i);
+        Object item = identifiables.get(i);
 
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
         else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
@@ -74,17 +76,17 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public int getItemCount() {
-        return event.asIdentifiables().size();
+        return identifiables.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return event.asIdentifiables().get(position).getId().hashCode();
+        return identifiables.get(position).getId().hashCode();
     }
 
     @Override
     public int getItemViewType(int position) {
-        Object thing = event.asIdentifiables().get(position);
+        Object thing = identifiables.get(position);
         return thing instanceof Item
                 ? ((Item) thing).getItemType()
                 : thing instanceof Team

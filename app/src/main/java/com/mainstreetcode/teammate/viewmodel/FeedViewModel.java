@@ -4,11 +4,12 @@ import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.FeedItem;
-import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.repository.JoinRequestRepository;
 import com.mainstreetcode.teammate.repository.RoleRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
@@ -28,7 +29,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     private final TeammateApi api = TeammateService.getApiInstance();
 
     private final RoleRepository roleRepository = RoleRepository.getInstance();
-    private final EventRepository eventRepository = EventRepository.getInstance();
+    private final GuestRepository guestRepository = GuestRepository.getInstance();
     private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
 
     private final List<Identifiable> feedItems = new ArrayList<>();
@@ -58,7 +59,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = eventRepository.rsvpEvent(feedItem.getModel(), attending)
+        Flowable<List<Identifiable>> sourceFlowable = guestRepository.createOrUpdate(Guest.forEvent(feedItem.getModel(), attending))
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)

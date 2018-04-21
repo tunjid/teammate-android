@@ -8,19 +8,26 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
 
 import static android.location.Location.distanceBetween;
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
@@ -34,10 +41,24 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private final EventRepository repository;
+    private final GuestRepository guestRepository;
     private final List<Event> publicEvents = new ArrayList<>();
     private final EventSearchRequest eventRequest = EventSearchRequest.empty();
 
-    public EventViewModel() {repository = EventRepository.getInstance();}
+    private Map<Event, List<Identifiable>> eventItemMap = new HashMap<>();
+
+    public EventViewModel() {
+        repository = EventRepository.getInstance();
+        guestRepository = GuestRepository.getInstance();
+    }
+
+    public List<Identifiable> getEventItems(Event event) {
+        List<Identifiable> items = eventItemMap.get(event);
+        if (!eventItemMap.containsKey(event))
+            eventItemMap.put(event, items = new ArrayList<>(event.asItems()));
+
+        return items;
+    }
 
     @Override
     Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
@@ -46,21 +67,24 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     public Flowable<DiffUtil.DiffResult> getEvent(Event event) {
-        List<Identifiable> staleOriginal =  new ArrayList<>(event.asIdentifiables());
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(event), event.getTeam(), event).cast(Event.class).map(Event::asIdentifiables);
-        return Identifiable.diff(sourceFlowable, () -> staleOriginal, (staleCopy, updatedOriginal) -> updatedOriginal);
+        Flowable<List<Identifiable>> eventFlowable = checkForInvalidObject(repository.get(event), event.getTeam(), event).cast(Event.class).map(Event::asIdentifiables);
+        Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(event, new Date()).map(ModelUtils::asIdentifiables);
+        Flowable<List<Identifiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, guestsFlowable);
+        return Identifiable.diff(sourceFlowable, () -> getEventItems(event), updateEventList(event));
     }
 
     public Single<DiffUtil.DiffResult> createOrUpdateEvent(final Event event) {
-        List<Identifiable> staleOriginal =  new ArrayList<>(event.asIdentifiables());
         Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(event).toFlowable(), event.getTeam(), event).cast(Event.class).map(Event::asIdentifiables);
-        return Identifiable.diff(sourceFlowable, () -> staleOriginal, (staleCopy, updatedOriginal) -> updatedOriginal).firstOrError();
+        return Identifiable.diff(sourceFlowable, () -> getEventItems(event), updateEventList(event)).firstOrError();
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final Event event, boolean attending) {
-        List<Identifiable> staleOriginal =  new ArrayList<>(event.asIdentifiables());
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.rsvpEvent(event, attending).toFlowable(), event.getTeam(), event).cast(Event.class).map(Event::asIdentifiables);
-        return Identifiable.diff(sourceFlowable, () -> staleOriginal, (staleCopy, updatedOriginal) -> updatedOriginal).firstOrError();
+        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(guestRepository.createOrUpdate(Guest.forEvent(event, attending)).toFlowable(), event.getTeam(), event).map(Collections::singletonList);
+        return Identifiable.diff(sourceFlowable, () -> getEventItems(event), (staleCopy, singletonGuestList) -> {
+            staleCopy.removeAll(singletonGuestList);
+            staleCopy.addAll(singletonGuestList);
+            return staleCopy;
+        }).firstOrError();
     }
 
     public Single<Event> delete(final Event event) {
@@ -94,6 +118,20 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
         Event event = findLast(getModelList(team), Event.class);
         return event == null ? null : event.getStartDate();
+    }
+
+    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> updateEventList(Event event) {
+        return (staleList, fetched) -> {
+            List<Identifiable> staleItems = new ArrayList<>();
+            Flowable.fromIterable(staleList).filter(identifiable -> identifiable instanceof Item)
+                    .collect(() -> staleItems, List::add).blockingGet();
+
+            staleList.removeAll(staleItems);
+            staleList.addAll(event.asItems());
+
+            ModelUtils.preserveAscending(staleList, fetched);
+            return staleList;
+        };
     }
 
     private EventSearchRequest fromMap(GoogleMap map) {

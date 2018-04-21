@@ -27,11 +27,9 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.TextBitmapUtil;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 
@@ -48,7 +46,6 @@ public class Event extends EventEntity
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
 
     @Ignore private final List<Item<Event>> items;
-    @Ignore private final List<Identifiable> identifiables;
 
     public static Event empty() {
         Date date = new Date();
@@ -60,13 +57,11 @@ public class Event extends EventEntity
         super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location, visibility);
         this.team = team;
         items = buildItems();
-        identifiables = buildIdentifiables();
     }
 
     protected Event(Parcel in) {
         super(in);
         items = buildItems();
-        identifiables = buildIdentifiables();
     }
 
     @SuppressWarnings("unchecked")
@@ -82,17 +77,8 @@ public class Event extends EventEntity
         );
     }
 
-    private List<Identifiable> buildIdentifiables() {
-        List<Identifiable> result = new ArrayList<>(items);
-        result.add(team);
-        return result;
-    }
-
     @Override
     public List<Item<Event>> asItems() { return items; }
-
-    @Override
-    public List<Identifiable> asIdentifiables() { return identifiables; }
 
     @Override
     public Item<Event> getHeaderItem() {
@@ -137,14 +123,6 @@ public class Event extends EventEntity
         visibility.update(updatedEvent.visibility);
         team.update(updatedEvent.team);
         updateItemList(updatedEvent);
-
-        ModelUtils.preserveAscending(identifiables, filterOutItems(updatedEvent));
-    }
-
-    private List<Identifiable> filterOutItems(Event event) {
-        return Flowable.fromIterable(event.identifiables)
-                .filter(identifiable -> !(identifiable instanceof Item))
-                .collect((Callable<ArrayList<Identifiable>>) ArrayList::new, List::add).blockingGet();
     }
 
     @Override
@@ -212,7 +190,6 @@ public class Event extends EventEntity
         private static final String START_DATE_KEY = "startDate";
         private static final String END_DATE_KEY = "endDate";
         private static final String LOCATION_KEY = "location";
-        private static final String GUESTS_KEY = "guests";
 
         @Override
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
@@ -262,15 +239,7 @@ public class Event extends EventEntity
 
             if (team == null) team = Team.empty();
 
-            Event result = new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
-
-            List<Guest> guestList = new ArrayList<>();
-            ModelUtils.deserializeList(context, eventJson.get(GUESTS_KEY), guestList, Guest.class);
-
-            for (Guest guest : guestList) guest.getEvent().update(result);
-            result.identifiables.addAll(guestList);
-
-            return result;
+            return new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
         }
     }
 }

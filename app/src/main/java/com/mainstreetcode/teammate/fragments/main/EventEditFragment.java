@@ -89,7 +89,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new EventEditAdapter(event, this))
+                .withAdapter(new EventEditAdapter(eventViewModel.getEventItems(event), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
@@ -341,7 +341,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return event.asIdentifiables().get(position) instanceof Guest ? 1 : 2;
+                return eventViewModel.getEventItems(event).get(position) instanceof Guest ? 1 : 2;
             }
         });
     }

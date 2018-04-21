@@ -71,6 +71,11 @@ public class Guest implements
         items = buildItems();
     }
 
+
+    public static Guest forEvent(Event event, boolean attending) {
+        return new Guest("", User.empty(), event, new Date(), attending);
+    }
+
     private List<Item<Guest>> buildItems() {
         User user = getUser();
         return Arrays.asList(
@@ -122,9 +127,9 @@ public class Guest implements
     @Override
     public void update(Guest updated) {
         id = updated.id;
+        attending = updated.attending;
         created = updated.created;
         user.update(updated.user);
-        attending = updated.attending;
     }
 
     @Override

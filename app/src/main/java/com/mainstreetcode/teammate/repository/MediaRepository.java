@@ -34,7 +34,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class MediaRepository extends QueryRepository<Media> {
+public class MediaRepository extends TeamQueryRepository<Media> {
 
     private final int num;
     private final TeammateApi api;

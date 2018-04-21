@@ -41,7 +41,7 @@ import static com.mainstreetcode.teammate.socket.SocketFactory.EVENT_NEW_MESSAGE
 import static io.reactivex.schedulers.Schedulers.io;
 import static io.socket.client.Socket.EVENT_ERROR;
 
-public class ChatRepository extends QueryRepository<Chat> {
+public class ChatRepository extends TeamQueryRepository<Chat> {
 
 
     private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";

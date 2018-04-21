@@ -25,7 +25,7 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends QueryRepository<Event> {
+public class EventRepository extends TeamQueryRepository<Event> {
 
     private static EventRepository ourInstance;
 
@@ -89,12 +89,6 @@ public class EventRepository extends QueryRepository<Event> {
     @Override
     Maybe<List<Event>> remoteModelsBefore(Team team, @Nullable Date date) {
         return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
-    }
-
-    public Single<Event> rsvpEvent(final Event event, boolean attending) {
-        return api.rsvpEvent(event.getId(), attending)
-                .map(getLocalUpdateFunction(event))
-                .map(getSaveFunction());
     }
 
     @Override

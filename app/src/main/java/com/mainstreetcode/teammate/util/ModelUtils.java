@@ -12,6 +12,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -99,6 +100,10 @@ public class ModelUtils {
         catch (ParseException e) {
             return new Date();
         }
+    }
+
+    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList){
+        return new ArrayList<>(subTypeList);
     }
 
     public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {

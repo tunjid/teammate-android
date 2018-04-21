@@ -6,6 +6,7 @@ import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
@@ -101,6 +102,9 @@ public interface TeammateApi {
     @GET("api/teams")
     Single<List<Team>> findTeam(@Query("name") String teamName);
 
+    @POST("api/teams/{id}/block")
+    Single<JsonObject> blockUser(@Path(ID_PATH) String teamId, @Body JsonObject blockedUserRequest);
+
     // =============================================================================================
     // Role endpoints
     // =============================================================================================
@@ -163,11 +167,14 @@ public interface TeammateApi {
     @GET("api/events/{id}")
     Single<Event> getEvent(@Path(ID_PATH) String eventId);
 
+    @GET("api/events/{id}/guests")
+    Single<List<Guest>> getEventGuests(@Path(ID_PATH) String eventId, @Query(DATE_QUERY) Date date);
+
     @DELETE("api/events/{id}")
     Single<Event> deleteEvent(@Path(ID_PATH) String eventId);
 
-    @GET("api/events/{id}/rsvp")
-    Single<Event> rsvpEvent(@Path(ID_PATH) String eventId, @Query("attending") boolean attending);
+    @GET("api/events/{id}/rsvpGuest")
+    Single<Guest> rsvpEvent(@Path(ID_PATH) String eventId, @Query("attending") boolean attending);
 
     // =============================================================================================
     // Team Chat endpoints
