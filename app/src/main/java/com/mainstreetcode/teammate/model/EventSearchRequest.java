@@ -26,13 +26,15 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
     private int distance;
     private Sport sport;
+    private Date startDate;
     private Date endDate;
     private LatLng location;
 
     private final List<Item<EventSearchRequest>> items;
 
-    private EventSearchRequest(int distance, Sport sport, Date endDate, LatLng location) {
+    private EventSearchRequest(int distance, Sport sport, LatLng location, Date startDate, Date endDate) {
         this.distance = distance;
+        this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
         this.sport = sport;
@@ -40,7 +42,7 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
     }
 
     public static EventSearchRequest empty() {
-        return new EventSearchRequest(5, Sport.empty(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)), null);
+        return new EventSearchRequest(5, Sport.empty(), null, new Date(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)));
     }
 
     public void setDistance(String distance) {
@@ -50,10 +52,13 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
     public void setSport(String sport) { this.sport = Config.sportFromCode(sport); }
 
+    private void setStartDate(String startDate) {
+        this.startDate = ModelUtils.parseDate(startDate, prettyPrinter);
+    }
+
     private void setEndDate(String endDate) {
         this.endDate = ModelUtils.parseDate(endDate, prettyPrinter);
     }
-
 
     public void setLocation(LatLng location) { this.location = location; }
 
@@ -66,6 +71,8 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
     private CharSequence getDistance() { return App.getInstance().getString(R.string.event_public_distance, distance); }
 
+    private CharSequence getStartDate() { return ModelUtils.prettyPrinter.format(startDate); }
+
     private CharSequence getEndDate() { return ModelUtils.prettyPrinter.format(endDate); }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +81,8 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
                 Item.text(0, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
                 Item.text(1, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(2, Item.DATE, R.string.start_date, this::getEndDate, this::setEndDate, this)
+                Item.text(2, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
+                Item.text(3, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
         );
     }
 
@@ -85,8 +93,9 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
         private static final String DISTANCE_KEY = "maxDistance";
         private static final String SPORT_KEY = "sport";
-
         private static final String LOCATION_KEY = "location";
+        private static final String START_DATE_KEY = "startDate";
+        private static final String END_DATE_KEY = "endDate";
 
         @Override
         public JsonElement serialize(EventSearchRequest src, Type typeOfSrc, JsonSerializationContext context) {
@@ -97,7 +106,11 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
             if (src.sport != null) {
                 serialized.addProperty(SPORT_KEY, src.sport.getCode());
             }
-
+            if (src.startDate != null) {
+                serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
+            if (src.endDate != null) {
+                serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));            }
+            }
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();
                 coordinates.add(src.location.longitude);

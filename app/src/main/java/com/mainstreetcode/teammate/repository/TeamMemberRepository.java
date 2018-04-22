@@ -56,10 +56,12 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
         Model<?> wrapped = model.getWrappedModel();
         Single<TeamMember<T>> single;
 
-        if (wrapped instanceof Role)
+        if (wrapped instanceof Role) {
             single = unsafeCast(roleRepository.createOrUpdate((Role) wrapped));
-        else if (wrapped instanceof JoinRequest)
+        }
+        else if (wrapped instanceof JoinRequest) {
             single = unsafeCast(joinRequestRepository.createOrUpdate((JoinRequest) wrapped));
+        }
         else single = Single.error(new TeammateException("Unimplemented"));
 
         single = single.map(getLocalUpdateFunction(model));
@@ -69,7 +71,7 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
 
     @Override
     public Flowable<TeamMember<T>> get(String id) {
-        return null;
+        return Flowable.error(new IllegalArgumentException("Unimplementable"));
     }
 
     @Override
@@ -77,14 +79,16 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
         Model<?> wrapped = model.getWrappedModel();
         Single<TeamMember<T>> single;
 
-        if (wrapped instanceof Role) single = unsafeCast(roleRepository.delete((Role) wrapped));
-        else if (wrapped instanceof JoinRequest)
+        if (wrapped instanceof Role) {
+            single = unsafeCast(roleRepository.delete((Role) wrapped));
+        }
+        else if (wrapped instanceof JoinRequest) {
             single = unsafeCast(joinRequestRepository.delete((JoinRequest) wrapped));
+        }
         else single = Single.error(new TeammateException("Unimplemented"));
 
         return single;
     }
-
 
     @Override
     @SuppressLint("CheckResult")
