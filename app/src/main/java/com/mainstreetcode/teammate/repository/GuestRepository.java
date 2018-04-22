@@ -19,6 +19,8 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
+import static io.reactivex.schedulers.Schedulers.io;
+
 public class GuestRepository extends QueryRepository<Guest, Event> {
 
     private final TeammateApi api;
@@ -63,7 +65,7 @@ public class GuestRepository extends QueryRepository<Guest, Event> {
     @Override
     Maybe<List<Guest>> localModelsBefore(Event key, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return guestDao.getGuests(key.getId(), date);
+        return guestDao.getGuests(key.getId(), date).subscribeOn(io());
     }
 
     @Override
