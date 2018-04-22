@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -12,16 +13,20 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +63,18 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
             eventItemMap.put(event, items = new ArrayList<>(event.asItems()));
 
         return items;
+    }
+
+    @Override
+    @SuppressLint("CheckResult")
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (!(alert instanceof Alert.UserBlocked)) return;
+
+        User blocked = ((Alert.UserBlocked) alert).getModel();
+        Flowable.fromIterable(eventItemMap.values())
+                .map(List::iterator)
+                .subscribe(iterator -> removeBlockedUser(blocked, iterator), ErrorHandler.EMPTY);
     }
 
     @Override
@@ -167,5 +184,16 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return Flowable.fromIterable(publicEvents).filter(event -> event.getTeam().getSport().equals(sport))
                 .collect(() -> filtered, List::add)
                 .blockingGet();
+    }
+
+    private void removeBlockedUser(User user, Iterator<Identifiable> iterator) {
+        while (iterator.hasNext()) {
+            Identifiable identifiable = iterator.next();
+            if (!(identifiable instanceof Guest)) continue;
+
+            if (((Guest) identifiable).getUser().equals(user)) {
+                iterator.remove();
+            }
+        }
     }
 }

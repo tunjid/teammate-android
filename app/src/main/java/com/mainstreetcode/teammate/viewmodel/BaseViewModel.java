@@ -3,17 +3,26 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.arch.lifecycle.ViewModel;
 
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.processors.PublishProcessor;
 
 
 abstract class BaseViewModel extends ViewModel {
 
     private static final int AD_THRESH = 5;
+
+    private static final PublishProcessor<Alert> eventSource = PublishProcessor.create();
+
+    private LinkedList<Identifiable> ads = new LinkedList<>();
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (source, additions) -> {
         if (sortsAscending()) ModelUtils.preserveAscending(source, additions);
@@ -23,13 +32,24 @@ abstract class BaseViewModel extends ViewModel {
         return source;
     };
 
-    private LinkedList<Identifiable> ads = new LinkedList<>();
-
-    BaseViewModel() {fetchAds();}
+    BaseViewModel() {
+        disposable.add(eventSource.subscribe(this::onModelAlert, ErrorHandler.EMPTY));
+        fetchAds();
+    }
 
     boolean hasNativeAds() {return true;}
 
     boolean sortsAscending() {return false;}
+
+    void pushModelAlert(Alert alert) { eventSource.onNext(alert); }
+
+    void onModelAlert(Alert alert) {}
+
+    @Override
+    protected void onCleared() {
+        disposable.clear();
+        super.onCleared();
+    }
 
     private void distributeAds(List<Identifiable> source) {
         //filterAds(source);
@@ -72,13 +92,14 @@ abstract class BaseViewModel extends ViewModel {
 //
 //        adLoader.loadAds(new AdRequest.Builder().build(), 2);
     }
-
+    //        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
+    //        Iterator<Identifiable> iterator = source.iterator();
 //    private void filterAds(List<Identifiable> source) {
-//        Iterator<Identifiable> iterator = source.iterator();
-//        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
+
 //    }
 
     private void shuffleAds(int count) {
         for (int i = 0; i < count; i++) ads.add(ads.removeFirst());
     }
+
 }

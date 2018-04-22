@@ -6,10 +6,12 @@ import android.support.v7.util.DiffUtil;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TransformingSequentialList;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -82,9 +84,14 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return checkForInvalidObject(repository.delete(team).toFlowable(), Team.class, team).observeOn(mainThread())
                 .firstOrError()
                 .cast(Team.class)
-                .map(TeamViewModel::onTeamDeleted)
-                .doOnSuccess(getModelList(Team.class)::remove)
+                .doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)))
                 .observeOn(mainThread());
+    }
+
+    public Completable blockUser(User user) {
+        return repository.blockUser(user)
+                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(user)))
+                .toCompletable();
     }
 
     public boolean postSearch(String queryText) {
@@ -104,12 +111,19 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Team getDefaultTeam() {return defaultTeam;}
 
+    @Override
     @SuppressLint("CheckResult")
-    static Team onTeamDeleted(Team deleted) {
-        teams.remove(deleted);
-        if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
-        Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
-                .delete(deleted)).subscribeOn(Schedulers.io()).subscribe(() -> {}, ErrorHandler.EMPTY);
-        return deleted;
+    void onModelAlert(Alert alert) {
+        if (alert instanceof Alert.TeamDeletion) {
+            Team deleted = ((Alert.TeamDeletion) alert).getModel();
+
+            teams.remove(deleted);
+            if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
+
+            Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
+                    .delete(deleted))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(() -> {}, ErrorHandler.EMPTY);
+        }
     }
 }

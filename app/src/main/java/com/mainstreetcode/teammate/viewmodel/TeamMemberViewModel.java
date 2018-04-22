@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -8,10 +9,14 @@ import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
+import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -33,6 +38,19 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     @Override
     boolean sortsAscending() {
         return true;
+    }
+
+    @Override
+    @SuppressLint("CheckResult")
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (alert instanceof Alert.UserBlocked) {
+            User user = ((Alert.UserBlocked) alert).getModel();
+
+            Flowable.fromIterable(modelListMap.values())
+                    .map(List::iterator)
+                    .subscribe(iterator -> removeBlockedUser(user, iterator), ErrorHandler.EMPTY);
+        }
     }
 
     @Override
@@ -119,5 +137,20 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
                 : model instanceof JoinRequest
                 ? ((JoinRequest) model).getCreated()
                 : null;
+    }
+
+    private void removeBlockedUser(User user, Iterator<Identifiable> iterator) {
+        while (iterator.hasNext()) {
+            Identifiable identifiable = iterator.next();
+            if (!(identifiable instanceof TeamMember)) continue;
+
+            Model model = ((TeamMember) identifiable).getWrappedModel();
+            if (model instanceof Role && ((Role) model).getUser().equals(user)) {
+                iterator.remove();
+            }
+            if (model instanceof JoinRequest && ((JoinRequest) model).getUser().equals(user)) {
+                iterator.remove();
+            }
+        }
     }
 }
