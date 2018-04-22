@@ -5,7 +5,9 @@ import android.support.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
+import com.mainstreetcode.teammate.persistence.GuestDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 
@@ -20,11 +22,13 @@ import io.reactivex.functions.Function;
 public class GuestRepository extends QueryRepository<Guest, Event> {
 
     private final TeammateApi api;
+    private final GuestDao guestDao;
 
     private static GuestRepository ourInstance;
 
     private GuestRepository() {
         api = TeammateService.getApiInstance();
+        guestDao = AppDatabase.getInstance().guestDao();
     }
 
     public static GuestRepository getInstance() {
@@ -34,7 +38,7 @@ public class GuestRepository extends QueryRepository<Guest, Event> {
 
     @Override
     public EntityDao<? super Guest> dao() {
-        return null;
+        return guestDao;
     }
 
     @Override
@@ -58,7 +62,8 @@ public class GuestRepository extends QueryRepository<Guest, Event> {
 
     @Override
     Maybe<List<Guest>> localModelsBefore(Event key, @Nullable Date date) {
-        return Maybe.empty();
+        if (date == null) date = getFutureDate();
+        return guestDao.getGuests(key.getId(), date);
     }
 
     @Override

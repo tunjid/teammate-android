@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
@@ -29,14 +30,14 @@ import java.util.List;
 
 import io.reactivex.Single;
 
-import static com.mainstreetcode.teammate.BuildConfig.DEBUG;
+import static com.mainstreetcode.teammate.BuildConfig.DEV;
 
 /**
  * App Database
  */
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
-        RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class}, version = 2)
+        RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class, Guest.class}, version = 2)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class,
         TeamTypeConverter.class, UserTypeConverter.class,
@@ -67,9 +68,11 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract MediaDao mediaDao();
 
-    public abstract JoinRequestDao joinRequestDao();
+    public abstract GuestDao guestDao();
 
     public abstract ChatDao teamChatDao();
+
+    public abstract JoinRequestDao joinRequestDao();
 
     public DeviceDao deviceDao() {return new DeviceDao();}
 
@@ -81,12 +84,12 @@ public abstract class AppDatabase extends RoomDatabase {
 
         singles.add(clearTable(teamChatDao()));
         singles.add(clearTable(joinRequestDao()));
+        singles.add(clearTable(guestDao()));
         singles.add(clearTable(eventDao()));
         singles.add(clearTable(mediaDao()));
         singles.add(clearTable(roleDao()));
         singles.add(clearTable(teamDao()));
         singles.add(clearTable(userDao()));
-        singles.add(clearTable(deviceDao()));
         singles.add(clearTable(deviceDao()));
         singles.add(clearTable(configDao()));
 
@@ -99,7 +102,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return entityDao.deleteAll()
                 .map(rowsDeleted -> new Pair<>(tableName, rowsDeleted))
                 .onErrorResumeNext(throwable -> {
-                    if (DEBUG) Log.e(TAG, "Error clearing table: " + tableName, throwable);
+                    if (DEV) Log.e(TAG, "Error clearing table: " + tableName, throwable);
                     return Single.just(new Pair<>(tableName, 0));
                 });
     }

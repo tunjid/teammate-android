@@ -28,5 +28,20 @@ public class Migration12 extends Migration {
         database.execSQL("ALTER TABLE join_requests ADD COLUMN join_request_created INTEGER DEFAULT " + now);
 
         database.execSQL("ALTER TABLE events ADD COLUMN event_visibility TEXT DEFAULT ''");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS `guests` " +
+                "(`guest_id` TEXT NOT NULL, " +
+                "`guest_user` TEXT, " +
+                "`guest_event` TEXT, " +
+                "`guest_created` INTEGER, " +
+                "`guest_attending` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`guest_id`), " +
+                "FOREIGN KEY(`guest_user`) " +
+                "REFERENCES `users`(`user_id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE, " +
+                "FOREIGN KEY(`guest_event`) " +
+                "REFERENCES `events`(`event_id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE)"
+        );
     }
 }

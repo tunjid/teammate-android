@@ -31,7 +31,7 @@ import java.util.List;
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
-        tableName = "event_guest",
+        tableName = "guests",
         foreignKeys = {
                 @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "guest_user", onDelete = CASCADE),
                 @ForeignKey(entity = EventEntity.class, parentColumns = "event_id", childColumns = "guest_event", onDelete = CASCADE)

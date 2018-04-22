@@ -12,7 +12,6 @@ import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -102,11 +101,5 @@ public class EventRepository extends TeamQueryRepository<Event> {
 
             return models;
         };
-    }
-
-    private Date getFutureDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 100);
-        return calendar.getTime();
     }
 }

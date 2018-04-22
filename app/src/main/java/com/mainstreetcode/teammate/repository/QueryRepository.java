@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Model;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,4 +23,10 @@ abstract class QueryRepository<T extends Model<T>, S extends Model<S>> extends M
     abstract Maybe<List<T>> localModelsBefore(S key, @Nullable Date date);
 
     abstract Maybe<List<T>> remoteModelsBefore(S key, @Nullable Date date);
+
+    Date getFutureDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, 100);
+        return calendar.getTime();
+    }
 }
