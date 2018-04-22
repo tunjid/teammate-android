@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.baseclasses;
 
 
+import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,9 +15,17 @@ import android.view.View;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.BlockUserRequest;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Flowable;
 
@@ -37,6 +47,12 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T>> extends MainA
 
     private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
+
+    protected abstract T getHeaderedModel();
+
+    protected abstract Flowable<DiffUtil.DiffResult> fetch(T model);
+
+    protected abstract void onModelUpdated(DiffUtil.DiffResult result);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,9 +119,29 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T>> extends MainA
                 .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
     }
 
-    protected abstract T getHeaderedModel();
+    protected void blockUser(User user, Team team) {
+        List<BlockReason> reasons = Config.getBlockReasons();
+        List<CharSequence> sequences = new ArrayList<>(reasons.size());
 
-    protected abstract Flowable<DiffUtil.DiffResult> fetch(T model);
+        for (BlockReason reason : reasons) sequences.add(reason.getName());
 
-    protected abstract void onModelUpdated(DiffUtil.DiffResult result);
+        new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.block_user)
+                .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialog, index) -> {
+                    BlockReason reason = reasons.get(index);
+                    BlockUserRequest request = BlockUserRequest.block(user, team, reason);
+
+                    disposables.add(teamViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler));
+                    toggleProgress(true);
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void onUserBlocked(User user) {
+        showSnackbar(getString(R.string.blocked_user, user.getFirstName()));
+        toggleProgress(false);
+        Activity activity = getActivity();
+        if (activity != null) activity.onBackPressed();
+    }
 }

@@ -158,6 +158,9 @@ public class RoleEditFragment extends HeaderedFragment<Role>
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
+            case R.id.action_block:
+                blockUser(role.getUser(), role.getTeam());
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

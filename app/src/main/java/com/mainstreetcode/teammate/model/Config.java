@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.MetaData;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -42,6 +43,7 @@ public class Config implements Model<Config> {
     private List<Sport> sports = new ArrayList<>();
     private List<Position> positions = new ArrayList<>();
     private List<Visibility> visibilities = new ArrayList<>();
+    private List<BlockReason> blockReasons = new ArrayList<>();
 
     Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
         this.defaultTeamLogo = defaultTeamLogo;
@@ -74,6 +76,10 @@ public class Config implements Model<Config> {
 
     public static List<Visibility> getVisibilities() {
         return getList(config -> config.visibilities);
+    }
+
+    public static List<BlockReason> getBlockReasons() {
+        return getList(config -> config.blockReasons);
     }
 
     public static Sport sportFromCode(String code) {
@@ -133,7 +139,8 @@ public class Config implements Model<Config> {
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(defaultTeamLogo) || sports.isEmpty() |positions.isEmpty()||visibilities.isEmpty();
+        return TextUtils.isEmpty(defaultTeamLogo) || sports.isEmpty() || positions.isEmpty()
+                || visibilities.isEmpty() || blockReasons.isEmpty();
     }
 
     @Override
@@ -172,6 +179,7 @@ public class Config implements Model<Config> {
         private static final String SPORTS_KEY = "sports";
         private static final String POSITIONS_KEY = "roles";
         private static final String VISIBILITIES_KEY = "visibility";
+        private static final String BLOCKED_REASONS_KEY = "blockReasons";
 
         @Override
         public JsonElement serialize(Config src, Type typeOfSrc, JsonSerializationContext context) {
@@ -184,14 +192,17 @@ public class Config implements Model<Config> {
             JsonArray sportsArray = new JsonArray();
             JsonArray positionArray = new JsonArray();
             JsonArray visibilityArray = new JsonArray();
+            JsonArray blockedReasonArray = new JsonArray();
 
             for (Sport item : src.sports) sportsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
+            for (BlockReason item : src.blockReasons) blockedReasonArray.add(context.serialize(item));
 
             serialized.add(SPORTS_KEY, sportsArray);
             serialized.add(POSITIONS_KEY, positionArray);
             serialized.add(VISIBILITIES_KEY, visibilityArray);
+            serialized.add(BLOCKED_REASONS_KEY, blockedReasonArray);
 
             return serialized;
         }
@@ -209,6 +220,7 @@ public class Config implements Model<Config> {
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
             ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
+            ModelUtils.deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason.class);
 
             return config;
         }

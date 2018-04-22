@@ -191,9 +191,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
             Identifiable identifiable = iterator.next();
             if (!(identifiable instanceof Guest)) continue;
 
-            if (((Guest) identifiable).getUser().equals(user)) {
-                iterator.remove();
-            }
+            if (((Guest) identifiable).getUser().equals(user)) iterator.remove();
         }
     }
 }

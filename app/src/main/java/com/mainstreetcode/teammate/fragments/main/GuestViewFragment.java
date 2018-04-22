@@ -95,6 +95,15 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_block) {
+            blockUser(guest.getUser(), guest.getEvent().getTeam());
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
         setToolbarTitle(getString(R.string.event_guest));

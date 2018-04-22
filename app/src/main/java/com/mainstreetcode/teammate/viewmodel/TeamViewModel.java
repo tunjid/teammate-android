@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.model.BlockUserRequest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -88,10 +89,9 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .observeOn(mainThread());
     }
 
-    public Completable blockUser(User user) {
-        return repository.blockUser(user)
-                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(user)))
-                .toCompletable();
+    public Single<User> blockUser(BlockUserRequest blockUserRequest) {
+        return repository.blockUser(blockUserRequest)
+                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(blockUserRequest.getUser())));
     }
 
     public boolean postSearch(String queryText) {
@@ -114,16 +114,15 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     @Override
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
-        if (alert instanceof Alert.TeamDeletion) {
-            Team deleted = ((Alert.TeamDeletion) alert).getModel();
+        if (!(alert instanceof Alert.TeamDeletion)) return;
+        Team deleted = ((Alert.TeamDeletion) alert).getModel();
 
-            teams.remove(deleted);
-            if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
+        teams.remove(deleted);
+        if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
 
-            Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
-                    .delete(deleted))
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(() -> {}, ErrorHandler.EMPTY);
-        }
+        Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
+                .delete(deleted))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> {}, ErrorHandler.EMPTY);
     }
 }

@@ -12,6 +12,7 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.BlockUserRequest;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
@@ -67,7 +68,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.192.16.191:8080/" : "https://teammateapp.org/";
+    public static final String API_BASE_URL = BuildConfig.DEV ? "https://35.193.241.124:8080/" : "https://teammateapp.org/";
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 
@@ -122,6 +123,7 @@ public class TeammateService {
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
+                .registerTypeAdapter(BlockUserRequest.class, new BlockUserRequest.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();

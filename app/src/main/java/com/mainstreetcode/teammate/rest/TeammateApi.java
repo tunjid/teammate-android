@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.rest;
 
 import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammate.model.BlockUserRequest;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
@@ -107,7 +108,7 @@ public interface TeammateApi {
     Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
     @POST("api/teams/{id}/block")
-    Single<JsonObject> blockUser(@Path(ID_PATH) String teamId, @Body JsonObject blockedUserRequest);
+    Single<JsonObject> blockUser(@Path(ID_PATH) String teamId, @Body BlockUserRequest blockUserRequest);
 
     // =============================================================================================
     // Role endpoints
