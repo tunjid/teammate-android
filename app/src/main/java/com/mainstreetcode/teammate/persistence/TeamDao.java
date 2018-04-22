@@ -30,10 +30,6 @@ public abstract class TeamDao extends EntityDao<TeamEntity> {
 
     @Query("SELECT * FROM teams" +
             " WHERE :id = team_id")
-    public abstract Maybe<TeamEntity> getAsEntity(String id);
-
-    @Query("SELECT * FROM teams" +
-            " WHERE :id = team_id")
     public abstract Maybe<Team> get(String id);
 
     @Query("SELECT * FROM teams")

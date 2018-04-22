@@ -1,13 +1,8 @@
 package com.mainstreetcode.teammate.model;
 
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -19,8 +14,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.persistence.entity.EventEntity;
-import com.mainstreetcode.teammate.persistence.entity.UserEntity;
+import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -28,49 +22,23 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@Entity(
-        tableName = "guests",
-        foreignKeys = {
-                @ForeignKey(entity = UserEntity.class, parentColumns = "user_id", childColumns = "guest_user", onDelete = CASCADE),
-                @ForeignKey(entity = EventEntity.class, parentColumns = "event_id", childColumns = "guest_event", onDelete = CASCADE)
-        }
-)
-public class Guest implements
-        Parcelable,
+public class Guest extends GuestEntity
+        implements
         Model<Guest>,
         HeaderedModel<Guest>,
         ListableModel<Guest> {
 
-    @NonNull @PrimaryKey
-    @ColumnInfo(name = "guest_id") private String id;
-    @ColumnInfo(name = "guest_user") private User user;
-    @ColumnInfo(name = "guest_event") private Event event;
-    @ColumnInfo(name = "guest_created") private Date created;
-    @ColumnInfo(name = "guest_attending") private boolean attending;
-
     @Ignore private final List<Item<Guest>> items;
 
-    Guest(@NonNull String id, User user, Event event, Date created, boolean attending) {
-        this.id = id;
-        this.user = user;
-        this.event = event;
-        this.created = created;
-        this.attending = attending;
+    public Guest(@NonNull String id, User user, Event event, Date created, boolean attending) {
+        super(id, user, event, created, attending);
         items = buildItems();
     }
 
     private Guest(Parcel in) {
-        id = in.readString();
-        user = (User) in.readValue(User.class.getClassLoader());
-        event = (Event) in.readValue(User.class.getClassLoader());
-        long tmpCreated = in.readLong();
-        created = tmpCreated != -1 ? new Date(tmpCreated) : null;
-        attending = in.readByte() != 0x00;
+        super(in);
         items = buildItems();
     }
-
 
     public static Guest forEvent(Event event, boolean attending) {
         return new Guest("", User.empty(), event, new Date(), attending);
@@ -100,11 +68,6 @@ public class Guest implements
         return TextUtils.isEmpty(id);
     }
 
-    @NonNull
-    @Override
-    public String getId() {
-        return id;
-    }
 
     @Override
     public boolean areContentsTheSame(Identifiable other) {
@@ -137,53 +100,9 @@ public class Guest implements
         return created.compareTo(o.created);
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public boolean isAttending() {
-        return attending;
-    }
-
     @Override
     public String getImageUrl() {
         return user.getImageUrl();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Guest)) return false;
-
-        Guest guest = (Guest) o;
-        return id.equals(guest.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeValue(user);
-        dest.writeValue(event);
-        dest.writeLong(created != null ? created.getTime() : -1L);
-        dest.writeByte((byte) (attending ? 0x01 : 0x00));
     }
 
     public static final Creator<Guest> CREATOR = new Creator<Guest>() {

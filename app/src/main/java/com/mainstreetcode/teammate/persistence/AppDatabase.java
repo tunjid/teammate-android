@@ -9,15 +9,16 @@ import android.util.Log;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
+import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.persistence.migrations.Migration12;
 import com.mainstreetcode.teammate.persistence.typeconverters.DateTypeConverter;
+import com.mainstreetcode.teammate.persistence.typeconverters.EventTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.LatLngTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.PositionTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.SportTypeConverter;
@@ -37,10 +38,11 @@ import static com.mainstreetcode.teammate.BuildConfig.DEV;
  */
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
-        RoleEntity.class, JoinRequestEntity.class, Chat.class, Media.class, Guest.class}, version = 2)
+        RoleEntity.class, JoinRequestEntity.class, GuestEntity.class,
+        Chat.class, Media.class}, version = 2)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class,
-        TeamTypeConverter.class, UserTypeConverter.class,
+        UserTypeConverter.class, TeamTypeConverter.class, EventTypeConverter.class,
         SportTypeConverter.class, PositionTypeConverter.class, VisibilityTypeConverter.class})
 
 public abstract class AppDatabase extends RoomDatabase {

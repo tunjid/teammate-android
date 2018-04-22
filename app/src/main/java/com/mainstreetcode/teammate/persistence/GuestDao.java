@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 import io.reactivex.Maybe;
 
 @Dao
-public abstract class GuestDao extends EntityDao<Guest> {
+public abstract class GuestDao extends EntityDao<GuestEntity> {
 
     @Override
     protected String getTableName() {
@@ -23,13 +24,13 @@ public abstract class GuestDao extends EntityDao<Guest> {
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<Guest> guests);
+    protected abstract void insert(List<GuestEntity> guests);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<Guest> guests);
+    protected abstract void update(List<GuestEntity> guests);
 
     @Delete
-    public abstract void delete(List<Guest> guests);
+    public abstract void delete(List<GuestEntity> guests);
 
     @Query("SELECT * FROM guests as role" +
             " WHERE :eventId = guest_event" +

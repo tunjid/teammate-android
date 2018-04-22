@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "56fb686675de1eba4eeea9e0539d9330",
+    "identityHash": "68bc0f4fc592228bac1c007ac1954d65",
     "entities": [
       {
         "tableName": "users",
@@ -391,6 +391,73 @@
         ]
       },
       {
+        "tableName": "guests",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`guest_id` TEXT NOT NULL, `guest_user` TEXT, `guest_event` TEXT, `guest_created` INTEGER, `guest_attending` INTEGER NOT NULL, PRIMARY KEY(`guest_id`), FOREIGN KEY(`guest_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`guest_event`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "guest_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user",
+            "columnName": "guest_user",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "event",
+            "columnName": "guest_event",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "created",
+            "columnName": "guest_created",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attending",
+            "columnName": "guest_attending",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "guest_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "guest_user"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "events",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "guest_event"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
         "tableName": "team_chats",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`team_chat_id` TEXT NOT NULL, `team_chat_kind` TEXT, `team_chat_content` TEXT, `team_chat_user` TEXT, `team_chat_team` TEXT, `team_chat_created` INTEGER, PRIMARY KEY(`team_chat_id`), FOREIGN KEY(`team_chat_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
@@ -540,7 +607,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"56fb686675de1eba4eeea9e0539d9330\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"68bc0f4fc592228bac1c007ac1954d65\")"
     ]
   }
 }
