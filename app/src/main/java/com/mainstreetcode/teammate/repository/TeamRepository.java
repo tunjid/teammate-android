@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
+import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.TeamDao;
@@ -84,6 +86,12 @@ public class TeamRepository extends ModelRepository<Team> {
                 .doOnError(throwable -> deleteInvalidModel(team, throwable));
     }
 
+    public Single<User> blockUser(User user) {
+        return api.blockUser(user.getId(), new JsonObject())
+                .map(result -> user)
+                .doOnSuccess(this::deleteBlockedUser);
+    }
+
     @Override
     Function<List<Team>, List<Team>> provideSaveManyFunction() {
         return models -> {
@@ -113,5 +121,14 @@ public class TeamRepository extends ModelRepository<Team> {
         AppDatabase database = AppDatabase.getInstance();
         database.roleDao().deleteByTeam(team.getId());
         database.joinRequestDao().deleteByTeam(team.getId());
+    }
+
+    private void deleteBlockedUser(User user) {
+        String userId = user.getId();
+        AppDatabase database = AppDatabase.getInstance();
+        database.userDao().delete(user);
+        database.roleDao().deleteUser(userId);
+        database.guestDao().deleteUser(userId);
+        database.joinRequestDao().deleteByTeam(userId);
     }
 }

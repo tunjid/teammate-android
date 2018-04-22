@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 
+import android.annotation.SuppressLint;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
@@ -68,6 +69,7 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
         clearNotification(notificationCancelMap(value));
     }
 
+    @SuppressLint("CheckResult")
     public void clearNotifications(K key) {
         Flowable.fromIterable(getModelList(key))
                 .map(this::notificationCancelMap)

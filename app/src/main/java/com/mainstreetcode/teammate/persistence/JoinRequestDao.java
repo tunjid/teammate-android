@@ -39,6 +39,9 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
     @Query("DELETE FROM join_requests WHERE join_request_team = :teamId")
     public abstract void deleteByTeam(String teamId);
 
+    @Query("DELETE FROM join_requests WHERE join_request_user = :userId")
+    public abstract void deleteUser(String userId);
+
     @Query("SELECT * FROM join_requests as request" +
             " WHERE :teamId = join_request_team" +
             " AND join_request_created < :date" +

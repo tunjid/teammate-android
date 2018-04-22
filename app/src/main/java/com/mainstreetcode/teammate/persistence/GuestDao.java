@@ -32,6 +32,9 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
     @Delete
     public abstract void delete(List<GuestEntity> guests);
 
+    @Query("DELETE FROM guests WHERE guest_user = :userId")
+    public abstract void deleteUser(String userId);
+
     @Query("SELECT * FROM guests as role" +
             " WHERE :eventId = guest_event" +
             " AND guest_created < :date" +

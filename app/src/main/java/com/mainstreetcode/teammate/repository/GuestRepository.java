@@ -2,7 +2,6 @@ package com.mainstreetcode.teammate.repository;
 
 import android.support.annotation.Nullable;
 
-import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
@@ -10,6 +9,7 @@ import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.GuestDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.Date;
 import java.util.List;
@@ -57,9 +57,7 @@ public class GuestRepository extends QueryRepository<Guest, Event> {
 
     @Override
     public Single<Guest> delete(Guest model) {
-        return api.blockUser(model.getEvent().getTeam().getId(), new JsonObject())
-                .map(result -> deleteLocally(model))
-                .doOnError(throwable -> deleteInvalidModel(model, throwable));
+        return Single.error(new TeammateException("Unimplemented"));
     }
 
     @Override
