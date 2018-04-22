@@ -99,7 +99,7 @@ public class TeamDetailFragment extends MainActivityFragment
         super.onResume();
         updateCurrentRole();
 
-        disposables.add(teamMemberViewModel.getMore(team).subscribe(this::onTeamUpdated, defaultErrorHandler));
+        fetchTeamMembers(true);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class TeamDetailFragment extends MainActivityFragment
         View rootView = getView();
         if (rootView == null) return;
 
-        if (teamModels.contains(role)) showFragment(RoleEditFragment.newInstance(role));
+        showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
@@ -182,7 +182,8 @@ public class TeamDetailFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (localRoleViewModel.hasPrivilegedRole()) showFragment(JoinRequestFragment.newInstance(team));
+                if (localRoleViewModel.hasPrivilegedRole())
+                    showFragment(JoinRequestFragment.newInstance(team));
                 break;
         }
     }
@@ -204,6 +205,13 @@ public class TeamDetailFragment extends MainActivityFragment
                     .addSharedElement(holder.getThumbnail(), getTransitionName(role, R.id.fragment_header_thumbnail));
         }
         return super.provideFragmentTransaction(fragmentTo);
+    }
+
+    void fetchTeamMembers(boolean fetchLatest) {
+        if (fetchLatest) scrollManager.setRefreshing();
+        else toggleProgress(true);
+
+        disposables.add(teamMemberViewModel.getMany(team, fetchLatest).subscribe(this::onTeamUpdated, defaultErrorHandler));
     }
 
     private void processJoinRequest(final JoinRequest request, final boolean approve) {

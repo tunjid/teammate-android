@@ -22,10 +22,6 @@ import io.reactivex.functions.BiFunction;
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-/**
- * ViewModel for roles in a team
- */
-
 public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
 
     private final TeamMemberRepository repository;
@@ -49,7 +45,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, boolean approved) {
-        return am(request, (member, repository) -> {
+        return asTypedTeamMember(request, (member, repository) -> {
             Single<TeamMember<JoinRequest>> sourceSingle = approved
                     ? repository.createOrUpdate(member)
                     : repository.delete(member);
@@ -66,7 +62,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public Single<Role> deleteRole(Role role) {
-        return am(role, (member, repository) -> {
+        return asTypedTeamMember(role, (member, repository) -> {
             Single<TeamMember<Role>> deletionSingle = repository.delete(member);
             deletionSingle = deletionSingle.doOnSuccess(getModelList(role.getTeam())::remove);
 
@@ -78,7 +74,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public Single<Role> updateRole(Role role) {
-        return am(role, (member, repository) -> {
+        return asTypedTeamMember(role, (member, repository) -> {
             Single<TeamMember<Role>> deletionSingle = repository.createOrUpdate(member);
 
             return checkForInvalidObject(deletionSingle.toFlowable(), role.getTeam(), member)
@@ -106,7 +102,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         return repository;
     }
 
-    private <T extends Model<T>, S> S am(T model, BiFunction<TeamMember<T>, TeamMemberRepository<T>, S> function) {
+    private <T extends Model<T>, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepository<T>, S> function) {
         try {return function.apply(TeamMember.fromModel(model), repository());}
         catch (Exception e) {throw new RuntimeException(e);}
     }

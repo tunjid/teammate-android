@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Relation;
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -19,18 +18,13 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
-import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import static com.mainstreetcode.teammate.util.ModelUtils.deserializeList;
 
 /**
  * Teams
@@ -51,17 +45,6 @@ public class Team extends TeamEntity
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
-    // Room fetches roles after setRoles is called. Since the reference of roles can't be changed,
-    // store the delayed roles here and update after Room is done.
-    @Ignore private List<Role> delayedRoles = new ArrayList<>();
-    @Ignore private List<JoinRequest> delayedRequests = new ArrayList<>();
-
-    @Relation(parentColumn = "team_id", entityColumn = "role_team", entity = RoleEntity.class)
-    private List<Role> roles = new ArrayList<>();
-
-    @Relation(parentColumn = "team_id", entityColumn = "join_request_team", entity = JoinRequestEntity.class)
-    private List<JoinRequest> joinRequests = new ArrayList<>();
-
     @Ignore private final List<Item<Team>> items;
 
     public Team(@NonNull String id, String name, String city, String state, String zip,
@@ -74,21 +57,11 @@ public class Team extends TeamEntity
 
     private Team(Parcel in) {
         super(in);
-        in.readList(roles, Role.class.getClassLoader());
-        in.readList(joinRequests, JoinRequest.class.getClassLoader());
         items = buildItems();
     }
 
     public static Team empty() {
         return new Team(NEW_TEAM, "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, Sport.empty(), 0, 0, 0, 0);
-    }
-
-    public static Team updateDelayedModels(Team team) {
-        team.roles.clear();
-        team.roles.addAll(team.delayedRoles);
-        team.joinRequests.clear();
-        team.joinRequests.addAll(team.delayedRequests);
-        return team;
     }
 
     @SuppressWarnings("unchecked")
@@ -140,8 +113,6 @@ public class Team extends TeamEntity
     public void reset() {
         name = city = state = zip = imageUrl = "";
         sport.reset();
-        roles.clear();
-        joinRequests.clear();
         restItemList();
     }
 
@@ -151,35 +122,16 @@ public class Team extends TeamEntity
         this.imageUrl = updatedTeam.imageUrl;
         this.storageUsed = updatedTeam.storageUsed;
 
-        updateItemList(updatedTeam);
-
         location = updatedTeam.location;
         sport.update(updatedTeam.sport);
 
-        ModelUtils.preserveAscending(roles, updatedTeam.roles);
-        ModelUtils.preserveAscending(joinRequests, updatedTeam.joinRequests);
+        updateItemList(updatedTeam);
     }
 
     @Override
     public int compareTo(@NonNull Team o) {
         int nameComparision = name.compareTo(o.name);
         return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public List<JoinRequest> getJoinRequests() {
-        return joinRequests;
-    }
-
-    public void setRoles(List<Role> roles) {
-        delayedRoles = roles;
-    }
-
-    public void setJoinRequests(List<JoinRequest> requests) {
-        delayedRequests = requests;
     }
 
     public void setAddress(Address address) {
@@ -193,13 +145,6 @@ public class Team extends TeamEntity
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeList(roles);
-        dest.writeList(joinRequests);
     }
 
     public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {
@@ -229,9 +174,7 @@ public class Team extends TeamEntity
         private static final String DESCRIPTION_KEY = "description";
         private static final String LOGO_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
-        private static final String ROLES_KEY = "roles";
         private static final String LOCATION_KEY = "location";
-        private static final String JOIN_REQUEST_KEY = "joinRequests";
         private static final String STORAGE_USED_KEY = "storageUsed";
         private static final String MAX_STORAGE_KEY = "maxStorage";
         private static final String MIN_AGE_KEY = "minAge";
@@ -261,16 +204,7 @@ public class Team extends TeamEntity
             int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
             int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip, description, logoUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
-
-            if (teamJson.has(ROLES_KEY)) {
-                deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
-            }
-            if (teamJson.has(JOIN_REQUEST_KEY)) {
-                deserializeList(context, teamJson.get(JOIN_REQUEST_KEY), team.joinRequests, JoinRequest.class);
-            }
-
-            return team;
+            return new Team(id, name, city, state, zip, description, logoUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         }
 
         @Override

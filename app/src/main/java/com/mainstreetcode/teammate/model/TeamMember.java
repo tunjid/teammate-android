@@ -28,6 +28,11 @@ public class TeamMember<S extends Model<S>> implements Model<TeamMember<S>> {
         return new TeamMember<>(wrappedModel);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <S extends Model<S>> TeamMember<S> unsafeCast(final TeamMember teamMember) {
+        return (TeamMember<S>) teamMember;
+    }
+
     @Override
     public boolean isEmpty() { return wrappedModel.isEmpty(); }
 

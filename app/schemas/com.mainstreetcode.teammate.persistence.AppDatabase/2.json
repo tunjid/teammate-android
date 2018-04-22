@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "63df0980d43d10d8cdda874b50fb7f1c",
+    "identityHash": "56fb686675de1eba4eeea9e0539d9330",
     "entities": [
       {
         "tableName": "users",
@@ -240,7 +240,7 @@
       },
       {
         "tableName": "roles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`role_id` TEXT NOT NULL, `role_image_url` TEXT, `role_name` TEXT, `role_team` TEXT, `role_user` TEXT, PRIMARY KEY(`role_id`), FOREIGN KEY(`role_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`role_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`role_id` TEXT NOT NULL, `role_image_url` TEXT, `role_name` TEXT, `role_team` TEXT, `role_user` TEXT, `role_created` INTEGER, PRIMARY KEY(`role_id`), FOREIGN KEY(`role_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`role_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -270,6 +270,12 @@
             "fieldPath": "user",
             "columnName": "role_user",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "created",
+            "columnName": "role_created",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
@@ -307,7 +313,7 @@
       },
       {
         "tableName": "join_requests",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`join_request_team_approved` INTEGER NOT NULL, `join_request_team_userApproved` INTEGER NOT NULL, `join_request_id` TEXT NOT NULL, `join_request_role_name` TEXT, `join_request_team` TEXT, `join_request_user` TEXT, PRIMARY KEY(`join_request_id`), FOREIGN KEY(`join_request_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`join_request_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`join_request_team_approved` INTEGER NOT NULL, `join_request_team_userApproved` INTEGER NOT NULL, `join_request_id` TEXT NOT NULL, `join_request_role_name` TEXT, `join_request_team` TEXT, `join_request_user` TEXT, `join_request_created` INTEGER, PRIMARY KEY(`join_request_id`), FOREIGN KEY(`join_request_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`join_request_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "teamApproved",
@@ -343,6 +349,12 @@
             "fieldPath": "user",
             "columnName": "join_request_user",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "created",
+            "columnName": "join_request_created",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
@@ -528,7 +540,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"63df0980d43d10d8cdda874b50fb7f1c\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"56fb686675de1eba4eeea9e0539d9330\")"
     ]
   }
 }
