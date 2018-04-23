@@ -138,11 +138,24 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
             List<Role> roles = classListMap.get(Role.class);
             List<JoinRequest> requests = classListMap.get(JoinRequest.class);
 
-            if (roles != null) roleRepository.getSaveManyFunction().apply(roles);
+            deleteStaleJoinRequests(roles);
+
             if (requests != null) joinRequestRepository.getSaveManyFunction().apply(requests);
+            if (roles != null) roleRepository.getSaveManyFunction().apply(roles);
 
             return models;
         };
+    }
+
+    private void deleteStaleJoinRequests(@Nullable List<Role> roles) {
+        if (roles == null) return;
+
+        String teamId = roles.get(0).getTeam().getId();
+        String[] userIds = new String[roles.size()];
+
+        for (int i = 0; i < roles.size(); i++) userIds[i] = roles.get(i).getId();
+
+        AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds);
     }
 
     @SuppressWarnings("unchecked")

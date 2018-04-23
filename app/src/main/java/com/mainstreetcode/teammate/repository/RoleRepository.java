@@ -77,13 +77,10 @@ public class RoleRepository extends ModelRepository<Role> {
             int size = models.size();
             List<Team> teams = new ArrayList<>(size);
             List<User> users = new ArrayList<>(size);
-            String[] userIds = new String[size];
 
-            for (int i = 0; i < models.size(); i++) {
+            for (int i = 0; i < size; i++) {
                 Role role = models.get(i);
-                User user = role.getUser();
-                users.add(user);
-                userIds[i] = user.getId();
+                users.add(role.getUser());
                 teams.add(role.getTeam());
             }
 
@@ -91,11 +88,6 @@ public class RoleRepository extends ModelRepository<Role> {
             if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));
-
-            if (teams.size() == 1) {
-                String teamId = teams.get(0).getId();
-                AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds);
-            }
 
             return models;
         };
