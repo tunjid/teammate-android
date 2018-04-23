@@ -89,7 +89,7 @@ public class TeamRepository extends ModelRepository<Team> {
     public Single<User> blockUser(BlockUserRequest blockUserRequest) {
         return api.blockUser(blockUserRequest.getTeam().getId(), blockUserRequest)
                 .map(result -> blockUserRequest.getUser())
-                .doOnSuccess(this::deleteBlockedUser);
+                .doOnSuccess(ignored -> deleteBlockedUser(blockUserRequest.getUser(), blockUserRequest.getTeam()));
     }
 
     @Override
@@ -123,12 +123,12 @@ public class TeamRepository extends ModelRepository<Team> {
         database.joinRequestDao().deleteByTeam(team.getId());
     }
 
-    private void deleteBlockedUser(User user) {
+    private void deleteBlockedUser(User user, Team team) {
         String userId = user.getId();
+        String teamId = team.getId();
         AppDatabase database = AppDatabase.getInstance();
-        database.userDao().delete(user);
-        database.roleDao().deleteUser(userId);
-        database.guestDao().deleteUser(userId);
-        database.joinRequestDao().deleteByTeam(userId);
+        database.roleDao().deleteUsers(userId, teamId);
+        database.guestDao().deleteUsers(userId, teamId);
+        database.joinRequestDao().deleteUsers(userId, teamId);
     }
 }

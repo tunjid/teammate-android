@@ -74,18 +74,28 @@ public class RoleRepository extends ModelRepository<Role> {
     @Override
     Function<List<Role>, List<Role>> provideSaveManyFunction() {
         return models -> {
-            List<Team> teams = new ArrayList<>(models.size());
-            List<User> users = new ArrayList<>(models.size());
+            int size = models.size();
+            List<Team> teams = new ArrayList<>(size);
+            List<User> users = new ArrayList<>(size);
+            String[] userIds = new String[size];
 
-            for (Role role : models) {
+            for (int i = 0; i < models.size(); i++) {
+                Role role = models.get(i);
+                User user = role.getUser();
+                users.add(user);
+                userIds[i] = user.getId();
                 teams.add(role.getTeam());
-                users.add(role.getUser());
             }
 
             if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
             if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));
+
+            if (teams.size() == 1) {
+                String teamId = teams.get(0).getId();
+                AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds);
+            }
 
             return models;
         };

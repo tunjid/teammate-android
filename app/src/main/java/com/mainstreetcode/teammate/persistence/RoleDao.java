@@ -53,8 +53,8 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
     @Query("DELETE FROM roles WHERE role_team = :teamId")
     public abstract void deleteByTeam(String teamId);
 
-    @Query("DELETE FROM roles WHERE role_user = :userId")
-    public abstract void deleteUser(String userId);
+    @Query("DELETE FROM roles WHERE role_user = :userId AND role_team = :teamId")
+    public abstract void deleteUsers(String userId, String teamId);
 
     @Query("SELECT * FROM roles as role" +
             " WHERE :teamId = role_team" +
