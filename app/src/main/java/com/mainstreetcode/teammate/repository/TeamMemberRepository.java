@@ -153,7 +153,7 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
         String teamId = roles.get(0).getTeam().getId();
         String[] userIds = new String[roles.size()];
 
-        for (int i = 0; i < roles.size(); i++) userIds[i] = roles.get(i).getId();
+        for (int i = 0; i < roles.size(); i++) userIds[i] = roles.get(i).getUser().getId();
 
         AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds);
     }
