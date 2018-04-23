@@ -67,6 +67,10 @@ public class LocationViewModel extends ViewModel {
         return locationPublishProcessor.firstElement();
     }
 
+    public boolean hasPermission(Fragment fragment) {
+        return SDK_INT >= M && ContextCompat.checkSelfPermission(fragment.requireActivity(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
     private void requestPermission(Fragment fragment) {
         fragment.requestPermissions(new String[]{ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
     }
@@ -78,9 +82,5 @@ public class LocationViewModel extends ViewModel {
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> requestPermission(fragment))
                 .create()
                 .show();
-    }
-
-    public boolean hasPermission(Fragment fragment) {
-        return SDK_INT >= M && ContextCompat.checkSelfPermission(fragment.requireActivity(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }

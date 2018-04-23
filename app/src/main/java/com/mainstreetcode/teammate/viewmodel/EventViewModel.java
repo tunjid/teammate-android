@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -45,12 +46,17 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class EventViewModel extends TeamMappedViewModel<Event> {
 
+    private static final LatLngBounds DEFAULT_BOUNDS;
+    private static final int DEFAULT_BAR_RANGE = 60;
+
     private final EventRepository repository;
     private final GuestRepository guestRepository;
     private final List<Event> publicEvents = new ArrayList<>();
     private final EventSearchRequest eventRequest = EventSearchRequest.empty();
 
     private Map<Event, List<Identifiable>> eventItemMap = new HashMap<>();
+
+    static { DEFAULT_BOUNDS = new LatLngBounds.Builder().include(new LatLng(0, 0)).build(); }
 
     public EventViewModel() {
         repository = EventRepository.getInstance();
@@ -130,6 +136,14 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         event.setTeam(newTeam);
     }
 
+    @Nullable
+    public LatLng getLastPublicSearchLocation() {
+        LatLng location = eventRequest.getLocation();
+        if (location == null) return null;
+        if (milesBetween(DEFAULT_BOUNDS.getCenter(), location) < DEFAULT_BAR_RANGE) return null;
+        return location;
+    }
+
     private Date getQueryDate(Team team, boolean fetchLatest) {
         if (fetchLatest) return null;
 
@@ -152,7 +166,6 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     private EventSearchRequest fromMap(GoogleMap map) {
-        float[] distance = new float[1];
         LatLng location = map.getCameraPosition().target;
 
         VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
@@ -160,9 +173,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         LatLng southwest = bounds.southwest;
         LatLng northeast = bounds.northeast;
 
-        distanceBetween(southwest.latitude, southwest.longitude, northeast.latitude, northeast.longitude, distance);
-
-        int miles = (int) (distance[0] * 0.000621371);
+        int miles = milesBetween(southwest, northeast);
 
         eventRequest.setDistance(String.valueOf(miles));
         eventRequest.setLocation(location);
@@ -184,6 +195,13 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return Flowable.fromIterable(publicEvents).filter(event -> event.getTeam().getSport().equals(sport))
                 .collect(() -> filtered, List::add)
                 .blockingGet();
+    }
+
+    private int milesBetween(LatLng locationA, LatLng locationB) {
+        float[] distance = new float[1];
+        distanceBetween(locationA.latitude, locationA.longitude, locationB.latitude, locationB.longitude, distance);
+
+        return (int) (distance[0] * 0.000621371);
     }
 
     private void removeBlockedUser(User user, Iterator<Identifiable> iterator) {

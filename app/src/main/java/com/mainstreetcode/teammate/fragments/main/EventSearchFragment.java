@@ -125,7 +125,23 @@ public class EventSearchFragment extends MainActivityFragment {
     public boolean showsBottomNav() { return false; }
 
     @Override
+    public boolean showsFab() { return locationViewModel.hasPermission(this); }
+
+    @Override
     public boolean[] insetState() {return NONE;}
+
+    @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        setFabClickListener(this);
+        setFabIcon(R.drawable.ic_crosshairs_gps_white_24dp);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.fab) disposables.add(locationViewModel.getLastLocation(this)
+                .subscribe(location -> onLocationFound(location, true), defaultErrorHandler));
+    }
 
     @Nullable
     @Override
@@ -140,7 +156,7 @@ public class EventSearchFragment extends MainActivityFragment {
     }
 
     private void requestLocation() {
-        LatLng lastLocation = eventViewModel.getEventRequest().getLocation();
+        LatLng lastLocation = eventViewModel.getLastPublicSearchLocation();
 
         if (lastLocation != null) onLocationFound(lastLocation, false);
         else disposables.add(locationViewModel.getLastLocation(this)
