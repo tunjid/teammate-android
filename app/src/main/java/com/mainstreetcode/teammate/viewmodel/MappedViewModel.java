@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Function;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
@@ -25,21 +23,6 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
 
     MappedViewModel() {}
-
-    Function<List<V>, List<Identifiable>> toIdentifiable = ArrayList<Identifiable>::new;
-
-    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> pullToRefreshFunction =
-            new BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>>() {
-                int count = 0;
-
-                @Override
-                public List<Identifiable> apply(List<Identifiable> stale, List<Identifiable> fetched) throws Exception {
-                    if (++count == 1) stale.clear();
-                    if (count >= 2) count = 0;
-                    preserveList.apply(stale, fetched);
-                    return stale;
-                }
-            };
 
     public abstract List<Identifiable> getModelList(K key);
 
@@ -54,15 +37,15 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     public Flowable<DiffUtil.DiffResult> getMore(K key) {
-        return Identifiable.diff(fetch(key, false).map(toIdentifiable), () -> getModelList(key), preserveList);
+        return Identifiable.diff(fetch(key, false).map(this::toIdentifiable), () -> getModelList(key), this::preserveList);
     }
 
     public Flowable<DiffUtil.DiffResult> refresh(K key) {
-        return Identifiable.diff(fetch(key, true).map(toIdentifiable), () -> getModelList(key), pullToRefreshFunction);
+        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::pullToRefresh);
     }
 
     private Flowable<DiffUtil.DiffResult> getLatest(K key) {
-        return Identifiable.diff(fetch(key, true).map(toIdentifiable), () -> getModelList(key), preserveList);
+        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList);
     }
 
     public void clearNotifications(V value) {
@@ -96,5 +79,9 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     private void checkForInvalidObject(Throwable throwable, Identifiable model, K key) {
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
+    }
+
+    final List<Identifiable> toIdentifiable(List<V> source) {
+        return new ArrayList<>(source);
     }
 }

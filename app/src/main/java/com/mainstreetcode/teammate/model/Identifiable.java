@@ -97,6 +97,8 @@ public interface Identifiable {
         static int getPoints(Identifiable identifiable) {
             if (identifiable instanceof FeedItem)
                 identifiable = ((FeedItem) identifiable).getModel();
+            if (identifiable instanceof TeamMember)
+                identifiable = ((TeamMember) identifiable).getWrappedModel();
             if (identifiable.getClass().equals(Item.class)) return 0;
             if (identifiable.getClass().equals(JoinRequest.class)) return 5;
             if (identifiable.getClass().equals(Role.class)) return 10;

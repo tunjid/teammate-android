@@ -74,7 +74,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(toIdentifiable);
+                .toFlowable().map(this::toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(false)).firstOrError();
     }
@@ -97,7 +97,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(toIdentifiable);
+                .toFlowable().map(this::toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged)).firstOrError();
     }

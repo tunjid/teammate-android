@@ -16,8 +16,11 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
@@ -44,13 +47,25 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (alert instanceof Alert.UserBlocked) {
-            User user = ((Alert.UserBlocked) alert).getModel();
+        if (!(alert instanceof Alert.UserBlocked)) return;
+        User user = ((Alert.UserBlocked) alert).getModel();
 
-            Flowable.fromIterable(modelListMap.values())
-                    .map(List::iterator)
-                    .subscribe(iterator -> removeBlockedUser(user, iterator), ErrorHandler.EMPTY);
-        }
+        Flowable.fromIterable(modelListMap.values())
+                .map(List::iterator)
+                .subscribe(iterator -> removeBlockedUser(user, iterator), ErrorHandler.EMPTY);
+
+    }
+
+    @Override
+    void afterPullToRefreshDiff(List<Identifiable> source) {
+        super.afterPullToRefreshDiff(source);
+        filterJoinedMembers(source);
+    }
+
+    @Override
+    void afterPreserveListDiff(List<Identifiable> source) {
+        super.afterPreserveListDiff(source);
+        filterJoinedMembers(source);
     }
 
     @Override
@@ -152,6 +167,24 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
             }
             if (model instanceof JoinRequest && ((JoinRequest) model).getUser().equals(user)) {
                 iterator.remove();
+            }
+        }
+    }
+
+    private void filterJoinedMembers(List<Identifiable> source) {
+        Set<String> userIds = new HashSet<>();
+        ListIterator<Identifiable> iterator = source.listIterator(source.size());
+
+        while (iterator.hasPrevious()) {
+            Identifiable item = iterator.previous();
+            if (!(item instanceof TeamMember)) continue;
+
+            item = ((TeamMember) item).getWrappedModel();
+
+            if (item instanceof Role) userIds.add(((Role) item).getUser().getId());
+            else if (item instanceof JoinRequest) {
+                User user = ((JoinRequest) item).getUser();
+                if (userIds.contains(user.getId())) iterator.remove();
             }
         }
     }

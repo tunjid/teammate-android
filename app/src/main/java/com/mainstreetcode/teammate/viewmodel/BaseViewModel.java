@@ -9,9 +9,9 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.processors.PublishProcessor;
 
 
@@ -22,15 +22,8 @@ abstract class BaseViewModel extends ViewModel {
     private static final PublishProcessor<Alert> eventSource = PublishProcessor.create();
 
     private LinkedList<Identifiable> ads = new LinkedList<>();
+    private AtomicInteger pullToRefreshCount = new AtomicInteger(0);
     private CompositeDisposable disposable = new CompositeDisposable();
-
-    BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> preserveList = (source, additions) -> {
-        if (sortsAscending()) ModelUtils.preserveAscending(source, additions);
-        else ModelUtils.preserveDescending(source, additions);
-
-        if (hasNativeAds()) distributeAds(source);
-        return source;
-    };
 
     BaseViewModel() {
         disposable.add(eventSource.subscribe(this::onModelAlert, ErrorHandler.EMPTY));
@@ -50,6 +43,29 @@ abstract class BaseViewModel extends ViewModel {
         disposable.clear();
         super.onCleared();
     }
+
+    final List<Identifiable> preserveList(List<Identifiable> source, List<Identifiable> additions) {
+        if (sortsAscending()) ModelUtils.preserveAscending(source, additions);
+        else ModelUtils.preserveDescending(source, additions);
+
+        afterPreserveListDiff(source);
+        if (hasNativeAds()) distributeAds(source);
+        return source;
+    }
+
+    final List<Identifiable> pullToRefresh(List<Identifiable> source, List<Identifiable> additions) {
+        int count;
+        if ((count = pullToRefreshCount.incrementAndGet()) == 1) source.clear();
+        if (count >= 2) pullToRefreshCount.set(0);
+
+        preserveList(source, additions);
+        afterPullToRefreshDiff(source);
+        return source;
+    }
+
+    void afterPullToRefreshDiff(List<Identifiable> source) {}
+
+    void afterPreserveListDiff(List<Identifiable> source) {}
 
     private void distributeAds(List<Identifiable> source) {
         //filterAds(source);
