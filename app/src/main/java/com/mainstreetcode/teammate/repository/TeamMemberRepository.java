@@ -10,15 +10,15 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
+import com.mainstreetcode.teammate.persistence.TeamMemberDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -30,15 +30,17 @@ import static io.reactivex.schedulers.Schedulers.io;
 public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepository<TeamMember<T>> {
 
     private final TeammateApi api;
+    private final TeamMemberDao dao;
     private final RoleRepository roleRepository;
-    private final JoinRequestRepository joinRequestRepository;
+    private final JoinRequestRepository requestRepository;
 
     private static TeamMemberRepository ourInstance;
 
     private TeamMemberRepository() {
         api = TeammateService.getApiInstance();
+        dao = AppDatabase.getInstance().teamMemberDao();
         roleRepository = RoleRepository.getInstance();
-        joinRequestRepository = JoinRequestRepository.getInstance();
+        requestRepository = JoinRequestRepository.getInstance();
     }
 
     public static TeamMemberRepository getInstance() {
@@ -48,7 +50,7 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
 
     @Override
     public EntityDao<? super TeamMember> dao() {
-        return null;
+        return dao;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
             single = unsafeCast(roleRepository.createOrUpdate((Role) wrapped));
         }
         else if (wrapped instanceof JoinRequest) {
-            single = unsafeCast(joinRequestRepository.createOrUpdate((JoinRequest) wrapped));
+            single = unsafeCast(requestRepository.createOrUpdate((JoinRequest) wrapped));
         }
         else single = Single.error(new TeammateException("Unimplemented"));
 
@@ -83,7 +85,7 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
             single = unsafeCast(roleRepository.delete((Role) wrapped));
         }
         else if (wrapped instanceof JoinRequest) {
-            single = unsafeCast(joinRequestRepository.delete((JoinRequest) wrapped));
+            single = unsafeCast(requestRepository.delete((JoinRequest) wrapped));
         }
         else single = Single.error(new TeammateException("Unimplemented"));
 
@@ -124,25 +126,12 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
     @SuppressWarnings("unchecked")
     Function<List<TeamMember<T>>, List<TeamMember<T>>> provideSaveManyFunction() {
         return models -> {
-            Map<Class, List> classListMap = new HashMap<>();
+            TeamMember.split(Collections.unmodifiableList(models), (roles, requests) -> {
+                deleteStaleJoinRequests(roles);
 
-            Flowable.fromIterable(models).subscribe(model -> {
-                Model wrapped = model.getWrappedModel();
-                Class modelClass = wrapped.getClass();
-                List items = classListMap.get(modelClass);
-
-                if (items == null) classListMap.put(modelClass, items = new ArrayList<>());
-                items.add(wrapped);
+                if (!requests.isEmpty()) requestRepository.getSaveManyFunction().apply(requests);
+                if (!roles.isEmpty()) roleRepository.getSaveManyFunction().apply(roles);
             });
-
-            List<Role> roles = classListMap.get(Role.class);
-            List<JoinRequest> requests = classListMap.get(JoinRequest.class);
-
-            deleteStaleJoinRequests(roles);
-
-            if (requests != null) joinRequestRepository.getSaveManyFunction().apply(requests);
-            if (roles != null) roleRepository.getSaveManyFunction().apply(roles);
-
             return models;
         };
     }

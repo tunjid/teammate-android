@@ -80,6 +80,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public ConfigDao configDao() {return new ConfigDao();}
 
+    public TeamMemberDao teamMemberDao() {return new TeamMemberDao();}
+
     public Single<List<Pair<String, Integer>>> clearTables() {
         final List<Single<Pair<String, Integer>>> singles = new ArrayList<>();
         final List<Pair<String, Integer>> collector = new ArrayList<>();

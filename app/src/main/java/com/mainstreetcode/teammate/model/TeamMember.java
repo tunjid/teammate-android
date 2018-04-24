@@ -9,9 +9,17 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mainstreetcode.teammate.util.Logger;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import io.reactivex.Flowable;
+import io.reactivex.functions.BiConsumer;
 
 @SuppressLint("ParcelCreator")
 public class TeamMember<S extends Model<S>> implements Model<TeamMember<S>> {
@@ -31,6 +39,31 @@ public class TeamMember<S extends Model<S>> implements Model<TeamMember<S>> {
     @SuppressWarnings("unchecked")
     public static <S extends Model<S>> TeamMember<S> unsafeCast(final TeamMember teamMember) {
         return (TeamMember<S>) teamMember;
+    }
+
+    @SuppressLint("CheckResult")
+    @SuppressWarnings("unchecked")
+    public static void split(List<TeamMember> members,
+                             BiConsumer<List<Role>, List<JoinRequest>> listBiConsumer) {
+        Map<Class, List> classListMap = new HashMap<>();
+
+        Flowable.fromIterable(members).subscribe(model -> {
+            Model wrapped = model.getWrappedModel();
+            Class modelClass = wrapped.getClass();
+            List items = classListMap.get(modelClass);
+
+            if (items == null) classListMap.put(modelClass, items = new ArrayList<>());
+            items.add(wrapped);
+        });
+
+        List<Role> roles = classListMap.get(Role.class);
+        List<JoinRequest> requests = classListMap.get(JoinRequest.class);
+
+        if (roles == null) roles = new ArrayList<>();
+        if (requests == null) requests = new ArrayList<>();
+
+        try { listBiConsumer.accept(roles, requests); }
+        catch (Exception e) {Logger.log("TeamMember", "Error splitting", e);}
     }
 
     @Override
