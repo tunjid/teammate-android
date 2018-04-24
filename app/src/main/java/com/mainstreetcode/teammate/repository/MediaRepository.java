@@ -107,8 +107,8 @@ public class MediaRepository extends TeamQueryRepository<Media> {
                 teams.add(media.getTeam());
             }
 
-            userRepository.getSaveManyFunction().apply(users);
-            teamRepository.getSaveManyFunction().apply(teams);
+            userRepository.saveAsNested().apply(users);
+            teamRepository.saveAsNested().apply(teams);
 
             mediaDao.upsert(Collections.unmodifiableList(models));
 
@@ -136,7 +136,7 @@ public class MediaRepository extends TeamQueryRepository<Media> {
     }
 
     @Nullable
-    MultipartBody.Part getBody(String path, String photoKey) {
+    private MultipartBody.Part getBody(String path, String photoKey) {
         Uri uri = Uri.parse(path);
         String type = App.getInstance().getContentResolver().getType(uri);
 

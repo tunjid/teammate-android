@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
+
 /**
  * Teams
  */
@@ -132,6 +134,11 @@ public class Team extends TeamEntity
     public int compareTo(@NonNull Team o) {
         int nameComparision = name.compareTo(o.name);
         return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
+    }
+
+    @Override
+    public boolean hasMajorFields() {
+        return areNotEmpty(id, name, city, state);
     }
 
     public void setAddress(Address address) {

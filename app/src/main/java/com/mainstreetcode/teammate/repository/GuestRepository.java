@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.GuestDao;
@@ -11,6 +12,8 @@ import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.TeammateException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -74,18 +77,18 @@ public class GuestRepository extends QueryRepository<Guest, Event> {
     @Override
     Function<List<Guest>, List<Guest>> provideSaveManyFunction() {
         return models -> {
-//            List<Team> teams = new ArrayList<>(models.size());
-//            List<User> users = new ArrayList<>(models.size());
-//
-//            for (JoinRequest request : models) {
-//                teams.add(request.getTeam());
-//                users.add(request.getUser());
-//            }
-//
-//            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
-//            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
-//
-//            joinRequestDao.upsert(Collections.unmodifiableList(models));
+            List<User> users = new ArrayList<>(models.size());
+            List<Event> events = new ArrayList<>(models.size());
+
+            for (Guest guest : models) {
+                users.add(guest.getUser());
+                events.add(guest.getEvent());
+            }
+
+            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
+            if (!events.isEmpty()) EventRepository.getInstance().saveAsNested().apply(events);
+
+            dao().upsert(Collections.unmodifiableList(models));
 
             return models;
         };

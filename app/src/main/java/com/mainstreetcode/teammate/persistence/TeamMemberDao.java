@@ -20,7 +20,7 @@ public class TeamMemberDao extends EntityDao<TeamMember> {
     }
 
     @Override
-    protected void insert(List<TeamMember> models) {
+    public void insert(List<TeamMember> models) {
         daos((roleDao, requestDao) -> TeamMember.split(models, (roles, requests) -> {
             roleDao.insert(Collections.unmodifiableList(roles));
             requestDao.insert(Collections.unmodifiableList(requests));

@@ -135,10 +135,6 @@ public class EventEntity implements Parcelable {
         this.imageUrl = imageUrl;
     }
 
-//    public void setTeamId(String teamId) {
-//        this.teamId = teamId;
-//    }
-
     protected void setStartDate(String startDate) {
         this.startDate = ModelUtils.parseDate(startDate, ModelUtils.prettyPrinter);
     }

@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.model;
 
 
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 /**
  * Base interface for model interactions
@@ -26,4 +27,8 @@ public interface Model<T> extends Identifiable, Parcelable, Comparable<T> {
     boolean isEmpty();
 
     String getImageUrl();
+
+    default boolean hasMajorFields() {
+        return !TextUtils.isEmpty(getImageUrl());
+    }
 }

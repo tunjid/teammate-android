@@ -24,7 +24,7 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<GuestEntity> guests);
+    public abstract void insert(List<GuestEntity> guests);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<GuestEntity> guests);

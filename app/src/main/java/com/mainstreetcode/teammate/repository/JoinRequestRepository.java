@@ -68,8 +68,8 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
                 users.add(request.getUser());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
+            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
+            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
 
             joinRequestDao.upsert(Collections.unmodifiableList(models));
 

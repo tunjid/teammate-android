@@ -84,8 +84,8 @@ public class RoleRepository extends ModelRepository<Role> {
                 teams.add(role.getTeam());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
+            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
+            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));
 

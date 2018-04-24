@@ -96,7 +96,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
             List<Team> teams = new ArrayList<>(models.size());
             for (Event event : models) teams.add(event.getTeam());
 
-            teamRepository.getSaveManyFunction().apply(teams);
+            teamRepository.saveAsNested().apply(teams);
             eventDao.upsert(Collections.unmodifiableList(models));
 
             return models;

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -201,6 +202,7 @@ public class UserRepository extends ModelRepository<User> {
     /**
      * Used to update changes to the current signed in user
      */
+    @SuppressLint("CheckResult")
     private Single<User> updateCurrent(Single<User> source) {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe

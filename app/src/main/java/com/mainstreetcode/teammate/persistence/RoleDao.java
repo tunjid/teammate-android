@@ -31,7 +31,7 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<RoleEntity> roles);
+    public abstract void insert(List<RoleEntity> roles);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<RoleEntity> roles);

@@ -81,6 +81,19 @@ public abstract class ModelRepository<T extends Model<T>> {
         return saveFunction;
     }
 
+    final Function<List<T>, List<T>> saveAsNested() {
+        return models -> {
+            if (models.isEmpty()) return models;
+
+            T litmus = models.get(0);
+            if (litmus.hasMajorFields()) return saveListFunction.apply(models);
+
+            dao().insert(Collections.unmodifiableList(models));
+            return models;
+        };
+    }
+
+
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
         AtomicReference<T> reference = new AtomicReference<>();
         local = local.doOnSuccess(reference::set);

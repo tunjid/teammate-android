@@ -11,7 +11,7 @@ public abstract class EntityDao<T> {
 
     protected abstract String getTableName();
 
-    protected abstract void insert(List<T> models);
+    public abstract void insert(List<T> models);
 
     protected abstract void update(List<T> models);
 

@@ -129,8 +129,8 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
             TeamMember.split(Collections.unmodifiableList(models), (roles, requests) -> {
                 deleteStaleJoinRequests(roles);
 
-                if (!requests.isEmpty()) requestRepository.getSaveManyFunction().apply(requests);
-                if (!roles.isEmpty()) roleRepository.getSaveManyFunction().apply(roles);
+                if (!requests.isEmpty()) requestRepository.saveAsNested().apply(requests);
+                if (!roles.isEmpty()) roleRepository.saveAsNested().apply(roles);
             });
             return models;
         };

@@ -33,6 +33,8 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
+
 /**
  * Event events
  */
@@ -92,6 +94,11 @@ public class Event extends EventEntity
         return name.equals(casted.name)
                 && startDate.equals(casted.getStartDate()) && endDate.equals(casted.getEndDate())
                 && locationName.equals(casted.getLocationName()) && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public boolean hasMajorFields() {
+        return areNotEmpty(id, name);
     }
 
     @Override

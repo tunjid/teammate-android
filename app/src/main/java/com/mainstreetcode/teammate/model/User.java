@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 
 public class User extends UserEntity implements
@@ -70,6 +71,11 @@ public class User extends UserEntity implements
         User casted = (User) other;
         return firstName.equals(casted.getFirstName()) && lastName.equals(casted.getLastName())
                 && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public boolean hasMajorFields() {
+        return areNotEmpty(id, firstName, lastName);
     }
 
     @Override

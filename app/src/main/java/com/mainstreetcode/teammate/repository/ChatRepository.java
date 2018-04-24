@@ -109,8 +109,8 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
                 teams.add(chat.getTeam());
             }
 
-            userModelRepository.getSaveManyFunction().apply(users);
-            teamModelRepository.getSaveManyFunction().apply(teams);
+            userModelRepository.saveAsNested().apply(users);
+            teamModelRepository.saveAsNested().apply(teams);
 
             chatDao.upsert(chats);
             return chats;

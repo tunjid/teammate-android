@@ -102,7 +102,7 @@ public class ModelUtils {
         }
     }
 
-    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList){
+    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
         return new ArrayList<>(subTypeList);
     }
 
@@ -146,6 +146,11 @@ public class ModelUtils {
         try { return Integer.valueOf(number); }
         catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
         return 0;
+    }
+
+    public static boolean areNotEmpty(CharSequence... values) {
+        for (CharSequence value : values) if (TextUtils.isEmpty(value)) return false;
+        return true;
     }
 
     @FunctionalInterface

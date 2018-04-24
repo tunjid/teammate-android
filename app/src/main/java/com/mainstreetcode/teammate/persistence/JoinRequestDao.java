@@ -35,7 +35,7 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<JoinRequestEntity> teams);
+    public abstract void insert(List<JoinRequestEntity> teams);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<JoinRequestEntity> teams);

@@ -36,7 +36,7 @@ public abstract class TeamDao extends EntityDao<TeamEntity> {
     public abstract Maybe<List<Team>> getTeams();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<TeamEntity> teams);
+    public abstract void insert(List<TeamEntity> teams);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<TeamEntity> teams);
