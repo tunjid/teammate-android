@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.location.Address;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -25,6 +26,7 @@ import static com.mainstreetcode.teammate.util.ModelUtils.prettyPrinter;
 public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
     private int distance;
+    private Address address;
     private Sport sport;
     private Date startDate;
     private Date endDate;
@@ -45,9 +47,14 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
         return new EventSearchRequest(5, Sport.empty(), null, new Date(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)));
     }
 
+    public void setAddress(Address address) {
+        this.address = address;
+        items.get(0).setValue(getAddress());
+    }
+
     public void setDistance(String distance) {
         this.distance = parse(distance);
-        items.get(0).setValue(getDistance());
+        items.get(1).setValue(getDistance());
     }
 
     public void setSport(String sport) { this.sport = Config.sportFromCode(sport); }
@@ -67,6 +74,8 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
 
     public Sport getSport() { return sport; }
 
+    private CharSequence getAddress() { return address == null ? "": address.getLocality() + ", " + address.getAdminArea(); }
+
     private CharSequence getSportName() { return sport.getName(); }
 
     private CharSequence getDistance() { return App.getInstance().getString(R.string.event_public_distance, distance); }
@@ -78,11 +87,12 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
     @SuppressWarnings("unchecked")
     private List<Item<EventSearchRequest>> buildItems() {
         return Arrays.asList(
-                Item.text(0, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
-                Item.text(1, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
+                Item.text(0, Item.LOCATION, R.string.location, this::getAddress, ignored -> {}, this),
+                Item.text(1, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
+                Item.text(2, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(2, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
-                Item.text(3, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
+                Item.text(3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
+                Item.text(4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
         );
     }
 
@@ -108,8 +118,9 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
             }
             if (src.startDate != null) {
                 serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
-            if (src.endDate != null) {
-                serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));            }
+                if (src.endDate != null) {
+                    serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
+                }
             }
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();

@@ -5,13 +5,14 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.ClickInputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.DateViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -27,13 +28,14 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
  * Adapter for {@link Event}
  */
 
-public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventSearchRequestAdapter.EventSearchAdapterListener> {
 
     private final EventSearchRequest request;
     private final List<Sport> sports;
 
-    public EventSearchRequestAdapter(EventSearchRequest request) {
-        super(new BaseRecyclerViewAdapter.AdapterListener() {});
+    public EventSearchRequestAdapter(EventSearchRequest request,
+                                     EventSearchRequestAdapter.EventSearchAdapterListener listener) {
+        super(listener);
         setHasStableIds(true);
         this.request = request;
         this.sports = new ArrayList<>(Config.getSports());
@@ -44,6 +46,9 @@ public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
+            case Item.LOCATION:
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE, adapterListener::onLocationClicked)
+                        .setButtonRunnable(R.drawable.ic_location_on_white_24dp, adapterListener::onLocationClicked);
             case Item.INFO:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.SPORT:
@@ -75,5 +80,9 @@ public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
     @Override
     public int getItemViewType(int position) {
         return request.asItems().get(position).getItemType();
+    }
+
+    public interface EventSearchAdapterListener extends BaseRecyclerViewAdapter.AdapterListener{
+        void onLocationClicked();
     }
 }

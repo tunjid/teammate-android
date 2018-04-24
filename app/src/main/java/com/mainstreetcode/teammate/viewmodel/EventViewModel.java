@@ -47,7 +47,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class EventViewModel extends TeamMappedViewModel<Event> {
 
     private static final LatLngBounds DEFAULT_BOUNDS;
-    private static final int DEFAULT_BAR_RANGE = 60;
+    private static final int DEFAULT_BAR_RANGE = 50;
 
     private final EventRepository repository;
     private final GuestRepository guestRepository;
@@ -173,7 +173,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         LatLng southwest = bounds.southwest;
         LatLng northeast = bounds.northeast;
 
-        int miles = milesBetween(southwest, northeast);
+        int miles = Math.min(DEFAULT_BAR_RANGE, milesBetween(southwest, northeast));
 
         eventRequest.setDistance(String.valueOf(miles));
         eventRequest.setLocation(location);

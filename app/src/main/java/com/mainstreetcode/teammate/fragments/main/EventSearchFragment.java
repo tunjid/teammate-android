@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,11 +29,13 @@ import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
 import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION;
@@ -59,7 +65,7 @@ public class EventSearchFragment extends MainActivityFragment {
         getLayoutParams(root.findViewById(R.id.status_bar_dimmer)).height = MainActivity.topInset;
 
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
-                .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest()))
+                .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest(), this::startPlacePicker))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -150,6 +156,15 @@ public class EventSearchFragment extends MainActivityFragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != PLACE_PICKER_REQUEST) return;
+        if (resultCode != RESULT_OK) return;
+
+        Place place = PlacePicker.getPlace(requireContext(), data);
+        if (place != null) onLocationFound(place.getLatLng(), true);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         boolean permissionGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
         if (permissionGranted && requestCode == PERMISSIONS_REQUEST_LOCATION) requestLocation();
@@ -170,6 +185,12 @@ public class EventSearchFragment extends MainActivityFragment {
         });
     }
 
+    private void startPlacePicker() {
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
+        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
+    }
+
     private void onMapReady(GoogleMap map) {
         map.setOnCameraIdleListener(() -> onMapIdle(map));
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted);
@@ -184,6 +205,7 @@ public class EventSearchFragment extends MainActivityFragment {
 
     private void onMapIdle(GoogleMap map) {
         disposables.add(eventViewModel.getPublicEvents(map).subscribe(events -> populateMap(map, events), defaultErrorHandler));
+        disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler));
         scrollManager.notifyDataSetChanged();
     }
 
@@ -206,6 +228,11 @@ public class EventSearchFragment extends MainActivityFragment {
         Object tag = marker.getTag();
         if (tag == null || !(tag instanceof Event)) return;
         showFragment(EventEditFragment.newInstance((Event) tag));
+    }
+
+    private void onAddressFound(Address address) {
+        eventViewModel.getEventRequest().setAddress(address);
+        scrollManager.notifyItemChanged(0);
     }
 
     @SuppressLint("ResourceAsColor")

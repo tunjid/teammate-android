@@ -48,7 +48,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
         EventEditAdapter.EventEditAdapterListener {
 
     public static final String ARG_EVENT = "event";
-    public static final int PLACE_PICKER_REQUEST = 1;
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Event event;
@@ -166,14 +165,11 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode == RESULT_OK) {
-            Activity activity;
-            if ((activity = getActivity()) == null) return;
+        if (resultCode != RESULT_OK) return;
 
-            Place place = PlacePicker.getPlace(activity, data);
-            event.setPlace(place);
-            scrollManager.notifyDataSetChanged();
-        }
+        Place place = PlacePicker.getPlace(requireContext(), data);
+        event.setPlace(place);
+        scrollManager.notifyDataSetChanged();
     }
 
     @Override

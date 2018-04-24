@@ -42,7 +42,6 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     private static final String ARG_TEAM = "team";
     private static final String ARG_STATE = "state";
-    public static final int PLACE_PICKER_REQUEST = 2;
 
     private int state;
     private Team team;

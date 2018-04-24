@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
@@ -36,16 +37,11 @@ public class LocationViewModel extends ViewModel {
     public LocationViewModel() {}
 
     public Single<Address> fromPlace(Place place) {
-        LatLng latLng = place.getLatLng();
-        Geocoder geocoder = new Geocoder(App.getInstance());
+       return fromLocation(place.getLatLng());
+    }
 
-        return Single.fromCallable(() -> geocoder.getFromLocation(latLng.latitude, latLng.longitude, MAX_RESULTS))
-                .map(addresses -> {
-                    if (!addresses.isEmpty()) return addresses.get(0);
-                    else throw new TeammateException("No address found");
-                })
-                .subscribeOn(io())
-                .observeOn(mainThread());
+    public Single<Address> fromMap(GoogleMap map) {
+        return fromLocation(map.getCameraPosition().target);
     }
 
     @SuppressLint("MissingPermission")
@@ -82,5 +78,17 @@ public class LocationViewModel extends ViewModel {
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> requestPermission(fragment))
                 .create()
                 .show();
+    }
+
+    private Single<Address> fromLocation(LatLng location) {
+        Geocoder geocoder = new Geocoder(App.getInstance());
+
+        return Single.fromCallable(() -> geocoder.getFromLocation(location.latitude, location.longitude, MAX_RESULTS))
+                .map(addresses -> {
+                    if (!addresses.isEmpty()) return addresses.get(0);
+                    else throw new TeammateException("No address found");
+                })
+                .subscribeOn(io())
+                .observeOn(mainThread());
     }
 }
