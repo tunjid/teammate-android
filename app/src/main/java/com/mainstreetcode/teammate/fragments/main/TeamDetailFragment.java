@@ -31,8 +31,6 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
-
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
@@ -155,27 +153,7 @@ public class TeamDetailFragment extends MainActivityFragment
 
     @Override
     public void onJoinRequestClicked(JoinRequest request) {
-        View rootView = getView();
-        if (rootView == null) return;
-        if (!localRoleViewModel.hasPrivilegedRole()) return;
-
-        boolean isInvite = request.isTeamApproved();
-        AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
-
-        builder.setTitle(isInvite
-                ? getString(R.string.retract_invitation)
-                : getString(R.string.add_user_to_team, request.getUser().getFirstName()));
-
-        if (isInvite) {
-            builder.setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, false))
-                    .setNegativeButton(R.string.no, (dialog, which) -> {});
-        }
-        else {
-            builder.setPositiveButton(R.string.yes, (dialog, which) -> processJoinRequest(request, true))
-                    .setNegativeButton(R.string.no, (dialog, which) -> processJoinRequest(request, false));
-        }
-
-        builder.show();
+        showFragment(JoinRequestFragment.viewInstance(request));
     }
 
     @Override
@@ -183,7 +161,7 @@ public class TeamDetailFragment extends MainActivityFragment
         switch (view.getId()) {
             case R.id.fab:
                 if (localRoleViewModel.hasPrivilegedRole())
-                    showFragment(JoinRequestFragment.newInstance(team));
+                    showFragment(JoinRequestFragment.inviteInstance(team));
                 break;
         }
     }
@@ -204,6 +182,17 @@ public class TeamDetailFragment extends MainActivityFragment
                     .addSharedElement(holder.itemView, getTransitionName(role, R.id.fragment_header_background))
                     .addSharedElement(holder.getThumbnail(), getTransitionName(role, R.id.fragment_header_thumbnail));
         }
+        if (fragmentTo.getStableTag().contains(JoinRequestFragment.class.getSimpleName())) {
+            JoinRequest request = fragmentTo.getArguments().getParcelable(JoinRequestFragment.ARG_JOIN_REQUEST);
+            if (request == null) return null;
+
+            ModelCardViewHolder holder = (ModelCardViewHolder) scrollManager.findViewHolderForItemId(request.hashCode());
+            if (holder == null) return null;
+
+            return beginTransaction()
+                    .addSharedElement(holder.itemView, getTransitionName(request, R.id.fragment_header_background))
+                    .addSharedElement(holder.getThumbnail(), getTransitionName(request, R.id.fragment_header_thumbnail));
+        }
         return super.provideFragmentTransaction(fragmentTo);
     }
 
@@ -212,11 +201,6 @@ public class TeamDetailFragment extends MainActivityFragment
         else toggleProgress(true);
 
         disposables.add(teamMemberViewModel.getMany(team, fetchLatest).subscribe(this::onTeamUpdated, defaultErrorHandler));
-    }
-
-    private void processJoinRequest(final JoinRequest request, final boolean approve) {
-        Flowable<DiffUtil.DiffResult> resultFlowable = teamMemberViewModel.processJoinRequest(request, approve);
-        disposables.add(resultFlowable.subscribe(diffResult -> onJoinAction(diffResult, request, approve), defaultErrorHandler));
     }
 
     private void deleteTeam() {
@@ -243,13 +227,6 @@ public class TeamDetailFragment extends MainActivityFragment
 
         disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
                 .subscribe(this::onRoleUpdated, ErrorHandler.EMPTY));
-    }
-
-    private void onJoinAction(DiffUtil.DiffResult result, JoinRequest request, boolean approve) {
-        scrollManager.onDiff(result);
-        int stringResource = approve ? R.string.added_user : R.string.removed_user;
-        String name = request.getUser().getFirstName();
-        showSnackbar(getString(stringResource, name));
     }
 
     private void onRoleUpdated() {

@@ -68,6 +68,8 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
                     ? repository.createOrUpdate(member)
                     : repository.delete(member);
 
+            sourceSingle = sourceSingle.doOnSuccess(processed -> pushModelAlert(Alert.requestProcessed(request)));
+
             Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(sourceSingle
                     .toFlowable().cast(Model.class), request.getTeam(), member)
                     .cast(Identifiable.class)

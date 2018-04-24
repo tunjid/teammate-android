@@ -19,9 +19,12 @@ import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import io.reactivex.Flowable;
 
 /**
  * Join request for a {@link Team}
@@ -59,14 +62,22 @@ public class JoinRequest extends JoinRequestEntity
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.email(2, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
-                Item.text(3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.text(3, Item.INPUT, R.string.user_about, user::getAbout, Item::ignore, this),
+                Item.email(4, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
+                Item.text(5, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 
     @Override
-    public List<Item<JoinRequest>> asItems() { return items; }
+    public List<Item<JoinRequest>> asItems() {
+        List<Item<JoinRequest>> filtered = new ArrayList<>();
+        Flowable.fromIterable(items)
+                .filter(this::filter)
+                .collectInto(filtered, List::add)
+                .subscribe();
+        return filtered;
+    }
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
@@ -87,7 +98,7 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return TextUtils.isEmpty(id);
     }
 
     @Override
@@ -137,6 +148,12 @@ public class JoinRequest extends JoinRequestEntity
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
+    }
+
+    private boolean filter(Item<JoinRequest> item) {
+        int stringRes = item.getStringRes();
+        if (isEmpty()) return stringRes != R.string.user_about;
+        return stringRes != R.string.email;
     }
 
     public static final Parcelable.Creator<JoinRequest> CREATOR = new Parcelable.Creator<JoinRequest>() {

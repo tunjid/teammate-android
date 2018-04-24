@@ -131,6 +131,7 @@ public final class FeedFragment extends MainActivityFragment
             builder.setTitle(title)
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, true)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processJoinRequest(item, false)))
+                    .setNeutralButton(R.string.event_details, ((dialog, which) -> showFragment(JoinRequestFragment.viewInstance(request))))
                     .show();
         }
         else if (model instanceof Media) {
@@ -161,6 +162,17 @@ public final class FeedFragment extends MainActivityFragment
             return beginTransaction()
                     .addSharedElement(holder.itemView, getTransitionName(media, R.id.fragment_media_background))
                     .addSharedElement(holder.thumbnail, getTransitionName(media, R.id.fragment_media_thumbnail));
+        }
+        else if (fragmentTo.getStableTag().contains(JoinRequestFragment.class.getSimpleName())) {
+            JoinRequest request = fragmentTo.getArguments().getParcelable(JoinRequestFragment.ARG_JOIN_REQUEST);
+            if (request == null) return null;
+
+            FeedItemViewHolder holder = (FeedItemViewHolder) scrollManager.findViewHolderForItemId(request.hashCode());
+            if (holder == null) return null;
+
+            return beginTransaction()
+                    .addSharedElement(holder.itemView, getTransitionName(request, R.id.fragment_header_background))
+                    .addSharedElement(holder.thumbnail, getTransitionName(request, R.id.fragment_header_thumbnail));
         }
         else if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
             Bundle args = fragmentTo.getArguments();

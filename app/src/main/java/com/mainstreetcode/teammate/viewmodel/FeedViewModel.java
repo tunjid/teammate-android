@@ -8,16 +8,19 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.repository.JoinRequestRepository;
-import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -28,9 +31,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
-    private final RoleRepository roleRepository = RoleRepository.getInstance();
     private final GuestRepository guestRepository = GuestRepository.getInstance();
     private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
+    private final TeamMemberRepository<JoinRequest> memberRepository = TeamMemberRepository.getInstance();
 
     private final List<Identifiable> feedItems = new ArrayList<>();
 
@@ -44,6 +47,14 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     @Override
     boolean sortsAscending() {
         return true;
+    }
+
+    @Override
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (!(alert instanceof Alert.JoinRequestProcessed)) return;
+        JoinRequest request = ((Alert.JoinRequestProcessed) alert).getModel();
+        removedProcessedRequest(request);
     }
 
     @Override
@@ -77,9 +88,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
         Single<? extends Model> sourceSingle = leaveUnchanged
                 ? Single.just(request)
                 : approved && request.isTeamApproved()
-                ? roleRepository.acceptInvite(request)
+                ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
                 : approved && request.isUserApproved()
-                ? roleRepository.approveUser(request)
+                ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
                 : joinRequestRepository.delete(request);
 
         Flowable<List<Identifiable>> sourceFlowable = sourceSingle
@@ -98,5 +109,18 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
             feedItems.removeAll(processed);
             return feedItems;
         };
+    }
+
+    private void removedProcessedRequest(JoinRequest request) {
+        Iterator<Identifiable> iterator = feedItems.iterator();
+        while (iterator.hasNext()) {
+            Identifiable identifiable = iterator.next();
+            if (!(identifiable instanceof FeedItem)) continue;
+
+            Model model = ((FeedItem) identifiable).getModel();
+            if (model instanceof JoinRequest && model.equals(request)) {
+                iterator.remove();
+            }
+        }
     }
 }

@@ -43,7 +43,8 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
         requestRepository = JoinRequestRepository.getInstance();
     }
 
-    public static TeamMemberRepository getInstance() {
+    @SuppressWarnings("unchecked")
+    public static <S extends Model<S>> TeamMemberRepository<S> getInstance() {
         if (ourInstance == null) ourInstance = new TeamMemberRepository();
         return ourInstance;
     }
@@ -62,7 +63,8 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
             single = unsafeCast(roleRepository.createOrUpdate((Role) wrapped));
         }
         else if (wrapped instanceof JoinRequest) {
-            single = unsafeCast(requestRepository.createOrUpdate((JoinRequest) wrapped));
+            JoinRequest request = (JoinRequest) wrapped;
+            single = request.isUserApproved() ? approveUser(request) : acceptInvite(request);
         }
         else single = Single.error(new TeammateException("Unimplemented"));
 
@@ -94,7 +96,6 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
 
     @Override
     @SuppressLint("CheckResult")
-    @SuppressWarnings("unchecked")
     Maybe<List<TeamMember<T>>> localModelsBefore(Team key, @Nullable Date date) {
         if (date == null) date = new Date();
 
@@ -112,18 +113,34 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
 
             return result;
         }).subscribeOn(io());
+
         return unsafeCastList(listMaybe);
     }
 
+    private Single<TeamMember<T>> acceptInvite(JoinRequest request) {
+        return apply(request, api.acceptInvite(request.getId()));
+    }
+
+    private Single<TeamMember<T>> approveUser(JoinRequest request) {
+        return apply(request, api.approveUser(request.getId()));
+    }
+
+    private Single<TeamMember<T>> apply(JoinRequest request, Single<Role> apiSingle) {
+        TeamMember<T> member = TeamMember.unsafeCast(TeamMember.fromModel(request));
+        return apiSingle
+                .map(roleRepository.getSaveFunction())
+                .doOnSuccess(role -> AppDatabase.getInstance().joinRequestDao().delete(request))
+                .map(role -> member)
+                .doOnError(throwable -> deleteInvalidModel(member, throwable));
+    }
+
     @Override
-    @SuppressWarnings("unchecked")
     Maybe<List<TeamMember<T>>> remoteModelsBefore(Team key, @Nullable Date date) {
         Maybe<List<TeamMember<T>>> maybe = TeamMemberRepository.unsafeCastList(api.getTeamMembers(key.getId(), date).toMaybe());
         return maybe.map(getSaveManyFunction());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     Function<List<TeamMember<T>>, List<TeamMember<T>>> provideSaveManyFunction() {
         return models -> {
             TeamMember.split(Collections.unmodifiableList(models), (roles, requests) -> {
@@ -147,13 +164,16 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
         AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds);
     }
 
-    @SuppressWarnings("unchecked")
     private static <S extends Model<S>, R extends Model<R>> Single<TeamMember<S>> unsafeCast(final Single<R> single) {
         return single.map(TeamMember::fromModel).map(TeamMember::unsafeCast);
     }
 
-    @SuppressWarnings("unchecked")
     private static <S extends Model<S>> Maybe<List<TeamMember<S>>> unsafeCastList(final Maybe<List<TeamMember>> single) {
-        return single.map(list -> new ArrayList(list));
+        return single.map(TeamMemberRepository::unsafeCastList);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <S extends Model<S>> List<S> unsafeCastList(List<TeamMember> source){
+        return new ArrayList(source);
     }
 }

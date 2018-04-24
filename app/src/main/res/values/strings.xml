@@ -113,6 +113,11 @@
 
     <!--JoinRequestFragment-->
     <string name="invite_user">Invite User</string>
+    <string name="approve_request">Approve User</string>
+    <string name="pending_request">Pending Request</string>
+    <string name="accept_request">Accept Request</string>
+    <string name="confirm_request_drop">Decline %1$s join request?</string>
+    <string name="confirm_request_leave">Decline this team\'s invitation?</string>
     <string name="user_invite_sent">Invite sent</string>
 
     <!--UserEditFragment-->

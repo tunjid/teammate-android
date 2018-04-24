@@ -44,6 +44,10 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final Supplier<Boolean> TRUE = () -> true;
     public static final Supplier<Boolean> FALSE = () -> false;
 
+    @SuppressWarnings("unused")
+    public static <T> void ignore(T ignored) {}
+
+
     private final int sortPosition;
     private final int inputType;
     private @ItemType final int itemType;

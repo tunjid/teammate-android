@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.repository;
 
-import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -95,20 +94,6 @@ public class RoleRepository extends ModelRepository<Role> {
 
     public Maybe<Role> getRoleInTeam(String userId, String teamId) {
         return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io());
-    }
-
-    public Single<Role> acceptInvite(JoinRequest request) {
-        return apply(request, api.acceptInvite(request.getId()));
-    }
-
-    public Single<Role> approveUser(JoinRequest request) {
-        return apply(request, api.approveUser(request.getId()));
-    }
-
-    private Single<Role> apply(JoinRequest request, Single<Role> apiSingle) {
-        return apiSingle.map(getSaveFunction())
-                .doOnSuccess(role -> AppDatabase.getInstance().joinRequestDao().delete(request))
-                .doOnError(throwable -> JoinRequestRepository.getInstance().deleteInvalidModel(request, throwable));
     }
 
     public Flowable<List<Role>> getMyRoles() {
