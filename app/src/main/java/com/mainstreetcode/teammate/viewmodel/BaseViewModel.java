@@ -9,7 +9,6 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.processors.PublishProcessor;
@@ -22,7 +21,6 @@ abstract class BaseViewModel extends ViewModel {
     private static final PublishProcessor<Alert> eventSource = PublishProcessor.create();
 
     private LinkedList<Identifiable> ads = new LinkedList<>();
-    private AtomicInteger pullToRefreshCount = new AtomicInteger(0);
     private CompositeDisposable disposable = new CompositeDisposable();
 
     BaseViewModel() {
@@ -52,18 +50,6 @@ abstract class BaseViewModel extends ViewModel {
         if (hasNativeAds()) distributeAds(source);
         return source;
     }
-
-    final List<Identifiable> pullToRefresh(List<Identifiable> source, List<Identifiable> additions) {
-        int count;
-        if ((count = pullToRefreshCount.incrementAndGet()) == 1) source.clear();
-        if (count >= 2) pullToRefreshCount.set(0);
-
-        preserveList(source, additions);
-        afterPullToRefreshDiff(source);
-        return source;
-    }
-
-    void afterPullToRefreshDiff(List<Identifiable> source) {}
 
     void afterPreserveListDiff(List<Identifiable> source) {}
 

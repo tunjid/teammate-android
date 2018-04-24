@@ -13,6 +13,7 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.Flowable;
 
@@ -20,6 +21,7 @@ import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
 
+    private AtomicInteger pullToRefreshCount = new AtomicInteger(0);
     private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
 
     MappedViewModel() {}
@@ -45,7 +47,8 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     private Flowable<DiffUtil.DiffResult> getLatest(K key) {
-        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList);
+        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList)
+                .doOnTerminate(() -> pullToRefreshCount.set(0));
     }
 
     public void clearNotifications(V value) {
@@ -58,6 +61,16 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
                 .map(this::notificationCancelMap)
                 .subscribe(this::clearNotification, ErrorHandler.EMPTY);
     }
+
+    private List<Identifiable> pullToRefresh(List<Identifiable> source, List<Identifiable> additions) {
+        if (pullToRefreshCount.getAndIncrement() == 0) source.clear();
+
+        preserveList(source, additions);
+        afterPullToRefreshDiff(source);
+        return source;
+    }
+
+    void afterPullToRefreshDiff(List<Identifiable> source) {}
 
     void onErrorMessage(Message message, K key, Identifiable invalid) {
         if (message.isInvalidObject()) getModelList(key).remove(invalid);
