@@ -8,8 +8,10 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.UserHost;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
@@ -53,7 +55,6 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         Flowable.fromIterable(modelListMap.values())
                 .map(List::iterator)
                 .subscribe(iterator -> removeBlockedUser(user, iterator), ErrorHandler.EMPTY);
-
     }
 
     @Override
@@ -133,11 +134,11 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     @SuppressWarnings("unchecked")
-    private <S extends Model<S>> TeamMemberRepository<S> repository() {
+    private <S extends Model<S> & UserHost & TeamHost> TeamMemberRepository<S> repository() {
         return repository;
     }
 
-    private <T extends Model<T>, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepository<T>, S> function) {
+    private <T extends Model<T> & TeamHost & UserHost, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepository<T>, S> function) {
         try {return function.apply(TeamMember.fromModel(model), repository());}
         catch (Exception e) {throw new RuntimeException(e);}
     }
@@ -161,13 +162,8 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
             Identifiable identifiable = iterator.next();
             if (!(identifiable instanceof TeamMember)) continue;
 
-            Model model = ((TeamMember) identifiable).getWrappedModel();
-            if (model instanceof Role && ((Role) model).getUser().equals(user)) {
-                iterator.remove();
-            }
-            if (model instanceof JoinRequest && ((JoinRequest) model).getUser().equals(user)) {
-                iterator.remove();
-            }
+            TeamMember member = ((TeamMember) identifiable);
+            if (member.getUser().equals(user)) iterator.remove();
         }
     }
 
@@ -179,11 +175,12 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
             Identifiable item = iterator.previous();
             if (!(item instanceof TeamMember)) continue;
 
-            item = ((TeamMember) item).getWrappedModel();
+            TeamMember member = ((TeamMember) item);
+            item = member.getWrappedModel();
 
-            if (item instanceof Role) userIds.add(((Role) item).getUser().getId());
+            if (item instanceof Role) userIds.add(member.getUser().getId());
             else if (item instanceof JoinRequest) {
-                User user = ((JoinRequest) item).getUser();
+                User user = member.getUser();
                 if (userIds.contains(user.getId())) iterator.remove();
             }
         }

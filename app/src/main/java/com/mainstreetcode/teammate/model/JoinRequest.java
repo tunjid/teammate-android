@@ -32,6 +32,8 @@ import io.reactivex.Flowable;
 
 public class JoinRequest extends JoinRequestEntity
         implements
+        UserHost,
+        TeamHost,
         Model<JoinRequest>,
         HeaderedModel<JoinRequest>,
         ListableModel<JoinRequest> {

@@ -29,6 +29,8 @@ import java.util.List;
 
 public class Role extends RoleEntity
         implements
+        UserHost,
+        TeamHost,
         Model<Role>,
         HeaderedModel<Role>,
         ListableModel<Role> {

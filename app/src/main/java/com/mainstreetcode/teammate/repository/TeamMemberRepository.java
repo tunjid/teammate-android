@@ -7,7 +7,9 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.UserHost;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.TeamMemberDao;
@@ -27,7 +29,7 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepository<TeamMember<T>> {
+public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> extends TeamQueryRepository<TeamMember<T>> {
 
     private final TeammateApi api;
     private final TeamMemberDao dao;
@@ -44,7 +46,7 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
     }
 
     @SuppressWarnings("unchecked")
-    public static <S extends Model<S>> TeamMemberRepository<S> getInstance() {
+    public static <S extends Model<S> & TeamHost & UserHost> TeamMemberRepository<S> getInstance() {
         if (ourInstance == null) ourInstance = new TeamMemberRepository();
         return ourInstance;
     }
@@ -164,16 +166,17 @@ public class TeamMemberRepository<T extends Model<T>> extends TeamQueryRepositor
         AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds);
     }
 
-    private static <S extends Model<S>, R extends Model<R>> Single<TeamMember<S>> unsafeCast(final Single<R> single) {
+    private static <S extends Model<S> & TeamHost & UserHost, R extends Model<R> & TeamHost & UserHost>
+    Single<TeamMember<S>> unsafeCast(final Single<R> single) {
         return single.map(TeamMember::fromModel).map(TeamMember::unsafeCast);
     }
 
-    private static <S extends Model<S>> Maybe<List<TeamMember<S>>> unsafeCastList(final Maybe<List<TeamMember>> single) {
+    private static <S extends Model<S> & TeamHost & UserHost> Maybe<List<TeamMember<S>>> unsafeCastList(final Maybe<List<TeamMember>> single) {
         return single.map(TeamMemberRepository::unsafeCastList);
     }
 
     @SuppressWarnings("unchecked")
-    private static <S extends Model<S>> List<S> unsafeCastList(List<TeamMember> source){
+    private static <S extends Model<S>> List<S> unsafeCastList(List<TeamMember> source) {
         return new ArrayList(source);
     }
 }

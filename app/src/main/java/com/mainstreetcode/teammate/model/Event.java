@@ -41,6 +41,7 @@ import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 
 public class Event extends EventEntity
         implements
+        TeamHost,
         Model<Event>,
         HeaderedModel<Event>,
         ListableModel<Event> {

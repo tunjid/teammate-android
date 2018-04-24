@@ -22,7 +22,10 @@ import io.reactivex.Flowable;
 import io.reactivex.functions.BiConsumer;
 
 @SuppressLint("ParcelCreator")
-public class TeamMember<S extends Model<S>> implements Model<TeamMember<S>> {
+public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
+        UserHost,
+        TeamHost,
+        Model<TeamMember<S>> {
 
     private final S wrappedModel;
 
@@ -32,12 +35,20 @@ public class TeamMember<S extends Model<S>> implements Model<TeamMember<S>> {
         return wrappedModel;
     }
 
-    public static <S extends Model<S>> TeamMember<S> fromModel(final S wrappedModel) {
+    public User getUser() {
+        return wrappedModel.getUser();
+    }
+
+    public Team getTeam() {
+        return wrappedModel.getTeam();
+    }
+
+    public static <S extends Model<S> & TeamHost & UserHost> TeamMember<S> fromModel(final S wrappedModel) {
         return new TeamMember<>(wrappedModel);
     }
 
     @SuppressWarnings("unchecked")
-    public static <S extends Model<S>> TeamMember<S> unsafeCast(final TeamMember teamMember) {
+    public static <S extends Model<S> & TeamHost & UserHost> TeamMember<S> unsafeCast(final TeamMember teamMember) {
         return (TeamMember<S>) teamMember;
     }
 

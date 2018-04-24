@@ -24,6 +24,7 @@ import java.util.List;
 
 public class Guest extends GuestEntity
         implements
+        UserHost,
         Model<Guest>,
         HeaderedModel<Guest>,
         ListableModel<Guest> {
