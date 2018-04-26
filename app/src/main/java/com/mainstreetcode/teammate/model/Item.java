@@ -102,7 +102,9 @@ public class Item<T> implements Identifiable, Comparable<Item> {
         return this;
     }
 
-    public int getInputType() { return inputType; }
+    public int getSortPosition() {return sortPosition;}
+
+    public int getInputType() {return inputType;}
 
     public int getItemType() {return this.itemType;}
 
@@ -129,6 +131,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
         return other;
     }
 
+    @SuppressWarnings("unused")
     public T getItemizedObject() {
         return itemizedObject;
     }

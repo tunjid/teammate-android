@@ -38,10 +38,18 @@ public class JoinRequest extends JoinRequestEntity
         HeaderedModel<JoinRequest>,
         ListableModel<JoinRequest> {
 
+    public static final int INVITING = 0;
+    public static final int JOINING = 1;
+    public static final int APPROVING = 2;
+    public static final int ACCEPTING = 3;
+    public static final int WAITING = 4;
+
+    private static final int ROLE_INDEX = 5;
+
     @Ignore private final List<Item<JoinRequest>> items;
 
-    public static JoinRequest join(Position position, Team team, User user) {
-        return new JoinRequest(false, true, "", position, team, user, new Date());
+    public static JoinRequest join(Team team, User user) {
+        return new JoinRequest(false, true, "", Position.empty(), team, user, new Date());
     }
 
     public static JoinRequest invite(Team team) {
@@ -66,8 +74,18 @@ public class JoinRequest extends JoinRequestEntity
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
                 Item.text(3, Item.INPUT, R.string.user_about, user::getAbout, Item::ignore, this),
                 Item.email(4, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
-                Item.text(5, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
-                        .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
+                // END USER ITEMS
+                Item.text(ROLE_INDEX, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                        .textTransformer(value -> Config.positionFromCode(value.toString()).getName()),
+                // START TEAM ITEMS
+                Item.text(6, Item.INPUT, R.string.team_name, team::getName, Item::ignore, this),
+                Item.text(7, Item.SPORT, R.string.team_sport, team.getSport()::getCode, Item::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
+                Item.text(8, Item.CITY, R.string.city, team::getCity, Item::ignore, this),
+                Item.text(9, Item.STATE, R.string.state, team::getState, Item::ignore, this),
+                Item.text(10, Item.ZIP, R.string.zip, team::getZip, Item::ignore, this),
+                Item.text(11, Item.DESCRIPTION, R.string.team_description, team::getDescription, Item::ignore, this),
+                Item.number(12, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(team.getMinAge()), Item::ignore, this),
+                Item.number(13, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(team.getMaxAge()), Item::ignore, this)
         );
     }
 
@@ -153,9 +171,20 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     private boolean filter(Item<JoinRequest> item) {
+        boolean isEmpty = isEmpty();
+        int sortPosition = item.getSortPosition();
+
+        // Joining a team
+        if (userApproved) return sortPosition >= ROLE_INDEX;
+
+        // Inviting a user
+        boolean ignoreTeam = sortPosition <= ROLE_INDEX;
+
         int stringRes = item.getStringRes();
-        if (isEmpty()) return stringRes != R.string.user_about;
-        return stringRes != R.string.email;
+
+        return isEmpty
+                ? ignoreTeam && stringRes != R.string.user_about
+                : ignoreTeam && stringRes != R.string.email;
     }
 
     public static final Parcelable.Creator<JoinRequest> CREATOR = new Parcelable.Creator<JoinRequest>() {

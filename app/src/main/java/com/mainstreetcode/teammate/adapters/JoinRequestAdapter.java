@@ -35,11 +35,10 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), joinRequest::isEmpty);
-            case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, joinRequest::isEmpty);
             default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields);
+            case Item.ROLE:
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
         }
     }
 
@@ -58,5 +57,9 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
         return joinRequest.asItems().get(position).getItemType();
     }
 
-    public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {}
+    public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
+        boolean canEditFields();
+
+        boolean canEditRole();
+    }
 }

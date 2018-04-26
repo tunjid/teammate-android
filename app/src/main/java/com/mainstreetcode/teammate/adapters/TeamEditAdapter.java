@@ -12,7 +12,6 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -43,8 +42,6 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
             case Item.DESCRIPTION:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, FALSE);
-            case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::isJoiningTeam);
             case Item.SPORT:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::isPrivileged, FALSE);
             case Item.CITY:
@@ -64,7 +61,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public int getItemCount() {
-        return adapterListener.isJoiningTeam() ? team.asItems().size() : team.asItems().size() - 1;
+        return team.asItems().size();
     }
 
     @Override
@@ -74,8 +71,6 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
         void onAddressClicked();
-
-        boolean isJoiningTeam();
 
         boolean isPrivileged();
     }

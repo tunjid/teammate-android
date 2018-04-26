@@ -238,7 +238,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     public void selectTeam() {
         if (!localRoleViewModel.hasPrivilegedRole()) {
-            showFragment(TeamEditFragment.newJoinInstance(event.getTeam()));
+            showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));
             return;
         }
         FragmentManager fragmentManager = getFragmentManager();

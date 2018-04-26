@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,16 +16,12 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
 import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -38,7 +35,6 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     private static final int CREATING = 0;
     private static final int EDITING = 1;
-    private static final int JOINING = 2;
 
     private static final String ARG_TEAM = "team";
     private static final String ARG_STATE = "state";
@@ -49,8 +45,6 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty(), CREATING);}
 
     public static TeamEditFragment newEditInstance(Team team) {return newInstance(team, EDITING);}
-
-    public static TeamEditFragment newJoinInstance(Team team) {return newInstance(team, JOINING);}
 
     private static TeamEditFragment newInstance(Team team, int state) {
         TeamEditFragment fragment = new TeamEditFragment();
@@ -116,20 +110,29 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public boolean showsFab() {
-        return state == CREATING || state == JOINING || localRoleViewModel.hasPrivilegedRole();
+        return state == CREATING || localRoleViewModel.hasPrivilegedRole();
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() != R.id.fab) return;
+
+        toggleProgress(true);
+        disposables.add(teamViewModel.createOrUpdate(team)
+                .subscribe(result -> {
+                    showSnackbar(getModelUpdateMessage());
+                    onModelUpdated(result);
+                }, defaultErrorHandler));
     }
 
     @Override
     public void onImageClick() {
-        if (state == CREATING) {
+        if (state == CREATING)
             showSnackbar(getString(R.string.create_team_first));
-            return;
-        }
-        if (!localRoleViewModel.hasPrivilegedRole()) {
+        else if (!localRoleViewModel.hasPrivilegedRole())
             showSnackbar(getString(R.string.no_permission));
-            return;
-        }
-        super.onImageClick();
+
+        else super.onImageClick();
     }
 
     @Override
@@ -137,13 +140,15 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     protected Flowable<DiffUtil.DiffResult> fetch(Team model) {
-        return state == JOINING ? Flowable.empty() : teamViewModel.getTeam(model);
+        return teamViewModel.getTeam(model);
     }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
-        toggleProgress(false);
+        viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
+        toggleProgress(false);
+        if (!team.isEmpty()) state = EDITING;
     }
 
     @Override
@@ -156,11 +161,6 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    public boolean isJoiningTeam() {
-        return state == JOINING;
-    }
-
-    @Override
     public boolean isPrivileged() {
         return state == CREATING || localRoleViewModel.hasPrivilegedRole();
     }
@@ -168,76 +168,32 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode == RESULT_OK) {
-            Context context = getContext();
-            if (context == null) return;
+        if (resultCode != RESULT_OK) return;
+        Context context = getContext();
+        if (context == null) return;
 
-            toggleProgress(true);
-            Place place = PlacePicker.getPlace(context, data);
-            disposables.add(locationViewModel.fromPlace(place).subscribe(address -> {
-                team.setAddress(address);
-                scrollManager.notifyDataSetChanged();
-                toggleProgress(false);
-            }, defaultErrorHandler));
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab:
-                Position position = Config.positionFromCode(team.asItems().get(Team.ROLE_POSITION).getValue().toString());
-
-                if (isJoiningTeam() && position.isInvalid()) {
-                    showSnackbar(getString(R.string.choose_role_error));
-                    return;
-                }
-
-                toggleProgress(true);
-                Disposable disposable = null;
-                switch (state) {
-                    case CREATING:
-                        disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            onModelUpdated(result);
-                            viewHolder.bind(getHeaderedModel());
-                            showSnackbar(getString(R.string.created_team, team.getName()));
-                        }, defaultErrorHandler);
-                        break;
-                    case JOINING:
-                        JoinRequest joinRequest = JoinRequest.join(position, team, userViewModel.getCurrentUser());
-                        disposable = roleViewModel.joinTeam(joinRequest).subscribe(request -> {
-                            showSnackbar(getString(R.string.team_submitted_join_request));
-                            toggleProgress(false);
-                        }, defaultErrorHandler);
-                        break;
-                    case EDITING:
-                        disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            onModelUpdated(result);
-                            viewHolder.bind(getHeaderedModel());
-                            showSnackbar(getString(R.string.updated_team));
-                        }, defaultErrorHandler);
-                        break;
-                }
-
-                if (disposable != null) disposables.add(disposable);
-        }
+        toggleProgress(true);
+        Place place = PlacePicker.getPlace(context, data);
+        disposables.add(locationViewModel.fromPlace(place)
+                .subscribe(this::onAddressFound, defaultErrorHandler));
     }
 
     private void onRoleUpdated() {
-        state = team.isEmpty() ? CREATING : localRoleViewModel.getCurrentRole().isEmpty() ? JOINING : EDITING;
-
-        switch (state) {
-            case CREATING:
-                setToolbarTitle(getString(R.string.create_team));
-                break;
-            case JOINING:
-                setToolbarTitle(getString(R.string.join_team));
-                break;
-            case EDITING:
-                setToolbarTitle(getString(R.string.edit_team));
-                break;
-        }
-        toggleFab(showsFab());
+        state = team.isEmpty() ? CREATING : EDITING;
         scrollManager.notifyDataSetChanged();
+
+        toggleFab(showsFab());
+        setToolbarTitle(getString(state == CREATING ? R.string.create_team : R.string.edit_team));
+    }
+
+    private void onAddressFound(Address address) {
+        team.setAddress(address);
+        scrollManager.notifyDataSetChanged();
+        toggleProgress(false);
+    }
+
+    @NonNull
+    private String getModelUpdateMessage() {
+        return state == CREATING ? getString(R.string.created_team, team.getName()) : getString(R.string.updated_team);
     }
 }

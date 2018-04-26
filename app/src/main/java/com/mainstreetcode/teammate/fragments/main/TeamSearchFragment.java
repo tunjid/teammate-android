@@ -107,7 +107,7 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public void onTeamClicked(Team team) {
-        showFragment(TeamEditFragment.newJoinInstance(team));
+        showFragment(JoinRequestFragment.joinInstance(team, userViewModel.getCurrentUser()));
     }
 
     @Override

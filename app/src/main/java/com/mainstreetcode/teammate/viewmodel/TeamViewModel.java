@@ -65,6 +65,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Flowable<DiffUtil.DiffResult> getTeam(Team team) {
+        if (team.isEmpty()) return Flowable.empty();
         Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(team), Team.class, team)
                 .observeOn(mainThread()).cast(Team.class).map(Team::asIdentifiables);
 

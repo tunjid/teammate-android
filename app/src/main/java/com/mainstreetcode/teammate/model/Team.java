@@ -38,11 +38,9 @@ public class Team extends TeamEntity
         HeaderedModel<Team>,
         ListableModel<Team> {
 
-    //    private static final int SPORT_POSITION = 1;
     private static final int CITY_POSITION = 2;
     private static final int STATE_POSITION = 3;
     private static final int ZIP_POSITION = 4;
-    public static final int ROLE_POSITION = 9;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
@@ -78,8 +76,7 @@ public class Team extends TeamEntity
                 Item.text(5, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
                 Item.number(6, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
                 Item.number(7, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
-                Item.text(8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this),
-                Item.text(ROLE_POSITION, Item.ROLE, R.string.team_role, Item.nullToEmpty(""), null, this)
+                Item.text(8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
         );
     }
 
