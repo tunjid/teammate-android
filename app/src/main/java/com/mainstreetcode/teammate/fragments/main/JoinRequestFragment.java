@@ -207,7 +207,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     private void createJoinRequest() {
         toggleProgress(true);
-        disposables.add(roleViewModel.joinTeam(request)
+        disposables.add(teamMemberViewModel.joinTeam(request)
                 .subscribe(request -> onJoinRequestSent(), defaultErrorHandler));
     }
 

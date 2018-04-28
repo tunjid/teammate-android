@@ -78,6 +78,13 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         return flowable;
     }
 
+    public Single<JoinRequest> joinTeam(JoinRequest request) {
+        return asTypedTeamMember(request, (member, repository) ->
+                repository.createOrUpdate(member)
+                        .map(pendingMember -> request)
+                        .observeOn(mainThread()));
+    }
+
     public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, boolean approved) {
         return asTypedTeamMember(request, (member, repository) -> {
             Single<TeamMember<JoinRequest>> sourceSingle = approved

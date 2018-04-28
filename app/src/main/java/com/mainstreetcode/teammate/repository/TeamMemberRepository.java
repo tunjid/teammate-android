@@ -66,7 +66,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
         }
         else if (wrapped instanceof JoinRequest) {
             JoinRequest request = (JoinRequest) wrapped;
-            single = request.isUserApproved() ? approveUser(request) : acceptInvite(request);
+            single = request.isEmpty() ? createJoinRequest(request) : createRole(request);
         }
         else single = Single.error(new TeammateException("Unimplemented"));
 
@@ -117,6 +117,15 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
         }).subscribeOn(io());
 
         return unsafeCastList(listMaybe);
+    }
+
+    private Single<TeamMember<T>> createJoinRequest(JoinRequest request) {
+        TeamMember<T> member = TeamMember.unsafeCast(TeamMember.fromModel(request));
+        return requestRepository.createOrUpdate(request).map(updated -> member);
+    }
+
+    private Single<TeamMember<T>> createRole(JoinRequest request) {
+       return request.isUserApproved() ? approveUser(request) : acceptInvite(request);
     }
 
     private Single<TeamMember<T>> acceptInvite(JoinRequest request) {
