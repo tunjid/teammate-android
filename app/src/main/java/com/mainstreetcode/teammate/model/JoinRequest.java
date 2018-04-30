@@ -19,12 +19,9 @@ import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import io.reactivex.Flowable;
 
 /**
  * Join request for a {@link Team}
@@ -38,11 +35,6 @@ public class JoinRequest extends JoinRequestEntity
         HeaderedModel<JoinRequest>,
         ListableModel<JoinRequest> {
 
-    public static final int INVITING = 0;
-    public static final int JOINING = 1;
-    public static final int APPROVING = 2;
-    public static final int ACCEPTING = 3;
-    public static final int WAITING = 4;
 
     private static final int ROLE_INDEX = 5;
 
@@ -91,12 +83,7 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public List<Item<JoinRequest>> asItems() {
-        List<Item<JoinRequest>> filtered = new ArrayList<>();
-        Flowable.fromIterable(items)
-                .filter(this::filter)
-                .collectInto(filtered, List::add)
-                .subscribe();
-        return filtered;
+        return items;
     }
 
     @Override
@@ -168,23 +155,6 @@ public class JoinRequest extends JoinRequestEntity
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-    }
-
-    private boolean filter(Item<JoinRequest> item) {
-        boolean isEmpty = isEmpty();
-        int sortPosition = item.getSortPosition();
-
-        // Joining a team
-        if (userApproved) return sortPosition >= ROLE_INDEX;
-
-        // Inviting a user
-        boolean ignoreTeam = sortPosition <= ROLE_INDEX;
-
-        int stringRes = item.getStringRes();
-
-        return isEmpty
-                ? ignoreTeam && stringRes != R.string.user_about
-                : ignoreTeam && stringRes != R.string.email;
     }
 
     public static final Parcelable.Creator<JoinRequest> CREATOR = new Parcelable.Creator<JoinRequest>() {

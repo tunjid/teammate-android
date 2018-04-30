@@ -15,6 +15,8 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
+import java.util.List;
+
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -23,11 +25,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
 
-    private final JoinRequest joinRequest;
+    private final List<Item<JoinRequest>> items;
 
-    public JoinRequestAdapter(JoinRequest joinRequest, AdapterListener listener) {
+    public JoinRequestAdapter(List<Item<JoinRequest>> items, AdapterListener listener) {
         super(listener);
-        this.joinRequest = joinRequest;
+        this.items = items;
     }
 
     @NonNull
@@ -44,17 +46,17 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(joinRequest.asItems().get(i));
+        baseItemViewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return joinRequest.asItems().size();
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return joinRequest.asItems().get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {

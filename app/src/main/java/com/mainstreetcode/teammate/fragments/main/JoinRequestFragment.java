@@ -1,5 +1,8 @@
 package com.mainstreetcode.teammate.fragments.main;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,14 +23,15 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel;
 
 import io.reactivex.Flowable;
 
-import static com.mainstreetcode.teammate.model.JoinRequest.ACCEPTING;
-import static com.mainstreetcode.teammate.model.JoinRequest.APPROVING;
-import static com.mainstreetcode.teammate.model.JoinRequest.INVITING;
-import static com.mainstreetcode.teammate.model.JoinRequest.JOINING;
-import static com.mainstreetcode.teammate.model.JoinRequest.WAITING;
+import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.ACCEPTING;
+import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.APPROVING;
+import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.INVITING;
+import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.JOINING;
+import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.WAITING;
 
 /**
  * Invites a Team member
@@ -39,8 +43,8 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     public static final String ARG_JOIN_REQUEST = "join-request";
 
-    private int state;
     private JoinRequest request;
+    private JoinRequestViewModel requestViewModel;
 
     public static JoinRequestFragment inviteInstance(Team team) {
         JoinRequestFragment fragment = newInstance(JoinRequest.invite(team));
@@ -91,11 +95,19 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ViewModelProvider provider = ViewModelProviders.of(this);
+        requestViewModel = provider.get(JoinRequestViewModel.class);
+    }
+
+    @Override
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         request = getArguments().getParcelable(ARG_JOIN_REQUEST);
+        requestViewModel.withJoinRequest(request);
     }
 
     @Nullable
@@ -104,7 +116,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new JoinRequestAdapter(request, this))
+                .withAdapter(new JoinRequestAdapter(requestViewModel.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -118,7 +130,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         User user = userViewModel.getCurrentUser();
         Team team = request.getTeam();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
-        checkState();
+        refreshState();
         super.onResume();
     }
 
@@ -132,7 +144,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         super.onPrepareOptionsMenu(menu);
         boolean isEmpty = request.isEmpty();
         boolean canBlockUser = localRoleViewModel.hasPrivilegedRole();
-        boolean canDeleteRequest = canBlockUser || isRequestOwner();
+        boolean canDeleteRequest = canBlockUser || requestViewModel.isRequestOwner();
 
         MenuItem block_item = menu.findItem(R.id.action_block);
         MenuItem deleteItem = menu.findItem(R.id.action_kick);
@@ -167,10 +179,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @Override
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean showsFab() {
-        if (state == INVITING || state == JOINING) return true;
-        else if (state == APPROVING) return localRoleViewModel.hasPrivilegedRole();
-        else if (state == ACCEPTING) return isRequestOwner();
-        else return false;
+        return requestViewModel.showsFab(localRoleViewModel.hasPrivilegedRole());
     }
 
     @Override
@@ -187,17 +196,21 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     @Override
     public boolean canEditFields() {
-        return state == INVITING;
+        return requestViewModel.canEditFields();
     }
 
     @Override
     public boolean canEditRole() {
-        return state == INVITING || state == JOINING;
+        return requestViewModel.canEditRole();
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
+
+        @JoinRequestViewModel.JoinRequestState
+        int state = requestViewModel.getState();
+
         if (state == WAITING) return;
 
         if (state == APPROVING || state == ACCEPTING) completeJoinRequest(true);
@@ -218,20 +231,20 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     }
 
     private void onJoinRequestSent() {
-        checkState();
+        scrollManager.getRecyclerView().getRecycledViewPool().clear();
+        refreshState();
         toggleProgress(false);
         toggleBottomSheet(false);
         showSnackbar(getString(request.isTeamApproved()
                 ? R.string.user_invite_sent
                 : R.string.team_submitted_join_request));
-        scrollManager.getRecyclerView().getRecycledViewPool().clear();
-        scrollManager.notifyDataSetChanged();
+
     }
 
     private void onRequestCompleted(boolean approved) {
         int stringResource = approved ? R.string.added_user : R.string.removed_user;
         String name = request.getUser().getFirstName();
-        showSnackbar(getString(stringResource, name));
+        if (!requestViewModel.isRequestOwner()) showSnackbar(getString(stringResource, name));
         requireActivity().onBackPressed();
     }
 
@@ -243,8 +256,8 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     private void showDeletePrompt() {
         User requestUser = request.getUser();
-        final String prompt = isRequestOwner()
-                ? getString(R.string.clarify_invitation, request.getTeam().getName())
+        final String prompt = requestViewModel.isRequestOwner()
+                ? getString(R.string.confirm_request_leave, request.getTeam().getName())
                 : getString(R.string.confirm_request_drop, requestUser.getFirstName());
 
         new AlertDialog.Builder(requireActivity()).setTitle(prompt)
@@ -253,37 +266,10 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
                 .show();
     }
 
-    private void checkState() {
-        boolean isEmpty = request.isEmpty();
-        boolean isRequestOwner = isRequestOwner();
-        boolean isUserEmpty = request.getUser().isEmpty();
-        boolean isUserApproved = request.isUserApproved();
-        boolean isTeamApproved = request.isTeamApproved();
-
-        state = isEmpty && isUserEmpty && isTeamApproved
-                ? INVITING
-                : isEmpty && isUserApproved && isRequestOwner
-                ? JOINING
-                : (!isEmpty && isUserApproved && isRequestOwner) || (!isEmpty && isTeamApproved && !isRequestOwner)
-                ? WAITING
-                : isTeamApproved && isRequestOwner ? ACCEPTING : APPROVING;
-
-        toggleFab(showsFab());
-        setToolbarTitle(getToolbarTitle());
+    private void refreshState() {
+        requestViewModel.refresh();
         scrollManager.notifyDataSetChanged();
-    }
-
-    private boolean isRequestOwner() {
-        return userViewModel.getCurrentUser().equals(request.getUser());
-    }
-
-    private String getToolbarTitle() {
-        return getString(state == JOINING
-                ? R.string.join_team
-                : state == INVITING
-                ? R.string.invite_user
-                : state == WAITING
-                ? R.string.pending_request
-                : state == APPROVING ? R.string.approve_request : R.string.accept_request);
+        toggleFab(showsFab());
+        setToolbarTitle(requestViewModel.getToolbarTitle(this));
     }
 }

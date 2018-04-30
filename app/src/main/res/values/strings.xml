@@ -116,8 +116,8 @@
     <string name="approve_request">Approve User</string>
     <string name="pending_request">Pending Request</string>
     <string name="accept_request">Accept Request</string>
-    <string name="confirm_request_drop">Decline %1$s join request?</string>
-    <string name="confirm_request_leave">Decline this team\'s invitation?</string>
+    <string name="confirm_request_drop">Dismiss the join request for %1$s?</string>
+    <string name="confirm_request_leave">Dismiss the request to join %1$s?</string>
     <string name="user_invite_sent">Invite sent</string>
 
     <!--UserEditFragment-->
