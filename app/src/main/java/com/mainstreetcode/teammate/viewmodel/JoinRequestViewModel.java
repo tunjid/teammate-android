@@ -35,14 +35,14 @@ public class JoinRequestViewModel {
     public static final int JOINING = 1;
     public static final int APPROVING = 2;
     public static final int ACCEPTING = 3;
-
     public static final int WAITING = 4;
+
     private int state;
 
     private int index;
+    private final JoinRequest request;
     private final UserRepository userRepository;
     private final List<Item<JoinRequest>> items;
-    private final JoinRequest request;
 
     private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
@@ -151,7 +151,7 @@ public class JoinRequestViewModel {
 
         int stringRes = item.getStringRes();
 
-        // ABout field should not show when inviting a user, email field should not show when trying
+        // About field should not show when inviting a user, email field should not show when trying
         // to join a team.
         return isEmpty
                 ? ignoreTeam && stringRes != R.string.user_about

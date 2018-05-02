@@ -37,15 +37,21 @@ public class JoinRequest extends JoinRequestEntity
 
 
     private static final int ROLE_INDEX = 5;
-
     @Ignore private final List<Item<JoinRequest>> items;
 
+    @NonNull
+    private static Team copyTeam(Team team) {
+        Team copy = Team.empty();
+        copy.update(team);
+        return copy;
+    }
+
     public static JoinRequest join(Team team, User user) {
-        return new JoinRequest(false, true, "", Position.empty(), team, user, new Date());
+        return new JoinRequest(false, true, "", Position.empty(), copyTeam(team), user, new Date());
     }
 
     public static JoinRequest invite(Team team) {
-        return new JoinRequest(true, false, "", Position.empty(), team, User.empty(), new Date());
+        return new JoinRequest(true, false, "", Position.empty(), copyTeam(team), User.empty(), new Date());
     }
 
     public JoinRequest(boolean teamApproved, boolean userApproved, String id, Position position, Team team, User user, Date created) {
