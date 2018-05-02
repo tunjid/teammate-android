@@ -1,4 +1,4 @@
-package com.mainstreetcode.teammate.viewmodel;
+package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
@@ -21,11 +21,7 @@ import io.reactivex.functions.BiFunction;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-/**
- * ViewModel for checking a role in local contexts
- */
-
-public class JoinRequestViewModel {
+public class JoinRequestGofer implements Gofer<JoinRequest> {
 
     @Retention(SOURCE)
     @IntDef({INVITING, JOINING, APPROVING, ACCEPTING, WAITING})
@@ -46,7 +42,7 @@ public class JoinRequestViewModel {
 
     private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
-    JoinRequestViewModel(JoinRequest request, BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+    public JoinRequestGofer(JoinRequest request, BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
         this.request = request;
         this.joinCompleter = joinCompleter;
         userRepository = UserRepository.getInstance();

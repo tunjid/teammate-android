@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.model.UserHost;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -75,8 +76,8 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         return flowable;
     }
 
-    public JoinRequestViewModel viewModelFor(JoinRequest joinRequest) {
-        return new JoinRequestViewModel(joinRequest, this::processRequest);
+    public JoinRequestGofer gofer(JoinRequest joinRequest) {
+        return new JoinRequestGofer(joinRequest, this::processRequest);
     }
 
     public Single<Role> deleteRole(Role role) {

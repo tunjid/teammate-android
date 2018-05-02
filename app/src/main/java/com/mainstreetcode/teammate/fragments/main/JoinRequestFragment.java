@@ -20,17 +20,17 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel;
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 
 import java.util.UUID;
 
 import io.reactivex.Flowable;
 
-import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.ACCEPTING;
-import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.APPROVING;
-import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.INVITING;
-import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.JOINING;
-import static com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel.WAITING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.ACCEPTING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.APPROVING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.INVITING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.JOINING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.WAITING;
 
 /**
  * Invites a Team member
@@ -43,7 +43,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     public static final String ARG_JOIN_REQUEST = "join-request";
 
     private JoinRequest request;
-    private JoinRequestViewModel requestViewModel;
+    private JoinRequestGofer requestGofer;
 
     public static JoinRequestFragment inviteInstance(Team team) {
         JoinRequestFragment fragment = newInstance(JoinRequest.invite(team));
@@ -98,7 +98,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         request = getArguments().getParcelable(ARG_JOIN_REQUEST);
-        requestViewModel = teamMemberViewModel.viewModelFor(request);
+        requestGofer = teamMemberViewModel.gofer(request);
     }
 
     @Nullable
@@ -107,7 +107,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new JoinRequestAdapter(requestViewModel.getItems(), this))
+                .withAdapter(new JoinRequestAdapter(requestGofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -135,7 +135,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         super.onPrepareOptionsMenu(menu);
         boolean isEmpty = request.isEmpty();
         boolean canBlockUser = localRoleViewModel.hasPrivilegedRole();
-        boolean canDeleteRequest = canBlockUser || requestViewModel.isRequestOwner();
+        boolean canDeleteRequest = canBlockUser || requestGofer.isRequestOwner();
 
         MenuItem block_item = menu.findItem(R.id.action_block);
         MenuItem deleteItem = menu.findItem(R.id.action_kick);
@@ -170,7 +170,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @Override
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean showsFab() {
-        return requestViewModel.showsFab(localRoleViewModel.hasPrivilegedRole());
+        return requestGofer.showsFab(localRoleViewModel.hasPrivilegedRole());
     }
 
     @Override
@@ -187,20 +187,20 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     @Override
     public boolean canEditFields() {
-        return requestViewModel.canEditFields();
+        return requestGofer.canEditFields();
     }
 
     @Override
     public boolean canEditRole() {
-        return requestViewModel.canEditRole();
+        return requestGofer.canEditRole();
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
 
-        @JoinRequestViewModel.JoinRequestState
-        int state = requestViewModel.getState();
+        @JoinRequestGofer.JoinRequestState
+        int state = requestGofer.getState();
 
         if (state == WAITING) return;
 
@@ -211,13 +211,13 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     private void createJoinRequest() {
         toggleProgress(true);
-        disposables.add(requestViewModel.joinTeam()
+        disposables.add(requestGofer.joinTeam()
                 .subscribe(request -> onJoinRequestSent(), defaultErrorHandler));
     }
 
     private void completeJoinRequest(boolean approved) {
         toggleProgress(true);
-        disposables.add(requestViewModel.processJoinRequest(approved)
+        disposables.add(requestGofer.processJoinRequest(approved)
                 .subscribe(deleted -> onRequestCompleted(approved), defaultErrorHandler));
     }
 
@@ -235,7 +235,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     private void onRequestCompleted(boolean approved) {
         int stringResource = approved ? R.string.added_user : R.string.removed_user;
         String name = request.getUser().getFirstName();
-        if (!requestViewModel.isRequestOwner()) showSnackbar(getString(stringResource, name));
+        if (!requestGofer.isRequestOwner()) showSnackbar(getString(stringResource, name));
         requireActivity().onBackPressed();
     }
 
@@ -247,7 +247,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     private void showDeletePrompt() {
         User requestUser = request.getUser();
-        final String prompt = requestViewModel.isRequestOwner()
+        final String prompt = requestGofer.isRequestOwner()
                 ? getString(R.string.confirm_request_leave, request.getTeam().getName())
                 : getString(R.string.confirm_request_drop, requestUser.getFirstName());
 
@@ -258,9 +258,9 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     }
 
     private void refreshState() {
-        requestViewModel.refresh();
+        requestGofer.refresh();
         scrollManager.notifyDataSetChanged();
         toggleFab(showsFab());
-        setToolbarTitle(requestViewModel.getToolbarTitle(this));
+        setToolbarTitle(requestGofer.getToolbarTitle(this));
     }
 }

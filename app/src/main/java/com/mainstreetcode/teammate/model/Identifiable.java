@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.model;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 
 import static android.support.v7.util.DiffUtil.calculateDiff;
@@ -38,6 +40,13 @@ public interface Identifiable {
                                                                        BiFunction<List<T>, List<T>, List<T>> accumulator) {
 
         return Util.diff(sourceFlowable, sourceSupplier, accumulator);
+    }
+
+    static <T extends Identifiable> Single<DiffUtil.DiffResult> diff(Single<List<T>> sourceSingle,
+                                                                     Callable<List<T>> sourceSupplier,
+                                                                     BiFunction<List<T>, List<T>, List<T>> accumulator) {
+
+        return Util.diff(sourceSingle, sourceSupplier, accumulator);
     }
 
     class IdentifiableDiffCallback extends DiffUtil.Callback {
@@ -121,22 +130,40 @@ public interface Identifiable {
 
             AtomicReference<List<T>> sourceUpdater = new AtomicReference<>();
 
-            return sourceFlowable.concatMapDelayError(fetchedItems -> Flowable.fromCallable(() -> {
-                        List<T> stale = sourceSupplier.call();
-                        List<T> updated = accumulator.apply(new ArrayList<>(stale), fetchedItems);
-
-                        sourceUpdater.set(updated);
-
-                        return calculateDiff(new IdentifiableDiffCallback(updated, stale));
-                    })
+            return sourceFlowable.concatMapDelayError(fetchedItems -> Flowable.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
                             .subscribeOn(computation())
                             .observeOn(mainThread())
-                            .doOnNext(diffResult -> {
-                                List<T> source = sourceSupplier.call();
-                                source.clear();
-                                source.addAll(sourceUpdater.get());
-                            })
+                            .doOnNext(diffResult -> updateListOnUIThread(sourceSupplier, sourceUpdater))
             );
+        }
+
+        static <T extends Identifiable> Single<DiffUtil.DiffResult> diff(Single<List<T>> sourceSingle,
+                                                                         Callable<List<T>> sourceSupplier,
+                                                                         BiFunction<List<T>, List<T>, List<T>> accumulator) {
+
+            AtomicReference<List<T>> sourceUpdater = new AtomicReference<>();
+
+            return sourceSingle.flatMap(fetchedItems -> Single.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
+                            .subscribeOn(computation())
+                            .observeOn(mainThread())
+                            .doOnSuccess(diffResult -> updateListOnUIThread(sourceSupplier, sourceUpdater))
+            );
+        }
+
+        @NonNull
+        private static <T extends Identifiable> DiffUtil.DiffResult getDiffResult(Callable<List<T>> sourceSupplier, BiFunction<List<T>, List<T>, List<T>> accumulator, AtomicReference<List<T>> sourceUpdater, List<T> fetchedItems) throws Exception {
+            List<T> stale = sourceSupplier.call();
+            List<T> updated = accumulator.apply(new ArrayList<>(stale), fetchedItems);
+
+            sourceUpdater.set(updated);
+
+            return calculateDiff(new IdentifiableDiffCallback(updated, stale));
+        }
+
+        private static <T extends Identifiable> void updateListOnUIThread(Callable<List<T>> sourceSupplier, AtomicReference<List<T>> sourceUpdater) throws Exception {
+            List<T> source = sourceSupplier.call();
+            source.clear();
+            source.addAll(sourceUpdater.get());
         }
     }
 }
