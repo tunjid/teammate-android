@@ -121,12 +121,6 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public void reset() {
-        userApproved = false;
-        teamApproved = false;
-        position.reset();
-        user.reset();
-        team.reset();
-        restItemList();
     }
 
     @Override
@@ -136,9 +130,14 @@ public class JoinRequest extends JoinRequestEntity
         this.id = updated.id;
 
         position.update(updated.position);
-        team.update(updated.team);
-        user.update(updated.user);
-        updateItemList(updated);
+        if (team.hasMajorFields()) team.update(updated.team);
+        if (user.hasMajorFields()) user.update(updated.user);
+    }
+
+    @Override
+    public void updateItemList(ListableModel<JoinRequest> other) {
+        items.clear();
+        items.addAll(buildItems());
     }
 
     @Override
