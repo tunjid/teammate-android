@@ -1,8 +1,5 @@
 package com.mainstreetcode.teammate.fragments.main;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +21,8 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.JoinRequestViewModel;
+
+import java.util.UUID;
 
 import io.reactivex.Flowable;
 
@@ -83,22 +82,14 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     public String getStableTag() {
         String superResult = super.getStableTag();
         JoinRequest temp = getArguments().getParcelable(ARG_JOIN_REQUEST);
+        User user = temp.getUser();
         String id = temp.getId();
-        String userApproved = String.valueOf(temp.isUserApproved());
-        String teamApproved = String.valueOf(temp.isTeamApproved());
-        String userHash = temp.getUser().getId();
+        String userHash = user.isEmpty() ? UUID.randomUUID().toString() : temp.getUser().getId();
         String teamHash = temp.getTeam().getCity();
 
         return (temp != null)
-                ? TextUtils.join("-", new String[]{superResult, id, userApproved, teamApproved, userHash, teamHash})
+                ? TextUtils.join("-", new String[]{superResult, id, userHash, teamHash})
                 : superResult;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        ViewModelProvider provider = ViewModelProviders.of(this);
-        requestViewModel = provider.get(JoinRequestViewModel.class);
     }
 
     @Override
@@ -107,7 +98,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         request = getArguments().getParcelable(ARG_JOIN_REQUEST);
-        requestViewModel.withJoinRequest(request);
+        requestViewModel = teamMemberViewModel.viewModelFor(request);
     }
 
     @Nullable
@@ -220,25 +211,25 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     private void createJoinRequest() {
         toggleProgress(true);
-        disposables.add(teamMemberViewModel.joinTeam(request)
+        disposables.add(requestViewModel.joinTeam()
                 .subscribe(request -> onJoinRequestSent(), defaultErrorHandler));
     }
 
     private void completeJoinRequest(boolean approved) {
         toggleProgress(true);
-        disposables.add(teamMemberViewModel.processJoinRequest(request, approved)
+        disposables.add(requestViewModel.processJoinRequest(approved)
                 .subscribe(deleted -> onRequestCompleted(approved), defaultErrorHandler));
     }
 
     private void onJoinRequestSent() {
         scrollManager.getRecyclerView().getRecycledViewPool().clear();
         refreshState();
+        toggleFab(false);
         toggleProgress(false);
         toggleBottomSheet(false);
         showSnackbar(getString(request.isTeamApproved()
                 ? R.string.user_invite_sent
                 : R.string.team_submitted_join_request));
-
     }
 
     private void onRequestCompleted(boolean approved) {

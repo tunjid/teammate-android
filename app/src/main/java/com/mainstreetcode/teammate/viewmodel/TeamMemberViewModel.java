@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
@@ -16,14 +15,12 @@ import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -78,30 +75,8 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         return flowable;
     }
 
-    public Single<JoinRequest> joinTeam(JoinRequest request) {
-        return asTypedTeamMember(request, (member, repository) ->
-                repository.createOrUpdate(member)
-                        .map(pendingMember -> request)
-                        .observeOn(mainThread()));
-    }
-
-    public Flowable<DiffUtil.DiffResult> processJoinRequest(JoinRequest request, boolean approved) {
-        return asTypedTeamMember(request, (member, repository) -> {
-            Single<TeamMember<JoinRequest>> sourceSingle = approved
-                    ? repository.createOrUpdate(member)
-                    : repository.delete(member);
-
-            sourceSingle = sourceSingle.doOnSuccess(processed -> pushModelAlert(Alert.requestProcessed(request)));
-
-            Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(sourceSingle
-                    .toFlowable().cast(Model.class), request.getTeam(), member)
-                    .cast(Identifiable.class)
-                    .map(Collections::singletonList);
-
-            final Callable<List<Identifiable>> listCallable = () -> getModelList(request.getTeam());
-
-            return Identifiable.diff(sourceFlowable, listCallable, onRequestProcessed(request, approved));
-        });
+    public JoinRequestViewModel viewModelFor(JoinRequest joinRequest) {
+        return new JoinRequestViewModel(joinRequest, this::processRequest);
     }
 
     public Single<Role> deleteRole(Role role) {
@@ -127,17 +102,26 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         });
     }
 
-    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onRequestProcessed(Identifiable model, boolean approved) {
-        if (approved) return (teamMembers, added) -> {
-            teamMembers.remove(model);
-            teamMembers.addAll(added);
-            Collections.sort(teamMembers, Identifiable.COMPARATOR);
-            return teamMembers;
-        };
-        else return (teamMembers, deleted) -> {
-            teamMembers.removeAll(deleted);
-            return teamMembers;
-        };
+    private Single<JoinRequest> processRequest(JoinRequest request, boolean approved) {
+        return asTypedTeamMember(request, (member, repository) -> {
+            Team team = request.getTeam();
+
+            Single<TeamMember<JoinRequest>> sourceSingle = approved
+                    ? repository.createOrUpdate(member)
+                    : repository.delete(member);
+
+            return checkForInvalidObject(sourceSingle.toFlowable(), team, member)
+                    .firstOrError()
+                    .doOnSuccess(processedMember -> onRequestProcessed(request, approved, team, processedMember))
+                    .map(processedMember -> request);
+        });
+    }
+
+    private void onRequestProcessed(JoinRequest request, boolean approved, Team team, Identifiable processedMember) {
+        pushModelAlert(Alert.requestProcessed(request));
+        List<Identifiable> list = getModelList(team);
+        list.remove(TeamMember.fromModel(request));
+        if (approved) list.add(processedMember);
     }
 
     @SuppressWarnings("unchecked")

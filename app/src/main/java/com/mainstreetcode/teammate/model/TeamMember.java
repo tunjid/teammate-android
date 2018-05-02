@@ -90,15 +90,11 @@ public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
     public int compareTo(@NonNull TeamMember o) { return Identifiable.COMPARATOR.compare(wrappedModel, o); }
 
     @Override
-    public void reset() {wrappedModel.reset();}
+    public void reset() {}
 
     @Override
     @SuppressWarnings("unchecked")
-    public void update(TeamMember updated) {
-        Model<?> wrapped = updated.getWrappedModel();
-        if (wrappedModel.getClass().equals(wrapped.getClass()))
-            wrappedModel.update((S) wrapped);
-    }
+    public void update(TeamMember updated) {}
 
     @Override
     public boolean areContentsTheSame(Identifiable other) {

@@ -1,12 +1,13 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
+import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 
 import java.lang.annotation.Retention;
@@ -14,39 +15,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * ViewModel for checking a role in local contexts
  */
 
-public class JoinRequestViewModel extends ViewModel {
-
-    public static final int INVITING = 0;
-    public static final int JOINING = 1;
-    public static final int APPROVING = 2;
-    public static final int ACCEPTING = 3;
-    public static final int WAITING = 4;
+public class JoinRequestViewModel {
 
     @Retention(SOURCE)
     @IntDef({INVITING, JOINING, APPROVING, ACCEPTING, WAITING})
     public @interface JoinRequestState {}
 
-    private int state;
-    private int index;
-    private JoinRequest request;
+    public static final int INVITING = 0;
+    public static final int JOINING = 1;
+    public static final int APPROVING = 2;
+    public static final int ACCEPTING = 3;
 
+    public static final int WAITING = 4;
+    private int state;
+
+    private int index;
     private final UserRepository userRepository;
     private final List<Item<JoinRequest>> items;
+    private final JoinRequest request;
 
-    public JoinRequestViewModel() {
+    private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
+
+    JoinRequestViewModel(JoinRequest request, BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+        this.request = request;
+        this.joinCompleter = joinCompleter;
         userRepository = UserRepository.getInstance();
         items = new ArrayList<>();
-    }
-
-    public void withJoinRequest(JoinRequest request) {
-        this.request = request;
         index = Flowable.range(0, request.asItems().size() - 1)
                 .filter(index -> request.asItems().get(index).getItemType() == Item.ROLE)
                 .first(0)
@@ -115,6 +119,17 @@ public class JoinRequestViewModel extends ViewModel {
                 : state == WAITING
                 ? R.string.pending_request
                 : state == APPROVING ? R.string.approve_request : R.string.accept_request);
+    }
+
+    public Single<JoinRequest> joinTeam() {
+        TeamMember<JoinRequest> member = TeamMember.fromModel(request);
+        TeamMemberRepository<JoinRequest> repository = TeamMemberRepository.getInstance();
+
+        return repository.createOrUpdate(member).map(ignored -> request).observeOn(mainThread());
+    }
+
+    public Single<JoinRequest> processJoinRequest(boolean approved) {
+        return Single.defer(() -> joinCompleter.apply(request, approved));
     }
 
     public List<Item<JoinRequest>> getItems() {
