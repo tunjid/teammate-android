@@ -9,11 +9,6 @@ import android.text.TextUtils;
  */
 public interface Model<T> extends Identifiable, Parcelable, Comparable<T> {
     /**
-     * Provides a means to reset a local copy of the model before being updated with values from the remote.
-     */
-    void reset();
-
-    /**
      * Update the current model with values in the model provided, while keeping values in
      * data structures like {@link java.util.List lists}
      *

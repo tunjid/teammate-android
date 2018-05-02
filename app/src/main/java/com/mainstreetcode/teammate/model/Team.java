@@ -109,13 +109,6 @@ public class Team extends TeamEntity
     }
 
     @Override
-    public void reset() {
-        name = city = state = zip = imageUrl = "";
-        sport.reset();
-        restItemList();
-    }
-
-    @Override
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
         this.imageUrl = updatedTeam.imageUrl;

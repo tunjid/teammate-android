@@ -90,9 +90,6 @@ public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
     public int compareTo(@NonNull TeamMember o) { return Identifiable.COMPARATOR.compare(wrappedModel, o); }
 
     @Override
-    public void reset() {}
-
-    @Override
     @SuppressWarnings("unchecked")
     public void update(TeamMember updated) {}
 

@@ -119,9 +119,6 @@ public class JoinRequest extends JoinRequestEntity
         return user == null ? null : user.getImageUrl();
     }
 
-    @Override
-    public void reset() {
-    }
 
     @Override
     public void update(JoinRequest updated) {

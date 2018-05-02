@@ -113,14 +113,6 @@ public class Event extends EventEntity
     }
 
     @Override
-    public void reset() {
-        imageUrl = "";
-        visibility.reset();
-        team.reset();
-        restItemList();
-    }
-
-    @Override
     @SuppressLint("CheckResult")
     public void update(Event updatedEvent) {
         this.id = updatedEvent.getId();

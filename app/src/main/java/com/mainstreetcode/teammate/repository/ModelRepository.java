@@ -18,8 +18,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Flowable;
@@ -53,24 +51,17 @@ public abstract class ModelRepository<T extends Model<T>> {
     abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
     public final Flowable<T> get(T model) {
-        AtomicInteger counter = new AtomicInteger(0);
         return model.isEmpty()
                 ? Flowable.error(new IllegalArgumentException("Model does not exist"))
                 : get(model.getId())
-                .doOnNext(fetched -> counter.incrementAndGet())
-                .map(getLocalUpdateFunction(model, () -> counter.get() == 2));
-    }
-
-    private Function<T, T> getLocalUpdateFunction(T original, Callable<Boolean> shouldReset) {
-        return emitted -> {
-            if (shouldReset.call()) original.reset();
-            original.update(emitted);
-            return original;
-        };
+                .map(getLocalUpdateFunction(model));
     }
 
     final Function<T, T> getLocalUpdateFunction(T original) {
-        return getLocalUpdateFunction(original, () -> true);
+        return emitted -> {
+            original.update(emitted);
+            return original;
+        };
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {

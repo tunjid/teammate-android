@@ -113,16 +113,6 @@ public class Config implements Model<Config> {
     }
 
     @Override
-    public void reset() {
-        defaultTeamLogo = EMPTY_STRING;
-        defaultEventLogo = EMPTY_STRING;
-        defaultUserAvatar = EMPTY_STRING;
-        sports.clear();
-        positions.clear();
-        visibilities.clear();
-    }
-
-    @Override
     public void update(Config updated) {
         this.defaultTeamLogo = updated.defaultTeamLogo;
         this.defaultEventLogo = updated.defaultEventLogo;

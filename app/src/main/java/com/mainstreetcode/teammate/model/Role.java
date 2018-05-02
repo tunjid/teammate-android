@@ -94,15 +94,6 @@ public class Role extends RoleEntity
     }
 
     @Override
-    public void reset() {
-        imageUrl = "";
-        position.reset();
-        team.reset();
-        user.reset();
-        restItemList();
-    }
-
-    @Override
     public void update(Role updated) {
         this.id = updated.getId();
         this.imageUrl = updated.imageUrl;

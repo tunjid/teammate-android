@@ -83,12 +83,6 @@ public class Guest extends GuestEntity
     }
 
     @Override
-    public void reset() {
-        attending = false;
-        user.reset();
-    }
-
-    @Override
     public void update(Guest updated) {
         id = updated.id;
         attending = updated.attending;

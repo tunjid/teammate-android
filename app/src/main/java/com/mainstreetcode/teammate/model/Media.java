@@ -124,15 +124,6 @@ public class Media implements
     }
 
     @Override
-    public void reset() {
-        url = "";
-        thumbnail = "";
-
-        team.reset();
-        user.reset();
-    }
-
-    @Override
     public void update(Media updated) {
         id = updated.id;
         url = updated.url;
