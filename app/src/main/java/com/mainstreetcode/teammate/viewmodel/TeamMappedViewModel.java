@@ -4,6 +4,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
@@ -11,9 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.functions.Consumer;
+
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
-public abstract class TeamMappedViewModel<V extends Identifiable> extends MappedViewModel<Team, V> {
+public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> extends MappedViewModel<Team, V> {
 
     final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
 
@@ -47,5 +50,9 @@ public abstract class TeamMappedViewModel<V extends Identifiable> extends Mapped
 
         pushModelAlert(Alert.teamDeletion(team));
         return true;
+    }
+
+    Consumer<Throwable> onError(V model) {
+        return throwable -> checkForInvalidObject(throwable, model, model.getTeam());
     }
 }

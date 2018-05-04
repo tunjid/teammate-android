@@ -19,15 +19,15 @@ import com.mainstreetcode.teammate.model.BlockUserRequest;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Flowable;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
@@ -36,7 +36,7 @@ import static io.reactivex.Completable.timer;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public abstract class HeaderedFragment<T extends HeaderedModel<T>> extends MainActivityFragment
+public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableModel<T>> extends MainActivityFragment
         implements
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener {
@@ -50,7 +50,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T>> extends MainA
 
     protected abstract T getHeaderedModel();
 
-    protected abstract Flowable<DiffUtil.DiffResult> fetch(T model);
+    protected abstract Gofer<T> gofer();
 
     protected abstract void onModelUpdated(DiffUtil.DiffResult result);
 
@@ -81,18 +81,23 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T>> extends MainA
     @Override
     public void onResume() {
         super.onResume();
-        T model = getHeaderedModel();
-        if (!model.isEmpty() && !fromUserPickerAction) {
-            disposables.add(fetch(model).subscribe(this::onModelUpdated, defaultErrorHandler));
-        }
+        Gofer<T> gofer = gofer();
+        disposables.add(gofer.prepare().subscribe(this::togglePersistentUi, ErrorHandler.EMPTY));
+
+        if (!fromUserPickerAction)
+            disposables.add(gofer.get().subscribe(this::onModelUpdated, defaultErrorHandler));
+
         fromUserPickerAction = false;
     }
 
     @Override
     public void onImageClick() {
         fromUserPickerAction = true;
-        if (showsFab()) ImageWorkerFragment.requestCrop(this);
-        else showSnackbar(getString(R.string.no_permission));
+        String errorMessage = gofer().getImageClickMessage(this);
+
+        if (errorMessage == null) ImageWorkerFragment.requestCrop(this);
+        else showSnackbar(errorMessage);
+        //else showSnackbar(getString(R.string.no_permission));
     }
 
     @Override

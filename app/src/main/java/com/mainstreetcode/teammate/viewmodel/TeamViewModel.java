@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.BlockUserRequest;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -13,6 +12,7 @@ import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -57,19 +57,21 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return Flowable.empty();
     }
 
-    public Single<DiffUtil.DiffResult> createOrUpdate(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), Team.class, team)
-                .observeOn(mainThread()).cast(Team.class).map(Team::asIdentifiables);
-
-        return Identifiable.diff(sourceFlowable, team::asIdentifiables, (old, updated) -> updated).firstOrError();
+    public TeamGofer gofer(Team team) {
+        return new TeamGofer(team, throwable -> checkForInvalidObject(throwable, team, Team.class), this::getTeam, this::createOrUpdate, this::deleteTeam);
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeam(Team team) {
+    private Flowable<Team> getTeam(Team team) {
         if (team.isEmpty()) return Flowable.empty();
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(team), Team.class, team)
-                .observeOn(mainThread()).cast(Team.class).map(Team::asIdentifiables);
+        return repository.get(team);
+    }
 
-        return Identifiable.diff(sourceFlowable, team::asIdentifiables, (old, updated) -> updated);
+    private Single<Team> createOrUpdate(Team team) {
+        return repository.createOrUpdate(team);
+    }
+
+    public Single<Team> deleteTeam(Team team) {
+        return repository.delete(team).doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)));
     }
 
     public Flowable<List<Team>> findTeams() {
@@ -79,14 +81,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .distinctUntilChanged()
                 .switchMap(query -> repository.findTeams(query).toFlowable())
                 .doFinally(() -> searchRef.set(null))
-                .observeOn(mainThread());
-    }
-
-    public Single<Team> deleteTeam(Team team) {
-        return checkForInvalidObject(repository.delete(team).toFlowable(), Team.class, team).observeOn(mainThread())
-                .firstOrError()
-                .cast(Team.class)
-                .doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)))
                 .observeOn(mainThread());
     }
 

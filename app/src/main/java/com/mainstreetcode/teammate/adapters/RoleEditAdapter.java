@@ -14,6 +14,8 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
+import java.util.List;
+
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -22,11 +24,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, RoleEditAdapter.RoleEditAdapterListener> {
 
-    private final Role role;
+    private final List<Item<Role>> items;
 
-    public RoleEditAdapter(Role role, RoleEditAdapter.RoleEditAdapterListener listener) {
+    public RoleEditAdapter(List<Item<Role>> items, RoleEditAdapter.RoleEditAdapterListener listener) {
         super(listener);
-        this.role = role;
+        this.items = items;
     }
 
     @NonNull
@@ -44,17 +46,17 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(role.asItems().get(i));
+        baseItemViewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return role.asItems().size();
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return role.asItems().get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
     public interface RoleEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {

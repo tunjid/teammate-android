@@ -15,6 +15,8 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
+import java.util.List;
+
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -24,11 +26,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
-    private final Team team;
+    private final List<Item<Team>> items;
 
-    public TeamEditAdapter(Team team, TeamEditAdapter.TeamEditAdapterListener listener) {
+    public TeamEditAdapter(List<Item<Team>> items, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
-        this.team = team;
+        this.items = items;
     }
 
     @NonNull
@@ -56,17 +58,17 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseTeamViewHolder, int i) {
-        baseTeamViewHolder.bind(team.asItems().get(i));
+        baseTeamViewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return team.asItems().size();
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return team.asItems().get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {

@@ -17,11 +17,11 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
-
-import io.reactivex.Flowable;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -33,25 +33,20 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         implements
         TeamEditAdapter.TeamEditAdapterListener {
 
-    private static final int CREATING = 0;
-    private static final int EDITING = 1;
-
     private static final String ARG_TEAM = "team";
-    private static final String ARG_STATE = "state";
 
-    private int state;
     private Team team;
+    private TeamGofer gofer;
 
-    public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty(), CREATING);}
+    public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty());}
 
-    public static TeamEditFragment newEditInstance(Team team) {return newInstance(team, EDITING);}
+    public static TeamEditFragment newEditInstance(Team team) {return newInstance(team);}
 
-    private static TeamEditFragment newInstance(Team team, int state) {
+    private static TeamEditFragment newInstance(Team team) {
         TeamEditFragment fragment = new TeamEditFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
-        args.putInt(ARG_STATE, state);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,11 +54,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        int state = getArguments().getInt(ARG_STATE);
-        Team tempTeam = getArguments().getParcelable(ARG_TEAM);
-
-        return tempTeam == null ? superResult : superResult + "-" + tempTeam.hashCode() + "-" + state;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_TEAM));
     }
 
     @Override
@@ -71,8 +62,8 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        state = getArguments().getInt(ARG_STATE);
         team = getArguments().getParcelable(ARG_TEAM);
+        gofer = teamViewModel.gofer(team);
     }
 
     @Nullable
@@ -81,20 +72,13 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new TeamEditAdapter(team, this))
+                .withAdapter(new TeamEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        User user = userViewModel.getCurrentUser();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -110,7 +94,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public boolean showsFab() {
-        return state == CREATING || localRoleViewModel.hasPrivilegedRole();
+        return gofer.showsFab();
     }
 
     @Override
@@ -118,37 +102,24 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         if (view.getId() != R.id.fab) return;
 
         toggleProgress(true);
-        disposables.add(teamViewModel.createOrUpdate(team)
+        disposables.add(gofer.save()
                 .subscribe(result -> {
-                    showSnackbar(getModelUpdateMessage());
+                    showSnackbar(gofer.getModelUpdateMessage(this));
                     onModelUpdated(result);
                 }, defaultErrorHandler));
-    }
-
-    @Override
-    public void onImageClick() {
-        if (state == CREATING)
-            showSnackbar(getString(R.string.create_team_first));
-        else if (!localRoleViewModel.hasPrivilegedRole())
-            showSnackbar(getString(R.string.no_permission));
-
-        else super.onImageClick();
     }
 
     @Override
     protected Team getHeaderedModel() {return team;}
 
     @Override
-    protected Flowable<DiffUtil.DiffResult> fetch(Team model) {
-        return teamViewModel.getTeam(model);
-    }
+    protected TeamHostingGofer<Team> gofer() { return gofer; }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
         viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
         toggleProgress(false);
-        if (!team.isEmpty()) state = EDITING;
     }
 
     @Override
@@ -162,7 +133,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public boolean isPrivileged() {
-        return state == CREATING || localRoleViewModel.hasPrivilegedRole();
+        return gofer.hasPrivilegedRole();
     }
 
     @Override
@@ -179,21 +150,14 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     private void onRoleUpdated() {
-        state = team.isEmpty() ? CREATING : EDITING;
         scrollManager.notifyDataSetChanged();
-
         toggleFab(showsFab());
-        setToolbarTitle(getString(state == CREATING ? R.string.create_team : R.string.edit_team));
+        setToolbarTitle(gofer.getToolbarTitle(this));
     }
 
     private void onAddressFound(Address address) {
         team.setAddress(address);
         scrollManager.notifyDataSetChanged();
         toggleProgress(false);
-    }
-
-    @NonNull
-    private String getModelUpdateMessage() {
-        return state == CREATING ? getString(R.string.created_team, team.getName()) : getString(R.string.updated_team);
     }
 }

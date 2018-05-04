@@ -31,6 +31,8 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Event event;
+    private EventGofer gofer;
 
     public static EventEditFragment newInstance(Event event) {
         EventEditFragment fragment = new EventEditFragment();
@@ -66,12 +69,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        Event tempEvent = getArguments().getParcelable(ARG_EVENT);
-
-        return (tempEvent != null)
-                ? superResult + "-" + tempEvent.hashCode()
-                : superResult;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_EVENT));
     }
 
     @Override
@@ -80,6 +78,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         event = getArguments().getParcelable(ARG_EVENT);
+        gofer = eventViewModel.gofer(event);
     }
 
     @Nullable
@@ -88,7 +87,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new EventEditAdapter(eventViewModel.getEventItems(event), this))
+                .withAdapter(new EventEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
@@ -193,9 +192,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     protected Event getHeaderedModel() {return event;}
 
     @Override
-    protected Flowable<DiffUtil.DiffResult> fetch(Event model) {
-        return eventViewModel.getEvent(model);
-    }
+    protected Gofer<Event> gofer() {return gofer;}
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
@@ -212,7 +209,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
             case R.id.fab:
                 boolean wasEmpty = event.isEmpty();
                 toggleProgress(true);
-                disposables.add(eventViewModel.createOrUpdateEvent(event).subscribe(diffResult -> {
+                disposables.add(gofer.save().subscribe(diffResult -> {
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
@@ -278,9 +275,9 @@ public class EventEditFragment extends HeaderedFragment<Event>
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
-    private void rsvpEvent(Event event, boolean attending) {
+    private void rsvpEvent(boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, attending).subscribe(this::onModelUpdated, defaultErrorHandler));
+        disposables.add(gofer.rsvpEvent(attending).subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 
     private void onRoleUpdated() {
@@ -312,8 +309,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
         if ((activity = getActivity()) == null) return;
 
         new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
-                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
-                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
+                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(true))
+                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(false))
                 .show();
     }
 
@@ -337,7 +334,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return eventViewModel.getEventItems(event).get(position) instanceof Guest ? 1 : 2;
+                return gofer.getItems().get(position) instanceof Guest ? 1 : 2;
             }
         });
     }

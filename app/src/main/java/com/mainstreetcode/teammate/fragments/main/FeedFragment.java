@@ -81,7 +81,7 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        disposables.add(userViewModel.getMe().subscribe(this::setToolbarTitle, defaultErrorHandler));
+        setToolbarTitle(userViewModel.getCurrentUser());
     }
 
     @Override

@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -28,7 +29,6 @@ import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
 
@@ -77,30 +77,19 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public JoinRequestGofer gofer(JoinRequest joinRequest) {
-        return new JoinRequestGofer(joinRequest, this::processRequest);
+        return new JoinRequestGofer(joinRequest, onError(TeamMember.fromModel(joinRequest)), this::processRequest);
     }
 
-    public Single<Role> deleteRole(Role role) {
-        return asTypedTeamMember(role, (member, repository) -> {
-            Single<TeamMember<Role>> deletionSingle = repository.delete(member);
-            deletionSingle = deletionSingle.doOnSuccess(getModelList(role.getTeam())::remove);
-
-            return checkForInvalidObject(deletionSingle.toFlowable(), role.getTeam(), member)
-                    .firstOrError()
-                    .map(deleted -> role)
-                    .observeOn(mainThread());
-        });
+    public RoleGofer gofer(Role role) {
+        return new RoleGofer(role, onError(TeamMember.fromModel(role)), this::deleteRole, this::updateRole);
     }
 
-    public Single<Role> updateRole(Role role) {
-        return asTypedTeamMember(role, (member, repository) -> {
-            Single<TeamMember<Role>> deletionSingle = repository.createOrUpdate(member);
+    private Single<Role> deleteRole(Role role) {
+        return asTypedTeamMember(role, (member, repository) -> repository.delete(member).doOnSuccess(getModelList(role.getTeam())::remove).map(deleted -> role));
+    }
 
-            return checkForInvalidObject(deletionSingle.toFlowable(), role.getTeam(), member)
-                    .firstOrError()
-                    .map(updated -> role)
-                    .observeOn(mainThread());
-        });
+    private Single<Role> updateRole(Role role) {
+        return asTypedTeamMember(role, (member, repository) -> repository.createOrUpdate(member).map(updated -> role));
     }
 
     private Single<JoinRequest> processRequest(JoinRequest request, boolean approved) {
@@ -111,8 +100,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
                     ? repository.createOrUpdate(member)
                     : repository.delete(member);
 
-            return checkForInvalidObject(sourceSingle.toFlowable(), team, member)
-                    .firstOrError()
+            return sourceSingle
                     .doOnSuccess(processedMember -> onRequestProcessed(request, approved, team, processedMember))
                     .map(processedMember -> request);
         });

@@ -34,6 +34,7 @@ import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 
 public class Team extends TeamEntity
         implements
+        TeamHost,
         Model<Team>,
         HeaderedModel<Team>,
         ListableModel<Team> {
@@ -106,6 +107,11 @@ public class Team extends TeamEntity
     @Override
     public boolean isEmpty() {
         return this.equals(empty());
+    }
+
+    @Override
+    public Team getTeam() {
+        return this;
     }
 
     @Override

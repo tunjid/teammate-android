@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
@@ -30,8 +31,12 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
 
     abstract Flowable<List<V>> fetch(K key, boolean fetchLatest);
 
-    Flowable<Identifiable> checkForInvalidObject(Flowable<? extends Identifiable> sourceFlowable, K key, V value) {
-        return sourceFlowable.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
+    Flowable<Identifiable> checkForInvalidObject(Flowable<? extends Identifiable> source, K key, V value) {
+        return source.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
+    }
+
+    Single<Identifiable> checkForInvalidObject(Single<? extends Identifiable> source, K key, V value) {
+        return source.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
     public Flowable<DiffUtil.DiffResult> getMany(K key, boolean fetchLatest) {
@@ -89,7 +94,7 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
         if (notifier != null) notifier.clearNotifications(pair.first);
     }
 
-    private void checkForInvalidObject(Throwable throwable, Identifiable model, K key) {
+    void checkForInvalidObject(Throwable throwable, V model, K key) {
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
     }

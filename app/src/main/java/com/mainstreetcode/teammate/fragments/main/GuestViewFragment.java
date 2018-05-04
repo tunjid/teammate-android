@@ -18,14 +18,15 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
-
-import io.reactivex.Flowable;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
 
 public class GuestViewFragment extends HeaderedFragment<Guest> {
 
     private static final String ARG_GUEST = "guest";
 
     private Guest guest;
+    private GuestGofer gofer;
 
     public static GuestViewFragment newInstance(Guest guest) {
         GuestViewFragment fragment = new GuestViewFragment();
@@ -39,12 +40,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        Guest tempGuest = getArguments().getParcelable(ARG_GUEST);
-
-        return (tempGuest != null)
-                ? superResult + "-" + tempGuest.hashCode()
-                : superResult;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_GUEST));
     }
 
     @Override
@@ -124,8 +120,8 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     protected Guest getHeaderedModel() {return guest;}
 
     @Override
-    protected Flowable<DiffUtil.DiffResult> fetch(Guest model) {
-        return Flowable.empty();
+    protected Gofer<Guest> gofer() {
+        return gofer;
     }
 
     @Override

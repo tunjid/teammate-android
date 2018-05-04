@@ -14,6 +14,8 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.User;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
+import java.util.List;
+
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -22,11 +24,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private final User user;
+    private final List<Item<User>> items;
 
-    public UserAdapter(User user, ImageWorkerFragment.ImagePickerListener listener) {
+    public UserAdapter(List<Item<User>> items, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
-        this.user = user;
+        this.items = items;
     }
 
     @NonNull
@@ -45,22 +47,22 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
-        viewHolder.bind(user.asItems().get(i));
+        viewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return user.asItems().size();
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return user.asItems().get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
     @Override
     public long getItemId(int position) {
-        return user.asItems().get(position).hashCode();
+        return items.get(position).hashCode();
     }
 
 }

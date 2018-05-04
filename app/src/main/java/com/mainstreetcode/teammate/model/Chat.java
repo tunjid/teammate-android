@@ -35,6 +35,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "team_chat_team", onDelete = CASCADE)
 )
 public class Chat implements
+        TeamHost,
         Parcelable,
         Model<Chat> {
 

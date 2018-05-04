@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 
@@ -43,6 +44,13 @@ public interface Identifiable {
     }
 
     static <T extends Identifiable> Single<DiffUtil.DiffResult> diff(Single<List<T>> sourceSingle,
+                                                                     Callable<List<T>> sourceSupplier,
+                                                                     BiFunction<List<T>, List<T>, List<T>> accumulator) {
+
+        return Util.diff(sourceSingle, sourceSupplier, accumulator);
+    }
+
+    static <T extends Identifiable> Maybe<DiffUtil.DiffResult> diff(Maybe<List<T>> sourceSingle,
                                                                      Callable<List<T>> sourceSupplier,
                                                                      BiFunction<List<T>, List<T>, List<T>> accumulator) {
 
@@ -147,6 +155,19 @@ public interface Identifiable {
                             .subscribeOn(computation())
                             .observeOn(mainThread())
                             .doOnSuccess(diffResult -> updateListOnUIThread(sourceSupplier, sourceUpdater))
+            );
+        }
+
+        static <T extends Identifiable> Maybe<DiffUtil.DiffResult> diff(Maybe<List<T>> sourceSingle,
+                                                                        Callable<List<T>> sourceSupplier,
+                                                                        BiFunction<List<T>, List<T>, List<T>> accumulator) {
+
+            AtomicReference<List<T>> sourceUpdater = new AtomicReference<>();
+
+            return sourceSingle.flatMap(fetchedItems -> Maybe.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
+                    .subscribeOn(computation())
+                    .observeOn(mainThread())
+                    .doOnSuccess(diffResult -> updateListOnUIThread(sourceSupplier, sourceUpdater))
             );
         }
 

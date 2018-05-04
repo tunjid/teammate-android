@@ -37,6 +37,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         }
 )
 public class Media implements
+        TeamHost,
         Parcelable,
         Model<Media> {
 

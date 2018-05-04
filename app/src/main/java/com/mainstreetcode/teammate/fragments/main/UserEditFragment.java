@@ -14,8 +14,8 @@ import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
-
-import io.reactivex.Flowable;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
 /**
  * Edits a Team member
@@ -28,6 +28,7 @@ public class UserEditFragment extends HeaderedFragment<User>
     private static final String ARG_USER = "user";
 
     private User user;
+    private UserGofer gofer;
 
     public static UserEditFragment newInstance(User user) {
         UserEditFragment fragment = new UserEditFragment();
@@ -41,12 +42,7 @@ public class UserEditFragment extends HeaderedFragment<User>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        User tempUser = getArguments().getParcelable(ARG_USER);
-
-        return (tempUser != null)
-                ? superResult + "-" + tempUser.hashCode()
-                : superResult;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_USER));
     }
 
     @Override
@@ -54,6 +50,7 @@ public class UserEditFragment extends HeaderedFragment<User>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         user = getArguments().getParcelable(ARG_USER);
+        gofer = userViewModel.gofer(user);
     }
 
     @Nullable
@@ -63,22 +60,13 @@ public class UserEditFragment extends HeaderedFragment<User>
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new UserAdapter(user, this))
+                .withAdapter(new UserAdapter(gofer.getItems(), this))
                 .withLinearLayoutManager()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        disposables.add(userViewModel.getMe().subscribe(ignored -> {
-            viewHolder.bind(getHeaderedModel());
-            scrollManager.notifyDataSetChanged();
-        }, defaultErrorHandler));
     }
 
     @Override
@@ -99,9 +87,7 @@ public class UserEditFragment extends HeaderedFragment<User>
     protected User getHeaderedModel() {return user;}
 
     @Override
-    protected Flowable<DiffUtil.DiffResult> fetch(User model) {
-        return userViewModel.getMe(user);
-    }
+    protected Gofer<User> gofer() { return gofer; }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
@@ -113,11 +99,11 @@ public class UserEditFragment extends HeaderedFragment<User>
         switch (view.getId()) {
             case R.id.fab:
                 toggleProgress(true);
-                disposables.add(userViewModel.updateUser(user).subscribe(updatedRole -> {
+                disposables.add(gofer.save().subscribe(result -> {
                     showSnackbar(getString(R.string.updated_user, user.getFirstName()));
                     toggleProgress(false);
                     viewHolder.bind(getHeaderedModel());
-                    scrollManager.notifyDataSetChanged();
+                    scrollManager.onDiff(result);
                 }, defaultErrorHandler));
                 break;
         }

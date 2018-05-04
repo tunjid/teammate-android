@@ -1,27 +1,32 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-public class JoinRequestGofer implements Gofer<JoinRequest> {
+public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
 
     @Retention(SOURCE)
     @IntDef({INVITING, JOINING, APPROVING, ACCEPTING, WAITING})
@@ -34,55 +39,26 @@ public class JoinRequestGofer implements Gofer<JoinRequest> {
     public static final int WAITING = 4;
 
     private int state;
-
     private int index;
-    private final JoinRequest request;
-    private final UserRepository userRepository;
     private final List<Item<JoinRequest>> items;
 
     private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
-    public JoinRequestGofer(JoinRequest request, BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
-        this.request = request;
+    public JoinRequestGofer(JoinRequest model, Consumer<Throwable> onError, BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+        super(model, onError);
         this.joinCompleter = joinCompleter;
-        userRepository = UserRepository.getInstance();
-        items = new ArrayList<>();
-        index = Flowable.range(0, request.asItems().size() - 1)
-                .filter(index -> request.asItems().get(index).getItemType() == Item.ROLE)
-                .first(0)
-                .blockingGet();
-        refresh();
+        index = getIndex(model);
+        updateState();
+        items = new ArrayList<>(filteredItems(model));
     }
 
-    public void refresh() {
-        boolean isEmpty = request.isEmpty();
-        boolean isRequestOwner = isRequestOwner();
-        boolean isUserEmpty = request.getUser().isEmpty();
-        boolean isUserApproved = request.isUserApproved();
-        boolean isTeamApproved = request.isTeamApproved();
-
-        state = isEmpty && isUserEmpty && isTeamApproved
-                ? INVITING
-                : isEmpty && isUserApproved && isRequestOwner
-                ? JOINING
-                : (!isEmpty && isUserApproved && isRequestOwner) || (!isEmpty && isTeamApproved && !isRequestOwner)
-                ? WAITING
-                : isTeamApproved && isRequestOwner ? ACCEPTING : APPROVING;
-
-        items.clear();
-        Flowable.fromIterable(request.asItems())
-                .filter(this::filter)
-                .collectInto(items, List::add)
-                .subscribe();
-    }
-
-    public boolean showsFab(boolean hasPrivilegedRole) {
+    public boolean showsFab() {
         switch (state) {
             case INVITING:
             case JOINING:
                 return true;
             case APPROVING:
-                return hasPrivilegedRole;
+                return hasPrivilegedRole();
             case ACCEPTING:
                 return isRequestOwner();
             default:
@@ -99,7 +75,23 @@ public class JoinRequestGofer implements Gofer<JoinRequest> {
     }
 
     public boolean isRequestOwner() {
-        return userRepository.getCurrentUser().equals(request.getUser());
+        return getSignedInUser().equals(model.getUser());
+    }
+
+    private void updateState() {
+        boolean isEmpty = model.isEmpty();
+        boolean isRequestOwner = isRequestOwner();
+        boolean isUserEmpty = model.getUser().isEmpty();
+        boolean isUserApproved = model.isUserApproved();
+        boolean isTeamApproved = model.isTeamApproved();
+
+        state = isEmpty && isUserEmpty && isTeamApproved
+                ? INVITING
+                : isEmpty && isUserApproved && isRequestOwner
+                ? JOINING
+                : (!isEmpty && isUserApproved && isRequestOwner) || (!isEmpty && isTeamApproved && !isRequestOwner)
+                ? WAITING
+                : isTeamApproved && isRequestOwner ? ACCEPTING : APPROVING;
     }
 
     @JoinRequestState
@@ -117,15 +109,38 @@ public class JoinRequestGofer implements Gofer<JoinRequest> {
                 : state == APPROVING ? R.string.approve_request : R.string.accept_request);
     }
 
-    public Single<JoinRequest> joinTeam() {
-        TeamMember<JoinRequest> member = TeamMember.fromModel(request);
-        TeamMemberRepository<JoinRequest> repository = TeamMemberRepository.getInstance();
-
-        return repository.createOrUpdate(member).map(ignored -> request).observeOn(mainThread());
+    @Nullable
+    @Override
+    public String getImageClickMessage(Fragment fragment) {
+        return fragment.getString(R.string.no_permission);
     }
 
-    public Single<JoinRequest> processJoinRequest(boolean approved) {
-        return Single.defer(() -> joinCompleter.apply(request, approved));
+    @Override
+    public Flowable<DiffUtil.DiffResult> fetch() {
+        return Flowable.empty();
+    }
+
+    @Override
+    Single<DiffUtil.DiffResult> upsert() {
+        Single<JoinRequest> single = model.isEmpty() ? joinTeam() : approveRequest();
+        Single<List<Item<JoinRequest>>> source = single.map(JoinRequest::asItems).doOnSuccess(ignored -> updateState());
+        return Identifiable.diff(source, () -> items, (items, updated) -> filteredItems(model));
+    }
+
+    @Override
+    public Completable delete() {
+        return Single.defer(() -> joinCompleter.apply(model, false)).toCompletable().observeOn(mainThread());
+    }
+
+    private Single<JoinRequest> joinTeam() {
+        TeamMember<JoinRequest> member = TeamMember.fromModel(model);
+        TeamMemberRepository<JoinRequest> repository = TeamMemberRepository.getInstance();
+
+        return repository.createOrUpdate(member).map(ignored -> model);
+    }
+
+    private Single<JoinRequest> approveRequest() {
+        return Single.defer(() -> joinCompleter.apply(model, true));
     }
 
     public List<Item<JoinRequest>> getItems() {
@@ -133,7 +148,7 @@ public class JoinRequestGofer implements Gofer<JoinRequest> {
     }
 
     private boolean filter(Item<JoinRequest> item) {
-        boolean isEmpty = request.isEmpty();
+        boolean isEmpty = model.isEmpty();
         int sortPosition = item.getSortPosition();
 
         if (item.getItemType() == Item.ROLE) return true;
@@ -152,5 +167,19 @@ public class JoinRequestGofer implements Gofer<JoinRequest> {
         return isEmpty
                 ? ignoreTeam && stringRes != R.string.user_about
                 : ignoreTeam && stringRes != R.string.email;
+    }
+
+    private Integer getIndex(JoinRequest model) {
+        return Flowable.range(0, model.asItems().size() - 1)
+                .filter(index -> model.asItems().get(index).getItemType() == Item.ROLE)
+                .first(0)
+                .blockingGet();
+    }
+
+    private List<Item<JoinRequest>> filteredItems(JoinRequest request) {
+        return Flowable.fromIterable(request.asItems())
+                .filter(this::filter)
+                .collect((Callable<ArrayList<Item<JoinRequest>>>) ArrayList::new, List::add)
+                .blockingGet();
     }
 }

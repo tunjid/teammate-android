@@ -21,10 +21,9 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
 
 import java.util.UUID;
-
-import io.reactivex.Flowable;
 
 import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.ACCEPTING;
 import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.APPROVING;
@@ -43,7 +42,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     public static final String ARG_JOIN_REQUEST = "join-request";
 
     private JoinRequest request;
-    private JoinRequestGofer requestGofer;
+    private JoinRequestGofer gofer;
 
     public static JoinRequestFragment inviteInstance(Team team) {
         JoinRequestFragment fragment = newInstance(JoinRequest.invite(team));
@@ -98,7 +97,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         request = getArguments().getParcelable(ARG_JOIN_REQUEST);
-        requestGofer = teamMemberViewModel.gofer(request);
+        gofer = teamMemberViewModel.gofer(request);
     }
 
     @Nullable
@@ -107,7 +106,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new JoinRequestAdapter(requestGofer.getItems(), this))
+                .withAdapter(new JoinRequestAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -118,10 +117,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     @Override
     public void onResume() {
-        User user = userViewModel.getCurrentUser();
-        Team team = request.getTeam();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
-        refreshState();
         super.onResume();
     }
 
@@ -134,8 +129,8 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         boolean isEmpty = request.isEmpty();
-        boolean canBlockUser = localRoleViewModel.hasPrivilegedRole();
-        boolean canDeleteRequest = canBlockUser || requestGofer.isRequestOwner();
+        boolean canBlockUser = gofer.hasPrivilegedRole();
+        boolean canDeleteRequest = canBlockUser || gofer.isRequestOwner();
 
         MenuItem block_item = menu.findItem(R.id.action_block);
         MenuItem deleteItem = menu.findItem(R.id.action_kick);
@@ -160,8 +155,10 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
-        setFabClickListener(this);
+        setToolbarTitle(gofer.getToolbarTitle(this));
         setFabIcon(R.drawable.ic_check_white_24dp);
+        requireActivity().invalidateOptionsMenu();
+        setFabClickListener(this);
     }
 
     @Override
@@ -170,7 +167,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @Override
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean showsFab() {
-        return requestGofer.showsFab(localRoleViewModel.hasPrivilegedRole());
+        return gofer.showsFab();
     }
 
     @Override
@@ -180,19 +177,19 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     protected JoinRequest getHeaderedModel() {return request;}
 
     @Override
-    protected Flowable<DiffUtil.DiffResult> fetch(JoinRequest model) { return Flowable.empty(); }
+    protected TeamHostingGofer<JoinRequest> gofer() { return gofer; }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) { }
 
     @Override
     public boolean canEditFields() {
-        return requestGofer.canEditFields();
+        return gofer.canEditFields();
     }
 
     @Override
     public boolean canEditRole() {
-        return requestGofer.canEditRole();
+        return gofer.canEditRole();
     }
 
     @Override
@@ -200,67 +197,62 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         if (view.getId() != R.id.fab) return;
 
         @JoinRequestGofer.JoinRequestState
-        int state = requestGofer.getState();
+        int state = gofer.getState();
 
         if (state == WAITING) return;
 
-        if (state == APPROVING || state == ACCEPTING) completeJoinRequest(true);
+        if (state == APPROVING || state == ACCEPTING) saveRequest();
         else if (request.getPosition().isInvalid()) showSnackbar(getString(R.string.select_role));
         else if (state == JOINING || state == INVITING) createJoinRequest();
     }
 
     private void createJoinRequest() {
         toggleProgress(true);
-        disposables.add(requestGofer.joinTeam()
-                .subscribe(request -> onJoinRequestSent(), defaultErrorHandler));
+        disposables.add(gofer.save().subscribe(this::onJoinRequestSent, defaultErrorHandler));
     }
 
-    private void completeJoinRequest(boolean approved) {
+    private void saveRequest() {
         toggleProgress(true);
-        disposables.add(requestGofer.processJoinRequest(approved)
-                .subscribe(deleted -> onRequestCompleted(approved), defaultErrorHandler));
+        disposables.add(gofer.save().subscribe(ignored -> onRequestSaved(), defaultErrorHandler));
     }
 
-    private void onJoinRequestSent() {
-        scrollManager.getRecyclerView().getRecycledViewPool().clear();
-        refreshState();
+    private void deleteRequest() {
+        toggleProgress(true);
+        disposables.add(gofer.remove().subscribe(this::onRequestDeleted, defaultErrorHandler));
+    }
+
+    private void onJoinRequestSent(DiffUtil.DiffResult result) {
+        scrollManager.onDiff(result);
         toggleFab(false);
         toggleProgress(false);
         toggleBottomSheet(false);
+        setToolbarTitle(gofer.getToolbarTitle(this));
         showSnackbar(getString(request.isTeamApproved()
                 ? R.string.user_invite_sent
                 : R.string.team_submitted_join_request));
     }
 
-    private void onRequestCompleted(boolean approved) {
-        int stringResource = approved ? R.string.added_user : R.string.removed_user;
+    private void onRequestDeleted() {
         String name = request.getUser().getFirstName();
-        if (!requestGofer.isRequestOwner()) showSnackbar(getString(stringResource, name));
+        if (!gofer.isRequestOwner()) showSnackbar(getString(R.string.removed_user, name));
         requireActivity().onBackPressed();
     }
 
-    private void onRoleUpdated() {
-        toggleFab(showsFab());
-        requireActivity().invalidateOptionsMenu();
-        scrollManager.notifyDataSetChanged();
+    private void onRequestSaved() {
+        String name = request.getUser().getFirstName();
+        if (!gofer.isRequestOwner()) showSnackbar(getString(R.string.added_user, name));
+        requireActivity().onBackPressed();
     }
 
     private void showDeletePrompt() {
         User requestUser = request.getUser();
-        final String prompt = requestGofer.isRequestOwner()
+        final String prompt = gofer.isRequestOwner()
                 ? getString(R.string.confirm_request_leave, request.getTeam().getName())
                 : getString(R.string.confirm_request_drop, requestUser.getFirstName());
 
         new AlertDialog.Builder(requireActivity()).setTitle(prompt)
-                .setPositiveButton(R.string.yes, (dialog, which) -> completeJoinRequest(false))
+                .setPositiveButton(R.string.yes, (dialog, which) -> deleteRequest())
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .show();
-    }
-
-    private void refreshState() {
-        requestGofer.refresh();
-        scrollManager.notifyDataSetChanged();
-        toggleFab(showsFab());
-        setToolbarTitle(requestGofer.getToolbarTitle(this));
     }
 }
