@@ -43,12 +43,12 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     public Flowable<DiffUtil.DiffResult> refresh(K key) {
-        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::pullToRefresh);
+        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::pullToRefresh)
+                .doOnTerminate(() -> pullToRefreshCount.set(0));
     }
 
     private Flowable<DiffUtil.DiffResult> getLatest(K key) {
-        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList)
-                .doOnTerminate(() -> pullToRefreshCount.set(0));
+        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList);
     }
 
     public void clearNotifications(V value) {
