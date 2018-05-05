@@ -127,8 +127,8 @@ public class JoinRequest extends JoinRequestEntity
         this.id = updated.id;
 
         position.update(updated.position);
-        if (team.hasMajorFields()) team.update(updated.team);
-        if (user.hasMajorFields()) user.update(updated.user);
+        if (updated.team.hasMajorFields()) team.update(updated.team);
+        if (updated.user.hasMajorFields()) user.update(updated.user);
     }
 
     @Override
