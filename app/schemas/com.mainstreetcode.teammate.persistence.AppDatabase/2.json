@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "68bc0f4fc592228bac1c007ac1954d65",
+    "identityHash": "3978990af68fefc2f928b795b458fc15",
     "entities": [
       {
         "tableName": "users",
@@ -240,7 +240,7 @@
       },
       {
         "tableName": "roles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`role_id` TEXT NOT NULL, `role_image_url` TEXT, `role_name` TEXT, `role_team` TEXT, `role_user` TEXT, `role_created` INTEGER, PRIMARY KEY(`role_id`), FOREIGN KEY(`role_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`role_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`role_id` TEXT NOT NULL, `role_image_url` TEXT, `role_nickname` TEXT, `role_name` TEXT, `role_team` TEXT, `role_user` TEXT, `role_created` INTEGER, PRIMARY KEY(`role_id`), FOREIGN KEY(`role_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`role_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -251,6 +251,12 @@
           {
             "fieldPath": "imageUrl",
             "columnName": "role_image_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nickname",
+            "columnName": "role_nickname",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -607,7 +613,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"68bc0f4fc592228bac1c007ac1954d65\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"3978990af68fefc2f928b795b458fc15\")"
     ]
   }
 }

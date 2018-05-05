@@ -41,8 +41,8 @@ public class Role extends RoleEntity
     @Ignore private final List<Item<Role>> items;
 
     @SuppressWarnings("unused")
-    public Role(String id, String imageUrl, Position position, Team team, User user, Date created) {
-        super(id, imageUrl, position, team, user, created);
+    public Role(String id, String imageUrl, String nickname, Position position, Team team, User user, Date created) {
+        super(id, imageUrl, nickname, position, team, user, created);
         items = buildItems();
     }
 
@@ -52,7 +52,7 @@ public class Role extends RoleEntity
     }
 
     public static Role empty() {
-        return new Role("", Config.getDefaultUserAvatar(), Position.empty(), Team.empty(), User.empty(), new Date());
+        return new Role("", Config.getDefaultUserAvatar(), "", Position.empty(), Team.empty(), User.empty(), new Date());
     }
 
     @SuppressWarnings("unchecked")
@@ -61,7 +61,8 @@ public class Role extends RoleEntity
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(2, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.text(2, Item.INPUT, R.string.nickname, this::getNickname, this::setNickname, this),
+                Item.text(3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
@@ -158,6 +159,7 @@ public class Role extends RoleEntity
         private static final String TEAM_KEY = "team";
         private static final String IMAGE_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
+        private static final String NICK_NAME_KEY = "nickname";
 
         @Override
         public JsonElement serialize(Role src, Type typeOfSrc, JsonSerializationContext context) {
@@ -179,6 +181,7 @@ public class Role extends RoleEntity
 
             String id = ModelUtils.asString(ID_KEY, roleJson);
             String imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson);
+            String nickname = ModelUtils.asString(NICK_NAME_KEY, roleJson);
             String positionName = ModelUtils.asString(NAME_KEY, roleJson);
 
             Position position = Config.positionFromCode(positionName);
@@ -188,7 +191,7 @@ public class Role extends RoleEntity
 
             if (user == null) user = User.empty();
 
-            return new Role(id, imageUrl, position, team, user, created);
+            return new Role(id, imageUrl, nickname, position, team, user, created);
         }
     }
 }

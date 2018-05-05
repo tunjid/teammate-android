@@ -23,6 +23,7 @@ public class Migration12 extends Migration {
         database.execSQL("ALTER TABLE teams ADD COLUMN team_min_age INTEGER NOT NULL DEFAULT 0");
         database.execSQL("ALTER TABLE teams ADD COLUMN team_max_age INTEGER NOT NULL DEFAULT 0");
 
+        database.execSQL("ALTER TABLE roles ADD COLUMN role_nickname TEXT DEFAULT ''");
         database.execSQL("ALTER TABLE roles ADD COLUMN role_created INTEGER DEFAULT " + now);
 
         database.execSQL("ALTER TABLE join_requests ADD COLUMN join_request_created INTEGER DEFAULT " + now);

@@ -31,14 +31,16 @@ public class RoleEntity implements Parcelable {
     @NonNull @PrimaryKey
     @ColumnInfo(name = "role_id") protected String id;
     @ColumnInfo(name = "role_image_url") protected String imageUrl;
+    @ColumnInfo(name = "role_nickname") protected String nickname;
     @ColumnInfo(name = "role_name") protected Position position;
     @ColumnInfo(name = "role_team") protected Team team;
     @ColumnInfo(name = "role_user") protected User user;
     @ColumnInfo(name = "role_created") protected Date created;
 
-    public RoleEntity(@NonNull String id, String imageUrl, Position position, Team team, User user, Date created) {
+    public RoleEntity(@NonNull String id, String imageUrl, String nickname, Position position, Team team, User user, Date created) {
         this.id = id;
         this.imageUrl = imageUrl;
+        this.nickname = nickname;
         this.position = position;
         this.team = team;
         this.user = user;
@@ -63,6 +65,10 @@ public class RoleEntity implements Parcelable {
         return position;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
     public String getImageUrl() {
         return TextUtils.isEmpty(imageUrl) ? user.getImageUrl() : imageUrl;
     }
@@ -81,6 +87,10 @@ public class RoleEntity implements Parcelable {
 
     public void setPosition(String position) {
         this.position = Config.positionFromCode(position);
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     protected void setImageUrl(String imageUrl) {

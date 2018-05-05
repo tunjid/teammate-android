@@ -26,6 +26,7 @@
     <!--SignUpFragment-->
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
+    <string name="nickname">Nickname</string>
     <string name="member_information">Member Information</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_up_error_default">Error signing up, please try again later</string>
