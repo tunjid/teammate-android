@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
@@ -69,7 +70,13 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
             Team guestTeam = guest.getEvent().getTeam();
             BlockReason reason = BlockReason.empty();
             pushModelAlert(Alert.userBlocked(BlockedUser.block(guestUser, guestTeam, reason)));
-        });
+        }, GuestRepository.getInstance()::get);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        blockedUserAlert.onComplete();
     }
 
     @Override

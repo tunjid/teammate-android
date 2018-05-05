@@ -34,6 +34,10 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
         return "join_requests";
     }
 
+    @Query("SELECT * FROM join_requests" +
+            " WHERE :id = join_request_id")
+    public abstract Maybe<JoinRequest> get(String id);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void insert(List<JoinRequestEntity> teams);
 

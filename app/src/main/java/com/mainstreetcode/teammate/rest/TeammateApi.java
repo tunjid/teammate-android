@@ -40,8 +40,10 @@ import retrofit2.http.Query;
 public interface TeammateApi {
 
     String ID_PATH = "id";
-    String TEAM_PATH = "teamId";
     String DATE_QUERY = "date";
+    String TEAM_PATH = "teamId";
+    String ROLE_PATH = "roleId";
+    String REQUEST_PATH = "requestId";
 
     @GET("api/config")
     Single<Config> getConfig();
@@ -117,15 +119,18 @@ public interface TeammateApi {
     @GET("api/me/roles")
     Single<List<Role>> getMyRoles();
 
+    @GET("api/roles/{roleId}")
+    Single<Role> getRole(@Path(ROLE_PATH) String roleId);
+
     @Multipart
     @POST("api/roles/{roleId}")
-    Single<Role> uploadRolePhoto(@Path("roleId") String roleId, @Part MultipartBody.Part file);
+    Single<Role> uploadRolePhoto(@Path(ROLE_PATH) String roleId, @Part MultipartBody.Part file);
 
     @PUT("api/roles/{roleId}")
-    Single<Role> updateRole(@Path("roleId") String roleId, @Body Role role);
+    Single<Role> updateRole(@Path(ROLE_PATH) String roleId, @Body Role role);
 
     @DELETE("api/roles/{roleId}")
-    Single<Role> deleteRole(@Path("roleId") String roleId);
+    Single<Role> deleteRole(@Path(ROLE_PATH) String roleId);
 
     // =============================================================================================
     // Join Request endpoints
@@ -138,16 +143,16 @@ public interface TeammateApi {
     Single<JoinRequest> inviteUser(@Body JoinRequest joinRequest);
 
     @GET("api/join-requests/{requestId}")
-    Single<JoinRequest> getJoinRequest(@Path("requestId") String requestId);
+    Single<JoinRequest> getJoinRequest(@Path(REQUEST_PATH) String requestId);
 
     @GET("api/join-requests/{requestId}/approve")
-    Single<Role> approveUser(@Path("requestId") String requestId);
+    Single<Role> approveUser(@Path(REQUEST_PATH) String requestId);
 
     @GET("api/join-requests/{requestId}/accept")
-    Single<Role> acceptInvite(@Path("requestId") String requestId);
+    Single<Role> acceptInvite(@Path(REQUEST_PATH) String requestId);
 
     @DELETE("api/join-requests/{requestId}")
-    Single<JoinRequest> deleteJoinRequest(@Path("requestId") String requestId);
+    Single<JoinRequest> deleteJoinRequest(@Path(REQUEST_PATH) String requestId);
 
     // =============================================================================================
     // Event endpoints
@@ -180,6 +185,9 @@ public interface TeammateApi {
 
     @GET("api/events/{id}/rsvpGuest")
     Single<Guest> rsvpEvent(@Path(ID_PATH) String eventId, @Query("attending") boolean attending);
+
+    @GET("api/guests/{guestId}")
+    Single<Guest> getGuest(@Path("guestId") String guestId);
 
     // =============================================================================================
     // Team Chat endpoints

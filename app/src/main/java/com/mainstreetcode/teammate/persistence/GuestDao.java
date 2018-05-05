@@ -23,6 +23,10 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
         return "guests";
     }
 
+    @Query("SELECT * FROM guests" +
+            " WHERE :id = guest_id")
+    public abstract Maybe<Guest> get(String id);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void insert(List<GuestEntity> guests);
 

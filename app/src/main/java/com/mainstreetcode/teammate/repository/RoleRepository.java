@@ -8,7 +8,6 @@ import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.RoleDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
-import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +59,10 @@ public class RoleRepository extends ModelRepository<Role> {
 
     @Override
     public Flowable<Role> get(String id) {
-        return Flowable.error(new TeammateException(""));
+        Maybe<Role> local = roleDao.get(id).subscribeOn(io());
+        Maybe<Role> remote = api.getRole(id).toMaybe();
+
+        return fetchThenGetModel(local, remote);
     }
 
     @Override

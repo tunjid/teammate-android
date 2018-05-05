@@ -62,7 +62,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     private Flowable<Team> getTeam(Team team) {
-        return team.isEmpty() ? Flowable.empty() : repository.get(team);
+        return repository.get(team);
     }
 
     private Single<Team> createOrUpdate(Team team) {

@@ -12,6 +12,8 @@ import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.UserHost;
+import com.mainstreetcode.teammate.repository.JoinRequestRepository;
+import com.mainstreetcode.teammate.repository.RoleRepository;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
@@ -73,11 +75,11 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public JoinRequestGofer gofer(JoinRequest joinRequest) {
-        return new JoinRequestGofer(joinRequest, onError(TeamMember.fromModel(joinRequest)), this::processRequest);
+        return new JoinRequestGofer(joinRequest, onError(TeamMember.fromModel(joinRequest)), JoinRequestRepository.getInstance()::get, this::processRequest);
     }
 
     public RoleGofer gofer(Role role) {
-        return new RoleGofer(role, onError(TeamMember.fromModel(role)), this::deleteRole, this::updateRole);
+        return new RoleGofer(role, onError(TeamMember.fromModel(role)), RoleRepository.getInstance()::get, this::deleteRole, this::updateRole);
     }
 
     private Single<Role> deleteRole(Role role) {

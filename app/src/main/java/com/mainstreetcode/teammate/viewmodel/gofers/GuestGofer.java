@@ -6,6 +6,7 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.TeammateException;
 
@@ -16,14 +17,19 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 public class GuestGofer extends Gofer<Guest> {
 
     private final List<Item<Guest>> items;
+    private final Function<Guest, Flowable<Guest>> getFunction;
 
-    public GuestGofer(Guest model, Consumer<Throwable> onError) {
+    public GuestGofer(Guest model,
+                      Consumer<Throwable> onError,
+                      Function<Guest, Flowable<Guest>> getFunction) {
         super(model, onError);
         this.items = new ArrayList<>(model.asItems());
+        this.getFunction = getFunction;
     }
 
     public List<Item<Guest>> getItems() {
@@ -43,7 +49,8 @@ public class GuestGofer extends Gofer<Guest> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        return Flowable.empty();
+        Flowable<List<Item<Guest>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Guest::asItems);
+        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {

@@ -22,6 +22,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -42,10 +43,15 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
     private int index;
     private final List<Item<JoinRequest>> items;
 
+    private final Function<JoinRequest, Flowable<JoinRequest>> getFunction;
     private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
-    public JoinRequestGofer(JoinRequest model, Consumer<Throwable> onError, BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+    public JoinRequestGofer(JoinRequest model,
+                            Consumer<Throwable> onError,
+                            Function<JoinRequest, Flowable<JoinRequest>> getFunction,
+                            BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
         super(model, onError);
+        this.getFunction = getFunction;
         this.joinCompleter = joinCompleter;
         index = getIndex(model);
         updateState();
@@ -117,7 +123,8 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        return Flowable.empty();
+        Flowable<List<Item<JoinRequest>>> source = Flowable.defer(() -> getFunction.apply(model)).map(JoinRequest::asItems);
+        return Identifiable.diff(source, () -> items, (items, updated) -> filteredItems(model));
     }
 
     @Override

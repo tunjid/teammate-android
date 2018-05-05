@@ -55,7 +55,10 @@ public class GuestRepository extends QueryRepository<Guest, Event> {
 
     @Override
     public Flowable<Guest> get(String id) {
-        return Flowable.empty();
+        Maybe<Guest> local = guestDao.get(id).subscribeOn(io());
+        Maybe<Guest> remote = api.getGuest(id).toMaybe();
+
+        return fetchThenGetModel(local, remote);
     }
 
     @Override

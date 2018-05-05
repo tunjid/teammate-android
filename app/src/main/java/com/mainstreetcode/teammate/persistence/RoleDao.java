@@ -30,6 +30,10 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
         return "roles";
     }
 
+    @Query("SELECT * FROM roles" +
+            " WHERE :id = role_id")
+    public abstract Maybe<Role> get(String id);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void insert(List<RoleEntity> roles);
 

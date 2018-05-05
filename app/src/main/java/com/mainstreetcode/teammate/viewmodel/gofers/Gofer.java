@@ -16,7 +16,7 @@ import io.reactivex.functions.Consumer;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-public abstract class Gofer<T extends ListableModel<T>> {
+public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     protected final T model;
     private final Consumer<Throwable> onError;
@@ -39,7 +39,7 @@ public abstract class Gofer<T extends ListableModel<T>> {
 
     public final Single<DiffUtil.DiffResult> save() { return upsert().doOnSuccess(ignored -> prepare()).doOnError(onError); }
 
-    public final Flowable<DiffUtil.DiffResult> get() { return fetch().doOnNext(ignored -> prepare().doOnError(onError)); }
+    public final Flowable<DiffUtil.DiffResult> get() { return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> prepare().doOnError(onError)); }
 
     public final Completable remove() { return delete().doOnError(onError).observeOn(mainThread()); }
 

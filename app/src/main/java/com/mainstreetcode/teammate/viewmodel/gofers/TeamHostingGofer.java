@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.viewmodel.gofers;
 import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.ListableModel;
+import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.model.User;
@@ -18,7 +19,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 /**
  * Interface for liaisons between a ViewModel and a single instance of it's Model
  */
-public abstract class TeamHostingGofer<T extends ListableModel<T> & TeamHost> extends Gofer<T>{
+public abstract class TeamHostingGofer<T extends Model<T> & ListableModel<T> & TeamHost> extends Gofer<T>{
 
     private Role currentRole;
     private final UserRepository userRepository;

@@ -23,11 +23,13 @@ import io.reactivex.functions.Function;
 public class RoleGofer extends TeamHostingGofer<Role> {
 
     private final List<Item<Role>> items;
+    private final Function<Role, Flowable<Role>> getFunction;
     private final Function<Role, Single<Role>> deleteFunction;
     private final Function<Role, Single<Role>> updateFunction;
 
-    public RoleGofer(Role model, Consumer<Throwable> onError, Function<Role, Single<Role>> deleteFunction, Function<Role, Single<Role>> updateFunction) {
+    public RoleGofer(Role model, Consumer<Throwable> onError, Function<Role, Flowable<Role>> getFunction, Function<Role, Single<Role>> deleteFunction, Function<Role, Single<Role>> updateFunction) {
         super(model, onError);
+        this.getFunction = getFunction;
         this.deleteFunction = deleteFunction;
         this.updateFunction = updateFunction;
         this.items = new ArrayList<>(model.asItems());
@@ -53,7 +55,8 @@ public class RoleGofer extends TeamHostingGofer<Role> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        return Flowable.empty();
+        Flowable<List<Item<Role>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Role::asItems);
+        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
