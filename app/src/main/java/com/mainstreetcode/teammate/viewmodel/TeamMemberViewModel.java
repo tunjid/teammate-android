@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
@@ -12,7 +13,6 @@ import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.UserHost;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer;
@@ -48,11 +48,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
         if (!(alert instanceof Alert.UserBlocked)) return;
-        User user = ((Alert.UserBlocked) alert).getModel();
-
-        Flowable.fromIterable(modelListMap.values())
-                .map(List::iterator)
-                .subscribe(iterator -> removeBlockedUser(user, iterator), ErrorHandler.EMPTY);
+        removeBlockedUser(((Alert.UserBlocked) alert).getModel());
     }
 
     @Override
@@ -137,13 +133,15 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
                 : null;
     }
 
-    private void removeBlockedUser(User user, Iterator<Identifiable> iterator) {
+    private void removeBlockedUser(BlockedUser blockedUser) {
+        Iterator<Identifiable> iterator = getModelList(blockedUser.getTeam()).iterator();
+
         while (iterator.hasNext()) {
             Identifiable identifiable = iterator.next();
             if (!(identifiable instanceof TeamMember)) continue;
 
             TeamMember member = ((TeamMember) identifiable);
-            if (member.getUser().equals(user)) iterator.remove();
+            if (member.getUser().equals(blockedUser.getUser())) iterator.remove();
         }
     }
 

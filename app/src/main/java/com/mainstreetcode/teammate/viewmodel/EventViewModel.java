@@ -9,10 +9,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
-import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.repository.GuestRepository;
@@ -23,7 +20,6 @@ import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -78,17 +74,15 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     private Flowable<Event> getEvent(Event event) {
-        return checkForInvalidObject(repository.get(event), event.getTeam(), event).cast(Event.class);
+        return event.isEmpty() ? Flowable.empty() : repository.get(event);
     }
 
     private Single<Event> createOrUpdateEvent(final Event event) {
-        return checkForInvalidObject(repository.createOrUpdate(event), event.getTeam(), event).cast(Event.class);
+        return repository.createOrUpdate(event);
     }
 
     public Single<Event> delete(final Event event) {
-        return checkForInvalidObject(repository.delete(event), event.getTeam(), event)
-                .doOnSuccess(getModelList(event.getTeam())::remove)
-                .cast(Event.class);
+        return repository.delete(event).doOnSuccess(getModelList(event.getTeam())::remove);
     }
 
     public Flowable<List<Event>> getPublicEvents(GoogleMap map) {
@@ -161,14 +155,5 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         distanceBetween(locationA.latitude, locationA.longitude, locationB.latitude, locationB.longitude, distance);
 
         return (int) (distance[0] * 0.000621371);
-    }
-
-    private void removeBlockedUser(User user, Iterator<Identifiable> iterator) {
-        while (iterator.hasNext()) {
-            Identifiable identifiable = iterator.next();
-            if (!(identifiable instanceof Guest)) continue;
-
-            if (((Guest) identifiable).getUser().equals(user)) iterator.remove();
-        }
     }
 }

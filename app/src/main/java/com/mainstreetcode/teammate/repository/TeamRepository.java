@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
-import com.mainstreetcode.teammate.model.BlockUserRequest;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
@@ -86,10 +86,10 @@ public class TeamRepository extends ModelRepository<Team> {
                 .doOnError(throwable -> deleteInvalidModel(team, throwable));
     }
 
-    public Single<User> blockUser(BlockUserRequest blockUserRequest) {
-        return api.blockUser(blockUserRequest.getTeam().getId(), blockUserRequest)
-                .map(result -> blockUserRequest.getUser())
-                .doOnSuccess(ignored -> deleteBlockedUser(blockUserRequest.getUser(), blockUserRequest.getTeam()));
+    public Single<User> blockUser(BlockedUser blockedUser) {
+        return api.blockUser(blockedUser.getTeam().getId(), blockedUser)
+                .map(result -> blockedUser.getUser())
+                .doOnSuccess(ignored -> deleteBlockedUser(blockedUser.getUser(), blockedUser.getTeam()));
     }
 
     @Override

@@ -15,7 +15,7 @@ import android.view.View;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammate.model.BlockUserRequest;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.Item;
@@ -134,7 +134,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
                 .setTitle(R.string.block_user)
                 .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialog, index) -> {
                     BlockReason reason = reasons.get(index);
-                    BlockUserRequest request = BlockUserRequest.block(user, team, reason);
+                    BlockedUser request = BlockedUser.block(user, team, reason);
 
                     disposables.add(teamViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler));
                     toggleProgress(true);

@@ -2,7 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
-import com.mainstreetcode.teammate.model.BlockUserRequest;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -62,8 +62,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     private Flowable<Team> getTeam(Team team) {
-        if (team.isEmpty()) return Flowable.empty();
-        return repository.get(team);
+        return team.isEmpty() ? Flowable.empty() : repository.get(team);
     }
 
     private Single<Team> createOrUpdate(Team team) {
@@ -84,9 +83,9 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .observeOn(mainThread());
     }
 
-    public Single<User> blockUser(BlockUserRequest blockUserRequest) {
-        return repository.blockUser(blockUserRequest)
-                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(blockUserRequest.getUser())));
+    public Single<User> blockUser(BlockedUser blockedUser) {
+        return repository.blockUser(blockedUser)
+                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(blockedUser)));
     }
 
     public boolean postSearch(String queryText) {
