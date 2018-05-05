@@ -39,7 +39,7 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     public final Single<DiffUtil.DiffResult> save() { return upsert().doOnSuccess(ignored -> prepare()).doOnError(onError); }
 
-    public final Flowable<DiffUtil.DiffResult> get() { return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> prepare().doOnError(onError)); }
+    public final Flowable<DiffUtil.DiffResult> get() { return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> prepare()).doOnError(onError); }
 
     public final Completable remove() { return delete().doOnError(onError).observeOn(mainThread()); }
 

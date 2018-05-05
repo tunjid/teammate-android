@@ -93,13 +93,13 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
                 ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
                 : joinRequestRepository.delete(request);
 
-        Flowable<List<Identifiable>> sourceFlowable = sourceSingle
+        Single<List<Identifiable>> sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem.class, feedItem)
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(this::toIdentifiable);
+                .map(this::toIdentifiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged)).firstOrError();
+        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged));
     }
 
     private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onFeedItemProcessed(boolean leaveUnchanged) {
