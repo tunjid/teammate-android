@@ -49,6 +49,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         guest = getArguments().getParcelable(ARG_GUEST);
+        gofer = eventViewModel.gofer(guest);
     }
 
     @Nullable

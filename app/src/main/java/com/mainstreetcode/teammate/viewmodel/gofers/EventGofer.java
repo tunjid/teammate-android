@@ -1,19 +1,24 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.GuestRepository;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -30,8 +35,10 @@ public class EventGofer extends TeamHostingGofer<Event> {
     private final Function<Event, Single<Event>> updateFunction;
     private final GuestRepository guestRepository;
 
+    @SuppressLint("CheckResult")
     public EventGofer(Event model,
                       Consumer<Throwable> onError,
+                      Flowable<BlockedUser> blockedUserFlowable,
                       Function<Event, Flowable<Event>> getFunction,
                       Function<Event, Single<Event>> upsertFunction,
                       Function<Event, Single<Event>> deleteFunction) {
@@ -41,6 +48,8 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.deleteFunction = deleteFunction;
         this.items = new ArrayList<>(model.asItems());
         this.guestRepository = GuestRepository.getInstance();
+
+        blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
     public List<Identifiable> getItems() {
@@ -82,7 +91,34 @@ public class EventGofer extends TeamHostingGofer<Event> {
         });
     }
 
-     Completable delete() {
+    public Single<Integer> getRSVPStatus() {
+        return Flowable.fromIterable(items)
+                .filter(identifiable -> identifiable instanceof Guest)
+                .cast(Guest.class)
+                .filter(Guest::isAttending)
+                .map(Guest::getUser)
+                .filter(getSignedInUser()::equals)
+                .collect(ArrayList::new, List::add)
+                .map(List::isEmpty)
+                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp);
+    }
+
+    Completable delete() {
         return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+    }
+
+    private void onUserBlocked(BlockedUser blockedUser) {
+        if (!blockedUser.getTeam().equals(model.getTeam())) return;
+
+        Iterator<Identifiable> iterator = items.iterator();
+
+        while (iterator.hasNext()) {
+            Identifiable identifiable = iterator.next();
+            if (!(identifiable instanceof Guest)) continue;
+            User blocked = blockedUser.getUser();
+            User guestUser = ((Guest) identifiable).getUser();
+
+            if (blocked.equals((guestUser))) iterator.remove();
+        }
     }
 }

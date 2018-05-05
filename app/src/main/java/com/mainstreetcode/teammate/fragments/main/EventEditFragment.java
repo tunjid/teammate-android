@@ -34,11 +34,6 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.Flowable;
-
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -105,18 +100,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
         if (canEditEvent() || event.isPublic()) menu.findItem(R.id.action_delete).setVisible(true);
 
-        User current = userViewModel.getCurrentUser();
-        List<User> users = new ArrayList<>();
-        disposables.add(Flowable.fromIterable(event.asIdentifiables())
-                .filter(identifiable -> identifiable instanceof Guest)
-                .cast(Guest.class)
-                .filter(Guest::isAttending)
-                .map(Guest::getUser)
-                .filter(current::equals)
-                .collectInto(users, List::add)
-                .map(List::isEmpty)
-                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp)
-                .subscribe(item::setIcon, emptyErrorHandler));
+        disposables.add(gofer.getRSVPStatus().subscribe(item::setIcon, emptyErrorHandler));
     }
 
     @Override

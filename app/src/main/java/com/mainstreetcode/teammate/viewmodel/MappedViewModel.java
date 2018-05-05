@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
@@ -32,10 +31,6 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     abstract Flowable<List<V>> fetch(K key, boolean fetchLatest);
 
     Flowable<Identifiable> checkForInvalidObject(Flowable<? extends Identifiable> source, K key, V value) {
-        return source.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
-    }
-
-    Single<Identifiable> checkForInvalidObject(Single<? extends Identifiable> source, K key, V value) {
         return source.cast(Identifiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
