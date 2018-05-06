@@ -129,11 +129,16 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    public void onAddressClicked() {
-        if (getActivity() == null) return;
+    protected boolean canGetModel() {
+        return super.canGetModel() && !gofer.isSettingAddress();
+    }
 
+    @Override
+    public void onAddressClicked() {
+        gofer.setSettingAddress(true);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);}
+
+        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
@@ -144,8 +149,12 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode != RESULT_OK) return;
+        boolean failed = resultCode != RESULT_OK;
+        boolean isFromPlacePicker = requestCode == PLACE_PICKER_REQUEST;
+
+        if (failed && isFromPlacePicker) gofer.setSettingAddress(false);
+        if (failed || !isFromPlacePicker) return;
+
         Context context = getContext();
         if (context == null) return;
 

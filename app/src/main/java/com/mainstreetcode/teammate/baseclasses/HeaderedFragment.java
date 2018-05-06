@@ -116,6 +116,12 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         toggleFab(showsFab());
     }
 
+    protected boolean canGetModel() {
+        boolean result = !ImageWorkerFragment.isPicking(this) && !imageJustCropped;
+        imageJustCropped = false;
+        return result;
+    }
+
     @Override
     protected void onKeyBoardChanged(boolean appeared) {
         super.onKeyBoardChanged(appeared);
@@ -150,11 +156,5 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         toggleProgress(false);
         Activity activity = getActivity();
         if (activity != null) activity.onBackPressed();
-    }
-
-    private boolean canGetModel() {
-        boolean result = !ImageWorkerFragment.isPicking(this) && !imageJustCropped;
-        imageJustCropped = false;
-        return result;
     }
 }
