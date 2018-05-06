@@ -61,7 +61,7 @@ public class Role extends RoleEntity
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(2, Item.INPUT, R.string.nickname, this::getNickname, this::setNickname, this),
+                Item.text(2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
                 Item.text(3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
@@ -166,6 +166,7 @@ public class Role extends RoleEntity
             JsonObject serialized = new JsonObject();
 
             serialized.addProperty(ID_KEY, src.getId());
+            serialized.addProperty(NICK_NAME_KEY, src.getNickname());
             serialized.add(USER_KEY, context.serialize(src.user));
 
             String positionCode = src.position != null ? src.position.getCode() : "";

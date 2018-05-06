@@ -53,7 +53,7 @@ public class User extends UserEntity implements
                 Item.text(0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
                 Item.text(1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
                 Item.email(2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.text(3, Item.INPUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+                Item.text(3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 

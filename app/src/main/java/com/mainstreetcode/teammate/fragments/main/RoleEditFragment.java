@@ -81,7 +81,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
         MenuItem kickItem = menu.findItem(R.id.action_kick);
         MenuItem blockItem = menu.findItem(R.id.action_block);
 
-        kickItem.setVisible(gofer.canChangeRolePicture());
+        kickItem.setVisible(gofer.canChangeRoleFields());
         blockItem.setVisible(canChangeRolePosition());
     }
 
@@ -103,7 +103,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return gofer.canChangeRolePicture();}
+    public boolean showsFab() {return gofer.canChangeRoleFields();}
 
     @Override
     protected Role getHeaderedModel() {return role;}
@@ -140,6 +140,11 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     @Override
     public boolean canChangeRolePosition() {
         return gofer.hasPrivilegedRole();
+    }
+
+    @Override
+    public boolean canChangeRoleFields() {
+        return gofer.canChangeRoleFields();
     }
 
     private void showDropRolePrompt() {

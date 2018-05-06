@@ -39,7 +39,7 @@ public class RoleGofer extends TeamHostingGofer<Role> {
         return items;
     }
 
-    public boolean canChangeRolePicture() {
+    public boolean canChangeRoleFields() {
         return hasPrivilegedRole() || getSignedInUser().equals(model.getUser());
     }
 

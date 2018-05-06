@@ -51,7 +51,7 @@ public class Guest extends GuestEntity
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, ignored -> {}, this),
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, ignored -> {}, this),
-                Item.email(2, Item.INPUT, R.string.user_about, user::getAbout, ignored -> {}, this)
+                Item.email(2, Item.ABOUT, R.string.user_about, user::getAbout, ignored -> {}, this)
         );
     }
 

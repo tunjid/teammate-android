@@ -42,6 +42,10 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
             return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, FALSE, FALSE);
             case Item.ROLE:
             return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
+            case Item.ABOUT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+            case Item.DESCRIPTION:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
             case Item.INPUT:
             default:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields);

@@ -40,6 +40,8 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final int NUMBER = 12;
     public static final int DESCRIPTION = 14;
     public static final int VISIBILITY = 15;
+    public static final int ABOUT = 16;
+    public static final int NICKNAME = 17;
 
     public static final Supplier<Boolean> TRUE = () -> true;
     public static final Supplier<Boolean> FALSE = () -> false;

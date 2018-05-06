@@ -70,7 +70,7 @@ public class JoinRequest extends JoinRequestEntity
         return Arrays.asList(
                 Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(3, Item.INPUT, R.string.user_about, user::getAbout, Item::ignore, this),
+                Item.text(3, Item.ABOUT, R.string.user_about, user::getAbout, Item::ignore, this),
                 Item.email(4, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
                 // END USER ITEMS
                 Item.text(ROLE_INDEX, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
