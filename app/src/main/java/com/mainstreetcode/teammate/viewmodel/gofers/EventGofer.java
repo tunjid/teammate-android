@@ -49,6 +49,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.items = new ArrayList<>(model.asItems());
         this.guestRepository = GuestRepository.getInstance();
 
+        items.add(model.getTeam());
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
@@ -68,18 +69,12 @@ public class EventGofer extends TeamHostingGofer<Event> {
         Flowable<List<Identifiable>> eventFlowable = Flowable.defer(() -> getFunction.apply(model)).map(Event::asIdentifiables);
         Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
         Flowable<List<Identifiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, guestsFlowable);
-        return Identifiable.diff(sourceFlowable, this::getItems, (old, fetched) -> {
-            ModelUtils.preserveAscending(old, fetched);
-            return old;
-        });
+        return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
         Single<List<Identifiable>> source = Single.defer(() -> updateFunction.apply(model)).map(Event::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (old, fetched) -> {
-            ModelUtils.preserveAscending(old, fetched);
-            return old;
-        });
+        return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(boolean attending) {
@@ -105,6 +100,11 @@ public class EventGofer extends TeamHostingGofer<Event> {
 
     Completable delete() {
         return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+    }
+
+    private List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
+        ModelUtils.preserveAscending(old, fetched);
+        return old;
     }
 
     private void onUserBlocked(BlockedUser blockedUser) {

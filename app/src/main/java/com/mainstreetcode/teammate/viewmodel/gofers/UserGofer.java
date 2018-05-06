@@ -49,12 +49,12 @@ public class UserGofer extends Gofer<User> {
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
         Flowable<List<Item<User>>> listFlowable = Flowable.defer(() -> getFunction.apply(model)).map(User::asItems);
-        return Identifiable.diff(listFlowable, () -> items, (stale, updated) -> updated);
+        return Identifiable.diff(listFlowable, this::getItems, (stale, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
         Single<List<Item<User>>> source = Single.defer(() -> updateFunction.apply(model)).map(User::asItems);
-        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     public Completable delete() {

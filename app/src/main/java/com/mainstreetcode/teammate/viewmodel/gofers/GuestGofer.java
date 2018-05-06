@@ -54,7 +54,7 @@ public class GuestGofer extends TeamHostingGofer<Guest> {
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
         Flowable<List<Item<Guest>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Guest::asItems);
-        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
