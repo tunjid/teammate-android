@@ -107,9 +107,11 @@ public class TeamDetailFragment extends MainActivityFragment
 
         MenuItem editItem = menu.findItem(R.id.action_edit);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
+        MenuItem blockedItem = menu.findItem(R.id.action_blocked);
 
         editItem.setVisible(visible);
         deleteItem.setVisible(visible);
+        blockedItem.setVisible(visible);
     }
 
     @Override
@@ -117,6 +119,9 @@ public class TeamDetailFragment extends MainActivityFragment
         switch (item.getItemId()) {
             case R.id.action_edit:
                 showFragment(TeamEditFragment.newEditInstance(team));
+                return true;
+            case R.id.action_blocked:
+                showFragment(BlockedUsersFragment.newInstance(team));
                 return true;
             case R.id.action_delete:
                 Context context = getContext();

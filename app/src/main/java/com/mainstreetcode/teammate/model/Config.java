@@ -94,6 +94,10 @@ public class Config implements Model<Config> {
         return getFromCode(code, config -> config.visibilities, Visibility.empty());
     }
 
+    public static BlockReason reasonFromCode(String code) {
+        return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
+    }
+
     private static Config getCurrentConfig() {
         return ConfigRepository.getInstance().getCurrent();
     }

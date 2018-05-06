@@ -2,11 +2,9 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
-import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -81,11 +79,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .switchMap(query -> repository.findTeams(query).toFlowable())
                 .doFinally(() -> searchRef.set(null))
                 .observeOn(mainThread());
-    }
-
-    public Single<User> blockUser(BlockedUser blockedUser) {
-        return repository.blockUser(blockedUser)
-                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(blockedUser)));
     }
 
     public boolean postSearch(String queryText) {

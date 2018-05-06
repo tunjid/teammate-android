@@ -47,7 +47,7 @@
     <!--Main Activity Options Menu-->
     <string name="settings">Settings</string>
     <string name="block_user">Block User</string>
-    <string name="blocked_user">Blocked %1$s</string>
+    <string name="user_blocked">Blocked %1$s</string>
 
     <!--FeedFragment-->
     <string name="home_greeting">Good %1$s, %2$s</string>
@@ -165,6 +165,12 @@
     <string name="attend_event">Attending this event?</string>
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
+
+    <!--BlockUserFragment-->
+    <string name="blocked_user">Blocked User</string>
+    <string name="blocked_users">Blocked Users</string>
+    <string name="blocked_users_title">Blocked Users for %1$s</string>
+    <string name="unblocked_user">Unblocked %1$s</string>
 
     <!--PublicEventFragment-->
     <string name="event_public_search">Search Options</string>

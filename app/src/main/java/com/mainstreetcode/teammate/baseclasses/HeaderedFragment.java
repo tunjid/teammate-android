@@ -136,15 +136,15 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
                     BlockReason reason = reasons.get(index);
                     BlockedUser request = BlockedUser.block(user, team, reason);
 
-                    disposables.add(teamViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler));
+                    disposables.add(blockedUserViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler));
                     toggleProgress(true);
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
-    private void onUserBlocked(User user) {
-        showSnackbar(getString(R.string.blocked_user, user.getFirstName()));
+    private void onUserBlocked(BlockedUser blockedUser) {
+        showSnackbar(getString(R.string.user_blocked, blockedUser.getUser().getFirstName()));
         toggleProgress(false);
         Activity activity = getActivity();
         if (activity != null) activity.onBackPressed();

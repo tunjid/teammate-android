@@ -7,11 +7,11 @@ import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
-import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -108,9 +108,6 @@ public interface TeammateApi {
 
     @GET("api/teams/{id}/members")
     Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
-
-    @POST("api/teams/{id}/block")
-    Single<JsonObject> blockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
 
     // =============================================================================================
     // Role endpoints
@@ -237,4 +234,17 @@ public interface TeammateApi {
 
     @PUT("api/me/devices/{id}")
     Single<Device> updateDevice(@Path(ID_PATH) String deviceId, @Body Device device);
+
+    // =============================================================================================
+    // BlockedUser endpoints
+    // =============================================================================================
+
+    @POST("api/teams/{id}/block")
+    Single<BlockedUser> blockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
+
+    @POST("api/teams/{id}/unblock")
+    Single<BlockedUser> unblockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
+
+    @GET("api/teams/{id}/blocked")
+    Single<List<BlockedUser>> blockedUsers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
 }

@@ -30,4 +30,23 @@ public abstract class EntityDao<T> {
         final String sql = "DELETE FROM " + getTableName();
         return Single.fromCallable(() -> AppDatabase.getInstance().compileStatement(sql).executeUpdateDelete());
     }
+
+    public static <T> EntityDao<T> daDont(){
+        return new EntityDao<T>() {
+            @Override
+            protected String getTableName() { return ""; }
+
+            @Override
+            public void insert(List<T> models) {}
+
+            @Override
+            protected void update(List<T> models) {}
+
+            @Override
+            public void delete(T model) {}
+
+            @Override
+            public void delete(List<T> models) {}
+        };
+    }
 }

@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.baseclasses;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -12,6 +13,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.viewmodel.BlockedUserViewModel;
 import com.mainstreetcode.teammate.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammate.viewmodel.EventViewModel;
 import com.mainstreetcode.teammate.viewmodel.FeedViewModel;
@@ -40,6 +42,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected LocationViewModel locationViewModel;
     protected LocalRoleViewModel localRoleViewModel;
     protected TeamMemberViewModel teamMemberViewModel;
+    protected BlockedUserViewModel blockedUserViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         chatViewModel = provider.get(ChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
         teamMemberViewModel = provider.get(TeamMemberViewModel.class);
+        blockedUserViewModel = provider.get(BlockedUserViewModel.class);
 
         defaultErrorHandler.addAction(() -> {if (scrollManager != null) scrollManager.reset();});
     }
@@ -100,6 +104,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (activity != null) activity.onBackPressed();
     }
 
+    @SuppressLint("CheckResult")
     protected void signOut() {
         userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),
