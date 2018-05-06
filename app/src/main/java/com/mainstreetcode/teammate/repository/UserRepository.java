@@ -72,9 +72,9 @@ public class UserRepository extends ModelRepository<User> {
     @Override
     public Single<User> createOrUpdate(User model) {
         Single<User> remote = model.isEmpty()
-                ? api.signUp(model)
-                : api.updateUser(model.getId(), model).doOnError(throwable -> deleteInvalidModel(model, throwable));
-
+                ? api.signUp(model).map(getLocalUpdateFunction(model))
+                : api.updateUser(model.getId(), model).map(getLocalUpdateFunction(model))
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), User.PHOTO_UPLOAD_KEY);
         if (body != null) {
