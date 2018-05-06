@@ -88,6 +88,12 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     }
 
     @Override
+    public void togglePersistentUi() {
+        super.togglePersistentUi();
+        scrollManager.notifyDataSetChanged();
+    }
+
+    @Override
     public void onImageClick() {
         viewHolder.bind(getHeaderedModel());
 
