@@ -89,9 +89,8 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
-        requireActivity().invalidateOptionsMenu();
         setToolbarTitle(getString(R.string.event_guest));
+        super.togglePersistentUi();
     }
 
     @Override
@@ -118,5 +117,11 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
         viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
         toggleProgress(false);
+    }
+
+    @Override
+    protected void onPrepComplete() {
+        requireActivity().invalidateOptionsMenu();
+        super.onPrepComplete();
     }
 }

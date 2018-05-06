@@ -92,11 +92,10 @@ public class RoleEditFragment extends HeaderedFragment<Role>
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.edit_role));
-        requireActivity().invalidateOptionsMenu();
+        super.togglePersistentUi();
     }
 
     @Override
@@ -110,6 +109,12 @@ public class RoleEditFragment extends HeaderedFragment<Role>
 
     @Override
     protected TeamHostingGofer<Role> gofer() { return gofer; }
+
+    @Override
+    protected void onPrepComplete() {
+        requireActivity().invalidateOptionsMenu();
+        super.onPrepComplete();
+    }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {

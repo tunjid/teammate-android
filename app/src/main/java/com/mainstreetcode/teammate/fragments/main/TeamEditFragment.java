@@ -83,10 +83,9 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        onRoleUpdated();
+        super.togglePersistentUi();
     }
 
     @Override
@@ -122,6 +121,13 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         toggleProgress(false);
     }
 
+    protected void onPrepComplete() {
+        scrollManager.notifyDataSetChanged();
+        toggleFab(showsFab());
+        setToolbarTitle(gofer.getToolbarTitle(this));
+        super.onPrepComplete();
+    }
+
     @Override
     public void onAddressClicked() {
         if (getActivity() == null) return;
@@ -147,12 +153,6 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         Place place = PlacePicker.getPlace(context, data);
         disposables.add(locationViewModel.fromPlace(place)
                 .subscribe(this::onAddressFound, defaultErrorHandler));
-    }
-
-    private void onRoleUpdated() {
-        scrollManager.notifyDataSetChanged();
-        toggleFab(showsFab());
-        setToolbarTitle(gofer.getToolbarTitle(this));
     }
 
     private void onAddressFound(Address address) {

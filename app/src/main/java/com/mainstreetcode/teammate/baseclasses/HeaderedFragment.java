@@ -82,15 +82,9 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     public void onResume() {
         super.onResume();
         Gofer<T> gofer = gofer();
-        disposables.add(gofer.prepare().subscribe(this::togglePersistentUi, ErrorHandler.EMPTY));
+        disposables.add(gofer.prepare().subscribe(this::onPrepComplete, ErrorHandler.EMPTY));
 
         if (canGetModel()) disposables.add(gofer.get().subscribe(this::onModelUpdated, defaultErrorHandler));
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        scrollManager.notifyDataSetChanged();
     }
 
     @Override
@@ -116,6 +110,10 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         super.onDestroyView();
         viewHolder = null;
         appBarLayout = null;
+    }
+
+    protected void onPrepComplete() {
+        toggleFab(showsFab());
     }
 
     @Override
