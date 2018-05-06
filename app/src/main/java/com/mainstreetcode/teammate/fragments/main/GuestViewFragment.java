@@ -15,8 +15,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GuestAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
@@ -69,21 +67,10 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), guest.getEvent().getTeam())
-                .subscribe(requireActivity()::invalidateOptionsMenu, ErrorHandler.EMPTY));
-    }
-
-    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         MenuItem item = menu.findItem(R.id.action_block);
-
-        User current = userViewModel.getCurrentUser();
-        boolean canBlockUser = localRoleViewModel.hasPrivilegedRole() && !current.equals(guest.getUser());
-
-        item.setVisible(canBlockUser);
+        item.setVisible(gofer.canBlockUser());
     }
 
     @Override
@@ -103,6 +90,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        requireActivity().invalidateOptionsMenu();
         setToolbarTitle(getString(R.string.event_guest));
     }
 

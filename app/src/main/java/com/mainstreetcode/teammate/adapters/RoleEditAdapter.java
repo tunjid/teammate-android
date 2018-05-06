@@ -38,7 +38,7 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
             case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canChangeRole);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canChangeRolePosition);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -60,6 +60,6 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     }
 
     public interface RoleEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
-        boolean canChangeRole();
+        boolean canChangeRolePosition();
     }
 }

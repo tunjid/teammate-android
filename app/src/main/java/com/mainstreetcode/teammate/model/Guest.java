@@ -25,6 +25,7 @@ import java.util.List;
 public class Guest extends GuestEntity
         implements
         UserHost,
+        TeamHost,
         Model<Guest>,
         HeaderedModel<Guest>,
         ListableModel<Guest> {
@@ -69,6 +70,10 @@ public class Guest extends GuestEntity
         return TextUtils.isEmpty(id);
     }
 
+    @Override
+    public Team getTeam() {
+        return event.getTeam();
+    }
 
     @Override
     public boolean areContentsTheSame(Identifiable other) {

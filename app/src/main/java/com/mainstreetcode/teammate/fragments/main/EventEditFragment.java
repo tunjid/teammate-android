@@ -139,9 +139,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     public void onResume() {
         super.onResume();
-        User user = userViewModel.getCurrentUser();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
-
         eventViewModel.clearNotifications(event);
     }
 
@@ -160,6 +157,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
+        requireActivity().invalidateOptionsMenu();
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
     }
 
@@ -218,7 +216,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void selectTeam() {
-        if (!localRoleViewModel.hasPrivilegedRole()) {
+        if (!gofer.hasPrivilegedRole()) {
             showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));
             return;
         }
@@ -244,7 +242,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public boolean canEditEvent() {
-        return event.isEmpty() || localRoleViewModel.hasPrivilegedRole();
+        return event.isEmpty() || gofer.hasPrivilegedRole();
     }
 
     @Override
@@ -262,16 +260,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     private void rsvpEvent(boolean attending) {
         toggleProgress(true);
         disposables.add(gofer.rsvpEvent(attending).subscribe(this::onModelUpdated, defaultErrorHandler));
-    }
-
-    private void onRoleUpdated() {
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        viewHolder.bind(getHeaderedModel());
-        scrollManager.notifyDataSetChanged();
-        activity.invalidateOptionsMenu();
-        toggleFab(canEditEvent());
     }
 
     private void deleteEvent() {

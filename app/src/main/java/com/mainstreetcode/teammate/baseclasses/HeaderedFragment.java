@@ -92,12 +92,13 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     @Override
     public void onImageClick() {
+        viewHolder.bind(getHeaderedModel());
+
         fromUserPickerAction = true;
         String errorMessage = gofer().getImageClickMessage(this);
 
         if (errorMessage == null) ImageWorkerFragment.requestCrop(this);
         else showSnackbar(errorMessage);
-        //else showSnackbar(getString(R.string.no_permission));
     }
 
     @Override

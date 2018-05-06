@@ -35,15 +35,19 @@ public class RoleGofer extends TeamHostingGofer<Role> {
         this.items = new ArrayList<>(model.asItems());
     }
 
+    public List<Item<Role>> getItems() {
+        return items;
+    }
+
+    public boolean canChangeRolePicture() {
+        return hasPrivilegedRole() || getSignedInUser().equals(model.getUser());
+    }
+
     public String getDropRolePrompt(Fragment fragment) {
         User roleUser = model.getUser();
         return UserRepository.getInstance().getCurrentUser().equals(roleUser)
                 ? fragment.getString(R.string.confirm_user_leave)
                 : fragment.getString(R.string.confirm_user_drop, roleUser.getFirstName());
-    }
-
-    public List<Item<Role>> getItems() {
-        return items;
     }
 
     @Nullable

@@ -19,7 +19,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-public class GuestGofer extends Gofer<Guest> {
+public class GuestGofer extends TeamHostingGofer<Guest> {
 
     private final List<Item<Guest>> items;
     private final Function<Guest, Flowable<Guest>> getFunction;
@@ -36,15 +36,19 @@ public class GuestGofer extends Gofer<Guest> {
         return items;
     }
 
-    @Override
-    public Completable prepare() {
-        return Completable.complete();
-    }
-
     @Nullable
     @Override
     public String getImageClickMessage(Fragment fragment) {
         return fragment.getString(R.string.no_permission);
+    }
+
+    public boolean canBlockUser() {
+        return hasPrivilegedRole() && !getSignedInUser().equals(model.getUser());
+    }
+
+    @Override
+    public Completable prepare() {
+        return Completable.complete();
     }
 
     @Override
