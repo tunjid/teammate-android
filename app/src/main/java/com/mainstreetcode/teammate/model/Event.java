@@ -139,6 +139,7 @@ public class Event extends EventEntity
 
     @SuppressLint("CheckResult")
     public void setPlace(Place place) {
+        locationName = place.getName().toString();
         location = place.getLatLng();
     }
 

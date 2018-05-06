@@ -6,9 +6,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
-import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.TeamDao;
@@ -72,9 +70,7 @@ public class TeamRepository extends ModelRepository<Team> {
     @Override
     public Flowable<Team> get(String id) {
         Maybe<Team> local = teamDao.get(id).subscribeOn(io());
-        Maybe<Team> remote = api.getTeam(id)
-                .doOnSuccess(this::clearStaleTeamMembers)
-                .map(getSaveFunction()).toMaybe();
+        Maybe<Team> remote = api.getTeam(id).map(getSaveFunction()).toMaybe();
 
         return fetchThenGetModel(local, remote);
     }
@@ -84,12 +80,6 @@ public class TeamRepository extends ModelRepository<Team> {
         return api.deleteTeam(team.getId())
                 .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(team, throwable));
-    }
-
-    public Single<User> blockUser(BlockedUser blockedUser) {
-        return api.blockUser(blockedUser.getTeam().getId(), blockedUser)
-                .map(result -> blockedUser.getUser())
-                .doOnSuccess(ignored -> deleteBlockedUser(blockedUser.getUser(), blockedUser.getTeam()));
     }
 
     @Override
@@ -116,19 +106,11 @@ public class TeamRepository extends ModelRepository<Team> {
         preferences.edit().putString(DEFAULT_TEAM, team.getId()).apply();
     }
 
+    @SuppressWarnings("unused")
     private void clearStaleTeamMembers(Team team) {
         // Clear stale join requests and roles because the api version has the latest
         AppDatabase database = AppDatabase.getInstance();
         database.roleDao().deleteByTeam(team.getId());
         database.joinRequestDao().deleteByTeam(team.getId());
-    }
-
-    private void deleteBlockedUser(User user, Team team) {
-        String userId = user.getId();
-        String teamId = team.getId();
-        AppDatabase database = AppDatabase.getInstance();
-        database.roleDao().deleteUsers(userId, teamId);
-        database.guestDao().deleteUsers(userId, teamId);
-        database.joinRequestDao().deleteUsers(userId, teamId);
     }
 }

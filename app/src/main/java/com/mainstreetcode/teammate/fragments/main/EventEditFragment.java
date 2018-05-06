@@ -144,8 +144,11 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode != RESULT_OK) return;
+        boolean failed = resultCode != RESULT_OK;
+        boolean isFromPlacePicker = requestCode == PLACE_PICKER_REQUEST;
+
+        if (failed && isFromPlacePicker) gofer.setSettingLocation(false);
+        if (failed || !isFromPlacePicker) return;
 
         Place place = PlacePicker.getPlace(requireContext(), data);
         disposables.add(gofer.setPlace(place).subscribe(this::onModelUpdated, emptyErrorHandler));
@@ -175,6 +178,15 @@ public class EventEditFragment extends HeaderedFragment<Event>
     protected Gofer<Event> gofer() {return gofer;}
 
     @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        toggleProgress(false);
+        scrollManager.onDiff(result);
+        viewHolder.bind(getHeaderedModel());
+        Activity activity;
+        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
+    }
+
+    @Override
     protected void onPrepComplete() {
         scrollManager.notifyDataSetChanged();
         requireActivity().invalidateOptionsMenu();
@@ -182,12 +194,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     @Override
-    protected void onModelUpdated(DiffUtil.DiffResult result) {
-        toggleProgress(false);
-        scrollManager.onDiff(result);
-        viewHolder.bind(getHeaderedModel());
-        Activity activity;
-        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
+    protected boolean canGetModel() {
+        return super.canGetModel() && !gofer.isSettingLocation();
     }
 
     @Override
@@ -252,12 +260,10 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void onLocationClicked() {
+        gofer.setSettingLocation(true);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        try {startActivityForResult(builder.build(activity), PLACE_PICKER_REQUEST);}
+        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 

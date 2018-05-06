@@ -30,6 +30,7 @@ import io.reactivex.functions.Function;
 
 public class EventGofer extends TeamHostingGofer<Event> {
 
+    private boolean isSettingLocation;
     private final List<Identifiable> items;
     private final Function<Event, Flowable<Event>> getFunction;
     private final Function<Event, Single<Event>> deleteFunction;
@@ -54,6 +55,14 @@ public class EventGofer extends TeamHostingGofer<Event> {
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
+    public void setSettingLocation(boolean settingLocation) {
+        isSettingLocation = settingLocation;
+    }
+
+    public boolean isSettingLocation() {
+        return isSettingLocation;
+    }
+
     public List<Identifiable> getItems() {
         return items;
     }
@@ -67,6 +76,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
 
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
+        if (isSettingLocation) return Flowable.empty();
         Flowable<List<Identifiable>> eventFlowable = Flowable.defer(() -> getFunction.apply(model)).map(Event::asIdentifiables);
         Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
         Flowable<List<Identifiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, guestsFlowable);
@@ -104,8 +114,9 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     public Single<DiffUtil.DiffResult> setPlace(Place place) {
+        isSettingLocation = true;
         model.setPlace(place);
-        return Identifiable.diff(Single.just(model.asIdentifiables()), this::getItems, this::preserveItems);
+        return Identifiable.diff(Single.just(model.asIdentifiables()), this::getItems, this::preserveItems).doFinally(() -> isSettingLocation = false);
     }
 
     private List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {

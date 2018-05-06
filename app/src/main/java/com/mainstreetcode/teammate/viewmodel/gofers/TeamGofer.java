@@ -26,6 +26,7 @@ public class TeamGofer extends TeamHostingGofer<Team> {
     private static final int EDITING = 1;
 
     private int state;
+    private boolean isSettingAddress;
     private final List<Item<Team>> items;
     private final Function<Team, Flowable<Team>> getFunction;
     private final Function<Team, Single<Team>> deleteFunction;
@@ -44,6 +45,14 @@ public class TeamGofer extends TeamHostingGofer<Team> {
         state = model.isEmpty() ? CREATING : EDITING;
     }
 
+    public void setSettingAddress(boolean settingAddress) {
+        isSettingAddress = settingAddress;
+    }
+
+    public boolean isSettingAddress() {
+        return isSettingAddress;
+    }
+
     public List<Item<Team>> getItems() {
         return items;
     }
@@ -52,24 +61,26 @@ public class TeamGofer extends TeamHostingGofer<Team> {
         return state == CREATING || hasPrivilegedRole();
     }
 
-   public Completable delete() {
+    public Completable delete() {
         return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
     }
 
-     Flowable<DiffUtil.DiffResult> fetch() {
+    Flowable<DiffUtil.DiffResult> fetch() {
+        if (isSettingAddress) return Flowable.empty();
         Flowable<List<Item<Team>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Team::asItems);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
-     Single<DiffUtil.DiffResult> upsert() {
+    Single<DiffUtil.DiffResult> upsert() {
         Single<List<Item<Team>>> source = Single.defer(() -> upsertFunction.apply(model)).map(Team::asItems);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
     }
 
     public Single<DiffUtil.DiffResult> setAddress(Address address) {
+        isSettingAddress = true;
         model.setAddress(address);
         Single<List<Item<Team>>> source = Single.just(model.<List<Item<Team>>>asItems());
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doFinally(() -> isSettingAddress = false);
     }
 
     @Nullable

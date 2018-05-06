@@ -115,8 +115,6 @@ public class Item<T> implements Identifiable, Comparable<Item> {
 
     public int getStringRes() {return this.stringRes;}
 
-    public CharSequence getRawValue() {return value;}
-
     public CharSequence getValue() {return textTransformer == null ? value : textTransformer.apply(value);}
 
     @Override
@@ -128,7 +126,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     @Override
     public boolean areContentsTheSame(Identifiable other) {
         if (other instanceof Item) return value.equals(((Item) other).value);
-        return id.equals(other.getId());
+        return value.equals(other.getId());
     }
 
     @Override
@@ -148,7 +146,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
 
         Item<?> item = (Item<?>) o;
 
-        return value != null ? value.equals(item.value) : item.value == null;
+        return id != null ? id.equals(item.id) : item.id == null;
     }
 
     @Override
