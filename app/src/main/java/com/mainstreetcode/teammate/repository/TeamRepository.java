@@ -55,8 +55,7 @@ public class TeamRepository extends ModelRepository<Team> {
     public Single<Team> createOrUpdate(Team model) {
         Single<Team> teamSingle = model.isEmpty()
                 ? api.createTeam(model).map(getLocalUpdateFunction(model))
-                : api.updateTeam(model.getId(), model)
-                .map(getLocalUpdateFunction(model))
+                : api.updateTeam(model.getId(), model).map(getLocalUpdateFunction(model))
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), Team.PHOTO_UPLOAD_KEY);

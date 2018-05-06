@@ -4,6 +4,7 @@ import android.support.text.emoji.EmojiCompat;
 
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
@@ -19,7 +20,7 @@ public class Sport extends MetaData {
     }
 
     public static Sport empty() {
-        return new Sport("", "", THONK);
+        return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
     }
 
     public CharSequence appendEmoji(String text) {

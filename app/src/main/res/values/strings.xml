@@ -95,6 +95,7 @@
     <string name="team_description">Description</string>
     <string name="team_min_age">Minimum Age</string>
     <string name="team_max_age">Maximum Age</string>
+    <string name="any_sport">any sport</string>
 
     <!--TeamsFragment-->
     <string name="pick_team">Pick a Team</string>
