@@ -171,6 +171,7 @@
     <string name="blocked_users">Blocked Users</string>
     <string name="blocked_users_title">Blocked Users for %1$s</string>
     <string name="unblocked_user">Unblocked %1$s</string>
+    <string name="no_blocked_users">No people have been blocked.</string>
 
     <!--PublicEventFragment-->
     <string name="event_public_search">Search Options</string>

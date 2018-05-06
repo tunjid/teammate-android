@@ -74,7 +74,7 @@ public final class BlockedUsersFragment extends MainActivityFragment
         Runnable refreshAction = () -> disposables.add(blockedUserViewModel.refresh(team).subscribe(BlockedUsersFragment.this::onBlockedUsersUpdated, defaultErrorHandler));
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_black_24dp, R.string.no_events))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchBlockedUsers(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
