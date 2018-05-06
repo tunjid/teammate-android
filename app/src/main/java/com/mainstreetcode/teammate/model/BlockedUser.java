@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @SuppressLint("ParcelCreator")
 public class BlockedUser implements UserHost,
@@ -116,6 +117,20 @@ public class BlockedUser implements UserHost,
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BlockedUser)) return false;
+        BlockedUser that = (BlockedUser) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id);
+    }
+
+    @Override
     public int compareTo(@NonNull BlockedUser o) {
         return 0;
     }
@@ -134,6 +149,7 @@ public class BlockedUser implements UserHost,
         public JsonElement serialize(BlockedUser src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
+            if (!src.isEmpty()) serialized.addProperty(UID_KEY, src.getId());
             serialized.addProperty(REASON_KEY, src.reason.getCode());
             serialized.addProperty(USER_KEY, src.user.getId());
             serialized.addProperty(TEAM_KEY, src.team.getId());

@@ -66,6 +66,7 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        setFabClickListener(this);
         setFabIcon(R.drawable.ic_unlock_white);
         setToolbarTitle(getString(R.string.blocked_user));
     }
