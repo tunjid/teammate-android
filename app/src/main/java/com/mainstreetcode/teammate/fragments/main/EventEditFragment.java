@@ -247,7 +247,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void onLocationClicked() {
-        fromUserPickerAction = true;
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
         Activity activity;

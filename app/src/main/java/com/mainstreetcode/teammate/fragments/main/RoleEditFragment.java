@@ -113,7 +113,9 @@ public class RoleEditFragment extends HeaderedFragment<Role>
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
+        viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
+        toggleProgress(false);
     }
 
     @Override

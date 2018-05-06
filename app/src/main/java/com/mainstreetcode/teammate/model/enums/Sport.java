@@ -31,7 +31,10 @@ public class Sport extends MetaData {
 
     public CharSequence getName() { return appendEmoji(name); }
 
-    public CharSequence getEmoji() { return EmojiCompat.get().process(emoji); }
+    public CharSequence getEmoji() {
+        EmojiCompat emojiCompat = EmojiCompat.get();
+        return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(emoji) : emoji;
+    }
 
     public void reset() {
         super.reset();
