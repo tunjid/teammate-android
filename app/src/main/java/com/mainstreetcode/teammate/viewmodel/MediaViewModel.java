@@ -59,7 +59,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
 
         Flowable<List<Identifiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete) : repository.ownerDelete(toDelete))
-                .toFlowable().map(toIdentifiable);
+                .toFlowable().map(this::toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> source, (sourceCopy, deleted) -> {
             partialDelete.set(deleted.size() != toDelete.size());

@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
@@ -59,7 +60,7 @@ public class MainActivity extends TeammatesBaseActivity
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
-            if (!isInMainFragmentContainer(v)) return;
+            if (isNotInMainFragmentContainer(v)) return;
 
             Menu menu = bottomNavigationView.getMenu();
             String t = f.getTag();
@@ -112,6 +113,8 @@ public class MainActivity extends TeammatesBaseActivity
             }
         });
         route(savedInstanceState, getIntent());
+
+        App.prime();
     }
 
     @Override
@@ -126,7 +129,9 @@ public class MainActivity extends TeammatesBaseActivity
                 })
                 .addEndRunnable(() -> {
                     TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
-                    if (view != null && view.showsBottomNav()) initTransition();
+                    if (view == null || !view.showsBottomNav()) return;
+                    bottomBar.setVisibility(View.VISIBLE);
+                    initTransition();
                 })
                 .build();
     }

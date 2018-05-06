@@ -1,19 +1,23 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.ClickInputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.RoleSelectViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -22,25 +26,26 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
+    private final List<Item<Team>> items;
 
-    private final Team team;
-    private final List<String> roles;
-
-    public TeamEditAdapter(Team team, List<String> roles, TeamEditAdapter.TeamEditAdapterListener listener) {
+    public TeamEditAdapter(List<Item<Team>> items, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
-        this.team = team;
-        this.roles = roles;
+        this.items = items;
     }
 
+    @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> false);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.INPUT:
+            case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
-            case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, adapterListener::isJoiningTeam);
+            case Item.DESCRIPTION:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, FALSE);
+            case Item.SPORT:
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::isPrivileged, FALSE);
             case Item.CITY:
             case Item.STATE:
                 return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, adapterListener::onAddressClicked);
@@ -52,24 +57,22 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     }
 
     @Override
-    public void onBindViewHolder(BaseItemViewHolder baseTeamViewHolder, int i) {
-        baseTeamViewHolder.bind(team.get(i));
+    public void onBindViewHolder(@NonNull BaseItemViewHolder baseTeamViewHolder, int i) {
+        baseTeamViewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return adapterListener.isJoiningTeam() ? team.size() : team.size() - 1;
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return team.get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
         void onAddressClicked();
-
-        boolean isJoiningTeam();
 
         boolean isPrivileged();
     }

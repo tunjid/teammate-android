@@ -41,7 +41,7 @@ import static com.mainstreetcode.teammate.socket.SocketFactory.EVENT_NEW_MESSAGE
 import static io.reactivex.schedulers.Schedulers.io;
 import static io.socket.client.Socket.EVENT_ERROR;
 
-public class ChatRepository extends QueryRepository<Chat> {
+public class ChatRepository extends TeamQueryRepository<Chat> {
 
 
     private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";
@@ -109,8 +109,8 @@ public class ChatRepository extends QueryRepository<Chat> {
                 teams.add(chat.getTeam());
             }
 
-            userModelRepository.getSaveManyFunction().apply(users);
-            teamModelRepository.getSaveManyFunction().apply(teams);
+            userModelRepository.saveAsNested().apply(users);
+            teamModelRepository.saveAsNested().apply(teams);
 
             chatDao.upsert(chats);
             return chats;

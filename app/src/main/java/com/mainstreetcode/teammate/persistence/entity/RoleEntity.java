@@ -10,8 +10,12 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Position;
+
+import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -26,26 +30,30 @@ public class RoleEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "role_id") protected String id;
-    @ColumnInfo(name = "role_name") protected String name;
     @ColumnInfo(name = "role_image_url") protected String imageUrl;
-
+    @ColumnInfo(name = "role_nickname") protected String nickname;
+    @ColumnInfo(name = "role_name") protected Position position;
     @ColumnInfo(name = "role_team") protected Team team;
     @ColumnInfo(name = "role_user") protected User user;
+    @ColumnInfo(name = "role_created") protected Date created;
 
-    public RoleEntity(@NonNull String id, String name, String imageUrl, Team team, User user) {
+    public RoleEntity(@NonNull String id, String imageUrl, String nickname, Position position, Team team, User user, Date created) {
         this.id = id;
-        this.name = name;
         this.imageUrl = imageUrl;
+        this.nickname = nickname;
+        this.position = position;
         this.team = team;
         this.user = user;
+        this.created = created;
     }
 
     protected RoleEntity(Parcel in) {
         id = in.readString();
-        name = in.readString();
         imageUrl = in.readString();
+        position = Config.positionFromCode(in.readString());
         team = (Team) in.readValue(Team.class.getClassLoader());
         user = (User) in.readValue(User.class.getClassLoader());
+        created = new Date(in.readLong());
     }
 
     @NonNull
@@ -53,8 +61,12 @@ public class RoleEntity implements Parcelable {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public Position getPosition() {
+        return position;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     public String getImageUrl() {
@@ -69,8 +81,16 @@ public class RoleEntity implements Parcelable {
         return user;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setPosition(String position) {
+        this.position = Config.positionFromCode(position);
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     protected void setImageUrl(String imageUrl) {
@@ -100,10 +120,11 @@ public class RoleEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(name);
         dest.writeString(imageUrl);
+        dest.writeString(position.getCode());
         dest.writeValue(team);
         dest.writeValue(user);
+        dest.writeValue(created.getTime());
     }
 
     public static final Creator<RoleEntity> CREATOR = new Creator<RoleEntity>() {

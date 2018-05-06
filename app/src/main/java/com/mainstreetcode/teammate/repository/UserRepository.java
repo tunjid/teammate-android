@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -111,7 +112,7 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
-        User newUser = new User("", firstName, lastName, primaryEmail, "");
+        User newUser = new User("", firstName, lastName, primaryEmail, "", "");
         newUser.setPassword(password);
 
         return createOrUpdate(newUser);
@@ -201,6 +202,7 @@ public class UserRepository extends ModelRepository<User> {
     /**
      * Used to update changes to the current signed in user
      */
+    @SuppressLint("CheckResult")
     private Single<User> updateCurrent(Single<User> source) {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe

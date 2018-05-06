@@ -39,7 +39,7 @@ public abstract class EventDao extends EntityDao<EventEntity> {
     public abstract Maybe<Event> get(String id);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<EventEntity> teams);
+    public abstract void insert(List<EventEntity> teams);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<EventEntity> teams);

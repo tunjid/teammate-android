@@ -6,8 +6,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
-import com.mainstreetcode.teammate.model.JoinRequest;
-import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
@@ -16,7 +15,6 @@ import com.mainstreetcode.teammate.persistence.TeamDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,17 +36,11 @@ public class TeamRepository extends ModelRepository<Team> {
     private final App app;
     private final TeammateApi api;
     private final TeamDao teamDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Role> roleRepository;
-    private final ModelRepository<JoinRequest> joinRequestRepository;
 
     private TeamRepository() {
         app = App.getInstance();
         api = TeammateService.getApiInstance();
         teamDao = AppDatabase.getInstance().teamDao();
-        userRepository = UserRepository.getInstance();
-        roleRepository = RoleRepository.getInstance();
-        joinRequestRepository = JoinRequestRepository.getInstance();
     }
 
     public static TeamRepository getInstance() {
@@ -79,7 +71,7 @@ public class TeamRepository extends ModelRepository<Team> {
 
     @Override
     public Flowable<Team> get(String id) {
-        Maybe<Team> local = teamDao.get(id).map(Team::updateDelayedModels).subscribeOn(io());
+        Maybe<Team> local = teamDao.get(id).subscribeOn(io());
         Maybe<Team> remote = api.getTeam(id)
                 .doOnSuccess(this::clearStaleTeamMembers)
                 .map(getSaveFunction()).toMaybe();
@@ -94,30 +86,16 @@ public class TeamRepository extends ModelRepository<Team> {
                 .doOnError(throwable -> deleteInvalidModel(team, throwable));
     }
 
+    public Single<User> blockUser(BlockedUser blockedUser) {
+        return api.blockUser(blockedUser.getTeam().getId(), blockedUser)
+                .map(result -> blockedUser.getUser())
+                .doOnSuccess(ignored -> deleteBlockedUser(blockedUser.getUser(), blockedUser.getTeam()));
+    }
+
     @Override
     Function<List<Team>, List<Team>> provideSaveManyFunction() {
         return models -> {
-            List<User> users = new ArrayList<>();
-            List<Role> roles = new ArrayList<>();
-            List<JoinRequest> requests = new ArrayList<>();
-
-            for (Team team : models) {
-                List<Role> teamRoles = team.getRoles();
-                List<JoinRequest> teamRequests = team.getJoinRequests();
-
-                roles.addAll(teamRoles);
-                requests.addAll(teamRequests);
-
-                for (Role role : teamRoles) users.add(role.getUser());
-                for (JoinRequest request : teamRequests) users.add(request.getUser());
-            }
-
             teamDao.upsert(Collections.unmodifiableList(models));
-
-            if (!users.isEmpty()) userRepository.getSaveManyFunction().apply(users);
-            if (!roles.isEmpty()) roleRepository.getSaveManyFunction().apply(roles);
-            if (!requests.isEmpty()) joinRequestRepository.getSaveManyFunction().apply(requests);
-
             return models;
         };
     }
@@ -143,5 +121,14 @@ public class TeamRepository extends ModelRepository<Team> {
         AppDatabase database = AppDatabase.getInstance();
         database.roleDao().deleteByTeam(team.getId());
         database.joinRequestDao().deleteByTeam(team.getId());
+    }
+
+    private void deleteBlockedUser(User user, Team team) {
+        String userId = user.getId();
+        String teamId = team.getId();
+        AppDatabase database = AppDatabase.getInstance();
+        database.roleDao().deleteUsers(userId, teamId);
+        database.guestDao().deleteUsers(userId, teamId);
+        database.joinRequestDao().deleteUsers(userId, teamId);
     }
 }

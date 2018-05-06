@@ -128,7 +128,7 @@ public class MediaFragment extends MainActivityFragment
         setFabClickListener(this);
     }
 
-    void fetchMedia(boolean fetchLatest) {
+    private void fetchMedia(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 

@@ -34,6 +34,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected static final boolean[] DEFAULT = {true, false, true, false};
     protected static final boolean[] VERTICAL = {true, true, true, false};
     protected static final boolean[] NONE = {false, true, false, false};
+    protected static final int PLACE_PICKER_REQUEST = 1;
 
     protected static final Validator VALIDATOR = new Validator();
 

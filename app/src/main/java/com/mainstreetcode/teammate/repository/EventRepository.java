@@ -12,7 +12,6 @@ import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +24,7 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends QueryRepository<Event> {
+public class EventRepository extends TeamQueryRepository<Event> {
 
     private static EventRepository ourInstance;
 
@@ -91,28 +90,16 @@ public class EventRepository extends QueryRepository<Event> {
         return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
-    public Single<Event> rsvpEvent(final Event event, boolean attending) {
-        return api.rsvpEvent(event.getId(), attending)
-                .map(getLocalUpdateFunction(event))
-                .map(getSaveFunction());
-    }
-
     @Override
     Function<List<Event>, List<Event>> provideSaveManyFunction() {
         return models -> {
             List<Team> teams = new ArrayList<>(models.size());
             for (Event event : models) teams.add(event.getTeam());
 
-            teamRepository.getSaveManyFunction().apply(teams);
+            teamRepository.saveAsNested().apply(teams);
             eventDao.upsert(Collections.unmodifiableList(models));
 
             return models;
         };
-    }
-
-    private Date getFutureDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 100);
-        return calendar.getTime();
     }
 }

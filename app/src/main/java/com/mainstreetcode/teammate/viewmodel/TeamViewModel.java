@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.support.v7.util.DiffUtil;
+import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
@@ -9,8 +9,9 @@ import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.TransformingSequentialList;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,7 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
@@ -38,6 +38,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     private final TeamRepository repository;
     private AtomicReference<PublishProcessor<String>> searchRef;
 
+    @SuppressLint("CheckResult")
     public TeamViewModel() {
         searchRef = new AtomicReference<>();
         repository = TeamRepository.getInstance();
@@ -54,18 +55,20 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return Flowable.empty();
     }
 
-    public Single<DiffUtil.DiffResult> createOrUpdate(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(team).toFlowable(), Team.class, team)
-                .observeOn(mainThread()).cast(Team.class).map(teamListFunction);
-
-        return Identifiable.diff(sourceFlowable, () -> teamListFunction.apply(team), (old, updated) -> updated).firstOrError();
+    public TeamGofer gofer(Team team) {
+        return new TeamGofer(team, throwable -> checkForInvalidObject(throwable, team, Team.class), this::getTeam, this::createOrUpdate, this::deleteTeam);
     }
 
-    public Flowable<DiffUtil.DiffResult> getTeam(Team team) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(team), Team.class, team)
-                .observeOn(mainThread()).cast(Team.class).map(teamListFunction);
+    private Flowable<Team> getTeam(Team team) {
+        return repository.get(team);
+    }
 
-        return Identifiable.diff(sourceFlowable, () -> teamListFunction.apply(team), (old, updated) -> updated);
+    private Single<Team> createOrUpdate(Team team) {
+        return repository.createOrUpdate(team);
+    }
+
+    public Single<Team> deleteTeam(Team team) {
+        return repository.delete(team).doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)));
     }
 
     public Flowable<List<Team>> findTeams() {
@@ -75,15 +78,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
                 .distinctUntilChanged()
                 .switchMap(query -> repository.findTeams(query).toFlowable())
                 .doFinally(() -> searchRef.set(null))
-                .observeOn(mainThread());
-    }
-
-    public Single<Team> deleteTeam(Team team) {
-        return checkForInvalidObject(repository.delete(team).toFlowable(), Team.class, team).observeOn(mainThread())
-                .firstOrError()
-                .cast(Team.class)
-                .map(TeamViewModel::onTeamDeleted)
-                .doOnSuccess(getModelList(Team.class)::remove)
                 .observeOn(mainThread());
     }
 
@@ -104,17 +98,18 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Team getDefaultTeam() {return defaultTeam;}
 
-    static Team onTeamDeleted(Team deleted) {
+    @Override
+    @SuppressLint("CheckResult")
+    void onModelAlert(Alert alert) {
+        if (!(alert instanceof Alert.TeamDeletion)) return;
+        Team deleted = ((Alert.TeamDeletion) alert).getModel();
+
         teams.remove(deleted);
         if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
-        Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
-                .delete(deleted)).subscribeOn(Schedulers.io()).subscribe(() -> {}, ErrorHandler.EMPTY);
-        return deleted;
-    }
 
-    private Function<Team, List<Identifiable>> teamListFunction = team -> {
-        List<Identifiable> items = new ArrayList<>();
-        for (int i = 0; i < team.size(); i++) items.add(team.get(i));
-        return items;
-    };
+        Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
+                .delete(deleted))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> {}, ErrorHandler.EMPTY);
+    }
 }

@@ -35,6 +35,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         foreignKeys = @ForeignKey(entity = TeamEntity.class, parentColumns = "team_id", childColumns = "team_chat_team", onDelete = CASCADE)
 )
 public class Chat implements
+        TeamHost,
         Parcelable,
         Model<Chat> {
 
@@ -105,16 +106,6 @@ public class Chat implements
     @Override
     public String getImageUrl() {
         return user == null ? null : user.getImageUrl();
-    }
-
-    @Override
-    public void reset() {
-        kind = "";
-        content = "";
-        created = new Date();
-        user.reset();
-        team.reset();
-        setSuccessful(true);
     }
 
     @Override

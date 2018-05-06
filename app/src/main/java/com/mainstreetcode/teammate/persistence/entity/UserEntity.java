@@ -18,13 +18,15 @@ public class UserEntity implements Parcelable {
     @ColumnInfo(name = "user_first_name") protected String firstName;
     @ColumnInfo(name = "user_last_name") protected String lastName;
     @ColumnInfo(name = "user_primary_email") protected String primaryEmail;
+    @ColumnInfo(name = "user_about") protected String about;
     @ColumnInfo(name = "user_image_url") protected String imageUrl;
 
-    public UserEntity(@NonNull String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
+    public UserEntity(@NonNull String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.imageUrl = imageUrl;
+        this.about = about;
         this.primaryEmail = primaryEmail;
     }
 
@@ -60,6 +62,10 @@ public class UserEntity implements Parcelable {
         return imageUrl;
     }
 
+    public String getAbout() {
+        return about;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -72,6 +78,11 @@ public class UserEntity implements Parcelable {
         this.primaryEmail = primaryEmail;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
@@ -81,6 +92,7 @@ public class UserEntity implements Parcelable {
         firstName = in.readString();
         lastName = in.readString();
         primaryEmail = in.readString();
+        about = in.readString();
         imageUrl = in.readString();
     }
 
@@ -95,6 +107,7 @@ public class UserEntity implements Parcelable {
         dest.writeString(firstName);
         dest.writeString(lastName);
         dest.writeString(primaryEmail);
+        dest.writeString(about);
         dest.writeString(imageUrl);
     }
 

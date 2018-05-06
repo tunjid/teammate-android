@@ -1,11 +1,11 @@
 package com.mainstreetcode.teammate.model;
 
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Relation;
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
@@ -17,18 +17,16 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
-import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.deserializeList;
+import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 
 /**
  * Teams
@@ -36,91 +34,69 @@ import static com.mainstreetcode.teammate.util.ModelUtils.deserializeList;
 
 public class Team extends TeamEntity
         implements
+        TeamHost,
         Model<Team>,
         HeaderedModel<Team>,
-        ItemListableBean<Team> {
+        ListableModel<Team> {
 
-    private static final int CITY_POSITION = 1;
-    private static final int STATE_POSITION = 2;
-    public static final int ZIP_POSITION = 3;
-    public static final int ROLE_POSITION = 5;
+    private static final int CITY_POSITION = 2;
+    private static final int STATE_POSITION = 3;
+    private static final int ZIP_POSITION = 4;
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
-    // Room fetches roles after setRoles is called. Since the reference of roles can't be changed,
-    // store the delayed roles here and update after Room is done.
-    @Ignore private List<Role> delayedRoles = new ArrayList<>();
-    @Ignore private List<JoinRequest> delayedRequests = new ArrayList<>();
-
-    @Relation(parentColumn = "team_id", entityColumn = "role_team", entity = RoleEntity.class)
-    private List<Role> roles = new ArrayList<>();
-
-    @Relation(parentColumn = "team_id", entityColumn = "join_request_team", entity = JoinRequestEntity.class)
-    private List<JoinRequest> joinRequests = new ArrayList<>();
-
     @Ignore private final List<Item<Team>> items;
 
-    public Team(String id, String name, String city, String state, String zip, String imageUrl,
-                Date created, LatLng location, long storageUsed, long maxStorage) {
-        super(id, name, city, state, zip, imageUrl, created, location, storageUsed, maxStorage);
-
+    public Team(@NonNull String id, String name, String city, String state, String zip,
+                String description, String imageUrl,
+                Date created, LatLng location, Sport sport,
+                long storageUsed, long maxStorage, int minAge, int maxAge) {
+        super(id, name, city, state, zip, description, imageUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         items = buildItems();
     }
 
     private Team(Parcel in) {
         super(in);
-        in.readList(roles, Role.class.getClassLoader());
-        in.readList(joinRequests, JoinRequest.class.getClassLoader());
         items = buildItems();
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, 0, 0);
+        return new Team(NEW_TEAM, "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
-    public static Team updateDelayedModels(Team team) {
-        team.roles.clear();
-        team.roles.addAll(team.delayedRoles);
-        team.joinRequests.clear();
-        team.joinRequests.addAll(team.delayedRequests);
-        return team;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<Team>> buildItems() {
+    private List<Item<Team>> buildItems() {
         return Arrays.asList(
-                new Item(Item.INPUT, R.string.team_name, R.string.team_info, name == null ? "" : name, this::setName, this),
-                new Item(Item.CITY, R.string.city, city == null ? "" : city, this::setCity, this),
-                new Item(Item.STATE, R.string.state, state == null ? "" : state, this::setState, this),
-                new Item(Item.ZIP, R.string.zip, zip == null ? "" : zip, this::setZip, this),
-                new Item(Item.INFO, R.string.team_storage_used, storageUsed + "/" + maxStorage + " MB", null, this),
-                new Item(Item.ROLE, R.string.team_role, R.string.team_role, "", null, this)
+                Item.text(0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
+                Item.text(1, Item.SPORT, R.string.team_sport, sport::getCode, this::setSport, this)
+                        .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
+                Item.text(CITY_POSITION, Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
+                Item.text(STATE_POSITION, Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
+                Item.text(ZIP_POSITION, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
+                Item.text(5, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
+                Item.number(6, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
+                Item.number(7, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
+                Item.text(8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<Team>> asItems() { return items; }
 
     @Override
     public Item<Team> getHeaderItem() {
-        return new Item<>(Item.IMAGE, R.string.team_logo, imageUrl, this::setImageUrl, this);
+        return Item.text(0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Team)) return id.equals(other.getId());
         Team casted = (Team) other;
-        return name.equals(casted.name) && city.equals(casted.getCity())
+        boolean same = name.equals(casted.name) && city.equals(casted.getCity())
                 && imageUrl.equals(casted.getImageUrl());
+
+        return same && (sport == null || sport.equals(casted.sport));
     }
 
     @Override
@@ -134,18 +110,8 @@ public class Team extends TeamEntity
     }
 
     @Override
-    public void reset() {
-        name = "";
-        city = "";
-        state = "";
-        zip = "";
-        imageUrl = "";
-
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue("");
-
-        roles.clear();
-        joinRequests.clear();
+    public Team getTeam() {
+        return this;
     }
 
     @Override
@@ -154,13 +120,10 @@ public class Team extends TeamEntity
         this.imageUrl = updatedTeam.imageUrl;
         this.storageUsed = updatedTeam.storageUsed;
 
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedTeam.get(i).getValue());
-
         location = updatedTeam.location;
+        sport.update(updatedTeam.sport);
 
-        ModelUtils.preserveAscending(roles, updatedTeam.roles);
-        ModelUtils.preserveAscending(joinRequests, updatedTeam.joinRequests);
+        updateItemList(updatedTeam);
     }
 
     @Override
@@ -169,20 +132,9 @@ public class Team extends TeamEntity
         return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
     }
 
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public List<JoinRequest> getJoinRequests() {
-        return joinRequests;
-    }
-
-    public void setRoles(List<Role> roles) {
-        delayedRoles = roles;
-    }
-
-    public void setJoinRequests(List<JoinRequest> requests) {
-        delayedRequests = requests;
+    @Override
+    public boolean hasMajorFields() {
+        return areNotEmpty(id, name, city, state);
     }
 
     public void setAddress(Address address) {
@@ -196,13 +148,6 @@ public class Team extends TeamEntity
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeList(roles);
-        dest.writeList(joinRequests);
     }
 
     public static final Parcelable.Creator<Team> CREATOR = new Parcelable.Creator<Team>() {
@@ -228,18 +173,20 @@ public class Team extends TeamEntity
         private static final String CITY_KEY = "city";
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
+        private static final String SPORT_KEY = "sport";
+        private static final String DESCRIPTION_KEY = "description";
         private static final String LOGO_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
-        private static final String ROLES_KEY = "roles";
         private static final String LOCATION_KEY = "location";
-        private static final String JOIN_REQUEST_KEY = "joinRequests";
         private static final String STORAGE_USED_KEY = "storageUsed";
         private static final String MAX_STORAGE_KEY = "maxStorage";
+        private static final String MIN_AGE_KEY = "minAge";
+        private static final String MAX_AGE_KEY = "maxAge";
 
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Team(json.getAsString(), "", "", "", "", "", new Date(), new LatLng(0, 0), 0, 0);
+                return new Team(json.getAsString(), "", "", "", "", "", "", new Date(), new LatLng(0, 0), Sport.empty(), 0, 0, 0, 0);
             }
 
             JsonObject teamJson = json.getAsJsonObject();
@@ -249,22 +196,18 @@ public class Team extends TeamEntity
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
+            String sportCode = ModelUtils.asString(SPORT_KEY, teamJson);
+            String description = ModelUtils.asString(DESCRIPTION_KEY, teamJson);
             String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
+            Sport sport = Config.sportFromCode(sportCode);
             long storageUsed = (long) ModelUtils.asFloat(STORAGE_USED_KEY, teamJson);
             long maxStorage = (long) ModelUtils.asFloat(MAX_STORAGE_KEY, teamJson);
+            int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
+            int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            Team team = new Team(id, name, city, state, zip, logoUrl, created, location, storageUsed, maxStorage);
-
-            if (teamJson.has(ROLES_KEY)) {
-                deserializeList(context, teamJson.get(ROLES_KEY), team.roles, Role.class);
-            }
-            if (teamJson.has(JOIN_REQUEST_KEY)) {
-                deserializeList(context, teamJson.get(JOIN_REQUEST_KEY), team.joinRequests, JoinRequest.class);
-            }
-
-            return team;
+            return new Team(id, name, city, state, zip, description, logoUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         }
 
         @Override
@@ -274,6 +217,12 @@ public class Team extends TeamEntity
             team.addProperty(CITY_KEY, src.city);
             team.addProperty(STATE_KEY, src.state);
             team.addProperty(ZIP_KEY, src.zip);
+            team.addProperty(DESCRIPTION_KEY, src.description);
+            team.addProperty(MIN_AGE_KEY, src.minAge);
+            team.addProperty(MAX_AGE_KEY, src.maxAge);
+
+            String sportCode = src.sport != null ? src.sport.getCode() : "";
+            if (!TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);
 
             if (src.location != null) {
                 JsonArray coordinates = new JsonArray();

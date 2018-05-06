@@ -137,9 +137,9 @@ public class ScrollManager {
         Adapter adapter;
         LayoutManager layoutManager;
 
-        Consumer<LayoutManager> layoutManagerConsumer;
-        Consumer<IndexOutOfBoundsException> handler;
-        List<Consumer<Integer>> stateConsumers = new ArrayList<>();
+        ModelUtils.Consumer<LayoutManager> layoutManagerConsumer;
+        ModelUtils.Consumer<IndexOutOfBoundsException> handler;
+        List<ModelUtils.Consumer<Integer>> stateConsumers = new ArrayList<>();
         List<BiConsumer<Integer, Integer>> displacementConsumers = new ArrayList<>();
 
         private Builder() {}
@@ -149,7 +149,7 @@ public class ScrollManager {
             return this;
         }
 
-        public Builder onLayoutManager(Consumer<LayoutManager> layoutManagerConsumer) {
+        public Builder onLayoutManager(ModelUtils.Consumer<LayoutManager> layoutManagerConsumer) {
             this.layoutManagerConsumer = layoutManagerConsumer;
             return this;
         }
@@ -171,7 +171,7 @@ public class ScrollManager {
             return this;
         }
 
-        public Builder withInconsistencyHandler(Consumer<IndexOutOfBoundsException> handler) {
+        public Builder withInconsistencyHandler(ModelUtils.Consumer<IndexOutOfBoundsException> handler) {
             this.handler = handler;
             return this;
         }
@@ -181,7 +181,7 @@ public class ScrollManager {
             return this;
         }
 
-        public Builder addStateListener(@NonNull Consumer<Integer> stateListener) {
+        public Builder addStateListener(@NonNull ModelUtils.Consumer<Integer> stateListener) {
             this.stateConsumers.add(stateListener);
             return this;
         }
@@ -257,7 +257,7 @@ public class ScrollManager {
 
 
             for (int i = 0; i < max; i++) {
-                final Consumer<Integer> consumer;
+                final ModelUtils.Consumer<Integer> consumer;
                 final BiConsumer<Integer, Integer> biConsumer;
 
                 if (i < stateConsumersSize) consumer = stateConsumers.get(i);
@@ -293,8 +293,4 @@ public class ScrollManager {
         }
     }
 
-    @FunctionalInterface
-    public interface Consumer<T> {
-        void accept(T t);
-    }
 }

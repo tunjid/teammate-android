@@ -20,11 +20,13 @@ public class ClickInputViewHolder extends InputViewHolder
 
     public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction) {
         super(itemView, enabler);
+        editText.removeTextChangedListener(this);
         this.clickAction = clickAction;
     }
 
     public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Supplier<Boolean> errorChecker) {
         super(itemView, enabler, errorChecker);
+        editText.removeTextChangedListener(this);
         this.clickAction = clickAction;
     }
 

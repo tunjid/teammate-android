@@ -48,7 +48,7 @@ public abstract class ChatDao extends EntityDao<Chat> {
     public abstract Maybe<Chat> get(String id);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<Chat> teams);
+    public abstract void insert(List<Chat> teams);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<Chat> teams);

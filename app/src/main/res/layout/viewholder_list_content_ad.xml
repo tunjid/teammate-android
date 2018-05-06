@@ -42,8 +42,7 @@
                 app:layout_constrainedWidth="true"
                 app:layout_constraintLeft_toRightOf="@+id/thumbnail"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_default="wrap" />
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView
                 android:id="@+id/item_subtitle"

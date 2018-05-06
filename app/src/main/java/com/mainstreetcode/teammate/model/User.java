@@ -20,29 +20,21 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 import static com.mainstreetcode.teammate.util.ModelUtils.asString;
-
-/**
- * Users that may be part of a {@link Team}
- * <p>
- * Created by Shemanigans on 6/4/17.
- */
 
 public class User extends UserEntity implements
         Model<User>,
         HeaderedModel<User>,
-        ItemListableBean<User> {
+        ListableModel<User> {
 
-    public static final int EMAIL_POSITION = 2;
     public static final String PHOTO_UPLOAD_KEY = "user-photo";
 
     @Ignore private transient String password;
-
     @Ignore private final List<Item<User>> items;
 
-    public User(String id, String firstName, String lastName, String primaryEmail, String imageUrl) {
-        super(id, firstName, lastName, primaryEmail, imageUrl);
-
+    public User(String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
+        super(id, firstName, lastName, primaryEmail, about, imageUrl);
         items = buildItems();
     }
 
@@ -52,32 +44,25 @@ public class User extends UserEntity implements
     }
 
     public static User empty() {
-        return new User("", "", "", "", Config.getDefaultUserAvatar());
+        return new User("", "", "", "", "", Config.getDefaultUserAvatar());
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Item<User>> buildItems() {
+    private List<Item<User>> buildItems() {
         return Arrays.asList(
-                new Item(Item.INPUT, R.string.first_name, R.string.user_info, firstName == null ? "" : firstName, this::setFirstName, this),
-                new Item(Item.INPUT, R.string.last_name, lastName == null ? "" : lastName, this::setLastName, this),
-                new Item(Item.INPUT, R.string.email, primaryEmail == null ? "" : primaryEmail, this::setPrimaryEmail, this)
+                Item.text(0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
+                Item.text(1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
+                Item.email(2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.text(3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 
     @Override
-    public int size() {
-        return items.size();
-    }
-
-    @Override
-    public Item get(int position) {
-        return items.get(position);
-    }
+    public List<Item<User>> asItems() { return items; }
 
     @Override
     public Item<User> getHeaderItem() {
-        return new Item<>(Item.IMAGE, R.string.profile_picture, R.string.profile_picture, imageUrl, this::setImageUrl, this);
+        return Item.text(0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -86,6 +71,11 @@ public class User extends UserEntity implements
         User casted = (User) other;
         return firstName.equals(casted.getFirstName()) && lastName.equals(casted.getLastName())
                 && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public boolean hasMajorFields() {
+        return areNotEmpty(id, firstName, lastName);
     }
 
     @Override
@@ -99,23 +89,11 @@ public class User extends UserEntity implements
     }
 
     @Override
-    public void reset() {
-        firstName = "";
-        lastName = "";
-        primaryEmail = "";
-        imageUrl = "";
-
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue("");
-    }
-
-    @Override
     public void update(User updatedUser) {
         this.id = updatedUser.id;
         this.imageUrl = updatedUser.imageUrl;
 
-        int size = size();
-        for (int i = 0; i < size; i++) get(i).setValue(updatedUser.get(i).getValue());
+        updateItemList(updatedUser);
     }
 
     @Override
@@ -165,12 +143,13 @@ public class User extends UserEntity implements
         private static final String FIRST_NAME_KEY = "firstName";
         private static final String IMAGE_KEY = "imageUrl";
         private static final String PRIMARY_EMAIL_KEY = "primaryEmail";
+        private static final String ABOUT_KEY = "about";
         private static final String PASSWORD_KEY = "password";
 
         @Override
         public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new User(json.getAsString(), "", "", "", "");
+                return new User(json.getAsString(), "", "", "", "", "");
             }
 
             JsonObject userObject = json.getAsJsonObject();
@@ -179,9 +158,10 @@ public class User extends UserEntity implements
             String firstName = asString(FIRST_NAME_KEY, userObject);
             String lastName = asString(LAST_NAME_KEY, userObject);
             String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
+            String about = asString(ABOUT_KEY, userObject);
             String imageUrl = asString(IMAGE_KEY, userObject);
 
-            return new User(id, firstName, lastName, primaryEmail, imageUrl);
+            return new User(id, firstName, lastName, primaryEmail, about, imageUrl);
         }
 
         @Override
@@ -190,6 +170,7 @@ public class User extends UserEntity implements
             user.addProperty(FIRST_NAME_KEY, src.firstName);
             user.addProperty(LAST_NAME_KEY, src.lastName);
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
+            user.addProperty(ABOUT_KEY, src.about);
 
             if (!TextUtils.isEmpty(src.password)) user.addProperty(PASSWORD_KEY, src.password);
 

@@ -8,7 +8,6 @@ import android.widget.DatePicker;
 import android.widget.TimePicker;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Supplier;
@@ -31,54 +30,60 @@ public class DateViewHolder extends ClickInputViewHolder
         TimePickerDialog.OnTimeSetListener {
 
     private Calendar calendar = getInstance();
-    private Calendar updatedCalendar = getInstance();
 
     public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
         itemView.findViewById(R.id.click_view).setOnClickListener(this);
+        setButtonRunnable(R.drawable.ic_access_time_white_24dp, this::showTime);
     }
 
     @Override
     public void bind(Item item) {
         super.bind(item);
-        String time = item.getValue();
+        String time = item.getValue().toString();
         editText.setText(time);
-        calendar.setTime(ModelUtils.parseDate(time, Event.prettyPrinter));
+        calendar.setTime(ModelUtils.parseDate(time, ModelUtils.prettyPrinter));
     }
 
     @Override
     public void onClick(View view) {
-        if (!isEnabled()) return;
-
-        AlertDialog dialog = new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
-
-        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
-        dialog.show();
+        showDate();
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        updatedCalendar.set(YEAR, year);
-        updatedCalendar.set(MONTH, month);
-        updatedCalendar.set(DATE, day);
+        calendar.set(YEAR, year);
+        calendar.set(MONTH, month);
+        calendar.set(DATE, day);
 
-        AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
-
-        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
-        dialog.show();
+        updateTime();
     }
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-        updatedCalendar.set(HOUR_OF_DAY, hourOfDay);
-        updatedCalendar.set(MINUTE, minute);
+        calendar.set(HOUR_OF_DAY, hourOfDay);
+        calendar.set(MINUTE, minute);
 
-        String updatedDate = Event.prettyPrinter.format(updatedCalendar.getTime());
+        updateTime();
+    }
 
+    private void showDate() {
+        if (!isEnabled()) return;
+        AlertDialog dialog = new DatePickerDialog(itemView.getContext(), this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.show();
+    }
+
+    private void showTime() {
+        if (!isEnabled()) return;
+        AlertDialog dialog = new TimePickerDialog(itemView.getContext(), this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.show();
+    }
+
+    private void updateTime() {
+        String updatedDate = ModelUtils.prettyPrinter.format(calendar.getTime());
         item.setValue(updatedDate);
         editText.setText(updatedDate);
-
-        calendar = updatedCalendar;
-        updatedCalendar = Calendar.getInstance();
     }
 }

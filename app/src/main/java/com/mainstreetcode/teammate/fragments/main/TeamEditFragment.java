@@ -2,11 +2,11 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +16,12 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.model.HeaderedModel;
-import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
-
-import io.reactivex.disposables.Disposable;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -31,33 +29,24 @@ import static android.app.Activity.RESULT_OK;
  * Creates, edits or lets a {@link com.mainstreetcode.teammate.model.User} join a {@link Team}
  */
 
-public class TeamEditFragment extends HeaderedFragment
+public class TeamEditFragment extends HeaderedFragment<Team>
         implements
         TeamEditAdapter.TeamEditAdapterListener {
 
-    private static final int CREATING = 0;
-    private static final int EDITING = 1;
-    private static final int JOINING = 2;
-
     private static final String ARG_TEAM = "team";
-    private static final String ARG_STATE = "state";
-    public static final int PLACE_PICKER_REQUEST = 2;
 
-    private int state;
     private Team team;
+    private TeamGofer gofer;
 
-    public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty(), CREATING);}
+    public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty());}
 
-    public static TeamEditFragment newEditInstance(Team team) {return newInstance(team, EDITING);}
+    public static TeamEditFragment newEditInstance(Team team) {return newInstance(team);}
 
-    public static TeamEditFragment newJoinInstance(Team team) {return newInstance(team, JOINING);}
-
-    private static TeamEditFragment newInstance(Team team, int state) {
+    private static TeamEditFragment newInstance(Team team) {
         TeamEditFragment fragment = new TeamEditFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
-        args.putInt(ARG_STATE, state);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,11 +54,7 @@ public class TeamEditFragment extends HeaderedFragment
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        int state = getArguments().getInt(ARG_STATE);
-        Team tempTeam = getArguments().getParcelable(ARG_TEAM);
-
-        return tempTeam == null ? superResult : superResult + "-" + tempTeam.hashCode() + "-" + state;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_TEAM));
     }
 
     @Override
@@ -77,8 +62,8 @@ public class TeamEditFragment extends HeaderedFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        state = getArguments().getInt(ARG_STATE);
         team = getArguments().getParcelable(ARG_TEAM);
+        gofer = teamViewModel.gofer(team);
     }
 
     @Nullable
@@ -87,27 +72,13 @@ public class TeamEditFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new TeamEditAdapter(team, roleViewModel.getRoleNames(), this))
+                .withAdapter(new TeamEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        User user = userViewModel.getCurrentUser();
-
-        roleViewModel.fetchRoleValues();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::onRoleUpdated, defaultErrorHandler));
-
-//        if (!team.isEmpty() && state != JOINING) {
-//            disposables.add(teamViewModel.getTeam(team).subscribe(this::onTeamChanged, defaultErrorHandler));
-//        }
     }
 
     @Override
@@ -123,24 +94,33 @@ public class TeamEditFragment extends HeaderedFragment
 
     @Override
     public boolean showsFab() {
-        return state == CREATING || state == JOINING || localRoleViewModel.hasPrivilegedRole();
+        return gofer.showsFab();
     }
 
     @Override
-    public void onImageClick() {
-        if(state == CREATING) {
-            showSnackbar(getString(R.string.create_team_first));
-            return;
-        }
-        if (!localRoleViewModel.hasPrivilegedRole()) {
-            showSnackbar(getString(R.string.no_permission));
-            return;
-        }
-        super.onImageClick();
+    public void onClick(View view) {
+        if (view.getId() != R.id.fab) return;
+
+        toggleProgress(true);
+        disposables.add(gofer.save()
+                .subscribe(result -> {
+                    showSnackbar(gofer.getModelUpdateMessage(this));
+                    onModelUpdated(result);
+                }, defaultErrorHandler));
     }
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return team;}
+    protected Team getHeaderedModel() {return team;}
+
+    @Override
+    protected TeamHostingGofer<Team> gofer() { return gofer; }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        viewHolder.bind(getHeaderedModel());
+        scrollManager.onDiff(result);
+        toggleProgress(false);
+    }
 
     @Override
     public void onAddressClicked() {
@@ -152,93 +132,32 @@ public class TeamEditFragment extends HeaderedFragment
     }
 
     @Override
-    public boolean isJoiningTeam() {
-        return state == JOINING;
-    }
-
-    @Override
     public boolean isPrivileged() {
-        return state == CREATING || localRoleViewModel.hasPrivilegedRole();
+        return gofer.hasPrivilegedRole();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode == RESULT_OK) {
-            Context context = getContext();
-            if (context == null) return;
+        if (resultCode != RESULT_OK) return;
+        Context context = getContext();
+        if (context == null) return;
 
-            toggleProgress(true);
-            Place place = PlacePicker.getPlace(context, data);
-            locationViewModel.fromPlace(place).subscribe(address -> {
-                team.setAddress(address);
-                scrollManager.notifyDataSetChanged();
-                toggleProgress(false);
-            }, defaultErrorHandler);
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab:
-                String role = team.get(Team.ROLE_POSITION).getValue();
-
-                if (isJoiningTeam() && TextUtils.isEmpty(role)) {
-                    showSnackbar(getString(R.string.choose_role_error));
-                    return;
-                }
-
-                toggleProgress(true);
-                Disposable disposable = null;
-                switch (state) {
-                    case CREATING:
-                        disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            onTeamChanged(result);
-                            viewHolder.bind(getHeaderedModel());
-                            showSnackbar(getString(R.string.created_team, team.getName()));
-                        }, defaultErrorHandler);
-                        break;
-                    case JOINING:
-                        JoinRequest joinRequest = JoinRequest.join(role, team, userViewModel.getCurrentUser());
-                        disposable = roleViewModel.joinTeam(joinRequest).subscribe(request -> {
-                            showSnackbar(getString(R.string.team_submitted_join_request));
-                            toggleProgress(false);
-                        }, defaultErrorHandler);
-                        break;
-                    case EDITING:
-                        disposable = teamViewModel.createOrUpdate(team).subscribe(result -> {
-                            onTeamChanged(result);
-                            viewHolder.bind(getHeaderedModel());
-                            showSnackbar(getString(R.string.updated_team));
-                        }, defaultErrorHandler);
-                        break;
-                }
-
-                if (disposable != null) disposables.add(disposable);
-        }
-    }
-
-    private void onTeamChanged(DiffUtil.DiffResult result) {
-        toggleProgress(false);
-        scrollManager.onDiff(result);
+        toggleProgress(true);
+        Place place = PlacePicker.getPlace(context, data);
+        disposables.add(locationViewModel.fromPlace(place)
+                .subscribe(this::onAddressFound, defaultErrorHandler));
     }
 
     private void onRoleUpdated() {
-        state = team.isEmpty() ? CREATING : localRoleViewModel.getCurrentRole().isEmpty() ? JOINING : EDITING;
-
-        switch (state) {
-            case CREATING:
-                setToolbarTitle(getString(R.string.create_team));
-                break;
-            case JOINING:
-                setToolbarTitle(getString(R.string.join_team));
-                break;
-            case EDITING:
-                setToolbarTitle(getString(R.string.edit_team));
-                break;
-        }
-        toggleFab(showsFab());
         scrollManager.notifyDataSetChanged();
+        toggleFab(showsFab());
+        setToolbarTitle(gofer.getToolbarTitle(this));
+    }
+
+    private void onAddressFound(Address address) {
+        team.setAddress(address);
+        scrollManager.notifyDataSetChanged();
+        toggleProgress(false);
     }
 }

@@ -1,23 +1,40 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.support.v7.util.DiffUtil;
+import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.VisibleRegion;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.BlockReason;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.repository.GuestRepository;
+import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
+import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
+import io.reactivex.processors.PublishProcessor;
 
+import static android.location.Location.distanceBetween;
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
+import static io.reactivex.Single.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
@@ -26,13 +43,49 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class EventViewModel extends TeamMappedViewModel<Event> {
 
+    private static final LatLngBounds DEFAULT_BOUNDS;
+    private static final int DEFAULT_BAR_RANGE = 50;
+
     private final EventRepository repository;
+    private final List<Event> publicEvents = new ArrayList<>();
+    private final EventSearchRequest eventRequest = EventSearchRequest.empty();
+    private final PublishProcessor<BlockedUser> blockedUserAlert = PublishProcessor.create();
 
-    public EventViewModel() {repository = EventRepository.getInstance();}
+    static { DEFAULT_BOUNDS = new LatLngBounds.Builder().include(new LatLng(0, 0)).build(); }
 
-    public List<Identifiable> fromEvent(Event event) {
-        try {return eventListFunction.apply(event);}
-        catch (Exception e) {return new ArrayList<>();}
+    public EventViewModel() {
+        repository = EventRepository.getInstance();
+    }
+
+    public EventGofer gofer(Event event) {
+        return new EventGofer(event, onError(event), blockedUserAlert, this::getEvent, this::createOrUpdateEvent, this::delete);
+    }
+
+    public GuestGofer gofer(Guest guest) {
+        return new GuestGofer(guest, throwable -> {
+            Message message = Message.fromThrowable(throwable);
+            if (message == null || !message.isInvalidObject()) return;
+
+            User guestUser = guest.getUser();
+            Team guestTeam = guest.getEvent().getTeam();
+            BlockReason reason = BlockReason.empty();
+            pushModelAlert(Alert.userBlocked(BlockedUser.block(guestUser, guestTeam, reason)));
+        }, GuestRepository.getInstance()::get);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        blockedUserAlert.onComplete();
+    }
+
+    @Override
+    @SuppressLint("CheckResult")
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (!(alert instanceof Alert.UserBlocked)) return;
+
+        blockedUserAlert.onNext(((Alert.UserBlocked) alert).getModel());
     }
 
     @Override
@@ -41,27 +94,29 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
                 .doOnError(throwable -> checkForInvalidTeam(throwable, key));
     }
 
-    public Flowable<DiffUtil.DiffResult> getEvent(Event event, List<Identifiable> eventItems) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.get(event), event.getTeam(), event).cast(Event.class).map(eventListFunction);
-        return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList);
+    private Flowable<Event> getEvent(Event event) {
+        return event.isEmpty() ? Flowable.empty() : repository.get(event);
     }
 
-    public Single<DiffUtil.DiffResult> createOrUpdateEvent(final Event event, List<Identifiable> eventItems) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.createOrUpdate(event).toFlowable(), event.getTeam(), event).cast(Event.class).map(eventListFunction);
-        return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
-    }
-
-    public Single<DiffUtil.DiffResult> rsvpEvent(final Event event, List<Identifiable> eventItems, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = checkForInvalidObject(repository.rsvpEvent(event, attending).toFlowable(), event.getTeam(), event).cast(Event.class).map(eventListFunction);
-        return Identifiable.diff(sourceFlowable, () -> eventItems, (sourceEventList, newEventList) -> newEventList).firstOrError();
+    private Single<Event> createOrUpdateEvent(final Event event) {
+        return repository.createOrUpdate(event);
     }
 
     public Single<Event> delete(final Event event) {
-        return checkForInvalidObject(repository.delete(event).toFlowable(), event.getTeam(), event)
-                .firstOrError()
-                .doOnSuccess(getModelList(event.getTeam())::remove)
-                .cast(Event.class)
-                .observeOn(mainThread());
+        return repository.delete(event).doOnSuccess(getModelList(event.getTeam())::remove);
+    }
+
+    public Flowable<List<Event>> getPublicEvents(GoogleMap map) {
+        Single<List<Event>> fetched = TeammateService.getApiInstance()
+                .getPublicEvents(fromMap(map))
+                .map(this::collatePublicEvents)
+                .map(this::filterPublicEvents);
+
+        return concat(Single.just(publicEvents).map(this::filterPublicEvents), fetched).observeOn(mainThread());
+    }
+
+    public EventSearchRequest getEventRequest() {
+        return eventRequest;
     }
 
     public void onEventTeamChanged(Event event, Team newTeam) {
@@ -69,21 +124,57 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         event.setTeam(newTeam);
     }
 
-    private Function<Event, List<Identifiable>> eventListFunction = event -> {
-        List<Identifiable> result = new ArrayList<>();
-        int eventSize = event.size();
-
-        for (int i = 0; i < eventSize; i++) result.add(event.get(i));
-        result.add(event.getTeam());
-        result.addAll(event.getGuests());
-
-        return result;
-    };
+    @Nullable
+    public LatLng getLastPublicSearchLocation() {
+        LatLng location = eventRequest.getLocation();
+        if (location == null) return null;
+        if (milesBetween(DEFAULT_BOUNDS.getCenter(), location) < DEFAULT_BAR_RANGE) return null;
+        return location;
+    }
 
     private Date getQueryDate(Team team, boolean fetchLatest) {
         if (fetchLatest) return null;
 
         Event event = findLast(getModelList(team), Event.class);
         return event == null ? null : event.getStartDate();
+    }
+
+    private EventSearchRequest fromMap(GoogleMap map) {
+        LatLng location = map.getCameraPosition().target;
+
+        VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
+        LatLngBounds bounds = visibleRegion.latLngBounds;
+        LatLng southwest = bounds.southwest;
+        LatLng northeast = bounds.northeast;
+
+        int miles = Math.min(DEFAULT_BAR_RANGE, milesBetween(southwest, northeast));
+
+        eventRequest.setDistance(String.valueOf(miles));
+        eventRequest.setLocation(location);
+
+        return eventRequest;
+    }
+
+    private List<Event> collatePublicEvents(List<Event> newEvents) {
+        ModelUtils.preserveAscending(publicEvents, newEvents);
+        return publicEvents;
+    }
+
+    private List<Event> filterPublicEvents(List<Event> source) {
+        Sport sport = eventRequest.getSport();
+        if (sport.isInvalid()) return source;
+
+        List<Event> filtered = new ArrayList<>();
+
+        return Flowable.fromIterable(publicEvents).filter(event -> event.getTeam().getSport().equals(sport))
+                .collect(() -> filtered, List::add)
+                .blockingGet();
+    }
+
+    private int milesBetween(LatLng locationA, LatLng locationB) {
+        float[] distance = new float[1];
+        distanceBetween(locationA.latitude, locationA.longitude, locationB.latitude, locationB.longitude, distance);
+
+        return (int) (distance[0] * 0.000621371);
     }
 }

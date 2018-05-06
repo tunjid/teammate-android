@@ -41,11 +41,6 @@ public class Device implements Model<Device> {
     }
 
     @Override
-    public void reset() {
-        fcmToken = "";
-    }
-
-    @Override
     public void update(Device updated) {
         this.id = updated.id;
         this.fcmToken = updated.fcmToken;

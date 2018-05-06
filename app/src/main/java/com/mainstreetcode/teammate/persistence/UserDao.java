@@ -32,7 +32,7 @@ public abstract class UserDao extends EntityDao<UserEntity> {
     public abstract Maybe<User> get(String id );
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<UserEntity> roles);
+    public abstract void insert(List<UserEntity> roles);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<UserEntity> roles);

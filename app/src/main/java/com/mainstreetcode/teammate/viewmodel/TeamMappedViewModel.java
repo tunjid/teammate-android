@@ -4,17 +4,30 @@ package com.mainstreetcode.teammate.viewmodel;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamHost;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.functions.Consumer;
+
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
-public abstract class TeamMappedViewModel<V extends Identifiable> extends MappedViewModel<Team, V> {
+public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> extends MappedViewModel<Team, V> {
 
     private final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
+
+    @Override
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (!(alert instanceof Alert.TeamDeletion)) return;
+
+        Team deleted = ((Alert.TeamDeletion) alert).getModel();
+        modelListMap.remove(deleted);
+    }
 
     public List<Identifiable> getModelList(Team team) {
         List<Identifiable> modelList = modelListMap.get(team);
@@ -26,15 +39,20 @@ public abstract class TeamMappedViewModel<V extends Identifiable> extends Mapped
     @Override
     void onErrorMessage(Message message, Team key, Identifiable invalid) {
         super.onErrorMessage(message, key, invalid);
-        if (message.isIllegalTeamMember()) TeamViewModel.onTeamDeleted(key);
+        if (message.isIllegalTeamMember()) pushModelAlert(Alert.teamDeletion(key));
     }
 
-    protected boolean checkForInvalidTeam(Throwable throwable, Team team) {
+    boolean checkForInvalidTeam(Throwable throwable, Team team) {
         Message message = fromThrowable(throwable);
-        if (message != null && (message.isInvalidObject() || message.isIllegalTeamMember())) {
-            TeamViewModel.onTeamDeleted(team);
-            return true;
-        }
-        return false;
+        boolean isValidModel = message == null || message.isValidModel();
+
+        if (isValidModel) return false;
+
+        pushModelAlert(Alert.teamDeletion(team));
+        return true;
+    }
+
+    Consumer<Throwable> onError(V model) {
+        return throwable -> checkForInvalidObject(throwable, model, model.getTeam());
     }
 }

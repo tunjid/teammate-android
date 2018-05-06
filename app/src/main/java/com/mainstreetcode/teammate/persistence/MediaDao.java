@@ -29,7 +29,7 @@ public abstract class MediaDao extends EntityDao<Media> {
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<Media> roles);
+    public abstract void insert(List<Media> roles);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<Media> roles);

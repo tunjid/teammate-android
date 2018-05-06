@@ -46,7 +46,7 @@ public abstract class SharedPreferencesDao<T> extends EntityDao<T> {
     }
 
     @Override
-    protected void insert(List<T> models) {
+    public void insert(List<T> models) {
         if (models.isEmpty() || models.size() > 1) return;
 
         T device = models.get(0);

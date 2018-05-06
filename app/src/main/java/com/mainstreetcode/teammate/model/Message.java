@@ -61,6 +61,8 @@ public class Message {
         return new Message((HttpException) throwable);
     }
 
+    public boolean isValidModel() { return !isIllegalTeamMember() && !isInvalidObject(); }
+    
     public boolean isInvalidObject() { return INVALID_OBJECT_REFERENCE_ERROR_CODE.equals(errorCode);}
 
     public boolean isIllegalTeamMember() { return ILLEGAL_TEAM_MEMBER_ERROR_CODE.equals(errorCode);}

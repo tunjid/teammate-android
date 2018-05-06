@@ -49,7 +49,7 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
     @Nullable
     private RequestCreator getCreator() {
         if (model == null) return null;
-        String pathOrUrl = model.getHeaderItem().getValue();
+        String pathOrUrl = model.getHeaderItem().getValue().toString();
 
         if (TextUtils.isEmpty(pathOrUrl)) return null;
 

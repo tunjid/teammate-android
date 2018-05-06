@@ -7,4 +7,11 @@
         android:icon="@drawable/ic_remove_role_white_24dp"
         android:title="@string/drop_user"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_block"
+        android:enabled="true"
+        android:icon="@drawable/ic_block_white_24dp"
+        android:title="@string/user_block"
+        app:showAsAction="ifRoom" />
 </menu>

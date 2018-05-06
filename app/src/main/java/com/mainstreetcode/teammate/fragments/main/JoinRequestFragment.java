@@ -3,39 +3,73 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.util.DiffUtil;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.JoinRequestAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.model.HeaderedModel;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
+
+import java.util.UUID;
+
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.ACCEPTING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.APPROVING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.INVITING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.JOINING;
+import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.WAITING;
 
 /**
  * Invites a Team member
  */
 
-public class JoinRequestFragment extends HeaderedFragment
+public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         implements
         JoinRequestAdapter.AdapterListener {
 
     public static final String ARG_JOIN_REQUEST = "join-request";
 
-    private JoinRequest joinRequest;
+    private JoinRequest request;
+    private JoinRequestGofer gofer;
 
-    public static JoinRequestFragment newInstance(Team team) {
+    public static JoinRequestFragment inviteInstance(Team team) {
+        JoinRequestFragment fragment = newInstance(JoinRequest.invite(team));
+        fragment.setEnterExitTransitions();
+
+        return fragment;
+    }
+
+    public static JoinRequestFragment joinInstance(Team team, User user) {
+        JoinRequestFragment fragment = newInstance(JoinRequest.join(team, user));
+        fragment.setEnterExitTransitions();
+
+        return fragment;
+    }
+
+    public static JoinRequestFragment viewInstance(JoinRequest request) {
+        JoinRequestFragment fragment = newInstance(request);
+        fragment.setEnterExitTransitions();
+
+        return fragment;
+    }
+
+    private static JoinRequestFragment newInstance(JoinRequest joinRequest) {
         JoinRequestFragment fragment = new JoinRequestFragment();
         Bundle args = new Bundle();
 
-        args.putParcelable(ARG_JOIN_REQUEST, JoinRequest.invite(team));
+        args.putParcelable(ARG_JOIN_REQUEST, joinRequest);
         fragment.setArguments(args);
         fragment.setEnterExitTransitions();
 
@@ -47,9 +81,13 @@ public class JoinRequestFragment extends HeaderedFragment
     public String getStableTag() {
         String superResult = super.getStableTag();
         JoinRequest temp = getArguments().getParcelable(ARG_JOIN_REQUEST);
+        User user = temp.getUser();
+        String id = temp.getId();
+        String userHash = user.isEmpty() ? UUID.randomUUID().toString() : temp.getUser().getId();
+        String teamHash = temp.getTeam().getCity();
 
         return (temp != null)
-                ? superResult + "-" + temp.getTeam().hashCode()
+                ? TextUtils.join("-", new String[]{superResult, id, userHash, teamHash})
                 : superResult;
     }
 
@@ -57,7 +95,9 @@ public class JoinRequestFragment extends HeaderedFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        joinRequest = getArguments().getParcelable(ARG_JOIN_REQUEST);
+        setHasOptionsMenu(true);
+        request = getArguments().getParcelable(ARG_JOIN_REQUEST);
+        gofer = teamMemberViewModel.gofer(request);
     }
 
     @Nullable
@@ -66,9 +106,8 @@ public class JoinRequestFragment extends HeaderedFragment
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new JoinRequestAdapter(joinRequest, roleViewModel.getRoleNames(), this))
+                .withAdapter(new JoinRequestAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addScrollListener(this::updateFabOnScroll)
                 .withLinearLayoutManager()
                 .build();
 
@@ -79,58 +118,141 @@ public class JoinRequestFragment extends HeaderedFragment
     @Override
     public void onResume() {
         super.onResume();
-        roleViewModel.fetchRoleValues();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        User user = userViewModel.getCurrentUser();
-        if (localRoleViewModel.hasPrivilegedRole() && !joinRequest.getUser().equals(user)) {
-            inflater.inflate(R.menu.fragment_user_edit, menu);
+        inflater.inflate(R.menu.fragment_user_edit, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean isEmpty = request.isEmpty();
+        boolean canBlockUser = gofer.hasPrivilegedRole();
+        boolean canDeleteRequest = canBlockUser || gofer.isRequestOwner();
+
+        MenuItem block_item = menu.findItem(R.id.action_block);
+        MenuItem deleteItem = menu.findItem(R.id.action_kick);
+
+        block_item.setVisible(!isEmpty && canBlockUser);
+        deleteItem.setVisible(!isEmpty && canDeleteRequest);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_kick:
+                showDeletePrompt();
+                return true;
+            case R.id.action_block:
+                blockUser(request.getUser(), request.getTeam());
+                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
-        setFabClickListener(this);
+        setToolbarTitle(gofer.getToolbarTitle(this));
         setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.invite_user));
+        requireActivity().invalidateOptionsMenu();
+        setFabClickListener(this);
     }
 
     @Override
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return true;}
+    @SuppressWarnings("SimplifiableIfStatement")
+    public boolean showsFab() {
+        return gofer.showsFab();
+    }
 
     @Override
     public void onImageClick() {}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return joinRequest;}
+    protected JoinRequest getHeaderedModel() {return request;}
+
+    @Override
+    protected TeamHostingGofer<JoinRequest> gofer() { return gofer; }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) { }
+
+    @Override
+    public boolean canEditFields() {
+        return gofer.canEditFields();
+    }
+
+    @Override
+    public boolean canEditRole() {
+        return gofer.canEditRole();
+    }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab:
-                String roleName = joinRequest.getRoleName();
+        if (view.getId() != R.id.fab) return;
 
-                if (TextUtils.isEmpty(roleName)) {
-                    showSnackbar(getString(R.string.select_role));
-                    return;
-                }
+        @JoinRequestGofer.JoinRequestState
+        int state = gofer.getState();
 
-                toggleProgress(true);
-                disposables.add(roleViewModel.joinTeam(joinRequest)
-                        .subscribe(request -> onJoinRequestSent(), defaultErrorHandler));
-                break;
-        }
+        if (state == WAITING) return;
+
+        if (state == APPROVING || state == ACCEPTING) saveRequest();
+        else if (request.getPosition().isInvalid()) showSnackbar(getString(R.string.select_role));
+        else if (state == JOINING || state == INVITING) createJoinRequest();
     }
 
-    private void onJoinRequestSent() {
+    private void createJoinRequest() {
+        toggleProgress(true);
+        disposables.add(gofer.save().subscribe(this::onJoinRequestSent, defaultErrorHandler));
+    }
+
+    private void saveRequest() {
+        toggleProgress(true);
+        disposables.add(gofer.save().subscribe(ignored -> onRequestSaved(), defaultErrorHandler));
+    }
+
+    private void deleteRequest() {
+        toggleProgress(true);
+        disposables.add(gofer.remove().subscribe(this::onRequestDeleted, defaultErrorHandler));
+    }
+
+    private void onJoinRequestSent(DiffUtil.DiffResult result) {
+        scrollManager.onDiff(result);
+        toggleFab(false);
         toggleProgress(false);
-        showSnackbar(getString(R.string.user_invite_sent));
         toggleBottomSheet(false);
+        setToolbarTitle(gofer.getToolbarTitle(this));
+        showSnackbar(getString(request.isTeamApproved()
+                ? R.string.user_invite_sent
+                : R.string.team_submitted_join_request));
+    }
+
+    private void onRequestDeleted() {
+        String name = request.getUser().getFirstName();
+        if (!gofer.isRequestOwner()) showSnackbar(getString(R.string.removed_user, name));
+        requireActivity().onBackPressed();
+    }
+
+    private void onRequestSaved() {
+        String name = request.getUser().getFirstName();
+        if (!gofer.isRequestOwner()) showSnackbar(getString(R.string.added_user, name));
+        requireActivity().onBackPressed();
+    }
+
+    private void showDeletePrompt() {
+        User requestUser = request.getUser();
+        final String prompt = gofer.isRequestOwner()
+                ? getString(R.string.confirm_request_leave, request.getTeam().getName())
+                : getString(R.string.confirm_request_drop, requestUser.getFirstName());
+
+        new AlertDialog.Builder(requireActivity()).setTitle(prompt)
+                .setPositiveButton(R.string.yes, (dialog, which) -> deleteRequest())
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

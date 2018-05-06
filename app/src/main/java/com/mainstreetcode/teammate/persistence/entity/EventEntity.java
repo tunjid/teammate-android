@@ -9,12 +9,12 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -24,7 +24,6 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class EventEntity implements Parcelable {
 
-    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
     //private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
     @NonNull @PrimaryKey
@@ -38,13 +37,15 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_start_date") protected Date startDate;
     @ColumnInfo(name = "event_end_date") protected Date endDate;
     @ColumnInfo(name = "event_location") protected LatLng location;
+    @ColumnInfo(name = "event_visibility") protected Visibility visibility;
 
     public EventEntity(@NonNull String id, String name, String notes, String imageUrl, String locationName,
-                       Date startDate, Date endDate, Team team, LatLng location) {
+                       Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
         this.id = id;
         this.name = name;
         this.notes = notes;
         this.imageUrl = imageUrl;
+        this.visibility = visibility;
         this.locationName = locationName;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -62,6 +63,7 @@ public class EventEntity implements Parcelable {
         endDate = new Date(in.readLong());
         team = (Team) in.readValue(Team.class.getClassLoader());
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
+        visibility = Config.visibilityFromCode(in.readString());
     }
 
     @NonNull
@@ -79,6 +81,10 @@ public class EventEntity implements Parcelable {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
     }
 
     public String getLocationName() {
@@ -102,21 +108,12 @@ public class EventEntity implements Parcelable {
     }
 
     public String getTime() {
-//        String time = prettyPrinter.format(startDate) + " - ";
-//        time += endsSameDay() ? timePrinter.format(endDate) : prettyPrinter.format(endDate);
-        return prettyPrinter.format(startDate);
+        return ModelUtils.prettyPrinter.format(startDate);
     }
 
-//    private boolean endsSameDay() {
-//        Calendar start = Calendar.getInstance();
-//        Calendar end = Calendar.getInstance();
-//
-//        start.setTime(startDate);
-//        end.setTime(endDate);
-//        return start.get(Calendar.YEAR) == end.get(Calendar.YEAR)
-//                && start.get(Calendar.MONTH) == end.get(Calendar.MONTH)
-//                && start.get(Calendar.DATE) == end.get(Calendar.DATE);
-//    }
+    public boolean isPublic(){
+        return visibility.isPublic();
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -124,6 +121,10 @@ public class EventEntity implements Parcelable {
 
     protected void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = Config.visibilityFromCode(visibility);
     }
 
     protected void setLocationName(String locationName) {
@@ -134,16 +135,12 @@ public class EventEntity implements Parcelable {
         this.imageUrl = imageUrl;
     }
 
-//    public void setTeamId(String teamId) {
-//        this.teamId = teamId;
-//    }
-
     protected void setStartDate(String startDate) {
-        this.startDate = ModelUtils.parseDate(startDate, prettyPrinter);
+        this.startDate = ModelUtils.parseDate(startDate, ModelUtils.prettyPrinter);
     }
 
     protected void setEndDate(String endDate) {
-        this.endDate = ModelUtils.parseDate(endDate, prettyPrinter);
+        this.endDate = ModelUtils.parseDate(endDate, ModelUtils.prettyPrinter);
     }
 
     @Override
@@ -178,6 +175,7 @@ public class EventEntity implements Parcelable {
         dest.writeLong(endDate.getTime());
         dest.writeValue(team);
         dest.writeValue(location);
+        dest.writeString(visibility.getCode());
     }
 
     public static final Parcelable.Creator<EventEntity> CREATOR = new Parcelable.Creator<EventEntity>() {

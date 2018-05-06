@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.repository;
 
-import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -9,7 +8,6 @@ import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.RoleDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
-import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +59,10 @@ public class RoleRepository extends ModelRepository<Role> {
 
     @Override
     public Flowable<Role> get(String id) {
-        return Flowable.error(new TeammateException(""));
+        Maybe<Role> local = roleDao.get(id).subscribeOn(io());
+        Maybe<Role> remote = api.getRole(id).toMaybe();
+
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
@@ -74,16 +75,18 @@ public class RoleRepository extends ModelRepository<Role> {
     @Override
     Function<List<Role>, List<Role>> provideSaveManyFunction() {
         return models -> {
-            List<Team> teams = new ArrayList<>(models.size());
-            List<User> users = new ArrayList<>(models.size());
+            int size = models.size();
+            List<Team> teams = new ArrayList<>(size);
+            List<User> users = new ArrayList<>(size);
 
-            for (Role role : models) {
-                teams.add(role.getTeam());
+            for (int i = 0; i < size; i++) {
+                Role role = models.get(i);
                 users.add(role.getUser());
+                teams.add(role.getTeam());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
+            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
+            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));
 
@@ -93,20 +96,6 @@ public class RoleRepository extends ModelRepository<Role> {
 
     public Maybe<Role> getRoleInTeam(String userId, String teamId) {
         return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io());
-    }
-
-    public Single<Role> acceptInvite(JoinRequest request) {
-        return apply(request, api.acceptInvite(request.getId()));
-    }
-
-    public Single<Role> approveUser(JoinRequest request) {
-        return apply(request, api.approveUser(request.getId()));
-    }
-
-    private Single<Role> apply(JoinRequest request, Single<Role> apiSingle) {
-        return apiSingle.map(getSaveFunction())
-                .doOnSuccess(role -> AppDatabase.getInstance().joinRequestDao().delete(request))
-                .doOnError(throwable -> JoinRequestRepository.getInstance().deleteInvalidModel(request, throwable));
     }
 
     public Flowable<List<Role>> getMyRoles() {

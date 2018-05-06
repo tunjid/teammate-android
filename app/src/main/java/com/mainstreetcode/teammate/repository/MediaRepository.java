@@ -34,7 +34,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class MediaRepository extends QueryRepository<Media> {
+public class MediaRepository extends TeamQueryRepository<Media> {
 
     private final int num;
     private final TeammateApi api;
@@ -107,8 +107,8 @@ public class MediaRepository extends QueryRepository<Media> {
                 teams.add(media.getTeam());
             }
 
-            userRepository.getSaveManyFunction().apply(users);
-            teamRepository.getSaveManyFunction().apply(teams);
+            userRepository.saveAsNested().apply(users);
+            teamRepository.saveAsNested().apply(teams);
 
             mediaDao.upsert(Collections.unmodifiableList(models));
 
@@ -136,7 +136,7 @@ public class MediaRepository extends QueryRepository<Media> {
     }
 
     @Nullable
-    MultipartBody.Part getBody(String path, String photoKey) {
+    private MultipartBody.Part getBody(String path, String photoKey) {
         Uri uri = Uri.parse(path);
         String type = App.getInstance().getContentResolver().getType(uri);
 

@@ -4,19 +4,23 @@ import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.notifications.FeedItem;
-import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.repository.JoinRequestRepository;
-import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -27,9 +31,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
-    private final RoleRepository roleRepository = RoleRepository.getInstance();
-    private final EventRepository eventRepository = EventRepository.getInstance();
+    private final GuestRepository guestRepository = GuestRepository.getInstance();
     private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
+    private final TeamMemberRepository<JoinRequest> memberRepository = TeamMemberRepository.getInstance();
 
     private final List<Identifiable> feedItems = new ArrayList<>();
 
@@ -38,6 +42,19 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     @Override
     public List<Identifiable> getModelList(Class<FeedItem> key) {
         return feedItems;
+    }
+
+    @Override
+    boolean sortsAscending() {
+        return true;
+    }
+
+    @Override
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (!(alert instanceof Alert.JoinRequestProcessed)) return;
+        JoinRequest request = ((Alert.JoinRequestProcessed) alert).getModel();
+        removedProcessedRequest(request);
     }
 
     @Override
@@ -53,11 +70,11 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = eventRepository.rsvpEvent(feedItem.getModel(), attending)
+        Flowable<List<Identifiable>> sourceFlowable = guestRepository.createOrUpdate(Guest.forEvent(feedItem.getModel(), attending))
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(toIdentifiable);
+                .toFlowable().map(this::toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(false)).firstOrError();
     }
@@ -71,18 +88,18 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
         Single<? extends Model> sourceSingle = leaveUnchanged
                 ? Single.just(request)
                 : approved && request.isTeamApproved()
-                ? roleRepository.acceptInvite(request)
+                ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
                 : approved && request.isUserApproved()
-                ? roleRepository.approveUser(request)
+                ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
                 : joinRequestRepository.delete(request);
 
-        Flowable<List<Identifiable>> sourceFlowable = sourceSingle
+        Single<List<Identifiable>> sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem.class, feedItem)
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(toIdentifiable);
+                .map(this::toIdentifiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged)).firstOrError();
+        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged));
     }
 
     private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onFeedItemProcessed(boolean leaveUnchanged) {
@@ -92,5 +109,18 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
             feedItems.removeAll(processed);
             return feedItems;
         };
+    }
+
+    private void removedProcessedRequest(JoinRequest request) {
+        Iterator<Identifiable> iterator = feedItems.iterator();
+        while (iterator.hasNext()) {
+            Identifiable identifiable = iterator.next();
+            if (!(identifiable instanceof FeedItem)) continue;
+
+            Model model = ((FeedItem) identifiable).getModel();
+            if (model instanceof JoinRequest && model.equals(request)) {
+                iterator.remove();
+            }
+        }
     }
 }
