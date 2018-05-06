@@ -176,6 +176,7 @@
 
     <!--PublicEventFragment-->
     <string name="event_public_search">Search for Public Events</string>
+    <string name="event_public_start_search">Search</string>
     <string name="event_distance">Distance</string>
     <string name="event_public_distance">%1$d miles</string>
     <string name="event_public_location_prompt">Location permission required</string>

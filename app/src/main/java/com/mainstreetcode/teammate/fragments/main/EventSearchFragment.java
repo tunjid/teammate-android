@@ -47,7 +47,9 @@ public class EventSearchFragment extends MainActivityFragment {
     private boolean leaveMap;
 
     private MapView mapView;
+    private TextView searchButton;
     private TextView searchTitle;
+    private ViewGroup cardView;
 
     public static EventSearchFragment newInstance() {
         EventSearchFragment fragment = new EventSearchFragment();
@@ -70,12 +72,18 @@ public class EventSearchFragment extends MainActivityFragment {
                 .withLinearLayoutManager()
                 .build();
 
-        searchTitle = root.findViewById(R.id.search_title);
-        searchTitle.setOnClickListener(clicked -> changeVisibility());
-
         mapView = root.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this::onMapReady);
+
+        View.OnClickListener searchClickListener = clicked -> toggleVisibility();
+
+        cardView = root.findViewById(R.id.card_view_wrapper);
+        searchTitle = root.findViewById(R.id.search_title);
+        searchButton = root.findViewById(R.id.search);
+
+        searchTitle.setOnClickListener(searchClickListener);
+        searchButton.setOnClickListener(searchClickListener);
 
         setTitleIcon(false);
         return root;
@@ -102,7 +110,8 @@ public class EventSearchFragment extends MainActivityFragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        mapView.onSaveInstanceState(outState);
+        try { mapView.onSaveInstanceState(outState);}
+        catch (Exception e) {Logger.log(getStableTag(), "Error in mapview onSaveInstanceState", e);}
         super.onSaveInstanceState(outState);
     }
 
@@ -115,6 +124,10 @@ public class EventSearchFragment extends MainActivityFragment {
     @Override
     public void onDestroyView() {
         mapView.onDestroy();
+        searchButton = null;
+        searchTitle = null;
+        cardView = null;
+        mapView = null;
         super.onDestroyView();
     }
 
@@ -170,6 +183,10 @@ public class EventSearchFragment extends MainActivityFragment {
         if (permissionGranted && requestCode == PERMISSIONS_REQUEST_LOCATION) requestLocation();
     }
 
+    private void fetchPublicEvents(GoogleMap map) {
+        disposables.add(eventViewModel.getPublicEvents(map).subscribe(events -> populateMap(map, events), defaultErrorHandler));
+    }
+
     private void requestLocation() {
         LatLng lastLocation = eventViewModel.getLastPublicSearchLocation();
 
@@ -204,7 +221,7 @@ public class EventSearchFragment extends MainActivityFragment {
     }
 
     private void onMapIdle(GoogleMap map) {
-        disposables.add(eventViewModel.getPublicEvents(map).subscribe(events -> populateMap(map, events), defaultErrorHandler));
+        fetchPublicEvents(map);
         disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler));
         scrollManager.notifyDataSetChanged();
     }
@@ -246,7 +263,7 @@ public class EventSearchFragment extends MainActivityFragment {
     }
 
     private void changeVisibility(boolean inVisible) {
-        TransitionManager.beginDelayedTransition((ViewGroup) scrollManager.getRecyclerView().getParent(), new AutoTransition());
+        TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
 
         setTitleIcon(inVisible);
 
@@ -256,12 +273,16 @@ public class EventSearchFragment extends MainActivityFragment {
         animatedDrawable.start();
 
         int visibility = inVisible ? View.GONE : View.VISIBLE;
+        searchButton.setVisibility(visibility);
         scrollManager.getRecyclerView().setVisibility(visibility);
     }
 
-    private void changeVisibility() {
+    private void toggleVisibility() {
         View view = scrollManager.getRecyclerView();
-        boolean visible = view.getVisibility() == View.VISIBLE;
-        changeVisibility(visible);
+        boolean invisible = view.getVisibility() == View.VISIBLE;
+        changeVisibility(invisible);
+
+        // Search
+        if (invisible) mapView.getMapAsync(this::fetchPublicEvents);
     }
 }
