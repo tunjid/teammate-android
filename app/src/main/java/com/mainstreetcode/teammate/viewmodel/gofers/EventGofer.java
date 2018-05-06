@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
+import com.google.android.gms.location.places.Place;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
@@ -100,6 +101,11 @@ public class EventGofer extends TeamHostingGofer<Event> {
 
     Completable delete() {
         return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+    }
+
+    public Single<DiffUtil.DiffResult> setPlace(Place place) {
+        model.setPlace(place);
+        return Identifiable.diff(Single.just(model.asIdentifiables()), this::getItems, this::preserveItems);
     }
 
     private List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {

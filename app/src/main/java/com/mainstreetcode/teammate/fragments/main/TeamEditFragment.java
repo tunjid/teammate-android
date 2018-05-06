@@ -156,8 +156,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     private void onAddressFound(Address address) {
-        team.setAddress(address);
-        scrollManager.notifyDataSetChanged();
+        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler));
         toggleProgress(false);
     }
 }

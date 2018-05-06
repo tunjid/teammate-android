@@ -19,6 +19,7 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 
 /**
@@ -39,54 +41,45 @@ public class Team extends TeamEntity
         HeaderedModel<Team>,
         ListableModel<Team> {
 
-    private static final int CITY_POSITION = 2;
-    private static final int STATE_POSITION = 3;
-    private static final int ZIP_POSITION = 4;
-
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
     private static final String NEW_TEAM = "new.team";
 
-    @Ignore private final List<Item<Team>> items;
+    @Ignore private static final IdCache holder = IdCache.cache(9);
 
     public Team(@NonNull String id, String name, String city, String state, String zip,
                 String description, String imageUrl,
                 Date created, LatLng location, Sport sport,
                 long storageUsed, long maxStorage, int minAge, int maxAge) {
         super(id, name, city, state, zip, description, imageUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
-        items = buildItems();
     }
 
     private Team(Parcel in) {
         super(in);
-        items = buildItems();
     }
 
     public static Team empty() {
         return new Team(NEW_TEAM, "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Item<Team>> buildItems() {
+    @Override
+    public List<Item<Team>> asItems() {
         return Arrays.asList(
-                Item.text(0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(1, Item.SPORT, R.string.team_sport, sport::getCode, this::setSport, this)
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
+                Item.text(holder.get(1),1, Item.SPORT, R.string.team_sport, sport::getCode, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(CITY_POSITION, Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
-                Item.text(STATE_POSITION, Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
-                Item.text(ZIP_POSITION, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
-                Item.text(5, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
-                Item.number(6, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
-                Item.number(7, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
-                Item.text(8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
+                Item.text(holder.get(2),2, Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
+                Item.text(holder.get(3),3, Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
+                Item.text(holder.get(4),4, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
+                Item.text(holder.get(5),5, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
+                Item.number(holder.get(6),6, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
+                Item.number(holder.get(7),7, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
+                Item.text(holder.get(8),8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
         );
     }
 
     @Override
-    public List<Item<Team>> asItems() { return items; }
-
-    @Override
     public Item<Team> getHeaderItem() {
-        return Item.text(0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -117,13 +110,18 @@ public class Team extends TeamEntity
     @Override
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
+        this.name = updatedTeam.name;
+        this.city = updatedTeam.city;
+        this.state = updatedTeam.state;
+        this.zip = updatedTeam.zip;
+        this.description = updatedTeam.description;
+        this.minAge = updatedTeam.minAge;
+        this.maxAge = updatedTeam.maxAge;
         this.imageUrl = updatedTeam.imageUrl;
         this.storageUsed = updatedTeam.storageUsed;
 
-        location = updatedTeam.location;
-        sport.update(updatedTeam.sport);
-
-        updateItemList(updatedTeam);
+        this.location = updatedTeam.location;
+        this.sport.update(updatedTeam.sport);
     }
 
     @Override
@@ -138,10 +136,6 @@ public class Team extends TeamEntity
     }
 
     public void setAddress(Address address) {
-        items.get(CITY_POSITION).setValue(address.getLocality());
-        items.get(STATE_POSITION).setValue(address.getAdminArea());
-        items.get(ZIP_POSITION).setValue(address.getPostalCode());
-
         location = new LatLng(address.getLatitude(), address.getLongitude());
     }
 

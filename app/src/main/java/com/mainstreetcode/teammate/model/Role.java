@@ -16,12 +16,15 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 
 /**
  * Roles on a team
@@ -38,41 +41,36 @@ public class Role extends RoleEntity
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
 
-    @Ignore private final List<Item<Role>> items;
+    @Ignore private static final IdCache holder = IdCache.cache(4);
 
     @SuppressWarnings("unused")
     public Role(String id, String imageUrl, String nickname, Position position, Team team, User user, Date created) {
         super(id, imageUrl, nickname, position, team, user, created);
-        items = buildItems();
     }
 
     protected Role(Parcel in) {
         super(in);
-        items = buildItems();
     }
 
     public static Role empty() {
         return new Role("", Config.getDefaultUserAvatar(), "", Position.empty(), Team.empty(), User.empty(), new Date());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Item<Role>> buildItems() {
+    @Override
+    public List<Item<Role>> asItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
-                Item.text(3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.text(holder.get(0),0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(holder.get(1),1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.text(holder.get(2),2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
+                Item.text(holder.get(3),3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 
     @Override
-    public List<Item<Role>> asItems() { return items; }
-
-    @Override
     public Item<Role> getHeaderItem() {
-        return Item.text(0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(EMPTY_STRING,0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -98,11 +96,11 @@ public class Role extends RoleEntity
     public void update(Role updated) {
         this.id = updated.getId();
         this.imageUrl = updated.imageUrl;
+        this.nickname = updated.nickname;
 
         this.position.update(updated.position);
         this.team.update(updated.team);
         this.user.update(updated.user);
-        updateItemList(updated);
     }
 
     @Override

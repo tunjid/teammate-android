@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.arch.persistence.room.Ignore;
 import android.location.Address;
 import android.support.annotation.Nullable;
 
@@ -12,6 +13,7 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -24,6 +26,8 @@ import static com.mainstreetcode.teammate.util.ModelUtils.parse;
 import static com.mainstreetcode.teammate.util.ModelUtils.prettyPrinter;
 
 public class EventSearchRequest implements ListableModel<EventSearchRequest> {
+
+    @Ignore private static final IdCache holder = IdCache.cache(5);
 
     private int distance;
     private Address address;
@@ -87,12 +91,12 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
     @SuppressWarnings("unchecked")
     private List<Item<EventSearchRequest>> buildItems() {
         return Arrays.asList(
-                Item.text(0, Item.LOCATION, R.string.location, this::getAddress, ignored -> {}, this),
-                Item.text(1, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
-                Item.text(2, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
+                Item.text(holder.get(0), 0, Item.LOCATION, R.string.location, this::getAddress, ignored -> {}, this),
+                Item.text(holder.get(1),1, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
+                Item.text(holder.get(2),2, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
-                Item.text(4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
+                Item.text(holder.get(3),3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
+                Item.text(holder.get(4),4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
         );
     }
 

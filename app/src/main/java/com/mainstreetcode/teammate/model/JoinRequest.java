@@ -16,12 +16,15 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 
 /**
  * Join request for a {@link Team}
@@ -35,9 +38,7 @@ public class JoinRequest extends JoinRequestEntity
         HeaderedModel<JoinRequest>,
         ListableModel<JoinRequest> {
 
-
-    private static final int ROLE_INDEX = 5;
-    @Ignore private final List<Item<JoinRequest>> items;
+    @Ignore private static final IdCache holder = IdCache.cache(13);
 
     @NonNull
     private static Team copyTeam(Team team) {
@@ -56,45 +57,38 @@ public class JoinRequest extends JoinRequestEntity
 
     public JoinRequest(boolean teamApproved, boolean userApproved, String id, Position position, Team team, User user, Date created) {
         super(teamApproved, userApproved, id, position, team, user, created);
-        items = buildItems();
     }
 
     protected JoinRequest(Parcel in) {
         super(in);
-        items = buildItems();
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<Item<JoinRequest>> buildItems() {
-        User user = getUser();
-        return Arrays.asList(
-                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(3, Item.ABOUT, R.string.user_about, user::getAbout, Item::ignore, this),
-                Item.email(4, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
-                // END USER ITEMS
-                Item.text(ROLE_INDEX, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
-                        .textTransformer(value -> Config.positionFromCode(value.toString()).getName()),
-                // START TEAM ITEMS
-                Item.text(6, Item.INPUT, R.string.team_name, team::getName, Item::ignore, this),
-                Item.text(7, Item.SPORT, R.string.team_sport, team.getSport()::getCode, Item::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(8, Item.CITY, R.string.city, team::getCity, Item::ignore, this),
-                Item.text(9, Item.STATE, R.string.state, team::getState, Item::ignore, this),
-                Item.text(10, Item.ZIP, R.string.zip, team::getZip, Item::ignore, this),
-                Item.text(11, Item.DESCRIPTION, R.string.team_description, team::getDescription, Item::ignore, this),
-                Item.number(12, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(team.getMinAge()), Item::ignore, this),
-                Item.number(13, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(team.getMaxAge()), Item::ignore, this)
-        );
     }
 
     @Override
     public List<Item<JoinRequest>> asItems() {
-        return items;
+        User user = getUser();
+        return Arrays.asList(
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.text(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, Item::ignore, this),
+                Item.email(holder.get(3), 3, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
+                // END USER ITEMS
+                Item.text(holder.get(4),4, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                        .textTransformer(value -> Config.positionFromCode(value.toString()).getName()),
+                // START TEAM ITEMS
+                Item.text(holder.get(5), 5, Item.INPUT, R.string.team_name, team::getName, Item::ignore, this),
+                Item.text(holder.get(6), 6, Item.SPORT, R.string.team_sport, team.getSport()::getCode, Item::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
+                Item.text(holder.get(7), 7, Item.CITY, R.string.city, team::getCity, Item::ignore, this),
+                Item.text(holder.get(8), 8, Item.STATE, R.string.state, team::getState, Item::ignore, this),
+                Item.text(holder.get(9), 9, Item.ZIP, R.string.zip, team::getZip, Item::ignore, this),
+                Item.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, team::getDescription, Item::ignore, this),
+                Item.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(team.getMinAge()), Item::ignore, this),
+                Item.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(team.getMaxAge()), Item::ignore, this)
+        );
     }
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        return Item.text(0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
@@ -129,12 +123,6 @@ public class JoinRequest extends JoinRequestEntity
         position.update(updated.position);
         if (updated.team.hasMajorFields()) team.update(updated.team);
         if (updated.user.hasMajorFields()) user.update(updated.user);
-    }
-
-    @Override
-    public void updateItemList(ListableModel<JoinRequest> other) {
-        items.clear();
-        items.addAll(buildItems());
     }
 
     @Override

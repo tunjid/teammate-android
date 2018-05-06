@@ -148,8 +148,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         if (resultCode != RESULT_OK) return;
 
         Place place = PlacePicker.getPlace(requireContext(), data);
-        event.setPlace(place);
-        scrollManager.notifyDataSetChanged();
+        disposables.add(gofer.setPlace(place).subscribe(this::onModelUpdated, emptyErrorHandler));
     }
 
     @Override
