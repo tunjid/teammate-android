@@ -180,7 +180,11 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     protected TeamHostingGofer<JoinRequest> gofer() { return gofer; }
 
     @Override
-    protected void onModelUpdated(DiffUtil.DiffResult result) { }
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        viewHolder.bind(getHeaderedModel());
+        scrollManager.onDiff(result);
+        toggleProgress(false);
+    }
 
     @Override
     public boolean canEditFields() {

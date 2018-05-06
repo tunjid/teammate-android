@@ -114,5 +114,9 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    protected void onModelUpdated(DiffUtil.DiffResult result) {}
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        viewHolder.bind(getHeaderedModel());
+        scrollManager.onDiff(result);
+        toggleProgress(false);
+    }
 }

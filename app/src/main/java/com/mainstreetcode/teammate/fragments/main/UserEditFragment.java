@@ -91,7 +91,9 @@ public class UserEditFragment extends HeaderedFragment<User>
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
+        viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
+        toggleProgress(false);
     }
 
     @Override

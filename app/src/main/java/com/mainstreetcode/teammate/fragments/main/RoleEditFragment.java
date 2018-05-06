@@ -112,7 +112,9 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     protected TeamHostingGofer<Role> gofer() { return gofer; }
 
     @Override
-    protected void onModelUpdated(DiffUtil.DiffResult result) { }
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        scrollManager.onDiff(result);
+    }
 
     @Override
     public void onClick(View view) {
