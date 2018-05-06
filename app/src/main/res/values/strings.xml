@@ -174,7 +174,7 @@
     <string name="no_blocked_users">No people have been blocked.</string>
 
     <!--PublicEventFragment-->
-    <string name="event_public_search">Search Options</string>
+    <string name="event_public_search">Search for Public Events</string>
     <string name="event_distance">Distance</string>
     <string name="event_public_distance">%1$d miles</string>
     <string name="event_public_location_prompt">Location permission required</string>
