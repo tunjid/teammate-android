@@ -27,7 +27,7 @@ import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.FeedFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
-import com.mainstreetcode.teammate.fragments.main.TeamDetailFragment;
+import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
@@ -199,7 +199,7 @@ public class MainActivity extends TeammatesBaseActivity
         if (model != null) route = route(
                 () -> route(model, Chat.class, Chat::getTeam, ChatFragment::newInstance),
                 () -> route(model, Event.class, event -> event, EventEditFragment::newInstance),
-                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamDetailFragment::newInstance)
+                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamMembersFragment::newInstance)
         );
 
         if (route != null) showFragment(route);

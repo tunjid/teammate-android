@@ -127,7 +127,7 @@ public final class TeamsFragment extends MainActivityFragment
         boolean canPick = target != null && target instanceof TeamAdapter.TeamAdapterListener;
 
         if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
-        else showFragment(TeamDetailFragment.newInstance(team));
+        else showFragment(TeamMembersFragment.newInstance(team));
     }
 
     @Override
