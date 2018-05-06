@@ -14,7 +14,7 @@ public class IdCache {
         ids = Collections.unmodifiableList(buildUniqueIds(count));
     }
 
-    public String get(int index){return ids.get(index);}
+    public String get(int index) {return ids.get(index);}
 
     private List<String> buildUniqueIds(int count) {
         List<String> result = new ArrayList<>(count);
