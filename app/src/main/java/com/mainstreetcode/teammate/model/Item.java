@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.InputType;
 
-import com.mainstreetcode.teammate.util.ObjectId;
 import com.mainstreetcode.teammate.util.Supplier;
 
 import java.lang.annotation.Retention;
@@ -58,12 +57,13 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     private @Nullable Function<CharSequence, CharSequence> textTransformer;
 
     private final T itemizedObject;
-    private final String id = new ObjectId().toHexString();
+    private final String id;
 
     private CharSequence value;
 
-    Item(int sortPosition, int inputType, int itemType, int stringRes,
+    Item(String id, int sortPosition, int inputType, int itemType, int stringRes,
          CharSequence value, @Nullable ValueChangeCallBack changeCallBack, T itemizedObject) {
+        this.id = id;
         this.sortPosition = sortPosition;
         this.inputType = inputType;
         this.itemType = itemType;
@@ -74,19 +74,22 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     }
 
 
-    public static <T> Item<T> number(int sortPosition, int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+    public static <T> Item<T> number(String id, int sortPosition, int itemType, int stringRes,
+                                     Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                      T itemizedObject) {
-        return new Item<>(sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+        return new Item<>(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static <T> Item<T> text(int sortPosition, int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+    public static <T> Item<T> text(String id, int sortPosition, int itemType, int stringRes,
+                                   Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                    T itemizedObject) {
-        return new Item<>(sortPosition, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+        return new Item<>(id, sortPosition, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static <T> Item<T> email(int sortPosition, int itemType, int stringRes, Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+    public static <T> Item<T> email(String id, int sortPosition, int itemType, int stringRes,
+                                    Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
                                     T itemizedObject) {
-        return new Item<>(sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+        return new Item<>(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
     public static Supplier<CharSequence> nullToEmpty(@Nullable String source) {
@@ -99,7 +102,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
         if (changeCallBack != null) changeCallBack.onValueChanged(value.toString());
     }
 
-    public Item textTransformer(Function<CharSequence, CharSequence> textTransformer) {
+    public Item<T> textTransformer(Function<CharSequence, CharSequence> textTransformer) {
         this.textTransformer = textTransformer;
         return this;
     }

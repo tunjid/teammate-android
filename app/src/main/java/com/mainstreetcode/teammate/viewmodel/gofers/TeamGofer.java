@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.location.Address;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -63,6 +64,12 @@ public class TeamGofer extends TeamHostingGofer<Team> {
      Single<DiffUtil.DiffResult> upsert() {
         Single<List<Item<Team>>> source = Single.defer(() -> upsertFunction.apply(model)).map(Team::asItems);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
+    }
+
+    public Single<DiffUtil.DiffResult> setAddress(Address address) {
+        model.setAddress(address);
+        Single<List<Item<Team>>> source = Single.just(model.<List<Item<Team>>>asItems());
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     @Nullable

@@ -15,6 +15,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -22,6 +23,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 
 @SuppressLint("ParcelCreator")
 public class BlockedUser implements UserHost,
@@ -36,7 +39,7 @@ public class BlockedUser implements UserHost,
     private final BlockReason reason;
     private final Date created;
 
-    @Ignore private final List<Item<BlockedUser>> items;
+    @Ignore private static final IdCache holder = IdCache.cache(3);
 
     private BlockedUser(String id, User user, Team team, BlockReason reason, Date created) {
         this.id = id;
@@ -44,22 +47,10 @@ public class BlockedUser implements UserHost,
         this.team = team;
         this.reason = reason;
         this.created = created;
-        items = buildItems();
     }
 
     public static BlockedUser block(User user, Team team, BlockReason reason) {
         return new BlockedUser("", user, team, reason, new Date());
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<Item<BlockedUser>> buildItems() {
-        User user = getUser();
-        return Arrays.asList(
-                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(3, Item.ROLE, R.string.team_role, reason::getCode, Item::ignore, this)
-                        .textTransformer(value -> Config.reasonFromCode(value.toString()).getName())
-        );
     }
 
     @Override
@@ -85,16 +76,27 @@ public class BlockedUser implements UserHost,
 
     @Override
     public Item<BlockedUser> getHeaderItem() {
-        return Item.text(0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.getImageUrl()), Item::ignore, this);
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.getImageUrl()), Item::ignore, this);
     }
 
     @Override
     public List<Item<BlockedUser>> asItems() {
-        return items;
+        User user = getUser();
+        return Arrays.asList(
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.text(holder.get(2), 2, Item.ROLE, R.string.team_role, reason::getCode, Item::ignore, this)
+                        .textTransformer(value -> Config.reasonFromCode(value.toString()).getName())
+        );
     }
 
     @Override
-    public void update(BlockedUser updated) { }
+    public void update(BlockedUser updated) {
+        this.id = updated.id;
+        this.reason.update(updated.reason);
+        if (updated.user.hasMajorFields()) this.user.update(updated.user);
+        if (updated.team.hasMajorFields()) this.team.update(updated.team);
+    }
 
     @Override
     public boolean isEmpty() {

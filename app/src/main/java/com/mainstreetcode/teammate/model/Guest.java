@@ -15,12 +15,15 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 
 public class Guest extends GuestEntity
         implements
@@ -30,39 +33,33 @@ public class Guest extends GuestEntity
         HeaderedModel<Guest>,
         ListableModel<Guest> {
 
-    @Ignore private final List<Item<Guest>> items;
+    @Ignore private static final IdCache holder = IdCache.cache(3);
 
     public Guest(@NonNull String id, User user, Event event, Date created, boolean attending) {
         super(id, user, event, created, attending);
-        items = buildItems();
     }
 
     private Guest(Parcel in) {
         super(in);
-        items = buildItems();
     }
 
     public static Guest forEvent(Event event, boolean attending) {
         return new Guest("", User.empty(), event, new Date(), attending);
     }
 
-    private List<Item<Guest>> buildItems() {
-        User user = getUser();
-        return Arrays.asList(
-                Item.text(0, Item.INPUT, R.string.first_name, user::getFirstName, ignored -> {}, this),
-                Item.text(1, Item.INPUT, R.string.last_name, user::getLastName, ignored -> {}, this),
-                Item.email(2, Item.ABOUT, R.string.user_about, user::getAbout, ignored -> {}, this)
-        );
-    }
-
     @Override
     public Item<Guest> getHeaderItem() {
-        return Item.text(0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
     public List<Item<Guest>> asItems() {
-        return items;
+        User user = getUser();
+        return Arrays.asList(
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, ignored -> {}, this),
+                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, ignored -> {}, this),
+                Item.email(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, ignored -> {}, this)
+        );
     }
 
     @Override

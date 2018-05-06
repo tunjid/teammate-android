@@ -15,11 +15,13 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 
@@ -31,38 +33,33 @@ public class User extends UserEntity implements
     public static final String PHOTO_UPLOAD_KEY = "user-photo";
 
     @Ignore private transient String password;
-    @Ignore private final List<Item<User>> items;
+    @Ignore private static final IdCache holder = IdCache.cache(4);
 
     public User(String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
         super(id, firstName, lastName, primaryEmail, about, imageUrl);
-        items = buildItems();
     }
 
     protected User(Parcel in) {
         super(in);
-        items = buildItems();
     }
 
     public static User empty() {
         return new User("", "", "", "", "", Config.getDefaultUserAvatar());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Item<User>> buildItems() {
+    @Override
+    public List<Item<User>> asItems() {
         return Arrays.asList(
-                Item.text(0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
-                Item.text(1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-                Item.email(2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.text(3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+                Item.text(holder.get(0),0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
+                Item.text(holder.get(1),1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
+                Item.email(holder.get(2),2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.text(holder.get(3),3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 
     @Override
-    public List<Item<User>> asItems() { return items; }
-
-    @Override
     public Item<User> getHeaderItem() {
-        return Item.text(0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -91,9 +88,11 @@ public class User extends UserEntity implements
     @Override
     public void update(User updatedUser) {
         this.id = updatedUser.id;
+        this.about = updatedUser.about;
+        this.firstName = updatedUser.firstName;
+        this.lastName = updatedUser.lastName;
         this.imageUrl = updatedUser.imageUrl;
-
-        updateItemList(updatedUser);
+        this.primaryEmail = updatedUser.primaryEmail;
     }
 
     @Override
