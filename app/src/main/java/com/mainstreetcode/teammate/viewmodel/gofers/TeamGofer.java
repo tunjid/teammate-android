@@ -57,12 +57,12 @@ public class TeamGofer extends TeamHostingGofer<Team> {
 
      Flowable<DiffUtil.DiffResult> fetch() {
         Flowable<List<Item<Team>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Team::asItems);
-        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
      Single<DiffUtil.DiffResult> upsert() {
         Single<List<Item<Team>>> source = Single.defer(() -> upsertFunction.apply(model)).map(Team::asItems);
-        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
     }
 
     @Nullable

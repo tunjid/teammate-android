@@ -124,14 +124,14 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
         Flowable<List<Item<JoinRequest>>> source = Flowable.defer(() -> getFunction.apply(model)).map(JoinRequest::asItems);
-        return Identifiable.diff(source, () -> items, (items, updated) -> filteredItems(model));
+        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
     }
 
     @Override
     Single<DiffUtil.DiffResult> upsert() {
         Single<JoinRequest> single = model.isEmpty() ? joinTeam() : approveRequest();
         Single<List<Item<JoinRequest>>> source = single.map(JoinRequest::asItems).doOnSuccess(ignored -> updateState());
-        return Identifiable.diff(source, () -> items, (items, updated) -> filteredItems(model));
+        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
     }
 
     @Override

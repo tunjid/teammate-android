@@ -154,11 +154,10 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        requireActivity().invalidateOptionsMenu();
         setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
+        super.togglePersistentUi();
     }
 
     @Override
@@ -175,6 +174,13 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     protected Gofer<Event> gofer() {return gofer;}
+
+    @Override
+    protected void onPrepComplete() {
+        scrollManager.notifyDataSetChanged();
+        requireActivity().invalidateOptionsMenu();
+        super.onPrepComplete();
+    }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
@@ -247,7 +253,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void onLocationClicked() {
-        fromUserPickerAction = true;
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
         Activity activity;

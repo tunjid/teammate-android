@@ -43,7 +43,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     private static final int FAB_DELAY = 400;
 
-    protected boolean fromUserPickerAction;
+    private boolean imageJustCropped;
 
     private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
@@ -82,19 +82,15 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     public void onResume() {
         super.onResume();
         Gofer<T> gofer = gofer();
-        disposables.add(gofer.prepare().subscribe(this::togglePersistentUi, ErrorHandler.EMPTY));
+        disposables.add(gofer.prepare().subscribe(this::onPrepComplete, ErrorHandler.EMPTY));
 
-        if (!fromUserPickerAction)
-            disposables.add(gofer.get().subscribe(this::onModelUpdated, defaultErrorHandler));
-
-        fromUserPickerAction = false;
+        if (canGetModel()) disposables.add(gofer.get().subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 
     @Override
     public void onImageClick() {
         viewHolder.bind(getHeaderedModel());
 
-        fromUserPickerAction = true;
         String errorMessage = gofer().getImageClickMessage(this);
 
         if (errorMessage == null) ImageWorkerFragment.requestCrop(this);
@@ -106,6 +102,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         Item item = getHeaderedModel().getHeaderItem();
         item.setValue(uri.getPath());
         viewHolder.bind(getHeaderedModel());
+        imageJustCropped = true;
     }
 
     @Override
@@ -113,6 +110,10 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         super.onDestroyView();
         viewHolder = null;
         appBarLayout = null;
+    }
+
+    protected void onPrepComplete() {
+        toggleFab(showsFab());
     }
 
     @Override
@@ -149,5 +150,11 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         toggleProgress(false);
         Activity activity = getActivity();
         if (activity != null) activity.onBackPressed();
+    }
+
+    private boolean canGetModel() {
+        boolean result = !ImageWorkerFragment.isPicking(this) && !imageJustCropped;
+        imageJustCropped = false;
+        return result;
     }
 }

@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.UUID;
 
@@ -37,9 +39,9 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     abstract Completable delete();
 
-    public final Single<DiffUtil.DiffResult> save() { return upsert().doOnSuccess(ignored -> prepare()).doOnError(onError); }
+    public final Single<DiffUtil.DiffResult> save() { return upsert().doOnSuccess(ignored -> startPrep()).doOnError(onError); }
 
-    public final Flowable<DiffUtil.DiffResult> get() { return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> prepare()).doOnError(onError); }
+    public final Flowable<DiffUtil.DiffResult> get() { return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> startPrep()).doOnError(onError); }
 
     public final Completable remove() { return delete().doOnError(onError).observeOn(mainThread()); }
 
@@ -47,4 +49,7 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     @Nullable
     public abstract String getImageClickMessage(Fragment fragment);
+
+    @SuppressLint("CheckResult")
+    void startPrep() { prepare().subscribe(() -> {}, ErrorHandler.EMPTY); }
 }

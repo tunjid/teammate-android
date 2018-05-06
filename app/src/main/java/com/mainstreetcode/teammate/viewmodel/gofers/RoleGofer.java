@@ -60,12 +60,12 @@ public class RoleGofer extends TeamHostingGofer<Role> {
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
         Flowable<List<Item<Role>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Role::asItems);
-        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
         Single<List<Item<Role>>> source = Single.defer(() -> updateFunction.apply(model)).map(Role::asItems);
-        return Identifiable.diff(source, () -> items, (itemsCopy, updated) -> updated);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     public Completable delete() {

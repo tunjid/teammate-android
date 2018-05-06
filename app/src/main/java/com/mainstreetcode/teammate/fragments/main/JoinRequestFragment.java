@@ -154,11 +154,10 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        requireActivity().invalidateOptionsMenu();
         setFabClickListener(this);
+        setFabIcon(R.drawable.ic_check_white_24dp);
+        setToolbarTitle(gofer.getToolbarTitle(this));
+        super.togglePersistentUi();
     }
 
     @Override
@@ -180,7 +179,17 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     protected TeamHostingGofer<JoinRequest> gofer() { return gofer; }
 
     @Override
-    protected void onModelUpdated(DiffUtil.DiffResult result) { }
+    protected void onPrepComplete() {
+        requireActivity().invalidateOptionsMenu();
+        super.onPrepComplete();
+    }
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        viewHolder.bind(getHeaderedModel());
+        scrollManager.onDiff(result);
+        toggleProgress(false);
+    }
 
     @Override
     public boolean canEditFields() {

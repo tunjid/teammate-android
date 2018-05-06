@@ -37,7 +37,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
  * Displays a {@link Team team's} {@link User members}.
  */
 
-public class TeamDetailFragment extends MainActivityFragment
+public class TeamMembersFragment extends MainActivityFragment
         implements
         TeamDetailAdapter.UserAdapterListener {
 
@@ -46,8 +46,8 @@ public class TeamDetailFragment extends MainActivityFragment
     private Team team;
     private List<Identifiable> teamModels;
 
-    public static TeamDetailFragment newInstance(Team team) {
-        TeamDetailFragment fragment = new TeamDetailFragment();
+    public static TeamMembersFragment newInstance(Team team) {
+        TeamMembersFragment fragment = new TeamMembersFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TEAM, team);
@@ -79,7 +79,7 @@ public class TeamDetailFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
 
-        Runnable refreshAction = () -> disposables.add(teamMemberViewModel.refresh(team).subscribe(TeamDetailFragment.this::onTeamUpdated, defaultErrorHandler));
+        Runnable refreshAction = () -> disposables.add(teamMemberViewModel.refresh(team).subscribe(TeamMembersFragment.this::onTeamUpdated, defaultErrorHandler));
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)

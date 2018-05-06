@@ -37,7 +37,7 @@ public class LocationViewModel extends ViewModel {
     public LocationViewModel() {}
 
     public Single<Address> fromPlace(Place place) {
-       return fromLocation(place.getLatLng());
+        return fromLocation(place.getLatLng());
     }
 
     public Single<Address> fromMap(GoogleMap map) {
@@ -64,7 +64,7 @@ public class LocationViewModel extends ViewModel {
     }
 
     public boolean hasPermission(Fragment fragment) {
-        return SDK_INT >= M && ContextCompat.checkSelfPermission(fragment.requireActivity(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return SDK_INT < M || ContextCompat.checkSelfPermission(fragment.requireActivity(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermission(Fragment fragment) {

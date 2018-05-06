@@ -30,8 +30,8 @@ public class LocalRoleViewModel extends ViewModel {
     }
 
     public Completable getRoleInTeam(User user, Team team) {
-        return !role.isEmpty() ? Completable.complete() : repository.getRoleInTeam(user.getId(), team.getId())
-                .map(this::onRoleFound).observeOn(mainThread()).flatMapCompletable(role1 -> Completable.complete());
+        return repository.getRoleInTeam(user.getId(), team.getId())
+                .map(this::onRoleFound).observeOn(mainThread()).flatMapCompletable(sameRole -> Completable.complete());
     }
 
     private Role onRoleFound(Role foundRole) {

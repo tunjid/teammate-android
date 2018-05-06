@@ -65,10 +65,10 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_unlock_white);
         setToolbarTitle(getString(R.string.blocked_user));
+        super.togglePersistentUi();
     }
 
     @Override
@@ -97,7 +97,15 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     }
 
     @Override
-    protected void onModelUpdated(DiffUtil.DiffResult result) {}
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        scrollManager.onDiff(result);
+    }
+
+    @Override
+    protected void onPrepComplete() {
+        requireActivity().invalidateOptionsMenu();
+        super.onPrepComplete();
+    }
 
     private void onUserUnblocked() {
         showSnackbar(getString(R.string.unblocked_user, blockedUser.getUser().getFirstName()));

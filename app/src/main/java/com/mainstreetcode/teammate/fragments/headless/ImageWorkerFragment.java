@@ -50,6 +50,8 @@ public class ImageWorkerFragment extends MainActivityFragment {
     private static final String[] MIME_TYPES = {"image/*", "video/*"};
     private static final String[] STORAGE_PERMISSIONS = {WRITE_EXTERNAL_STORAGE};
 
+    private boolean isPicking;
+
     public static ImageWorkerFragment newInstance() {
         return new ImageWorkerFragment();
     }
@@ -73,6 +75,11 @@ public class ImageWorkerFragment extends MainActivityFragment {
         });
     }
 
+    public static boolean isPicking(BaseFragment host) {
+        ImageWorkerFragment instance = getInstance(host);
+
+        return instance != null && instance.isPicking;
+    }
 
     public static void requestMultipleMedia(BaseFragment host) {
         requireInstanceWithActivity(host, (instance, activity) -> {
@@ -133,6 +140,7 @@ public class ImageWorkerFragment extends MainActivityFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         boolean isCropListener = isCropListener();
         boolean isMediaListener = isMediaListener();
+        boolean failed = resultCode != Activity.RESULT_OK;
 
         Fragment target = getParentFragment();
         if (target == null) return;
@@ -140,7 +148,10 @@ public class ImageWorkerFragment extends MainActivityFragment {
         Activity activity = getActivity();
         if (activity == null) return;
 
-        if (resultCode != Activity.RESULT_OK || (!isCropListener && !isMediaListener)) return;
+        if (failed && (requestCode == CROP_CHOOSER || requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE))
+            isPicking = false;
+
+        if (failed || (!isCropListener && !isMediaListener)) return;
 
         if (requestCode == CROP_CHOOSER && isCropListener) {
             CropImage.activity(data.getData())
@@ -155,6 +166,7 @@ public class ImageWorkerFragment extends MainActivityFragment {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             Uri resultUri = result.getUri();
             ((CropListener) target).onImageCropped(resultUri);
+            isPicking = false;
         }
         else if (requestCode == MULTIPLE_MEDIA_CHOOSER && isMediaListener) {
             MediaListener listener = (MediaListener) target;
@@ -183,6 +195,7 @@ public class ImageWorkerFragment extends MainActivityFragment {
     }
 
     private void startImagePicker() {
+        isPicking = true;
         Intent intent = new Intent();
         intent.setType(IMAGE_SELECTION);
         intent.setAction(Intent.ACTION_GET_CONTENT);
