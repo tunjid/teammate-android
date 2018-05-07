@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.annotation.SuppressLint;
-
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
@@ -37,7 +35,6 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
     }
 
     @Override
-    @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
 
