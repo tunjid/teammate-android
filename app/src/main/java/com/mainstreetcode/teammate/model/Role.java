@@ -60,17 +60,17 @@ public class Role extends RoleEntity
     public List<Item<Role>> asItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(holder.get(0),0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(holder.get(1),1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(holder.get(2),2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
-                Item.text(holder.get(3),3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.text(holder.get(2), 2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
+                Item.text(holder.get(3), 3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 
     @Override
     public Item<Role> getHeaderItem() {
-        return Item.text(EMPTY_STRING,0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
@@ -97,10 +97,9 @@ public class Role extends RoleEntity
         this.id = updated.getId();
         this.imageUrl = updated.imageUrl;
         this.nickname = updated.nickname;
-
         this.position.update(updated.position);
-        this.team.update(updated.team);
-        this.user.update(updated.user);
+        if (updated.team.hasMajorFields()) this.team.update(updated.team);
+        if (updated.user.hasMajorFields()) this.user.update(updated.user);
     }
 
     @Override

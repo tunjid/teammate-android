@@ -16,10 +16,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.util.TeammateException;
 
 import io.reactivex.Maybe;
-import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -36,11 +34,11 @@ public class LocationViewModel extends ViewModel {
 
     public LocationViewModel() {}
 
-    public Single<Address> fromPlace(Place place) {
+    public Maybe<Address> fromPlace(Place place) {
         return fromLocation(place.getLatLng());
     }
 
-    public Single<Address> fromMap(GoogleMap map) {
+    public Maybe<Address> fromMap(GoogleMap map) {
         return fromLocation(map.getCameraPosition().target);
     }
 
@@ -80,14 +78,11 @@ public class LocationViewModel extends ViewModel {
                 .show();
     }
 
-    private Single<Address> fromLocation(LatLng location) {
+    private Maybe<Address> fromLocation(LatLng location) {
         Geocoder geocoder = new Geocoder(App.getInstance());
 
-        return Single.fromCallable(() -> geocoder.getFromLocation(location.latitude, location.longitude, MAX_RESULTS))
-                .map(addresses -> {
-                    if (!addresses.isEmpty()) return addresses.get(0);
-                    else throw new TeammateException("No address found");
-                })
+        return Maybe.fromCallable(() -> geocoder.getFromLocation(location.latitude, location.longitude, MAX_RESULTS))
+                .flatMap(addresses -> addresses.isEmpty() ? Maybe.empty() : Maybe.just(addresses.get(0)))
                 .subscribeOn(io())
                 .observeOn(mainThread());
     }

@@ -1,18 +1,17 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Item;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+
+import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -22,45 +21,37 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private final Guest guest;
+    private final List<Item<Guest>> items;
 
-    public GuestAdapter(Guest guest, ImageWorkerFragment.ImagePickerListener listener) {
+    public GuestAdapter(List<Item<Guest>> items, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
-        this.guest = guest;
+        this.items = items;
     }
 
     @NonNull
     @Override
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_simple_input, viewGroup, false);
-
-        switch (viewType) {
-            case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
-            default:
-                return new BaseItemViewHolder(itemView);
-        }
+        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
-        viewHolder.bind(guest.asItems().get(i));
+        viewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return guest.asItems().size();
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return guest.asItems().get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
     @Override
     public long getItemId(int position) {
-        return guest.asItems().get(position).hashCode();
+        return items.get(position).hashCode();
     }
 
 }

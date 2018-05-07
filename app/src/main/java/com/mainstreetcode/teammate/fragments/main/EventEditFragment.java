@@ -158,7 +158,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     public void togglePersistentUi() {
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
+        setToolbarTitle(gofer.getToolbarTitle(this));
         super.togglePersistentUi();
     }
 
@@ -229,21 +229,9 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void selectTeam() {
-        if (!gofer.hasPrivilegedRole()) {
+        if (gofer.hasPrivilegedRole()) chooseTeam();
+        else if (!gofer.hasRole())
             showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));
-            return;
-        }
-        FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager == null) return;
-
-        TeamsFragment teamsFragment = TeamsFragment.newInstance();
-        teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
-
-        beginTransaction()
-                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
-                .commit();
-
-        toggleBottomSheet(true);
     }
 
     @Override
@@ -294,6 +282,20 @@ public class EventEditFragment extends HeaderedFragment<Event>
                 .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(true))
                 .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(false))
                 .show();
+    }
+
+    private void chooseTeam() {
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager == null) return;
+
+        TeamsFragment teamsFragment = TeamsFragment.newInstance();
+        teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
+
+        beginTransaction()
+                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
+                .commit();
+
+        toggleBottomSheet(true);
     }
 
     @Nullable

@@ -36,6 +36,8 @@ public abstract class TeamHostingGofer<T extends Model<T> & ListableModel<T> & T
                 .doOnSuccess(this::onRoleFound).ignoreElement().observeOn(mainThread());
     }
 
+    public boolean hasRole() {return !model.isEmpty();}
+
     public boolean hasPrivilegedRole() {
         return currentRole.isPrivilegedRole();
     }

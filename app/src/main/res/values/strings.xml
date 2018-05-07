@@ -147,7 +147,7 @@
 
     <!--EventDetailFragment-->
     <string name="create_event">Create Event</string>
-    <string name="edit_event">Edit Event</string>
+    <string name="edit_event">Event: %1$s</string>
     <string name="event_name">Event Name</string>
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
