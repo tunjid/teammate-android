@@ -70,6 +70,12 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return items;
     }
 
+    public String getToolbarTitle(Fragment fragment) {
+        return model.isEmpty()
+                ? fragment.getString(R.string.create_event)
+                : fragment.getString(R.string.edit_event, model.getName());
+    }
+
     @Nullable
     @Override
     public String getImageClickMessage(Fragment fragment) {

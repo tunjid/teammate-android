@@ -68,6 +68,11 @@ public class Guest extends GuestEntity
     }
 
     @Override
+    public boolean hasMajorFields() {
+        return user.hasMajorFields();
+    }
+
+    @Override
     public Team getTeam() {
         return event.getTeam();
     }
@@ -89,7 +94,7 @@ public class Guest extends GuestEntity
         id = updated.id;
         attending = updated.attending;
         created = updated.created;
-        user.update(updated.user);
+        if (updated.user.hasMajorFields()) user.update(updated.user);
     }
 
     @Override

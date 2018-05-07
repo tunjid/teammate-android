@@ -57,7 +57,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new GuestAdapter(guest, this))
+                .withAdapter(new GuestAdapter(gofer.getItems(), this))
                 .withLinearLayoutManager()
                 .build();
 
