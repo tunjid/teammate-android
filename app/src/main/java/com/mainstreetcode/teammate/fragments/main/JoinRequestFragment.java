@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,10 +19,9 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
-
-import java.util.UUID;
 
 import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.ACCEPTING;
 import static com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.APPROVING;
@@ -79,16 +77,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        JoinRequest temp = getArguments().getParcelable(ARG_JOIN_REQUEST);
-        User user = temp.getUser();
-        String id = temp.getId();
-        String userHash = user.isEmpty() ? UUID.randomUUID().toString() : temp.getUser().getId();
-        String teamHash = temp.getTeam().getCity();
-
-        return (temp != null)
-                ? TextUtils.join("-", new String[]{superResult, id, userHash, teamHash})
-                : superResult;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_JOIN_REQUEST));
     }
 
     @Override
