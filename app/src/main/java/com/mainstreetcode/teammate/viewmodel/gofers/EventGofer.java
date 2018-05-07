@@ -32,6 +32,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
 
     private boolean isSettingLocation;
     private final List<Identifiable> items;
+    private final Function<Guest, Single<Guest>> rsvpFunction;
     private final Function<Event, Flowable<Event>> getFunction;
     private final Function<Event, Single<Event>> deleteFunction;
     private final Function<Event, Single<Event>> updateFunction;
@@ -43,9 +44,11 @@ public class EventGofer extends TeamHostingGofer<Event> {
                       Flowable<BlockedUser> blockedUserFlowable,
                       Function<Event, Flowable<Event>> getFunction,
                       Function<Event, Single<Event>> upsertFunction,
-                      Function<Event, Single<Event>> deleteFunction) {
+                      Function<Event, Single<Event>> deleteFunction,
+                      Function<Guest, Single<Guest>> rsvpFunction) {
         super(model, onError);
         this.getFunction = getFunction;
+        this.rsvpFunction = rsvpFunction;
         this.updateFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
         this.items = new ArrayList<>(model.asItems());
@@ -89,7 +92,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(boolean attending) {
-        Single<List<Identifiable>> single = guestRepository.createOrUpdate(Guest.forEvent(model, attending)).map(Collections::singletonList);
+        Single<List<Identifiable>> single = Single.defer(() -> rsvpFunction.apply(Guest.forEvent(model, attending)).map(Collections::singletonList));
         return Identifiable.diff(single, this::getItems, (staleCopy, singletonGuestList) -> {
             staleCopy.removeAll(singletonGuestList);
             staleCopy.addAll(singletonGuestList);

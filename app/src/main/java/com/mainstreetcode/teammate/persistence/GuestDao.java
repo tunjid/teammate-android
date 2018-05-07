@@ -46,10 +46,18 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
             ")")
     public abstract void deleteUsers(String userId, String teamId);
 
-    @Query("SELECT * FROM guests as role" +
+    @Query("SELECT * FROM guests" +
             " WHERE :eventId = guest_event" +
             " AND guest_created < :date" +
             " ORDER BY guest_created DESC" +
             " LIMIT 40")
     public abstract Maybe<List<Guest>> getGuests(String eventId, Date date);
+
+    @Query("SELECT * FROM guests" +
+            " WHERE :userId = guest_user" +
+            " AND guest_created < :date" +
+            " AND guest_attending = 1" +
+            " ORDER BY guest_created DESC" +
+            " LIMIT 40")
+    public abstract Maybe<List<Guest>> getRsvpList(String userId, Date date);
 }

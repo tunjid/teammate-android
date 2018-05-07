@@ -221,6 +221,9 @@
     <string name="flag_media_message">Do you want to report this post as inappropriate? The post will be temporarily removed and will be reviewed by our compliance team.</string>
     <string name="media_flagged">This item has been flagged</string>
 
+    <!--AttendingFragment-->
+    <string name="attending_events">RSVP List</string>
+
     <!--Notifier-->
     <string name="roles">Roles</string>
     <string name="join_requests">Join Requests</string>
@@ -238,6 +241,7 @@
     <string name="no_team">You aren\'t part of any teams. Tap the floating button to create one or search for your team.</string>
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team! Tap the floating button to upload.</string>
+    <string name="no_rsvp">You aren\'t attending any events.</string>
 
     <!--Facebook-->
     <string name="facebook_app_id">2000415723539146</string>

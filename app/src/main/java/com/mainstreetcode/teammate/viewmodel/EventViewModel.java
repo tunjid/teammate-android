@@ -30,6 +30,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 
 import static android.location.Location.distanceBetween;
@@ -58,7 +59,10 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     public EventGofer gofer(Event event) {
-        return new EventGofer(event, onError(event), blockedUserAlert, this::getEvent, this::createOrUpdateEvent, this::delete);
+        Function<Guest, Single<Guest>> rsvpFunction = source -> GuestRepository.getInstance().createOrUpdate(source).doOnSuccess(guest -> {
+            if (!guest.isAttending()) pushModelAlert(Alert.eventAbsentee(guest.getEvent()));
+        });
+        return new EventGofer(event, onError(event), blockedUserAlert, this::getEvent, this::createOrUpdateEvent, this::delete, rsvpFunction);
     }
 
     public GuestGofer gofer(Guest guest) {
@@ -103,7 +107,10 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     public Single<Event> delete(final Event event) {
-        return repository.delete(event).doOnSuccess(getModelList(event.getTeam())::remove);
+        return repository.delete(event).doOnSuccess(deleted -> {
+            getModelList(event.getTeam()).remove(deleted);
+            pushModelAlert(Alert.eventAbsentee(deleted));
+        });
     }
 
     public Flowable<List<Event>> getPublicEvents(GoogleMap map) {
