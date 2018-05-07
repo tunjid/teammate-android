@@ -4,12 +4,15 @@ package com.mainstreetcode.teammate.repository;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.EventDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.TransformingSequentialList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,6 +91,19 @@ public class EventRepository extends TeamQueryRepository<Event> {
     @Override
     Maybe<List<Event>> remoteModelsBefore(Team team, @Nullable Date date) {
         return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+    }
+
+    public Flowable<List<Event>> attending(@Nullable Date date) {
+        User current = UserRepository.getInstance().getCurrentUser();
+        Date localDate = date == null ? getFutureDate() : date;
+
+        Maybe<List<Event>> local = AppDatabase.getInstance().guestDao().getRsvpList(current.getId(), localDate)
+                .map(guests -> (List<Event>) new ArrayList<>(new TransformingSequentialList<>(guests, Guest::getEvent)))
+                .subscribeOn(io());
+
+        Maybe<List<Event>> remote = api.eventsAttending(date).map(getSaveManyFunction()).toMaybe();
+
+        return fetchThenGet(local, remote);
     }
 
     @Override

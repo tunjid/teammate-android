@@ -158,6 +158,9 @@ public interface TeammateApi {
     @GET("/api/teams/{teamId}/events")
     Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
 
+    @GET("/api/events/attending")
+    Single<List<Event>> eventsAttending(@Query(DATE_QUERY) Date date);
+
     @POST("/api/events/public")
     Single<List<Event>> getPublicEvents(@Body EventSearchRequest request);
 
