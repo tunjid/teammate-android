@@ -106,19 +106,15 @@ public class Event extends EventEntity
     }
 
     @Override
-    @SuppressLint("CheckResult")
     public void update(Event updatedEvent) {
         this.id = updatedEvent.id;
         this.notes = updatedEvent.notes;
         this.imageUrl = updatedEvent.imageUrl;
-
         this.endDate = updatedEvent.endDate;
         this.startDate = updatedEvent.startDate;
-
         this.location = updatedEvent.location;
-
-        this.team.update(updatedEvent.team);
         this.visibility.update(updatedEvent.visibility);
+        if (updatedEvent.team.hasMajorFields()) this.team.update(updatedEvent.team);
     }
 
     @Override
