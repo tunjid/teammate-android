@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
+import android.arch.core.util.Function;
 import android.content.res.ColorStateList;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
@@ -17,7 +18,8 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.Supplier;
 
-import static android.view.View.*;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * Viewholder for editing simple text fields for an {@link Item}
@@ -31,6 +33,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     private final TextInputLayout inputLayout;
     private final Supplier<Boolean> errorChecker;
     private final Supplier<Boolean> enabler;
+
+    @Nullable private Function<Item, Boolean> visibilitySupplier;
 
     public InputViewHolder(View itemView, Supplier<Boolean> enabler, @Nullable Supplier<Boolean> errorChecker) {
         super(itemView);
@@ -49,7 +53,11 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     public InputViewHolder setButtonRunnable(@DrawableRes int icon, Runnable clickRunnable) {
-        button.setVisibility(VISIBLE);
+        return setButtonRunnable(input -> true, icon, clickRunnable);
+    }
+
+    public InputViewHolder setButtonRunnable(Function<Item, Boolean> visibilitySupplier, @DrawableRes int icon, Runnable clickRunnable) {
+        this.visibilitySupplier = visibilitySupplier;
         button.setImageResource(icon);
         button.setOnClickListener(clicked -> clickRunnable.run());
         return this;
@@ -91,6 +99,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     private void setClickableState() {
         int colorInt = ContextCompat.getColor(itemView.getContext(), isEnabled() ? R.color.black : R.color.light_grey);
         editText.setTextColor(ColorStateList.valueOf(colorInt));
+
+        int visibility = item == null || visibilitySupplier == null ? GONE : visibilitySupplier.apply(item) ? VISIBLE : GONE;
+        button.setVisibility(visibility);
     }
 
     private boolean hasText() {

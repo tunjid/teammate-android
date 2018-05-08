@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.arch.core.util.Function;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
@@ -36,7 +37,10 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE)
+                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
+            case Item.ABOUT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
             case Item.NICKNAME:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canChangeRoleFields, Item.FALSE);
             case Item.ROLE:
@@ -59,6 +63,10 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     @Override
     public int getItemViewType(int position) {
         return items.get(position).getItemType();
+    }
+
+    private boolean showsChangePicture(Item item) {
+        return item.getStringRes() == R.string.first_name && adapterListener.canChangeRoleFields();
     }
 
     public interface RoleEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {

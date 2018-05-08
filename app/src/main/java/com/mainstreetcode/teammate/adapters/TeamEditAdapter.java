@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.arch.core.util.Function;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
@@ -41,7 +42,8 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.INPUT:
             case Item.NUMBER:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged)
+                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.DESCRIPTION:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::isPrivileged, FALSE);
             case Item.SPORT:
@@ -71,7 +73,12 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
         return items.get(position).getItemType();
     }
 
+    private boolean showsChangePicture(Item item) {
+        return item.getStringRes() == R.string.team_name && adapterListener.isPrivileged();
+    }
+
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
+
         void onAddressClicked();
 
         boolean isPrivileged();

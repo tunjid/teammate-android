@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.arch.core.util.Function;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -39,7 +40,8 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.TRUE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.TRUE)
+                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.ABOUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.TRUE, Item.FALSE);
             default:
@@ -67,4 +69,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
         return items.get(position).hashCode();
     }
 
+    private boolean showsChangePicture(Item item) {
+        return item.getStringRes() == R.string.first_name;
+    }
 }

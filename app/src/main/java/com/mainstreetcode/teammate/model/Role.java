@@ -41,7 +41,7 @@ public class Role extends RoleEntity
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
     private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
 
-    @Ignore private static final IdCache holder = IdCache.cache(4);
+    @Ignore private static final IdCache holder = IdCache.cache(5);
 
     @SuppressWarnings("unused")
     public Role(String id, String imageUrl, String nickname, Position position, Team team, User user, Date created) {
@@ -63,7 +63,8 @@ public class Role extends RoleEntity
                 Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
                 Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
                 Item.text(holder.get(2), 2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
-                Item.text(holder.get(3), 3, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.text(holder.get(3), 3, Item.ABOUT, R.string.user_about, user::getAbout, Item::ignore, this),
+                Item.text(holder.get(4), 4, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
