@@ -158,7 +158,6 @@ public class ImageWorkerFragment extends MainActivityFragment {
                     .setFixAspectRatio(true)
                     .setAspectRatio(1, 1)
                     .setMinCropWindowSize(80, 80)
-                    .setMaxCropResultSize(1000, 1000)
                     .setOutputCompressFormat(Bitmap.CompressFormat.PNG)
                     .start(activity, this);
         }
