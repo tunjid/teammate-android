@@ -57,7 +57,7 @@ public class TeamGofer extends TeamHostingGofer<Team> {
         return items;
     }
 
-    public boolean showsFab() {
+    public boolean canEditTeam() {
         return state == CREATING || hasPrivilegedRole();
     }
 

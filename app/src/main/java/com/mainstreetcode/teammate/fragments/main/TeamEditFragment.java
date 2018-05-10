@@ -93,7 +93,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public boolean showsFab() {
-        return gofer.showsFab();
+        return gofer.canEditTeam();
     }
 
     @Override
@@ -143,8 +143,8 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    public boolean isPrivileged() {
-        return gofer.hasPrivilegedRole();
+    public boolean canEditFields() {
+        return gofer.canEditTeam();
     }
 
     @Override
