@@ -138,6 +138,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    public void toggleAltToolbar(boolean show) {}
+
+    @Override
     public void toggleBottombar(boolean show) {}
 
     @Override
@@ -171,6 +174,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(title);
     }
+
+    @Override
+    public void setAltToolbarTitle(CharSequence title) {}
+
+    @Override
+    public void setAltToolbarMenu(int menu) {}
 
     @Override
     public void showSnackBar(CharSequence message) {
