@@ -164,7 +164,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         toggleFab(showsFab());
         toggleSystemUI(true);
         toggleToolbar(showsToolBar());
-        toggleAltToolbar(false);
         toggleBottombar(showsBottomNav());
     }
 
