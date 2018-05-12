@@ -113,12 +113,10 @@ public class MainActivity extends TeammatesBaseActivity
             }
 
             @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
-        route(savedInstanceState, getIntent());
 
+        route(savedInstanceState, getIntent());
         App.prime();
     }
 
