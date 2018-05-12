@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.MenuRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
@@ -91,6 +92,8 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void toggleToolbar(boolean show) {getPersistentUiController().toggleToolbar(show);}
 
+    protected void toggleAltToolbar(boolean show) {getPersistentUiController().toggleAltToolbar(show);}
+
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
 
     protected void toggleSystemUI(boolean show) {getPersistentUiController().toggleSystemUI(show);}
@@ -100,6 +103,10 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon);}
 
     protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
+
+    protected void setAltToolbarTitle(CharSequence title) {getPersistentUiController().setAltToolbarTitle(title);}
+
+    protected void setAltToolbarMenu(@MenuRes int menu) {getPersistentUiController().setAltToolbarMenu(menu);}
 
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
@@ -173,53 +180,42 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     private static final PersistentUiController DUMMY = new PersistentUiController() {
         @Override
-        public void toggleToolbar(boolean show) {
-
-        }
+        public void toggleToolbar(boolean show) {}
 
         @Override
-        public void toggleBottombar(boolean show) {
-
-        }
+        public void toggleAltToolbar(boolean show) {}
 
         @Override
-        public void toggleFab(boolean show) {
-
-        }
+        public void toggleBottombar(boolean show) {}
 
         @Override
-        public void toggleProgress(boolean show) {
-
-        }
+        public void toggleFab(boolean show) {}
 
         @Override
-        public void toggleSystemUI(boolean show) {
-
-        }
+        public void toggleProgress(boolean show) {}
 
         @Override
-        public void setFabIcon(int icon) {
-
-        }
+        public void toggleSystemUI(boolean show) {}
 
         @Override
-        public void showSnackBar(CharSequence message) {
-
-        }
+        public void setFabIcon(int icon) {}
 
         @Override
-        public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
-
-        }
+        public void showSnackBar(CharSequence message) {}
 
         @Override
-        public void setToolbarTitle(CharSequence title) {
-
-        }
+        public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {}
 
         @Override
-        public void setFabClickListener(View.OnClickListener clickListener) {
+        public void setToolbarTitle(CharSequence title) {}
 
-        }
+        @Override
+        public void setAltToolbarTitle(CharSequence title) {}
+
+        @Override
+        public void setAltToolbarMenu(int menu) {}
+
+        @Override
+        public void setFabClickListener(View.OnClickListener clickListener) {}
     };
 }

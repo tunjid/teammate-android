@@ -55,6 +55,8 @@ public class TeamRepository extends ModelRepository<Team> {
     public Single<Team> createOrUpdate(Team model) {
         Single<Team> teamSingle = model.isEmpty()
                 ? api.createTeam(model).map(getLocalUpdateFunction(model))
+                .flatMap(team -> RoleRepository.getInstance().getMyRoles().lastOrError())
+                .map(roles -> model)
                 : api.updateTeam(model.getId(), model).map(getLocalUpdateFunction(model))
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));
 

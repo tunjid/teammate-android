@@ -5,13 +5,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.transition.Fade;
-import android.support.transition.Transition;
-import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,8 +47,6 @@ public class MediaFragment extends MainActivityFragment
     private Team team;
     private List<Identifiable> items;
     private AtomicBoolean bottomBarState;
-
-    private Toolbar contextBar;
 
     public static MediaFragment newInstance(Team team) {
         MediaFragment fragment = new MediaFragment();
@@ -103,9 +97,6 @@ public class MediaFragment extends MainActivityFragment
                 .withGridLayoutManager(4)
                 .build();
 
-        contextBar = rootView.findViewById(R.id.alt_toolbar);
-        contextBar.inflateMenu(R.menu.fragment_media_context);
-        contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomBarState.set(true);
 
         return rootView;
@@ -123,6 +114,7 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        setAltToolbarMenu(R.menu.fragment_media_context);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
         setFabClickListener(this);
@@ -253,18 +245,8 @@ public class MediaFragment extends MainActivityFragment
     }
 
     private void toggleContextMenu(boolean show) {
-        //boolean current = contextBar.getVisibility() == View.VISIBLE;
-        ViewGroup root = (ViewGroup) getView();
-        if (root == null) return;
-
-        contextBar.setTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
-        //if (current == show) return;
-
-        toggleToolbar(!show);
-
-        Transition transition = new Fade().excludeTarget(scrollManager.getRecyclerView(), true);
-        TransitionManager.beginDelayedTransition(root, transition);
-        contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        setAltToolbarTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
+        toggleAltToolbar(show);
     }
 
     private void longClickMedia(Media media) {
@@ -284,6 +266,6 @@ public class MediaFragment extends MainActivityFragment
         if (!partialDelete) return;
 
         scrollManager.notifyDataSetChanged();
-        contextBar.postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
+        scrollManager.getRecyclerView().postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
     }
 }

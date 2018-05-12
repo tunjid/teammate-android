@@ -5,12 +5,14 @@ import android.arch.core.util.Function;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +58,7 @@ public class MainActivity extends TeammatesBaseActivity
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
+    private Toolbar altToolbar;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -96,9 +99,11 @@ public class MainActivity extends TeammatesBaseActivity
 
         TeammatesInstanceIdService.updateFcmToken();
 
+        altToolbar = findViewById(R.id.alt_toolbar);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
 
+        altToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -108,12 +113,10 @@ public class MainActivity extends TeammatesBaseActivity
             }
 
             @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
-        route(savedInstanceState, getIntent());
 
+        route(savedInstanceState, getIntent());
         App.prime();
     }
 
@@ -171,6 +174,32 @@ public class MainActivity extends TeammatesBaseActivity
     public void onBackPressed() {
         if (bottomSheetBehavior.getState() != STATE_HIDDEN) toggleBottomSheet(false);
         else super.onBackPressed();
+    }
+
+    @Override
+    public void setAltToolbarMenu(@MenuRes int menu) {
+        altToolbar.getMenu().clear();
+        altToolbar.inflateMenu(menu);
+    }
+
+    @Override
+    public void setAltToolbarTitle(CharSequence title) {
+        altToolbar.setTitle(title);
+    }
+
+    @Override
+    public void toggleAltToolbar(boolean show) {
+        TeammatesBaseFragment current = (TeammatesBaseFragment) getCurrentFragment();
+        if (show) toggleToolbar(false);
+        else if (current != null) toggleToolbar(current.showsToolBar());
+
+        altToolbar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void toggleToolbar(boolean show) {
+        super.toggleToolbar(show);
+        altToolbar.setVisibility(View.INVISIBLE);
     }
 
     @Override

@@ -222,7 +222,10 @@ public class ImageWorkerFragment extends MainActivityFragment {
 
     private static <T> T requireInstanceWithActivity(BaseFragment host, BiFunction<ImageWorkerFragment, Activity, T> biFunction, T defaultValue) {
         ImageWorkerFragment instance = getInstance(host);
-        if (instance == null) return defaultValue;
+        if (instance == null) {
+            attach(host);
+            return defaultValue;
+        }
 
         Activity activity = host.getActivity();
         if (activity == null) return defaultValue;
@@ -259,7 +262,7 @@ public class ImageWorkerFragment extends MainActivityFragment {
         }
 
         @Override
-        public void subscribe(MaybeEmitter<List<Uri>> emitter) throws Exception {
+        public void subscribe(MaybeEmitter<List<Uri>> emitter) {
             emitter.onSuccess(onData());
         }
 
