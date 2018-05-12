@@ -104,9 +104,10 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        if (isTeamPicker()) return;
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_search_white_24dp);
-        setToolbarTitle(getString(isTeamPicker() ? R.string.pick_team : R.string.my_teams));
+        setToolbarTitle(getString(R.string.my_teams));
     }
 
     @Override
@@ -134,7 +135,7 @@ public final class TeamsFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                toggleBottomSheet(false);
+                hideBottomSheet();
                 showFragment(TeamSearchFragment.newInstance());
                 break;
         }

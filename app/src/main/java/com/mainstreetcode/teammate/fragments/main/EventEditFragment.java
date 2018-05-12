@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,6 +23,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.EventEditAdapter;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
@@ -221,7 +221,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     public void onTeamClicked(Team team) {
         eventViewModel.onEventTeamChanged(event, team);
-        toggleBottomSheet(false);
+        hideBottomSheet();
 
         int index = event.asIdentifiables().indexOf(team);
         if (index > -1) scrollManager.notifyItemChanged(index);
@@ -285,17 +285,14 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     private void chooseTeam() {
-        FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager == null) return;
-
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
 
-        beginTransaction()
-                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
-                .commit();
-
-        toggleBottomSheet(true);
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setTitle(getString(R.string.pick_team))
+                .setFragment(teamsFragment)
+                .build());
     }
 
     @Nullable

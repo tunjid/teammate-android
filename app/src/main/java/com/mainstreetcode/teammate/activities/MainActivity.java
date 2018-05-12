@@ -58,6 +58,7 @@ public class MainActivity extends TeammatesBaseActivity
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
+    private Toolbar bottomSheetToolbar;
     private Toolbar altToolbar;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -100,10 +101,12 @@ public class MainActivity extends TeammatesBaseActivity
         TeammatesInstanceIdService.updateFcmToken();
 
         altToolbar = findViewById(R.id.alt_toolbar);
+        bottomSheetToolbar = findViewById(R.id.bottom_toolbar);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
 
         altToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+        bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -172,7 +175,7 @@ public class MainActivity extends TeammatesBaseActivity
 
     @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior.getState() != STATE_HIDDEN) toggleBottomSheet(false);
+        if (bottomSheetBehavior.getState() != STATE_HIDDEN) hideBottomSheet();
         else super.onBackPressed();
     }
 
@@ -210,14 +213,30 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    public void toggleBottomSheet(boolean show) {
-        bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_HIDDEN);
-        if (!show) restoreHiddenViewState();
+    public void hideBottomSheet() {
+        bottomSheetBehavior.setState(STATE_HIDDEN);
+        restoreHiddenViewState();
+    }
+
+    @Override
+    public void showBottomSheet(Args args) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager == null) return;
+
+        BaseFragment toShow = args.getFragment();
+        fragmentManager.beginTransaction()
+                .replace(R.id.bottom_sheet, toShow, toShow.getStableTag())
+                .commit();
+
+        bottomSheetToolbar.getMenu().clear();
+        bottomSheetToolbar.inflateMenu(args.getMenuRes());
+        bottomSheetToolbar.setTitle(args.getTitle());
+        bottomSheetBehavior.setState(STATE_EXPANDED);
     }
 
     @Override
     public boolean showFragment(BaseFragment fragment) {
-        toggleBottomSheet(false);
+        hideBottomSheet();
         return super.showFragment(fragment);
     }
 

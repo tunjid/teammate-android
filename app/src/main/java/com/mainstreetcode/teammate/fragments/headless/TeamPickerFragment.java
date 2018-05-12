@@ -10,9 +10,10 @@ import android.support.v4.app.FragmentManager;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
+import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.model.Team;
@@ -98,7 +99,7 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
                 showFragment(MediaFragment.newInstance(item));
                 break;
         }
-        toggleBottomSheet(false);
+        hideBottomSheet();
     }
 
     private void pick() {
@@ -108,16 +109,13 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     }
 
     private void showPicker() {
-        FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager == null) return;
-
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, requestCode);
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
-                .commit();
-
-        toggleBottomSheet(true);
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(requestCode == R.id.request_event_team_pick ? R.menu.fragment_feed : R.menu.empty)
+                .setTitle(getString(R.string.pick_team))
+                .setFragment(teamsFragment)
+                .build());
     }
 }
