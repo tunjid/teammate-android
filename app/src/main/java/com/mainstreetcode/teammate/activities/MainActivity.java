@@ -25,9 +25,11 @@ import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
+import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.FeedFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
+import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
 import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
@@ -168,6 +170,12 @@ public class MainActivity extends TeammatesBaseActivity
                 return true;
             case R.id.action_settings:
                 showFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_rsvp_list:
+                showFragment(MyEventsFragment.newInstance());
+                return true;
+            case R.id.action_public_events:
+                showFragment(EventSearchFragment.newInstance());
                 return true;
         }
         return super.onOptionsItemSelected(item);

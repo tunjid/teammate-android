@@ -112,8 +112,11 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
         TeamsFragment teamsFragment = TeamsFragment.newInstance();
         teamsFragment.setTargetFragment(this, requestCode);
 
+        int menuRes = requestCode != R.id.request_event_team_pick || teamViewModel.isOnATeam()
+                ? R.menu.empty : R.menu.fragment_events_team_pick;
+
         showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(requestCode == R.id.request_event_team_pick ? R.menu.fragment_feed : R.menu.empty)
+                .setMenuRes(menuRes)
                 .setTitle(getString(R.string.pick_team))
                 .setFragment(teamsFragment)
                 .build());

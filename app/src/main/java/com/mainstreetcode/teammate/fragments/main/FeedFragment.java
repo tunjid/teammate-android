@@ -104,14 +104,6 @@ public final class FeedFragment extends MainActivityFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_rsvp_list:
-                showFragment(MyEventsFragment.newInstance());
-                return true;
-            case R.id.action_public_events:
-                showFragment(EventSearchFragment.newInstance());
-                return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
