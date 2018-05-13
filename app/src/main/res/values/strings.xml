@@ -55,7 +55,7 @@
     <string name="decline">Decline</string>
     <string name="clarify_invitation">Do you still want to join %1$s?</string>
     <string name="accept_invitation">Join %1$s?</string>
-    <string name="no_team_feed">You aren\'t part of any teams. Go to the team tab to find or create yours!</string>
+    <string name="no_team_feed">You aren\'t part of any teams.\n\nVisit the teams tab to find or create yours, or the events tab to find events nearby!</string>
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>

@@ -54,9 +54,12 @@ public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
 
     public static final String FEED_DEEP_LINK = "feed-deep-link";
+    public static final String BOTTOM_TOOLBAR_STATE = "BOTTOM_TOOLBAR_STATE";
 
     @Nullable
     private ViewHider bottombarHider;
+    @Nullable
+    private ToolbarState bottomToolbarState;
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -88,8 +91,8 @@ public class MainActivity extends TeammatesBaseActivity
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedState) {
+        super.onCreate(savedState);
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
 
@@ -121,7 +124,10 @@ public class MainActivity extends TeammatesBaseActivity
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
 
-        route(savedInstanceState, getIntent());
+        if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
+        refreshBottomToolbar();
+
+        route(savedState, getIntent());
         App.prime();
     }
 
@@ -182,6 +188,12 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onBackPressed() {
         if (bottomSheetBehavior.getState() != STATE_HIDDEN) hideBottomSheet();
         else super.onBackPressed();
@@ -236,10 +248,9 @@ public class MainActivity extends TeammatesBaseActivity
                 .replace(R.id.bottom_sheet, toShow, toShow.getStableTag())
                 .commit();
 
-        bottomSheetToolbar.getMenu().clear();
-        bottomSheetToolbar.inflateMenu(args.getMenuRes());
-        bottomSheetToolbar.setTitle(args.getTitle());
+        bottomToolbarState = args.getToolbarState();
         bottomSheetBehavior.setState(STATE_EXPANDED);
+        refreshBottomToolbar();
     }
 
     @Override
@@ -260,6 +271,13 @@ public class MainActivity extends TeammatesBaseActivity
 
         if (route != null) showFragment(route);
         else if (savedInstanceState == null) showFragment(FeedFragment.newInstance());
+    }
+
+    private void refreshBottomToolbar() {
+        if (bottomToolbarState == null) return;
+        bottomSheetToolbar.getMenu().clear();
+        bottomSheetToolbar.inflateMenu(bottomToolbarState.getMenuRes());
+        bottomSheetToolbar.setTitle(bottomToolbarState.getTitle());
     }
 
     private void restoreHiddenViewState() {
