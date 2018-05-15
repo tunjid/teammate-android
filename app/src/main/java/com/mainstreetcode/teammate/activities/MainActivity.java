@@ -246,6 +246,8 @@ public class MainActivity extends TeammatesBaseActivity
         BaseFragment toShow = args.getFragment();
         fragmentManager.beginTransaction()
                 .replace(R.id.bottom_sheet, toShow, toShow.getStableTag())
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                        android.R.anim.fade_in, android.R.anim.fade_out)
                 .commit();
 
         bottomToolbarState = args.getToolbarState();

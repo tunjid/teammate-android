@@ -55,7 +55,6 @@
     <string name="decline">Decline</string>
     <string name="clarify_invitation">Do you still want to join %1$s?</string>
     <string name="accept_invitation">Join %1$s?</string>
-    <string name="no_team_feed">You aren\'t part of any teams.\n\nVisit the teams tab to find or create yours, or the events tab to find events nearby!</string>
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>
@@ -236,12 +235,16 @@
     <string name="join_requests_notifier_description">Notifications for join requests</string>
 
     <!--Empty ViewHolder-->
-    <string name="no_events">Organize. Plan. Strategize. Your team\'s events live here.</string>
     <string name="no_feed">You\'re all caught up!</string>
-    <string name="no_team">You aren\'t part of any teams. Tap the floating button to create one or search for your team.</string>
+    <string name="no_team">Tap the floating button to create or search for your team.</string>
+    <string name="no_events">Organize. Plan. Strategize. Your team\'s events live here.</string>
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team! Tap the floating button to upload.</string>
     <string name="no_rsvp">You aren\'t attending any events.</string>
+    <string name="no_team_feed">Welcome! Use the tabs to join your team, or browse nearby events.</string>
+    <string name="no_team_event">Your teams\' events. Join a team or browse nearby public events.</string>
+    <string name="no_team_chat">Your teams\' chats. Join a team to start chatting</string>
+    <string name="no_team_media">Your teams\' moments. Join a team and relive them all.</string>
 
     <!--Facebook-->
     <string name="facebook_app_id">2000415723539146</string>
