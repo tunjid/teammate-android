@@ -35,13 +35,44 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin" />
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_bar_height"
+            android:layout_gravity="top"
+            android:background="@color/transparent"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_inset"
+            app:titleTextColor="@color/white" />
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/alt_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_bar_height"
+            android:layout_gravity="top"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_inset" />
+
         <FrameLayout
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorPrimary"
             app:behavior_hideable="true"
-            app:layout_behavior="android.support.design.widget.BottomSheetBehavior" />
+            app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/bottom_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_bar_height"
+                android:layout_gravity="top"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        </FrameLayout>
     </android.support.design.widget.CoordinatorLayout>
 
     <View
@@ -51,27 +82,6 @@
         app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintLeft_toRightOf="parent" />
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/action_bar_height"
-        android:background="@color/transparent"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_inset"
-        app:titleTextColor="@color/white" />
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/alt_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/action_bar_height"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:visibility="invisible"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_inset" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation"

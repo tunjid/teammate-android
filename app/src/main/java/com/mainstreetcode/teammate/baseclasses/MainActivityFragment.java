@@ -91,11 +91,16 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (shouldGoBack) activity.onBackPressed();
     }
 
-    protected void toggleBottomSheet(boolean show) {
+    protected void hideBottomSheet() {
         PersistentUiController controller = getPersistentUiController();
-        if (controller instanceof BottomSheetController) {
-            ((BottomSheetController) controller).toggleBottomSheet(show);
-        }
+        if (controller instanceof BottomSheetController)
+            ((BottomSheetController) controller).hideBottomSheet();
+    }
+
+    protected void showBottomSheet(BottomSheetController.Args args) {
+        PersistentUiController controller = getPersistentUiController();
+        if (controller instanceof BottomSheetController)
+            ((BottomSheetController) controller).showBottomSheet(args);
     }
 
     protected void onInconsistencyDetected(IndexOutOfBoundsException exception) {

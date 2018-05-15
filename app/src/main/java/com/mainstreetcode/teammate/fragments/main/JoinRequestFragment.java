@@ -221,9 +221,9 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
     private void onJoinRequestSent(DiffUtil.DiffResult result) {
         scrollManager.onDiff(result);
+        hideBottomSheet();
         toggleFab(false);
         toggleProgress(false);
-        toggleBottomSheet(false);
         setToolbarTitle(gofer.getToolbarTitle(this));
         showSnackbar(getString(request.isTeamApproved()
                 ? R.string.user_invite_sent
