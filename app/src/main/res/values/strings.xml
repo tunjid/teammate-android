@@ -258,5 +258,6 @@
     <!--Deep linking-->
     <string name="deep_link_filter_name">teammateDeepLink</string>
     <string name="deep_link_scheme">https</string>
-    <string name="deep_link_host">teammateapp.org</string>
+    <string name="domain_1">teammateapp.org</string>
+    <string name="domain_2">teammate.app</string>
 </resources>
