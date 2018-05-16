@@ -13,6 +13,8 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -244,10 +246,11 @@ public class MainActivity extends TeammatesBaseActivity
         if (fragmentManager == null) return;
 
         BaseFragment toShow = args.getFragment();
+        toShow.setEnterTransition(getBottomSheetTransition());
+        toShow.setExitTransition(getBottomSheetTransition());
+
         fragmentManager.beginTransaction()
                 .replace(R.id.bottom_sheet, toShow, toShow.getStableTag())
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-                        android.R.anim.fade_in, android.R.anim.fade_out)
                 .commit();
 
         bottomToolbarState = args.getToolbarState();
@@ -259,6 +262,10 @@ public class MainActivity extends TeammatesBaseActivity
     public boolean showFragment(BaseFragment fragment) {
         hideBottomSheet();
         return super.showFragment(fragment);
+    }
+
+    private Transition getBottomSheetTransition() {
+        return new Fade().setDuration(250);
     }
 
     private void route(@Nullable Bundle savedInstanceState, @NonNull Intent intent) {
