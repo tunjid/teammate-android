@@ -125,7 +125,7 @@ public class Role extends RoleEntity
 
     public String getTitle() {
         String title = user.getFirstName();
-        if (!TextUtils.isEmpty(nickname)) title = title + " \"" + nickname + "\"";
+        if (!TextUtils.isEmpty(nickname)) title = title + "\n\"" + nickname + "\"";
 
         return title;
     }
