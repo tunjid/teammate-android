@@ -65,7 +65,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="@string/domain_1"
+                    android:host="@string/domain_2"
                     android:scheme="@string/deep_link_scheme" />
             </intent-filter>
         </activity>

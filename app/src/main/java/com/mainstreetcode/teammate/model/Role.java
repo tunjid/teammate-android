@@ -123,6 +123,13 @@ public class Role extends RoleEntity
         return !TextUtils.isEmpty(positionCode) && !isEmpty() && PRIVILEGED_ROLES.contains(positionCode);
     }
 
+    public String getTitle() {
+        String title = user.getFirstName();
+        if (!TextUtils.isEmpty(nickname)) title = title + " \"" + nickname + "\"";
+
+        return title;
+    }
+
     @Override
     public int describeContents() {
         return 0;
