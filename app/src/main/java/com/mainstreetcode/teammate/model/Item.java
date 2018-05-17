@@ -92,7 +92,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
         return new Item<>(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
-    public static Supplier<CharSequence> nullToEmpty(@Nullable String source) {
+    public static Supplier<CharSequence> nullToEmpty(@Nullable CharSequence source) {
         CharSequence finalSource = source == null ? "" : source;
         return () -> finalSource;
     }

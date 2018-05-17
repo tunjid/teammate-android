@@ -78,7 +78,7 @@ public class UserRepository extends ModelRepository<User> {
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), User.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            remote = remote.flatMap(put -> api.uploadUserPhoto(model.getId(), body));
+            remote = remote.flatMap(put -> api.uploadUserPhoto(model.getId(), body).map(getLocalUpdateFunction(model)));
         }
 
         remote = remote.map(getSaveFunction());

@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import java.util.Date;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.parse;
+import static com.mainstreetcode.teammate.util.ModelUtils.processString;
 
 
 @Entity(tableName = "teams")
@@ -21,11 +22,11 @@ public class TeamEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "team_id") protected String id;
-    @ColumnInfo(name = "team_name") protected String name;
+    @ColumnInfo(name = "team_name") protected CharSequence name;
     @ColumnInfo(name = "team_city") protected String city;
     @ColumnInfo(name = "team_state") protected String state;
     @ColumnInfo(name = "team_zip") protected String zip;
-    @ColumnInfo(name = "team_description") protected String description;
+    @ColumnInfo(name = "team_description") protected CharSequence description;
     @ColumnInfo(name = "team_image_url") protected String imageUrl;
 
     @ColumnInfo(name = "team_sport") protected Sport sport;
@@ -37,8 +38,8 @@ public class TeamEntity implements Parcelable {
     @ColumnInfo(name = "team_min_age") protected int minAge;
     @ColumnInfo(name = "team_max_age") protected int maxAge;
 
-    public TeamEntity(@NonNull String id, String name, String city, String state,
-                      String zip, String description, String imageUrl,
+    public TeamEntity(@NonNull String id, CharSequence name, String city, String state,
+                      String zip, CharSequence description, String imageUrl,
                       Date created, LatLng location, Sport sport,
                       long storageUsed, long maxStorage,
                       int minAge, int maxAge) {
@@ -78,7 +79,7 @@ public class TeamEntity implements Parcelable {
     @NonNull
     public String getId() {return this.id;}
 
-    public String getName() {return this.name;}
+    public CharSequence getName() {return processString(this.name);}
 
     public CharSequence getSportAndName() {return sport.appendEmoji(name);}
 
@@ -116,8 +117,8 @@ public class TeamEntity implements Parcelable {
         return sport;
     }
 
-    public String getDescription() {
-        return description;
+    public CharSequence getDescription() {
+        return processString(description);
     }
 
     public String getImageUrl() {
@@ -179,11 +180,11 @@ public class TeamEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(name);
+        dest.writeString(name.toString());
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zip);
-        dest.writeString(description);
+        dest.writeString(description.toString());
         dest.writeString(imageUrl);
         dest.writeLong(created.getTime());
         dest.writeValue(location);

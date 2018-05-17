@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static com.mainstreetcode.teammate.util.ModelUtils.processString;
 
 
 @Entity(tableName = "events",
@@ -28,10 +29,10 @@ public class EventEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "event_id") protected String id;
-    @ColumnInfo(name = "event_name") protected String name;
-    @ColumnInfo(name = "event_notes") protected String notes;
+    @ColumnInfo(name = "event_name") protected CharSequence name;
+    @ColumnInfo(name = "event_notes") protected CharSequence notes;
     @ColumnInfo(name = "event_image_url") protected String imageUrl;
-    @ColumnInfo(name = "event_location_name") protected String locationName;
+    @ColumnInfo(name = "event_location_name") protected CharSequence locationName;
 
     @ColumnInfo(name = "event_team") protected Team team;
     @ColumnInfo(name = "event_start_date") protected Date startDate;
@@ -39,7 +40,7 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_location") protected LatLng location;
     @ColumnInfo(name = "event_visibility") protected Visibility visibility;
 
-    public EventEntity(@NonNull String id, String name, String notes, String imageUrl, String locationName,
+    public EventEntity(@NonNull String id, CharSequence name, CharSequence notes, String imageUrl, CharSequence locationName,
                        Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
         this.id = id;
         this.name = name;
@@ -71,12 +72,12 @@ public class EventEntity implements Parcelable {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public CharSequence getName() {
+        return processString(name);
     }
 
-    public String getNotes() {
-        return notes;
+    public CharSequence getNotes() {
+        return processString(notes);
     }
 
     public String getImageUrl() {
@@ -87,8 +88,8 @@ public class EventEntity implements Parcelable {
         return visibility;
     }
 
-    public String getLocationName() {
-        return locationName;
+    public CharSequence getLocationName() {
+        return processString(locationName);
     }
 
     public Team getTeam() {
@@ -167,10 +168,10 @@ public class EventEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(notes);
+        dest.writeString(name.toString());
+        dest.writeString(notes.toString());
         dest.writeString(imageUrl);
-        dest.writeString(locationName);
+        dest.writeString(locationName.toString());
         dest.writeLong(startDate.getTime());
         dest.writeLong(endDate.getTime());
         dest.writeValue(team);

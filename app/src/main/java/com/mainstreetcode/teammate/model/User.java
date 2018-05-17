@@ -35,7 +35,7 @@ public class User extends UserEntity implements
     @Ignore private transient String password;
     @Ignore private static final IdCache holder = IdCache.cache(4);
 
-    public User(String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
+    public User(String id, CharSequence firstName, CharSequence lastName, String primaryEmail, CharSequence about, String imageUrl) {
         super(id, firstName, lastName, primaryEmail, about, imageUrl);
     }
 
@@ -97,8 +97,8 @@ public class User extends UserEntity implements
 
     @Override
     public int compareTo(@NonNull User o) {
-        int firstNameComparison = firstName.compareTo(o.firstName);
-        int lastNameComparison = lastName.compareTo(o.lastName);
+        int firstNameComparison = firstName.toString().compareTo(o.firstName.toString());
+        int lastNameComparison = lastName.toString().compareTo(o.lastName.toString());
 
         return firstNameComparison != 0
                 ? firstNameComparison
@@ -166,10 +166,10 @@ public class User extends UserEntity implements
         @Override
         public JsonElement serialize(User src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject user = new JsonObject();
-            user.addProperty(FIRST_NAME_KEY, src.firstName);
-            user.addProperty(LAST_NAME_KEY, src.lastName);
+            user.addProperty(FIRST_NAME_KEY, src.firstName.toString());
+            user.addProperty(LAST_NAME_KEY, src.lastName.toString());
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
-            user.addProperty(ABOUT_KEY, src.about);
+            user.addProperty(ABOUT_KEY, src.about.toString());
 
             if (!TextUtils.isEmpty(src.password)) user.addProperty(PASSWORD_KEY, src.password);
 

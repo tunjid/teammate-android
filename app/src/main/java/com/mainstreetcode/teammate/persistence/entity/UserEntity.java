@@ -10,18 +10,20 @@ import android.support.annotation.NonNull;
 
 import com.mainstreetcode.teammate.model.User;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.processString;
+
 @Entity(tableName = "users")
 public class UserEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "user_id") protected String id;
-    @ColumnInfo(name = "user_first_name") protected String firstName;
-    @ColumnInfo(name = "user_last_name") protected String lastName;
+    @ColumnInfo(name = "user_first_name") protected CharSequence firstName;
+    @ColumnInfo(name = "user_last_name") protected CharSequence lastName;
     @ColumnInfo(name = "user_primary_email") protected String primaryEmail;
-    @ColumnInfo(name = "user_about") protected String about;
+    @ColumnInfo(name = "user_about") protected CharSequence about;
     @ColumnInfo(name = "user_image_url") protected String imageUrl;
 
-    public UserEntity(@NonNull String id, String firstName, String lastName, String primaryEmail, String about, String imageUrl) {
+    public UserEntity(@NonNull String id, CharSequence firstName, CharSequence lastName, String primaryEmail, CharSequence about, String imageUrl) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,10 +53,10 @@ public class UserEntity implements Parcelable {
     @NonNull
     public String getId() {return this.id;}
 
-    public String getFirstName() {return this.firstName;}
+    public CharSequence getFirstName() {return processString(this.firstName);}
 
     @SuppressWarnings("unused")
-    public String getLastName() {return this.lastName;}
+    public CharSequence getLastName() {return processString(this.lastName);}
 
     public String getPrimaryEmail() {return this.primaryEmail;}
 
@@ -62,8 +64,8 @@ public class UserEntity implements Parcelable {
         return imageUrl;
     }
 
-    public String getAbout() {
-        return about;
+    public CharSequence getAbout() {
+        return processString(about);
     }
 
     public void setFirstName(String firstName) {
@@ -104,10 +106,10 @@ public class UserEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(firstName);
-        dest.writeString(lastName);
+        dest.writeString(firstName.toString());
+        dest.writeString(lastName.toString());
         dest.writeString(primaryEmail);
-        dest.writeString(about);
+        dest.writeString(about.toString());
         dest.writeString(imageUrl);
     }
 

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.notifications;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -77,6 +78,7 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     @Override
+    @SuppressLint("CheckResult")
     protected void handleNotification(FeedItem<Chat> item) {
         ChatRepository repository = ChatRepository.getInstance();
         AtomicInteger count = new AtomicInteger(0);
@@ -104,7 +106,7 @@ public class ChatNotifier extends Notifier<Chat> {
                 .setAutoCancel(true);
 
         Chat first = chats.get(0);
-        String teamName = first.getTeam().getName();
+        CharSequence teamName = first.getTeam().getName();
 
         notificationBuilder.setSound(getNotificationSound(count));
         setGroupAlertSummary(notificationBuilder);
@@ -161,8 +163,8 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     @NonNull
-    private String getChatLine(Chat chat) {
-        String firstName = chat.getUser().getFirstName();
+    private CharSequence getChatLine(Chat chat) {
+        CharSequence firstName = chat.getUser().getFirstName();
         return app.getString(R.string.chat_notification_multiline_item, firstName, chat.getContent());
     }
 }

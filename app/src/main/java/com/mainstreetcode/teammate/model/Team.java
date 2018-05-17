@@ -46,8 +46,8 @@ public class Team extends TeamEntity
 
     @Ignore private static final IdCache holder = IdCache.cache(9);
 
-    public Team(@NonNull String id, String name, String city, String state, String zip,
-                String description, String imageUrl,
+    public Team(@NonNull String id, CharSequence name, String city, String state, String zip,
+                CharSequence description, String imageUrl,
                 Date created, LatLng location, Sport sport,
                 long storageUsed, long maxStorage, int minAge, int maxAge) {
         super(id, name, city, state, zip, description, imageUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
@@ -126,7 +126,7 @@ public class Team extends TeamEntity
 
     @Override
     public int compareTo(@NonNull Team o) {
-        int nameComparision = name.compareTo(o.name);
+        int nameComparision = name.toString().compareTo(o.name.toString());
         return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
     }
 
@@ -210,11 +210,11 @@ public class Team extends TeamEntity
         @Override
         public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject team = new JsonObject();
-            team.addProperty(NAME_KEY, src.name);
+            team.addProperty(NAME_KEY, src.name.toString());
             team.addProperty(CITY_KEY, src.city);
             team.addProperty(STATE_KEY, src.state);
             team.addProperty(ZIP_KEY, src.zip);
-            team.addProperty(DESCRIPTION_KEY, src.description);
+            team.addProperty(DESCRIPTION_KEY, src.description.toString());
             team.addProperty(MIN_AGE_KEY, src.minAge);
             team.addProperty(MAX_AGE_KEY, src.maxAge);
 

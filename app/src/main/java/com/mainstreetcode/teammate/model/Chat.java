@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static com.mainstreetcode.teammate.util.ModelUtils.processString;
 
 @Entity(
         tableName = "team_chats",
@@ -49,14 +50,14 @@ public class Chat implements
     @NonNull @PrimaryKey
     @ColumnInfo(name = "team_chat_id") private String id;
     @ColumnInfo(name = "team_chat_kind") private String kind;
-    @ColumnInfo(name = "team_chat_content") private String content;
+    @ColumnInfo(name = "team_chat_content") private CharSequence content;
 
     @ColumnInfo(name = "team_chat_user") private User user;
     @ColumnInfo(name = "team_chat_team") private Team team;
 
     @ColumnInfo(name = "team_chat_created") private Date created;
 
-    public Chat(@NonNull String id, String content, String kind,
+    public Chat(@NonNull String id, CharSequence content, String kind,
                 User user, Team team, Date created) {
         this.id = id;
         this.content = content;
@@ -141,8 +142,8 @@ public class Chat implements
         return team;
     }
 
-    public String getContent() {
-        return content;
+    public CharSequence getContent() {
+        return processString(content);
     }
 
     public String getCreatedDate() {
@@ -182,7 +183,7 @@ public class Chat implements
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(kind);
-        dest.writeString(content);
+        dest.writeString(content.toString());
         dest.writeValue(user);
         dest.writeValue(team);
         dest.writeLong(created != null ? created.getTime() : -1L);
@@ -235,9 +236,9 @@ public class Chat implements
         public JsonElement serialize(Chat src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject team = new JsonObject();
             team.addProperty(KIND_KEY, src.kind);
-            team.addProperty(CONTENT_KEY, src.content);
             team.addProperty(USER_KEY, src.user.getId());
             team.addProperty(TEAM_KEY, src.team.getId());
+            team.addProperty(CONTENT_KEY, src.content.toString());
 
             return team;
         }

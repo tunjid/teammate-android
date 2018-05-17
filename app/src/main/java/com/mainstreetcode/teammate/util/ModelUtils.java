@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.util;
 
 import android.support.annotation.Nullable;
+import android.support.text.emoji.EmojiCompat;
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -151,6 +152,11 @@ public class ModelUtils {
     public static boolean areNotEmpty(CharSequence... values) {
         for (CharSequence value : values) if (TextUtils.isEmpty(value)) return false;
         return true;
+    }
+
+    public static CharSequence processString(CharSequence source) {
+        EmojiCompat emojiCompat = EmojiCompat.get();
+        return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(source) : source;
     }
 
     @FunctionalInterface

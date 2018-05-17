@@ -231,13 +231,13 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     }
 
     private void onRequestDeleted() {
-        String name = request.getUser().getFirstName();
+        CharSequence name = request.getUser().getFirstName();
         if (!gofer.isRequestOwner()) showSnackbar(getString(R.string.removed_user, name));
         requireActivity().onBackPressed();
     }
 
     private void onRequestSaved() {
-        String name = request.getUser().getFirstName();
+        CharSequence name = request.getUser().getFirstName();
         if (!gofer.isRequestOwner()) showSnackbar(getString(R.string.added_user, name));
         requireActivity().onBackPressed();
     }
