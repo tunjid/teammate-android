@@ -4,14 +4,14 @@ import android.content.Context;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.TeamDetailAdapter;
+import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.User;
 
-public class JoinRequestViewHolder extends ModelCardViewHolder<JoinRequest, TeamDetailAdapter.UserAdapterListener>
+public class JoinRequestViewHolder extends ModelCardViewHolder<JoinRequest, TeamMemberAdapter.UserAdapterListener>
         implements View.OnClickListener {
 
-    public JoinRequestViewHolder(View itemView, TeamDetailAdapter.UserAdapterListener adapterListener) {
+    public JoinRequestViewHolder(View itemView, TeamMemberAdapter.UserAdapterListener adapterListener) {
         super(itemView, adapterListener);
         itemView.setOnClickListener(this);
     }
