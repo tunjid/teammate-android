@@ -29,9 +29,9 @@ public class EventEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "event_id") protected String id;
+    @ColumnInfo(name = "event_image_url") protected String imageUrl;
     @ColumnInfo(name = "event_name") protected CharSequence name;
     @ColumnInfo(name = "event_notes") protected CharSequence notes;
-    @ColumnInfo(name = "event_image_url") protected String imageUrl;
     @ColumnInfo(name = "event_location_name") protected CharSequence locationName;
 
     @ColumnInfo(name = "event_team") protected Team team;

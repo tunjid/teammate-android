@@ -22,12 +22,12 @@ public class TeamEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "team_id") protected String id;
-    @ColumnInfo(name = "team_name") protected CharSequence name;
+    @ColumnInfo(name = "team_image_url") protected String imageUrl;
     @ColumnInfo(name = "team_city") protected String city;
     @ColumnInfo(name = "team_state") protected String state;
     @ColumnInfo(name = "team_zip") protected String zip;
+    @ColumnInfo(name = "team_name") protected CharSequence name;
     @ColumnInfo(name = "team_description") protected CharSequence description;
-    @ColumnInfo(name = "team_image_url") protected String imageUrl;
 
     @ColumnInfo(name = "team_sport") protected Sport sport;
     @ColumnInfo(name = "team_created") protected Date created;

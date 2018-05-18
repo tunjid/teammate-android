@@ -17,11 +17,11 @@ public class UserEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "user_id") protected String id;
+    @ColumnInfo(name = "user_image_url") protected String imageUrl;
+    @ColumnInfo(name = "user_primary_email") protected String primaryEmail;
     @ColumnInfo(name = "user_first_name") protected CharSequence firstName;
     @ColumnInfo(name = "user_last_name") protected CharSequence lastName;
-    @ColumnInfo(name = "user_primary_email") protected String primaryEmail;
     @ColumnInfo(name = "user_about") protected CharSequence about;
-    @ColumnInfo(name = "user_image_url") protected String imageUrl;
 
     public UserEntity(@NonNull String id, String imageUrl, String primaryEmail, CharSequence firstName, CharSequence lastName, CharSequence about) {
         this.id = id;
