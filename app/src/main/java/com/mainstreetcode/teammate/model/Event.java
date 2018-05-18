@@ -108,11 +108,13 @@ public class Event extends EventEntity
     @Override
     public void update(Event updatedEvent) {
         this.id = updatedEvent.id;
+        this.name = updatedEvent.name;
         this.notes = updatedEvent.notes;
         this.imageUrl = updatedEvent.imageUrl;
         this.endDate = updatedEvent.endDate;
         this.startDate = updatedEvent.startDate;
         this.location = updatedEvent.location;
+        this.locationName = updatedEvent.locationName;
         this.visibility.update(updatedEvent.visibility);
         if (updatedEvent.team.hasMajorFields()) this.team.update(updatedEvent.team);
     }
