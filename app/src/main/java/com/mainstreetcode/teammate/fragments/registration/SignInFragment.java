@@ -26,11 +26,6 @@ import io.reactivex.Completable;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-/**
- * Splash screen
- * <p>
- * Created by Shemanigans on 6/1/17.
- */
 
 public final class SignInFragment extends RegistrationActivityFragment
         implements
@@ -132,9 +127,14 @@ public final class SignInFragment extends RegistrationActivityFragment
             String password = passwordInput.getText().toString();
 
             disposables.add(viewModel.signIn(email, password)
-                    .subscribe((authResult) -> RegistrationActivity.startMainActivity(getActivity()),
-                            defaultErrorHandler)
+                    .subscribe(user -> onSignIn(), defaultErrorHandler)
             );
         }
+    }
+
+    private void onSignIn() {
+        toggleProgress(false);
+        hideKeyboard();
+        RegistrationActivity.startMainActivity(getActivity());
     }
 }
