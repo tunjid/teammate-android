@@ -35,8 +35,8 @@ public class User extends UserEntity implements
     @Ignore private transient String password;
     @Ignore private static final IdCache holder = IdCache.cache(4);
 
-    public User(String id, CharSequence firstName, CharSequence lastName, String primaryEmail, CharSequence about, String imageUrl) {
-        super(id, firstName, lastName, primaryEmail, about, imageUrl);
+    public User(String id, String imageUrl, String primaryEmail, CharSequence firstName, CharSequence lastName, CharSequence about) {
+        super(id, imageUrl, primaryEmail, firstName, lastName, about);
     }
 
     protected User(Parcel in) {
@@ -44,16 +44,16 @@ public class User extends UserEntity implements
     }
 
     public static User empty() {
-        return new User("", "", "", "", "", Config.getDefaultUserAvatar());
+        return new User("", Config.getDefaultUserAvatar(), "", "", "", "");
     }
 
     @Override
     public List<Item<User>> asItems() {
         return Arrays.asList(
-                Item.text(holder.get(0),0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
-                Item.text(holder.get(1),1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-                Item.email(holder.get(2),2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.text(holder.get(3),3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
+                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
+                Item.email(holder.get(2), 2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.text(holder.get(3), 3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 
@@ -154,13 +154,13 @@ public class User extends UserEntity implements
             JsonObject userObject = json.getAsJsonObject();
 
             String id = asString(UID_KEY, userObject);
+            String imageUrl = asString(IMAGE_KEY, userObject);
+            String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
             String firstName = asString(FIRST_NAME_KEY, userObject);
             String lastName = asString(LAST_NAME_KEY, userObject);
-            String primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject);
             String about = asString(ABOUT_KEY, userObject);
-            String imageUrl = asString(IMAGE_KEY, userObject);
 
-            return new User(id, firstName, lastName, primaryEmail, about, imageUrl);
+            return new User(id, imageUrl, primaryEmail, firstName, lastName, about);
         }
 
         @Override

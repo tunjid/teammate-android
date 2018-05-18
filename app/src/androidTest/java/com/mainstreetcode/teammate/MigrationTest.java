@@ -7,7 +7,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.mainstreetcode.teammate.persistence.AppDatabase;
-import com.mainstreetcode.teammate.persistence.migrations.Migration12;
+import com.mainstreetcode.teammate.persistence.migrations.Migration1To2;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class MigrationTest {
 
         // Re-open the database with version 2 and provide
         // MIGRATION_1_2 as the migration process.
-        helper.runMigrationsAndValidate(TEST_DB, 2, true, new Migration12());
+        helper.runMigrationsAndValidate(TEST_DB, 2, true, new Migration1To2());
 
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.

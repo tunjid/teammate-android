@@ -46,11 +46,11 @@ public class Team extends TeamEntity
 
     @Ignore private static final IdCache holder = IdCache.cache(9);
 
-    public Team(@NonNull String id, CharSequence name, String city, String state, String zip,
-                CharSequence description, String imageUrl,
+    public Team(@NonNull String id, String imageUrl, String city, String state, String zip,
+                CharSequence name, CharSequence description,
                 Date created, LatLng location, Sport sport,
                 long storageUsed, long maxStorage, int minAge, int maxAge) {
-        super(id, name, city, state, zip, description, imageUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+        super(id, imageUrl, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
     }
 
     private Team(Parcel in) {
@@ -58,7 +58,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, "", "", "", "", "", Config.getDefaultTeamLogo(), new Date(), null, Sport.empty(), 0, 0, 0, 0);
+        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class Team extends TeamEntity
         private static final String ZIP_KEY = "zip";
         private static final String SPORT_KEY = "sport";
         private static final String DESCRIPTION_KEY = "description";
-        private static final String LOGO_KEY = "imageUrl";
+        private static final String IMAGE_URL_KEY = "imageUrl";
         private static final String CREATED_KEY = "created";
         private static final String LOCATION_KEY = "location";
         private static final String STORAGE_USED_KEY = "storageUsed";
@@ -195,7 +195,7 @@ public class Team extends TeamEntity
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
             String sportCode = ModelUtils.asString(SPORT_KEY, teamJson);
             String description = ModelUtils.asString(DESCRIPTION_KEY, teamJson);
-            String logoUrl = ModelUtils.asString(LOGO_KEY, teamJson);
+            String imageUrl = ModelUtils.asString(IMAGE_URL_KEY, teamJson);
             Date created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, teamJson));
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson);
             Sport sport = Config.sportFromCode(sportCode);
@@ -204,7 +204,7 @@ public class Team extends TeamEntity
             int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
             int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            return new Team(id, name, city, state, zip, description, logoUrl, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+            return new Team(id, imageUrl, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         }
 
         @Override

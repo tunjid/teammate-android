@@ -40,12 +40,13 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_location") protected LatLng location;
     @ColumnInfo(name = "event_visibility") protected Visibility visibility;
 
-    public EventEntity(@NonNull String id, CharSequence name, CharSequence notes, String imageUrl, CharSequence locationName,
+    public EventEntity(@NonNull String id, String imageUrl,
+                       CharSequence name, CharSequence notes, CharSequence locationName,
                        Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
         this.id = id;
+        this.imageUrl = imageUrl;
         this.name = name;
         this.notes = notes;
-        this.imageUrl = imageUrl;
         this.visibility = visibility;
         this.locationName = locationName;
         this.startDate = startDate;
@@ -56,9 +57,9 @@ public class EventEntity implements Parcelable {
 
     protected EventEntity(Parcel in) {
         id = in.readString();
+        imageUrl = in.readString();
         name = in.readString();
         notes = in.readString();
-        imageUrl = in.readString();
         locationName = in.readString();
         startDate = new Date(in.readLong());
         endDate = new Date(in.readLong());
@@ -168,9 +169,9 @@ public class EventEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeString(imageUrl);
         dest.writeString(name.toString());
         dest.writeString(notes.toString());
-        dest.writeString(imageUrl);
         dest.writeString(locationName.toString());
         dest.writeLong(startDate.getTime());
         dest.writeLong(endDate.getTime());

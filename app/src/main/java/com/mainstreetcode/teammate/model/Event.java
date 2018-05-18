@@ -51,12 +51,12 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", "", "", Config.getDefaultEventLogo(), "", date, date, Team.empty(), null, Visibility.empty());
+        return new Event("", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.empty());
     }
 
-    public Event(String id, CharSequence name, CharSequence notes, String imageUrl, CharSequence locationName,
+    public Event(String id, String imageUrl, CharSequence name, CharSequence notes, CharSequence locationName,
                  Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
-        super(id, name, notes, imageUrl, locationName, startDate, endDate, team, location, visibility);
+        super(id, imageUrl, name, notes, locationName, startDate, endDate, team, location, visibility);
     }
 
     protected Event(Parcel in) {
@@ -228,7 +228,7 @@ public class Event extends EventEntity
 
             if (team == null) team = Team.empty();
 
-            return new Event(id, name, notes, imageUrl, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
+            return new Event(id, imageUrl, name, notes, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
         }
     }
 }

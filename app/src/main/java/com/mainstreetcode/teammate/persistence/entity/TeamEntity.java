@@ -38,19 +38,19 @@ public class TeamEntity implements Parcelable {
     @ColumnInfo(name = "team_min_age") protected int minAge;
     @ColumnInfo(name = "team_max_age") protected int maxAge;
 
-    public TeamEntity(@NonNull String id, CharSequence name, String city, String state,
-                      String zip, CharSequence description, String imageUrl,
+    public TeamEntity(@NonNull String id, String imageUrl, String city, String state, String zip,
+                      CharSequence name, CharSequence description,
                       Date created, LatLng location, Sport sport,
                       long storageUsed, long maxStorage,
                       int minAge, int maxAge) {
         this.id = id;
-        this.name = name;
+        this.imageUrl = imageUrl;
         this.city = city;
         this.state = state;
         this.zip = zip;
-        this.sport = sport;
+        this.name = name;
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.sport = sport;
         this.created = created;
         this.location = location;
         this.storageUsed = storageUsed;
@@ -61,12 +61,12 @@ public class TeamEntity implements Parcelable {
 
     protected TeamEntity(Parcel in) {
         id = in.readString();
-        name = in.readString();
+        imageUrl = in.readString();
         city = in.readString();
         state = in.readString();
         zip = in.readString();
+        name = in.readString();
         description = in.readString();
-        imageUrl = in.readString();
         created = new Date(in.readLong());
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
         sport = Config.sportFromCode(in.readString());
@@ -180,12 +180,12 @@ public class TeamEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(name.toString());
+        dest.writeString(imageUrl);
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zip);
+        dest.writeString(name.toString());
         dest.writeString(description.toString());
-        dest.writeString(imageUrl);
         dest.writeLong(created.getTime());
         dest.writeValue(location);
         dest.writeString(sport.getCode());

@@ -23,13 +23,13 @@ public class UserEntity implements Parcelable {
     @ColumnInfo(name = "user_about") protected CharSequence about;
     @ColumnInfo(name = "user_image_url") protected String imageUrl;
 
-    public UserEntity(@NonNull String id, CharSequence firstName, CharSequence lastName, String primaryEmail, CharSequence about, String imageUrl) {
+    public UserEntity(@NonNull String id, String imageUrl, String primaryEmail, CharSequence firstName, CharSequence lastName, CharSequence about) {
         this.id = id;
+        this.imageUrl = imageUrl;
+        this.primaryEmail = primaryEmail;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.imageUrl = imageUrl;
         this.about = about;
-        this.primaryEmail = primaryEmail;
     }
 
     @Override
@@ -91,11 +91,11 @@ public class UserEntity implements Parcelable {
 
     protected UserEntity(Parcel in) {
         id = in.readString();
+        imageUrl = in.readString();
+        primaryEmail = in.readString();
         firstName = in.readString();
         lastName = in.readString();
-        primaryEmail = in.readString();
         about = in.readString();
-        imageUrl = in.readString();
     }
 
     @Override
@@ -106,11 +106,11 @@ public class UserEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeString(imageUrl);
+        dest.writeString(primaryEmail);
         dest.writeString(firstName.toString());
         dest.writeString(lastName.toString());
-        dest.writeString(primaryEmail);
         dest.writeString(about.toString());
-        dest.writeString(imageUrl);
     }
 
     public static final Parcelable.Creator<UserEntity> CREATOR = new Parcelable.Creator<UserEntity>() {

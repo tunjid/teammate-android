@@ -57,7 +57,8 @@ public class Chat implements
 
     @ColumnInfo(name = "team_chat_created") private Date created;
 
-    public Chat(@NonNull String id, CharSequence content, String kind,
+    public Chat(@NonNull String id, String kind,
+                CharSequence content,
                 User user, Team team, Date created) {
         this.id = id;
         this.content = content;
