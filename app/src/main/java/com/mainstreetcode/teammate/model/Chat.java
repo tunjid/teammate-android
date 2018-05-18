@@ -230,7 +230,7 @@ public class Chat implements
             if (user == null) user = User.empty();
             if (team == null) team = Team.empty();
 
-            return new Chat(id, content, kind, user, team, created);
+            return new Chat(id, kind, content, user, team, created);
         }
 
         @Override
