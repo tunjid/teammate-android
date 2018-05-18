@@ -31,11 +31,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ROLE;
  * Adapter for {@link Team}
  */
 
-public class TeamDetailAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamDetailAdapter.UserAdapterListener> {
+public class TeamMemberAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamMemberAdapter.UserAdapterListener> {
 
     private final List<Identifiable> teamModels;
 
-    public TeamDetailAdapter(List<Identifiable> teamModels, UserAdapterListener listener) {
+    public TeamMemberAdapter(List<Identifiable> teamModels, UserAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
         this.teamModels = teamModels;

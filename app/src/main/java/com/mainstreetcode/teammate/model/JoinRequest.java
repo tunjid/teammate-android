@@ -186,8 +186,8 @@ public class JoinRequest extends JoinRequestEntity
             User user = src.user;
 
             if (src.teamApproved) {
-                result.addProperty(USER_FIRST_NAME_KEY, user.getFirstName());
-                result.addProperty(USER_LAST_NAME_KEY, user.getLastName());
+                result.addProperty(USER_FIRST_NAME_KEY, user.getFirstName().toString());
+                result.addProperty(USER_LAST_NAME_KEY, user.getLastName().toString());
                 result.addProperty(USER_PRIMARY_EMAIL_KEY, user.getPrimaryEmail());
             }
             else {

@@ -13,11 +13,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -43,7 +45,6 @@ public class Role extends RoleEntity
 
     @Ignore private static final IdCache holder = IdCache.cache(5);
 
-    @SuppressWarnings("unused")
     public Role(String id, String imageUrl, String nickname, Position position, Team team, User user, Date created) {
         super(id, imageUrl, nickname, position, team, user, created);
     }
@@ -123,9 +124,11 @@ public class Role extends RoleEntity
         return !TextUtils.isEmpty(positionCode) && !isEmpty() && PRIVILEGED_ROLES.contains(positionCode);
     }
 
-    public String getTitle() {
-        String title = user.getFirstName();
-        if (!TextUtils.isEmpty(nickname)) title = title + "\n\"" + nickname + "\"";
+    public CharSequence getTitle() {
+        CharSequence title = user.getFirstName();
+        if (!TextUtils.isEmpty(nickname)) return new SpanBuilder(App.getInstance(), title)
+                .appendNewLine().appendCharsequence("\"" + nickname + "\"")
+                .build();
 
         return title;
     }
@@ -140,7 +143,6 @@ public class Role extends RoleEntity
         super.writeToParcel(dest, flags);
     }
 
-    @SuppressWarnings("unused")
     public static final Parcelable.Creator<Role> CREATOR = new Parcelable.Creator<Role>() {
         @Override
         public Role createFromParcel(Parcel in) {

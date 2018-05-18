@@ -6,9 +6,9 @@ import android.support.annotation.NonNull;
 
 import java.util.Date;
 
-public class Migration12 extends Migration {
+public class Migration1To2 extends Migration {
 
-    public Migration12() {
+    public Migration1To2() {
         super(1, 2);
     }
 

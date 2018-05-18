@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.TeamDetailAdapter;
+import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -39,7 +39,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 public class TeamMembersFragment extends MainActivityFragment
         implements
-        TeamDetailAdapter.UserAdapterListener {
+        TeamMemberAdapter.UserAdapterListener {
 
     private static final String ARG_TEAM = "team";
 
@@ -83,7 +83,7 @@ public class TeamMembersFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withAdapter(new TeamDetailAdapter(teamModels, this))
+                .withAdapter(new TeamMemberAdapter(teamModels, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addScrollListener(this::updateFabOnScroll)
                 .withStaggeredGridLayoutManager(2)

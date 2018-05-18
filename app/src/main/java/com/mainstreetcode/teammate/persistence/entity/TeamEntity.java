@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import java.util.Date;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.parse;
+import static com.mainstreetcode.teammate.util.ModelUtils.processString;
 
 
 @Entity(tableName = "teams")
@@ -21,12 +22,12 @@ public class TeamEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "team_id") protected String id;
-    @ColumnInfo(name = "team_name") protected String name;
+    @ColumnInfo(name = "team_image_url") protected String imageUrl;
     @ColumnInfo(name = "team_city") protected String city;
     @ColumnInfo(name = "team_state") protected String state;
     @ColumnInfo(name = "team_zip") protected String zip;
-    @ColumnInfo(name = "team_description") protected String description;
-    @ColumnInfo(name = "team_image_url") protected String imageUrl;
+    @ColumnInfo(name = "team_name") protected CharSequence name;
+    @ColumnInfo(name = "team_description") protected CharSequence description;
 
     @ColumnInfo(name = "team_sport") protected Sport sport;
     @ColumnInfo(name = "team_created") protected Date created;
@@ -37,19 +38,19 @@ public class TeamEntity implements Parcelable {
     @ColumnInfo(name = "team_min_age") protected int minAge;
     @ColumnInfo(name = "team_max_age") protected int maxAge;
 
-    public TeamEntity(@NonNull String id, String name, String city, String state,
-                      String zip, String description, String imageUrl,
+    public TeamEntity(@NonNull String id, String imageUrl, String city, String state, String zip,
+                      CharSequence name, CharSequence description,
                       Date created, LatLng location, Sport sport,
                       long storageUsed, long maxStorage,
                       int minAge, int maxAge) {
         this.id = id;
-        this.name = name;
+        this.imageUrl = imageUrl;
         this.city = city;
         this.state = state;
         this.zip = zip;
-        this.sport = sport;
+        this.name = name;
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.sport = sport;
         this.created = created;
         this.location = location;
         this.storageUsed = storageUsed;
@@ -60,12 +61,12 @@ public class TeamEntity implements Parcelable {
 
     protected TeamEntity(Parcel in) {
         id = in.readString();
-        name = in.readString();
+        imageUrl = in.readString();
         city = in.readString();
         state = in.readString();
         zip = in.readString();
+        name = in.readString();
         description = in.readString();
-        imageUrl = in.readString();
         created = new Date(in.readLong());
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
         sport = Config.sportFromCode(in.readString());
@@ -78,7 +79,7 @@ public class TeamEntity implements Parcelable {
     @NonNull
     public String getId() {return this.id;}
 
-    public String getName() {return this.name;}
+    public CharSequence getName() {return processString(this.name);}
 
     public CharSequence getSportAndName() {return sport.appendEmoji(name);}
 
@@ -116,8 +117,8 @@ public class TeamEntity implements Parcelable {
         return sport;
     }
 
-    public String getDescription() {
-        return description;
+    public CharSequence getDescription() {
+        return processString(description);
     }
 
     public String getImageUrl() {
@@ -179,12 +180,12 @@ public class TeamEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(name);
+        dest.writeString(imageUrl);
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zip);
-        dest.writeString(description);
-        dest.writeString(imageUrl);
+        dest.writeString(name.toString());
+        dest.writeString(description.toString());
         dest.writeLong(created.getTime());
         dest.writeValue(location);
         dest.writeString(sport.getCode());

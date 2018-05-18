@@ -3,16 +3,16 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.TeamDetailAdapter;
+import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.model.Role;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
-public class RoleViewHolder extends ModelCardViewHolder<Role, TeamDetailAdapter.UserAdapterListener>
+public class RoleViewHolder extends ModelCardViewHolder<Role, TeamMemberAdapter.UserAdapterListener>
         implements View.OnClickListener {
 
-    public RoleViewHolder(View itemView, TeamDetailAdapter.UserAdapterListener adapterListener) {
+    public RoleViewHolder(View itemView, TeamMemberAdapter.UserAdapterListener adapterListener) {
         super(itemView, adapterListener);
         itemView.setOnClickListener(this);
     }

@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammate.model.enums;
 
-import android.support.text.emoji.EmojiCompat;
-
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
@@ -23,7 +21,7 @@ public class Sport extends MetaData {
         return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
     }
 
-    public CharSequence appendEmoji(String text) {
+    public CharSequence appendEmoji(CharSequence text) {
         return new SpanBuilder(App.getInstance(), getEmoji())
                 .appendCharsequence("   ")
                 .appendCharsequence(text)
@@ -33,8 +31,7 @@ public class Sport extends MetaData {
     public CharSequence getName() { return appendEmoji(name); }
 
     public CharSequence getEmoji() {
-        EmojiCompat emojiCompat = EmojiCompat.get();
-        return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(emoji) : emoji;
+        return ModelUtils.processString(emoji);
     }
 
     public void reset() {

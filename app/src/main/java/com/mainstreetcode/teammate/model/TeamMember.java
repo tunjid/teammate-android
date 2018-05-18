@@ -110,7 +110,7 @@ public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
 
     @Override
     public int hashCode() {
-        return Objects.hash(wrappedModel);
+        return wrappedModel.hashCode();
     }
 
     @Override
