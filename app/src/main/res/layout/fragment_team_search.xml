@@ -7,10 +7,15 @@
 
     <TextView
         android:id="@+id/create_team"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_chat_box"
+        android:backgroundTint="@color/colorAccent"
         android:gravity="center"
-        android:padding="@dimen/single_margin"
+        android:paddingBottom="@dimen/half_margin"
+        android:paddingLeft="@dimen/single_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:paddingTop="@dimen/half_margin"
         android:text="@string/create_team_prompt"
         android:textColor="@color/white"
         android:textSize="@dimen/small_text"
