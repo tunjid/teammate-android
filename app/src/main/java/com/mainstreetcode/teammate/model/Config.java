@@ -104,7 +104,11 @@ public class Config implements Model<Config> {
 
     private static <T> List<T> getList(Function<Config, List<T>> function) {
         Config config = getCurrentConfig();
-        return config == null ? new ArrayList<>() : function.apply(config);
+
+        if (config != null && !config.isEmpty()) return function.apply(config);
+
+        fetchConfig();
+        return new ArrayList<>();
     }
 
     private static <T extends MetaData> T getFromCode(String code, Function<Config, List<T>> function, T defaultItem) {
