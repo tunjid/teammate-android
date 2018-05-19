@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.app.IntentService;
 import android.content.Context;
@@ -14,6 +15,7 @@ import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.notifications.MediaNotifier;
 import com.mainstreetcode.teammate.repository.MediaRepository;
 import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -21,8 +23,10 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import io.reactivex.Flowable;
@@ -38,7 +42,7 @@ public class MediaTransferIntentService extends IntentService {
     private static final String EXTRA_MEDIA = "com.mainstreetcode.teammates.extra.media";
     private static final String APP_ROOT_DIR = "teammate";
 
-    private static UploadStats stats;
+    private static UploadStats uploadStats;
     private static DownloadStats downloadStats;
 
     public MediaTransferIntentService() {
@@ -54,6 +58,7 @@ public class MediaTransferIntentService extends IntentService {
         context.startService(intent);
     }
 
+    @SuppressLint("CheckResult")
     public static void startActionDownload(Context context, List<Media> mediaList) {
         Intent intent = new Intent(context, MediaTransferIntentService.class);
         intent.setAction(ACTION_DOWNLOAD);
@@ -67,8 +72,12 @@ public class MediaTransferIntentService extends IntentService {
                 }, ErrorHandler.EMPTY);
     }
 
-    public static UploadStats getStats() {
-        return stats;
+    public static UploadStats getUploadStats() {
+        return uploadStats;
+    }
+
+    public static DownloadStats getDownloadStats() {
+        return downloadStats;
     }
 
     @Override
@@ -95,8 +104,8 @@ public class MediaTransferIntentService extends IntentService {
      * parameters.
      */
     private void handleActionUpload(User user, Team team, List<Uri> mediaUris) {
-        if (stats == null) stats = new UploadStats();
-        for (Uri uri : mediaUris) stats.enqueue(Media.fromUri(user, team, uri));
+        if (uploadStats == null) uploadStats = new UploadStats();
+        for (Uri uri : mediaUris) uploadStats.enqueue(Media.fromUri(user, team, uri));
     }
 
     private void handleActionDownload(List<Media> mediaList) {
@@ -123,6 +132,7 @@ public class MediaTransferIntentService extends IntentService {
             if (!isOnGoing) invoke();
         }
 
+        @SuppressLint("CheckResult")
         private void invoke() {
             if (uploadQueue.isEmpty()) {
                 numToUpload = 0;
@@ -171,6 +181,9 @@ public class MediaTransferIntentService extends IntentService {
     }
 
     public static class DownloadStats {
+
+        private Set<Long> downloadQueue = new HashSet<>();
+
         void enqueue(Media media) {
             if (!isExternalStorageWritable()) return;
 
@@ -187,11 +200,16 @@ public class MediaTransferIntentService extends IntentService {
             request.setTitle(getMediaTitle(media, app));
             request.allowScanningByMediaScanner();
 
-            downloadManager.enqueue(request
+            downloadQueue.add(downloadManager.enqueue(request
                     .setDestinationUri(Uri.fromFile(destination))
                     .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
                     .setAllowedOverRoaming(false)
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE));
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)));
+        }
+
+        public void onDownloadComplete(long id) {
+            if (downloadQueue.remove(id) && downloadQueue.isEmpty())
+                MediaNotifier.getInstance().notifyDownloadComplete();
         }
 
         private String getMediaTitle(Media media, App app) {

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.notifications;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -28,6 +29,8 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class MediaNotifier extends Notifier<Media> {
 
     private static final String MEDIA_UPLOADS = "media_uploads";
+    private static final int UPLOAD_NOTIFICATION_ID = 1;
+    private static final int DOWNLOAD_NOTIFICATION_ID = 2;
 
     private static MediaNotifier INSTANCE;
 
@@ -52,6 +55,7 @@ public class MediaNotifier extends Notifier<Media> {
                 buildNotificationChannel(MEDIA_UPLOADS, R.string.media_upload_channel_name, R.string.media_upload_channel_description, NotificationManager.IMPORTANCE_LOW)};
     }
 
+    @SuppressLint("CheckResult")
     public Single<Media> notifyOfUploads(Single<Media> mediaSingle, RequestBody requestBody) {
         if (!(requestBody instanceof ProgressRequestBody)) return mediaSingle;
 
@@ -63,28 +67,34 @@ public class MediaNotifier extends Notifier<Media> {
         return mediaSingle;
     }
 
-    private void updateProgress(int percentage) {
-        MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getStats();
+    public void notifyDownloadComplete() {
+        notifyOfDownload(mediaTransferBuilder()
+                .setContentTitle(app.getString(R.string.download_complete)));
+    }
 
-        notifyOfUpload(progressNotificationBuilder()
+    private void updateProgress(int percentage) {
+        MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getUploadStats();
+
+        notifyOfUpload(mediaTransferBuilder()
                 .setContentText(app.getString(R.string.upload_progress_status, stats.getNumAttempted(), stats.getNumToUpload(), stats.getNumErrors()))
                 .setContentTitle(app.getString(R.string.uploading_media))
                 .setProgress(100, percentage, false));
     }
 
+    @SuppressLint("CheckResult")
     private void onUploadComplete() {
-        MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getStats();
+        MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getUploadStats();
         if (!stats.isComplete()) return;
 
         Completable.timer(800, TimeUnit.MILLISECONDS).subscribe(
-                () -> notifyOfUpload(progressNotificationBuilder()
+                () -> notifyOfUpload(mediaTransferBuilder()
                         .setContentText(getUploadCompletionContentText(stats))
                         .setContentTitle(getUploadCompletionContentTitle(stats))
                         .setProgress(0, 0, false)),
                 ErrorHandler.EMPTY);
     }
 
-    private NotificationCompat.Builder progressNotificationBuilder() {
+    private NotificationCompat.Builder mediaTransferBuilder() {
         return new NotificationCompat.Builder(app, FeedItem.MEDIA)
                 .setDefaults(NotificationCompat.DEFAULT_SOUND)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -93,13 +103,22 @@ public class MediaNotifier extends Notifier<Media> {
     }
 
     private void notifyOfUpload(NotificationCompat.Builder builder) {
+        notifyOfMediaTransfer(builder, UPLOAD_NOTIFICATION_ID);
+
+    }
+
+    private void notifyOfDownload(NotificationCompat.Builder builder) {
+        notifyOfMediaTransfer(builder, DOWNLOAD_NOTIFICATION_ID);
+    }
+
+    private void notifyOfMediaTransfer(NotificationCompat.Builder builder, int notificationId) {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
-        if (notifier != null) notifier.notify(1, builder.build());
+        if (notifier != null) notifier.notify(notificationId, builder.build());
     }
 
     @NonNull
     private String getUploadCompletionContentTitle(MediaTransferIntentService.UploadStats stats) {
-        return stats.isAtMaxStorage() ? app.getString(R.string.upload_failed): app.getString(R.string.upload_complete);
+        return stats.isAtMaxStorage() ? app.getString(R.string.upload_failed) : app.getString(R.string.upload_complete);
     }
 
     @NonNull

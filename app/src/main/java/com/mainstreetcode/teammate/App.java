@@ -1,6 +1,11 @@
 package com.mainstreetcode.teammate;
 
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
@@ -28,17 +33,25 @@ public class App extends MultiDexApplication {
 
     static App INSTANCE;
 
+    private final BroadcastReceiver mediaDownloadListener = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+            MediaTransferIntentService.getDownloadStats().onDownloadComplete(downloadId);
+        }
+    };
+
+    public static App getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     @SuppressLint("CheckResult")
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
         initializeEmoji();
+        registerReceiver(mediaDownloadListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         //MobileAds.initialize(this, getString(R.string.admob_app_id));
-    }
-
-    public static App getInstance() {
-        return INSTANCE;
     }
 
     @SuppressLint("CheckResult")
