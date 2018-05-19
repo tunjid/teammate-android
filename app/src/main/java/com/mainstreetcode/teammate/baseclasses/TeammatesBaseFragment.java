@@ -16,6 +16,7 @@ import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Message;
@@ -176,6 +177,14 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected PersistentUiController getPersistentUiController() {
         Activity activity = getActivity();
         return activity == null ? DUMMY : ((PersistentUiController) activity);
+    }
+
+    protected void hideKeyboard() {
+        View root = getView();
+        if (root == null) return;
+
+        InputMethodManager imm = (InputMethodManager) root.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
 
     private static final PersistentUiController DUMMY = new PersistentUiController() {

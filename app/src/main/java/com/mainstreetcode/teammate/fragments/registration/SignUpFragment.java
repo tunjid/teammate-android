@@ -23,11 +23,6 @@ import io.reactivex.Completable;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-/**
- * Splash screen
- * <p>
- * Created by Shemanigans on 6/1/17.
- */
 
 public class SignUpFragment extends RegistrationActivityFragment
         implements
@@ -123,33 +118,21 @@ public class SignUpFragment extends RegistrationActivityFragment
                 && VALIDATOR.isValidPassword(passwordInput)) {
 
             String firstName = firstNameInput.getText().toString();
-            String lastname = lastNameInput.getText().toString();
+            String lastName = lastNameInput.getText().toString();
             String email = emailInput.getText().toString();
             String password = passwordInput.getText().toString();
 
             toggleProgress(true);
 
-            disposables.add(viewModel.signUp(firstName, lastname, email, password)
-                    .subscribe((user) -> RegistrationActivity.startMainActivity(getActivity()),
-                            defaultErrorHandler)
+            disposables.add(viewModel.signUp(firstName, lastName, email, password)
+                    .subscribe(user -> onSignUp(), defaultErrorHandler)
             );
         }
     }
-}
 
-// (exception) -> {
-//@StringRes int errorMessage;
-//        if (exception instanceof FirebaseAuthWeakPasswordException) {
-//        errorMessage = R.string.sign_up_error_weak_password;
-//        }
-//        else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-//        errorMessage = R.string.sign_up_error_invalid_credentials;
-//        }
-//        else if (exception instanceof FirebaseAuthUserCollisionException) {
-//        errorMessage = R.string.sign_up_error_duplicate_credentials;
-//        }
-//        else {
-//        errorMessage = R.string.sign_up_error_default;
-//        }
-//        Snackbar.make(emailInput, errorMessage, Snackbar.LENGTH_LONG).show();
-//        }
+    private void onSignUp() {
+        toggleProgress(false);
+        hideKeyboard();
+        RegistrationActivity.startMainActivity(getActivity());
+    }
+}

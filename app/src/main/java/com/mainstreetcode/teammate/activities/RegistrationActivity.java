@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
@@ -52,7 +53,8 @@ public class RegistrationActivity extends TeammatesBaseActivity {
         return domainMatches && data.getPath().contains("forgotPassword");
     }
 
-    public static void startMainActivity(Activity activity) {
+    public static void startMainActivity(@Nullable Activity activity) {
+        if (activity == null) return;
         Intent main = new Intent(activity, MainActivity.class);
         activity.startActivity(main);
         activity.finish();

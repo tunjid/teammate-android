@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.notifications;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -69,6 +70,7 @@ public abstract class Notifier<T extends Model<T>> {
         else notifier.cancel(getNotificationTag(model), getNotifyId().hashCode());
     }
 
+    @SuppressLint("CheckResult")
     public final void notify(FeedItem<T> item) {
         getRepository().get(item.getModel()).lastElement()
                 .filter(getNotificationFilter())

@@ -34,11 +34,6 @@ public class Sport extends MetaData {
         return ModelUtils.processString(emoji);
     }
 
-    public void reset() {
-        super.reset();
-        this.emoji = THONK;
-    }
-
     public void update(Sport updated) {
         super.update(updated);
         this.emoji = updated.emoji;
@@ -49,9 +44,15 @@ public class Sport extends MetaData {
         private static final String EMOJI_KEY = "emoji";
 
         @Override
-        Sport with(String code, String name, JsonObject body) {
+        Sport fromJson(String code, String name, JsonObject body) {
             String emoji = ModelUtils.asString(EMOJI_KEY, body);
             return new Sport(code, name, emoji);
+        }
+
+        @Override
+        JsonObject toJson(JsonObject serialized, Sport src) {
+            serialized.addProperty(EMOJI_KEY, src.emoji);
+            return serialized;
         }
     }
 }

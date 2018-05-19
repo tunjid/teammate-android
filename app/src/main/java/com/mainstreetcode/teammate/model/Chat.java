@@ -79,7 +79,7 @@ public class Chat implements
     }
 
     public static Chat chat(String content, User user, Team team) {
-        return new Chat(new ObjectId().toHexString(), content, KIND_TEXT, user, team, new Date());
+        return new Chat(new ObjectId().toHexString(), KIND_TEXT, content, user, team, new Date());
     }
 
     @Override
@@ -230,7 +230,7 @@ public class Chat implements
             if (user == null) user = User.empty();
             if (team == null) team = Team.empty();
 
-            return new Chat(id, content, kind, user, team, created);
+            return new Chat(id, kind, content, user, team, created);
         }
 
         @Override

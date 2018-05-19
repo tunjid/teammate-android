@@ -8,8 +8,8 @@ android {
         applicationId "com.mainstreetcode.teammate"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 8
-        versionName "2.0.0"
+        versionCode 9
+        versionName "2.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true  //add this line
@@ -55,6 +55,7 @@ android {
             minifyEnabled true
             signingConfig signingConfigs.staging
             buildConfigField "boolean", "DEV", "false"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
             minifyEnabled true
@@ -133,6 +134,7 @@ dependencies {
     }
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
     //implementation 'com.theartofdev.edmodo:android-image-cropper:2.5.0'
     implementation('com.theartofdev.edmodo:android-image-cropper:2.6.0') {

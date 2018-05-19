@@ -68,10 +68,12 @@
 -keepattributes Signature
 -keepattributes Exceptions
 
--keepclasseswithmembers class * {
+-keepclassmembernames,allowobfuscation interface * {
     @retrofit2.http.* <methods>;
 }
 
+# Ignore annotation used for build tooling.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
 ## Google Play Services 4.3.23 specific rules ##
 ## https://developer.android.com/google/play-services/setup.html#Proguard ##
@@ -112,9 +114,14 @@
 
 -keepattributes Signature
 -keepattributes *Annotation*
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
+-keep class com.squareup.okhttp3.** { *; }
+-keep interface com.squareup.okhttp3.** { *; }
 -dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+# A resource is loaded with a relative path so the package of this class must be preserved.
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 # Picasso
 

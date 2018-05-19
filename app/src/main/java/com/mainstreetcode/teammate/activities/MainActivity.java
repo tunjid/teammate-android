@@ -89,6 +89,17 @@ public class MainActivity extends TeammatesBaseActivity
             MenuItem menuItem = menu.findItem(id);
 
             if (menuItem != null) menuItem.setChecked(true);
+            altToolbar.setOnMenuItemClickListener(f::onOptionsItemSelected);
+        }
+
+        @Override
+        public void onFragmentViewDestroyed(FragmentManager fm, Fragment f) {
+            altToolbar.setOnMenuItemClickListener(MainActivity.this::onOptionsItemSelected);
+        }
+
+        @Override
+        public void onFragmentStopped(FragmentManager fm, Fragment f) {
+            altToolbar.setOnMenuItemClickListener(MainActivity.this::onOptionsItemSelected);
         }
     };
 
@@ -112,7 +123,6 @@ public class MainActivity extends TeammatesBaseActivity
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
 
-        altToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {

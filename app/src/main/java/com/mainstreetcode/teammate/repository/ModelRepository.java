@@ -53,8 +53,7 @@ public abstract class ModelRepository<T extends Model<T>> {
     public final Flowable<T> get(T model) {
         return model.isEmpty()
                 ? Flowable.error(new IllegalArgumentException("Model does not exist"))
-                : get(model.getId())
-                .map(getLocalUpdateFunction(model));
+                : get(model.getId()).map(getLocalUpdateFunction(model));
     }
 
     final Function<T, T> getLocalUpdateFunction(T original) {

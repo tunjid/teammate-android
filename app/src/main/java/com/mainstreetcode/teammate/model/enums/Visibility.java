@@ -19,7 +19,7 @@ public class Visibility extends MetaData {
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Visibility> {
         @Override
-        Visibility with(String code, String name, JsonObject body) {
+        Visibility fromJson(String code, String name, JsonObject body) {
             return new Visibility(code, name);
         }
     }
