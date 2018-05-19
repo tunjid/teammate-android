@@ -2,15 +2,19 @@ package com.mainstreetcode.teammate.rest;
 
 import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 
@@ -36,8 +40,10 @@ import retrofit2.http.Query;
 public interface TeammateApi {
 
     String ID_PATH = "id";
-    String TEAM_PATH = "teamId";
     String DATE_QUERY = "date";
+    String TEAM_PATH = "teamId";
+    String ROLE_PATH = "roleId";
+    String REQUEST_PATH = "requestId";
 
     @GET("api/config")
     Single<Config> getConfig();
@@ -100,25 +106,28 @@ public interface TeammateApi {
     @GET("api/teams")
     Single<List<Team>> findTeam(@Query("name") String teamName);
 
+    @GET("api/teams/{id}/members")
+    Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
+
     // =============================================================================================
     // Role endpoints
     // =============================================================================================
 
-    @GET("api/roles/values")
-    Single<List<String>> getRoleValues();
-
     @GET("api/me/roles")
     Single<List<Role>> getMyRoles();
 
+    @GET("api/roles/{roleId}")
+    Single<Role> getRole(@Path(ROLE_PATH) String roleId);
+
     @Multipart
     @POST("api/roles/{roleId}")
-    Single<Role> uploadRolePhoto(@Path("roleId") String roleId, @Part MultipartBody.Part file);
+    Single<Role> uploadRolePhoto(@Path(ROLE_PATH) String roleId, @Part MultipartBody.Part file);
 
     @PUT("api/roles/{roleId}")
-    Single<Role> updateRole(@Path("roleId") String roleId, @Body Role role);
+    Single<Role> updateRole(@Path(ROLE_PATH) String roleId, @Body Role role);
 
     @DELETE("api/roles/{roleId}")
-    Single<Role> deleteRole(@Path("roleId") String roleId);
+    Single<Role> deleteRole(@Path(ROLE_PATH) String roleId);
 
     // =============================================================================================
     // Join Request endpoints
@@ -131,16 +140,16 @@ public interface TeammateApi {
     Single<JoinRequest> inviteUser(@Body JoinRequest joinRequest);
 
     @GET("api/join-requests/{requestId}")
-    Single<JoinRequest> getJoinRequest(@Path("requestId") String requestId);
+    Single<JoinRequest> getJoinRequest(@Path(REQUEST_PATH) String requestId);
 
     @GET("api/join-requests/{requestId}/approve")
-    Single<Role> approveUser(@Path("requestId") String requestId);
+    Single<Role> approveUser(@Path(REQUEST_PATH) String requestId);
 
     @GET("api/join-requests/{requestId}/accept")
-    Single<Role> acceptInvite(@Path("requestId") String requestId);
+    Single<Role> acceptInvite(@Path(REQUEST_PATH) String requestId);
 
     @DELETE("api/join-requests/{requestId}")
-    Single<JoinRequest> deleteJoinRequest(@Path("requestId") String requestId);
+    Single<JoinRequest> deleteJoinRequest(@Path(REQUEST_PATH) String requestId);
 
     // =============================================================================================
     // Event endpoints
@@ -148,6 +157,12 @@ public interface TeammateApi {
 
     @GET("/api/teams/{teamId}/events")
     Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+
+    @GET("/api/events/attending")
+    Single<List<Event>> eventsAttending(@Query(DATE_QUERY) Date date);
+
+    @POST("/api/events/public")
+    Single<List<Event>> getPublicEvents(@Body EventSearchRequest request);
 
     @POST("api/events")
     Single<Event> createEvent(@Body Event event);
@@ -162,11 +177,17 @@ public interface TeammateApi {
     @GET("api/events/{id}")
     Single<Event> getEvent(@Path(ID_PATH) String eventId);
 
+    @GET("api/events/{id}/guests")
+    Single<List<Guest>> getEventGuests(@Path(ID_PATH) String eventId, @Query(DATE_QUERY) Date date);
+
     @DELETE("api/events/{id}")
     Single<Event> deleteEvent(@Path(ID_PATH) String eventId);
 
-    @GET("api/events/{id}/rsvp")
-    Single<Event> rsvpEvent(@Path(ID_PATH) String eventId, @Query("attending") boolean attending);
+    @GET("api/events/{id}/rsvpGuest")
+    Single<Guest> rsvpEvent(@Path(ID_PATH) String eventId, @Query("attending") boolean attending);
+
+    @GET("api/guests/{guestId}")
+    Single<Guest> getGuest(@Path("guestId") String guestId);
 
     // =============================================================================================
     // Team Chat endpoints
@@ -216,4 +237,17 @@ public interface TeammateApi {
 
     @PUT("api/me/devices/{id}")
     Single<Device> updateDevice(@Path(ID_PATH) String deviceId, @Body Device device);
+
+    // =============================================================================================
+    // BlockedUser endpoints
+    // =============================================================================================
+
+    @POST("api/teams/{id}/block")
+    Single<BlockedUser> blockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
+
+    @POST("api/teams/{id}/unblock")
+    Single<BlockedUser> unblockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
+
+    @GET("api/teams/{id}/blocked")
+    Single<List<BlockedUser>> blockedUsers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
 }

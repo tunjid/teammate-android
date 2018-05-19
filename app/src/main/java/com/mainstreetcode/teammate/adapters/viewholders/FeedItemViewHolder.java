@@ -6,6 +6,7 @@ import android.view.View;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.FeedAdapter;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
@@ -42,7 +43,7 @@ public class FeedItemViewHolder<H extends Model<H>> extends ModelCardViewHolder<
             setTransitionName(itemView, getTransitionName(model, R.id.fragment_media_background));
             setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_media_thumbnail));
         }
-        else if (model instanceof Event) {
+        else if (model instanceof Event || model instanceof JoinRequest) {
             ViewCompat.setTransitionName(itemView, getTransitionName(item, R.id.fragment_header_background));
             ViewCompat.setTransitionName(thumbnail, getTransitionName(item, R.id.fragment_header_thumbnail));
         }

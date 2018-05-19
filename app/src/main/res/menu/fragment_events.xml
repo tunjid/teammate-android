@@ -2,6 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_rsvp_list"
+        android:enabled="true"
+        android:icon="@drawable/ic_event_rsvp_white_24dp"
+        android:title="@string/attending_events"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_public_events"
+        android:enabled="true"
+        android:icon="@drawable/ic_globe_white_24dp"
+        android:title="@string/event_public"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_pick_team"
         android:enabled="true"
         android:icon="@drawable/ic_shield_white"

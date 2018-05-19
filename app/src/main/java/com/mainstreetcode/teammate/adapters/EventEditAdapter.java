@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -7,12 +8,15 @@ import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.DateViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.GuestViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -29,25 +33,29 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     private static final int GUEST = 12;
     private static final int TEAM = 13;
 
-    private final List<Identifiable> items;
+    private final List<Identifiable> identifiables;
 
-    public EventEditAdapter(List<Identifiable> items, EventEditAdapterListener listener) {
+    public EventEditAdapter(List<Identifiable> identifiables, EventEditAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
-        this.items = items;
+        this.identifiables = identifiables;
     }
 
+    @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.TEXT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, () -> false);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.LOCATION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, () -> false);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE)
+                        .setButtonRunnable(R.drawable.ic_location_on_white_24dp, this::onLocationClicked);
+            case Item.VISIBILITY:
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.event_visibility_selection, Config.getVisibilities(), Visibility::getName, Visibility::getCode, adapterListener::canEditEvent);
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_event_guest, viewGroup), adapterListener);
             case TEAM:
@@ -58,8 +66,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     }
 
     @Override
-    public void onBindViewHolder(BaseViewHolder viewHolder, int i) {
-        Object item = items.get(i);
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+        Object item = identifiables.get(i);
 
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
         else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
@@ -68,22 +76,26 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return identifiables.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return items.get(position).getId().hashCode();
+        return identifiables.get(position).getId().hashCode();
     }
 
     @Override
     public int getItemViewType(int position) {
-        Object thing = items.get(position);
+        Object thing = identifiables.get(position);
         return thing instanceof Item
                 ? ((Item) thing).getItemType()
                 : thing instanceof Team
                 ? TEAM
                 : GUEST;
+    }
+
+    private void onLocationClicked() {
+        if (adapterListener.canEditEvent()) adapterListener.onLocationClicked();
     }
 
     public interface EventEditAdapterListener extends

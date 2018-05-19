@@ -5,13 +5,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.transition.Fade;
-import android.support.transition.Transition;
-import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mainstreetcode.teammate.MediaUploadIntentService;
+import com.mainstreetcode.teammate.MediaTransferIntentService;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.MediaAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
@@ -42,7 +38,8 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 public class MediaFragment extends MainActivityFragment
         implements
         MediaAdapter.MediaAdapterListener,
-        ImageWorkerFragment.MediaListener {
+        ImageWorkerFragment.MediaListener,
+        ImageWorkerFragment.DownloadRequester {
 
     private static final int MEDIA_DELETE_SNACKBAR_DELAY = 350;
     private static final String ARG_TEAM = "team";
@@ -50,8 +47,6 @@ public class MediaFragment extends MainActivityFragment
     private Team team;
     private List<Identifiable> items;
     private AtomicBoolean bottomBarState;
-
-    private Toolbar contextBar;
 
     public static MediaFragment newInstance(Team team) {
         MediaFragment fragment = new MediaFragment();
@@ -102,9 +97,6 @@ public class MediaFragment extends MainActivityFragment
                 .withGridLayoutManager(4)
                 .build();
 
-        contextBar = rootView.findViewById(R.id.alt_toolbar);
-        contextBar.inflateMenu(R.menu.fragment_media_context);
-        contextBar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomBarState.set(true);
 
         return rootView;
@@ -122,12 +114,13 @@ public class MediaFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        setAltToolbarMenu(R.menu.fragment_media_context);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
         setFabIcon(R.drawable.ic_add_white_24dp);
         setFabClickListener(this);
     }
 
-    void fetchMedia(boolean fetchLatest) {
+    private void fetchMedia(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 
@@ -148,6 +141,10 @@ public class MediaFragment extends MainActivityFragment
             case R.id.action_delete:
                 mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
                         .subscribe(this::onMediaDeleted, defaultErrorHandler);
+                return true;
+            case R.id.action_download:
+                if (ImageWorkerFragment.requestDownload(this, team))
+                    scrollManager.notifyDataSetChanged();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -228,7 +225,18 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public void onFilesSelected(List<Uri> uris) {
-        MediaUploadIntentService.startActionUpload(getContext(), userViewModel.getCurrentUser(), team, uris);
+        MediaTransferIntentService.startActionUpload(getContext(), userViewModel.getCurrentUser(), team, uris);
+    }
+
+    @Override
+    public Team requestedTeam() {
+        return team;
+    }
+
+    @Override
+    public void startedDownLoad(boolean started) {
+        toggleContextMenu(!started);
+        if (started) scrollManager.notifyDataSetChanged();
     }
 
     private void onMediaUpdated(DiffUtil.DiffResult result) {
@@ -237,18 +245,8 @@ public class MediaFragment extends MainActivityFragment
     }
 
     private void toggleContextMenu(boolean show) {
-        //boolean current = contextBar.getVisibility() == View.VISIBLE;
-        ViewGroup root = (ViewGroup) getView();
-        if (root == null) return;
-
-        contextBar.setTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
-        //if (current == show) return;
-
-        toggleToolbar(!show);
-
-        Transition transition = new Fade().excludeTarget(scrollManager.getRecyclerView(), true);
-        TransitionManager.beginDelayedTransition(root, transition);
-        contextBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        setAltToolbarTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
+        toggleAltToolbar(show);
     }
 
     private void longClickMedia(Media media) {
@@ -268,6 +266,6 @@ public class MediaFragment extends MainActivityFragment
         if (!partialDelete) return;
 
         scrollManager.notifyDataSetChanged();
-        contextBar.postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
+        scrollManager.getRecyclerView().postDelayed(() -> showSnackbar(getString(R.string.partial_delete_message)), MEDIA_DELETE_SNACKBAR_DELAY);
     }
 }

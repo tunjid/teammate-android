@@ -24,6 +24,7 @@ public class ViewHolderUtil {
     public static final int MEDIA_IMAGE = 7;
     public static final int MEDIA_VIDEO = 8;
     public static final int JOIN_REQUEST = 9;
+    public static final int BLOCKED_USER = 10;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
 

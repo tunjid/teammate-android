@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
@@ -64,7 +66,7 @@ public final class TeamsFragment extends MainActivityFragment
         Runnable refreshAction = () -> disposables.add(roleViewModel.refresh(Role.class).subscribe(TeamsFragment.this::onTeamsUpdated, defaultErrorHandler));
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_group_black_24dp, R.string.no_team))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
@@ -106,7 +108,7 @@ public final class TeamsFragment extends MainActivityFragment
         super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_search_white_24dp);
-        setToolbarTitle(getString(isTeamPicker() ? R.string.pick_team : R.string.my_teams));
+        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
     }
 
     @Override
@@ -127,14 +129,14 @@ public final class TeamsFragment extends MainActivityFragment
         boolean canPick = target != null && target instanceof TeamAdapter.TeamAdapterListener;
 
         if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
-        else showFragment(TeamDetailFragment.newInstance(team));
+        else showFragment(TeamMembersFragment.newInstance(team));
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                toggleBottomSheet(false);
+                hideBottomSheet();
                 showFragment(TeamSearchFragment.newInstance());
                 break;
         }
@@ -153,5 +155,33 @@ public final class TeamsFragment extends MainActivityFragment
 
     private boolean isTeamPicker() {
         return getTargetRequestCode() != 0;
+    }
+
+    @DrawableRes
+    private int getEmptyDrawable() {
+        switch (getTargetRequestCode()) {
+            case R.id.request_event_team_pick:
+                return R.drawable.ic_event_white_24dp;
+            case R.id.request_chat_team_pick:
+                return R.drawable.ic_message_black_24dp;
+            case R.id.request_media_team_pick:
+                return R.drawable.ic_video_library_black_24dp;
+            default:
+                return R.drawable.ic_group_black_24dp;
+        }
+    }
+
+    @StringRes
+    private int getEmptyText() {
+        switch (getTargetRequestCode()) {
+            case R.id.request_event_team_pick:
+                return R.string.no_team_event;
+            case R.id.request_chat_team_pick:
+                return R.string.no_team_chat;
+            case R.id.request_media_team_pick:
+                return R.string.no_team_media;
+            default:
+                return R.string.no_team;
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.facebook.login.LoginResult;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -32,6 +33,10 @@ public class UserViewModel extends ViewModel {
         return repository.getCurrentUser();
     }
 
+    public UserGofer gofer(User user){
+        return new UserGofer(user, ignored -> getMe(), this::updateUser);
+    }
+
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
         return repository.signUp(firstName, lastName, primaryEmail, password).observeOn(mainThread());
     }
@@ -42,14 +47,6 @@ public class UserViewModel extends ViewModel {
 
     public Single<User> signIn(String email, String password) {
         return repository.signIn(email, password).observeOn(mainThread());
-    }
-
-    public Single<User> updateUser(User user) {
-        return repository.createOrUpdate(user).observeOn(mainThread());
-    }
-
-    public Flowable<User> getMe() {
-        return repository.getMe().observeOn(mainThread());
     }
 
     public Single<Boolean> signOut() {
@@ -63,5 +60,13 @@ public class UserViewModel extends ViewModel {
 
     public Single<Message> resetPassword(String email, String token, String password) {
         return repository.resetPassword(email, token, password).observeOn(mainThread());
+    }
+
+    private Single<User> updateUser(User user) {
+        return repository.createOrUpdate(user);
+    }
+
+    private Flowable<User> getMe() {
+        return repository.getMe();
     }
 }

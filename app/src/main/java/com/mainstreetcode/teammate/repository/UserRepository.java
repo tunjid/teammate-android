@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -71,13 +72,13 @@ public class UserRepository extends ModelRepository<User> {
     @Override
     public Single<User> createOrUpdate(User model) {
         Single<User> remote = model.isEmpty()
-                ? api.signUp(model)
-                : api.updateUser(model.getId(), model).doOnError(throwable -> deleteInvalidModel(model, throwable));
-
+                ? api.signUp(model).map(getLocalUpdateFunction(model))
+                : api.updateUser(model.getId(), model).map(getLocalUpdateFunction(model))
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
 
         MultipartBody.Part body = getBody(model.getHeaderItem().getValue(), User.PHOTO_UPLOAD_KEY);
         if (body != null) {
-            remote = remote.flatMap(put -> api.uploadUserPhoto(model.getId(), body));
+            remote = remote.flatMap(put -> api.uploadUserPhoto(model.getId(), body).map(getLocalUpdateFunction(model)));
         }
 
         remote = remote.map(getSaveFunction());
@@ -111,7 +112,7 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
-        User newUser = new User("", firstName, lastName, primaryEmail, "");
+        User newUser = new User("", firstName, lastName, primaryEmail, "", "");
         newUser.setPassword(password);
 
         return createOrUpdate(newUser);
@@ -201,6 +202,7 @@ public class UserRepository extends ModelRepository<User> {
     /**
      * Used to update changes to the current signed in user
      */
+    @SuppressLint("CheckResult")
     private Single<User> updateCurrent(Single<User> source) {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe

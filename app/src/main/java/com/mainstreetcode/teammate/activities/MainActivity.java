@@ -5,16 +5,21 @@ import android.arch.core.util.Function;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
@@ -22,11 +27,13 @@ import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
+import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.FeedFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
+import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
 import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
-import com.mainstreetcode.teammate.fragments.main.TeamDetailFragment;
+import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
@@ -49,17 +56,22 @@ public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
 
     public static final String FEED_DEEP_LINK = "feed-deep-link";
+    public static final String BOTTOM_TOOLBAR_STATE = "BOTTOM_TOOLBAR_STATE";
 
     @Nullable
     private ViewHider bottombarHider;
+    @Nullable
+    private ToolbarState bottomToolbarState;
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
+    private Toolbar bottomSheetToolbar;
+    private Toolbar altToolbar;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
-            if (!isInMainFragmentContainer(v)) return;
+            if (isNotInMainFragmentContainer(v)) return;
 
             Menu menu = bottomNavigationView.getMenu();
             String t = f.getTag();
@@ -81,8 +93,8 @@ public class MainActivity extends TeammatesBaseActivity
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedState) {
+        super.onCreate(savedState);
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
 
@@ -95,9 +107,13 @@ public class MainActivity extends TeammatesBaseActivity
 
         TeammatesInstanceIdService.updateFcmToken();
 
+        altToolbar = findViewById(R.id.alt_toolbar);
+        bottomSheetToolbar = findViewById(R.id.bottom_toolbar);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
 
+        altToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+        bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -107,11 +123,14 @@ public class MainActivity extends TeammatesBaseActivity
             }
 
             @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-            }
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
-        route(savedInstanceState, getIntent());
+
+        if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
+        refreshBottomToolbar();
+
+        route(savedState, getIntent());
+        App.prime();
     }
 
     @Override
@@ -126,7 +145,9 @@ public class MainActivity extends TeammatesBaseActivity
                 })
                 .addEndRunnable(() -> {
                     TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
-                    if (view != null && view.showsBottomNav()) initTransition();
+                    if (view == null || !view.showsBottomNav()) return;
+                    bottomBar.setVisibility(View.VISIBLE);
+                    initTransition();
                 })
                 .build();
     }
@@ -158,14 +179,52 @@ public class MainActivity extends TeammatesBaseActivity
             case R.id.action_settings:
                 showFragment(SettingsFragment.newInstance());
                 return true;
+            case R.id.action_rsvp_list:
+                showFragment(MyEventsFragment.newInstance());
+                return true;
+            case R.id.action_public_events:
+                showFragment(EventSearchFragment.newInstance());
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior.getState() != STATE_HIDDEN) toggleBottomSheet(false);
+        if (bottomSheetBehavior.getState() != STATE_HIDDEN) hideBottomSheet();
         else super.onBackPressed();
+    }
+
+    @Override
+    public void setAltToolbarMenu(@MenuRes int menu) {
+        altToolbar.getMenu().clear();
+        altToolbar.inflateMenu(menu);
+    }
+
+    @Override
+    public void setAltToolbarTitle(CharSequence title) {
+        altToolbar.setTitle(title);
+    }
+
+    @Override
+    public void toggleAltToolbar(boolean show) {
+        TeammatesBaseFragment current = (TeammatesBaseFragment) getCurrentFragment();
+        if (show) toggleToolbar(false);
+        else if (current != null) toggleToolbar(current.showsToolBar());
+
+        altToolbar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void toggleToolbar(boolean show) {
+        super.toggleToolbar(show);
+        altToolbar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -176,15 +235,37 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    public void toggleBottomSheet(boolean show) {
-        bottomSheetBehavior.setState(show ? STATE_EXPANDED : STATE_HIDDEN);
-        if (!show) restoreHiddenViewState();
+    public void hideBottomSheet() {
+        bottomSheetBehavior.setState(STATE_HIDDEN);
+        restoreHiddenViewState();
+    }
+
+    @Override
+    public void showBottomSheet(Args args) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager == null) return;
+
+        BaseFragment toShow = args.getFragment();
+        toShow.setEnterTransition(getBottomSheetTransition());
+        toShow.setExitTransition(getBottomSheetTransition());
+
+        fragmentManager.beginTransaction()
+                .replace(R.id.bottom_sheet, toShow, toShow.getStableTag())
+                .commit();
+
+        bottomToolbarState = args.getToolbarState();
+        bottomSheetBehavior.setState(STATE_EXPANDED);
+        refreshBottomToolbar();
     }
 
     @Override
     public boolean showFragment(BaseFragment fragment) {
-        toggleBottomSheet(false);
+        hideBottomSheet();
         return super.showFragment(fragment);
+    }
+
+    private Transition getBottomSheetTransition() {
+        return new Fade().setDuration(250);
     }
 
     private void route(@Nullable Bundle savedInstanceState, @NonNull Intent intent) {
@@ -194,11 +275,18 @@ public class MainActivity extends TeammatesBaseActivity
         if (model != null) route = route(
                 () -> route(model, Chat.class, Chat::getTeam, ChatFragment::newInstance),
                 () -> route(model, Event.class, event -> event, EventEditFragment::newInstance),
-                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamDetailFragment::newInstance)
+                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamMembersFragment::newInstance)
         );
 
         if (route != null) showFragment(route);
         else if (savedInstanceState == null) showFragment(FeedFragment.newInstance());
+    }
+
+    private void refreshBottomToolbar() {
+        if (bottomToolbarState == null) return;
+        bottomSheetToolbar.getMenu().clear();
+        bottomSheetToolbar.inflateMenu(bottomToolbarState.getMenuRes());
+        bottomSheetToolbar.setTitle(bottomToolbarState.getTitle());
     }
 
     private void restoreHiddenViewState() {

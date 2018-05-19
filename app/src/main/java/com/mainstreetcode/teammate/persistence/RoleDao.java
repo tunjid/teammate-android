@@ -11,6 +11,7 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -29,8 +30,12 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
         return "roles";
     }
 
+    @Query("SELECT * FROM roles" +
+            " WHERE :id = role_id")
+    public abstract Maybe<Role> get(String id);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(List<RoleEntity> roles);
+    public abstract void insert(List<RoleEntity> roles);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     protected abstract void update(List<RoleEntity> roles);
@@ -51,4 +56,14 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
 
     @Query("DELETE FROM roles WHERE role_team = :teamId")
     public abstract void deleteByTeam(String teamId);
+
+    @Query("DELETE FROM roles WHERE role_user = :userId AND role_team = :teamId")
+    public abstract void deleteUsers(String userId, String teamId);
+
+    @Query("SELECT * FROM roles as role" +
+            " WHERE :teamId = role_team" +
+            " AND role_created < :date" +
+            " ORDER BY role_created DESC" +
+            " LIMIT 40")
+    public abstract Maybe<List<Role>> getRoles(String teamId, Date date);
 }

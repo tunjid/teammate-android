@@ -3,13 +3,13 @@ apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "26.0.3"
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.mainstreetcode.teammate"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 7
-        versionName "1.0.5"
+        versionCode 8
+        versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true  //add this line
@@ -20,6 +20,9 @@ android {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
+    }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     signingConfigs {
         release {
@@ -68,33 +71,38 @@ android {
 }
 
 dependencies {
-    provided 'org.projectlombok:lombok:1.14.4'
-    annotationProcessor 'org.projectlombok:lombok:1.14.4'
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:multidex:1.0.1'
+    implementation 'com.android.support:multidex:1.0.3'
 
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:exifinterface:27.0.2'
-    implementation 'com.android.support:cardview-v7:27.0.2'
-    implementation 'com.android.support:palette-v7:27.0.2'
-    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:exifinterface:27.1.1'
+    implementation 'com.android.support:support-emoji:27.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
+    implementation 'com.android.support:palette-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 
-    implementation "android.arch.lifecycle:runtime:1.0.3"
-    implementation "android.arch.lifecycle:extensions:1.0.0"
-    implementation "android.arch.persistence.room:runtime:1.0.0"
-    implementation "android.arch.persistence.room:rxjava2:1.0.0"
+    implementation "android.arch.lifecycle:runtime:1.1.1"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation "android.arch.persistence.room:runtime:1.1.1-rc1"
+    implementation "android.arch.persistence.room:rxjava2:1.1.0"
 
-    implementation ('com.google.android.gms:play-services-places:11.8.0') {
-        exclude group: 'com.android.support', module: 'support-media-compat'
+    implementation ('com.google.android.gms:play-services-places:15.0.0') {
+        exclude module: 'support-media-compat'
+        exclude module: 'customtabs'
+    }
+    implementation ('com.google.android.gms:play-services-location:15.0.0') {
+        exclude module: 'support-media-compat'
+        exclude module: 'customtabs'
     }
 
-    implementation 'com.google.firebase:firebase-ads:11.8.0'
-    implementation 'com.google.firebase:firebase-messaging:11.8.0'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.google.firebase:firebase-ads:15.0.1'
+    implementation 'com.google.firebase:firebase-messaging:15.0.2'
 
     implementation "io.reactivex.rxjava2:rxjava:2.1.5"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -146,7 +154,7 @@ dependencies {
         exclude module: 'design'
     }
     //implementation 'com.tunjid.android-bootstrap:core:1.0.0'
-    implementation(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.0", changing: true) {
+    implementation(group: "com.tunjid.android-bootstrap", name: "core", version: "2.0.1", changing: true) {
         exclude module: 'support-annotations'
         exclude module: 'recyclerview-v7'
         exclude module: 'exifinterface'
@@ -156,10 +164,12 @@ dependencies {
         exclude module: 'design'
     }
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation "android.arch.persistence.room:testing:1.1.0"
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.gson'
     })
 }
 

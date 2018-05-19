@@ -37,6 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:gravity="center"
+            android:lineSpacingMultiplier="1.2"
             android:paddingLeft="@dimen/single_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/half_margin"

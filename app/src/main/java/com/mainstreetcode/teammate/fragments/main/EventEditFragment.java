@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,20 +23,16 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.EventEditAdapter;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.HeaderedModel;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.Flowable;
+import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -45,17 +40,15 @@ import static android.app.Activity.RESULT_OK;
  * Edits a Team member
  */
 
-public class EventEditFragment extends HeaderedFragment
+public class EventEditFragment extends HeaderedFragment<Event>
         implements
         EventEditAdapter.EventEditAdapterListener {
 
     public static final String ARG_EVENT = "event";
-    public static final int PLACE_PICKER_REQUEST = 1;
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
-    private boolean fromUserPickerAction;
     private Event event;
-    private List<Identifiable> eventItems;
+    private EventGofer gofer;
 
     public static EventEditFragment newInstance(Event event) {
         EventEditFragment fragment = new EventEditFragment();
@@ -71,12 +64,7 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        String superResult = super.getStableTag();
-        Event tempEvent = getArguments().getParcelable(ARG_EVENT);
-
-        return (tempEvent != null)
-                ? superResult + "-" + tempEvent.hashCode()
-                : superResult;
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_EVENT));
     }
 
     @Override
@@ -85,6 +73,7 @@ public class EventEditFragment extends HeaderedFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         event = getArguments().getParcelable(ARG_EVENT);
+        gofer = eventViewModel.gofer(event);
     }
 
     @Nullable
@@ -92,12 +81,9 @@ public class EventEditFragment extends HeaderedFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        eventItems = eventViewModel.fromEvent(event);
-
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withAdapter(new EventEditAdapter(eventItems, this))
+                .withAdapter(new EventEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addScrollListener(this::updateFabOnScroll)
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
                 .build();
@@ -112,18 +98,9 @@ public class EventEditFragment extends HeaderedFragment
         MenuItem item = menu.findItem(R.id.action_rsvp);
         if (item == null) return;
 
-        if (canEditEvent()) menu.findItem(R.id.action_delete).setVisible(true);
+        if (canEditEvent() || event.isPublic()) menu.findItem(R.id.action_delete).setVisible(true);
 
-        User current = userViewModel.getCurrentUser();
-        List<User> users = new ArrayList<>();
-        disposables.add(Flowable.fromIterable(event.getGuests())
-                .filter(Guest::isAttending)
-                .map(Guest::getUser)
-                .filter(current::equals)
-                .collectInto(users, List::add)
-                .map(List::isEmpty)
-                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp)
-                .subscribe(item::setIcon, emptyErrorHandler));
+        disposables.add(gofer.getRSVPStatus().subscribe(item::setIcon, emptyErrorHandler));
     }
 
     @Override
@@ -145,7 +122,7 @@ public class EventEditFragment extends HeaderedFragment
                 startActivity(maps);
                 return true;
             case R.id.action_rsvp:
-                rsvpToEvent(userViewModel.getCurrentUser());
+                rsvpToEvent();
                 return true;
             case R.id.action_delete:
                 Context context = getContext();
@@ -162,36 +139,27 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void onResume() {
         super.onResume();
-        User user = userViewModel.getCurrentUser();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, event.getTeam()).subscribe(this::onRoleUpdated, emptyErrorHandler));
-
-        if (!event.isEmpty() && !fromUserPickerAction) {
-            disposables.add(eventViewModel.getEvent(event, eventItems).subscribe(this::onEventChanged, defaultErrorHandler));
-        }
-
         eventViewModel.clearNotifications(event);
-        fromUserPickerAction = false;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode == RESULT_OK) {
-            Activity activity;
-            if ((activity = getActivity()) == null) return;
+        boolean failed = resultCode != RESULT_OK;
+        boolean isFromPlacePicker = requestCode == PLACE_PICKER_REQUEST;
 
-            Place place = PlacePicker.getPlace(activity, data);
-            event.setPlace(place);
-            scrollManager.notifyDataSetChanged();
-        }
+        if (failed && isFromPlacePicker) gofer.setSettingLocation(false);
+        if (failed || !isFromPlacePicker) return;
+
+        Place place = PlacePicker.getPlace(requireContext(), data);
+        disposables.add(gofer.setPlace(place).subscribe(this::onModelUpdated, emptyErrorHandler));
     }
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(event.isEmpty() ? R.string.create_event : R.string.edit_event));
+        setToolbarTitle(gofer.getToolbarTitle(this));
+        super.togglePersistentUi();
     }
 
     @Override
@@ -204,7 +172,31 @@ public class EventEditFragment extends HeaderedFragment
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    protected HeaderedModel getHeaderedModel() {return event;}
+    protected Event getHeaderedModel() {return event;}
+
+    @Override
+    protected Gofer<Event> gofer() {return gofer;}
+
+    @Override
+    protected void onModelUpdated(DiffUtil.DiffResult result) {
+        toggleProgress(false);
+        scrollManager.onDiff(result);
+        viewHolder.bind(getHeaderedModel());
+        Activity activity;
+        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onPrepComplete() {
+        scrollManager.notifyDataSetChanged();
+        requireActivity().invalidateOptionsMenu();
+        super.onPrepComplete();
+    }
+
+    @Override
+    protected boolean canGetModel() {
+        return super.canGetModel() && !gofer.isSettingLocation();
+    }
 
     @Override
     public void onClick(View view) {
@@ -212,9 +204,9 @@ public class EventEditFragment extends HeaderedFragment
             case R.id.fab:
                 boolean wasEmpty = event.isEmpty();
                 toggleProgress(true);
-                disposables.add(eventViewModel.createOrUpdateEvent(event, eventItems).subscribe(diffResult -> {
+                disposables.add(gofer.save().subscribe(diffResult -> {
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
-                    onEventChanged(diffResult);
+                    onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
                 }, defaultErrorHandler));
                 break;
@@ -229,70 +221,43 @@ public class EventEditFragment extends HeaderedFragment
     @Override
     public void onTeamClicked(Team team) {
         eventViewModel.onEventTeamChanged(event, team);
-        toggleBottomSheet(false);
+        hideBottomSheet();
 
-        int index = eventItems.indexOf(team);
+        int index = event.asIdentifiables().indexOf(team);
         if (index > -1) scrollManager.notifyItemChanged(index);
     }
 
     @Override
     public void selectTeam() {
-        FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager == null) return;
-
-        TeamsFragment teamsFragment = TeamsFragment.newInstance();
-        teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
-
-        beginTransaction()
-                .replace(R.id.bottom_sheet, teamsFragment, teamsFragment.getStableTag())
-                .commit();
-
-        toggleBottomSheet(true);
+        if (gofer.hasPrivilegedRole()) chooseTeam();
+        else if (!gofer.hasRole())
+            showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));
     }
 
     @Override
     public void onGuestClicked(Guest guest) {
-        rsvpToEvent(guest.getUser());
+        User current = userViewModel.getCurrentUser();
+        if (current.equals(guest.getUser())) rsvpToEvent();
+        else showFragment(GuestViewFragment.newInstance(guest));
     }
 
     @Override
     public boolean canEditEvent() {
-        return event.isEmpty() || localRoleViewModel.hasPrivilegedRole();
+        return event.isEmpty() || gofer.hasPrivilegedRole();
     }
 
     @Override
     public void onLocationClicked() {
-        fromUserPickerAction = true;
+        gofer.setSettingLocation(true);
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        try {startActivityForResult(builder.build(activity), PLACE_PICKER_REQUEST);}
+        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
-    private void rsvpEvent(Event event, boolean attending) {
+    private void rsvpEvent(boolean attending) {
         toggleProgress(true);
-        disposables.add(eventViewModel.rsvpEvent(event, eventItems, attending).subscribe(this::onEventChanged, defaultErrorHandler));
-    }
-
-    private void onEventChanged(DiffUtil.DiffResult result) {
-        toggleProgress(false);
-        scrollManager.onDiff(result);
-        viewHolder.bind(getHeaderedModel());
-        Activity activity;
-        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
-    }
-
-    private void onRoleUpdated() {
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        viewHolder.bind(getHeaderedModel());
-        scrollManager.notifyDataSetChanged();
-        activity.invalidateOptionsMenu();
-        toggleFab(canEditEvent());
+        disposables.add(gofer.rsvpEvent(attending).subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 
     private void deleteEvent() {
@@ -309,16 +274,25 @@ public class EventEditFragment extends HeaderedFragment
         activity.onBackPressed();
     }
 
-    private void rsvpToEvent(User user) {
+    private void rsvpToEvent() {
         Activity activity;
-        User roleUser = localRoleViewModel.getCurrentRole().getUser();
-        if ((activity = getActivity()) == null || !user.equals(roleUser))
-            return;
+        if ((activity = getActivity()) == null) return;
 
         new AlertDialog.Builder(activity).setTitle(getString(R.string.attend_event))
-                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(event, true))
-                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(event, false))
+                .setPositiveButton(R.string.yes, (dialog, which) -> rsvpEvent(true))
+                .setNegativeButton(R.string.no, (dialog, which) -> rsvpEvent(false))
                 .show();
+    }
+
+    private void chooseTeam() {
+        TeamsFragment teamsFragment = TeamsFragment.newInstance();
+        teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick);
+
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setTitle(getString(R.string.pick_team))
+                .setFragment(teamsFragment)
+                .build());
     }
 
     @Nullable
@@ -341,7 +315,7 @@ public class EventEditFragment extends HeaderedFragment
         ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return eventItems.get(position) instanceof Guest ? 1 : 2;
+                return gofer.getItems().get(position) instanceof Guest ? 1 : 2;
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.util;
 
 import android.support.annotation.Nullable;
+import android.support.text.emoji.EmojiCompat;
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,6 +13,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,7 +29,9 @@ import java.util.TimeZone;
 
 public class ModelUtils {
 
+    public static final String EMPTY_STRING = "";
     public static final SimpleDateFormat dateFormatter;
+    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
     static {
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
@@ -99,6 +103,10 @@ public class ModelUtils {
         }
     }
 
+    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
+        return new ArrayList<>(subTypeList);
+    }
+
     public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
         Collections.sort(source, Identifiable.COMPARATOR);
@@ -132,5 +140,27 @@ public class ModelUtils {
         set.addAll(source);
         source.clear();
         source.addAll(set);
+    }
+
+    public static int parse(String number) {
+        if (TextUtils.isEmpty(number)) return 0;
+        try { return Integer.valueOf(number); }
+        catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
+        return 0;
+    }
+
+    public static boolean areNotEmpty(CharSequence... values) {
+        for (CharSequence value : values) if (TextUtils.isEmpty(value)) return false;
+        return true;
+    }
+
+    public static CharSequence processString(CharSequence source) {
+        EmojiCompat emojiCompat = EmojiCompat.get();
+        return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(source) : source;
+    }
+
+    @FunctionalInterface
+    public interface Consumer<T> {
+        void accept(T t);
     }
 }

@@ -66,9 +66,9 @@ public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapt
         leftParams.horizontalBias = detailsParams.horizontalBias = isSignedInUser ? 1F : 0F;
     }
 
-    private String getDetailsText(Chat item, boolean isSignedInUser, Context context) {
-        String date = item.getCreatedDate();
-        String firstName = item.getUser().getFirstName();
+    private CharSequence getDetailsText(Chat item, boolean isSignedInUser, Context context) {
+        CharSequence date = item.getCreatedDate();
+        CharSequence firstName = item.getUser().getFirstName();
         return isSignedInUser ? date : context.getString(R.string.chat_details, firstName, date);
     }
 }

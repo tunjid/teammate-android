@@ -4,15 +4,17 @@ package com.mainstreetcode.teammate.repository;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.EventDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.TransformingSequentialList;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +27,7 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends QueryRepository<Event> {
+public class EventRepository extends TeamQueryRepository<Event> {
 
     private static EventRepository ourInstance;
 
@@ -91,10 +93,17 @@ public class EventRepository extends QueryRepository<Event> {
         return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
-    public Single<Event> rsvpEvent(final Event event, boolean attending) {
-        return api.rsvpEvent(event.getId(), attending)
-                .map(getLocalUpdateFunction(event))
-                .map(getSaveFunction());
+    public Flowable<List<Event>> attending(@Nullable Date date) {
+        User current = UserRepository.getInstance().getCurrentUser();
+        Date localDate = date == null ? getFutureDate() : date;
+
+        Maybe<List<Event>> local = AppDatabase.getInstance().guestDao().getRsvpList(current.getId(), localDate)
+                .map(guests -> (List<Event>) new ArrayList<>(new TransformingSequentialList<>(guests, Guest::getEvent)))
+                .subscribeOn(io());
+
+        Maybe<List<Event>> remote = api.eventsAttending(date).map(getSaveManyFunction()).toMaybe();
+
+        return fetchThenGet(local, remote);
     }
 
     @Override
@@ -103,16 +112,10 @@ public class EventRepository extends QueryRepository<Event> {
             List<Team> teams = new ArrayList<>(models.size());
             for (Event event : models) teams.add(event.getTeam());
 
-            teamRepository.getSaveManyFunction().apply(teams);
+            teamRepository.saveAsNested().apply(teams);
             eventDao.upsert(Collections.unmodifiableList(models));
 
             return models;
         };
-    }
-
-    private Date getFutureDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 100);
-        return calendar.getTime();
     }
 }

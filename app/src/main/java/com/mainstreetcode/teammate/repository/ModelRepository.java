@@ -18,8 +18,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Flowable;
@@ -53,24 +51,17 @@ public abstract class ModelRepository<T extends Model<T>> {
     abstract Function<List<T>, List<T>> provideSaveManyFunction();
 
     public final Flowable<T> get(T model) {
-        AtomicInteger counter = new AtomicInteger(0);
         return model.isEmpty()
                 ? Flowable.error(new IllegalArgumentException("Model does not exist"))
                 : get(model.getId())
-                .doOnNext(fetched -> counter.incrementAndGet())
-                .map(getLocalUpdateFunction(model, () -> counter.get() == 2));
-    }
-
-    private Function<T, T> getLocalUpdateFunction(T original, Callable<Boolean> shouldReset) {
-        return emitted -> {
-            if (shouldReset.call()) original.reset();
-            original.update(emitted);
-            return original;
-        };
+                .map(getLocalUpdateFunction(model));
     }
 
     final Function<T, T> getLocalUpdateFunction(T original) {
-        return getLocalUpdateFunction(original, () -> true);
+        return emitted -> {
+            original.update(emitted);
+            return original;
+        };
     }
 
     final Function<List<T>, List<T>> getSaveManyFunction() {
@@ -80,6 +71,19 @@ public abstract class ModelRepository<T extends Model<T>> {
     final Function<T, T> getSaveFunction() {
         return saveFunction;
     }
+
+    final Function<List<T>, List<T>> saveAsNested() {
+        return models -> {
+            if (models.isEmpty()) return models;
+
+            T litmus = models.get(0);
+            if (litmus.hasMajorFields()) return saveListFunction.apply(models);
+
+            dao().insert(Collections.unmodifiableList(models));
+            return models;
+        };
+    }
+
 
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
         AtomicReference<T> reference = new AtomicReference<>();
@@ -102,11 +106,12 @@ public abstract class ModelRepository<T extends Model<T>> {
     }
 
     @Nullable
-    MultipartBody.Part getBody(String path, String photoKey) {
-        File file = new File(path);
+    MultipartBody.Part getBody(CharSequence path, String photoKey) {
+        String pathString = path.toString();
+        File file = new File(pathString);
 
         if (!file.exists()) return null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        String extension = MimeTypeMap.getFileExtensionFromUrl(pathString);
 
         if (extension == null) return null;
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);

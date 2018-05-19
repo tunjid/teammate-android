@@ -1,22 +1,25 @@
 package com.mainstreetcode.teammate.model;
 
+import android.arch.core.util.Function;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.text.InputType;
 
-import com.mainstreetcode.teammate.util.ObjectId;
+import com.mainstreetcode.teammate.util.Supplier;
 
 import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Item for listing properties of a {@link com.mainstreetcode.teammate.util.ListableBean}
+ * Item for listing properties of a {@link Model}
  */
-public class Item<T> implements Identifiable {
+public class Item<T> implements Identifiable, Comparable<Item> {
 
     @Retention(SOURCE)
-    @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO})
+    @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY})
     @interface ItemType {}
 
     public static final int INPUT = 2;
@@ -27,59 +30,103 @@ public class Item<T> implements Identifiable {
     public static final int CITY = 6;
     public static final int ZIP = 8;
     public static final int STATE = 7;
+    public static final int SPORT = 13;
 
     public static final int LOCATION = 9;
 
     public static final int INFO = 10;
     public static final int TEXT = 11;
+    public static final int NUMBER = 12;
+    public static final int DESCRIPTION = 14;
+    public static final int VISIBILITY = 15;
+    public static final int ABOUT = 16;
+    public static final int NICKNAME = 17;
 
+    public static final Supplier<Boolean> TRUE = () -> true;
+    public static final Supplier<Boolean> FALSE = () -> false;
+
+    @SuppressWarnings("unused")
+    public static <T> void ignore(T ignored) {}
+
+
+    private final int sortPosition;
+    private final int inputType;
     private @ItemType final int itemType;
     private @StringRes final int stringRes;
-    private @StringRes final int headerStringRes;
     private @Nullable final ValueChangeCallBack changeCallBack;
+    private @Nullable Function<CharSequence, CharSequence> textTransformer;
 
     private final T itemizedObject;
-    private final String id = new ObjectId().toHexString();
+    private final String id;
 
-    private String value;
+    private CharSequence value;
 
-    public Item(int itemType, int stringRes, String value, @Nullable ValueChangeCallBack changeCallBack,
-                T itemizedObject) {
-        this(itemType, stringRes, 0, value, changeCallBack, itemizedObject);
-    }
-
-    public Item(int itemType, int stringRes, int headerStringRes,
-                String value, @Nullable ValueChangeCallBack changeCallBack, T itemizedObject) {
+    Item(String id, int sortPosition, int inputType, int itemType, int stringRes,
+         CharSequence value, @Nullable ValueChangeCallBack changeCallBack, T itemizedObject) {
+        this.id = id;
+        this.sortPosition = sortPosition;
+        this.inputType = inputType;
         this.itemType = itemType;
         this.stringRes = stringRes;
-        this.headerStringRes = headerStringRes;
         this.value = value;
         this.changeCallBack = changeCallBack;
         this.itemizedObject = itemizedObject;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-        if (changeCallBack != null) changeCallBack.onValueChanged(value);
+
+    public static <T> Item<T> number(String id, int sortPosition, int itemType, int stringRes,
+                                     Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+                                     T itemizedObject) {
+        return new Item<>(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
+
+    public static <T> Item<T> text(String id, int sortPosition, int itemType, int stringRes,
+                                   Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+                                   T itemizedObject) {
+        return new Item<>(id, sortPosition, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+    }
+
+    public static <T> Item<T> email(String id, int sortPosition, int itemType, int stringRes,
+                                    Supplier<CharSequence> supplier, @Nullable ValueChangeCallBack changeCallBack,
+                                    T itemizedObject) {
+        return new Item<>(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
+    }
+
+    public static Supplier<CharSequence> nullToEmpty(@Nullable CharSequence source) {
+        CharSequence finalSource = source == null ? "" : source;
+        return () -> finalSource;
+    }
+
+    public void setValue(CharSequence value) {
+        this.value = value;
+        if (changeCallBack != null) changeCallBack.onValueChanged(value.toString());
+    }
+
+    public Item<T> textTransformer(Function<CharSequence, CharSequence> textTransformer) {
+        this.textTransformer = textTransformer;
+        return this;
+    }
+
+    public int getSortPosition() {return sortPosition;}
+
+    public int getInputType() {return inputType;}
 
     public int getItemType() {return this.itemType;}
 
     public int getStringRes() {return this.stringRes;}
 
-    public int getHeaderStringRes() {
-        return headerStringRes;
-    }
-
-    public String getValue() {return this.value;}
+    public CharSequence getValue() {return textTransformer == null ? value : textTransformer.apply(value);}
 
     @Override
     public String getId() {return id;}
 
     @Override
+    public int compareTo(@NonNull Item o) { return Integer.compare(sortPosition, o.sortPosition); }
+
+    @Override
     public boolean areContentsTheSame(Identifiable other) {
         if (other instanceof Item) return value.equals(((Item) other).value);
-        return id.equals(other.getId());
+        return value.equals(other.getId());
     }
 
     @Override
@@ -87,6 +134,7 @@ public class Item<T> implements Identifiable {
         return other;
     }
 
+    @SuppressWarnings("unused")
     public T getItemizedObject() {
         return itemizedObject;
     }
@@ -98,7 +146,7 @@ public class Item<T> implements Identifiable {
 
         Item<?> item = (Item<?>) o;
 
-        return value != null ? value.equals(item.value) : item.value == null;
+        return id != null ? id.equals(item.id) : item.id == null;
     }
 
     @Override
@@ -110,4 +158,6 @@ public class Item<T> implements Identifiable {
     public interface ValueChangeCallBack {
         void onValueChanged(String value);
     }
+
+
 }

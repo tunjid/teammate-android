@@ -45,7 +45,11 @@ public class RegistrationActivity extends TeammatesBaseActivity {
     }
 
     private boolean isForgotPasswordDeepLink(Uri data) {
-        return getString(R.string.deep_link_host).equals(data.getHost()) && data.getPath().contains("forgotPassword");
+        String domain1 = getString(R.string.domain_1);
+        String domain2 = getString(R.string.domain_2);
+
+        boolean domainMatches = domain1.equals(data.getHost()) || domain2.equals(data.getHost());
+        return domainMatches && data.getPath().contains("forgotPassword");
     }
 
     public static void startMainActivity(Activity activity) {

@@ -14,8 +14,11 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
@@ -47,7 +50,10 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
 
     @Override
     public Flowable<JoinRequest> get(String id) {
-        return api.getJoinRequest(id).toFlowable();
+        Maybe<JoinRequest> local = joinRequestDao.get(id).subscribeOn(io());
+        Maybe<JoinRequest> remote = api.getJoinRequest(id).toMaybe();
+
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
@@ -68,8 +74,8 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
                 users.add(request.getUser());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().getSaveManyFunction().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().getSaveManyFunction().apply(users);
+            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
+            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
 
             joinRequestDao.upsert(Collections.unmodifiableList(models));
 

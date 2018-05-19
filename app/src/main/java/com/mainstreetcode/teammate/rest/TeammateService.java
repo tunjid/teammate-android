@@ -10,7 +10,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
@@ -19,9 +21,14 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.enums.Position;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.Logger;
 
@@ -61,7 +68,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class TeammateService {
 
-    public static final String API_BASE_URL = "https://teammateapp.org/";
+    public static final String API_BASE_URL = BuildConfig.DEV ? "https://dev.teammate.app/" : "https://teammate.app/";
     public static final String SESSION_PREFS = "session.prefs";
     private static final String TAG = "API Service";
 
@@ -76,9 +83,10 @@ public class TeammateService {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-            OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .addInterceptor(loggingInterceptor)
-                    .cookieJar(new SessionCookieJar());
+            OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
+
+            if (BuildConfig.DEV) builder.addInterceptor(loggingInterceptor);
+            if (BuildConfig.DEV) builder.hostnameVerifier((hostname, session) -> true);
 
             assignSSLSocketFactory(builder);
 
@@ -106,11 +114,17 @@ public class TeammateService {
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Media.class, new Media.GsonAdapter())
                 .registerTypeAdapter(Guest.class, new Guest.GsonAdapter())
+                .registerTypeAdapter(Sport.class, new Sport.GsonAdapter())
                 .registerTypeAdapter(Config.class, new Config.GsonAdapter())
                 .registerTypeAdapter(Device.class, new Device.GsonAdapter())
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
+                .registerTypeAdapter(Position.class, new Position.GsonAdapter())
+                .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
+                .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
+                .registerTypeAdapter(BlockedUser.class, new BlockedUser.GsonAdapter())
+                .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();
                     body.addProperty("access_token", src.getAccessToken().getToken());
@@ -128,7 +142,7 @@ public class TeammateService {
     private static void assignSSLSocketFactory(OkHttpClient.Builder builder) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            InputStream stream = App.getInstance().getResources().openRawResource(R.raw.server);
+            InputStream stream = App.getInstance().getResources().openRawResource(BuildConfig.DEV ? R.raw.dev : R.raw.prod);
 
             Certificate certificate = certificateFactory.generateCertificate(stream);
             stream.close();

@@ -1,19 +1,24 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.RoleSelectViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.enums.Position;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -22,41 +27,49 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
 
-    private final JoinRequest joinRequest;
-    private final List<String> roles;
+    private final List<Item<JoinRequest>> items;
 
-    public JoinRequestAdapter(JoinRequest joinRequest, List<String> roles, AdapterListener listener) {
+    public JoinRequestAdapter(List<Item<JoinRequest>> items, AdapterListener listener) {
         super(listener);
-        this.joinRequest = joinRequest;
-        this.roles = roles;
+        this.items = items;
     }
 
+    @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), () -> true);
+            case Item.SPORT:
+            return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, FALSE, FALSE);
             case Item.ROLE:
-                return new RoleSelectViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), roles, () -> true);
+            return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
+            case Item.ABOUT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+            case Item.DESCRIPTION:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+            case Item.INPUT:
             default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields);
         }
     }
 
     @Override
-    public void onBindViewHolder(BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(joinRequest.get(i));
+    public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
+        baseItemViewHolder.bind(items.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return joinRequest.size();
+        return items.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return joinRequest.get(position).getItemType();
+        return items.get(position).getItemType();
     }
 
-    public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {}
+    public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
+        boolean canEditFields();
+
+        boolean canEditRole();
+    }
 }

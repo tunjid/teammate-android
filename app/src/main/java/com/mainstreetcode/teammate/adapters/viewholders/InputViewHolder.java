@@ -1,23 +1,25 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
+import android.arch.core.util.Function;
 import android.content.res.ColorStateList;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Supplier;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * Viewholder for editing simple text fields for an {@link Item}
@@ -27,19 +29,20 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         TextWatcher {
 
     EditText editText;
-    @Nullable
-    private final TextView headerText;
+    private final ImageButton button;
     private final TextInputLayout inputLayout;
     private final Supplier<Boolean> errorChecker;
     private final Supplier<Boolean> enabler;
+
+    @Nullable private Function<Item, Boolean> visibilitySupplier;
 
     public InputViewHolder(View itemView, Supplier<Boolean> enabler, @Nullable Supplier<Boolean> errorChecker) {
         super(itemView);
         this.enabler = enabler;
         this.errorChecker = errorChecker == null ? this::hasText : errorChecker;
         inputLayout = itemView.findViewById(R.id.input_layout);
+        button = itemView.findViewById(R.id.button);
         editText = inputLayout.getEditText();
-        headerText = itemView.findViewById(R.id.header_name);
 
         inputLayout.setEnabled(isEnabled());
         editText.addTextChangedListener(this);
@@ -49,29 +52,24 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         this(itemView, enabler, null);
     }
 
+    public InputViewHolder setButtonRunnable(@DrawableRes int icon, Runnable clickRunnable) {
+        return setButtonRunnable(input -> true, icon, clickRunnable);
+    }
+
+    public InputViewHolder setButtonRunnable(Function<Item, Boolean> visibilitySupplier, @DrawableRes int icon, Runnable clickRunnable) {
+        this.visibilitySupplier = visibilitySupplier;
+        button.setImageResource(icon);
+        button.setOnClickListener(clicked -> clickRunnable.run());
+        return this;
+    }
+
     @Override
     public void bind(Item item) {
         super.bind(item);
         inputLayout.setEnabled(isEnabled());
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
         editText.setText(item.getValue());
-
-        int position = getAdapterPosition();
-        Class itemizedClass = item.getItemizedObject().getClass();
-
-        editText.setInputType(itemizedClass.equals(Team.class) && position == Team.ZIP_POSITION
-                ? InputType.TYPE_CLASS_NUMBER
-                : itemizedClass.equals(User.class) && position == User.EMAIL_POSITION
-                ? InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-                : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-
-        if (item.getHeaderStringRes() != 0 && headerText != null) {
-            headerText.setText(item.getHeaderStringRes());
-            headerText.setVisibility(View.VISIBLE);
-        }
-        else if (headerText != null) {
-            headerText.setVisibility(View.GONE);
-        }
+        editText.setInputType(item.getInputType());
 
         checkForErrors();
         setClickableState();
@@ -101,6 +99,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     private void setClickableState() {
         int colorInt = ContextCompat.getColor(itemView.getContext(), isEnabled() ? R.color.black : R.color.light_grey);
         editText.setTextColor(ColorStateList.valueOf(colorInt));
+
+        int visibility = item == null || visibilitySupplier == null ? GONE : visibilitySupplier.apply(item) ? VISIBLE : GONE;
+        button.setVisibility(visibility);
     }
 
     private boolean hasText() {

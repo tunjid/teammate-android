@@ -15,7 +15,6 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
-import lombok.Getter;
 import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
@@ -25,7 +24,6 @@ import retrofit2.HttpException;
  * Messages from the {@link com.mainstreetcode.teammate.rest.TeammateApi}
  */
 
-@Getter
 public class Message {
 
     private static final String UNKNOWN_ERROR_CODE = "unknown.error";
@@ -34,8 +32,8 @@ public class Message {
     private static final String UNAUTHENTICATED_USER_ERROR_CODE = "unauthenticated.user.error";
     private static final String INVALID_OBJECT_REFERENCE_ERROR_CODE = "invalid.object.reference.error";
 
-    final String message;
-    final String errorCode;
+    private final String message;
+    private final String errorCode;
 
     public Message(String message) {
         this.message = message;
@@ -53,12 +51,18 @@ public class Message {
         this.errorCode = parsed.errorCode;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     @Nullable
     public static Message fromThrowable(Throwable throwable) {
         if (!(throwable instanceof HttpException)) return null;
         return new Message((HttpException) throwable);
     }
 
+    public boolean isValidModel() { return !isIllegalTeamMember() && !isInvalidObject(); }
+    
     public boolean isInvalidObject() { return INVALID_OBJECT_REFERENCE_ERROR_CODE.equals(errorCode);}
 
     public boolean isIllegalTeamMember() { return ILLEGAL_TEAM_MEMBER_ERROR_CODE.equals(errorCode);}

@@ -40,13 +40,13 @@ public class ErrorHandler implements Consumer<Throwable> {
 
     public static ErrorHandler EMPTY = new ErrorHandler(null, null, null) {
         @Override
-        public void accept(Throwable throwable) throws Exception {
+        public void accept(Throwable throwable) {
             Logger.log(TAG, ERROR_HANDLER_RECEIVED_ERROR, throwable);
         }
     };
 
     @Override
-    public void accept(Throwable throwable) throws Exception {
+    public void accept(Throwable throwable) {
         Logger.log(TAG, ERROR_HANDLER_RECEIVED_ERROR, throwable);
 
         String key = throwable.getClass().getName();

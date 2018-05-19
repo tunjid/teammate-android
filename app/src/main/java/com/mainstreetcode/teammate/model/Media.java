@@ -37,6 +37,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         }
 )
 public class Media implements
+        TeamHost,
         Parcelable,
         Model<Media> {
 
@@ -121,15 +122,6 @@ public class Media implements
 
     public boolean isFlagged() {
         return flagged;
-    }
-
-    @Override
-    public void reset() {
-        url = "";
-        thumbnail = "";
-
-        team.reset();
-        user.reset();
     }
 
     @Override

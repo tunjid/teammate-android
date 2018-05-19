@@ -4,6 +4,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.MediaTransferIntentService;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
@@ -57,7 +59,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
 
         Flowable<List<Identifiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete) : repository.ownerDelete(toDelete))
-                .toFlowable().map(toIdentifiable);
+                .toFlowable().map(this::toIdentifiable);
 
         return Identifiable.diff(sourceFlowable, () -> source, (sourceCopy, deleted) -> {
             partialDelete.set(deleted.size() != toDelete.size());
@@ -67,6 +69,16 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
                 .map(diffResult -> new Pair<>(partialDelete.get(), diffResult))
                 .firstElement()
                 .doOnSuccess(diffResult -> clearSelections(team));
+    }
+
+    public boolean downloadMedia(Team team) {
+        List<Identifiable> source = getModelList(team);
+        List<Media> toDownload = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
+        if (source == null || toDownload == null || toDownload.isEmpty()) return false;
+
+        MediaTransferIntentService.startActionDownload(App.getInstance(), toDownload);
+        clearSelections(team);
+        return true;
     }
 
     public Single<Media> flagMedia(Media model) {
