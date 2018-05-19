@@ -7,6 +7,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
@@ -14,8 +16,8 @@ import java.util.Objects;
 
 public class MetaData {
 
-    private String code;
-    protected String name;
+    String code;
+    String name;
 
     MetaData(String code, String name) {
         this.code = code;
@@ -29,11 +31,6 @@ public class MetaData {
     public CharSequence getName() { return name; }
 
     public String getCode() { return code; }
-
-    public void reset() {
-        this.code = "";
-        this.name = "";
-    }
 
     public void update(MetaData updated) {
         this.code = updated.code;
@@ -53,7 +50,10 @@ public class MetaData {
         return Objects.hash(code);
     }
 
-    public static abstract class GsonAdapter<T extends MetaData> implements JsonDeserializer<T> {
+    public static abstract class GsonAdapter<T extends MetaData>
+            implements
+            JsonSerializer<T>,
+            JsonDeserializer<T> {
 
         private static final String CODE_KEY = "code";
         private static final String NAME_KEY = "name";
@@ -65,10 +65,24 @@ public class MetaData {
             String code = ModelUtils.asString(CODE_KEY, baseEnumJson);
             String name = ModelUtils.asString(NAME_KEY, baseEnumJson);
 
-            return with(code, name, baseEnumJson);
+            return fromJson(code, name, baseEnumJson);
         }
 
-        abstract T with(String code, String name, JsonObject body);
+        @Override
+        public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject serialized = new JsonObject();
+
+            serialized.addProperty(CODE_KEY, src.code);
+            serialized.addProperty(NAME_KEY, src.name);
+
+            return toJson(serialized, src);
+        }
+
+        abstract T fromJson(String code, String name, JsonObject body);
+
+        JsonObject toJson(JsonObject serialized, T src) {
+            return serialized;
+        }
     }
 }
 

@@ -134,6 +134,7 @@ dependencies {
     }
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
     //implementation 'com.theartofdev.edmodo:android-image-cropper:2.5.0'
     implementation('com.theartofdev.edmodo:android-image-cropper:2.6.0') {

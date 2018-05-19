@@ -24,6 +24,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
@@ -86,7 +87,6 @@ public class TeammateService {
             OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
 
             if (BuildConfig.DEV) builder.addInterceptor(loggingInterceptor);
-            if (BuildConfig.DEV) builder.hostnameVerifier((hostname, session) -> true);
 
             assignSSLSocketFactory(builder);
 
@@ -122,6 +122,7 @@ public class TeammateService {
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
+                .registerTypeAdapter(BlockReason.class, new BlockReason.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .registerTypeAdapter(BlockedUser.class, new BlockedUser.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())

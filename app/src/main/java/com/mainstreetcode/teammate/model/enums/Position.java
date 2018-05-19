@@ -14,7 +14,7 @@ public class Position extends MetaData {
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Position> {
         @Override
-        Position with(String code, String name, JsonObject body) {
+        Position fromJson(String code, String name, JsonObject body) {
             return new Position(code, name);
         }
     }
