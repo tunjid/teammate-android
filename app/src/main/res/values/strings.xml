@@ -211,6 +211,7 @@
     <string name="multi_select">%1$d Selected</string>
     <string name="delete_media">Delete media</string>
     <string name="download_media">Download media</string>
+    <string name="download_complete">Download complete.</string>
     <string name="media_download_started">Download started. Check notifications for progress</string>
     <string name="media_download_title">Team media for %1$s at %2$s</string>
     <string name="partial_delete_message">Could not delete all photos selected because you did not upload them.</string>

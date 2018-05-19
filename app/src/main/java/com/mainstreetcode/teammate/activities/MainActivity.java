@@ -89,6 +89,10 @@ public class MainActivity extends TeammatesBaseActivity
             MenuItem menuItem = menu.findItem(id);
 
             if (menuItem != null) menuItem.setChecked(true);
+        }
+
+        @Override
+        public void onFragmentResumed(FragmentManager fm, Fragment f) {
             altToolbar.setOnMenuItemClickListener(f::onOptionsItemSelected);
         }
 

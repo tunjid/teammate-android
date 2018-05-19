@@ -5,9 +5,9 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
@@ -26,13 +26,12 @@ import com.mainstreetcode.teammate.persistence.typeconverters.SportTypeConverter
 import com.mainstreetcode.teammate.persistence.typeconverters.TeamTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.UserTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.VisibilityTypeConverter;
+import com.mainstreetcode.teammate.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
-
-import static com.mainstreetcode.teammate.BuildConfig.DEV;
 
 /**
  * App Database
@@ -49,11 +48,13 @@ import static com.mainstreetcode.teammate.BuildConfig.DEV;
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String TAG = "AppDatabase";
+    private static final String PROD_DB = "database-name";
+    private static final String DEV_DB = "teammate-dev-db";
     private static AppDatabase INSTANCE;
 
     public static AppDatabase getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(App.getInstance(), AppDatabase.class, "database-name")
+            INSTANCE = Room.databaseBuilder(App.getInstance(), AppDatabase.class, BuildConfig.DEV ? DEV_DB : PROD_DB)
                     .addMigrations(new Migration1To2())
                     .fallbackToDestructiveMigration()
                     .build();
@@ -107,7 +108,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return entityDao.deleteAll()
                 .map(rowsDeleted -> new Pair<>(tableName, rowsDeleted))
                 .onErrorResumeNext(throwable -> {
-                    if (DEV) Log.e(TAG, "Error clearing table: " + tableName, throwable);
+                    Logger.log(TAG, "Error clearing table: " + tableName, throwable);
                     return Single.just(new Pair<>(tableName, 0));
                 });
     }
