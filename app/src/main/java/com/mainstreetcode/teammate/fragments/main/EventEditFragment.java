@@ -223,7 +223,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         eventViewModel.onEventTeamChanged(event, team);
         hideBottomSheet();
 
-        int index = event.asIdentifiables().indexOf(team);
+        int index = gofer.getItems().indexOf(team);
         if (index > -1) scrollManager.notifyItemChanged(index);
     }
 
