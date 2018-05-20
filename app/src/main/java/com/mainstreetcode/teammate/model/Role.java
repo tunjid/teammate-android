@@ -172,8 +172,9 @@ public class Role extends RoleEntity
         public JsonElement serialize(Role src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
-            serialized.addProperty(ID_KEY, src.getId());
-            serialized.addProperty(NICK_NAME_KEY, src.getNickname());
+            serialized.addProperty(ID_KEY, src.id);
+            serialized.addProperty(IMAGE_KEY, src.imageUrl);
+            serialized.addProperty(NICK_NAME_KEY, src.nickname);
             serialized.add(USER_KEY, context.serialize(src.user));
 
             String positionCode = src.position != null ? src.position.getCode() : "";
