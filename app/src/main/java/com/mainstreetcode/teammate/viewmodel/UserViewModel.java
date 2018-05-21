@@ -34,7 +34,7 @@ public class UserViewModel extends ViewModel {
     }
 
     public UserGofer gofer(User user){
-        return new UserGofer(user, ignored -> getMe(), this::updateUser);
+        return new UserGofer(user, this::getUser, this::updateUser);
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
@@ -66,7 +66,7 @@ public class UserViewModel extends ViewModel {
         return repository.createOrUpdate(user);
     }
 
-    private Flowable<User> getMe() {
-        return repository.getMe();
+    private Flowable<User> getUser(User user) {
+        return repository.get(user);
     }
 }

@@ -52,7 +52,7 @@ import static com.tunjid.androidbootstrap.core.view.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
-    private static final int TOP_INSET = 1;
+    protected static final int TOP_INSET = 1;
     private static final int LEFT_INSET = 0;
     private static final int RIGHT_INSET = 2;
 
@@ -128,6 +128,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             showSystemUI();
             setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
+    }
+
+    @Override
+    public TeammatesBaseFragment getCurrentFragment() {
+        return (TeammatesBaseFragment) super.getCurrentFragment();
     }
 
     @Override
@@ -208,7 +213,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     public void onDialogDismissed() {
-        TeammatesBaseFragment fragment = (TeammatesBaseFragment) getCurrentFragment();
+        TeammatesBaseFragment fragment = getCurrentFragment();
         boolean showFab = fragment != null && fragment.showsFab();
 
         if (showFab) toggleFab(true);
@@ -223,7 +228,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         Transition transition = new AutoTransition();
         transition.setDuration(200);
 
-        TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+        TeammatesBaseFragment view = getCurrentFragment();
         if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
         transition.excludeTarget(RecyclerView.class, true);
 
@@ -250,7 +255,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         int keyboardPadding = insets.getSystemWindowInsetBottom();
         setKeyboardPadding(keyboardPadding);
 
-        TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+        TeammatesBaseFragment view = getCurrentFragment();
         if (view != null) view.onKeyBoardChanged(keyboardPadding != bottomInset);
         return insets;
     }
