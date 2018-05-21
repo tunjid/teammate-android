@@ -117,7 +117,7 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
-        User newUser = new User("", firstName, lastName, primaryEmail, "", "");
+        User newUser = new User("", "", primaryEmail, firstName, lastName, "");
         newUser.setPassword(password);
 
         return createOrUpdate(newUser);

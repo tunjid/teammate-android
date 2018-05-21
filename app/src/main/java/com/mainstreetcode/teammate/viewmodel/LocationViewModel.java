@@ -16,9 +16,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.util.TeammateException;
 
 import io.reactivex.Maybe;
-import io.reactivex.processors.PublishProcessor;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.os.Build.VERSION.SDK_INT;
@@ -51,14 +51,16 @@ public class LocationViewModel extends ViewModel {
             return Maybe.empty();
         }
 
-        PublishProcessor<LatLng> locationPublishProcessor = PublishProcessor.create();
+        String errorString = fragment.getString(R.string.event_public_location_unknown);
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(fragment.requireActivity());
 
-        client.getLastLocation().addOnSuccessListener(location -> locationPublishProcessor.onNext(new LatLng(location.getLatitude(), location.getLongitude())))
-                .addOnCompleteListener(ignored -> locationPublishProcessor.onComplete())
-                .addOnFailureListener(locationPublishProcessor::onError);
-
-        return locationPublishProcessor.firstElement();
+        return Maybe.create(emitter -> client.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) emitter.onSuccess(new LatLng(location.getLatitude(), location.getLongitude()));
+                    else emitter.onError(new TeammateException(errorString));
+                })
+                .addOnCompleteListener(ignored -> emitter.onComplete())
+                .addOnFailureListener(emitter::onError));
     }
 
     public boolean hasPermission(Fragment fragment) {

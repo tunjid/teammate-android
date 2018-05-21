@@ -179,6 +179,7 @@
     <string name="event_public_start_search">Search</string>
     <string name="event_distance">Distance</string>
     <string name="event_public_distance">%1$d miles</string>
+    <string name="event_public_location_unknown">Unable to get current location</string>
     <string name="event_public_location_prompt">Location permission required</string>
     <string name="event_public_location_rationale">Your current location is used only to show events nearest to you.\n\nYou can still move the map manually to view public events without providing your location.</string>
 
