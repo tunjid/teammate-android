@@ -64,6 +64,7 @@
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
     <string name="error_default">Sorry, an error occurred</string>
+    <string name="error_network">Unable to connect, please try again later.</string>
     <string name="error_socket">Unable to connect</string>
 
     <!--TeamSearchFragment-->

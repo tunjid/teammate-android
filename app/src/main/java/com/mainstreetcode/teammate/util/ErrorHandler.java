@@ -1,14 +1,20 @@
 package com.mainstreetcode.teammate.util;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Message;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.functions.Consumer;
-import retrofit2.HttpException;
 
 /**
  * A Error handler
@@ -54,9 +60,7 @@ public class ErrorHandler implements Consumer<Throwable> {
                 ? new Message(messageMap.get(key))
                 : isTeammateException(throwable)
                 ? new Message(throwable.getMessage())
-                : isHttpException(throwable)
-                ? new Message((HttpException) throwable)
-                : new Message(defaultMessage);
+                : parseMessage(throwable);
 
         try {
             messageConsumer.accept(message);
@@ -71,12 +75,31 @@ public class ErrorHandler implements Consumer<Throwable> {
         actions.add(action);
     }
 
-    private boolean isHttpException(Throwable throwable) {
-        return throwable instanceof HttpException;
-    }
-
     private boolean isTeammateException(Throwable throwable) {
         return throwable instanceof TeammateException;
+    }
+
+    private boolean isOffline() {
+        App app = App.getInstance();
+        if (app == null) return true;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) return true;
+
+        NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+        return netInfo == null || !netInfo.isConnectedOrConnecting();
+    }
+
+    private Message parseMessage(Throwable throwable) {
+        Message message = Message.fromThrowable(throwable);
+        if (message != null) return message;
+
+        App app = App.getInstance();
+
+        if ((isOffline() || throwable instanceof UnknownHostException) && app != null)
+            return new Message(app.getString(R.string.error_network));
+
+        return new Message(defaultMessage);
     }
 
     public static class Builder {
