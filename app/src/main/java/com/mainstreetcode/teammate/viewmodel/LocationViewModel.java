@@ -54,13 +54,13 @@ public class LocationViewModel extends ViewModel {
         String errorString = fragment.getString(R.string.event_public_location_unknown);
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(fragment.requireActivity());
 
-        return Maybe.create(emitter -> client.getLastLocation()
+        return Maybe.create(emit -> client.getLastLocation()
                 .addOnSuccessListener(location -> {
-                    if (location != null) emitter.onSuccess(new LatLng(location.getLatitude(), location.getLongitude()));
-                    else emitter.onError(new TeammateException(errorString));
+                    if (location == null) emit.onError(new TeammateException(errorString));
+                    else emit.onSuccess(new LatLng(location.getLatitude(), location.getLongitude()));
                 })
-                .addOnCompleteListener(ignored -> emitter.onComplete())
-                .addOnFailureListener(emitter::onError));
+                .addOnCompleteListener(ignored -> emit.onComplete())
+                .addOnFailureListener(emit::onError));
     }
 
     public boolean hasPermission(Fragment fragment) {
