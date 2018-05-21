@@ -26,6 +26,7 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
@@ -319,6 +320,14 @@ public class MainActivity extends TeammatesBaseActivity
         toggleFab(current.showsFab());
         toggleToolbar(current.showsToolBar());
         toggleBottombar(current.showsBottomNav());
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager == null) return;
+
+        BaseFragment fragment = BlankBottomSheetFragment.newInstance();
+        fragmentManager.beginTransaction()
+                .replace(R.id.bottom_sheet, fragment, fragment.getStableTag())
+                .commit();
     }
 
     public static void startRegistrationActivity(Activity activity) {
