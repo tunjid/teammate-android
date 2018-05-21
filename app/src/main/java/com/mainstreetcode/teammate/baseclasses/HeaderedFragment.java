@@ -29,6 +29,8 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
@@ -81,10 +83,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     @Override
     public void onResume() {
         super.onResume();
-        Gofer<T> gofer = gofer();
-        disposables.add(gofer.prepare().subscribe(this::onPrepComplete, ErrorHandler.EMPTY));
-
-        if (canGetModel()) disposables.add(gofer.get().subscribe(this::onModelUpdated, defaultErrorHandler));
+        getData(false);
     }
 
     @Override
@@ -130,6 +129,21 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         if (showsFab()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
                 .observeOn(mainThread())
                 .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
+    }
+
+    protected final void refresh() {
+        getData(true);
+    }
+
+    private void getData(boolean refresh) {
+        Gofer<T> gofer = gofer();
+        disposables.add(gofer.prepare().subscribe(this::onPrepComplete, ErrorHandler.EMPTY));
+
+        Flowable<DiffUtil.DiffResult> diffFlowable = gofer.get();
+        if (refresh) diffFlowable = diffFlowable.doOnComplete(scrollManager::notifyDataSetChanged);
+
+        if (canGetModel())
+            disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 
     protected void blockUser(User user, Team team) {

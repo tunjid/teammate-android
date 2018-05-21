@@ -82,6 +82,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new EventEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .onLayoutManager(this::setSpanSizeLookUp)
@@ -223,7 +224,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         eventViewModel.onEventTeamChanged(event, team);
         hideBottomSheet();
 
-        int index = event.asIdentifiables().indexOf(team);
+        int index = gofer.getItems().indexOf(team);
         if (index > -1) scrollManager.notifyItemChanged(index);
     }
 

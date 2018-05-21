@@ -90,7 +90,12 @@ public class UserRepository extends ModelRepository<User> {
         Maybe<User> local = userDao.get(id).subscribeOn(io());
         Single<User> remote = api.getMe().map(getSaveFunction());
 
-        return fetchThenGetModel(updateCurrent(local.toSingle()).toMaybe(), updateCurrent(remote).toMaybe());
+        if (id.equals(currentUser.getId())) {
+            local = updateCurrent(local.toSingle()).toMaybe();
+            remote = updateCurrent(remote);
+        }
+
+        return fetchThenGetModel(local, remote.toMaybe());
     }
 
     @Override
@@ -134,7 +139,7 @@ public class UserRepository extends ModelRepository<User> {
         String userId = getUserId();
         return TextUtils.isEmpty(userId)
                 ? Flowable.error(new TeammateException("No signed in user"))
-                : get(userId);
+                : get(userId).map(getLocalUpdateFunction(currentUser));
     }
 
     public Single<Boolean> signOut() {

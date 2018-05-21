@@ -18,6 +18,7 @@ import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
@@ -65,6 +66,7 @@ public class MainActivity extends TeammatesBaseActivity
 
     private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
+    private ViewGroup bottomSheetContainer;
     private Toolbar bottomSheetToolbar;
     private Toolbar altToolbar;
 
@@ -124,8 +126,9 @@ public class MainActivity extends TeammatesBaseActivity
 
         altToolbar = findViewById(R.id.alt_toolbar);
         bottomSheetToolbar = findViewById(R.id.bottom_toolbar);
+        bottomSheetContainer = findViewById(R.id.bottom_sheet);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
@@ -154,11 +157,11 @@ public class MainActivity extends TeammatesBaseActivity
         View bottomBar = findViewById(R.id.bottom_navigation);
         bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
                 .addStartRunnable(() -> {
-                    TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+                    TeammatesBaseFragment view = getCurrentFragment();
                     if (view != null && !view.showsBottomNav()) bottomBar.setVisibility(GONE);
                 })
                 .addEndRunnable(() -> {
-                    TeammatesBaseFragment view = (TeammatesBaseFragment) getCurrentFragment();
+                    TeammatesBaseFragment view = getCurrentFragment();
                     if (view == null || !view.showsBottomNav()) return;
                     bottomBar.setVisibility(View.VISIBLE);
                     initTransition();
@@ -228,7 +231,7 @@ public class MainActivity extends TeammatesBaseActivity
 
     @Override
     public void toggleAltToolbar(boolean show) {
-        TeammatesBaseFragment current = (TeammatesBaseFragment) getCurrentFragment();
+        TeammatesBaseFragment current = getCurrentFragment();
         if (show) toggleToolbar(false);
         else if (current != null) toggleToolbar(current.showsToolBar());
 
@@ -260,6 +263,9 @@ public class MainActivity extends TeammatesBaseActivity
         if (fragmentManager == null) return;
 
         BaseFragment toShow = args.getFragment();
+        TeammatesBaseFragment current = getCurrentFragment();
+        int topPadding = current != null && current.insetState()[TOP_INSET] ? TeammatesBaseActivity.topInset : 0;
+
         toShow.setEnterTransition(getBottomSheetTransition());
         toShow.setExitTransition(getBottomSheetTransition());
 
@@ -269,6 +275,7 @@ public class MainActivity extends TeammatesBaseActivity
 
         bottomToolbarState = args.getToolbarState();
         bottomSheetBehavior.setState(STATE_EXPANDED);
+        bottomSheetContainer.setPadding(0, topPadding, 0, 0);
         refreshBottomToolbar();
     }
 
@@ -304,14 +311,14 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     private void restoreHiddenViewState() {
-        TeammatesBaseFragment fragment = (TeammatesBaseFragment) getCurrentFragment();
-        if (fragment == null) return;
+        TeammatesBaseFragment current = getCurrentFragment();
+        if (current == null) return;
 
-        fragment.togglePersistentUi();
-        setFabClickListener(fragment);
-        toggleFab(fragment.showsFab());
-        toggleToolbar(fragment.showsToolBar());
-        toggleBottombar(fragment.showsBottomNav());
+        current.togglePersistentUi();
+        setFabClickListener(current);
+        toggleFab(current.showsFab());
+        toggleToolbar(current.showsToolBar());
+        toggleBottombar(current.showsBottomNav());
     }
 
     public static void startRegistrationActivity(Activity activity) {
