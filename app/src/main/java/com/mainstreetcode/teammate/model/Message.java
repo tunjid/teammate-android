@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
+import io.reactivex.exceptions.CompositeException;
 import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
@@ -57,12 +58,19 @@ public class Message {
 
     @Nullable
     public static Message fromThrowable(Throwable throwable) {
-        if (!(throwable instanceof HttpException)) return null;
-        return new Message((HttpException) throwable);
+        if (throwable instanceof HttpException) {
+            return new Message((HttpException) throwable);
+        }
+        else if (throwable instanceof CompositeException) {
+            CompositeException compositeException = (CompositeException) throwable;
+            HttpException httpException = ModelUtils.findFirst(compositeException.getExceptions(), HttpException.class);
+            if (httpException != null) return new Message(httpException);
+        }
+        return null;
     }
 
     public boolean isValidModel() { return !isIllegalTeamMember() && !isInvalidObject(); }
-    
+
     public boolean isInvalidObject() { return INVALID_OBJECT_REFERENCE_ERROR_CODE.equals(errorCode);}
 
     public boolean isIllegalTeamMember() { return ILLEGAL_TEAM_MEMBER_ERROR_CODE.equals(errorCode);}

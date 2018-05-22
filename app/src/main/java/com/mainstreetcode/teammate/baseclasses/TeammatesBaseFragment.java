@@ -166,6 +166,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         toggleSystemUI(true);
         toggleToolbar(showsToolBar());
         toggleBottombar(showsBottomNav());
+        setFabClickListener(this);
     }
 
     @SuppressLint("CommitTransaction")

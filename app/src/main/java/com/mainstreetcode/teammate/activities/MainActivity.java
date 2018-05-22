@@ -26,6 +26,7 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
@@ -314,11 +315,19 @@ public class MainActivity extends TeammatesBaseActivity
         TeammatesBaseFragment current = getCurrentFragment();
         if (current == null) return;
 
-        current.togglePersistentUi();
-        setFabClickListener(current);
-        toggleFab(current.showsFab());
-        toggleToolbar(current.showsToolBar());
-        toggleBottombar(current.showsBottomNav());
+        Runnable onCommit = () -> {
+            TeammatesBaseFragment post = getCurrentFragment();
+            if (post != null && post.getView() != null) post.togglePersistentUi();
+        };
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager == null) return;
+
+        BaseFragment fragment = BlankBottomSheetFragment.newInstance();
+        fragmentManager.beginTransaction()
+                .replace(R.id.bottom_sheet, fragment, fragment.getStableTag())
+                .runOnCommit(onCommit)
+                .commit();
     }
 
     public static void startRegistrationActivity(Activity activity) {
