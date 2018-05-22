@@ -119,18 +119,18 @@ public class ModelUtils {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public static <T> T findFirst(List<Identifiable> list, Class<T> typeClass) {
-        for (Identifiable item : list) if (item.getClass().equals(typeClass)) return (T) item;
+    public static <T> T findFirst(List<?> list, Class<T> typeClass) {
+        for (Object item : list) if (typeClass.isAssignableFrom(item.getClass())) return (T) item;
         return null;
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public static <T> T findLast(List<Identifiable> list, Class<T> typeClass) {
-        ListIterator<Identifiable> li = list.listIterator(list.size());
+    public static <T> T findLast(List<?> list, Class<T> typeClass) {
+        ListIterator<?> li = list.listIterator(list.size());
         while (li.hasPrevious()) {
-            Identifiable item = li.previous();
-            if (item.getClass().equals(typeClass)) return ((T) item);
+            Object item = li.previous();
+            if (typeClass.isAssignableFrom(item.getClass())) return ((T) item);
         }
         return null;
     }

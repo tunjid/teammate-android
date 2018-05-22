@@ -121,6 +121,7 @@ public class RoleEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(imageUrl);
+        dest.writeString(nickname);
         dest.writeString(position.getCode());
         dest.writeValue(team);
         dest.writeValue(user);

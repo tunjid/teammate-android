@@ -38,37 +38,40 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="start|top"
+            android:maxLines="1"
             android:paddingBottom="@dimen/quarter_margin"
             android:paddingLeft="@dimen/single_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/half_margin"
             android:textColor="@color/dark_grey"
-            app:layout_constraintVertical_chainStyle="spread_inside"
             android:textSize="@dimen/small_text"
-            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintBottom_toTopOf="@+id/item_subtitle"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Hi I'm some ." />
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
 
         <TextView
             android:id="@+id/item_subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:gravity="start|bottom"
+            android:maxLines="1"
             android:paddingBottom="@dimen/half_margin"
             android:paddingLeft="@dimen/single_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/quarter_margin"
             android:textColor="@color/dark_grey"
             android:textSize="@dimen/tiny_text"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_title"
-            app:layout_constrainedWidth="true"
-            tools:text="Hi I'm some very interesting text." />
+            tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>
