@@ -1,3 +1,7 @@
+## Repository Overview
+
+This repo is managed using git flow. The latest code is in the develop branch.
+
 ## Architecture Overview
 
 Teammate is a MVVM Android Application that depends heavily on Functional Reactive Programming
