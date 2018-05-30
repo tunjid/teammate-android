@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.repository;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.JoinRequest;
@@ -97,7 +96,6 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
     }
 
     @Override
-    @SuppressLint("CheckResult")
     Maybe<List<TeamMember<T>>> localModelsBefore(Team key, @Nullable Date date) {
         if (date == null) date = new Date();
 
