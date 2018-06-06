@@ -93,21 +93,6 @@ public class MainActivity extends TeammatesBaseActivity
 
             if (menuItem != null) menuItem.setChecked(true);
         }
-
-        @Override
-        public void onFragmentResumed(FragmentManager fm, Fragment f) {
-            altToolbar.setOnMenuItemClickListener(f::onOptionsItemSelected);
-        }
-
-        @Override
-        public void onFragmentViewDestroyed(FragmentManager fm, Fragment f) {
-            altToolbar.setOnMenuItemClickListener(MainActivity.this::onOptionsItemSelected);
-        }
-
-        @Override
-        public void onFragmentStopped(FragmentManager fm, Fragment f) {
-            altToolbar.setOnMenuItemClickListener(MainActivity.this::onOptionsItemSelected);
-        }
     };
 
     @Override
@@ -131,6 +116,7 @@ public class MainActivity extends TeammatesBaseActivity
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
+        altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -284,6 +270,11 @@ public class MainActivity extends TeammatesBaseActivity
     public boolean showFragment(BaseFragment fragment) {
         hideBottomSheet();
         return super.showFragment(fragment);
+    }
+
+    private boolean onAltMenuItemSelected(MenuItem item) {
+        Fragment current = getCurrentFragment();
+        return current != null && current.onOptionsItemSelected(item);
     }
 
     private Transition getBottomSheetTransition() {
