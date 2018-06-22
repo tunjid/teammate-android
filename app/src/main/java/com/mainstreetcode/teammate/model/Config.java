@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.MetaData;
 import com.mainstreetcode.teammate.model.enums.Position;
@@ -44,6 +45,7 @@ public class Config implements Model<Config> {
     private List<Position> positions = new ArrayList<>();
     private List<Visibility> visibilities = new ArrayList<>();
     private List<BlockReason> blockReasons = new ArrayList<>();
+    private List<AndroidVariant> staticVariants = new ArrayList<>();
 
     Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
         this.defaultTeamLogo = defaultTeamLogo;
@@ -80,6 +82,10 @@ public class Config implements Model<Config> {
 
     public static List<BlockReason> getBlockReasons() {
         return getList(config -> config.blockReasons);
+    }
+
+    public static boolean isStaticVariant() {
+        return getList(config -> config.staticVariants).contains(AndroidVariant.empty());
     }
 
     public static Sport sportFromCode(String code) {
@@ -128,6 +134,7 @@ public class Config implements Model<Config> {
         sports.addAll(updated.sports);
         positions.addAll(updated.positions);
         visibilities.addAll(updated.visibilities);
+        staticVariants.addAll(updated.staticVariants);
     }
 
     @Override
@@ -138,7 +145,7 @@ public class Config implements Model<Config> {
     @Override
     public boolean isEmpty() {
         return TextUtils.isEmpty(defaultTeamLogo) || sports.isEmpty() || positions.isEmpty()
-                || visibilities.isEmpty() || blockReasons.isEmpty();
+                || visibilities.isEmpty() || blockReasons.isEmpty() || staticVariants.isEmpty();
     }
 
     @Override
@@ -178,6 +185,7 @@ public class Config implements Model<Config> {
         private static final String POSITIONS_KEY = "roles";
         private static final String VISIBILITIES_KEY = "visibility";
         private static final String BLOCKED_REASONS_KEY = "blockReasons";
+        private static final String STATIC_VARIANTS_KEY = "staticAndroidVariants";
 
         @Override
         public JsonElement serialize(Config src, Type typeOfSrc, JsonSerializationContext context) {
@@ -191,16 +199,19 @@ public class Config implements Model<Config> {
             JsonArray positionArray = new JsonArray();
             JsonArray visibilityArray = new JsonArray();
             JsonArray blockedReasonArray = new JsonArray();
+            JsonArray staticVariantsArray = new JsonArray();
 
             for (Sport item : src.sports) sportsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
             for (BlockReason item : src.blockReasons) blockedReasonArray.add(context.serialize(item));
+            for (AndroidVariant item : src.staticVariants) staticVariantsArray.add(context.serialize(item));
 
             serialized.add(SPORTS_KEY, sportsArray);
             serialized.add(POSITIONS_KEY, positionArray);
             serialized.add(VISIBILITIES_KEY, visibilityArray);
             serialized.add(BLOCKED_REASONS_KEY, blockedReasonArray);
+            serialized.add(STATIC_VARIANTS_KEY, staticVariantsArray);
 
             return serialized;
         }
@@ -219,6 +230,7 @@ public class Config implements Model<Config> {
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
             ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
             ModelUtils.deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason.class);
+            ModelUtils.deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant.class);
 
             return config;
         }

@@ -24,6 +24,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -125,6 +126,7 @@ public class TeammateService {
                 .registerTypeAdapter(BlockReason.class, new BlockReason.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .registerTypeAdapter(BlockedUser.class, new BlockedUser.GsonAdapter())
+                .registerTypeAdapter(AndroidVariant.class, new AndroidVariant.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();
