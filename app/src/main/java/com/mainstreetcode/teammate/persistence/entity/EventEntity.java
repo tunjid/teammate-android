@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static com.mainstreetcode.teammate.util.ModelUtils.parse;
 import static com.mainstreetcode.teammate.util.ModelUtils.processString;
 
 
@@ -40,9 +41,12 @@ public class EventEntity implements Parcelable {
     @ColumnInfo(name = "event_location") protected LatLng location;
     @ColumnInfo(name = "event_visibility") protected Visibility visibility;
 
+    @ColumnInfo(name = "event_spots") protected int spots;
+
     public EventEntity(@NonNull String id, String imageUrl,
                        CharSequence name, CharSequence notes, CharSequence locationName,
-                       Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
+                       Date startDate, Date endDate, Team team, LatLng location, Visibility visibility,
+                       int spots) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.name = name;
@@ -53,6 +57,7 @@ public class EventEntity implements Parcelable {
         this.endDate = endDate;
         this.team = team;
         this.location = location;
+        this.spots = spots;
     }
 
     protected EventEntity(Parcel in) {
@@ -66,6 +71,7 @@ public class EventEntity implements Parcelable {
         team = (Team) in.readValue(Team.class.getClassLoader());
         location = (LatLng) in.readValue(LatLng.class.getClassLoader());
         visibility = Config.visibilityFromCode(in.readString());
+        spots = in.readInt();
     }
 
     @NonNull
@@ -113,6 +119,10 @@ public class EventEntity implements Parcelable {
         return ModelUtils.prettyPrinter.format(startDate);
     }
 
+    public int getSpots() {
+        return spots;
+    }
+
     public boolean isPublic(){
         return visibility.isPublic();
     }
@@ -143,6 +153,10 @@ public class EventEntity implements Parcelable {
 
     protected void setEndDate(String endDate) {
         this.endDate = ModelUtils.parseDate(endDate, ModelUtils.prettyPrinter);
+    }
+
+    protected void setSpots(String spots) {
+        this.spots = parse(spots);
     }
 
     @Override
@@ -178,6 +192,7 @@ public class EventEntity implements Parcelable {
         dest.writeValue(team);
         dest.writeValue(location);
         dest.writeString(visibility.getCode());
+        dest.writeInt(spots);
     }
 
     public static final Parcelable.Creator<EventEntity> CREATOR = new Parcelable.Creator<EventEntity>() {

@@ -153,6 +153,7 @@
     <string name="create_event">Create Event</string>
     <string name="edit_event">Event: %1$s</string>
     <string name="event_name">Event Name</string>
+    <string name="event_spots">Spots Available</string>
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="event_public">Public events</string>

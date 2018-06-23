@@ -30,8 +30,8 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventEditAdapter.EventEditAdapterListener> {
 
-    private static final int GUEST = 12;
-    private static final int TEAM = 13;
+    private static final int GUEST = 18;
+    private static final int TEAM = 19;
 
     private final List<Identifiable> identifiables;
 
@@ -48,6 +48,8 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.TEXT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE);
+            case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
