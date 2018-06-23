@@ -29,6 +29,10 @@
     <string name="nickname">Nickname</string>
     <string name="member_information">Member Information</string>
     <string name="sign_up">Sign Up</string>
+    <string name="sign_up_terms_phrase">I agree to the %1$s and the %2$s</string>
+    <string name="sign_up_terms">Terms of Service</string>
+    <string name="sign_up_privacy_policy">Privacy Policy</string>
+    <string name="sign_up_terms_accept">Please accept the Terms of Service and Privacy Policy to continue</string>
     <string name="sign_up_error_default">Error signing up, please try again later</string>
     <string name="sign_up_error_weak_password">Your password is too weak, please try again</string>
     <string name="sign_up_error_invalid_credentials">The credentials provided don\'t match our records, please try again</string>
