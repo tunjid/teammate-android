@@ -8,9 +8,6 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -80,27 +77,6 @@ public final class TeamsFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchTeams();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_teams, menu);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.action_search);
-        if (item != null && isTeamPicker()) item.setVisible(false);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                showFragment(TeamSearchFragment.newInstance());
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

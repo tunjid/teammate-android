@@ -9,9 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -39,6 +36,7 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     private View createTeam;
     private final List<Identifiable> teams = new ArrayList<>();
+    private SearchView searchView;
 
     public static TeamSearchFragment newInstance() {
         TeamSearchFragment fragment = new TeamSearchFragment();
@@ -57,6 +55,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_team_search, container, false);
+        searchView = rootView.findViewById(R.id.searchView);
         createTeam = rootView.findViewById(R.id.create_team);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
@@ -65,18 +64,12 @@ public final class TeamSearchFragment extends MainActivityFragment
                 .withStaggeredGridLayoutManager(2)
                 .build();
 
+        searchView.setOnQueryTextListener(this);
+        searchView.setIconifiedByDefault(false);
+        searchView.setIconified(false);
         createTeam.setOnClickListener(this);
 
         return rootView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_team_search, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchItem.expandActionView();
-        if (searchView != null) searchView.setOnQueryTextListener(this);
     }
 
     @Override
@@ -88,22 +81,19 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        searchView.clearFocus();
+        searchView = null;
         createTeam = null;
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setToolbarTitle(getString(R.string.team_search));
     }
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() { return false; }
+
+    @Override
+    public boolean showsToolBar() { return false; }
 
     @Override
     public void onTeamClicked(Team team) {
