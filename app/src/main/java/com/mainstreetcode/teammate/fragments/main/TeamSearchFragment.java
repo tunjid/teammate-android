@@ -75,7 +75,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        postSearch("");
+        postSearch(searchView.getQuery().toString());
     }
 
     @Override
