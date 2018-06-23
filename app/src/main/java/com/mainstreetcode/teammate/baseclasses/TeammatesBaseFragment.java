@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Validator;
@@ -127,14 +128,18 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Transition baseTransition = new Fade();
+
+            setEnterTransition(baseTransition);
+            setExitTransition(baseTransition);
+
+            if (Config.isStaticVariant()) return;
+
             Transition baseSharedTransition = new TransitionSet()
                     .addTransition(new ChangeBounds())
                     .addTransition(new ChangeTransform())
                     .addTransition(new ChangeImageTransform())
                     .setOrdering(TransitionSet.ORDERING_TOGETHER);
 
-            setEnterTransition(baseTransition);
-            setExitTransition(baseTransition);
             setSharedElementEnterTransition(baseSharedTransition);
             setSharedElementReturnTransition(baseSharedTransition);
         }

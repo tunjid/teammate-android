@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.persistence.migrations.Migration1To2;
+import com.mainstreetcode.teammate.persistence.migrations.Migration2To3;
 import com.mainstreetcode.teammate.persistence.typeconverters.CharSequenceConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.DateTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.EventTypeConverter;
@@ -39,7 +40,7 @@ import io.reactivex.Single;
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
         RoleEntity.class, JoinRequestEntity.class, GuestEntity.class,
-        Chat.class, Media.class}, version = 2)
+        Chat.class, Media.class}, version = 3)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class, CharSequenceConverter.class,
         UserTypeConverter.class, TeamTypeConverter.class, EventTypeConverter.class,
@@ -56,6 +57,7 @@ public abstract class AppDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(App.getInstance(), AppDatabase.class, BuildConfig.DEV ? DEV_DB : PROD_DB)
                     .addMigrations(new Migration1To2())
+                    .addMigrations(new Migration2To3())
                     .fallbackToDestructiveMigration()
                     .build();
         }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/action_bar_height">
@@ -116,6 +117,20 @@
                 android:imeOptions="actionDone"
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
+
+        <CheckBox
+            android:id="@+id/terms"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/single_margin"
+            android:buttonTint="@color/white"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/password_wrapper"
+            tools:text="Accept the terms and conditions to proceed" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v4.widget.NestedScrollView>
 

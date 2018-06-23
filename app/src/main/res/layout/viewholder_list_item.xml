@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.18"
+            app:layout_constraintGuide_percent="0.20"
             app:layout_constraintLeft_toLeftOf="parent" />
 
         <ImageView
@@ -27,6 +27,7 @@
             android:layout_height="0dp"
             android:background="@color/dark_grey"
             android:contentDescription="@string/team_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="H,1:1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="@+id/guideline"
@@ -53,7 +54,7 @@
             app:layout_constraintVertical_chainStyle="spread_inside"
             tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/item_subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -65,9 +66,10 @@
             android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/quarter_margin"
             android:textColor="@color/dark_grey"
-            android:textSize="@dimen/tiny_text"
+            app:autoSizeMinTextSize="@dimen/tiny_text"
+            app:autoSizeTextType="uniform"
             app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintRight_toRightOf="parent"

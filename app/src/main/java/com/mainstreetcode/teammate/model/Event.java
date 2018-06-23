@@ -46,17 +46,18 @@ public class Event extends EventEntity
         ListableModel<Event> {
 
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
+    public static final int DEFAULT_NUM_SPOTS = 12;
 
-    @Ignore private static final IdCache holder = IdCache.cache(6);
+    @Ignore private static final IdCache holder = IdCache.cache(7);
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.empty());
+        return new Event("", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
     }
 
     public Event(String id, String imageUrl, CharSequence name, CharSequence notes, CharSequence locationName,
-                 Date startDate, Date endDate, Team team, LatLng location, Visibility visibility) {
-        super(id, imageUrl, name, notes, locationName, startDate, endDate, team, location, visibility);
+                 Date startDate, Date endDate, Team team, LatLng location, Visibility visibility, int spots) {
+        super(id, imageUrl, name, notes, locationName, startDate, endDate, team, location, visibility, spots);
     }
 
     protected Event(Parcel in) {
@@ -69,10 +70,11 @@ public class Event extends EventEntity
                 Item.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
                 Item.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, visibility::getCode, this::setVisibility, this)
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
-                Item.text(holder.get(2), 2, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-                Item.text(holder.get(3), 3, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
-                Item.text(holder.get(4), 4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
-                Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this)
+                Item.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, () -> String.valueOf(spots), this::setSpots, this),
+                Item.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
+                Item.text(holder.get(4), 4, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
+                Item.text(holder.get(5), 5, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
+                Item.text(holder.get(6), 6, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this)
         );
     }
 
@@ -110,6 +112,7 @@ public class Event extends EventEntity
         this.id = updatedEvent.id;
         this.name = updatedEvent.name;
         this.notes = updatedEvent.notes;
+        this.spots = updatedEvent.spots;
         this.imageUrl = updatedEvent.imageUrl;
         this.endDate = updatedEvent.endDate;
         this.startDate = updatedEvent.startDate;
@@ -181,6 +184,7 @@ public class Event extends EventEntity
         private static final String START_DATE_KEY = "startDate";
         private static final String END_DATE_KEY = "endDate";
         private static final String LOCATION_KEY = "location";
+        private static final String SPOTS_KEY = "spots";
 
         @Override
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
@@ -189,6 +193,7 @@ public class Event extends EventEntity
             serialized.addProperty(NAME_KEY, src.name.toString());
             serialized.addProperty(NOTES_KEY, src.notes.toString());
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName.toString());
+            serialized.addProperty(SPOTS_KEY, src.getSpots());
             serialized.addProperty(TEAM_KEY, src.team.getId());
             serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
             serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
@@ -210,7 +215,7 @@ public class Event extends EventEntity
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Event(json.getAsString(), "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.empty());
+                return new Event(json.getAsString(), "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
             }
 
             JsonObject eventJson = json.getAsJsonObject();
@@ -223,6 +228,9 @@ public class Event extends EventEntity
             String locationName = ModelUtils.asString(LOCATION_NAME_KEY, eventJson);
             String startDate = ModelUtils.asString(START_DATE_KEY, eventJson);
             String endDate = ModelUtils.asString(END_DATE_KEY, eventJson);
+            int spots = (int) ModelUtils.asFloat(SPOTS_KEY, eventJson);
+
+            if (spots == 0) spots = DEFAULT_NUM_SPOTS;
 
             Team team = context.deserialize(eventJson.get(TEAM_KEY), Team.class);
             LatLng location = ModelUtils.parseCoordinates(LOCATION_KEY, eventJson);
@@ -230,7 +238,7 @@ public class Event extends EventEntity
 
             if (team == null) team = Team.empty();
 
-            return new Event(id, imageUrl, name, notes, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility);
+            return new Event(id, imageUrl, name, notes, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility, spots);
         }
     }
 }
