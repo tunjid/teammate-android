@@ -3,9 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.transition.AutoTransition;
-import android.support.transition.TransitionManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -125,10 +122,6 @@ public final class TeamSearchFragment extends MainActivityFragment
     }
 
     private void onTeamsUpdated(List<Team> teams) {
-        ViewGroup parent = (ViewGroup) createTeam.getParent();
-        TransitionManager.beginDelayedTransition(parent, new AutoTransition().excludeChildren(RecyclerView.class, true));
-        createTeam.setVisibility(View.VISIBLE);
-
         this.teams.clear();
         this.teams.addAll(teams);
         scrollManager.notifyDataSetChanged();
