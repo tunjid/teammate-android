@@ -83,13 +83,13 @@ public class TeammateService {
     public static TeammateApi getApiInstance() {
         if (api == null) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
 
             if (BuildConfig.DEV) builder.addInterceptor(loggingInterceptor);
 
-            assignSSLSocketFactory(builder);
+            //assignSSLSocketFactory(builder);
 
             httpClient = builder.build();
 
@@ -142,6 +142,7 @@ public class TeammateService {
         return httpClient;
     }
 
+    @SuppressWarnings("unused")
     private static void assignSSLSocketFactory(OkHttpClient.Builder builder) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
