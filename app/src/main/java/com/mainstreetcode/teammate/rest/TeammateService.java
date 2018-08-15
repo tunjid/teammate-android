@@ -26,10 +26,13 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
+import com.mainstreetcode.teammate.model.enums.GameStat;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.TournamentStyle;
+import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.Logger;
@@ -121,12 +124,15 @@ public class TeammateService {
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
+                .registerTypeAdapter(GameStat.class, new GameStat.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(BlockReason.class, new BlockReason.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .registerTypeAdapter(BlockedUser.class, new BlockedUser.GsonAdapter())
                 .registerTypeAdapter(AndroidVariant.class, new AndroidVariant.GsonAdapter())
+                .registerTypeAdapter(TournamentType.class, new TournamentType.GsonAdapter())
+                .registerTypeAdapter(TournamentStyle.class, new TournamentStyle.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();

@@ -17,9 +17,12 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
+import com.mainstreetcode.teammate.model.enums.GameStat;
 import com.mainstreetcode.teammate.model.enums.MetaData;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.TournamentStyle;
+import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.repository.ConfigRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -43,9 +46,12 @@ public class Config implements Model<Config> {
     private String defaultUserAvatar;
     private List<Sport> sports = new ArrayList<>();
     private List<Position> positions = new ArrayList<>();
+    private List<GameStat> gameStats = new ArrayList<>();
     private List<Visibility> visibilities = new ArrayList<>();
     private List<BlockReason> blockReasons = new ArrayList<>();
     private List<AndroidVariant> staticVariants = new ArrayList<>();
+    private List<TournamentType> tournamentTypes = new ArrayList<>();
+    private List<TournamentStyle> tournamentStyles = new ArrayList<>();
 
     Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
         this.defaultTeamLogo = defaultTeamLogo;
@@ -186,6 +192,9 @@ public class Config implements Model<Config> {
         private static final String VISIBILITIES_KEY = "visibility";
         private static final String BLOCKED_REASONS_KEY = "blockReasons";
         private static final String STATIC_VARIANTS_KEY = "staticAndroidVariants";
+        private static final String GAME_STATS_KEY = "stats";
+        private static final String TOURNAMENT_TYPE_KEY = "tournamentTypes";
+        private static final String TOURNAMENT_STYLE_KEY = "tournamentStyles";
 
         @Override
         public JsonElement serialize(Config src, Type typeOfSrc, JsonSerializationContext context) {
@@ -195,23 +204,32 @@ public class Config implements Model<Config> {
             serialized.addProperty(EVENT_LOGO_KEY, src.defaultEventLogo);
             serialized.addProperty(USER_AVATAR_KEY, src.defaultUserAvatar);
 
+            JsonArray statsArray = new JsonArray();
             JsonArray sportsArray = new JsonArray();
             JsonArray positionArray = new JsonArray();
             JsonArray visibilityArray = new JsonArray();
             JsonArray blockedReasonArray = new JsonArray();
             JsonArray staticVariantsArray = new JsonArray();
+            JsonArray tournamentTypesArray = new JsonArray();
+            JsonArray tournamentStylesArray = new JsonArray();
 
             for (Sport item : src.sports) sportsArray.add(context.serialize(item));
+            for (GameStat item : src.gameStats) statsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
             for (BlockReason item : src.blockReasons) blockedReasonArray.add(context.serialize(item));
             for (AndroidVariant item : src.staticVariants) staticVariantsArray.add(context.serialize(item));
+            for (TournamentType item : src.tournamentTypes) tournamentTypesArray.add(context.serialize(item));
+            for (TournamentStyle item : src.tournamentStyles) tournamentStylesArray.add(context.serialize(item));
 
             serialized.add(SPORTS_KEY, sportsArray);
+            serialized.add(GAME_STATS_KEY, statsArray);
             serialized.add(POSITIONS_KEY, positionArray);
             serialized.add(VISIBILITIES_KEY, visibilityArray);
             serialized.add(BLOCKED_REASONS_KEY, blockedReasonArray);
             serialized.add(STATIC_VARIANTS_KEY, staticVariantsArray);
+            serialized.add(TOURNAMENT_TYPE_KEY, tournamentTypesArray);
+            serialized.add(TOURNAMENT_STYLE_KEY, tournamentStylesArray);
 
             return serialized;
         }
@@ -228,9 +246,12 @@ public class Config implements Model<Config> {
 
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
+            ModelUtils.deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.gameStats, GameStat.class);
             ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
             ModelUtils.deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason.class);
             ModelUtils.deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant.class);
+            ModelUtils.deserializeList(context, deviceJson.get(TOURNAMENT_TYPE_KEY), config.tournamentTypes, TournamentType.class);
+            ModelUtils.deserializeList(context, deviceJson.get(TOURNAMENT_STYLE_KEY), config.tournamentStyles, TournamentStyle.class);
 
             return config;
         }
