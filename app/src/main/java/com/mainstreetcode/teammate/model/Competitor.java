@@ -65,7 +65,7 @@ public interface Competitor<T> extends Model<T> {
 
     class Empty implements Competitor, Parcelable {
 
-        private final String id = IdCache.cache(1).get();
+        private final String id = IdCache.cache(1).get(0);
 
         private Empty() {}
 
