@@ -27,10 +27,12 @@ import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 
 public class User extends UserEntity implements
         Model<User>,
+        Competitor<User>,
         HeaderedModel<User>,
         ListableModel<User> {
 
     public static final String PHOTO_UPLOAD_KEY = "user-photo";
+    public static final String COMPETITOR_TYPE = "user";
 
     @Ignore private transient String password;
     @Ignore private static final IdCache holder = IdCache.cache(4);
@@ -68,6 +70,16 @@ public class User extends UserEntity implements
         User casted = (User) other;
         return firstName.equals(casted.getFirstName()) && lastName.equals(casted.getLastName())
                 && imageUrl.equals(casted.getImageUrl());
+    }
+
+    @Override
+    public CharSequence getName() {
+        return firstName;
+    }
+
+    @Override
+    public String getType() {
+        return COMPETITOR_TYPE;
     }
 
     @Override

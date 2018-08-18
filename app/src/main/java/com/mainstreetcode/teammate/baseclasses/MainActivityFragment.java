@@ -17,12 +17,14 @@ import com.mainstreetcode.teammate.viewmodel.BlockedUserViewModel;
 import com.mainstreetcode.teammate.viewmodel.ChatViewModel;
 import com.mainstreetcode.teammate.viewmodel.EventViewModel;
 import com.mainstreetcode.teammate.viewmodel.FeedViewModel;
+import com.mainstreetcode.teammate.viewmodel.GameViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocalRoleViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammate.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammate.viewmodel.RoleViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
+import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 
 /**
@@ -36,12 +38,14 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected RoleViewModel roleViewModel;
     protected UserViewModel userViewModel;
     protected TeamViewModel teamViewModel;
+    protected GameViewModel gameViewModel;
     protected EventViewModel eventViewModel;
     protected MediaViewModel mediaViewModel;
     protected ChatViewModel chatViewModel;
     protected LocationViewModel locationViewModel;
     protected LocalRoleViewModel localRoleViewModel;
     protected TeamMemberViewModel teamMemberViewModel;
+    protected TournamentViewModel tournamentViewModel;
     protected BlockedUserViewModel blockedUserViewModel;
 
     @Override
@@ -59,11 +63,13 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         roleViewModel = provider.get(RoleViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         teamViewModel = provider.get(TeamViewModel.class);
+        gameViewModel = provider.get(GameViewModel.class);
         eventViewModel = provider.get(EventViewModel.class);
         mediaViewModel = provider.get(MediaViewModel.class);
         chatViewModel = provider.get(ChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
         teamMemberViewModel = provider.get(TeamMemberViewModel.class);
+        tournamentViewModel = provider.get(TournamentViewModel.class);
         blockedUserViewModel = provider.get(BlockedUserViewModel.class);
 
         defaultErrorHandler.addAction(() -> {if (scrollManager != null) scrollManager.reset();});

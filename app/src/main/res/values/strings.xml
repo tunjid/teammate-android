@@ -172,6 +172,25 @@
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
 
+    <!--TournamentDetailFragment-->
+    <string name="tournaments">Tournaments</string>
+    <string name="delete_tournament_prompt">Delete tournament?</string>
+    <string name="create_tournament">Create Tournament</string>
+    <string name="create_tournament_first">Please create the tournament first</string>
+    <string name="edit_tournament">Tournament: %1$s</string>
+    <string name="tournament_name">Tournament Name</string>
+    <string name="tournament_fixtures">Tournament Fixtures</string>
+    <string name="tournament_games">View scores</string>
+    <string name="tournament_description">Tournament Description</string>
+    <string name="tournament_type">Tournament Type</string>
+    <string name="tournament_style">Tournament Style</string>
+    <string name="tournament_legs">Number of legs</string>
+    <string name="tournament_round">Number of rounds</string>
+    <string name="tournament_round_index">Round %1$s</string>
+    <string name="tournament_single_final">One game final</string>
+    <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
+
+
     <!--BlockUserFragment-->
     <string name="blocked_user">Blocked User</string>
     <string name="blocked_users">Blocked Users</string>

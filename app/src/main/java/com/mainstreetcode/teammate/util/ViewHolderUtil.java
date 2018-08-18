@@ -17,14 +17,17 @@ public class ViewHolderUtil {
     public static final int TEAM = 0;
     public static final int CHAT = 1;
     public static final int ROLE = 2;
-    public static final int EVENT = 3;
-    public static final int FEED_ITEM = 4;
-    public static final int CONTENT_AD = 5;
-    public static final int INSTALL_AD = 6;
-    public static final int MEDIA_IMAGE = 7;
-    public static final int MEDIA_VIDEO = 8;
-    public static final int JOIN_REQUEST = 9;
-    public static final int BLOCKED_USER = 10;
+    public static final int GAME = 3;
+    public static final int STAT = 4;
+    public static final int EVENT = 5;
+    public static final int FEED_ITEM = 6;
+    public static final int TOURNAMENT = 7;
+    public static final int CONTENT_AD = 8;
+    public static final int INSTALL_AD = 9;
+    public static final int MEDIA_IMAGE = 10;
+    public static final int MEDIA_VIDEO = 11;
+    public static final int JOIN_REQUEST = 12;
+    public static final int BLOCKED_USER = 13;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
 

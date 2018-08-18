@@ -39,11 +39,12 @@ public class Config implements Model<Config> {
 
     private static final String EMPTY_STRING = "";
 
-    public static Config empty() {return new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);}
+    public static Config empty() {return new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);}
 
     private String defaultTeamLogo;
     private String defaultEventLogo;
     private String defaultUserAvatar;
+    private String defaultTournamentLogo;
     private List<Sport> sports = new ArrayList<>();
     private List<Position> positions = new ArrayList<>();
     private List<GameStat> gameStats = new ArrayList<>();
@@ -53,10 +54,11 @@ public class Config implements Model<Config> {
     private List<TournamentType> tournamentTypes = new ArrayList<>();
     private List<TournamentStyle> tournamentStyles = new ArrayList<>();
 
-    Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
+    Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar, String defaultTournamentLogo) {
         this.defaultTeamLogo = defaultTeamLogo;
         this.defaultEventLogo = defaultEventLogo;
         this.defaultUserAvatar = defaultUserAvatar;
+        this.defaultTournamentLogo = defaultTournamentLogo;
     }
 
     static String getDefaultTeamLogo() {
@@ -74,6 +76,11 @@ public class Config implements Model<Config> {
         return getCurrentConfig().defaultUserAvatar;
     }
 
+    static String getDefaultTournamentLogo() {
+        if (getCurrentConfig().isEmpty()) fetchConfig();
+        return getCurrentConfig().defaultTournamentLogo;
+    }
+
     public static List<Sport> getSports() {
         return getList(config -> config.sports);
     }
@@ -88,6 +95,14 @@ public class Config implements Model<Config> {
 
     public static List<BlockReason> getBlockReasons() {
         return getList(config -> config.blockReasons);
+    }
+
+    public static List<TournamentType> getTournamentTypes() {
+        return getList(config -> config.tournamentTypes);
+    }
+
+    public static List<TournamentStyle> getTournamentStyles() {
+        return getList(config -> config.tournamentStyles);
     }
 
     public static boolean isStaticVariant() {
@@ -108,6 +123,14 @@ public class Config implements Model<Config> {
 
     public static BlockReason reasonFromCode(String code) {
         return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
+    }
+
+    public static TournamentType tournamentTypeFromCode(String code) {
+        return getFromCode(code, config -> config.tournamentTypes, TournamentType.empty());
+    }
+
+    public static TournamentStyle tournamentStyleFromCode(String code) {
+        return getFromCode(code, config -> config.tournamentStyles, TournamentStyle.empty());
     }
 
     private static Config getCurrentConfig() {
@@ -187,6 +210,7 @@ public class Config implements Model<Config> {
         private static final String TEAM_LOGO_KEY = "defaultTeamLogo";
         private static final String EVENT_LOGO_KEY = "defaultEventLogo";
         private static final String USER_AVATAR_KEY = "defaultUserAvatar";
+        private static final String TOURNAMENT_LOGO_KEY = "defaultTournamentLogo";
         private static final String SPORTS_KEY = "sports";
         private static final String POSITIONS_KEY = "roles";
         private static final String VISIBILITIES_KEY = "visibility";
@@ -203,6 +227,7 @@ public class Config implements Model<Config> {
             serialized.addProperty(TEAM_LOGO_KEY, src.defaultTeamLogo);
             serialized.addProperty(EVENT_LOGO_KEY, src.defaultEventLogo);
             serialized.addProperty(USER_AVATAR_KEY, src.defaultUserAvatar);
+            serialized.addProperty(TOURNAMENT_LOGO_KEY, src.defaultTeamLogo);
 
             JsonArray statsArray = new JsonArray();
             JsonArray sportsArray = new JsonArray();
@@ -241,8 +266,9 @@ public class Config implements Model<Config> {
             String defaultTeamLogo = ModelUtils.asString(TEAM_LOGO_KEY, deviceJson);
             String defaultEventLogo = ModelUtils.asString(EVENT_LOGO_KEY, deviceJson);
             String defaultUserAvatar = ModelUtils.asString(USER_AVATAR_KEY, deviceJson);
+            String defaultTournamentLogo = ModelUtils.asString(TOURNAMENT_LOGO_KEY, deviceJson);
 
-            Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar);
+            Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar, defaultTournamentLogo);
 
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);

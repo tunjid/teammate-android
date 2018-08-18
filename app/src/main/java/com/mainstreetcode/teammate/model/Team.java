@@ -38,10 +38,12 @@ public class Team extends TeamEntity
         implements
         TeamHost,
         Model<Team>,
+        Competitor<Team>,
         HeaderedModel<Team>,
         ListableModel<Team> {
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
+    public static final String COMPETITOR_TYPE = "team";
     private static final String NEW_TEAM = "new.team";
 
     @Ignore private static final IdCache holder = IdCache.cache(9);
@@ -90,6 +92,11 @@ public class Team extends TeamEntity
                 && imageUrl.equals(casted.getImageUrl());
 
         return same && (sport == null || sport.equals(casted.sport));
+    }
+
+    @Override
+    public String getType() {
+        return COMPETITOR_TYPE;
     }
 
     @Override

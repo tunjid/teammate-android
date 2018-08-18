@@ -7,14 +7,18 @@
         android:icon="@drawable/ic_edit_white_24dp"
         android:title="@string/edit_team"
         app:showAsAction="ifRoom" />
-
+    <item
+        android:id="@+id/action_tournaments"
+        android:enabled="true"
+        android:icon="@drawable/ic_trophy_white_24dp"
+        android:title="@string/tournaments"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_blocked"
         android:enabled="true"
         android:icon="@drawable/ic_blocked_users_white_24dp"
         android:title="@string/blocked_users"
         app:showAsAction="ifRoom" />
-
     <item
         android:id="@+id/action_delete"
         android:enabled="true"

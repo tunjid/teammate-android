@@ -24,7 +24,7 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class GuestRepository extends QueryRepository<Guest, Event> {
+public class GuestRepository extends QueryRepository<Guest, Event, Date> {
 
     private final TeammateApi api;
     private final GuestDao guestDao;

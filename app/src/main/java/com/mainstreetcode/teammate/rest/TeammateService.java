@@ -17,20 +17,23 @@ import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
-import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.GameStat;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
@@ -114,6 +117,8 @@ public class TeammateService {
                 .registerTypeAdapter(Team.class, new Team.GsonAdapter())
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
                 .registerTypeAdapter(Role.class, new Role.GsonAdapter())
+                .registerTypeAdapter(Game.class, new Game.GsonAdapter())
+                .registerTypeAdapter(Stat.class, new Stat.GsonAdapter())
                 .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Media.class, new Media.GsonAdapter())
@@ -125,6 +130,7 @@ public class TeammateService {
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
                 .registerTypeAdapter(GameStat.class, new GameStat.GsonAdapter())
+                .registerTypeAdapter(Tournament.class, new Tournament.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(BlockReason.class, new BlockReason.GsonAdapter())

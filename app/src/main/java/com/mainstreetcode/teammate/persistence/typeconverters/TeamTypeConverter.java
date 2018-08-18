@@ -15,6 +15,7 @@ public class TeamTypeConverter {
 
     @TypeConverter
     public Team fromId(String id) {
-        return AppDatabase.getInstance().teamDao().get(id).blockingGet();
+        return AppDatabase.getInstance().teamDao().get(id)
+                .onErrorReturn(error -> Team.empty()).blockingGet();
     }
 }
