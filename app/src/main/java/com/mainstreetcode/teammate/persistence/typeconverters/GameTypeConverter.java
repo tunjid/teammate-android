@@ -15,7 +15,6 @@ public class GameTypeConverter {
 
     @TypeConverter
     public Game fromId(String id) {
-        return AppDatabase.getInstance().gameDao().get(id)
-                .onErrorReturn(error -> Game.empty()).blockingGet();
+        return AppDatabase.getInstance().gameDao().get(id).blockingGet();
     }
 }

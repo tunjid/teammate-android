@@ -34,6 +34,7 @@ public class TournamentEntity implements Parcelable {
     @NonNull @PrimaryKey
     @ColumnInfo(name = "tournament_id") protected String id;
     @ColumnInfo(name = "tournament_image_url") protected String imageUrl;
+    @ColumnInfo(name = "tournament_ref_path") protected String refPath;
     @ColumnInfo(name = "tournament_name") protected CharSequence name;
     @ColumnInfo(name = "tournament_description") protected CharSequence description;
 
@@ -51,7 +52,7 @@ public class TournamentEntity implements Parcelable {
 
     @ColumnInfo(name = "tournament_single_final") protected boolean singleFinal;
 
-    public TournamentEntity(@NonNull String id, String imageUrl,
+    public TournamentEntity(@NonNull String id, String imageUrl, String refPath,
                             CharSequence name, CharSequence description,
                             Date created, Team host, Sport sport, TournamentType type, TournamentStyle style,
                             Competitor winner,
@@ -59,6 +60,7 @@ public class TournamentEntity implements Parcelable {
                             boolean singleFinal) {
         this.id = id;
         this.imageUrl = imageUrl;
+        this.refPath = refPath;
         this.name = name;
         this.description = description;
         this.created = created;
@@ -77,6 +79,7 @@ public class TournamentEntity implements Parcelable {
     protected TournamentEntity(Parcel in) {
         id = in.readString();
         imageUrl = in.readString();
+        refPath = in.readString();
         name = in.readString();
         description = in.readString();
         created = new Date(in.readLong());
@@ -84,7 +87,7 @@ public class TournamentEntity implements Parcelable {
         sport = Config.sportFromCode(in.readString());
         type = Config.tournamentTypeFromCode(in.readString());
         style = Config.tournamentStyleFromCode(in.readString());
-        winner = Competitor.Util.fromParcel(in);
+        winner = (Competitor) in.readValue(Competitor.class.getClassLoader());
         numLegs = in.readInt();
         numRounds = in.readInt();
         currentRound = in.readInt();
@@ -107,6 +110,10 @@ public class TournamentEntity implements Parcelable {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getRefPath() {
+        return refPath;
     }
 
     public Team getHost() {
@@ -177,7 +184,6 @@ public class TournamentEntity implements Parcelable {
         return id.equals(event.id);
     }
 
-
     @Override
     public int hashCode() {
         return id.hashCode();
@@ -199,7 +205,7 @@ public class TournamentEntity implements Parcelable {
         dest.writeString(sport.getCode());
         dest.writeString(type.getCode());
         dest.writeString(style.getCode());
-        Competitor.Util.writeToParcel(winner, dest);
+        dest.writeValue(winner);
         dest.writeInt(numLegs);
         dest.writeInt(numRounds);
         dest.writeInt(currentRound);

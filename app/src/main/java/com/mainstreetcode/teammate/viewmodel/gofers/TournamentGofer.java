@@ -50,7 +50,6 @@ public class TournamentGofer extends TeamHostingGofer<Tournament> {
         this.competitorsFunction = competitorsFunction;
         this.items = new ArrayList<>(model.asItems());
 
-        items.add(model.getTeam());
         state = model.isEmpty() ? CREATING : EDITING;
     }
 

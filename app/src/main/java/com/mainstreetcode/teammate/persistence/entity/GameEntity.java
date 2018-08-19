@@ -27,6 +27,7 @@ public class GameEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "game_id") protected String id;
+    @ColumnInfo(name = "game_ref_path") protected String refPath;
     @ColumnInfo(name = "game_score") protected String score;
 
     @ColumnInfo(name = "game_created") protected Date created;
@@ -44,12 +45,13 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_ended") protected boolean ended;
     @ColumnInfo(name = "game_can_draw") protected boolean canDraw;
 
-    public GameEntity(@NonNull String id, String score,
+    public GameEntity(@NonNull String id, String refPath, String score,
                       Date created, Sport sport, Event event, Tournament tournament,
                       Competitor home, Competitor away, Competitor winner,
                       int seed, int leg, int round,
                       boolean ended, boolean canDraw) {
         this.id = id;
+        this.refPath = refPath;
         this.score = score;
         this.created = created;
         this.sport = sport;
@@ -67,14 +69,15 @@ public class GameEntity implements Parcelable {
 
     protected GameEntity(Parcel in) {
         id = in.readString();
+        refPath = in.readString();
         score = in.readString();
         created = new Date(in.readLong());
         sport = Config.sportFromCode(in.readString());
         event = (Event) in.readValue(Event.class.getClassLoader());
         tournament = (Tournament) in.readValue(Tournament.class.getClassLoader());
-        home = Competitor.Util.fromParcel(in);
-        away = Competitor.Util.fromParcel(in);
-        winner = Competitor.Util.fromParcel(in);
+        home = (Competitor) in.readValue(Competitor.class.getClassLoader());
+        away = (Competitor) in.readValue(Competitor.class.getClassLoader());
+        winner = (Competitor) in.readValue(Competitor.class.getClassLoader());
         seed = in.readInt();
         leg = in.readInt();
         round = in.readInt();
@@ -89,6 +92,10 @@ public class GameEntity implements Parcelable {
 
     public String getImageUrl() {
         return EMPTY_STRING;
+    }
+
+    public String getRefPath() {
+        return refPath;
     }
 
     public Date getCreated() {
@@ -165,14 +172,15 @@ public class GameEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeString(refPath);
         dest.writeString(score);
         dest.writeLong(created.getTime());
         dest.writeString(sport.getCode());
         dest.writeValue(event);
         dest.writeValue(tournament);
-        Competitor.Util.writeToParcel(home, dest);
-        Competitor.Util.writeToParcel(away, dest);
-        Competitor.Util.writeToParcel(winner, dest);
+        dest.writeValue(home);
+        dest.writeValue(away);
+        dest.writeValue(winner);
         dest.writeInt(seed);
         dest.writeInt(leg);
         dest.writeInt(round);

@@ -6,14 +6,14 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
@@ -22,7 +22,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.FALSE;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -52,8 +52,8 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getTournamentTypes(), TournamentType::getName, TournamentType::getCode, adapterListener::canEditBeforeCreation, FALSE);
             case Item.TOURNAMENT_STYLE:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getTournamentStyles(), TournamentStyle::getName, TournamentStyle::getCode, adapterListener::canEditBeforeCreation, FALSE);
-            case TEAM:
-                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), item -> {});
+            case TOURNAMENT:
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), new BaseRecyclerViewAdapter.AdapterListener() {});
                 default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -64,7 +64,7 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
         Object item = items.get(i);
 
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
-        else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
+        else if (item instanceof Competitor) ((CompetitorViewHolder) viewHolder).bind((Competitor) item);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
         Object thing = items.get(position);
         return thing instanceof Item
                 ? ((Item) thing).getItemType()
-                : TEAM;
+                : TOURNAMENT;
     }
 
     private boolean showsChangePicture(Item item) {

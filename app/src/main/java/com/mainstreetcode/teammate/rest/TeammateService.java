@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
@@ -131,6 +132,7 @@ public class TeammateService {
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
                 .registerTypeAdapter(GameStat.class, new GameStat.GsonAdapter())
                 .registerTypeAdapter(Tournament.class, new Tournament.GsonAdapter())
+                .registerTypeAdapter(Competitor.class, new Competitor.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(BlockReason.class, new BlockReason.GsonAdapter())

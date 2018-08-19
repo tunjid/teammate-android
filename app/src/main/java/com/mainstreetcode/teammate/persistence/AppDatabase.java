@@ -10,6 +10,7 @@ import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Media;
+import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
 import com.mainstreetcode.teammate.persistence.entity.GameEntity;
 import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
@@ -23,6 +24,7 @@ import com.mainstreetcode.teammate.persistence.migrations.Migration1To2;
 import com.mainstreetcode.teammate.persistence.migrations.Migration2To3;
 import com.mainstreetcode.teammate.persistence.migrations.Migration3To4;
 import com.mainstreetcode.teammate.persistence.typeconverters.CharSequenceConverter;
+import com.mainstreetcode.teammate.persistence.typeconverters.CompetitiveTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.CompetitorTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.DateTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.EventTypeConverter;
@@ -49,15 +51,15 @@ import io.reactivex.Single;
 
 @Database(entities = {UserEntity.class, TeamEntity.class, EventEntity.class,
         RoleEntity.class, JoinRequestEntity.class, GuestEntity.class,
-        TournamentEntity.class, GameEntity.class, StatEntity.class,
+        TournamentEntity.class, CompetitorEntity.class, GameEntity.class, StatEntity.class,
         Chat.class, Media.class}, version = 4)
 
 @TypeConverters({LatLngTypeConverter.class, DateTypeConverter.class, CharSequenceConverter.class,
         UserTypeConverter.class, TeamTypeConverter.class, EventTypeConverter.class,
-        TournamentTypeConverter.class, GameTypeConverter.class,
+        TournamentTypeConverter.class, CompetitorTypeConverter.class, GameTypeConverter.class,
         SportTypeConverter.class, PositionTypeConverter.class, VisibilityTypeConverter.class,
         TournamentTypeTypeConverter.class, TournamentStyleTypeConverter.class,
-        CompetitorTypeConverter.class})
+        CompetitiveTypeConverter.class})
 
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -97,6 +99,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ChatDao teamChatDao();
 
     public abstract TournamentDao tournamentDao();
+
+    public abstract CompetitorDao competitorDao();
 
     public abstract JoinRequestDao joinRequestDao();
 

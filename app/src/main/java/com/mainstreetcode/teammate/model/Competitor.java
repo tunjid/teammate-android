@@ -1,117 +1,141 @@
 package com.mainstreetcode.teammate.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.mainstreetcode.teammate.util.IdCache;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
-public interface Competitor<T> extends Model<T> {
+import java.lang.reflect.Type;
+import java.util.Date;
 
-    CharSequence getName();
+@SuppressLint("ParcelCreator")
+public class Competitor extends CompetitorEntity
+        implements
+        Model<Competitor>,
+        Competitive {
 
-    String getType();
-
-    default boolean hasSameType(Competitor other) {
-        return getType().equals(other.getType());
+    public static Competitor empty() {
+        return new Competitor("", "", "", new N(), new Date());
     }
 
-    class Util {
-
-        public static Competitor empty() {
-            return new Empty();
-        }
-
-        public static Competitor deserialize(String refPath, @Nullable JsonElement element, JsonDeserializationContext context) {
-            boolean hasElement = element != null;
-
-            switch (refPath) {
-                case User.COMPETITOR_TYPE:
-                    return hasElement ? context.deserialize(element, User.class) : User.empty();
-                case Team.COMPETITOR_TYPE:
-                    return hasElement ? context.deserialize(element, Team.class) : Team.empty();
-                default:
-                    return empty();
-            }
-        }
-
-        public static Competitor fromParcel(Parcel in) {
-            String refPath = in.readString();
-            switch (refPath) {
-                case User.COMPETITOR_TYPE:
-                    return (User) in.readValue(User.class.getClassLoader());
-
-                case Team.COMPETITOR_TYPE:
-                    return (Team) in.readValue(Team.class.getClassLoader());
-                default:
-                    return empty();
-            }
-        }
-
-        public static void writeToParcel(Competitor competitor, Parcel dest) {
-            String refPath = competitor.getType();
-            dest.writeString(refPath);
-            switch (refPath) {
-                case User.COMPETITOR_TYPE:
-                case Team.COMPETITOR_TYPE:
-                    dest.writeValue(competitor);
-                    break;
-            }
-        }
+    public static Competitor empty(Competitive entity) {
+        return new Competitor("", "", "", entity, new Date());
     }
 
-    class Empty implements Competitor, Parcelable {
+    public Competitor(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created) {
+        super(id, refPath, tournamentId, entity, created);
+    }
 
-        private final String id = IdCache.cache(1).get(0);
+    boolean hasSameType(Competitor other) {
+        return getRefType().equals(other.getRefType());
+    }
 
-        private Empty() {}
+    @Override
+    public String getRefType() {
+        return entity.getRefType();
+    }
 
-        protected Empty(Parcel in) { }
+    @Override
+    public CharSequence getName() {
+        return entity.getName();
+    }
+
+    @Override
+    public void update(Competitor updated) {
+        Competitive other = updated.entity;
+        if (entity instanceof User && other instanceof User) ((User) entity).update(((User) other));
+        if (entity instanceof Team && other instanceof Team) ((Team) entity).update(((Team) other));
+        else entity = updated.entity;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(id);
+    }
+
+    @Override
+    public String getImageUrl() {
+        return null;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof Competitor)) return id.equals(other.getId());
+        Competitor casted = (Competitor) other;
+        return entity.getClass().equals(casted.entity.getClass())
+                && entity.getRefType().equals(casted.entity.getRefType())
+                && entity.getId().equals(casted.entity.getId());
+    }
+
+    @Override
+    public int compareTo(@NonNull Competitor competitor) {
+        Competitive other = competitor.entity;
+        if (entity instanceof User && other instanceof User)
+            return ((User) entity).compareTo(((User) other));
+        if (entity instanceof Team && other instanceof Team)
+            return ((Team) entity).compareTo(((Team) other));
+        return 0;
+    }
+
+    public static class N implements Competitive {
+        @Override
+        public String getId() { return ""; }
+
+        @Override
+        public String getRefType() { return ""; }
 
         @Override
         public CharSequence getName() { return ""; }
+    }
+
+    public static class GsonAdapter
+            implements
+            JsonSerializer<Competitor>,
+            JsonDeserializer<Competitor> {
+
+        private static final String ID = "_id";
+        private static final String REF_PATH = "refPath";
+        private static final String ENTITY = "entity";
+        private static final String TOURNAMENT = "tournament";
+        private static final String CREATED = "created";
 
         @Override
-        public String getImageUrl() { return ""; }
-
-        @Override
-        public String getType() { return "empty"; }
-
-        @Override
-        public boolean isEmpty() { return true; }
-
-        @Override
-        public void update(Object updated) { }
-
-        @Override
-        public String getId() { return id; }
-
-        @Override
-        public int compareTo(@NonNull Object o) {
-            return 0;
+        public JsonElement serialize(Competitor src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.entity.getId());
         }
 
         @Override
-        public int describeContents() { return 0; }
+        public Competitor deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(getType());
+            if (json.isJsonPrimitive()) {
+                return new Competitor(json.getAsString(), "", "", new N(), new Date());
+            }
+
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            String id = ModelUtils.asString(ID, jsonObject);
+            String refPath = ModelUtils.asString(REF_PATH, jsonObject);
+            String tournament = ModelUtils.asString(TOURNAMENT, jsonObject);
+            String created = ModelUtils.asString(CREATED, jsonObject);
+            Competitive competitive = context.deserialize(jsonObject.get(ENTITY),
+                    User.COMPETITOR_TYPE.equals(refPath) ? User.class : Team.class);
+
+            return new Competitor(id, refPath, tournament, competitive, ModelUtils.parseDate(created));
         }
-
-        public static final Creator<Empty> CREATOR = new Creator<Empty>() {
-            @Override
-            public Empty createFromParcel(Parcel in) {
-                return new Empty(in);
-            }
-
-            @Override
-            public Empty[] newArray(int size) {
-                return new Empty[size];
-            }
-        };
     }
 }

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.repository;
 
 import android.support.annotation.Nullable;
 
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
@@ -103,7 +104,8 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
     }
 
     private void addIfValid(Competitor competitor, List<User> users, List<Team> teams) {
-        if (competitor instanceof User) users.add((User) competitor);
-        if (competitor instanceof Team) teams.add((Team) competitor);
+        Competitive entity = competitor.getEntity();
+        if (entity instanceof User) users.add((User) entity);
+        if (entity instanceof Team) teams.add((Team) entity);
     }
 }

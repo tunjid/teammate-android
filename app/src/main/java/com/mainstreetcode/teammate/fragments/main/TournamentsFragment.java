@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
@@ -146,14 +146,14 @@ public final class TournamentsFragment extends MainActivityFragment
     public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
         FragmentTransaction superResult = super.provideFragmentTransaction(fragmentTo);
 
-        if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
+        if (fragmentTo.getStableTag().contains(TournamentEditFragment.class.getSimpleName())) {
             Bundle args = fragmentTo.getArguments();
             if (args == null) return superResult;
 
-            Event tournament = args.getParcelable(EventEditFragment.ARG_EVENT);
+            Tournament tournament = args.getParcelable(TournamentEditFragment.ARG_TOURNAMENT);
             if (tournament == null) return superResult;
 
-            EventViewHolder viewHolder = (EventViewHolder) scrollManager.findViewHolderForItemId(tournament.hashCode());
+            TournamentViewHolder viewHolder = (TournamentViewHolder) scrollManager.findViewHolderForItemId(tournament.hashCode());
             if (viewHolder == null) return superResult;
 
             return beginTransaction()

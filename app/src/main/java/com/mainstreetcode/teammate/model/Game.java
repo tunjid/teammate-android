@@ -32,18 +32,12 @@ public class Game extends GameEntity
         HeaderedModel<Game>,
         ListableModel<Game> {
 
-    public static Game empty() {
-        return new Game("", "TBD", new Date(), Sport.empty(), Event.empty(), Tournament.empty(Team.empty()),
-                Competitor.Util.empty(), Competitor.Util.empty(), Competitor.Util.empty(),
-                0, 0, 0, false, false);
-    }
-
-    public Game(@NonNull String id, String score,
+    public Game(@NonNull String id, String refPath, String score,
                 Date created, Sport sport, Event event, Tournament tournament,
                 Competitor home, Competitor away, Competitor winner,
                 int seed, int leg, int round,
                 boolean ended, boolean canDraw) {
-        super(id, score, created, sport, event, tournament, home, away, winner, seed, leg, round, ended, canDraw);
+        super(id, refPath, score, created, sport, event, tournament, home, away, winner, seed, leg, round, ended, canDraw);
     }
 
     protected Game(Parcel in) {
@@ -64,7 +58,9 @@ public class Game extends GameEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Game)) return id.equals(other.getId());
         Game casted = (Game) other;
-        return score.equals(casted.score);
+        return score.equals(casted.score)
+                && home.areContentsTheSame(casted.home)
+                && away.areContentsTheSame(casted.away);
     }
 
     @Override
@@ -137,6 +133,7 @@ public class Game extends GameEntity
             JsonDeserializer<Game> {
 
         private static final String ID_KEY = "_id";
+        private static final String REF_PATH = "refPath";
         private static final String SCORE = "score";
         private static final String CREATED_KEY = "created";
         private static final String SPORT_KEY = "sport";
@@ -145,7 +142,6 @@ public class Game extends GameEntity
         private static final String HOME = "home";
         private static final String AWAY = "away";
         private static final String WINNER = "winner";
-        private static final String REF_PATH = "refPath";
         private static final String LEG = "leg";
         private static final String SEED = "seed";
         private static final String ROUND = "round";
@@ -156,19 +152,18 @@ public class Game extends GameEntity
         @Override
         public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Game(json.getAsString(), "TBD", new Date(), Sport.empty(), Event.empty(),
-                        Tournament.empty(Team.empty()), Competitor.Util.empty(), Competitor.Util.empty(), Competitor.Util.empty(),
+                return new Game(json.getAsString(),"" ,"TBD", new Date(), Sport.empty(), Event.empty(),
+                        Tournament.empty(Team.empty()), Competitor.empty(), Competitor.empty(), Competitor.empty(),
                         0, 0, 0, false, false);
             }
 
             JsonObject body = json.getAsJsonObject();
 
             String id = ModelUtils.asString(ID_KEY, body);
+            String refPath = ModelUtils.asString(REF_PATH, body);
             String score = ModelUtils.asString(SCORE, body);
             String created = ModelUtils.asString(CREATED_KEY, body);
             String sportCode = ModelUtils.asString(SPORT_KEY, body);
-
-            String refPath = ModelUtils.asString(REF_PATH, body);
 
             int seed = (int) ModelUtils.asFloat(SEED, body);
             int leg = (int) ModelUtils.asFloat(LEG, body);
@@ -179,14 +174,13 @@ public class Game extends GameEntity
             Sport sport = Config.sportFromCode(sportCode);
             Event event = context.deserialize(body.get(EVENT), Event.class);
             Tournament tournament = context.deserialize(body.get(TOURNAMENT), Tournament.class);
-            Competitor home = Competitor.Util.deserialize(refPath, body.get(HOME), context);
-            Competitor away = Competitor.Util.deserialize(refPath, body.get(AWAY), context);
-            Competitor winner = Competitor.Util.deserialize(refPath, body.get(WINNER), context);
-
+            Competitor home = context.deserialize(body.get(HOME), Competitor.class);
+            Competitor away = context.deserialize(body.get(AWAY), Competitor.class);
+            Competitor winner = body.has(WINNER) ? context.deserialize(body.get(WINNER), Competitor.class) : Competitor.empty();
 
             if (event == null) event = Event.empty();
 
-            return new Game(id, score, ModelUtils.parseDate(created), sport,
+            return new Game(id, refPath, score, ModelUtils.parseDate(created), sport,
                     event, tournament, home, away, winner, seed, leg, round, ended, canDraw);
         }
     }

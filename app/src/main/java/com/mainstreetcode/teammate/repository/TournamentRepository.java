@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.repository;
 
 import android.support.annotation.Nullable;
 
-import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
@@ -89,14 +88,6 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
     @Override
     Maybe<List<Tournament>> remoteModelsBefore(Team team, @Nullable Date date) {
         return api.getTournaments(team.getId(), date).map(getSaveManyFunction()).toMaybe();
-    }
-
-    public Flowable<List<Competitor>> getCompetitors(Tournament tournament) {
-        return tournament.isEmpty()
-                ? Flowable.empty()
-                : api.getCompetitors(tournament.getId())
-                .doOnError(throwable -> deleteInvalidModel(tournament, throwable))
-                .toFlowable();
     }
 
     @Override

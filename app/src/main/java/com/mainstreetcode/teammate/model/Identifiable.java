@@ -115,6 +115,7 @@ public interface Identifiable {
             if (identifiable.getClass().equals(Media.class)) return 20;
             if (identifiable.getClass().equals(Team.class)) return 25;
             if (identifiable.getClass().equals(Guest.class)) return 30;
+            if (identifiable.getClass().equals(Competitor.class)) return 35;
             return 0;
         }
 

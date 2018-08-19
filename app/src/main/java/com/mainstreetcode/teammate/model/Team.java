@@ -37,8 +37,8 @@ import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 public class Team extends TeamEntity
         implements
         TeamHost,
+        Competitive,
         Model<Team>,
-        Competitor<Team>,
         HeaderedModel<Team>,
         ListableModel<Team> {
 
@@ -95,7 +95,7 @@ public class Team extends TeamEntity
     }
 
     @Override
-    public String getType() {
+    public String getRefType() {
         return COMPETITOR_TYPE;
     }
 

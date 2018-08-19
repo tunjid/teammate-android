@@ -26,8 +26,8 @@ import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 
 public class User extends UserEntity implements
+        Competitive,
         Model<User>,
-        Competitor<User>,
         HeaderedModel<User>,
         ListableModel<User> {
 
@@ -78,7 +78,7 @@ public class User extends UserEntity implements
     }
 
     @Override
-    public String getType() {
+    public String getRefType() {
         return COMPETITOR_TYPE;
     }
 

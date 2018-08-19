@@ -16,6 +16,7 @@ public class Migration3To4 extends Migration {
         database.execSQL("CREATE TABLE IF NOT EXISTS `tournaments` (" +
                 "`tournament_id` TEXT NOT NULL, " +
                 "`tournament_image_url` TEXT, " +
+                "`tournament_ref_path` TEXT, " +
                 "`tournament_name` TEXT, " +
                 "`tournament_description` TEXT, " +
                 "`tournament_host` TEXT, " +
@@ -36,6 +37,7 @@ public class Migration3To4 extends Migration {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS `games` " +
                 "(`game_id` TEXT NOT NULL, " +
+                "`game_ref_path` TEXT, " +
                 "`game_score` TEXT, " +
                 "`game_created` INTEGER, " +
                 "`game_sport` TEXT, " +
@@ -51,8 +53,19 @@ public class Migration3To4 extends Migration {
                 "`game_can_draw` INTEGER NOT NULL, " +
                 "PRIMARY KEY(`game_id`), " +
                 "FOREIGN KEY(`game_tournament`) " +
-                "REFERENCES `tournaments`(`tournament_id`) O" +
-                "N UPDATE NO ACTION ON DELETE CASCADE )");
+                "REFERENCES `tournaments`(`tournament_id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )");
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS `competitors` " +
+                "(`competitor_id` TEXT NOT NULL, " +
+                "`competitor_ref_path` TEXT, " +
+                "`competitor_tournament_id` TEXT, " +
+                "`competitor_entity_id` TEXT, " +
+                "`competitor_created` INTEGER, " +
+                "PRIMARY KEY(`competitor_id`), " +
+                "FOREIGN KEY(`competitor_tournament_id`) " +
+                "REFERENCES `tournaments`(`tournament_id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS `stats` (" +
                 "`stat_id` TEXT NOT NULL, " +

@@ -30,7 +30,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         implements
         TournamentEditAdapter.AdapterListener {
 
-    public static final String ARG_EVENT = "tournament";
+    public static final String ARG_TOURNAMENT = "tournament";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Tournament tournament;
@@ -40,7 +40,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         TournamentEditFragment fragment = new TournamentEditFragment();
         Bundle args = new Bundle();
 
-        args.putParcelable(ARG_EVENT, tournament);
+        args.putParcelable(ARG_TOURNAMENT, tournament);
         fragment.setArguments(args);
         fragment.setEnterExitTransitions();
 
@@ -50,7 +50,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_EVENT));
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_TOURNAMENT));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        tournament = getArguments().getParcelable(ARG_EVENT);
+        tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         gofer = tournamentViewModel.gofer(tournament);
     }
 

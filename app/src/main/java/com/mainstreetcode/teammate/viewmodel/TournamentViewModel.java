@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.TournamentRepository;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
 
@@ -27,7 +28,8 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     public TournamentGofer gofer(Tournament tournament) {
-        return new TournamentGofer(tournament, onError(tournament), this::getTournament, this::createOrUpdateTournament, this::delete, repository::getCompetitors);
+        return new TournamentGofer(tournament, onError(tournament), this::getTournament, this::createOrUpdateTournament, this::delete,
+            tournament1 ->     CompetitorRepository.getInstance().modelsBefore(tournament, 0));
     }
 
     @Override
