@@ -68,12 +68,12 @@ public class Tournament extends TournamentEntity
         return Arrays.asList(
                 Item.text(holder.get(0), 0, Item.INPUT, R.string.tournament_name, Item.nullToEmpty(name), this::setName, this),
                 Item.text(holder.get(1), 1, Item.DESCRIPTION, R.string.tournament_description, Item.nullToEmpty(description), this::setDescription, this),
-                Item.number(holder.get(2), 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::getCode, this::setType, this)
+                Item.text(holder.get(2), 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::getCode, this::setType, this)
                         .textTransformer(value -> Config.tournamentTypeFromCode(value.toString()).getName()),
-                Item.number(holder.get(3), 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::getCode, this::setStyle, this)
+                Item.text(holder.get(3), 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::getCode, this::setStyle, this)
                         .textTransformer(value -> Config.tournamentStyleFromCode(value.toString()).getName()),
-                Item.text(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, () -> String.valueOf(numLegs), this::setNumLegs, this),
-                Item.text(holder.get(5), 5, Item.NUMBER, R.string.tournament_round, () -> String.valueOf(numRounds), this::setNumRounds, this)
+                Item.number(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, () -> String.valueOf(numLegs), this::setNumLegs, this),
+                Item.number(holder.get(5), 5, Item.NUMBER, R.string.tournament_round, () -> String.valueOf(numRounds), this::setNumRounds, this)
         );
     }
 

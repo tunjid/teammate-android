@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -190,5 +191,16 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         if ((activity = getActivity()) == null) return;
 
         activity.onBackPressed();
+    }
+
+    private void addCompetitor() {
+        TeamSearchFragment searchFragment = TeamSearchFragment.newInstance();
+        searchFragment.setTargetFragment(this, R.id.request_event_edit_pick);
+
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setTitle(getString(R.string.pick_team))
+                .setFragment(searchFragment)
+                .build());
     }
 }
