@@ -14,13 +14,18 @@ import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.functions.BiConsumer;
+import io.reactivex.functions.Function;
+
+import static android.support.v7.widget.helper.ItemTouchHelper.Callback.makeMovementFlags;
 
 public class ScrollManager {
 
@@ -36,6 +41,7 @@ public class ScrollManager {
     private ScrollManager(@Nullable EndlessScroller scroller,
                           @Nullable EmptyViewHolder viewHolder,
                           @Nullable SwipeRefreshLayout refreshLayout,
+                          @Nullable SwipeDragOptions swipeDragOptions,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
                           List<OnScrollListener> listeners) {
 
@@ -50,6 +56,7 @@ public class ScrollManager {
         recyclerView.setAdapter(adapter);
 
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
+        if (swipeDragOptions != null) fromSwipeDragOptions(this, swipeDragOptions);
         for (OnScrollListener listener : listeners) recyclerView.addOnScrollListener(listener);
     }
 
@@ -57,6 +64,10 @@ public class ScrollManager {
         Builder builder = new Builder();
         builder.recyclerView = recyclerView;
         return builder;
+    }
+
+    public static SwipeDragOptionsBuilder swipeDragOptionsBuilder() {
+        return new SwipeDragOptionsBuilder();
     }
 
     public void updateForEmptyList(@DrawableRes int iconRes, @StringRes int stringRes) {
@@ -89,6 +100,11 @@ public class ScrollManager {
 
     public void notifyItemRemoved(int position) {
         if (adapter != null) adapter.notifyItemRemoved(position);
+        if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
+    }
+
+    public void notifyItemMoved(int from, int to) {
+        if (adapter != null) adapter.notifyItemMoved(from, to);
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
@@ -137,6 +153,7 @@ public class ScrollManager {
         Adapter adapter;
         LayoutManager layoutManager;
 
+        SwipeDragOptions swipeDragOptions;
         ModelUtils.Consumer<LayoutManager> layoutManagerConsumer;
         ModelUtils.Consumer<IndexOutOfBoundsException> handler;
         List<ModelUtils.Consumer<Integer>> stateConsumers = new ArrayList<>();
@@ -199,6 +216,11 @@ public class ScrollManager {
 
         public Builder withEmptyViewholder(@NonNull EmptyViewHolder emptyViewholder) {
             this.emptyViewholder = emptyViewholder;
+            return this;
+        }
+
+        public Builder withSwipeDragOptions(@NonNull SwipeDragOptions swipeDragOptions) {
+            this.swipeDragOptions = swipeDragOptions;
             return this;
         }
 
@@ -289,8 +311,92 @@ public class ScrollManager {
             stateConsumers.clear();
             displacementConsumers.clear();
 
-            return new ScrollManager(scroller, emptyViewholder, refreshLayout, recyclerView, adapter, layoutManager, scrollListeners);
+            return new ScrollManager(scroller, emptyViewholder, refreshLayout, swipeDragOptions, recyclerView, adapter, layoutManager, scrollListeners);
         }
     }
 
+    static class SwipeDragOptions {
+        Supplier<Boolean> itemViewSwipeSupplier;
+        Supplier<Boolean> longPressDragEnabledSupplier;
+        Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier;
+        Supplier<List> listSupplier;
+
+        SwipeDragOptions(Supplier<Boolean> itemViewSwipeSupplier, Supplier<Boolean> longPressDragEnabledSupplier, Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier, Supplier<List> listSupplier) {
+            this.itemViewSwipeSupplier = itemViewSwipeSupplier;
+            this.longPressDragEnabledSupplier = longPressDragEnabledSupplier;
+            this.movementFlagsSupplier = movementFlagsSupplier;
+            this.listSupplier = listSupplier;
+        }
+    }
+
+    private static void fromSwipeDragOptions(ScrollManager scrollManager, SwipeDragOptions options) {
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                try { return options.movementFlagsSupplier.apply(viewHolder); }
+                catch (Exception e) { e.printStackTrace(); }
+                return defaultMovements();
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                int from = viewHolder.getAdapterPosition();
+                int to = target.getAdapterPosition();
+                List mItems = options.listSupplier.get();
+
+                if (from < to) for (int i = from; i < to; i++) Collections.swap(mItems, i, i + 1);
+                else for (int i = from; i > to; i--) Collections.swap(mItems, i, i - 1);
+
+                scrollManager.notifyItemMoved(from, to);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                options.listSupplier.get().remove(position);
+                scrollManager.notifyItemRemoved(position);
+            }
+        });
+
+        helper.attachToRecyclerView(scrollManager.recyclerView);
+    }
+
+    public static class SwipeDragOptionsBuilder {
+        private Supplier<Boolean> itemViewSwipeSupplier = () -> false;
+        private Supplier<Boolean> longPressDragEnabledSupplier = () -> false;
+        private Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier = viewHolder -> defaultMovements();
+        private Supplier<List> listSupplier;
+
+        public SwipeDragOptionsBuilder setItemViewSwipeSupplier(Supplier<Boolean> itemViewSwipeSupplier) {
+            this.itemViewSwipeSupplier = itemViewSwipeSupplier;
+            return this;
+        }
+
+        public SwipeDragOptionsBuilder setLongPressDragEnabledSupplier(Supplier<Boolean> longPressDragEnabledSupplier) {
+            this.longPressDragEnabledSupplier = longPressDragEnabledSupplier;
+            return this;
+        }
+
+        public SwipeDragOptionsBuilder setMovementFlagsSupplier(Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier) {
+            this.movementFlagsSupplier = movementFlagsSupplier;
+            return this;
+        }
+
+        public SwipeDragOptionsBuilder setListSupplier(Supplier<List> listSupplier) {
+            this.listSupplier = listSupplier;
+            return this;
+        }
+
+        public ScrollManager.SwipeDragOptions build() {
+            return new ScrollManager.SwipeDragOptions(itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
+        }
+    }
+
+    static int defaultMovements() {
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        return makeMovementFlags(dragFlags, swipeFlags);
+    }
 }

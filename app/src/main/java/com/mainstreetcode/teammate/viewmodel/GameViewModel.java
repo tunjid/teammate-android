@@ -21,25 +21,6 @@ public class GameViewModel extends BaseViewModel {
     private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
     private final GameRepository gameRepository = GameRepository.getInstance();
 
-    public int getSpanSize(Tournament tournament) {
-        int numLegs = tournament.getNumLegs();
-        return numLegs % 2 != 0 ? numLegs * 2 : numLegs;
-    }
-
-    public int lookUpSpanSize(Tournament tournament, int round, int position) {
-        int maxSpanSize = getSpanSize(tournament);
-        List<Identifiable> identifiables = getGamesForRound(tournament, round);
-        Identifiable identifiable = identifiables.get(position);
-        if (!(identifiable instanceof Game) || tournament.isRoundRobin()) return maxSpanSize;
-
-        Game game = (Game) identifiable;
-        int seed = game.getSeed();
-        int played = Flowable.fromIterable(identifiables).filter(item -> item instanceof Game && ((Game) item).getSeed() == seed)
-                .count().blockingGet().intValue();
-
-        return maxSpanSize / played;
-    }
-
     @SuppressLint("UseSparseArrays")
     public List<Identifiable> getGamesForRound(Tournament tournament, int round) {
 

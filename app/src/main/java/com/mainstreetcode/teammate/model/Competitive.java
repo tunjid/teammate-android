@@ -6,5 +6,7 @@ public interface Competitive {
 
     String getRefType();
 
+    String getImageUrl();
+
     CharSequence getName();
 }

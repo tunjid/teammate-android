@@ -25,15 +25,13 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
 
     @Override
     protected String getTableName() {
-        return "events";
+        return "tournaments";
     }
 
     @Query("SELECT * FROM tournaments as tournament" +
-            " INNER JOIN games AS game" +
-            " ON tournament.tournament_id = game.game_tournament" +
-            " WHERE :teamId = game.game_home" +
-            " OR :teamId = game.game_away" +
-            " OR :teamId = tournament.tournament_host" +
+            " INNER JOIN competitors AS competitor" +
+            " ON tournament.tournament_id = competitor.competitor_tournament_id" +
+            " WHERE :teamId = competitor.competitor_entity_id" +
             " AND :date < tournament.tournament_created" +
             " ORDER BY tournament.tournament_created DESC" +
             " LIMIT 40")

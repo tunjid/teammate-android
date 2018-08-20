@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -66,6 +67,11 @@ public final class TeamSearchFragment extends MainActivityFragment
         searchView.setIconified(false);
         createTeam.setOnClickListener(this);
 
+        if (getTargetFragment() != null) {
+            teams.clear();
+            teams.addAll(teamViewModel.getModelList(Team.class));
+        }
+
         return rootView;
     }
 
@@ -94,7 +100,11 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     public void onTeamClicked(Team team) {
-        showFragment(JoinRequestFragment.joinInstance(team, userViewModel.getCurrentUser()));
+        Fragment target = getTargetFragment();
+        boolean canPick = target != null && target instanceof TeamAdapter.TeamAdapterListener;
+
+        if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
+        else showFragment(JoinRequestFragment.joinInstance(team, userViewModel.getCurrentUser()));
     }
 
     @Override

@@ -284,6 +284,9 @@ public interface TeammateApi {
     @GET("api/tournaments/{tournamentId}/competitors")
     Single<List<Competitor>> getCompetitors(@Path(TOURNAMENT_PATH) String tournamentId);
 
+    @POST("api/tournaments/{tournamentId}/competitors")
+    Single<Tournament> addCompetitors(@Path(TOURNAMENT_PATH) String tournamentId, @Body List<Competitor> competitors);
+
     // =============================================================================================
     // Game endpoints
     // =============================================================================================

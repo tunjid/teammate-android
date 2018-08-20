@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.repository;
 
 import android.support.annotation.Nullable;
 
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
@@ -46,6 +47,12 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
     @Override
     public EntityDao<? super Tournament> dao() {
         return tournamentDao;
+    }
+
+    public Single<Tournament> addCompetitors(Tournament tournament, List<Competitor> competitors) {
+        return api.addCompetitors(tournament.getId(), competitors)
+                .map(getLocalUpdateFunction(tournament))
+                .map(getSaveFunction());
     }
 
     @Override

@@ -21,8 +21,8 @@ import java.util.Date;
 @SuppressLint("ParcelCreator")
 public class Competitor extends CompetitorEntity
         implements
-        Model<Competitor>,
-        Competitive {
+        Competitive,
+        Model<Competitor>{
 
     public static Competitor empty() {
         return new Competitor("", "", "", new N(), new Date());
@@ -59,19 +59,13 @@ public class Competitor extends CompetitorEntity
     }
 
     @Override
-    public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
-    }
+    public boolean isEmpty() { return TextUtils.isEmpty(id); }
 
     @Override
-    public String getImageUrl() {
-        return null;
-    }
+    public String getImageUrl() { return entity.getImageUrl(); }
 
     @Override
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
 
     @Override
     public boolean areContentsTheSame(Identifiable other) {
@@ -98,6 +92,9 @@ public class Competitor extends CompetitorEntity
 
         @Override
         public String getRefType() { return ""; }
+
+        @Override
+        public String getImageUrl() { return ""; }
 
         @Override
         public CharSequence getName() { return ""; }

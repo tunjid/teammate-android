@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -145,6 +144,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         viewHolder.bind(getHeaderedModel());
         Activity activity;
         if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
+        if (!tournament.isEmpty() && tournament.getNumCompetitors() == 0) promptForCompetitors();
     }
 
     @Override
@@ -193,14 +193,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         activity.onBackPressed();
     }
 
-    private void addCompetitor() {
-        TeamSearchFragment searchFragment = TeamSearchFragment.newInstance();
-        searchFragment.setTargetFragment(this, R.id.request_event_edit_pick);
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setTitle(getString(R.string.pick_team))
-                .setFragment(searchFragment)
-                .build());
+    private void promptForCompetitors() {
+        showSnackbar(getString(R.string.add_tournament_competitors_prompt), R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament)));
     }
 }

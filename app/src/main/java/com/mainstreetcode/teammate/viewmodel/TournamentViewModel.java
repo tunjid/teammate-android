@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
@@ -13,6 +14,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * ViewModel for {@link Tournament tournaments}
@@ -22,14 +24,17 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private final TournamentRepository repository;
 
-
     public TournamentViewModel() {
         repository = TournamentRepository.getInstance();
     }
 
     public TournamentGofer gofer(Tournament tournament) {
         return new TournamentGofer(tournament, onError(tournament), this::getTournament, this::createOrUpdateTournament, this::delete,
-            tournament1 ->     CompetitorRepository.getInstance().modelsBefore(tournament, 0));
+                ignored -> CompetitorRepository.getInstance().modelsBefore(tournament, 0));
+    }
+
+    public Single<Tournament> addCompetitors(final Tournament tournament, List<Competitor> competitors) {
+        return repository.addCompetitors(tournament, competitors).observeOn(mainThread());
     }
 
     @Override

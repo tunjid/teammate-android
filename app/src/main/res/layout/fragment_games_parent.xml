@@ -18,6 +18,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:tabBackground="@color/colorPrimary"
         app:tabIndicatorColor="@color/white"
+        app:tabMode="scrollable"
         app:tabSelectedTextColor="@color/white"
         app:tabTextColor="@color/light_grey" />
 

@@ -17,8 +17,6 @@ public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, BaseRe
 
     public void bind(Competitor model) {
         super.bind(model);
-        if (model.isEmpty()) return;
-
         title.setText(model.getName());
         //subtitle.setText(model.getCity());
     }

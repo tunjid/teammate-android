@@ -53,7 +53,15 @@ public class GamesParentFragment extends MainActivityFragment {
         TabLayout tabLayout = root.findViewById(R.id.tab_layout);
 
         viewPager.setAdapter(new GameRoundAdapter(tournament, getChildFragmentManager()));
+        viewPager.setCurrentItem(tournament.getCurrentRound());
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            public void onTabSelected(TabLayout.Tab tab) { viewPager.setCurrentItem(tab.getPosition()); }
+
+            public void onTabUnselected(TabLayout.Tab tab) { }
+
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
 
         return root;
     }

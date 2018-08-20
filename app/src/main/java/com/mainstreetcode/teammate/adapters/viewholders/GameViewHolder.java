@@ -58,6 +58,6 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
 
         if (TextUtils.isEmpty(awayUrl)) awayThumbnail.setImageResource(R.color.dark_grey);
         else Picasso.with(itemView.getContext()).load(awayUrl).
-                resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(homeThumbnail);
+                resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(awayThumbnail);
     }
 }
