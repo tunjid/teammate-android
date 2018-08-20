@@ -151,8 +151,6 @@ public final class CompetitorsFragment extends MainActivityFragment
     }
 
     private void addCompetitors() {
-        disposables.add(tournamentViewModel.addCompetitors(tournament, items).subscribe(added -> {
-            requireActivity().onBackPressed();
-        }, defaultErrorHandler));
+        disposables.add(tournamentViewModel.addCompetitors(tournament, items).subscribe(added -> requireActivity().onBackPressed(), defaultErrorHandler));
     }
 }

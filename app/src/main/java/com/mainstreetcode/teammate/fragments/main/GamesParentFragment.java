@@ -15,6 +15,9 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
+import static android.support.design.widget.TabLayout.MODE_FIXED;
+import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
+
 public class GamesParentFragment extends MainActivityFragment {
 
     public static final String ARG_TOURNAMENT = "role";
@@ -54,14 +57,8 @@ public class GamesParentFragment extends MainActivityFragment {
 
         viewPager.setAdapter(new GameRoundAdapter(tournament, getChildFragmentManager()));
         viewPager.setCurrentItem(tournament.getCurrentRound());
+        tabLayout.setTabMode(tournament.getNumRounds() > 4 ? MODE_SCROLLABLE : MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            public void onTabSelected(TabLayout.Tab tab) { viewPager.setCurrentItem(tab.getPosition()); }
-
-            public void onTabUnselected(TabLayout.Tab tab) { }
-
-            public void onTabReselected(TabLayout.Tab tab) { }
-        });
 
         return root;
     }
