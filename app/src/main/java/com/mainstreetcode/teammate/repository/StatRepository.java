@@ -3,8 +3,10 @@ package com.mainstreetcode.teammate.repository;
 
 import android.support.annotation.Nullable;
 
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.StatDao;
@@ -23,18 +25,22 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class StatRepository extends TeamQueryRepository<Stat> {
+public class StatRepository extends QueryRepository<Stat, Game, Date> {
 
     private static StatRepository ourInstance;
 
     private final TeammateApi api;
     private final StatDao statDao;
+    private final ModelRepository<User> userRepository;
     private final ModelRepository<Team> teamRepository;
+    private final ModelRepository<Game> gameRepository;
 
     private StatRepository() {
         api = TeammateService.getApiInstance();
         statDao = AppDatabase.getInstance().statDao();
+        userRepository = UserRepository.getInstance();
         teamRepository = TeamRepository.getInstance();
+        gameRepository = GameRepository.getInstance();
     }
 
     public static StatRepository getInstance() {
@@ -50,8 +56,8 @@ public class StatRepository extends TeamQueryRepository<Stat> {
     @Override
     public Single<Stat> createOrUpdate(Stat stat) {
         Single<Stat> statSingle = stat.isEmpty()
-                ? api.createStat(stat.getTeam().getId(), stat.getGame().getId(), stat).map(getLocalUpdateFunction(stat))
-                : api.updateStat(stat.getTeam().getId(), stat.getGame().getId(),stat.getId(), stat)
+                ? api.createStat(stat.getGame().getId(), stat).map(getLocalUpdateFunction(stat))
+                : api.updateStat(stat.getGame().getId(), stat.getId(), stat)
                 .map(getLocalUpdateFunction(stat))
                 .doOnError(throwable -> deleteInvalidModel(stat, throwable));
 
@@ -65,29 +71,40 @@ public class StatRepository extends TeamQueryRepository<Stat> {
 
     @Override
     public Single<Stat> delete(Stat stat) {
-        return api.deleteStat(stat.getTeam().getId(), stat.getGame().getId(), stat.getId())
+        return api.deleteStat(stat.getGame().getId(), stat.getId())
                 .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(stat, throwable));
     }
 
     @Override
-    Maybe<List<Stat>> localModelsBefore(Team team, @Nullable Date date) {
+    Maybe<List<Stat>> localModelsBefore(Game game, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return statDao.getStats(team.getId(), date).subscribeOn(io());
+        return statDao.getStats(game.getId(), date).subscribeOn(io());
     }
 
     @Override
-    Maybe<List<Stat>> remoteModelsBefore(Team team, @Nullable Date date) {
-        return api.getStats(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+    Maybe<List<Stat>> remoteModelsBefore(Game game, @Nullable Date date) {
+        return api.getStats(game.getId(), date).map(getSaveManyFunction())
+                .doOnSuccess(stats -> { for (Stat stat : stats) stat.getGame().update(game); })
+                .toMaybe();
     }
 
     @Override
     Function<List<Stat>, List<Stat>> provideSaveManyFunction() {
         return models -> {
+            List<User> users = new ArrayList<>(models.size());
             List<Team> teams = new ArrayList<>(models.size());
-            for (Stat stat : models) teams.add(stat.getTeam());
+            List<Game> games = new ArrayList<>(models.size());
 
+            for (Stat stat : models) {
+                users.add(stat.getUser());
+                teams.add(stat.getTeam());
+                games.add(stat.getGame());
+            }
+
+            userRepository.saveAsNested().apply(users);
             teamRepository.saveAsNested().apply(teams);
+            gameRepository.saveAsNested().apply(games);
             statDao.upsert(Collections.unmodifiableList(models));
 
             return models;

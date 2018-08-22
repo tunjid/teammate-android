@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
@@ -43,6 +45,13 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
                 .doOnError(throwable -> checkForInvalidTeam(throwable, key));
     }
 
+    @Override
+    void onErrorMessage(Message message, Team key, Identifiable invalid) {
+        super.onErrorMessage(message, key, invalid);
+        boolean shouldRemove = message.isInvalidObject() && invalid instanceof Tournament;
+        if (shouldRemove) removeTournament((Tournament) invalid);
+    }
+
     private Flowable<Tournament> getTournament(Tournament tournament) {
         return tournament.isEmpty() ? Flowable.empty() : repository.get(tournament);
     }
@@ -52,9 +61,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     public Single<Tournament> delete(final Tournament tournament) {
-        return repository.delete(tournament).doOnSuccess(deleted -> {
-            getModelList(tournament.getTeam()).remove(deleted);
-        });
+        return repository.delete(tournament).doOnSuccess(this::removeTournament);
     }
 
     private Date getQueryDate(Team team, boolean fetchLatest) {
@@ -62,5 +69,9 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
         Tournament tournament = findLast(getModelList(team), Tournament.class);
         return tournament == null ? null : tournament.getCreated();
+    }
+
+    private void removeTournament(Tournament tournament) {
+        for (List<Identifiable> list : modelListMap.values()) list.remove(tournament);
     }
 }

@@ -122,7 +122,7 @@ public final class GamesChildFragment extends MainActivityFragment
 
     @Override
     public void onGameClicked(Game game) {
-
+        showFragment(GameFragment.newInstance(game));
     }
 
     @Nullable

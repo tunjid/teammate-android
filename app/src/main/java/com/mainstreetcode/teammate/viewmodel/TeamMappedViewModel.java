@@ -18,7 +18,7 @@ import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> extends MappedViewModel<Team, V> {
 
-    private final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
+    final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
 
     @Override
     void onModelAlert(Alert alert) {

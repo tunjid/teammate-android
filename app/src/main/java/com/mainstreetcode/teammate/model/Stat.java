@@ -165,8 +165,8 @@ public class Stat extends StatEntity
 
             Sport sport = Config.sportFromCode(sportCode);
             User user = context.deserialize(body.get(USER), User.class);
-            Team team = context.deserialize(body.get(USER), Team.class);
-            Game game = context.deserialize(body.get(USER), Game.class);
+            Team team = context.deserialize(body.get(TEAM), Team.class);
+            Game game = context.deserialize(body.get(GAME), Game.class);
 
             return new Stat(id, name, ModelUtils.parseDate(created), sport,
                     user, team, game, value, time);

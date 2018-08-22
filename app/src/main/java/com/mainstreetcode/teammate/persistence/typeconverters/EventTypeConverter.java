@@ -16,6 +16,6 @@ public class EventTypeConverter {
     @TypeConverter
     public Event fromId(String id) {
         return AppDatabase.getInstance().eventDao().get(id)
-                .onErrorReturn(error -> Event.empty()).blockingGet();
+                .onErrorReturn(error -> Event.empty()).blockingGet(Event.empty());
     }
 }

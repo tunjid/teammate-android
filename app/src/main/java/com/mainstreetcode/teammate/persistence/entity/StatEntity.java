@@ -8,6 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
@@ -100,6 +101,14 @@ public class StatEntity implements Parcelable {
     public int getValue() { return value; }
 
     public float getTime() { return time; }
+
+    public boolean isHome() {
+        String refPath = game.refPath;
+        Competitive home = game.home.entity;
+        return User.COMPETITOR_TYPE.equals(refPath)
+                ? user.equals(home)
+                : team.equals(home);
+    }
 
     @Override
     public boolean equals(Object o) {

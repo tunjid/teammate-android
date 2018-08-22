@@ -176,10 +176,7 @@
     <!--TournamentDetailFragment-->
     <string name="tournaments">Tournaments</string>
     <string name="editing_competitors">Editing</string>
-    <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>
     <string name="add_tournament_competitors_prompt">Add Competitors?</string>
-    <string name="add_tournament_competitors">Add Competitors</string>
-    <string name="competitor_exists">This competitor is already added</string>
     <string name="delete_tournament_prompt">Delete tournament?</string>
     <string name="create_tournament">Create Tournament</string>
     <string name="create_tournament_first">Please create the tournament first</string>
@@ -196,6 +193,14 @@
     <string name="tournament_single_final">One game final</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
 
+
+    <!--CompetitorsFragment-->
+    <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>
+    <string name="add_tournament_competitors">Add Competitors</string>
+    <string name="competitor_exists">This competitor is already added</string>
+
+    <!--GameFragment-->
+    <string name="no_stats">Keep Score. Earn bragging rights.</string>
 
     <!--BlockUserFragment-->
     <string name="blocked_user">Blocked User</string>

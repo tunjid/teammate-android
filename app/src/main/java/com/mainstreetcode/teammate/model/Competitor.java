@@ -18,6 +18,8 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.util.Date;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
+
 @SuppressLint("ParcelCreator")
 public class Competitor extends CompetitorEntity
         implements
@@ -38,6 +40,11 @@ public class Competitor extends CompetitorEntity
 
     boolean hasSameType(Competitor other) {
         return getRefType().equals(other.getRefType());
+    }
+
+    @Override
+    public boolean hasMajorFields() {
+        return areNotEmpty(id, refPath);
     }
 
     @Override
@@ -87,17 +94,15 @@ public class Competitor extends CompetitorEntity
     }
 
     public static class N implements Competitive {
-        @Override
         public String getId() { return ""; }
 
-        @Override
         public String getRefType() { return ""; }
 
-        @Override
         public String getImageUrl() { return ""; }
 
-        @Override
         public CharSequence getName() { return ""; }
+
+        public boolean hasMajorFields() { return false; }
     }
 
     public static class GsonAdapter

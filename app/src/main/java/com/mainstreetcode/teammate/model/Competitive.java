@@ -9,4 +9,7 @@ public interface Competitive {
     String getImageUrl();
 
     CharSequence getName();
+
+    boolean hasMajorFields();
+
 }

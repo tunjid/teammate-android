@@ -22,6 +22,7 @@ import com.mainstreetcode.teammate.viewmodel.LocalRoleViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammate.viewmodel.MediaViewModel;
 import com.mainstreetcode.teammate.viewmodel.RoleViewModel;
+import com.mainstreetcode.teammate.viewmodel.StatViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
@@ -39,6 +40,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected UserViewModel userViewModel;
     protected TeamViewModel teamViewModel;
     protected GameViewModel gameViewModel;
+    protected StatViewModel statViewModel;
     protected EventViewModel eventViewModel;
     protected MediaViewModel mediaViewModel;
     protected ChatViewModel chatViewModel;
@@ -64,6 +66,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         userViewModel = provider.get(UserViewModel.class);
         teamViewModel = provider.get(TeamViewModel.class);
         gameViewModel = provider.get(GameViewModel.class);
+        statViewModel = provider.get(StatViewModel.class);
         eventViewModel = provider.get(EventViewModel.class);
         mediaViewModel = provider.get(MediaViewModel.class);
         chatViewModel = provider.get(ChatViewModel.class);

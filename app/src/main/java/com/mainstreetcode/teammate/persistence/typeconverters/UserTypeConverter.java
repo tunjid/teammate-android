@@ -16,6 +16,6 @@ public class UserTypeConverter {
     @TypeConverter
     public User fromId(String id) {
         return AppDatabase.getInstance().userDao().get(id)
-                .onErrorReturn(error -> User.empty()).blockingGet();
+                .onErrorReturn(error -> User.empty()).blockingGet(User.empty());
     }
 }

@@ -65,7 +65,7 @@ public class Game extends GameEntity
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id);
+        return areNotEmpty(id, refPath, score) && home.hasMajorFields() && away.hasMajorFields();
     }
 
     @Override
