@@ -128,11 +128,6 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return Identifiable.diff(Single.just(model.asIdentifiables()), this::getItems, this::preserveItems).doFinally(() -> isSettingLocation = false);
     }
 
-    private List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
-        ModelUtils.preserveAscending(old, fetched);
-        return old;
-    }
-
     private void onUserBlocked(BlockedUser blockedUser) {
         if (!blockedUser.getTeam().equals(model.getTeam())) return;
 

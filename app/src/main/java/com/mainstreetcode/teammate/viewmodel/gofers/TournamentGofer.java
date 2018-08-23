@@ -6,16 +6,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -95,25 +91,5 @@ public class TournamentGofer extends TeamHostingGofer<Tournament> {
 
     Completable delete() {
         return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
-    }
-
-    private List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
-        ModelUtils.preserveAscending(old, fetched);
-        return old;
-    }
-
-    private void onUserBlocked(BlockedUser blockedUser) {
-        if (!blockedUser.getTeam().equals(model.getTeam())) return;
-
-        Iterator<Identifiable> iterator = items.iterator();
-
-        while (iterator.hasNext()) {
-            Identifiable identifiable = iterator.next();
-            if (!(identifiable instanceof Guest)) continue;
-            User blocked = blockedUser.getUser();
-            User guestUser = ((Guest) identifiable).getUser();
-
-            if (blocked.equals((guestUser))) iterator.remove();
-        }
     }
 }

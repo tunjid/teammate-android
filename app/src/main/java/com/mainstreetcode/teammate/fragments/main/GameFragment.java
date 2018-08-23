@@ -16,9 +16,11 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Lists {@link Event games}
@@ -29,6 +31,7 @@ public final class GameFragment extends MainActivityFragment {
     private static final String ARG_GAME = "game";
 
     private Game game;
+    private AtomicBoolean fabStatus;
     private List<Identifiable> items;
 
     public static GameFragment newInstance(Game game) {
@@ -57,6 +60,7 @@ public final class GameFragment extends MainActivityFragment {
         super.onCreate(savedInstanceState);
         game = getArguments().getParcelable(ARG_GAME);
         items = statViewModel.getModelList(game);
+        fabStatus = new AtomicBoolean();
     }
 
     @Override
@@ -96,7 +100,12 @@ public final class GameFragment extends MainActivityFragment {
 
     @Override
     public boolean showsFab() {
-        return false;
+        return fabStatus.get();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fab) showFragment(StatEditFragment.newInstance(Stat.empty(game)));
     }
 
     void fetchStats(boolean fetchLatest) {
@@ -104,6 +113,7 @@ public final class GameFragment extends MainActivityFragment {
         else toggleProgress(true);
 
         disposables.add(statViewModel.getMany(game, fetchLatest).subscribe(this::onGamesUpdated, defaultErrorHandler));
+        disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(fabStatus::set).subscribe(ignored -> togglePersistentUi(), defaultErrorHandler));
     }
 
     private void onGamesUpdated(DiffUtil.DiffResult result) {

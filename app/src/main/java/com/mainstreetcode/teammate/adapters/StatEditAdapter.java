@@ -11,8 +11,10 @@ import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -31,9 +33,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, StatEditAdapter.AdapterListener> {
 
-    private final List<Item<Stat>> items;
+    private final List<Identifiable> items;
 
-    public StatEditAdapter(List<Item<Stat>> items, AdapterListener listener) {
+    public StatEditAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
     }
@@ -58,7 +60,11 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
-        ((BaseItemViewHolder) viewHolder).bind(items.get(i));
+        Object item = items.get(i);
+
+        if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
+        else if (item instanceof User) ((UserViewHolder) viewHolder).bind((User) item);
+        else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
     }
 
     @Override
@@ -68,7 +74,10 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getItemType();
+        Object object = items.get(position);
+        return object instanceof Item ? ((Item) object).getItemType()
+                : object instanceof User
+                ? USER : TEAM;
     }
 
 

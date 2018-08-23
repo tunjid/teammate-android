@@ -37,11 +37,11 @@ public class Stat extends StatEntity
         HeaderedModel<Stat>,
         ListableModel<Stat> {
 
-    @Ignore private static final IdCache holder = IdCache.cache(6);
+    @Ignore private static final IdCache holder = IdCache.cache(2);
 
-    public static Stat empty(Team team, Game game) {
-        return new Stat("", new Date(), StatType.empty(), team.getSport(), User.empty(),
-                team, game, 0, 0);
+    public static Stat empty(Game game) {
+        return new Stat("", new Date(), StatType.empty(), game.getSport(), User.empty(),
+                Team.empty(), game, 0, 0);
     }
 
     public Stat(@NonNull String id,
@@ -57,11 +57,9 @@ public class Stat extends StatEntity
     @Override
     public List<Item<Stat>> asItems() {
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.team, team::getName, Item::ignore, this),
-                Item.text(holder.get(1), 1, Item.INPUT, R.string.user, user::getName, Item::ignore, this),
-                Item.text(holder.get(2), 2, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
+                Item.text(holder.get(0), 0, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
                         .textTransformer(value -> Config.statTypeFromCode(value.toString()).getName()),
-                Item.number(holder.get(5), 5, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this)
+                Item.number(holder.get(1), 1, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this)
         );
     }
 
@@ -94,16 +92,16 @@ public class Stat extends StatEntity
     }
 
     @Override
-    public void update(Stat updatedEvent) {
-        this.id = updatedEvent.id;
-        this.created = updatedEvent.created;
-        this.value = updatedEvent.value;
-        this.time = updatedEvent.time;
-        this.statType.update(updatedEvent.statType);
-        this.sport.update(updatedEvent.sport);
-        if (updatedEvent.user.hasMajorFields()) this.user.update(updatedEvent.user);
-        if (updatedEvent.team.hasMajorFields()) this.team.update(updatedEvent.team);
-        if (updatedEvent.game.hasMajorFields()) this.game.update(updatedEvent.game);
+    public void update(Stat updatedStat) {
+        this.id = updatedStat.id;
+        this.created = updatedStat.created;
+        this.value = updatedStat.value;
+        this.time = updatedStat.time;
+        this.statType.update(updatedStat.statType);
+        this.sport.update(updatedStat.sport);
+        if (updatedStat.user.hasMajorFields()) this.user.update(updatedStat.user);
+        if (updatedStat.team.hasMajorFields()) this.team.update(updatedStat.team);
+        if (updatedStat.game.hasMajorFields()) this.game.update(updatedStat.game);
     }
 
     @Override

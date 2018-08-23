@@ -95,12 +95,8 @@ public class ModelUtils {
 
     public static Date parseDate(String date, SimpleDateFormat formatter) {
         if (TextUtils.isEmpty(date)) return new Date();
-        try {
-            return formatter.parse(date);
-        }
-        catch (ParseException e) {
-            return new Date();
-        }
+        try { return formatter.parse(date); }
+        catch (ParseException e) { return new Date(); }
     }
 
     public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {

@@ -5,10 +5,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 import io.reactivex.Completable;
@@ -52,4 +55,9 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     @SuppressLint("CheckResult")
     void startPrep() { prepare().subscribe(() -> {}, ErrorHandler.EMPTY); }
+
+    List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
+        ModelUtils.preserveAscending(old, fetched);
+        return old;
+    }
 }
