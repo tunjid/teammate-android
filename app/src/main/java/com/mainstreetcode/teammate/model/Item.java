@@ -41,8 +41,9 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final int VISIBILITY = 15;
     public static final int ABOUT = 16;
     public static final int NICKNAME = 17;
-    public static final int TOURNAMENT_TYPE = 18;
-    public static final int TOURNAMENT_STYLE = 19;
+    public static final int STAT_TYPE = 18;
+    public static final int TOURNAMENT_TYPE = 19;
+    public static final int TOURNAMENT_STYLE = 20;
 
     public static final Supplier<Boolean> TRUE = () -> true;
     public static final Supplier<Boolean> FALSE = () -> false;

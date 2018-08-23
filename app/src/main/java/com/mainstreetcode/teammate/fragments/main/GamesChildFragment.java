@@ -88,6 +88,8 @@ public final class GamesChildFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
+        scrollManager.setViewHolderColor(R.color.dark_grey);
+
         return rootView;
     }
 

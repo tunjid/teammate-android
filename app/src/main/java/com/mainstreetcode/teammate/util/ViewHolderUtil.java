@@ -12,22 +12,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+
 public class ViewHolderUtil {
 
-    public static final int TEAM = 0;
-    public static final int CHAT = 1;
-    public static final int ROLE = 2;
-    public static final int GAME = 3;
-    public static final int STAT = 4;
-    public static final int EVENT = 5;
-    public static final int FEED_ITEM = 6;
-    public static final int TOURNAMENT = 7;
-    public static final int CONTENT_AD = 8;
-    public static final int INSTALL_AD = 9;
-    public static final int MEDIA_IMAGE = 10;
-    public static final int MEDIA_VIDEO = 11;
-    public static final int JOIN_REQUEST = 12;
-    public static final int BLOCKED_USER = 13;
+    public static final int USER = 0;
+    public static final int TEAM = 1;
+    public static final int CHAT = 2;
+    public static final int ROLE = 3;
+    public static final int GAME = 4;
+    public static final int STAT = 5;
+    public static final int EVENT = 6;
+    public static final int FEED_ITEM = 7;
+    public static final int TOURNAMENT = 8;
+    public static final int CONTENT_AD = 9;
+    public static final int INSTALL_AD = 10;
+    public static final int MEDIA_IMAGE = 11;
+    public static final int MEDIA_VIDEO = 12;
+    public static final int JOIN_REQUEST = 13;
+    public static final int BLOCKED_USER = 14;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
 
@@ -47,9 +50,13 @@ public class ViewHolderUtil {
     public static Activity getActivity(RecyclerView.ViewHolder viewHolder) {
         Context context = viewHolder.itemView.getContext();
         while (context instanceof ContextWrapper) {
-            if (context instanceof Activity) return (Activity)context;
-            context = ((ContextWrapper)context).getBaseContext();
+            if (context instanceof Activity) return (Activity) context;
+            context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
+    }
+
+    public interface SimpleAdapterListener<T> extends BaseRecyclerViewAdapter.AdapterListener {
+        void onItemClicked(T item);
     }
 }

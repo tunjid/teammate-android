@@ -15,32 +15,32 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
+import com.mainstreetcode.teammate.adapters.StatEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
-import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
+import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 /**
  * Edits a Team member
  */
 
-public class TournamentEditFragment extends HeaderedFragment<Tournament>
+public class StatEditFragment extends HeaderedFragment<Stat>
         implements
-        TournamentEditAdapter.AdapterListener {
+        StatEditAdapter.AdapterListener {
 
-    public static final String ARG_TOURNAMENT = "tournament";
+    public static final String ARG_STAT = "stat";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
-    private Tournament tournament;
-    private TournamentGofer gofer;
+    private Stat stat;
+    private StatGofer gofer;
 
-    public static TournamentEditFragment newInstance(Tournament tournament) {
-        TournamentEditFragment fragment = new TournamentEditFragment();
+    public static StatEditFragment newInstance(Stat stat) {
+        StatEditFragment fragment = new StatEditFragment();
         Bundle args = new Bundle();
 
-        args.putParcelable(ARG_TOURNAMENT, tournament);
+        args.putParcelable(ARG_STAT, stat);
         fragment.setArguments(args);
         fragment.setEnterExitTransitions();
 
@@ -50,7 +50,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_TOURNAMENT));
+        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_STAT));
     }
 
     @Override
@@ -58,8 +58,8 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        tournament = getArguments().getParcelable(ARG_TOURNAMENT);
-        gofer = tournamentViewModel.gofer(tournament);
+        stat = getArguments().getParcelable(ARG_STAT);
+        gofer = statViewModel.gofer(stat);
     }
 
     @Nullable
@@ -69,7 +69,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
-                .withAdapter(new TournamentEditAdapter(gofer.getItems(), this))
+                .withAdapter(new StatEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -81,26 +81,22 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_rounds).setVisible(!tournament.isEmpty());
-        menu.findItem(R.id.action_delete).setVisible(gofer.canEditAfterCreation());
+        menu.findItem(R.id.action_delete).setVisible(gofer.canEdit());
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_tournament_edit, menu);
+        inflater.inflate(R.menu.fragment_stat_edit, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_rounds:
-                showFragment(GamesParentFragment.newInstance(tournament));
-                break;
             case R.id.action_delete:
                 Context context = getContext();
                 if (context == null) return true;
-                new AlertDialog.Builder(context).setTitle(getString(R.string.delete_tournament_prompt))
-                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteTournament())
+                new AlertDialog.Builder(context).setTitle(getString(R.string.delete_stat_prompt))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteStat())
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
                 return true;
@@ -111,14 +107,14 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @Override
     public void onResume() {
         super.onResume();
-        tournamentViewModel.clearNotifications(tournament);
+        statViewModel.clearNotifications(stat);
     }
 
     @Override
     public void togglePersistentUi() {
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(gofer.getToolbarTitle(this));
+        setToolbarTitle(getString(R.string.game_stats));
         super.togglePersistentUi();
     }
 
@@ -126,16 +122,16 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return gofer.canEditAfterCreation();}
+    public boolean showsFab() {return gofer.canEdit();}
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
-    protected Tournament getHeaderedModel() {return tournament;}
+    protected Stat getHeaderedModel() {return stat;}
 
     @Override
-    protected Gofer<Tournament> gofer() {return gofer;}
+    protected Gofer<Stat> gofer() {return gofer;}
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
@@ -144,7 +140,11 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         viewHolder.bind(getHeaderedModel());
         Activity activity;
         if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
-        if (!tournament.isEmpty() && tournament.getNumCompetitors() == 0) promptForCompetitors();
+    }
+
+    @Override
+    public void onUserClicked() {
+
     }
 
     @Override
@@ -158,42 +158,28 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                boolean wasEmpty = tournament.isEmpty();
+                boolean wasEmpty = stat.isEmpty();
                 toggleProgress(true);
                 disposables.add(gofer.save().subscribe(diffResult -> {
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     onModelUpdated(diffResult);
-                    showSnackbar(getString(stringRes, tournament.getName()));
+                    showSnackbar(getString(stringRes, stat.getStatType()));
                 }, defaultErrorHandler));
                 break;
         }
     }
 
-    @Override
-    public boolean canEditBeforeCreation() {
-        return gofer.canEditBeforeCreation();
+    private void deleteStat() {
+        disposables.add(gofer.remove().subscribe(this::onStatDeleted, defaultErrorHandler));
     }
 
-    @Override
-    public boolean canEditAfterCreation() {
-        return gofer.canEditAfterCreation();
-    }
-
-    private void deleteTournament() {
-        disposables.add(gofer.remove().subscribe(this::onTournamentDeleted, defaultErrorHandler));
-    }
-
-    private void onTournamentDeleted() {
-        showSnackbar(getString(R.string.deleted_team, tournament.getName()));
+    private void onStatDeleted() {
+        showSnackbar(getString(R.string.deleted_team, stat.getStatType()));
         removeEnterExitTransitions();
 
         Activity activity;
         if ((activity = getActivity()) == null) return;
 
         activity.onBackPressed();
-    }
-
-    private void promptForCompetitors() {
-        showSnackbar(getString(R.string.add_tournament_competitors_prompt), R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament)));
     }
 }

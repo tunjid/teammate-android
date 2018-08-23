@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,7 +17,6 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
@@ -73,9 +71,11 @@ public final class GameFragment extends MainActivityFragment {
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchStats(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new StatAdapter(items, new BaseRecyclerViewAdapter.AdapterListener() {}))
+                .withAdapter(new StatAdapter(items, stat -> showFragment(StatEditFragment.newInstance(stat))))
                 .withLinearLayoutManager()
                 .build();
+
+        scrollManager.setViewHolderColor(R.color.dark_grey);
 
         return rootView;
     }
@@ -84,16 +84,6 @@ public final class GameFragment extends MainActivityFragment {
     public void onResume() {
         super.onResume();
         fetchStats(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.action_pick_team:
-//                TeamPickerFragment.change(getActivity(), R.id.request_game_team_pick);
-//                return true;
-//        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -108,7 +98,6 @@ public final class GameFragment extends MainActivityFragment {
     public boolean showsFab() {
         return false;
     }
-
 
     void fetchStats(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();

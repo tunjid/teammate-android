@@ -69,8 +69,8 @@ public class Migration3To4 extends Migration {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS `stats` (" +
                 "`stat_id` TEXT NOT NULL, " +
-                "`stat_score` TEXT, " +
                 "`stat_created` INTEGER, " +
+                "`stat_type` TEXT, " +
                 "`stat_sport` TEXT, " +
                 "`stat_user` TEXT, " +
                 "`stat_team` TEXT, " +

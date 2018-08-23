@@ -74,7 +74,7 @@ public class User extends UserEntity implements
 
     @Override
     public CharSequence getName() {
-        return firstName;
+        return firstName + " " + lastName;
     }
 
     @Override

@@ -32,7 +32,7 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
-import com.mainstreetcode.teammate.model.enums.GameStat;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
@@ -130,7 +130,7 @@ public class TeammateService {
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
-                .registerTypeAdapter(GameStat.class, new GameStat.GsonAdapter())
+                .registerTypeAdapter(StatType.class, new StatType.GsonAdapter())
                 .registerTypeAdapter(Tournament.class, new Tournament.GsonAdapter())
                 .registerTypeAdapter(Competitor.class, new Competitor.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())

@@ -26,11 +26,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.STAT;
  * Adapter for {@link Team}
  */
 
-public class StatAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class StatAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, ViewHolderUtil.SimpleAdapterListener<Stat>> {
 
     private final List<Identifiable> items;
 
-    public StatAdapter(List<Identifiable> items, AdapterListener listener) {
+    public StatAdapter(List<Identifiable> items, ViewHolderUtil.SimpleAdapterListener<Stat> listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);

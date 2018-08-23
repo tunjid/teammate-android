@@ -32,6 +32,7 @@ import com.mainstreetcode.teammate.persistence.typeconverters.GameTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.LatLngTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.PositionTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.SportTypeConverter;
+import com.mainstreetcode.teammate.persistence.typeconverters.StatTypeTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.TeamTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.TournamentStyleTypeConverter;
 import com.mainstreetcode.teammate.persistence.typeconverters.TournamentTypeConverter;
@@ -59,7 +60,7 @@ import io.reactivex.Single;
         TournamentTypeConverter.class, CompetitorTypeConverter.class, GameTypeConverter.class,
         SportTypeConverter.class, PositionTypeConverter.class, VisibilityTypeConverter.class,
         TournamentTypeTypeConverter.class, TournamentStyleTypeConverter.class,
-        CompetitiveTypeConverter.class})
+        StatTypeTypeConverter.class, CompetitiveTypeConverter.class})
 
 public abstract class AppDatabase extends RoomDatabase {
 

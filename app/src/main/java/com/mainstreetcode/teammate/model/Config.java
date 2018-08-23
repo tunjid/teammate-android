@@ -17,7 +17,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
-import com.mainstreetcode.teammate.model.enums.GameStat;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.MetaData;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -47,7 +47,7 @@ public class Config implements Model<Config> {
     private String defaultTournamentLogo;
     private List<Sport> sports = new ArrayList<>();
     private List<Position> positions = new ArrayList<>();
-    private List<GameStat> gameStats = new ArrayList<>();
+    private List<StatType> statTypes = new ArrayList<>();
     private List<Visibility> visibilities = new ArrayList<>();
     private List<BlockReason> blockReasons = new ArrayList<>();
     private List<AndroidVariant> staticVariants = new ArrayList<>();
@@ -97,6 +97,10 @@ public class Config implements Model<Config> {
         return getList(config -> config.blockReasons);
     }
 
+    public static List<StatType> getStatTypes() {
+        return getList(config -> config.statTypes);
+    }
+
     public static List<TournamentType> getTournamentTypes() {
         return getList(config -> config.tournamentTypes);
     }
@@ -125,6 +129,10 @@ public class Config implements Model<Config> {
         return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
     }
 
+    public static StatType statTypeFromCode(String code) {
+        return getFromCode(code, config -> config.statTypes, StatType.empty());
+    }
+
     public static TournamentType tournamentTypeFromCode(String code) {
         return getFromCode(code, config -> config.tournamentTypes, TournamentType.empty());
     }
@@ -149,9 +157,10 @@ public class Config implements Model<Config> {
     private static <T extends MetaData> T getFromCode(String code, Function<Config, List<T>> function, T defaultItem) {
         Config config = getCurrentConfig();
         String matcher = code != null ? code : "";
-        return Flowable.fromIterable(function.apply(config))
+        List<T> list = function.apply(config);
+        return Flowable.fromIterable(list)
                 .filter(metaData -> matcher.equals(metaData.getCode()))
-                .first(defaultItem)
+                .first(list.isEmpty() ? defaultItem : list.get(0))
                 .blockingGet();
     }
 
@@ -239,7 +248,7 @@ public class Config implements Model<Config> {
             JsonArray tournamentStylesArray = new JsonArray();
 
             for (Sport item : src.sports) sportsArray.add(context.serialize(item));
-            for (GameStat item : src.gameStats) statsArray.add(context.serialize(item));
+            for (StatType item : src.statTypes) statsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
             for (BlockReason item : src.blockReasons) blockedReasonArray.add(context.serialize(item));
@@ -272,7 +281,7 @@ public class Config implements Model<Config> {
 
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
-            ModelUtils.deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.gameStats, GameStat.class);
+            ModelUtils.deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType.class);
             ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
             ModelUtils.deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason.class);
             ModelUtils.deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant.class);

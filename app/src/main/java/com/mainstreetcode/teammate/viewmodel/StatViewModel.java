@@ -4,6 +4,7 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.repository.StatRepository;
+import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +30,10 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         repository = StatRepository.getInstance();
     }
 
+    public StatGofer gofer(Stat stat) {
+        return new StatGofer(stat, throwable -> checkForInvalidObject(throwable, stat, stat.getGame()), this::createOrUpdateStat, this::delete);
+    }
+
     @Override
     Flowable<List<Stat>> fetch(Game key, boolean fetchLatest) {
         return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
@@ -40,6 +45,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
 
         return modelList;
     }
+
     private Flowable<Stat> getStat(Stat tournament) {
         return tournament.isEmpty() ? Flowable.empty() : repository.get(tournament);
     }
@@ -60,14 +66,4 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         Stat stat = findLast(getModelList(game), Stat.class);
         return stat == null ? null : stat.getCreated();
     }
-
-//    private Consumer<Throwable> onError(Game model) {
-//        return throwable -> {
-//            Message message = fromThrowable(throwable);
-//            boolean isValidModel = message == null || message.isValidModel();
-//
-//            if (isValidModel) return false;
-//
-//        };
-//    }
 }

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.util;
 
 
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,6 +73,12 @@ public class ScrollManager {
 
     public void updateForEmptyList(@DrawableRes int iconRes, @StringRes int stringRes) {
         if (viewHolder != null) viewHolder.update(iconRes, stringRes);
+    }
+
+    public void setViewHolderColor(@ColorRes int color) {
+        if (viewHolder == null || adapter == null) return;
+        viewHolder.setColor(color);
+        viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
     public void onDiff(DiffUtil.DiffResult result) {

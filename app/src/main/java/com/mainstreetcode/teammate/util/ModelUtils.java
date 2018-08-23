@@ -149,6 +149,13 @@ public class ModelUtils {
         return 0;
     }
 
+    public static float parseFloat(String number) {
+        if (TextUtils.isEmpty(number)) return 0;
+        try { return Float.valueOf(number); }
+        catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
+        return 0;
+    }
+
     public static boolean areNotEmpty(CharSequence... values) {
         for (CharSequence value : values) if (TextUtils.isEmpty(value)) return false;
         return true;

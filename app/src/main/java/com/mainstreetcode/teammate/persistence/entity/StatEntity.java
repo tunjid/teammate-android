@@ -14,11 +14,13 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatType;
 
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
+import static com.mainstreetcode.teammate.util.ModelUtils.parseFloat;
 
 
 @Entity(tableName = "stats",
@@ -32,9 +34,9 @@ public class StatEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "stat_id") protected String id;
-    @ColumnInfo(name = "stat_score") protected CharSequence name;
 
     @ColumnInfo(name = "stat_created") protected Date created;
+    @ColumnInfo(name = "stat_type") protected StatType statType;
     @ColumnInfo(name = "stat_sport") protected Sport sport;
     @ColumnInfo(name = "stat_user") protected User user;
     @ColumnInfo(name = "stat_team") protected Team team;
@@ -43,12 +45,12 @@ public class StatEntity implements Parcelable {
     @ColumnInfo(name = "stat_value") protected int value;
     @ColumnInfo(name = "stat_time") protected float time;
 
-    public StatEntity(@NonNull String id, CharSequence name,
-                      Date created, Sport sport, User user, Team team, Game game,
+    public StatEntity(@NonNull String id, Date created,
+                      StatType statType, Sport sport, User user, Team team, Game game,
                       int value, float time) {
         this.id = id;
-        this.name = name;
         this.created = created;
+        this.statType = statType;
         this.sport = sport;
         this.user = user;
         this.team = team;
@@ -59,8 +61,8 @@ public class StatEntity implements Parcelable {
 
     protected StatEntity(Parcel in) {
         id = in.readString();
-        name = in.readString();
         created = new Date(in.readLong());
+        statType = Config.statTypeFromCode(in.readString());
         sport = Config.sportFromCode(in.readString());
         user = (User) in.readValue(User.class.getClassLoader());
         team = (Team) in.readValue(Team.class.getClassLoader());
@@ -94,13 +96,21 @@ public class StatEntity implements Parcelable {
         return user;
     }
 
-    public CharSequence getName() { return name; }
+    public StatType getStatType() { return statType; }
 
     public Sport getSport() { return sport; }
 
     public int getValue() { return value; }
 
     public float getTime() { return time; }
+
+    protected void setStatType(String statType) {
+        this.statType = Config.statTypeFromCode(statType);
+    }
+
+    protected void setTime(String time) {
+        this.time = parseFloat(time);
+    }
 
     public boolean isHome() {
         String refPath = game.refPath;
@@ -133,8 +143,8 @@ public class StatEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(name.toString());
         dest.writeLong(created.getTime());
+        dest.writeString(statType.getCode());
         dest.writeString(sport.getCode());
         dest.writeValue(user);
         dest.writeValue(team);

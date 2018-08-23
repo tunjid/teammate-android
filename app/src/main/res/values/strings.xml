@@ -193,7 +193,6 @@
     <string name="tournament_single_final">One game final</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
 
-
     <!--CompetitorsFragment-->
     <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>
     <string name="add_tournament_competitors">Add Competitors</string>
@@ -201,6 +200,15 @@
 
     <!--GameFragment-->
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
+
+    <!--StatEditFragment-->
+    <string name="user">User</string>
+    <string name="stat_type">Stat type</string>
+    <string name="stat_time">Stat time</string>
+    <string name="choose_stat">Choose stat</string>
+    <string name="game_stats">Game stats</string>
+    <string name="delete_stat_prompt">Delete stat?</string>
+
 
     <!--BlockUserFragment-->
     <string name="blocked_user">Blocked User</string>

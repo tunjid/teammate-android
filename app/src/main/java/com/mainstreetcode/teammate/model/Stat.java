@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -13,11 +14,13 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.persistence.entity.StatEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -34,19 +37,32 @@ public class Stat extends StatEntity
         HeaderedModel<Stat>,
         ListableModel<Stat> {
 
-    public Stat(@NonNull String id, CharSequence name,
-                Date created, Sport sport, User user, Team team, Game game,
-                int value, float time) {
-        super(id, name, created, sport, user, team, game, value, time);
+    @Ignore private static final IdCache holder = IdCache.cache(6);
+
+    public static Stat empty(Team team, Game game) {
+        return new Stat("", new Date(), StatType.empty(), team.getSport(), User.empty(),
+                team, game, 0, 0);
     }
 
-    protected Stat(Parcel in) {
+    public Stat(@NonNull String id,
+                Date created, StatType statType, Sport sport, User user, Team team, Game game,
+                int value, float time) {
+        super(id, created, statType, sport, user, team, game, value, time);
+    }
+
+    private Stat(Parcel in) {
         super(in);
     }
 
     @Override
     public List<Item<Stat>> asItems() {
-        return Collections.emptyList();
+        return Arrays.asList(
+                Item.text(holder.get(0), 0, Item.INPUT, R.string.team, team::getName, Item::ignore, this),
+                Item.text(holder.get(1), 1, Item.INPUT, R.string.user, user::getName, Item::ignore, this),
+                Item.text(holder.get(2), 2, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
+                        .textTransformer(value -> Config.statTypeFromCode(value.toString()).getName()),
+                Item.number(holder.get(5), 5, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this)
+        );
     }
 
     @Override
@@ -58,7 +74,7 @@ public class Stat extends StatEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Stat)) return id.equals(other.getId());
         Stat casted = (Stat) other;
-        return name.equals(casted.name) && user.equals(casted.user)
+        return statType.equals(casted.statType) && user.equals(casted.user)
                 && value == casted.value && time == casted.time;
     }
 
@@ -80,10 +96,10 @@ public class Stat extends StatEntity
     @Override
     public void update(Stat updatedEvent) {
         this.id = updatedEvent.id;
-        this.name = updatedEvent.name;
         this.created = updatedEvent.created;
         this.value = updatedEvent.value;
         this.time = updatedEvent.time;
+        this.statType.update(updatedEvent.statType);
         this.sport.update(updatedEvent.sport);
         if (updatedEvent.user.hasMajorFields()) this.user.update(updatedEvent.user);
         if (updatedEvent.team.hasMajorFields()) this.team.update(updatedEvent.team);
@@ -120,8 +136,8 @@ public class Stat extends StatEntity
             JsonDeserializer<Stat> {
 
         private static final String ID_KEY = "_id";
-        private static final String NAME = "name";
         private static final String CREATED_KEY = "created";
+        private static final String STAT_TYPE = "name";
         private static final String SPORT_KEY = "sport";
         private static final String USER = "user";
         private static final String TEAM = "team";
@@ -132,7 +148,7 @@ public class Stat extends StatEntity
         @Override
         public JsonElement serialize(Stat src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject stat = new JsonObject();
-            stat.addProperty(NAME, src.name.toString());
+            stat.addProperty(STAT_TYPE, src.statType.getCode());
             stat.addProperty(USER, src.user.getId());
             stat.addProperty(TEAM, src.team.getId());
             stat.addProperty(GAME, src.game.getId());
@@ -148,27 +164,28 @@ public class Stat extends StatEntity
         @Override
         public Stat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Stat(json.getAsString(), "", new Date(), Sport.empty(), User.empty(),
+                return new Stat(json.getAsString(), new Date(), StatType.empty(), Sport.empty(), User.empty(),
                         Team.empty(), null, 0, 0);
             }
 
             JsonObject body = json.getAsJsonObject();
 
             String id = ModelUtils.asString(ID_KEY, body);
-            String name = ModelUtils.asString(NAME, body);
             String created = ModelUtils.asString(CREATED_KEY, body);
+            String typeCode = ModelUtils.asString(STAT_TYPE, body);
             String sportCode = ModelUtils.asString(SPORT_KEY, body);
 
 
             int value = (int) ModelUtils.asFloat(VALUE, body);
             float time = ModelUtils.asFloat(TIME, body);
 
+            StatType statType = Config.statTypeFromCode(typeCode);
             Sport sport = Config.sportFromCode(sportCode);
             User user = context.deserialize(body.get(USER), User.class);
             Team team = context.deserialize(body.get(TEAM), Team.class);
             Game game = context.deserialize(body.get(GAME), Game.class);
 
-            return new Stat(id, name, ModelUtils.parseDate(created), sport,
+            return new Stat(id, ModelUtils.parseDate(created), statType, sport,
                     user, team, game, value, time);
         }
     }
