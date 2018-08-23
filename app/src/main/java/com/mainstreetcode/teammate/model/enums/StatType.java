@@ -1,7 +1,9 @@
 package com.mainstreetcode.teammate.model.enums;
 
 import com.google.gson.JsonObject;
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.Objects;
 
@@ -20,6 +22,13 @@ public class StatType extends MetaData {
 
     public CharSequence getEmoji() {
         return ModelUtils.processString(emoji);
+    }
+
+    public CharSequence getEmojiAndName() {
+        return new SpanBuilder(App.getInstance(), getEmoji())
+                .appendCharsequence("   ")
+                .appendCharsequence(name)
+                .build();
     }
 
     public void update(StatType updated) {

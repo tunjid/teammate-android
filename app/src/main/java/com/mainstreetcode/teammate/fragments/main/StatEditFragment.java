@@ -85,7 +85,7 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_delete).setVisible(gofer.canEdit());
+        menu.findItem(R.id.action_delete).setVisible(gofer.canEdit() && !stat.getGame().isEnded());
     }
 
     @Override
@@ -118,7 +118,7 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     public void togglePersistentUi() {
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.game_stats));
+        setToolbarTitle(getString(stat.isEmpty() ? R.string.stat_create : R.string.stat_edit));
         super.togglePersistentUi();
     }
 
@@ -138,6 +138,9 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     protected Gofer<Stat> gofer() {return gofer;}
 
     @Override
+    protected boolean canExpandAppBar() { return false; }
+
+    @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
         toggleProgress(false);
         scrollManager.onDiff(result);
@@ -154,18 +157,21 @@ public class StatEditFragment extends HeaderedFragment<Stat>
 
     @Override
     public void onUserClicked() {
-        TeamMembersFragment fragment = TeamMembersFragment.newInstance(stat.getTeam());
-        fragment.setTargetFragment(this, R.id.request_stat_edit_pick);
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setTitle(getString(R.string.pick_team))
-                .setFragment(fragment)
-                .build());    }
+        if (stat.getGame().isEnded()) showSnackbar(getString(R.string.stat_game_ended));
+        else if (!stat.isEmpty()) showSnackbar(getString(R.string.stat_already_added));
+        else pickStatUser();
+    }
 
     @Override
     public void onTeamClicked() {
-        disposables.add(gofer.switchTeams().subscribe(this::onModelUpdated, defaultErrorHandler));
+        if (stat.getGame().isEnded()) showSnackbar(getString(R.string.stat_game_ended));
+        else if (!stat.isEmpty()) showSnackbar(getString(R.string.stat_already_added));
+        else switchStatTeam();
+    }
+
+    @Override
+    public boolean canChangeStat() {
+        return stat.isEmpty();
     }
 
     @Override
@@ -177,17 +183,15 @@ public class StatEditFragment extends HeaderedFragment<Stat>
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab:
-                boolean wasEmpty = stat.isEmpty();
-                toggleProgress(true);
-                disposables.add(gofer.save().subscribe(diffResult -> {
-                    int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
-                    onModelUpdated(diffResult);
-                    showSnackbar(getString(stringRes, stat.getStatType()));
-                }, defaultErrorHandler));
-                break;
-        }
+        if (view.getId() != R.id.fab) return;
+        boolean wasEmpty = stat.isEmpty();
+
+        toggleProgress(true);
+        disposables.add(gofer.save().subscribe(diffResult -> {
+            int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
+            onModelUpdated(diffResult);
+            showSnackbar(getString(stringRes, stat.getStatType()));
+        }, defaultErrorHandler));
     }
 
     private void deleteStat() {
@@ -202,5 +206,20 @@ public class StatEditFragment extends HeaderedFragment<Stat>
         if ((activity = getActivity()) == null) return;
 
         activity.onBackPressed();
+    }
+
+    private void pickStatUser() {
+        TeamMembersFragment fragment = TeamMembersFragment.newInstance(stat.getTeam());
+        fragment.setTargetFragment(this, R.id.request_stat_edit_pick);
+
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setTitle(getString(R.string.pick_team))
+                .setFragment(fragment)
+                .build());
+    }
+
+    private void switchStatTeam() {
+        disposables.add(gofer.switchTeams().subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 }

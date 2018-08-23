@@ -48,7 +48,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case Item.STAT_TYPE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_stat, Config.getStatTypes(), StatType::getName, StatType::getCode, TRUE, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_stat, Config.getStatTypes(), StatType::getEmojiAndName, StatType::getCode, adapterListener::canChangeStat, FALSE);
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
             case TEAM:
@@ -85,5 +85,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
         void onUserClicked();
 
         void onTeamClicked();
+
+        boolean canChangeStat();
     }
 }

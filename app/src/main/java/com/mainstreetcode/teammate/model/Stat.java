@@ -107,7 +107,7 @@ public class Stat extends StatEntity
     @Override
     public int compareTo(@NonNull Stat o) {
         int timeComparison = -Float.compare(time, o.time);
-        return timeComparison != 0 ? timeComparison : created.compareTo(o.created);
+        return timeComparison != 0 ? timeComparison : -created.compareTo(o.created);
     }
 
     @Override

@@ -78,6 +78,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
+        view.findViewById(R.id.header).setVisibility(canExpandAppBar() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -114,6 +115,8 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     protected void onPrepComplete() {
         toggleFab(showsFab());
     }
+
+    protected boolean canExpandAppBar() {return true;}
 
     protected boolean canGetModel() {
         boolean result = !ImageWorkerFragment.isPicking(this) && !imageJustCropped;

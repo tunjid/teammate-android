@@ -98,7 +98,7 @@ public final class GameFragment extends MainActivityFragment {
         super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_add_white_24dp);
-        setToolbarTitle("");
+        setToolbarTitle(getString(R.string.game_stats));
     }
 
     @Override
