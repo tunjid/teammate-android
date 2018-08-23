@@ -52,7 +52,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
             case TEAM:
-                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), team -> {});
+                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), team -> adapterListener.onTeamClicked());
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -83,5 +83,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
         void onUserClicked();
+
+        void onTeamClicked();
     }
 }

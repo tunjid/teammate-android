@@ -40,7 +40,7 @@ public class Stat extends StatEntity
     @Ignore private static final IdCache holder = IdCache.cache(2);
 
     public static Stat empty(Game game) {
-        return new Stat("", new Date(), StatType.empty(), game.getSport(), User.empty(),
+        return new Stat("", new Date(), Config.statTypeFromCode(""), game.getSport(), User.empty(),
                 Team.empty(), game, 0, 0);
     }
 
@@ -106,9 +106,8 @@ public class Stat extends StatEntity
 
     @Override
     public int compareTo(@NonNull Stat o) {
-        int createdComparison = created.compareTo(o.created);
-
-        return createdComparison != 0 ? createdComparison : id.compareTo(o.id);
+        int timeComparison = -Float.compare(time, o.time);
+        return timeComparison != 0 ? timeComparison : created.compareTo(o.created);
     }
 
     @Override

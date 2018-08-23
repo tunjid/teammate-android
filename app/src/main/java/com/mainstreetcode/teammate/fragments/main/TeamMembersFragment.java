@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
@@ -27,6 +28,7 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -153,15 +155,16 @@ public class TeamMembersFragment extends MainActivityFragment
 
     @Override
     public void onRoleClicked(Role role) {
-        View rootView = getView();
-        if (rootView == null) return;
-
-        showFragment(RoleEditFragment.newInstance(role));
+        ViewHolderUtil.SimpleAdapterListener<User> target = isPicking();
+        if (target != null) target.onItemClicked(role.getUser());
+        else showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
     public void onJoinRequestClicked(JoinRequest request) {
-        showFragment(JoinRequestFragment.viewInstance(request));
+        ViewHolderUtil.SimpleAdapterListener<User> target = isPicking();
+        if (target != null) showSnackbar(getString(R.string.stat_user_not_on_team));
+        else showFragment(JoinRequestFragment.viewInstance(request));
     }
 
     @Override
@@ -241,5 +244,12 @@ public class TeamMembersFragment extends MainActivityFragment
         toggleFab(showsFab());
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();
+    }
+
+    @Nullable
+    private ViewHolderUtil.SimpleAdapterListener<User> isPicking() {
+        Fragment target = getTargetFragment();
+        return target == null || !(target instanceof ViewHolderUtil.SimpleAdapterListener)
+                ? null : ((ViewHolderUtil.SimpleAdapterListener) target);
     }
 }

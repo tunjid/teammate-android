@@ -208,6 +208,8 @@
     <string name="choose_stat">Choose stat</string>
     <string name="game_stats">Game stats</string>
     <string name="delete_stat_prompt">Delete stat?</string>
+    <string name="stat_user_not_on_team">This person is not on your team yet</string>
+    <string name="stat_only_team">You can only add stats for team\'s you\'re a part of</string>
 
 
     <!--BlockUserFragment-->

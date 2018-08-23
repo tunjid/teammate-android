@@ -13,8 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class GameViewModel extends BaseViewModel {
 
@@ -39,5 +42,9 @@ public class GameViewModel extends BaseViewModel {
         Function<List<Game>, List<Identifiable>> listMapper = items -> new ArrayList<>(items);
         return Identifiable.diff(flowable.map(listMapper), () -> getGamesForRound(tournament, round), this::preserveList);
 
+    }
+
+    public Completable getGame(Game game) {
+        return gameRepository.get(game).ignoreElements().observeOn(mainThread());
     }
 }

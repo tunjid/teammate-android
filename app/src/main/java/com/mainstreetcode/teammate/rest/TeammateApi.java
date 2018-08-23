@@ -48,7 +48,7 @@ public interface TeammateApi {
     String TEAM_PATH = "teamId";
     String ROLE_PATH = "roleId";
     String GAME_PATH = "gameId";
-    String STAT_PATH = "stateId";
+    String STAT_PATH = "statId";
     String REQUEST_PATH = "requestId";
     String TOURNAMENT_PATH = "tournamentId";
 

@@ -45,8 +45,8 @@ public class Tournament extends TournamentEntity
 
     public static Tournament empty(Team host) {
         Date date = new Date();
-        return new Tournament("", Config.getDefaultTournamentLogo(), "","", "", date, host, host.getSport(),
-                TournamentType.empty(), TournamentStyle.empty(), Competitor.empty(),
+        return new Tournament("", Config.getDefaultTournamentLogo(), "", "", "", date, host, host.getSport(),
+                Config.tournamentTypeFromCode(""), Config.tournamentStyleFromCode(""), Competitor.empty(),
                 1, 1, 0, 0, false);
     }
 
@@ -202,7 +202,7 @@ public class Tournament extends TournamentEntity
         @Override
         public Tournament deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Tournament(json.getAsString(), "", "", "","", new Date(), Team.empty(),
+                return new Tournament(json.getAsString(), "", "", "", "", new Date(), Team.empty(),
                         Sport.empty(), TournamentType.empty(), TournamentStyle.empty(), Competitor.empty(),
                         1, 1, 0, 0, false);
             }
@@ -235,7 +235,7 @@ public class Tournament extends TournamentEntity
 
             if (host == null) host = Team.empty();
 
-            return new Tournament(id, imageUrl, refPath,name, description, ModelUtils.parseDate(created), host,
+            return new Tournament(id, imageUrl, refPath, name, description, ModelUtils.parseDate(created), host,
                     sport, type, style, winner, numLegs, numRounds, currentRound, numCompetitors, singleFinal);
         }
     }

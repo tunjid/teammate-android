@@ -24,7 +24,7 @@ import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 public class Competitor extends CompetitorEntity
         implements
         Competitive,
-        Model<Competitor>{
+        Model<Competitor> {
 
     public static Competitor empty() {
         return new Competitor("", "", "", new N(), new Date());

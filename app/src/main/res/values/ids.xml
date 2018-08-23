@@ -6,6 +6,7 @@
     <item name="viewholder_role" type="id"/>
     <item name="viewholder_join_request" type="id"/>
     <item name="request_chat_team_pick" type="id"/>
+    <item name="request_stat_edit_pick" type="id"/>
     <item name="request_media_team_pick" type="id"/>
     <item name="request_event_team_pick" type="id"/>
     <item name="request_event_edit_pick" type="id"/>

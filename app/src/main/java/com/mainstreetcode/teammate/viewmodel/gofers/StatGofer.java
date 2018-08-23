@@ -4,11 +4,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -48,6 +53,7 @@ public class StatGofer extends Gofer<Stat> {
 
     @Override
     public Completable prepare() {
+        eligibleTeams.clear();
         return Flowable.defer(() -> eligibleTeamSource.apply(model))
                 .doOnNext(eligibleTeams::add).ignoreElements()
                 .doOnComplete(this::updateDefaultTeam);
@@ -69,6 +75,34 @@ public class StatGofer extends Gofer<Stat> {
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
+    public Single<DiffUtil.DiffResult> chooseUser(User otherUser) {
+        Single<List<Identifiable>> sourceSingle = Single.just(Collections.singletonList(otherUser));
+        return Identifiable.diff(sourceSingle, this::getItems, (sourceCopy, fetched) -> {
+            User current = model.getUser();
+            sourceCopy.remove(current);
+            sourceCopy.add(otherUser);
+            current.update(otherUser);
+            return sourceCopy;
+        });
+    }
+
+    public Single<DiffUtil.DiffResult> switchTeams() {
+        if (eligibleTeams.size() <= 1)
+            return Single.error(new TeammateException(App.getInstance().getString(R.string.stat_only_team)));
+
+        Single<List<Identifiable>> sourceSingle = Flowable.fromIterable(eligibleTeams)
+                .filter(team -> ! model.getTeam().equals(team)).collect(ArrayList::new, List::add);
+
+        return Identifiable.diff(sourceSingle, this::getItems, (sourceCopy, fetched) -> {
+            Team current = model.getTeam();
+            Team otherTeam = (Team) fetched.get(0);
+            sourceCopy.remove(current);
+            sourceCopy.add(otherTeam);
+            current.update(otherTeam);
+            return sourceCopy;
+        });
+    }
+
     public Completable delete() {
         return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
     }
@@ -83,6 +117,7 @@ public class StatGofer extends Gofer<Stat> {
         statTeam.update(defaultTeam);
         items.clear();
         items.addAll(makeItems());
+        Collections.sort(items, Identifiable.COMPARATOR);
     }
 
     private List<Identifiable> makeItems() {

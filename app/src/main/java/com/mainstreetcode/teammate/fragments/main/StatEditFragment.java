@@ -16,9 +16,12 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatEditAdapter;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
@@ -28,7 +31,8 @@ import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 public class StatEditFragment extends HeaderedFragment<Stat>
         implements
-        StatEditAdapter.AdapterListener {
+        StatEditAdapter.AdapterListener,
+        ViewHolderUtil.SimpleAdapterListener<User> {
 
     public static final String ARG_STAT = "stat";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
@@ -143,8 +147,25 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     }
 
     @Override
-    public void onUserClicked() {
+    public void onItemClicked(User item) {
+        disposables.add(gofer.chooseUser(item).subscribe(this::onModelUpdated, defaultErrorHandler));
+        hideBottomSheet();
+    }
 
+    @Override
+    public void onUserClicked() {
+        TeamMembersFragment fragment = TeamMembersFragment.newInstance(stat.getTeam());
+        fragment.setTargetFragment(this, R.id.request_stat_edit_pick);
+
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setTitle(getString(R.string.pick_team))
+                .setFragment(fragment)
+                .build());    }
+
+    @Override
+    public void onTeamClicked() {
+        disposables.add(gofer.switchTeams().subscribe(this::onModelUpdated, defaultErrorHandler));
     }
 
     @Override

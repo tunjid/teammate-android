@@ -32,6 +32,7 @@ public final class GameFragment extends MainActivityFragment {
 
     private Game game;
     private AtomicBoolean fabStatus;
+    private GameViewHolder viewHolder;
     private List<Identifiable> items;
 
     public static GameFragment newInstance(Game game) {
@@ -66,7 +67,8 @@ public final class GameFragment extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game, container, false);
-        new GameViewHolder(rootView, null).bind(game);
+        viewHolder = new GameViewHolder(rootView, null);
+        viewHolder.bind(game);
 
         Runnable refreshAction = () -> disposables.add(statViewModel.refresh(game).subscribe(GameFragment.this::onGamesUpdated, defaultErrorHandler));
 
@@ -87,6 +89,7 @@ public final class GameFragment extends MainActivityFragment {
     @Override
     public void onResume() {
         super.onResume();
+        fetchGame();
         fetchStats(true);
     }
 
@@ -108,7 +111,11 @@ public final class GameFragment extends MainActivityFragment {
         if (v.getId() == R.id.fab) showFragment(StatEditFragment.newInstance(Stat.empty(game)));
     }
 
-    void fetchStats(boolean fetchLatest) {
+    private void fetchGame() {
+        disposables.add(gameViewModel.getGame(game).subscribe(() -> viewHolder.bind(game), defaultErrorHandler));
+    }
+
+    private void fetchStats(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 
