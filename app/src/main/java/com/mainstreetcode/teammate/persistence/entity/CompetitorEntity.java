@@ -45,7 +45,7 @@ public class CompetitorEntity implements Parcelable {
         id = in.readString();
         refPath = in.readString();
         tournamentId = in.readString();
-        entity = fromParcel(in);
+        entity = fromParcel(refPath, in);
         created = new Date(in.readLong());
     }
 
@@ -59,8 +59,7 @@ public class CompetitorEntity implements Parcelable {
 
     public Date getCreated() { return created; }
 
-    private static Competitive fromParcel(Parcel in) {
-        String refPath = in.readString();
+    private static Competitive fromParcel(String refPath, Parcel in) {
         switch (refPath) {
             case User.COMPETITOR_TYPE:
                 return (User) in.readValue(User.class.getClassLoader());
@@ -72,8 +71,6 @@ public class CompetitorEntity implements Parcelable {
     }
 
     private static void writeToParcel(Competitive competitive, Parcel dest) {
-        String refPath = competitive.getRefType();
-        dest.writeString(refPath);
         dest.writeValue(competitive);
     }
 
@@ -103,7 +100,7 @@ public class CompetitorEntity implements Parcelable {
         dest.writeString(refPath);
         dest.writeString(tournamentId);
         writeToParcel(entity, dest);
-        dest.writeValue(created.getTime());
+        dest.writeLong(created.getTime());
     }
 
     public static final Creator<CompetitorEntity> CREATOR = new Creator<CompetitorEntity>() {

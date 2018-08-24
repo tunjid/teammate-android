@@ -5,8 +5,7 @@ import android.os.Parcel;
 public class EmptyCompetitor implements Competitive {
     public EmptyCompetitor() {}
 
-    @SuppressWarnings("unused")
-    private EmptyCompetitor(Parcel in) {}
+    private EmptyCompetitor(Parcel in) {in.readString();}
 
     public String getId() { return ""; }
 
@@ -24,7 +23,7 @@ public class EmptyCompetitor implements Competitive {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) { }
+    public void writeToParcel(Parcel dest, int flags) {dest.writeString(""); }
 
     public static final Creator<EmptyCompetitor> CREATOR = new Creator<EmptyCompetitor>() {
         @Override
