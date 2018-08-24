@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammate.model;
 
-public interface Competitive {
+import android.os.Parcelable;
+
+public interface Competitive extends Parcelable{
 
     String getId();
 

@@ -103,7 +103,7 @@ public final class GameFragment extends MainActivityFragment {
 
     @Override
     public boolean showsFab() {
-        return fabStatus.get();
+        return fabStatus.get() && !game.isEnded();
     }
 
     @Override

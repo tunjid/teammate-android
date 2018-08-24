@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.model;
 
-import android.annotation.SuppressLint;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -20,14 +21,13 @@ import java.util.Date;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 
-@SuppressLint("ParcelCreator")
 public class Competitor extends CompetitorEntity
         implements
         Competitive,
         Model<Competitor> {
 
     public static Competitor empty() {
-        return new Competitor("", "", "", new N(), new Date());
+        return new Competitor("", "", "", new EmptyCompetitor(), new Date());
     }
 
     public static Competitor empty(Competitive entity) {
@@ -36,6 +36,10 @@ public class Competitor extends CompetitorEntity
 
     public Competitor(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created) {
         super(id, refPath, tournamentId, entity, created);
+    }
+
+    protected Competitor(Parcel in) {
+        super(in);
     }
 
     boolean hasSameType(Competitor other) {
@@ -93,17 +97,18 @@ public class Competitor extends CompetitorEntity
         return 0;
     }
 
-    public static class N implements Competitive {
-        public String getId() { return ""; }
+    public static final Parcelable.Creator<Competitor> CREATOR = new Parcelable.Creator<Competitor>() {
+        @Override
+        public Competitor createFromParcel(Parcel in) {
+            return new Competitor(in);
+        }
 
-        public String getRefType() { return ""; }
+        @Override
+        public Competitor[] newArray(int size) {
+            return new Competitor[size];
+        }
+    };
 
-        public String getImageUrl() { return ""; }
-
-        public CharSequence getName() { return ""; }
-
-        public boolean hasMajorFields() { return false; }
-    }
 
     public static class GsonAdapter
             implements
@@ -125,7 +130,7 @@ public class Competitor extends CompetitorEntity
         public Competitor deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
             if (json.isJsonPrimitive()) {
-                return new Competitor(json.getAsString(), "", "", new N(), new Date());
+                return new Competitor(json.getAsString(), "", "", new EmptyCompetitor(), new Date());
             }
 
             JsonObject jsonObject = json.getAsJsonObject();

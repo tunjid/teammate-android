@@ -4,7 +4,7 @@ import android.arch.persistence.room.TypeConverter;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.model.Competitive;
-import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.EmptyCompetitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 
@@ -20,7 +20,7 @@ public class CompetitiveTypeConverter {
 
     @TypeConverter
     public Competitive fromId(String source) {
-        if (TextUtils.isEmpty(source)) return new Competitor.N();
+        if (TextUtils.isEmpty(source)) return new EmptyCompetitor();
         String[] split = source.split(",");
         String type = split[0];
         String id = split[1];
@@ -31,7 +31,7 @@ public class CompetitiveTypeConverter {
             case Team.COMPETITOR_TYPE:
                 return teamTypeConverter.fromId(id);
             default:
-                return new Competitor.N();
+                return new EmptyCompetitor();
         }
     }
 }

@@ -198,6 +198,7 @@ public class TournamentEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(imageUrl);
+        dest.writeString(refPath);
         dest.writeString(name.toString());
         dest.writeString(description.toString());
         dest.writeLong(created.getTime());

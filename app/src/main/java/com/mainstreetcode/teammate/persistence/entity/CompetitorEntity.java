@@ -10,6 +10,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.EmptyCompetitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 
@@ -40,7 +41,7 @@ public class CompetitorEntity implements Parcelable {
         this.created = created;
     }
 
-    private CompetitorEntity(Parcel in) {
+    protected CompetitorEntity(Parcel in) {
         id = in.readString();
         refPath = in.readString();
         tournamentId = in.readString();
@@ -63,21 +64,17 @@ public class CompetitorEntity implements Parcelable {
         switch (refPath) {
             case User.COMPETITOR_TYPE:
                 return (User) in.readValue(User.class.getClassLoader());
-            default:
             case Team.COMPETITOR_TYPE:
                 return (Team) in.readValue(Team.class.getClassLoader());
+            default:
+                return (EmptyCompetitor) in.readValue(EmptyCompetitor.class.getClassLoader());
         }
     }
 
-    private static void writeToParcel(Competitive competitor, Parcel dest) {
-        String refPath = competitor.getRefType();
+    private static void writeToParcel(Competitive competitive, Parcel dest) {
+        String refPath = competitive.getRefType();
         dest.writeString(refPath);
-        switch (refPath) {
-            case User.COMPETITOR_TYPE:
-            case Team.COMPETITOR_TYPE:
-                dest.writeValue(competitor);
-                break;
-        }
+        dest.writeValue(competitive);
     }
 
     @Override
