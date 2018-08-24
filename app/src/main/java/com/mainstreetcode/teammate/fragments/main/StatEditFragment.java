@@ -184,14 +184,9 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     @Override
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
-        boolean wasEmpty = stat.isEmpty();
 
         toggleProgress(true);
-        disposables.add(gofer.save().subscribe(diffResult -> {
-            int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
-            onModelUpdated(diffResult);
-            showSnackbar(getString(stringRes, stat.getStatType()));
-        }, defaultErrorHandler));
+        disposables.add(gofer.save().subscribe(diffResult -> requireActivity().onBackPressed(), defaultErrorHandler));
     }
 
     private void deleteStat() {

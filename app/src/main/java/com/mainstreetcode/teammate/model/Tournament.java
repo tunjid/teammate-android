@@ -116,12 +116,14 @@ public class Tournament extends TournamentEntity
     public void update(Tournament updatedTournament) {
         this.id = updatedTournament.id;
         this.name = updatedTournament.name;
+        this.refPath = updatedTournament.refPath;
         this.description = updatedTournament.description;
         this.imageUrl = updatedTournament.imageUrl;
         this.created = updatedTournament.created;
         this.numLegs = updatedTournament.numLegs;
         this.numRounds = updatedTournament.numRounds;
         this.currentRound = updatedTournament.currentRound;
+        this.numCompetitors = updatedTournament.numCompetitors;
         this.singleFinal = updatedTournament.singleFinal;
         this.type.update(updatedTournament.type);
         this.style.update(updatedTournament.style);

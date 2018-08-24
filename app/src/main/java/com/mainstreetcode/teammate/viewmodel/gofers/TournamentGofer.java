@@ -77,7 +77,6 @@ public class TournamentGofer extends TeamHostingGofer<Tournament> {
 
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
-       // if (isSettingLocation) return Flowable.empty();
         Flowable<List<Identifiable>> eventFlowable = Flowable.defer(() -> getFunction.apply(model)).map(Tournament::asIdentifiables);
         Flowable<List<Identifiable>> competitorsFlowable = Flowable.defer(() -> competitorsFunction.apply(model)).map(ModelUtils::asIdentifiables);
         Flowable<List<Identifiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, competitorsFlowable);

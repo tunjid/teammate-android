@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -13,7 +12,6 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
@@ -21,11 +19,8 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
-
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
  * Lists {@link Event tournaments}
@@ -125,29 +120,6 @@ public final class GamesChildFragment extends MainActivityFragment
     @Override
     public void onGameClicked(Game game) {
         showFragment(GameFragment.newInstance(game));
-    }
-
-    @Nullable
-    @Override
-    public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
-        FragmentTransaction superResult = super.provideFragmentTransaction(fragmentTo);
-
-        if (fragmentTo.getStableTag().contains(EventEditFragment.class.getSimpleName())) {
-            Bundle args = fragmentTo.getArguments();
-            if (args == null) return superResult;
-
-            Event tournament = args.getParcelable(EventEditFragment.ARG_EVENT);
-            if (tournament == null) return superResult;
-
-            EventViewHolder viewHolder = (EventViewHolder) scrollManager.findViewHolderForItemId(tournament.hashCode());
-            if (viewHolder == null) return superResult;
-
-            return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, getTransitionName(tournament, R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.getImage(), getTransitionName(tournament, R.id.fragment_header_thumbnail));
-
-        }
-        return superResult;
     }
 
     void fetchTournaments(boolean fetchLatest) {

@@ -189,7 +189,7 @@
     <string name="tournament_style">Tournament Style</string>
     <string name="tournament_legs">Number of legs</string>
     <string name="tournament_round">Number of rounds</string>
-    <string name="tournament_round_index">Round %1$s</string>
+    <string name="tournament_round_index">Round %1$d</string>
     <string name="tournament_single_final">One game final</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
 

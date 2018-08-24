@@ -14,42 +14,37 @@ public class StatViewHolder extends BaseViewHolder<ViewHolderUtil.SimpleAdapterL
 
     protected Stat model;
 
-    private TextView homeStatTime;
-    private TextView homeStatUser;
-    private TextView homeStatName;
-    private TextView homeStatEmoji;
-    private TextView awayStatTime;
-    private TextView awayStatUser;
-    private TextView awayStatName;
-    private TextView awayStatEmoji;
+    private TextView[] statTime;
+    private TextView[] statUser;
+    private TextView[] statName;
+    private TextView[] statEmoji;
 
     public StatViewHolder(View itemView, ViewHolderUtil.SimpleAdapterListener<Stat> adapterListener) {
         super(itemView, adapterListener);
-        homeStatTime = itemView.findViewById(R.id.home_stat_time);
-        homeStatUser = itemView.findViewById(R.id.home_stat_user);
-        homeStatName = itemView.findViewById(R.id.home_stat_name);
-        homeStatEmoji = itemView.findViewById(R.id.home_stat_emoji);
-        awayStatTime = itemView.findViewById(R.id.away_stat_time);
-        awayStatUser = itemView.findViewById(R.id.away_stat_user);
-        awayStatName = itemView.findViewById(R.id.away_stat_name);
-        awayStatEmoji = itemView.findViewById(R.id.away_stat_emoji);
+        statTime = new TextView[]{itemView.findViewById(R.id.home_stat_time), itemView.findViewById(R.id.away_stat_time)};
+        statUser = new TextView[]{itemView.findViewById(R.id.home_stat_user), itemView.findViewById(R.id.away_stat_user)};
+        statName = new TextView[]{itemView.findViewById(R.id.home_stat_name), itemView.findViewById(R.id.away_stat_name)};
+        statEmoji = new TextView[]{itemView.findViewById(R.id.home_stat_emoji), itemView.findViewById(R.id.away_stat_emoji)};
 
         itemView.setOnClickListener(view -> adapterListener.onItemClicked(model));
     }
 
     public void bind(Stat model) {
         this.model = model;
-        boolean isHome = model.isHome();
         StatType statType = model.getStatType();
 
-        TextView time = isHome ? homeStatTime : awayStatTime;
-        TextView user = isHome ? homeStatUser : awayStatUser;
-        TextView name = isHome ? homeStatName : awayStatName;
-        TextView emoji = isHome ? homeStatEmoji : awayStatEmoji;
+        setText(statTime, String.valueOf(model.getTime()));
+        setText(statUser, model.getUser().getFirstName());
+        setText(statName, statType.getName());
+        setText(statEmoji, statType.getEmoji());
+    }
 
-        time.setText(String.valueOf(model.getTime()));
-        user.setText(model.getUser().getFirstName());
-        name.setText(statType.getName());
-        emoji.setText(statType.getEmoji());
+    private void setText(TextView[] textViewPair, CharSequence text) {
+        boolean isHome = model.isHome();
+        int home = isHome ? 0 : 1;
+        int away = isHome ? 1: 0;
+
+        textViewPair[home].setText(text);
+        textViewPair[away].setText("");
     }
 }

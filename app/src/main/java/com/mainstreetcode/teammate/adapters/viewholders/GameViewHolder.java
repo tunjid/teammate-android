@@ -20,11 +20,11 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
 
     protected Game model;
 
-    TextView homeText;
-    TextView awayText;
-    TextView score;
-    public ImageView homeThumbnail;
-    public ImageView awayThumbnail;
+    private TextView homeText;
+    private TextView awayText;
+    private TextView score;
+    private ImageView homeThumbnail;
+    private ImageView awayThumbnail;
 
     public GameViewHolder(View itemView, GameAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
