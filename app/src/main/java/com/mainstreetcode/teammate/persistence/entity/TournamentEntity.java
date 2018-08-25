@@ -138,8 +138,8 @@ public class TournamentEntity implements Parcelable {
 
     public int getNumCompetitors() { return numCompetitors; }
 
-    public boolean isRoundRobin() {
-        return type.getCode().contains("obin");
+    public boolean hasWinner() {
+        return !winner.isEmpty();
     }
 
     public int getNumLegs() { return numLegs; }

@@ -58,7 +58,10 @@ public class EmptyViewHolder {
     @Nullable
     private Drawable getDrawable(@Nullable Drawable original) {
         if (original == null) return null;
-        Drawable wrapped = DrawableCompat.wrap(original);
+        Drawable mutated = original;
+        if (color != R.color.white) mutated = original.mutate();
+
+        Drawable wrapped = DrawableCompat.wrap(mutated);
         DrawableCompat.setTint(wrapped, getColor());
 
         return wrapped;

@@ -184,6 +184,7 @@
     <string name="tournament_name">Tournament Name</string>
     <string name="tournament_fixtures">Tournament Fixtures</string>
     <string name="tournament_games">View scores</string>
+    <string name="tournament_games_desc">Games to play show up here.\nAdd competitors to create fixtures</string>
     <string name="tournament_description">Tournament Description</string>
     <string name="tournament_type">Tournament Type</string>
     <string name="tournament_style">Tournament Style</string>
@@ -191,12 +192,14 @@
     <string name="tournament_round">Number of rounds</string>
     <string name="tournament_round_index">Round %1$d</string>
     <string name="tournament_single_final">One game final</string>
+    <string name="tournament_winner">🥇 CHAMPION  🏆</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
 
     <!--CompetitorsFragment-->
     <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>
     <string name="add_tournament_competitors">Add Competitors</string>
     <string name="competitor_exists">This competitor is already added</string>
+    <string name="add_competitor">Add Competitor</string>
 
     <!--GameFragment-->
     <string name="no_stats">Keep Score. Earn bragging rights.</string>

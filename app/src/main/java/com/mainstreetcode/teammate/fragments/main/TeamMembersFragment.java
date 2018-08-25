@@ -145,7 +145,7 @@ public class TeamMembersFragment extends MainActivityFragment
         super.togglePersistentUi();
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_group_add_white_24dp);
-        setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
+        setToolbarTitle(getTargetFragment() != null ? "" : getString(R.string.team_name_prefix, team.getName()));
     }
 
     @Override

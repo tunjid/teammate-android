@@ -5,6 +5,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.persistence.entity.TournamentEntity;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.TournamentRepository;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
@@ -50,6 +52,12 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
         super.onErrorMessage(message, key, invalid);
         boolean shouldRemove = message.isInvalidObject() && invalid instanceof Tournament;
         if (shouldRemove) removeTournament((Tournament) invalid);
+    }
+
+    public Maybe<Boolean> onWinnerChanged(Tournament tournament) {
+        boolean hasWinner = tournament.hasWinner();
+        if (tournament.isEmpty() || hasWinner) return Maybe.empty();
+        return repository.get(tournament).lastElement().map(TournamentEntity::hasWinner).filter(value -> !value);
     }
 
     private Flowable<Tournament> getTournament(Tournament tournament) {
