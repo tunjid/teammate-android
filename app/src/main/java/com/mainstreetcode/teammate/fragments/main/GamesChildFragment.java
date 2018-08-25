@@ -105,17 +105,10 @@ public final class GamesChildFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_add_white_24dp);
-        setToolbarTitle(getString(R.string.tournaments));
-    }
+    public void togglePersistentUi() {/* Do nothing */}
 
     @Override
-    public boolean showsFab() {
-        return false;
-    }
+    public boolean showsFab() { return false; }
 
     @Override
     public void onGameClicked(Game game) {

@@ -162,8 +162,10 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
                 toggleProgress(true);
                 disposables.add(gofer.save().subscribe(diffResult -> {
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
-                    onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, tournament.getName()));
+
+                    if (wasEmpty) showFragment(GamesParentFragment.newInstance(tournament));
+                    else onModelUpdated(diffResult);
                 }, defaultErrorHandler));
                 break;
         }

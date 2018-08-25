@@ -65,12 +65,14 @@ public class GamesParentFragment extends MainActivityFragment {
         TabLayout tabLayout = root.findViewById(R.id.tab_layout);
         EmptyViewHolder viewHolder = new EmptyViewHolder(root, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc);
 
+        boolean hasCompetitors = tournament.getNumCompetitors() > 0;
         viewPager.setAdapter(new GameRoundAdapter(tournament, getChildFragmentManager()));
         viewPager.setCurrentItem(tournament.getCurrentRound());
         tabLayout.setTabMode(tournament.getNumRounds() > 4 ? MODE_SCROLLABLE : MODE_FIXED);
+        tabLayout.setVisibility(hasCompetitors ? View.VISIBLE : View.GONE);
         tabLayout.setupWithViewPager(viewPager);
         viewHolder.setColor(R.color.dark_grey);
-        viewHolder.toggle(tournament.getNumCompetitors() <= 0);
+        viewHolder.toggle(!hasCompetitors);
 
         setUpWinner(root);
 
@@ -80,13 +82,27 @@ public class GamesParentFragment extends MainActivityFragment {
     @Override
     public void onResume() {
         super.onResume();
+        User user = userViewModel.getCurrentUser();
+        Team team = tournament.getHost();
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(showsFab()), emptyErrorHandler));
         disposables.add(tournamentViewModel.onWinnerChanged(tournament).subscribe(changed -> setUpWinner(getView()), defaultErrorHandler));
     }
 
     @Override
     public void togglePersistentUi() {
         setToolbarTitle(getString(R.string.tournament_fixtures));
+        setFabIcon(R.drawable.ic_group_add_white_24dp);
         super.togglePersistentUi();
+    }
+
+    @Override
+    public boolean showsFab() {
+        return localRoleViewModel.hasPrivilegedRole() && tournament.getNumCompetitors() == 0;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament));
     }
 
     @SuppressWarnings("unchecked")
