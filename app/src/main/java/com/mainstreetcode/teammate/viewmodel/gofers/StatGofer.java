@@ -95,7 +95,7 @@ public class StatGofer extends Gofer<Stat> {
         Single<List<Identifiable>> sourceSingle = Flowable.fromIterable(eligibleTeams)
                 .filter(team -> !model.getTeam().equals(team)).collect(ArrayList::new, List::add);
 
-        return swap(sourceSingle, model::getTeam, Team::update).concatWith(chooseUser(teamUserFunction.apply(model.getTeam())));
+        return swap(sourceSingle, model::getTeam, Team::update).concatWith(updateDefaultUser());
     }
 
     public Completable delete() {
@@ -107,8 +107,14 @@ public class StatGofer extends Gofer<Stat> {
             boolean hasNoDefaultTeam = !model.getTeam().isEmpty() || eligibleTeams.isEmpty();
             if (hasNoDefaultTeam) return Completable.complete();
             Single<List<Identifiable>> sourceSingle = Single.just(Collections.singletonList(eligibleTeams.get(0)));
-            return swap(sourceSingle, model::getTeam, Team::update).toCompletable();
+            return swap(sourceSingle, model::getTeam, Team::update)
+                    .concatWith(updateDefaultUser())
+                    .ignoreElements();
         });
+    }
+
+    private Single<DiffUtil.DiffResult> updateDefaultUser() {
+        return chooseUser(teamUserFunction.apply(model.getTeam()));
     }
 
     @SuppressWarnings("unchecked")
