@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.arch.core.util.Function;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
@@ -23,22 +24,24 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.BiConsumer;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class StatGofer extends Gofer<Stat> {
 
     private final List<Identifiable> items;
     private final List<Team> eligibleTeams;
+    private final Function<Team, User> teamUserFunction;
     private final Function<Stat, Single<Stat>> upsertFunction;
     private final Function<Stat, Single<Stat>> deleteFunction;
     private final Function<Stat, Flowable<Team>> eligibleTeamSource;
 
 
     public StatGofer(Stat model, Consumer<Throwable> onError,
+                     Function<Team, User> teamUserFunction,
                      Function<Stat, Single<Stat>> upsertFunction,
                      Function<Stat, Single<Stat>> deleteFunction,
                      Function<Stat, Flowable<Team>> eligibleTeamSource) {
         super(model, onError);
+        this.teamUserFunction = teamUserFunction;
         this.upsertFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
         this.eligibleTeamSource = eligibleTeamSource;
@@ -85,14 +88,14 @@ public class StatGofer extends Gofer<Stat> {
         return swap(sourceSingle, model::getUser, User::update);
     }
 
-    public Single<DiffUtil.DiffResult> switchTeams() {
+    public Flowable<DiffUtil.DiffResult> switchTeams() {
         if (eligibleTeams.size() <= 1)
-            return Single.error(new TeammateException(App.getInstance().getString(R.string.stat_only_team)));
+            return Flowable.error(new TeammateException(App.getInstance().getString(R.string.stat_only_team)));
 
         Single<List<Identifiable>> sourceSingle = Flowable.fromIterable(eligibleTeams)
                 .filter(team -> !model.getTeam().equals(team)).collect(ArrayList::new, List::add);
 
-        return swap(sourceSingle, model::getTeam, Team::update);
+        return swap(sourceSingle, model::getTeam, Team::update).concatWith(chooseUser(teamUserFunction.apply(model.getTeam())));
     }
 
     public Completable delete() {

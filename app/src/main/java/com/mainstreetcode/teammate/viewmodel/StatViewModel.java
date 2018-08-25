@@ -1,12 +1,16 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import android.arch.core.util.Function;
+
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.repository.StatRepository;
+import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 import java.util.ArrayList;
@@ -18,7 +22,6 @@ import java.util.Map;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 
@@ -37,8 +40,9 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
 
     public StatGofer gofer(Stat stat) {
         Consumer<Throwable> onError = throwable -> checkForInvalidObject(throwable, stat, stat.getGame());
+        Function<Team, User> userFunction = team -> UserRepository.getInstance().getCurrentUser();
         Function<Stat, Flowable<Team>> eligibleTeamSource = sourceStat -> getEligibleTeamsForGame(stat.getGame());
-        return new StatGofer(stat, onError, this::createOrUpdateStat, this::delete, eligibleTeamSource);
+        return new StatGofer(stat, onError, userFunction, this::createOrUpdateStat, this::delete, eligibleTeamSource);
     }
 
     @Override
@@ -53,18 +57,12 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         return modelList;
     }
 
-    private Flowable<Stat> getStat(Stat stat) {
-        return stat.isEmpty() ? Flowable.empty() : repository.get(stat);
-    }
-
     private Single<Stat> createOrUpdateStat(final Stat tournament) {
         return repository.createOrUpdate(tournament);
     }
 
     public Single<Stat> delete(final Stat stat) {
-        return repository.delete(stat).doOnSuccess(deleted -> {
-            getModelList(stat.getGame()).remove(deleted);
-        });
+        return repository.delete(stat).doOnSuccess(deleted -> getModelList(stat.getGame()).remove(deleted));
     }
 
     public Single<Boolean> canEditGameStats(Game game) {
