@@ -109,7 +109,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         super.onResume();
         User user = userViewModel.getCurrentUser();
         Team team = tournament.getHost();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(showsFab()), emptyErrorHandler));
+        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::togglePersistentUi, emptyErrorHandler));
         disposables.add(tournamentViewModel.onWinnerChanged(tournament).subscribe(changed -> setUpWinner(getView()), defaultErrorHandler));
     }
 
@@ -117,12 +117,13 @@ public class TournamentDetailFragment extends MainActivityFragment {
     public void togglePersistentUi() {
         setToolbarTitle(getString(R.string.tournament_fixtures));
         setFabIcon(R.drawable.ic_group_add_white_24dp);
+        requireActivity().invalidateOptionsMenu();
         super.togglePersistentUi();
     }
 
     @Override
     public boolean showsFab() {
-        return localRoleViewModel.hasPrivilegedRole() && tournament.getNumCompetitors() == 0;
+        return localRoleViewModel.hasPrivilegedRole() && tournament.hacCompetitors();
     }
 
     @Override

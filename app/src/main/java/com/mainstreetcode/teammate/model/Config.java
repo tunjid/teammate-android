@@ -236,7 +236,7 @@ public class Config implements Model<Config> {
             serialized.addProperty(TEAM_LOGO_KEY, src.defaultTeamLogo);
             serialized.addProperty(EVENT_LOGO_KEY, src.defaultEventLogo);
             serialized.addProperty(USER_AVATAR_KEY, src.defaultUserAvatar);
-            serialized.addProperty(TOURNAMENT_LOGO_KEY, src.defaultTeamLogo);
+            serialized.addProperty(TOURNAMENT_LOGO_KEY, src.defaultTournamentLogo);
 
             JsonArray statsArray = new JsonArray();
             JsonArray sportsArray = new JsonArray();

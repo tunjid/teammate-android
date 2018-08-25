@@ -8,7 +8,8 @@ import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public class Row {
 
     private String id;
     private Competitor competitor;
-    private Map<String, String> tableValues = new HashMap<>();
+    private List<String> tableValues = new ArrayList<>();
 
     private Row(String id, Competitor competitor) {
         this.id = id;
@@ -48,7 +49,7 @@ public class Row {
 
             JsonObject columnObject = columnElement.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : columnObject.entrySet())
-                row.tableValues.put(entry.getKey(), entry.getValue().toString());
+                row.tableValues.add(entry.getValue().toString());
 
             return row;
         }

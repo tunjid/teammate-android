@@ -138,9 +138,9 @@ public class TournamentEntity implements Parcelable {
 
     public int getNumCompetitors() { return numCompetitors; }
 
-    public boolean hasWinner() {
-        return !winner.isEmpty();
-    }
+    public boolean hasWinner() { return !winner.isEmpty(); }
+
+    public boolean hacCompetitors() { return numCompetitors > 0; }
 
     public int getNumLegs() { return numLegs; }
 
