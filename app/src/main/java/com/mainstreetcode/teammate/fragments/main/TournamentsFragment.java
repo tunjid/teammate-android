@@ -128,7 +128,7 @@ public final class TournamentsFragment extends MainActivityFragment
 
     @Override
     public void onTournamentClicked(Tournament tournament) {
-        showFragment(TournamentEditFragment.newInstance(tournament));
+        showFragment(TournamentDetailFragment.newInstance(tournament));
     }
 
     @Override

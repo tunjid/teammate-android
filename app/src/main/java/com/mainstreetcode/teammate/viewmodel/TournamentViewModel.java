@@ -57,7 +57,8 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     public Maybe<Boolean> onWinnerChanged(Tournament tournament) {
         boolean hasWinner = tournament.hasWinner();
         if (tournament.isEmpty() || hasWinner) return Maybe.empty();
-        return repository.get(tournament).lastElement().map(TournamentEntity::hasWinner).filter(value -> !value);
+        return repository.get(tournament).lastElement()
+                .map(TournamentEntity::hasWinner).filter(value -> value).observeOn(mainThread());
     }
 
     private Flowable<Tournament> getTournament(Tournament tournament) {

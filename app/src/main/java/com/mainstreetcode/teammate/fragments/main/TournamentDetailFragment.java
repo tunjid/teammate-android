@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,14 +30,14 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import static android.support.design.widget.TabLayout.MODE_FIXED;
 import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
 
-public class GamesParentFragment extends MainActivityFragment {
+public class TournamentDetailFragment extends MainActivityFragment {
 
     public static final String ARG_TOURNAMENT = "role";
 
     private Tournament tournament;
 
-    public static GamesParentFragment newInstance(Tournament tournament) {
-        GamesParentFragment fragment = new GamesParentFragment();
+    public static TournamentDetailFragment newInstance(Tournament tournament) {
+        TournamentDetailFragment fragment = new TournamentDetailFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(ARG_TOURNAMENT, tournament);
@@ -54,6 +57,7 @@ public class GamesParentFragment extends MainActivityFragment {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
     }
 
@@ -77,6 +81,27 @@ public class GamesParentFragment extends MainActivityFragment {
         setUpWinner(root);
 
         return root;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.action_edit).setVisible(localRoleViewModel.hasPrivilegedRole());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_tournament_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                showFragment(TournamentEditFragment.newInstance(tournament));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

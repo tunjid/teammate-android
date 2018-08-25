@@ -94,7 +94,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_rounds:
-                showFragment(GamesParentFragment.newInstance(tournament));
+                showFragment(TournamentDetailFragment.newInstance(tournament));
                 break;
             case R.id.action_delete:
                 Context context = getContext();
@@ -164,7 +164,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     showSnackbar(getString(stringRes, tournament.getName()));
 
-                    if (wasEmpty) showFragment(GamesParentFragment.newInstance(tournament));
+                    if (wasEmpty) showFragment(TournamentDetailFragment.newInstance(tournament));
                     else onModelUpdated(diffResult);
                 }, defaultErrorHandler));
                 break;
