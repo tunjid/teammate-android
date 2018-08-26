@@ -97,10 +97,10 @@ public class Game extends GameEntity
         else this.home = updatedGame.home;
         if (updatedGame.away.hasMajorFields() && this.away.hasSameType(updatedGame.away))
             this.away.update(updatedGame.away);
-        else this.away = updatedGame.home;
+        else this.away = updatedGame.away;
         if (updatedGame.winner.hasMajorFields() && this.winner.hasSameType(updatedGame.winner))
             this.winner.update(updatedGame.winner);
-        else this.winner = updatedGame.home;
+        else this.winner = updatedGame.winner;
         if (updatedGame.event.hasMajorFields()) this.event.update(updatedGame.event);
     }
 

@@ -3,9 +3,11 @@ package com.mainstreetcode.teammate.repository;
 
 import android.support.annotation.Nullable;
 
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.TournamentDao;
@@ -31,12 +33,16 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
 
     private final TeammateApi api;
     private final TournamentDao tournamentDao;
+    private final ModelRepository<User> userRepository;
     private final ModelRepository<Team> teamRepository;
+    private final ModelRepository<Competitor> competitorRepository;
 
     private TournamentRepository() {
         api = TeammateService.getApiInstance();
         tournamentDao = AppDatabase.getInstance().tournamentDao();
+        userRepository = UserRepository.getInstance();
         teamRepository = TeamRepository.getInstance();
+        competitorRepository = CompetitorRepository.getInstance();
     }
 
     public static TournamentRepository getInstance() {
@@ -100,10 +106,26 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
     @Override
     Function<List<Tournament>, List<Tournament>> provideSaveManyFunction() {
         return models -> {
-            List<Team> teams = new ArrayList<>(models.size());
-            for (Tournament tournament : models) teams.add(tournament.getTeam());
+            int size = models.size();
+            List<User> users = new ArrayList<>(size);
+            List<Team> teams = new ArrayList<>(size);
+            List<Competitor> competitors = new ArrayList<>(size);
 
+            for (Tournament tournament : models) {
+                teams.add(tournament.getTeam());
+                Competitor competitor = tournament.getWinner();
+
+                if (competitor.isEmpty()) continue;
+                competitors.add(competitor);
+
+                Competitive competitive = competitor.getEntity();
+                if (competitive instanceof User) users.add((User) competitive);
+                if (competitive instanceof Team) teams.add((Team) competitive);
+            }
+
+            userRepository.saveAsNested().apply(users);
             teamRepository.saveAsNested().apply(teams);
+            competitorRepository.saveAsNested().apply(competitors);
             tournamentDao.upsert(Collections.unmodifiableList(models));
 
             return models;

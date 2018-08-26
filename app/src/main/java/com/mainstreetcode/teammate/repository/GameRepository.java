@@ -35,12 +35,14 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
     private final GameDao gameDao;
     private final ModelRepository<User> userRepository;
     private final ModelRepository<Team> teamRepository;
+    private final ModelRepository<Competitor> competitorRepository;
 
     private GameRepository() {
         api = TeammateService.getApiInstance();
         gameDao = AppDatabase.getInstance().gameDao();
-        teamRepository = TeamRepository.getInstance();
         userRepository = UserRepository.getInstance();
+        teamRepository = TeamRepository.getInstance();
+        competitorRepository = CompetitorRepository.getInstance();
     }
 
     public static GameRepository getInstance() {
@@ -87,15 +89,20 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
         return models -> {
             List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
+            List<Competitor> competitors = new ArrayList<>(models.size());
 
             for (Game game : models) {
-                addIfValid(game.getHome(), users, teams);
-                addIfValid(game.getAway(), users, teams);
-                addIfValid(game.getWinner(), users, teams);
+                Competitor home = game.getHome();
+                Competitor away = game.getAway();
+                addIfValid(home, users, teams);
+                addIfValid(away, users, teams);
+                competitors.add(home);
+                competitors.add(away);
             }
 
             teamRepository.saveAsNested().apply(teams);
             userRepository.saveAsNested().apply(users);
+            competitorRepository.saveAsNested().apply(competitors);
 
             gameDao.upsert(Collections.unmodifiableList(models));
 

@@ -33,7 +33,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private final TournamentRepository repository;
-    final Map<Tournament, Standings> standingsMap = new HashMap<>();
+    private final Map<Tournament, Standings> standingsMap = new HashMap<>();
 
     public TournamentViewModel() {
         repository = TournamentRepository.getInstance();
