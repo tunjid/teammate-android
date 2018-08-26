@@ -194,6 +194,7 @@
     <string name="tournament_single_final">One game final</string>
     <string name="tournament_winner">🥇  CHAMPION   🏆</string>
     <string name="tournament_edit">Edit Tournament</string>
+    <string name="tournament_standings">Standings</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
 
     <!--CompetitorsFragment-->

@@ -87,6 +87,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.action_edit).setVisible(localRoleViewModel.hasPrivilegedRole());
+        menu.findItem(R.id.action_standings).setVisible(!tournament.isKnockOut());
     }
 
     @Override
@@ -99,6 +100,9 @@ public class TournamentDetailFragment extends MainActivityFragment {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 showFragment(TournamentEditFragment.newInstance(tournament));
+                break;
+            case R.id.action_standings:
+                showFragment(StandingsFragment.newInstance(tournament));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -123,7 +127,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
 
     @Override
     public boolean showsFab() {
-        return localRoleViewModel.hasPrivilegedRole() && tournament.hacCompetitors();
+        return localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors();
     }
 
     @Override

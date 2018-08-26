@@ -5,6 +5,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamHost;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
@@ -30,10 +31,7 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
     }
 
     public List<Identifiable> getModelList(Team team) {
-        List<Identifiable> modelList = modelListMap.get(team);
-        if (!modelListMap.containsKey(team)) modelListMap.put(team, modelList = new ArrayList<>());
-
-        return modelList;
+        return ModelUtils.get(team, modelListMap, ArrayList::new);
     }
 
     @Override

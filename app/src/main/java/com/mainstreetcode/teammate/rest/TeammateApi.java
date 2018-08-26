@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -283,6 +284,9 @@ public interface TeammateApi {
 
     @GET("api/tournaments/{tournamentId}/competitors")
     Single<List<Competitor>> getCompetitors(@Path(TOURNAMENT_PATH) String tournamentId);
+
+    @GET("api/tournaments/{tournamentId}/table")
+    Single<Standings> getStandings(@Path(TOURNAMENT_PATH) String tournamentId);
 
     @POST("api/tournaments/{tournamentId}/competitors")
     Single<Tournament> addCompetitors(@Path(TOURNAMENT_PATH) String tournamentId, @Body List<Competitor> competitors);

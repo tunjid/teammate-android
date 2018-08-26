@@ -8,4 +8,11 @@
         android:title="@string/tournament_edit"
         android:visible="false"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_standings"
+        android:enabled="true"
+        android:icon="@drawable/ic_table_24dp"
+        android:title="@string/tournament_standings"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -65,6 +66,13 @@ public class ModelUtils {
                 destination.add(context.deserialize(element, type));
             }
         }
+    }
+
+    public static <K, V> V get(K key, Map<K, V> map, Supplier<V> instantiator) {
+        V value = map.get(key);
+        if (value == null) map.put(key, value = instantiator.get());
+
+        return value;
     }
 
     public static Date parseDate(String date) {

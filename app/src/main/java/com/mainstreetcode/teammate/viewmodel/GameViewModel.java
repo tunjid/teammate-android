@@ -7,6 +7,7 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.repository.GameRepository;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,15 +27,8 @@ public class GameViewModel extends BaseViewModel {
 
     @SuppressLint("UseSparseArrays")
     public List<Identifiable> getGamesForRound(Tournament tournament, int round) {
-
-        Map<Integer, List<Identifiable>> roundMap = gameRoundMap.get(tournament);
-        if (!gameRoundMap.containsKey(tournament))
-            gameRoundMap.put(tournament, roundMap = new HashMap<>());
-
-        List<Identifiable> games = roundMap.get(round);
-        if (!roundMap.containsKey(round)) roundMap.put(round, games = new ArrayList<>());
-
-        return games;
+        Map<Integer, List<Identifiable>> roundMap =  ModelUtils.get(tournament, gameRoundMap, HashMap::new);
+        return ModelUtils.get(round, roundMap, ArrayList::new);
     }
 
     public Flowable<DiffUtil.DiffResult> fetchGamesInRound(Tournament tournament, int round) {

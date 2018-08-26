@@ -3,16 +3,22 @@ package com.mainstreetcode.teammate.viewmodel;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.entity.TournamentEntity;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.TournamentRepository;
+import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -27,6 +33,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private final TournamentRepository repository;
+    final Map<Tournament, Standings> standingsMap = new HashMap<>();
 
     public TournamentViewModel() {
         repository = TournamentRepository.getInstance();
@@ -54,6 +61,10 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
         if (shouldRemove) removeTournament((Tournament) invalid);
     }
 
+    public Standings getStandings(Tournament tournament) {
+        return ModelUtils.get(tournament, standingsMap, () -> Standings.forTournament(tournament));
+    }
+
     public Maybe<Boolean> onWinnerChanged(Tournament tournament) {
         boolean hasWinner = tournament.hasWinner();
         if (tournament.isEmpty() || hasWinner) return Maybe.empty();
@@ -71,6 +82,12 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     public Single<Tournament> delete(final Tournament tournament) {
         return repository.delete(tournament).doOnSuccess(this::removeTournament);
+    }
+
+    public Completable fetchStandings(Tournament tournament) {
+        return TeammateService.getApiInstance().getStandings(tournament.getId())
+                .map(getStandings(tournament)::update)
+                .toCompletable().observeOn(mainThread());
     }
 
     private Date getQueryDate(Team team, boolean fetchLatest) {

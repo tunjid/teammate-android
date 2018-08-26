@@ -29,10 +29,28 @@ public class Standings {
     private List<Row> table = new ArrayList<>();
     private List<String> columnNames = new ArrayList<>();
 
+    public static Standings forTournament(Tournament tournament) {
+        return new Standings("", tournament.getId());
+    }
+
     private Standings(String id, String tournamentId) {
         this.id = id;
         this.tournamentId = tournamentId;
     }
+
+    public List<String> getColumnNames() { return columnNames; }
+
+    public Standings update(Standings other) {
+        this.id = other.id;
+        this.tournamentId = other.tournamentId;
+        table.clear();
+        table.addAll(other.table);
+        columnNames.clear();
+        columnNames.addAll(other.columnNames);
+        return this;
+    }
+
+    public List<Row> getTable() { return table; }
 
     public static class GsonAdapter
             implements
@@ -41,6 +59,7 @@ public class Standings {
         private static final String ID = "_id";
         private static final String TOURNAMENT = "tournament";
         private static final String TABLE = "table";
+        private static final String COLUMNS = "columns";
 
         @Override
         @SuppressLint("CheckResult")
@@ -56,11 +75,11 @@ public class Standings {
             if (table.size() == 0) return standings;
 
             ModelUtils.deserializeList(context, table, standings.table, Row.class);
-            JsonObject columnObject = table.get(0).getAsJsonObject();
-            
+            JsonObject columnObject = table.get(0).getAsJsonObject().get(COLUMNS).getAsJsonObject();
+
             Flowable.fromIterable(columnObject.entrySet())
                     .filter(entry -> !entry.getKey().equals("competitor"))
-                    .map(Map.Entry::getValue).map(Object::toString)
+                    .map(Map.Entry::getKey).map(Object::toString)
                     .subscribe(standings.columnNames::add, ErrorHandler.EMPTY);
 
             return standings;

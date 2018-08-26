@@ -25,6 +25,8 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Row;
+import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -32,9 +34,9 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
-import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
@@ -115,6 +117,7 @@ public class TeammateService {
     public static Gson getGson() {
 
         return new GsonBuilder()
+                .registerTypeAdapter(Row.class, new Row.GsonAdapter())
                 .registerTypeAdapter(Team.class, new Team.GsonAdapter())
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
                 .registerTypeAdapter(Role.class, new Role.GsonAdapter())
@@ -131,6 +134,7 @@ public class TeammateService {
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
                 .registerTypeAdapter(StatType.class, new StatType.GsonAdapter())
+                .registerTypeAdapter(Standings.class, new Standings.GsonAdapter())
                 .registerTypeAdapter(Tournament.class, new Tournament.GsonAdapter())
                 .registerTypeAdapter(Competitor.class, new Competitor.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())

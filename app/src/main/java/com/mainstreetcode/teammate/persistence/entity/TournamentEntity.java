@@ -140,7 +140,9 @@ public class TournamentEntity implements Parcelable {
 
     public boolean hasWinner() { return !winner.isEmpty(); }
 
-    public boolean hacCompetitors() { return numCompetitors > 0; }
+    public boolean hasCompetitors() { return numCompetitors > 0; }
+
+    public boolean isKnockOut() { return style.getCode().contains("noc"); }
 
     public int getNumLegs() { return numLegs; }
 

@@ -16,16 +16,24 @@ import java.util.Map;
  * Event events
  */
 
-public class Row {
+public class Row implements Identifiable{
 
-    private String id;
-    private Competitor competitor;
-    private List<String> tableValues = new ArrayList<>();
+    private final String id;
+    private final Competitor competitor;
+    private final List<String> tableValues = new ArrayList<>();
 
     private Row(String id, Competitor competitor) {
         this.id = id;
         this.competitor = competitor;
     }
+
+    public String getId() { return id; }
+
+    public String getImageUrl() { return competitor.getImageUrl(); }
+
+    public CharSequence getName() { return competitor.getName(); }
+
+    public List<String>  getColumns() { return tableValues; }
 
     public static class GsonAdapter
             implements
