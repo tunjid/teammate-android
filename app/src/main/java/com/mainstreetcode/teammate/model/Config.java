@@ -31,6 +31,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 
@@ -97,8 +98,10 @@ public class Config implements Model<Config> {
         return getList(config -> config.blockReasons);
     }
 
-    public static List<StatType> getStatTypes() {
-        return getList(config -> config.statTypes);
+    public static List<StatType> getStatTypes(Sport sport) {
+        return getList(config -> Flowable.fromIterable(config.statTypes)
+                .filter(sport::matchesStatType)
+                .collect((Callable<ArrayList<StatType>>) ArrayList::new, List::add).blockingGet());
     }
 
     public static List<TournamentType> getTournamentTypes() {
@@ -251,10 +254,14 @@ public class Config implements Model<Config> {
             for (StatType item : src.statTypes) statsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
-            for (BlockReason item : src.blockReasons) blockedReasonArray.add(context.serialize(item));
-            for (AndroidVariant item : src.staticVariants) staticVariantsArray.add(context.serialize(item));
-            for (TournamentType item : src.tournamentTypes) tournamentTypesArray.add(context.serialize(item));
-            for (TournamentStyle item : src.tournamentStyles) tournamentStylesArray.add(context.serialize(item));
+            for (BlockReason item : src.blockReasons)
+                blockedReasonArray.add(context.serialize(item));
+            for (AndroidVariant item : src.staticVariants)
+                staticVariantsArray.add(context.serialize(item));
+            for (TournamentType item : src.tournamentTypes)
+                tournamentTypesArray.add(context.serialize(item));
+            for (TournamentStyle item : src.tournamentStyles)
+                tournamentStylesArray.add(context.serialize(item));
 
             serialized.add(SPORTS_KEY, sportsArray);
             serialized.add(GAME_STATS_KEY, statsArray);

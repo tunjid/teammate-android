@@ -10,19 +10,21 @@ import java.util.Objects;
 public class StatType extends MetaData {
 
     private String emoji;
+    private String sportCode;
 
-    StatType(String code, String name, String emoji) {
+    StatType(String code, String name, String emoji, String sportCode) {
         super(code, name);
         this.emoji = emoji;
+        this.sportCode = sportCode;
     }
 
     public static StatType empty() {
-        return new StatType("", "","");
+        return new StatType("", "","", "");
     }
 
-    public CharSequence getEmoji() {
-        return ModelUtils.processString(emoji);
-    }
+    public String getSportCode() { return sportCode; }
+
+    public CharSequence getEmoji() { return ModelUtils.processString(emoji); }
 
     public CharSequence getEmojiAndName() {
         return new SpanBuilder(App.getInstance(), getEmoji())
@@ -51,11 +53,13 @@ public class StatType extends MetaData {
     public static class GsonAdapter extends MetaData.GsonAdapter<StatType> {
 
         private static final String EMOJI_KEY = "emoji";
+        private static final String SPORT = "sport";
 
         @Override
         StatType fromJson(String code, String name, JsonObject body) {
             String emoji = ModelUtils.asString(EMOJI_KEY, body);
-            return new StatType(code, name, emoji);
+            String sportCode = ModelUtils.asString(SPORT, body);
+            return new StatType(code, name, emoji, sportCode);
         }
 
         @Override

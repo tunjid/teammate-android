@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
@@ -170,9 +171,10 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     }
 
     @Override
-    public boolean canChangeStat() {
-        return stat.isEmpty();
-    }
+    public boolean canChangeStat() { return stat.isEmpty(); }
+
+    @Override
+    public Sport getSport() { return stat.getSport(); }
 
     @Override
     protected void onPrepComplete() {

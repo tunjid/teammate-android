@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.model.enums;
 
+import android.text.TextUtils;
+
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
@@ -19,6 +21,11 @@ public class Sport extends MetaData {
 
     public static Sport empty() {
         return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
+    }
+
+    public boolean matchesStatType(StatType statType) {
+        String sportCode = statType.getSportCode();
+        return code.equals(sportCode) || TextUtils.isEmpty(sportCode);
     }
 
     public CharSequence appendEmoji(CharSequence text) {

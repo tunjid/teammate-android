@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
@@ -48,7 +49,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case Item.STAT_TYPE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_stat, Config.getStatTypes(), StatType::getEmojiAndName, StatType::getCode, adapterListener::canChangeStat, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_stat, Config.getStatTypes(adapterListener.getSport()), StatType::getEmojiAndName, StatType::getCode, adapterListener::canChangeStat, FALSE);
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
             case TEAM:
@@ -87,5 +88,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
         void onTeamClicked();
 
         boolean canChangeStat();
+
+        Sport getSport();
     }
 }
