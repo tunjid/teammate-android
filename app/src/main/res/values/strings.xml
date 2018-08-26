@@ -195,6 +195,7 @@
     <string name="tournament_winner">🥇  CHAMPION   🏆</string>
     <string name="tournament_edit">Edit Tournament</string>
     <string name="tournament_standings">Standings</string>
+    <string name="tournament_no_standings">The ultimate test of consistency, tournament standings show up here</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
 
     <!--CompetitorsFragment-->
@@ -202,6 +203,7 @@
     <string name="add_tournament_competitors">Add Competitors</string>
     <string name="competitor_exists">This competitor is already added</string>
     <string name="add_competitor">Add Competitor</string>
+    <string name="competitor">Competitor</string>
 
     <!--GameFragment-->
     <string name="no_stats">Keep Score. Earn bragging rights.</string>

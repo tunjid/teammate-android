@@ -71,7 +71,7 @@ public final class StandingsFragment extends MainActivityFragment {
         Runnable refreshAction = () -> fetchStandings(true);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
+                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_table_24dp, R.string.tournament_no_standings))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchStandings(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -79,10 +79,11 @@ public final class StandingsFragment extends MainActivityFragment {
                 .withLinearLayoutManager()
                 .build();
 
-        viewHolder = new StandingRowViewHolder(rootView, new BaseRecyclerViewAdapter.AdapterListener() {});
-        viewHolder.thumbnail.setBackground(null);
-        viewHolder.thumbnail.setImageResource(R.drawable.ic_shield_white);
-        viewHolder.title.setText(getString(R.string.tournament_standings));
+        scrollManager.setViewHolderColor(R.color.dark_grey);
+
+        viewHolder = new StandingRowViewHolder(rootView.findViewById(R.id.item_container), new BaseRecyclerViewAdapter.AdapterListener() {});
+        viewHolder.thumbnail.setVisibility(View.GONE);
+        viewHolder.title.setText(getString(R.string.competitor));
         viewHolder.setColor(R.color.white);
 
         return rootView;

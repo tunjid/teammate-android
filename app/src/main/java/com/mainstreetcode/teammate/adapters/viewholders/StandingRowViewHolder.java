@@ -43,6 +43,7 @@ public class StandingRowViewHolder extends BaseViewHolder<BaseRecyclerViewAdapte
 
         int adapterPosition = getAdapterPosition();
         if (adapterPosition >= 0) position.setText(String.valueOf(adapterPosition + 1));
+        else position.setVisibility(View.GONE);
 
         String imageUrl = model.getImageUrl();
         if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey);
@@ -59,6 +60,7 @@ public class StandingRowViewHolder extends BaseViewHolder<BaseRecyclerViewAdapte
         int resolved = getColor();
         int count = columns.getChildCount();
         for (int i = 0; i < count; i++) getItem(i).setTextColor(resolved);
+        title.setTextColor(resolved);
     }
 
     private TextView getItem(int position) {
