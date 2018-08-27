@@ -12,13 +12,26 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/thumbnail"
-        android:layout_width="@dimen/triple_margin"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:contentDescription="@string/team_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent=".16" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/inset"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/team_logo"
+        app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
+        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintHorizontal_bias=".1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintWidth_percent=".08" />
 
     <TextView
         android:id="@+id/item_title"
@@ -33,7 +46,7 @@
         android:textSize="@dimen/regular_text"
         app:layout_constraintBottom_toTopOf="@+id/item_subtitle"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+        app:layout_constraintLeft_toRightOf="@+id/inset"
         app:layout_constraintRight_toLeftOf="@+id/item_position"
         app:layout_constraintTop_toTopOf="@+id/thumbnail"
         app:layout_constraintVertical_chainStyle="spread"
@@ -51,7 +64,7 @@
         android:textColor="@color/dark_grey"
         app:autoSizeMinTextSize="@dimen/tiny_text"
         app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
-        app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+        app:layout_constraintLeft_toRightOf="@+id/inset"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_title"
         tools:text="Hi I'm " />

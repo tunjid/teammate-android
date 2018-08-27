@@ -62,11 +62,12 @@ public final class StandingsFragment extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_standings, container, false);
+        View spacerToolbar = rootView.findViewById(R.id.spacer_toolbar);
 
         Runnable refreshAction = () -> fetchStandings(true);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_table_24dp, R.string.tournament_no_standings))
+                .withEmptyViewholder(new EmptyViewHolder(rootView.findViewById(R.id.empty_container), R.drawable.ic_table_24dp, R.string.tournament_no_standings))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchStandings(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -74,7 +75,7 @@ public final class StandingsFragment extends MainActivityFragment {
                 .withLinearLayoutManager()
                 .build();
 
-        viewHolder = new StandingRowViewHolder(rootView.findViewById(R.id.item_container), new BaseRecyclerViewAdapter.AdapterListener() {});
+        viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), new BaseRecyclerViewAdapter.AdapterListener() {});
         viewHolder.thumbnail.setVisibility(View.GONE);
         viewHolder.position.setVisibility(View.GONE);
 

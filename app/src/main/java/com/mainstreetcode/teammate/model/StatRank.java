@@ -34,6 +34,8 @@ public class StatRank
         this.user = user;
     }
 
+    public String getInset() { return team.getImageUrl(); }
+
     public String getCount() { return String.valueOf(count); }
 
     public CharSequence getTitle() { return user.getName(); }
@@ -67,7 +69,7 @@ public class StatRank
 
     @Override
     public int compareTo(@NonNull StatRank o) {
-        return Integer.compare(count, o.count);
+        return -Integer.compare(count, o.count);
     }
 
     public static class GsonAdapter

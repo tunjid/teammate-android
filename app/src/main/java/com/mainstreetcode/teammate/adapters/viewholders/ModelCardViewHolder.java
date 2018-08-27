@@ -41,12 +41,7 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
             return;
         }
 
-        RequestCreator creator = Picasso.with(itemView.getContext()).load(imageUrl);
-
-        if (isThumbnail()) creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside();
-        else creator.fit().centerCrop();
-
-        creator.into(thumbnail);
+        load(imageUrl, thumbnail);
     }
 
     public ImageView getThumbnail() {
@@ -54,4 +49,13 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
     }
 
     public boolean isThumbnail() {return true;}
+
+    void load(String imageUrl, ImageView destination) {
+        RequestCreator creator = Picasso.with(itemView.getContext()).load(imageUrl);
+
+        if (isThumbnail()) creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside();
+        else creator.fit().centerCrop();
+
+        creator.into(destination);
+    }
 }
