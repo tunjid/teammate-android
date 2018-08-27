@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -59,6 +62,7 @@ public final class GameFragment extends MainActivityFragment {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         game = getArguments().getParcelable(ARG_GAME);
         items = statViewModel.getModelList(game);
         fabStatus = new AtomicBoolean();
@@ -87,6 +91,27 @@ public final class GameFragment extends MainActivityFragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.action_end_game).setVisible(showsFab());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_game, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_end_game:
+                endGame();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         fetchGame();
@@ -99,6 +124,7 @@ public final class GameFragment extends MainActivityFragment {
         setFabClickListener(this);
         setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.game_stats));
+        requireActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -111,8 +137,13 @@ public final class GameFragment extends MainActivityFragment {
         if (v.getId() == R.id.fab) showFragment(StatEditFragment.newInstance(Stat.empty(game)));
     }
 
+    private void endGame() {
+        toggleProgress(true);
+        disposables.add(gameViewModel.endGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+    }
+
     private void fetchGame() {
-        disposables.add(gameViewModel.getGame(game).subscribe(() -> viewHolder.bind(game), defaultErrorHandler));
+        disposables.add(gameViewModel.getGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
     }
 
     private void fetchStats(boolean fetchLatest) {
@@ -126,5 +157,11 @@ public final class GameFragment extends MainActivityFragment {
     private void onGamesUpdated(DiffUtil.DiffResult result) {
         scrollManager.onDiff(result);
         toggleProgress(false);
+    }
+
+    private void onGameUpdated() {
+        viewHolder.bind(game);
+        toggleProgress(false);
+        togglePersistentUi();
     }
 }

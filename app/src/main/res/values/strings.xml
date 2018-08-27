@@ -209,6 +209,8 @@
     <!--GameFragment-->
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
     <string name="game_stats">Game stats</string>
+    <string name="game_end">End game</string>
+    <string name="game_ended">FT</string>
 
     <!--StatEditFragment-->
     <string name="user">User</string>

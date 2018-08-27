@@ -27,7 +27,7 @@ public class GameViewModel extends BaseViewModel {
 
     @SuppressLint("UseSparseArrays")
     public List<Identifiable> getGamesForRound(Tournament tournament, int round) {
-        Map<Integer, List<Identifiable>> roundMap =  ModelUtils.get(tournament, gameRoundMap, HashMap::new);
+        Map<Integer, List<Identifiable>> roundMap = ModelUtils.get(tournament, gameRoundMap, HashMap::new);
         return ModelUtils.get(round, roundMap, ArrayList::new);
     }
 
@@ -40,5 +40,11 @@ public class GameViewModel extends BaseViewModel {
 
     public Completable getGame(Game game) {
         return gameRepository.get(game).ignoreElements().observeOn(mainThread());
+    }
+
+    public Completable endGame(Game game) {
+        game.setEnded(true);
+        return gameRepository.createOrUpdate(game).toCompletable()
+                .doOnError(throwable -> game.setEnded(false)).observeOn(mainThread());
     }
 }

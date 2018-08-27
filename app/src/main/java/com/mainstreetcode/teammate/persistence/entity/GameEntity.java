@@ -148,6 +148,10 @@ public class GameEntity implements Parcelable {
         return canDraw;
     }
 
+    public void setEnded(boolean ended) {
+        this.ended = ended;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

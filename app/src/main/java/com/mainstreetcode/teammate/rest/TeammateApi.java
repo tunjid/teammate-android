@@ -303,6 +303,9 @@ public interface TeammateApi {
     @GET("api/games/{gameId}")
     Single<Game> getGame(@Path(GAME_PATH) String gameId);
 
+    @PUT("api/games/{gameId}")
+    Single<Game> updateGame(@Path(GAME_PATH) String gameId, @Body Game game);
+
     @GET("api/tournaments/{tournamentId}/games")
     Single<List<Game>> getGames(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round);
 

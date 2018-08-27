@@ -57,7 +57,12 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
 
     @Override
     public Single<Game> createOrUpdate(Game game) {
-        return Single.error(new TeammateException(""));
+        return game.isEmpty()
+                ? Single.error(new TeammateException(""))
+                : api.updateGame(game.getId(), game)
+                .doOnError(throwable -> deleteInvalidModel(game, throwable))
+                .map(getLocalUpdateFunction(game))
+                .map(getSaveFunction());
     }
 
     @Override

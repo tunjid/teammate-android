@@ -32,7 +32,7 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
             " INNER JOIN competitors AS competitor" +
             " ON tournament.tournament_id = competitor.competitor_tournament_id" +
             " WHERE :teamId = competitor.competitor_entity_id" +
-            " AND :date < tournament.tournament_created" +
+            " AND tournament.tournament_created < :date" +
             " ORDER BY tournament.tournament_created DESC" +
             " LIMIT 40")
     public abstract Maybe<List<Tournament>> getTournaments(String teamId, Date date);

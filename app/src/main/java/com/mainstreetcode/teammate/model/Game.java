@@ -9,6 +9,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.GameEntity;
@@ -130,6 +132,7 @@ public class Game extends GameEntity
 
     public static class GsonAdapter
             implements
+            JsonSerializer<Game>,
             JsonDeserializer<Game> {
 
         private static final String ID_KEY = "_id";
@@ -148,11 +151,18 @@ public class Game extends GameEntity
         private static final String ENDED = "ended";
         private static final String CAN_DRAW = "canDraw";
 
+        @Override
+        public JsonElement serialize(Game src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject body = new JsonObject();
+            body.addProperty(ENDED, src.ended);
+            if (!src.event.isEmpty()) body.addProperty(EVENT, src.event.getId());
+            return body;
+        }
 
         @Override
         public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Game(json.getAsString(),"" ,"TBD", new Date(), Sport.empty(), Event.empty(),
+                return new Game(json.getAsString(), "", "TBD", new Date(), Sport.empty(), Event.empty(),
                         Tournament.empty(Team.empty()), Competitor.empty(), Competitor.empty(), Competitor.empty(),
                         0, 0, 0, false, false);
             }

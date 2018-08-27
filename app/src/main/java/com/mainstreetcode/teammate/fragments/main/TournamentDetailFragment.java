@@ -21,7 +21,6 @@ import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
@@ -154,7 +153,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
                 : null;
 
         if (viewHolder == null) return;
-        viewHolder.bind((Model) competitive);
+        viewHolder.bind(competitive);
 
         winnerText.setVisibility(View.VISIBLE);
         itemView.setVisibility(View.VISIBLE);

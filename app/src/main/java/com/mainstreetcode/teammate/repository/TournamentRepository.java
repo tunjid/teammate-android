@@ -95,7 +95,8 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
     @Override
     Maybe<List<Tournament>> localModelsBefore(Team team, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return tournamentDao.getTournaments(team.getId(), date).subscribeOn(io());
+        // To concatenate team to account for the way the id is stored in the db to accommodate users and teams
+        return tournamentDao.getTournaments("team," + team.getId(), date).subscribeOn(io());
     }
 
     @Override
