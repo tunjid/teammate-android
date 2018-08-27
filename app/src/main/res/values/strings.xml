@@ -204,7 +204,7 @@
     <string name="add_tournament_competitors">Add Competitors</string>
     <string name="competitor_exists">This competitor is already added</string>
     <string name="add_competitor">Add Competitor</string>
-    <string name="competitor">Competitor</string>
+    <string name="competitor">Competitors</string>
 
     <!--GameFragment-->
     <string name="no_stats">Keep Score. Earn bragging rights.</string>

@@ -79,8 +79,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     public Completable fetchStandings(Tournament tournament) {
         return api.getStandings(tournament.getId())
-                .map(getStandings(tournament)::update)
-                .toCompletable().observeOn(mainThread());
+                .observeOn(mainThread()).map(getStandings(tournament)::update).toCompletable();
     }
 
     public Maybe<Boolean> onWinnerChanged(Tournament tournament) {

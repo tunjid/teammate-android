@@ -54,14 +54,13 @@
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
         android:paddingTop="@dimen/half_margin"
+        android:text="@string/competitor"
         android:textColor="@color/dark_grey"
         android:textSize="@dimen/small_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintLeft_toRightOf="@+id/thumbnail"
         app:layout_constraintRight_toRightOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Name" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/item_row"

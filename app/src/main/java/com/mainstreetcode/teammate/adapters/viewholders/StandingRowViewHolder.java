@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.support.annotation.ColorRes;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,8 +21,6 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class StandingRowViewHolder extends BaseViewHolder<BaseRecyclerViewAdapter.AdapterListener> {
 
-    @ColorRes private int color = R.color.dark_grey;
-
     public TextView title;
     public TextView position;
     public ImageView thumbnail;
@@ -42,8 +38,7 @@ public class StandingRowViewHolder extends BaseViewHolder<BaseRecyclerViewAdapte
         title.setText(model.getName());
 
         int adapterPosition = getAdapterPosition();
-        if (adapterPosition >= 0) position.setText(String.valueOf(adapterPosition + 1));
-        else position.setVisibility(View.GONE);
+        position.setText(String.valueOf(adapterPosition + 1));
 
         String imageUrl = model.getImageUrl();
         if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey);
@@ -55,29 +50,16 @@ public class StandingRowViewHolder extends BaseViewHolder<BaseRecyclerViewAdapte
         for (int i = 0; i < count; i++) getItem(i).setText(columns.get(i));
     }
 
-    public void setColor(@ColorRes int color) {
-        this.color = color;
-        int resolved = getColor();
-        int count = columns.getChildCount();
-        for (int i = 0; i < count; i++) getItem(i).setTextColor(resolved);
-        title.setTextColor(resolved);
-    }
-
     private TextView getItem(int position) {
         int max = columns.getChildCount() - 1;
         if (position <= max) return (TextView) columns.getChildAt(position);
 
         TextView textView = new TextView(itemView.getContext());
         textView.setGravity(CENTER);
-        textView.setTextColor(getColor());
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT, 1);
         columns.addView(textView, params);
 
         return textView;
-    }
-
-    private int getColor() {
-        return ContextCompat.getColor(itemView.getContext(), color);
     }
 }
