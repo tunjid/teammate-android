@@ -77,7 +77,6 @@ public final class StandingsFragment extends MainActivityFragment {
         viewHolder = new StandingRowViewHolder(rootView.findViewById(R.id.item_container), new BaseRecyclerViewAdapter.AdapterListener() {});
         viewHolder.thumbnail.setVisibility(View.GONE);
         viewHolder.title.setText(getString(R.string.competitor));
-        viewHolder.setColor(R.color.white);
 
         return rootView;
     }

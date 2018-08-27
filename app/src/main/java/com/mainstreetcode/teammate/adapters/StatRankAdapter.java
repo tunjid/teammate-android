@@ -43,7 +43,7 @@ public class StatRankAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Vie
                 ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
                 ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : new StatRankViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
+                : new StatRankViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_stat_rank, viewGroup), adapterListener);
     }
 
     @Override

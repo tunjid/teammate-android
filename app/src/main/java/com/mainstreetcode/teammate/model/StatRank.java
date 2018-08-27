@@ -34,6 +34,8 @@ public class StatRank
         this.user = user;
     }
 
+    public String getCount() { return String.valueOf(count); }
+
     public CharSequence getTitle() { return user.getName(); }
 
     public CharSequence getSubtitle() { return team.getName(); }

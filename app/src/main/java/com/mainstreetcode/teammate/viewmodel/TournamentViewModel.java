@@ -96,7 +96,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     public Single<DiffUtil.DiffResult> getStatRank(Tournament tournament, StatType type) {
         Single<List<Identifiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(fetched -> new ArrayList<>(fetched));
-        return Identifiable.diff(sourceSingle, () -> getStatRanks(tournament), this::preserveList).observeOn(mainThread());
+        return Identifiable.diff(sourceSingle, () -> getStatRanks(tournament), ModelUtils::replaceList).observeOn(mainThread());
     }
 
     private Flowable<Tournament> getTournament(Tournament tournament) {

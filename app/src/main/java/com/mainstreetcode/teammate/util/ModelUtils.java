@@ -121,6 +121,13 @@ public class ModelUtils {
         Collections.sort(source, (a, b) -> -Identifiable.COMPARATOR.compare(a, b));
     }
 
+    public static <T extends Identifiable> List<T> replaceList(List<T> source, List<T> additions) {
+        source.clear();
+        source.addAll(additions);
+        Collections.sort(source, Identifiable.COMPARATOR);
+        return source;
+    }
+
     @Nullable
     @SuppressWarnings("unchecked")
     public static <T> T findFirst(List<?> list, Class<T> typeClass) {
