@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +11,12 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StandingsAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
  * Lists {@link Event tournaments}
@@ -79,8 +74,6 @@ public final class StandingsFragment extends MainActivityFragment {
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager.setViewHolderColor(R.color.dark_grey);
-
         viewHolder = new StandingRowViewHolder(rootView.findViewById(R.id.item_container), new BaseRecyclerViewAdapter.AdapterListener() {});
         viewHolder.thumbnail.setVisibility(View.GONE);
         viewHolder.title.setText(getString(R.string.competitor));
@@ -96,38 +89,10 @@ public final class StandingsFragment extends MainActivityFragment {
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setFabClickListener(this);
-        setFabIcon(R.drawable.ic_add_white_24dp);
-        setToolbarTitle(getString(R.string.tournament_standings));
-    }
+    public void togglePersistentUi() {/* Do nothing */}
 
     @Override
     public boolean showsFab() { return false; }
-
-    @Nullable
-    @Override
-    public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
-        FragmentTransaction superResult = super.provideFragmentTransaction(fragmentTo);
-
-        if (fragmentTo.getStableTag().contains(TournamentEditFragment.class.getSimpleName())) {
-            Bundle args = fragmentTo.getArguments();
-            if (args == null) return superResult;
-
-            Tournament tournament = args.getParcelable(TournamentEditFragment.ARG_TOURNAMENT);
-            if (tournament == null) return superResult;
-
-            TournamentViewHolder viewHolder = (TournamentViewHolder) scrollManager.findViewHolderForItemId(tournament.hashCode());
-            if (viewHolder == null) return superResult;
-
-            return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, getTransitionName(tournament, R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.getImage(), getTransitionName(tournament, R.id.fragment_header_thumbnail));
-
-        }
-        return superResult;
-    }
 
     void fetchStandings(boolean isRefreshing) {
         if (isRefreshing) scrollManager.setRefreshing();

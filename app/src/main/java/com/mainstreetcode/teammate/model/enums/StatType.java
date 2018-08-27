@@ -33,9 +33,15 @@ public class StatType extends MetaData {
                 .build();
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public void update(StatType updated) {
         super.update(updated);
         this.emoji = updated.emoji;
+        this.sportCode = updated.sportCode;
     }
 
     @Override

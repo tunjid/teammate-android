@@ -28,6 +28,7 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Row;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatRank;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -133,6 +134,7 @@ public class TeammateService {
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
+                .registerTypeAdapter(StatRank.class, new StatRank.GsonAdapter())
                 .registerTypeAdapter(StatType.class, new StatType.GsonAdapter())
                 .registerTypeAdapter(Standings.class, new Standings.GsonAdapter())
                 .registerTypeAdapter(Tournament.class, new Tournament.GsonAdapter())

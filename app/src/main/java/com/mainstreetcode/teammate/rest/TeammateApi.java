@@ -17,10 +17,12 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatRank;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 
 import java.util.Date;
@@ -290,6 +292,9 @@ public interface TeammateApi {
 
     @POST("api/tournaments/{tournamentId}/competitors")
     Single<Tournament> addCompetitors(@Path(TOURNAMENT_PATH) String tournamentId, @Body List<Competitor> competitors);
+
+    @POST("api/tournaments/{tournamentId}/stats")
+    Single<List<StatRank>> getStatRanks(@Path(TOURNAMENT_PATH) String tournamentId, @Body StatType statType);
 
     // =============================================================================================
     // Game endpoints

@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.GameRoundAdapter;
+import com.mainstreetcode.teammate.adapters.TournamentRoundAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
@@ -70,7 +70,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         EmptyViewHolder viewHolder = new EmptyViewHolder(root, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc);
 
         boolean hasCompetitors = tournament.getNumCompetitors() > 0;
-        viewPager.setAdapter(new GameRoundAdapter(tournament, getChildFragmentManager()));
+        viewPager.setAdapter(new TournamentRoundAdapter(tournament, getChildFragmentManager()));
         viewPager.setCurrentItem(tournament.getCurrentRound());
         tabLayout.setTabMode(tournament.getNumRounds() > 4 ? MODE_SCROLLABLE : MODE_FIXED);
         tabLayout.setVisibility(hasCompetitors ? View.VISIBLE : View.GONE);
@@ -102,7 +102,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
                 showFragment(TournamentEditFragment.newInstance(tournament));
                 break;
             case R.id.action_standings:
-                showFragment(StandingsFragment.newInstance(tournament));
+                showFragment(StatDetailFragment.newInstance(tournament));
                 break;
         }
         return super.onOptionsItemSelected(item);

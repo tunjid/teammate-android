@@ -183,6 +183,7 @@
     <string name="edit_tournament">Tournament: %1$s</string>
     <string name="tournament_name">Tournament Name</string>
     <string name="tournament_fixtures">Tournament Fixtures</string>
+    <string name="tournament_stats">Tournament Stats</string>
     <string name="tournament_games">View scores</string>
     <string name="tournament_games_desc">Games to play show up here.\nAdd competitors to create fixtures</string>
     <string name="tournament_description">Tournament Description</string>
@@ -221,6 +222,7 @@
     <string name="delete_stat_prompt">Delete stat?</string>
     <string name="stat_user_not_on_team">This person is not on your team yet</string>
     <string name="stat_only_team">You can only add stats for team\'s you\'re a part of</string>
+    <string name="stat_ranks">Leaderboard</string>
 
 
     <!--BlockUserFragment-->

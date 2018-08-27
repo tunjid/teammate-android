@@ -2,13 +2,11 @@ package com.mainstreetcode.teammate.model;
 
 import android.os.Parcelable;
 
-public interface Competitive extends Parcelable{
+public interface Competitive extends RemoteImage, Parcelable {
 
     String getId();
 
     String getRefType();
-
-    String getImageUrl();
 
     CharSequence getName();
 

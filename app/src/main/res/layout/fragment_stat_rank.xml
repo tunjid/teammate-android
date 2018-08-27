@@ -8,35 +8,27 @@
         android:id="@+id/spacer_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="@dimen/quarter_margin"
         android:background="@color/white"
+        android:elevation="@dimen/quarter_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <include
-            layout="@layout/viewholder_standings_row"
+        <Spinner
+            android:id="@+id/spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/single_margin"
-            android:layout_marginRight="@dimen/single_margin" />
+            android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/refresh_layout"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/team_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spacer_toolbar">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/team_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+        app:layout_constraintTop_toBottomOf="@+id/spacer_toolbar" />
 
     <include
         layout="@layout/viewholder_empty"

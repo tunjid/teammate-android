@@ -10,10 +10,10 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.main.GamesChildFragment;
 import com.mainstreetcode.teammate.model.Tournament;
 
-public class GameRoundAdapter extends FragmentStatePagerAdapter{
+public class TournamentRoundAdapter extends FragmentStatePagerAdapter{
     private final Tournament tournament;
 
-    public GameRoundAdapter(Tournament tournament, FragmentManager fm) {
+    public TournamentRoundAdapter(Tournament tournament, FragmentManager fm) {
         super(fm);
         this.tournament = tournament;
     }
