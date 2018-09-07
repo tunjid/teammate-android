@@ -70,7 +70,7 @@ public final class GamesChildFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_games_child, container, false);
 
         Runnable refreshAction = () -> disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(GamesChildFragment.this::onGamesUpdated, defaultErrorHandler));
 

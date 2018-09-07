@@ -63,11 +63,13 @@
             android:id="@+id/home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/third_margin"
+            android:layout_marginTop="@dimen/third_margin"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:paddingBottom="@dimen/half_margin"
-            android:paddingTop="@dimen/half_margin"
+            android:paddingBottom="@dimen/third_margin"
+            android:paddingTop="@dimen/third_margin"
             android:textColor="@color/dark_grey"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -80,11 +82,13 @@
             android:id="@+id/away"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/third_margin"
+            android:layout_marginTop="@dimen/third_margin"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:paddingBottom="@dimen/half_margin"
-            android:paddingTop="@dimen/half_margin"
+            android:paddingBottom="@dimen/third_margin"
+            android:paddingTop="@dimen/third_margin"
             android:textColor="@color/dark_grey"
             android:textSize="@dimen/small_text"
             app:layout_constrainedWidth="true"
@@ -101,19 +105,20 @@
             android:text="@string/game_ended"
             android:textColor="@color/dark_grey"
             android:textSize="12sp"
-            tools:text="hi"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            tools:text="hi" />
 
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/quarter_margin"
             android:text="@string/game_ended"
             android:textColor="@color/dark_grey"
             android:textSize="12sp"
-            tools:text="hi"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
+            tools:text="hi" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>
