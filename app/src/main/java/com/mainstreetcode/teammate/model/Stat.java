@@ -14,6 +14,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatAttribute;
+import com.mainstreetcode.teammate.model.enums.StatAttributes;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.persistence.entity.StatEntity;
 import com.mainstreetcode.teammate.util.IdCache;
@@ -41,13 +43,13 @@ public class Stat extends StatEntity
 
     public static Stat empty(Game game) {
         return new Stat("", new Date(), Config.statTypeFromCode(""), game.getSport(), User.empty(),
-                Team.empty(), game, 0, 0);
+                Team.empty(), game, new StatAttributes(),0, 0);
     }
 
     public Stat(@NonNull String id,
                 Date created, StatType statType, Sport sport, User user, Team team, Game game,
-                int value, float time) {
-        super(id, created, statType, sport, user, team, game, value, time);
+                StatAttributes attributes, int value, float time) {
+        super(id, created, statType, sport, user, team, game, attributes, value, time);
     }
 
     private Stat(Parcel in) {
@@ -141,6 +143,7 @@ public class Stat extends StatEntity
         private static final String GAME = "game";
         private static final String TIME = "time";
         private static final String VALUE = "value";
+        private static final String ATTRIBUTES = "attributes";
 
         @Override
         public JsonElement serialize(Stat src, Type typeOfSrc, JsonSerializationContext context) {
@@ -162,7 +165,7 @@ public class Stat extends StatEntity
         public Stat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
                 return new Stat(json.getAsString(), new Date(), StatType.empty(), Sport.empty(), User.empty(),
-                        Team.empty(), null, 0, 0);
+                        Team.empty(), null, new StatAttributes(),0, 0);
             }
 
             JsonObject body = json.getAsJsonObject();
@@ -172,7 +175,6 @@ public class Stat extends StatEntity
             String typeCode = ModelUtils.asString(STAT_TYPE, body);
             String sportCode = ModelUtils.asString(SPORT_KEY, body);
 
-
             int value = (int) ModelUtils.asFloat(VALUE, body);
             float time = ModelUtils.asFloat(TIME, body);
 
@@ -181,9 +183,12 @@ public class Stat extends StatEntity
             User user = context.deserialize(body.get(USER), User.class);
             Team team = context.deserialize(body.get(TEAM), Team.class);
             Game game = context.deserialize(body.get(GAME), Game.class);
+            StatAttributes attributes = new StatAttributes();
+
+            ModelUtils.deserializeList(context, body.get(ATTRIBUTES), attributes, StatAttribute.class);
 
             return new Stat(id, ModelUtils.parseDate(created), statType, sport,
-                    user, team, game, value, time);
+                    user, team, game, attributes, value, time);
         }
     }
 }

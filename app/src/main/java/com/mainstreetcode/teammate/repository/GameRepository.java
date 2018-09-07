@@ -81,12 +81,14 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
     @Override
     Maybe<List<Game>> localModelsBefore(Tournament tournament, @Nullable Integer round) {
         if (round == null) round = 0;
-        return gameDao.getGames(tournament.getId(), round).subscribeOn(io());
+        return gameDao.getGames(tournament.getId(), round).subscribeOn(io())
+                .doOnSuccess(games -> updateGameEvent(tournament, games));
     }
 
     @Override
     Maybe<List<Game>> remoteModelsBefore(Tournament tournament, @Nullable Integer round) {
-        return api.getGames(tournament.getId(), round == null ? 0 : round).map(getSaveManyFunction()).toMaybe();
+        return api.getGames(tournament.getId(), round == null ? 0 : round).map(getSaveManyFunction()).toMaybe()
+                .doOnSuccess(games -> updateGameEvent(tournament, games));
     }
 
     @Override
@@ -119,5 +121,20 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
         Competitive entity = competitor.getEntity();
         if (entity instanceof User) users.add((User) entity);
         if (entity instanceof Team) teams.add((Team) entity);
+    }
+
+    private void updateGameEvent(Tournament tournament, List<Game> games) {
+        for (Game game : games) {
+            if (!game.getEvent().isEmpty() || !game.hasValidRefType()) continue;
+
+            String refPath = game.getRefPath();
+            Team eventTeam = game.getEvent().getTeam();
+            Competitive home = game.getHome().getEntity();
+
+            if (User.COMPETITOR_TYPE.equals(refPath) && home instanceof User)
+                eventTeam.update(tournament.getTeam());
+            else if (Team.COMPETITOR_TYPE.equals(refPath) && home instanceof Team)
+                eventTeam.update((Team) home);
+        }
     }
 }

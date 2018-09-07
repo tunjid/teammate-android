@@ -35,7 +35,8 @@ public final class GameFragment extends MainActivityFragment {
 
     private Game game;
     private AtomicBoolean fabStatus;
-    private GameViewHolder viewHolder;
+    private GameViewHolder gameViewHolder;
+
     private List<Identifiable> items;
 
     public static GameFragment newInstance(Game game) {
@@ -71,8 +72,8 @@ public final class GameFragment extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game, container, false);
-        viewHolder = new GameViewHolder(rootView, null);
-        viewHolder.bind(game);
+        gameViewHolder = new GameViewHolder(rootView.findViewById(R.id.app_bar), ignored -> {});
+        gameViewHolder.bind(game);
 
         Runnable refreshAction = () -> disposables.add(statViewModel.refresh(game).subscribe(GameFragment.this::onGamesUpdated, defaultErrorHandler));
 
@@ -129,7 +130,7 @@ public final class GameFragment extends MainActivityFragment {
 
     @Override
     public boolean showsFab() {
-         return fabStatus.get() && !game.isEnded();
+        return fabStatus.get() && !game.isEnded();
     }
 
     @Override
@@ -155,12 +156,12 @@ public final class GameFragment extends MainActivityFragment {
     }
 
     private void onGamesUpdated(DiffUtil.DiffResult result) {
-        scrollManager.onDiff(result);
         toggleProgress(false);
+        scrollManager.onDiff(result);
     }
 
     private void onGameUpdated() {
-        viewHolder.bind(game);
+        gameViewHolder.bind(game);
         toggleProgress(false);
         togglePersistentUi();
     }

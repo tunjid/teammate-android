@@ -75,18 +75,19 @@ public class Migration3To4 extends Migration {
                 "`stat_user` TEXT, " +
                 "`stat_team` TEXT, " +
                 "`stat_game` TEXT, " +
+                "`stat_attributes` TEXT, " +
                 "`stat_value` INTEGER NOT NULL, " +
                 "`stat_time` REAL NOT NULL, " +
                 "PRIMARY KEY(`stat_id`), " +
                 "FOREIGN KEY(`stat_game`) " +
                 "REFERENCES `games`(`game_id`) " +
-                "ON UPDATE NO ACTION ON DELETE CASCADE,"+
+                "ON UPDATE NO ACTION ON DELETE CASCADE , " +
                 "FOREIGN KEY(`stat_team`) " +
                 "REFERENCES `teams`(`team_id`) " +
-                "ON UPDATE NO ACTION ON DELETE CASCADE," +
+                "ON UPDATE NO ACTION ON DELETE CASCADE , " +
                 "FOREIGN KEY(`stat_user`) " +
                 "REFERENCES `users`(`user_id`) " +
-                "ON UPDATE NO ACTION ON DELETE CASCADE)"
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
         );
     }
 }

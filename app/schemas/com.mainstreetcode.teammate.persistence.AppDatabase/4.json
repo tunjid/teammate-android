@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "a9f0575d336d514687d94cc24ff680b0",
+    "identityHash": "a5d0c03d3689e7582f9375cbc8e1a2bc",
     "entities": [
       {
         "tableName": "users",
@@ -765,7 +765,7 @@
       },
       {
         "tableName": "stats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stat_id` TEXT NOT NULL, `stat_created` INTEGER, `stat_type` TEXT, `stat_sport` TEXT, `stat_user` TEXT, `stat_team` TEXT, `stat_game` TEXT, `stat_value` INTEGER NOT NULL, `stat_time` REAL NOT NULL, PRIMARY KEY(`stat_id`), FOREIGN KEY(`stat_game`) REFERENCES `games`(`game_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`stat_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`stat_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stat_id` TEXT NOT NULL, `stat_created` INTEGER, `stat_type` TEXT, `stat_sport` TEXT, `stat_user` TEXT, `stat_team` TEXT, `stat_game` TEXT, `stat_attributes` TEXT, `stat_value` INTEGER NOT NULL, `stat_time` REAL NOT NULL, PRIMARY KEY(`stat_id`), FOREIGN KEY(`stat_game`) REFERENCES `games`(`game_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`stat_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`stat_user`) REFERENCES `users`(`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -806,6 +806,12 @@
           {
             "fieldPath": "game",
             "columnName": "stat_game",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "attributes",
+            "columnName": "stat_attributes",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1015,7 +1021,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a9f0575d336d514687d94cc24ff680b0\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a5d0c03d3689e7582f9375cbc8e1a2bc\")"
     ]
   }
 }

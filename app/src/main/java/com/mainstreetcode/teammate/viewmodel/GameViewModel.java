@@ -44,6 +44,10 @@ public class GameViewModel extends BaseViewModel {
 
     public Completable endGame(Game game) {
         game.setEnded(true);
+        return updateGame(game);
+    }
+
+    public Completable updateGame(Game game) {
         return gameRepository.createOrUpdate(game).toCompletable()
                 .doOnError(throwable -> game.setEnded(false)).observeOn(mainThread());
     }

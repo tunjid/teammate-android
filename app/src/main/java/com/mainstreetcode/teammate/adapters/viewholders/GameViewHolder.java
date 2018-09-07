@@ -24,11 +24,13 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
     private TextView awayText;
     private TextView ended;
     private TextView score;
+    private TextView date;
     private ImageView homeThumbnail;
     private ImageView awayThumbnail;
 
     public GameViewHolder(View itemView, GameAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
+        date = itemView.findViewById(R.id.date);
         score = itemView.findViewById(R.id.score);
         ended = itemView.findViewById(R.id.ended);
         homeText = itemView.findViewById(R.id.home);
@@ -45,6 +47,7 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         Competitor away = model.getAway();
         Competitor winner = model.getWinner();
 
+        date.setText(model.getDate());
         score.setText(model.getScore());
         homeText.setText(home.getName());
         awayText.setText(away.getName());

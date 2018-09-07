@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatAttributes;
 import com.mainstreetcode.teammate.model.enums.StatType;
 
 import java.util.Date;
@@ -41,13 +42,14 @@ public class StatEntity implements Parcelable {
     @ColumnInfo(name = "stat_user") protected User user;
     @ColumnInfo(name = "stat_team") protected Team team;
     @ColumnInfo(name = "stat_game") protected Game game;
+    @ColumnInfo(name = "stat_attributes") protected StatAttributes attributes;
 
     @ColumnInfo(name = "stat_value") protected int value;
     @ColumnInfo(name = "stat_time") protected float time;
 
     public StatEntity(@NonNull String id, Date created,
                       StatType statType, Sport sport, User user, Team team, Game game,
-                      int value, float time) {
+                      StatAttributes attributes, int value, float time) {
         this.id = id;
         this.created = created;
         this.statType = statType;
@@ -57,6 +59,7 @@ public class StatEntity implements Parcelable {
         this.game = game;
         this.value = value;
         this.time = time;
+        this.attributes = attributes;
     }
 
     protected StatEntity(Parcel in) {
@@ -99,6 +102,8 @@ public class StatEntity implements Parcelable {
     public StatType getStatType() { return statType; }
 
     public Sport getSport() { return sport; }
+
+    public StatAttributes getAttributes() { return attributes; }
 
     public int getValue() { return value; }
 

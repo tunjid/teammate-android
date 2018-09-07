@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.model.enums;
 
 import android.os.Build;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class TournamentType extends MetaData {
 
     public static class GsonAdapter extends MetaData.GsonAdapter<TournamentType> {
         @Override
-        TournamentType fromJson(String code, String name, JsonObject body) {
+        TournamentType fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
             return new TournamentType(code, name);
         }
     }

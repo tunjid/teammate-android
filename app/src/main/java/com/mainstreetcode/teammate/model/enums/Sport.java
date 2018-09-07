@@ -2,7 +2,9 @@ package com.mainstreetcode.teammate.model.enums;
 
 import android.text.TextUtils;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -51,13 +53,13 @@ public class Sport extends MetaData {
         private static final String EMOJI_KEY = "emoji";
 
         @Override
-        Sport fromJson(String code, String name, JsonObject body) {
+        Sport fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
             String emoji = ModelUtils.asString(EMOJI_KEY, body);
             return new Sport(code, name, emoji);
         }
 
         @Override
-        JsonObject toJson(JsonObject serialized, Sport src) {
+        JsonObject toJson(JsonObject serialized, Sport src, JsonSerializationContext context) {
             serialized.addProperty(EMOJI_KEY, src.emoji);
             return serialized;
         }

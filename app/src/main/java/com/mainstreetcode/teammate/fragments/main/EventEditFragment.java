@@ -26,6 +26,7 @@ import com.mainstreetcode.teammate.adapters.EventEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -44,9 +45,12 @@ public class EventEditFragment extends HeaderedFragment<Event>
         implements
         EventEditAdapter.EventEditAdapterListener {
 
+    public static final String ARG_GAME = "game";
     public static final String ARG_EVENT = "event";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
+    @Nullable
+    private Game game;
     private Event event;
     private EventGofer gofer;
 
@@ -61,6 +65,13 @@ public class EventEditFragment extends HeaderedFragment<Event>
         return fragment;
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public static EventEditFragment newInstance(Game game) {
+        EventEditFragment fragment = newInstance(game.getEvent());
+        fragment.getArguments().putParcelable(ARG_GAME, game);
+        return fragment;
+    }
+
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
@@ -72,7 +83,9 @@ public class EventEditFragment extends HeaderedFragment<Event>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        event = getArguments().getParcelable(ARG_EVENT);
+        Bundle args = getArguments();
+        game = args.getParcelable(ARG_GAME);
+        event = game != null ? game.getEvent() : args.getParcelable(ARG_EVENT);
         gofer = eventViewModel.gofer(event);
     }
 
@@ -209,6 +222,10 @@ public class EventEditFragment extends HeaderedFragment<Event>
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
+                    if (game != null) {
+                        toggleProgress(true);
+                        disposables.add(gameViewModel.updateGame(game).subscribe(requireActivity()::onBackPressed, defaultErrorHandler));
+                    };
                 }, defaultErrorHandler));
                 break;
         }
@@ -230,7 +247,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void selectTeam() {
-        if (gofer.hasPrivilegedRole()) chooseTeam();
+        if (game != null) showSnackbar(getString(R.string.game_event_team_change));
+        else if (gofer.hasPrivilegedRole()) chooseTeam();
         else if (!gofer.hasRole())
             showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));
     }

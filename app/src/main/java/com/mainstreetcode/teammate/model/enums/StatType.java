@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammate.model.enums;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
@@ -11,6 +13,7 @@ public class StatType extends MetaData {
 
     private String emoji;
     private String sportCode;
+    private StatAttributes attributes = new StatAttributes();
 
     StatType(String code, String name, String emoji, String sportCode) {
         super(code, name);
@@ -60,17 +63,23 @@ public class StatType extends MetaData {
 
         private static final String EMOJI_KEY = "emoji";
         private static final String SPORT = "sport";
+        private static final String ATTRIBUTES = "attributes";
 
         @Override
-        StatType fromJson(String code, String name, JsonObject body) {
+        StatType fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
             String emoji = ModelUtils.asString(EMOJI_KEY, body);
             String sportCode = ModelUtils.asString(SPORT, body);
-            return new StatType(code, name, emoji, sportCode);
+
+            StatType type = new StatType(code, name, emoji, sportCode);
+            ModelUtils.deserializeList(context, body.get(ATTRIBUTES), type.attributes, StatAttribute.class);
+            return type;
         }
 
         @Override
-        JsonObject toJson(JsonObject serialized, StatType src) {
+        JsonObject toJson(JsonObject serialized, StatType src, JsonSerializationContext context) {
             serialized.addProperty(EMOJI_KEY, src.emoji);
+            serialized.add(ATTRIBUTES, context.serialize(src.attributes));
+
             return serialized;
         }
     }

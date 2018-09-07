@@ -47,6 +47,7 @@ public class StandingRowViewHolder extends BaseViewHolder<BaseRecyclerViewAdapte
 
     public void bindColumns(List<String> columns) {
         int count = columns.size();
+        this.columns.setWeightSum(count);
         for (int i = 0; i < count; i++) getItem(i).setText(columns.get(i));
     }
 

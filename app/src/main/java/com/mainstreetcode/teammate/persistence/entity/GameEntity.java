@@ -11,10 +11,14 @@ import android.support.annotation.NonNull;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
@@ -24,6 +28,8 @@ import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
         foreignKeys = @ForeignKey(entity = TournamentEntity.class, parentColumns = "tournament_id", childColumns = "game_tournament", onDelete = CASCADE)
 )
 public class GameEntity implements Parcelable {
+
+    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("dd MMM", Locale.US);
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "game_id") protected String id;
@@ -85,6 +91,10 @@ public class GameEntity implements Parcelable {
         canDraw = in.readByte() != 0x00;
     }
 
+    public boolean hasValidRefType() {
+        return User.COMPETITOR_TYPE.equals(refPath) || Team.COMPETITOR_TYPE.equals(refPath);
+    }
+
     @NonNull
     public String getId() {
         return id;
@@ -96,6 +106,10 @@ public class GameEntity implements Parcelable {
 
     public String getRefPath() {
         return refPath;
+    }
+
+    public String getDate() {
+        return event.isEmpty() ? "" : prettyPrinter.format(event.startDate);
     }
 
     public Date getCreated() {

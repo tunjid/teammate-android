@@ -70,10 +70,10 @@
                     android:id="@+id/ended"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:padding="@dimen/sixteenth_margin"
                     android:text="@string/game_ended"
                     android:textColor="@color/white"
-                    android:gravity="center"
                     android:textSize="@dimen/small_text"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -109,6 +109,18 @@
                     app:layout_constraintLeft_toRightOf="@+id/score"
                     app:layout_constraintRight_toRightOf="parent"
                     tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
+
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/game_ended"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintLeft_toRightOf="@id/home_thumbnail"
+                    app:layout_constraintRight_toLeftOf="@id/away_thumbnail"
+                    app:layout_constraintTop_toTopOf="@id/home_thumbnail"
+                    tools:text="hi" />
             </android.support.constraint.ConstraintLayout>
 
             <android.support.v7.widget.Toolbar

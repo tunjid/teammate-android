@@ -65,7 +65,7 @@ public class MetaData {
             String code = ModelUtils.asString(CODE_KEY, baseEnumJson);
             String name = ModelUtils.asString(NAME_KEY, baseEnumJson);
 
-            return fromJson(code, name, baseEnumJson);
+            return fromJson(code, name, baseEnumJson, context);
         }
 
         @Override
@@ -75,12 +75,12 @@ public class MetaData {
             serialized.addProperty(CODE_KEY, src.code);
             serialized.addProperty(NAME_KEY, src.name);
 
-            return toJson(serialized, src);
+            return toJson(serialized, src, context);
         }
 
-        abstract T fromJson(String code, String name, JsonObject body);
+        abstract T fromJson(String code, String name, JsonObject body, JsonDeserializationContext context);
 
-        JsonObject toJson(JsonObject serialized, T src) {
+        JsonObject toJson(JsonObject serialized, T src, JsonSerializationContext context) {
             return serialized;
         }
     }

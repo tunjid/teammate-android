@@ -207,6 +207,7 @@
     <string name="competitor">Competitors</string>
 
     <!--GameFragment-->
+    <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
     <string name="game_stats">Game stats</string>
     <string name="game_end">End game</string>
