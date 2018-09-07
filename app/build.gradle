@@ -91,6 +91,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.1.1"
     implementation "android.arch.persistence.room:runtime:1.1.1-rc1"
     implementation "android.arch.persistence.room:rxjava2:1.1.0"
+    implementation 'com.google.android:flexbox:0.3.2'
 
     implementation('com.google.android.gms:play-services-places:15.0.0') {
         exclude module: 'support-media-compat'
