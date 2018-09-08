@@ -19,6 +19,7 @@ import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static com.mainstreetcode.teammate.util.ModelUtils.parse;
+import static com.mainstreetcode.teammate.util.ModelUtils.parseBoolean;
 import static com.mainstreetcode.teammate.util.ModelUtils.processString;
 
 
@@ -172,8 +173,8 @@ public class TournamentEntity implements Parcelable {
         this.numLegs = parse(numLegs);
     }
 
-    protected void setNumRounds(String numRounds) {
-        this.numRounds = parse(numRounds);
+    protected void setSingleFinal(String singleFinal) {
+        this.singleFinal = parseBoolean(singleFinal);
     }
 
     @Override

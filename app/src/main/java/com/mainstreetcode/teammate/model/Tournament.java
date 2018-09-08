@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
@@ -73,7 +74,7 @@ public class Tournament extends TournamentEntity
                 Item.text(holder.get(3), 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::getCode, this::setStyle, this)
                         .textTransformer(value -> Config.tournamentStyleFromCode(value.toString()).getName()),
                 Item.number(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, () -> String.valueOf(numLegs), this::setNumLegs, this),
-                Item.number(holder.get(5), 5, Item.NUMBER, R.string.tournament_round, () -> String.valueOf(numRounds), this::setNumRounds, this)
+                Item.number(holder.get(5), 5, Item.INFO, R.string.tournament_single_final, () -> App.getInstance().getString(singleFinal ? R.string.yes : R.string.no), this::setSingleFinal, this)
         );
     }
 

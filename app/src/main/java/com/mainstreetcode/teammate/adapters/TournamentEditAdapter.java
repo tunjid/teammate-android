@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.arch.core.util.Function;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
@@ -19,6 +20,7 @@ import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.FALSE;
@@ -52,9 +54,12 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getTournamentTypes(), TournamentType::getName, TournamentType::getCode, adapterListener::canEditBeforeCreation, FALSE);
             case Item.TOURNAMENT_STYLE:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getTournamentStyles(), TournamentStyle::getName, TournamentStyle::getCode, adapterListener::canEditBeforeCreation, FALSE);
+            case Item.INFO:
+                Resources resources = viewGroup.getResources();
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_single_final, Arrays.asList(true, false), flag -> resources.getString(flag ? R.string.yes : R.string.no), String::valueOf, adapterListener::canEditBeforeCreation, FALSE);
             case TOURNAMENT:
                 return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), new BaseRecyclerViewAdapter.AdapterListener() {});
-                default:
+            default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }

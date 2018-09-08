@@ -167,6 +167,13 @@ public class ModelUtils {
         return 0;
     }
 
+    public static boolean parseBoolean(String number) {
+        if (TextUtils.isEmpty(number)) return false;
+        try { return Boolean.valueOf(number); }
+        catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
+        return false;
+    }
+
     public static boolean areNotEmpty(CharSequence... values) {
         for (CharSequence value : values) if (TextUtils.isEmpty(value)) return false;
         return true;
