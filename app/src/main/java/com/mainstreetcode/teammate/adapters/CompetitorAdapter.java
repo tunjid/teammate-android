@@ -29,7 +29,7 @@ public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHol
     @NonNull
     @Override
     public CompetitorViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        return new CompetitorViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
+        return new CompetitorViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener);
     }
 
     @Override

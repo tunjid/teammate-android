@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter;
@@ -33,7 +32,6 @@ public final class CompetitorsFragment extends MainActivityFragment
 
     private static final String ARG_TOURNAMENT = "tournament";
 
-    private boolean isEditing = true;
     private Tournament tournament;
     private List<Competitor> items;
     private Set<Model> set = new HashSet<>();
@@ -70,7 +68,6 @@ public final class CompetitorsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
-        CheckBox editing = rootView.findViewById(R.id.editing);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
@@ -78,15 +75,12 @@ public final class CompetitorsFragment extends MainActivityFragment
                 .withAdapter(new CompetitorAdapter(items, new BaseRecyclerViewAdapter.AdapterListener() {}))
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder()
+                        .setLongPressDragEnabledSupplier(() -> true)
                         .setListSupplier(() -> items)
                         .build())
                 .build();
 
-        editing.setChecked(isEditing);
-        editing.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            isEditing = isChecked;
-            togglePersistentUi();
-        });
+        rootView.findViewById(R.id.add_competitor).setOnClickListener(view -> findCompetitor());
 
         return rootView;
     }
@@ -101,7 +95,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     public void togglePersistentUi() {
         super.togglePersistentUi();
         setFabClickListener(this);
-        setFabIcon(isEditing ? R.drawable.ic_add_white_24dp : R.drawable.ic_check_white_24dp);
+        setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.add_tournament_competitors));
     }
 
@@ -120,8 +114,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
-                if (isEditing) findCompetitor();
-                else addCompetitors();
+                addCompetitors();
                 break;
         }
     }
@@ -147,7 +140,8 @@ public final class CompetitorsFragment extends MainActivityFragment
         set.add(item);
         items.add(Competitor.empty(item));
         scrollManager.notifyDataSetChanged();
-        hideBottomSheet();
+        scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
+        hideKeyboard();
     }
 
     private void addCompetitors() {

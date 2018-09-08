@@ -23,10 +23,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editing" />
+        app:layout_constraintTop_toBottomOf="@+id/add_competitor" />
 
-    <CheckBox
-        android:id="@+id/editing"
+    <TextView
+        android:id="@+id/add_competitor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/single_margin"
@@ -42,9 +42,10 @@
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
         android:paddingTop="@dimen/half_margin"
-        android:text="@string/editing_competitors"
+        android:text="@string/add_competitor"
         android:textColor="@color/white"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spacer_toolbar" />
 
     <include

@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
@@ -71,7 +74,8 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new TournamentEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withLinearLayoutManager()
+                .onLayoutManager(this::setSpanSizeLookUp)
+                .withGridLayoutManager(2)
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -197,5 +201,14 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
 
     private void promptForCompetitors() {
         showSnackbar(getString(R.string.add_tournament_competitors_prompt), R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament)));
+    }
+
+    private void setSpanSizeLookUp(RecyclerView.LayoutManager layoutManager) {
+        ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return gofer.getItems().get(position) instanceof Competitor ? 1 : 2;
+            }
+        });
     }
 }
