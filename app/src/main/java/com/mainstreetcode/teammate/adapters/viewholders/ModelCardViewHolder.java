@@ -36,17 +36,11 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
         this.model = model;
         String imageUrl = model.getImageUrl();
 
-        if (TextUtils.isEmpty(imageUrl)) {
-            thumbnail.setImageResource(R.color.dark_grey);
-            return;
-        }
-
-        load(imageUrl, thumbnail);
+        if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey);
+        else load(imageUrl, thumbnail);
     }
 
-    public ImageView getThumbnail() {
-        return thumbnail;
-    }
+    public ImageView getThumbnail() { return thumbnail; }
 
     public boolean isThumbnail() {return true;}
 
