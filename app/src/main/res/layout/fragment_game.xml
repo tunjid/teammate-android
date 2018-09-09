@@ -113,8 +113,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/half_margin"
-                    android:drawableStart="@drawable/ic_event_white_24dp"
-                    android:text="@string/game_event"
                     android:textColor="@color/white"
                     android:textSize="@dimen/small_text"
                     app:layout_constraintLeft_toRightOf="@id/home_thumbnail"

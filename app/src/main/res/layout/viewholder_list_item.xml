@@ -9,7 +9,7 @@
     android:layout_marginLeft="@dimen/single_margin"
     android:layout_marginRight="@dimen/single_margin"
     android:layout_marginTop="@dimen/half_margin"
-    app:cardCornerRadius="@dimen/half_margin">
+    app:cardCornerRadius="@dimen/quarter_margin">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

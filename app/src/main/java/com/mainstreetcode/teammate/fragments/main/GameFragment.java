@@ -110,6 +110,9 @@ public final class GameFragment extends MainActivityFragment {
             case R.id.action_end_game:
                 endGame();
                 return true;
+            case R.id.action_event:
+                showFragment(EventEditFragment.newInstance(game));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
