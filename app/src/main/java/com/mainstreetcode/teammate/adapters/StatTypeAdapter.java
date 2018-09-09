@@ -33,14 +33,11 @@ public class StatTypeAdapter extends BaseRecyclerViewAdapter<ChipViewHolder, Sta
         return adapterListener.getAttributes().size();
     }
 
-//    public void updateStatType(StatType statType) {
-//        this.statType.update(statType);
-//        notifyDataSetChanged();
-//    }
-
     public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
 
         List<StatAttribute> getAttributes();
+
+        boolean isEnabled();
 
         boolean isSelected(StatAttribute attribute);
 

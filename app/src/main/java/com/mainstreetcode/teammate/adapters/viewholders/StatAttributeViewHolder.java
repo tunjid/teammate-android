@@ -37,9 +37,10 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
             }
 
             @Override
-            public boolean isSelected(StatAttribute attribute) {
-                return stat.contains(attribute);
-            }
+            public boolean isEnabled() { return enabler.get(); }
+
+            @Override
+            public boolean isSelected(StatAttribute attribute) { return stat.contains(attribute); }
 
             @Override
             public void onAttributeTapped(StatAttribute attribute) {

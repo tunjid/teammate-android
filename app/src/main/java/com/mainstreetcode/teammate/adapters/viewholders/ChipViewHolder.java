@@ -21,6 +21,7 @@ public class ChipViewHolder extends BaseViewHolder<StatTypeAdapter.AdapterListen
     public void bind(StatAttribute attribute) {
         this.attribute = attribute;
         chip.setText(attribute.getName());
+        chip.setEnabled(adapterListener.isEnabled());
         chip.setChecked(adapterListener.isSelected(attribute));
     }
 }
