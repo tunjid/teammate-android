@@ -120,6 +120,8 @@ public class Item<T> implements Identifiable, Comparable<Item> {
 
     public CharSequence getValue() {return textTransformer == null ? value : textTransformer.apply(value);}
 
+    public String getRawValue() {return value.toString();}
+
     @Override
     public String getId() {return id;}
 

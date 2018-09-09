@@ -59,9 +59,9 @@ public class Stat extends StatEntity
     @Override
     public List<Item<Stat>> asItems() {
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
-                        .textTransformer(value -> Config.statTypeFromCode(value.toString()).getName()),
-                Item.number(holder.get(1), 1, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this)
+                Item.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this),
+                Item.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
+                        .textTransformer(value -> Config.statTypeFromCode(value.toString()).getName())
         );
     }
 

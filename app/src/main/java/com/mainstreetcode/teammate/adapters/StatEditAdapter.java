@@ -6,17 +6,15 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.StatAttributeViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.model.enums.Sport;
-import com.mainstreetcode.teammate.model.enums.StatType;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -49,7 +47,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case Item.STAT_TYPE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_stat, Config.getStatTypes(adapterListener.getSport()), StatType::getEmojiAndName, StatType::getCode, adapterListener::canChangeStat, FALSE);
+                return new StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup), R.string.choose_stat, adapterListener.getStat(), adapterListener::canChangeStat, FALSE);
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
             case TEAM:
@@ -89,6 +87,6 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
 
         boolean canChangeStat();
 
-        Sport getSport();
+        Stat getStat();
     }
 }

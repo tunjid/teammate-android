@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatAttribute;
 import com.mainstreetcode.teammate.model.enums.StatAttributes;
 import com.mainstreetcode.teammate.model.enums.StatType;
 
@@ -109,12 +110,19 @@ public class StatEntity implements Parcelable {
 
     public float getTime() { return time; }
 
+    public boolean contains(StatAttribute attribute) {return attributes.contains(attribute);}
+
     protected void setStatType(String statType) {
         this.statType = Config.statTypeFromCode(statType);
     }
 
     protected void setTime(String time) {
         this.time = parseFloat(time);
+    }
+
+    public void compoundAttribute(StatAttribute attribute) {
+        if (attributes.contains(attribute)) attributes.remove(attribute);
+        else attributes.add(attribute);
     }
 
     public boolean isHome() {

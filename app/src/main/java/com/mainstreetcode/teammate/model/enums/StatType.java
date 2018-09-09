@@ -36,6 +36,10 @@ public class StatType extends MetaData {
                 .build();
     }
 
+    public StatAttributes getAttributes() {
+        return attributes;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -45,6 +49,7 @@ public class StatType extends MetaData {
         super.update(updated);
         this.emoji = updated.emoji;
         this.sportCode = updated.sportCode;
+        ModelUtils.replaceList(attributes, updated.attributes);
     }
 
     @Override

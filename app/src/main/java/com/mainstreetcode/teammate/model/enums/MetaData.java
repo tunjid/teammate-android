@@ -9,12 +9,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class MetaData {
+public class MetaData implements Identifiable{
 
     String code;
     String name;
@@ -27,6 +28,9 @@ public class MetaData {
     public boolean isInvalid() {
         return TextUtils.isEmpty(code);
     }
+
+    @Override
+    public String getId() { return code; }
 
     public CharSequence getName() { return name; }
 
