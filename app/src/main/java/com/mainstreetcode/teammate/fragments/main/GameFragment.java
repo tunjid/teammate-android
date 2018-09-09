@@ -88,6 +88,8 @@ public final class GameFragment extends MainActivityFragment {
 
         scrollManager.setViewHolderColor(R.color.dark_grey);
 
+        rootView.findViewById(R.id.date).setOnClickListener(view -> showFragment(EventEditFragment.newInstance(game)));
+
         return rootView;
     }
 

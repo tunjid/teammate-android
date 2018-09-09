@@ -47,7 +47,6 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         Competitor away = model.getAway();
         Competitor winner = model.getWinner();
 
-        date.setText(model.getDate());
         score.setText(model.getScore());
         homeText.setText(home.getName());
         awayText.setText(away.getName());
@@ -55,8 +54,11 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         homeText.setTypeface(homeText.getTypeface(), home.equals(winner) ? Typeface.BOLD : Typeface.NORMAL);
         awayText.setTypeface(awayText.getTypeface(), away.equals(winner) ? Typeface.BOLD : Typeface.NORMAL);
 
+        String eventDate = model.getDate();
         String homeUrl = home.getImageUrl();
         String awayUrl = away.getImageUrl();
+
+        if (!TextUtils.isEmpty(eventDate)) date.setText(eventDate);
 
         if (TextUtils.isEmpty(homeUrl)) homeThumbnail.setImageResource(R.color.dark_grey);
         else Picasso.with(itemView.getContext()).load(homeUrl)

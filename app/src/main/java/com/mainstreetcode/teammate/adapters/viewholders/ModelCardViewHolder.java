@@ -47,8 +47,10 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
     void load(String imageUrl, ImageView destination) {
         RequestCreator creator = Picasso.with(itemView.getContext()).load(imageUrl);
 
-        if (isThumbnail()) creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside();
-        else creator.fit().centerCrop();
+        if (!isThumbnail()) creator.fit().centerCrop();
+        else creator.placeholder(R.drawable.bg_image_placeholder)
+                .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
+                .centerInside();
 
         creator.into(destination);
     }
