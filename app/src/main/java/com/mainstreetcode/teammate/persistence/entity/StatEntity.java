@@ -114,6 +114,7 @@ public class StatEntity implements Parcelable {
 
     protected void setStatType(String statType) {
         this.statType = Config.statTypeFromCode(statType);
+        attributes.clear();
     }
 
     protected void setTime(String time) {

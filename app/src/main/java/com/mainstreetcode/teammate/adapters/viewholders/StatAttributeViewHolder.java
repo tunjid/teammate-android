@@ -20,6 +20,7 @@ import java.util.List;
 public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
 
     private final StatTypeAdapter adapter;
+    private final StatType statType = StatType.empty();
 
     public StatAttributeViewHolder(View itemView,
                                    int titleRes,
@@ -30,6 +31,11 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
         super(itemView, titleRes, Config.getStatTypes(stat.getSport()), StatType::getEmojiAndName, StatType::getCode, enabler, errorChecker);
 
         adapter = new StatTypeAdapter(new StatTypeAdapter.AdapterListener() {
+            @Override
+            public List<StatAttribute> getAttributes() {
+                return enabler.get() ? statType.getAttributes() : stat.getAttributes();
+            }
+
             @Override
             public boolean isSelected(StatAttribute attribute) {
                 return stat.contains(attribute);
@@ -56,12 +62,14 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
     @Override
     public void bind(Item item) {
         super.bind(item);
-        adapter.updateStatType(Config.statTypeFromCode(item.getRawValue()));
+        statType.update(Config.statTypeFromCode(item.getRawValue()));
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onItemSelected(List<CharSequence> sequences, int position, StatType type) {
         super.onItemSelected(sequences, position, type);
-        adapter.updateStatType(type);
+        statType.update(type);
+        adapter.notifyDataSetChanged();
     }
 }

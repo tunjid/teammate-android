@@ -6,13 +6,12 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChipViewHolder;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
-import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
-public class StatTypeAdapter extends BaseRecyclerViewAdapter<ChipViewHolder, StatTypeAdapter.AdapterListener> {
+import java.util.List;
 
-    private StatType statType = StatType.empty();
+public class StatTypeAdapter extends BaseRecyclerViewAdapter<ChipViewHolder, StatTypeAdapter.AdapterListener> {
 
     public StatTypeAdapter(AdapterListener adapterListener) {
         super(adapterListener);
@@ -26,20 +25,23 @@ public class StatTypeAdapter extends BaseRecyclerViewAdapter<ChipViewHolder, Sta
 
     @Override
     public void onBindViewHolder(@NonNull ChipViewHolder chipViewHolder, int i) {
-        chipViewHolder.bind(statType.getAttributes().get(i));
+        chipViewHolder.bind(adapterListener.getAttributes().get(i));
     }
 
     @Override
     public int getItemCount() {
-        return statType.getAttributes().size();
+        return adapterListener.getAttributes().size();
     }
 
-    public void updateStatType(StatType statType) {
-        this.statType.update(statType);
-        notifyDataSetChanged();
-    }
+//    public void updateStatType(StatType statType) {
+//        this.statType.update(statType);
+//        notifyDataSetChanged();
+//    }
 
     public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+
+        List<StatAttribute> getAttributes();
+
         boolean isSelected(StatAttribute attribute);
 
         void onAttributeTapped(StatAttribute attribute);

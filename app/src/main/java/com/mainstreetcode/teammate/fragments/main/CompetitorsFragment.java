@@ -131,7 +131,6 @@ public final class CompetitorsFragment extends MainActivityFragment
 
         showBottomSheet(BottomSheetController.Args.builder()
                 .setMenuRes(R.menu.empty)
-                .setTitle(getString(R.string.add_competitor))
                 .setFragment(fragment)
                 .build());
     }

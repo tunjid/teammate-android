@@ -22,7 +22,7 @@ public class StatType extends MetaData {
     }
 
     public static StatType empty() {
-        return new StatType("", "","", "");
+        return new StatType("", "", "", "");
     }
 
     public String getSportCode() { return sportCode; }
@@ -38,6 +38,11 @@ public class StatType extends MetaData {
 
     public StatAttributes getAttributes() {
         return attributes;
+    }
+
+    public StatAttribute fromCode(String code) {
+        for (StatAttribute attribute : attributes) if (attribute.code.equals(code)) return attribute;
+        return StatAttribute.empty();
     }
 
     @Override
@@ -57,7 +62,8 @@ public class StatType extends MetaData {
         if (this == o) return true;
         if (!(o instanceof StatType)) return false;
         StatType variant = (StatType) o;
-        return Objects.equals(code, variant.code) && Objects.equals(name, variant.name);    }
+        return Objects.equals(code, variant.code) && Objects.equals(name, variant.name);
+    }
 
     @Override
     public int hashCode() {
