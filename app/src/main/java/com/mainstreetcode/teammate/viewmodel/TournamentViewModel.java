@@ -82,11 +82,10 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
                 .observeOn(mainThread()).map(getStandings(tournament)::update).toCompletable();
     }
 
-    public Maybe<Boolean> onWinnerChanged(Tournament tournament) {
-        boolean hasWinner = tournament.hasWinner();
-        if (tournament.isEmpty() || hasWinner) return Maybe.empty();
+    public Maybe<Boolean> checkForWinner(Tournament tournament) {
+        if (tournament.isEmpty()) return Maybe.empty();
         return repository.get(tournament).lastElement()
-                .map(TournamentEntity::hasWinner).filter(value -> value).observeOn(mainThread());
+                .map(TournamentEntity::hasWinner).observeOn(mainThread());
     }
 
     public Single<Tournament> delete(final Tournament tournament) {

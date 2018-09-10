@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
+import com.mainstreetcode.teammate.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
@@ -58,8 +59,8 @@ public final class TeamSearchFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new TeamAdapter(teams, this))
-                .withStaggeredGridLayoutManager(2)
+                .withAdapter(new TeamSearchAdapter(teams, this))
+                .withGridLayoutManager(2)
                 .build();
 
         searchView.setOnQueryTextListener(this);

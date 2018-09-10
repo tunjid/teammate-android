@@ -296,7 +296,7 @@ public class ScrollManager {
 
                 scrollListeners.add(new OnScrollListener() {
                     @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                         if (biConsumer == null) return;
                         try { biConsumer.accept(dx, dy);}
                         catch (Exception e) {
@@ -305,7 +305,7 @@ public class ScrollManager {
                     }
 
                     @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                         if (consumer == null) return;
                         try { consumer.accept(newState);}
                         catch (Exception e) {
@@ -340,27 +340,37 @@ public class ScrollManager {
         ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
 
             @Override
-            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            public boolean isLongPressDragEnabled() {
+                return options.longPressDragEnabledSupplier.get();
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return options.itemViewSwipeSupplier.get();
+            }
+
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 try { return options.movementFlagsSupplier.apply(viewHolder); }
                 catch (Exception e) { e.printStackTrace(); }
                 return defaultMovements();
             }
 
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 int from = viewHolder.getAdapterPosition();
                 int to = target.getAdapterPosition();
-                List mItems = options.listSupplier.get();
+                List items = options.listSupplier.get();
 
-                if (from < to) for (int i = from; i < to; i++) Collections.swap(mItems, i, i + 1);
-                else for (int i = from; i > to; i--) Collections.swap(mItems, i, i - 1);
+                if (from < to) for (int i = from; i < to; i++) Collections.swap(items, i, i + 1);
+                else for (int i = from; i > to; i--) Collections.swap(items, i, i - 1);
 
                 scrollManager.notifyItemMoved(from, to);
                 return true;
             }
 
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 options.listSupplier.get().remove(position);
                 scrollManager.notifyItemRemoved(position);

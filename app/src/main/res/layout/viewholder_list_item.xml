@@ -70,7 +70,7 @@
             app:autoSizeMinTextSize="@dimen/tiny_text"
             app:autoSizeTextType="uniform"
             app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintRight_toRightOf="parent"

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -108,7 +109,7 @@ public final class GameFragment extends MainActivityFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_end_game:
-                endGame();
+                endGameRequest();
                 return true;
             case R.id.action_event:
                 showFragment(EventEditFragment.newInstance(game));
@@ -143,9 +144,15 @@ public final class GameFragment extends MainActivityFragment {
         if (v.getId() == R.id.fab) showFragment(StatEditFragment.newInstance(Stat.empty(game)));
     }
 
-    private void endGame() {
-        toggleProgress(true);
-        disposables.add(gameViewModel.endGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+    private void endGameRequest() {
+        new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.game_end_request)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    toggleProgress(true);
+                    disposables.add(gameViewModel.endGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void fetchGame() {

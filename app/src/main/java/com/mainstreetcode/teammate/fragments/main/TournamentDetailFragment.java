@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentRoundAdapter;
@@ -24,6 +25,7 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 import static android.support.design.widget.TabLayout.MODE_FIXED;
@@ -113,7 +115,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         User user = userViewModel.getCurrentUser();
         Team team = tournament.getHost();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::togglePersistentUi, emptyErrorHandler));
-        disposables.add(tournamentViewModel.onWinnerChanged(tournament).subscribe(changed -> setUpWinner(getView()), defaultErrorHandler));
+        disposables.add(tournamentViewModel.checkForWinner(tournament).subscribe(changed -> setUpWinner(getView()), defaultErrorHandler));
     }
 
     @Override
@@ -157,5 +159,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
 
         winnerText.setVisibility(View.VISIBLE);
         itemView.setVisibility(View.VISIBLE);
+
+        root.<TextView>findViewById(R.id.winner).setText(ModelUtils.processString(getString(R.string.tournament_winner)));
     }
 }

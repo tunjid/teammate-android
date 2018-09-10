@@ -28,6 +28,7 @@ import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
@@ -75,7 +76,9 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_EVENT));
+        Bundle args = getArguments();
+        Model model = args.getParcelable(args.containsKey(ARG_EVENT) ? ARG_EVENT : ARG_GAME);
+        return Gofer.tag(super.getStableTag(), model);
     }
 
     @Override
@@ -225,7 +228,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
                     if (game != null) {
                         toggleProgress(true);
                         disposables.add(gameViewModel.updateGame(game).subscribe(requireActivity()::onBackPressed, defaultErrorHandler));
-                    };
+                    }
                 }, defaultErrorHandler));
                 break;
         }

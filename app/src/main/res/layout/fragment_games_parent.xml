@@ -48,7 +48,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/single_margin"
-        android:text="@string/tournament_winner"
         android:textStyle="bold"
         android:textColor="@color/black"
         android:visibility="gone"
