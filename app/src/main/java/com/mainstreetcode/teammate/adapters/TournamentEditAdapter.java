@@ -58,7 +58,7 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
                 Resources resources = viewGroup.getResources();
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_single_final, Arrays.asList(true, false), flag -> resources.getString(flag ? R.string.yes : R.string.no), String::valueOf, adapterListener::canEditBeforeCreation, FALSE);
             case TOURNAMENT:
-                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), new BaseRecyclerViewAdapter.AdapterListener() {});
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), viewHolder -> {});
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

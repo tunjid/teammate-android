@@ -34,6 +34,7 @@ public class ScrollManager {
 
     @Nullable private EndlessScroller scroller;
     @Nullable private EmptyViewHolder viewHolder;
+    @Nullable private ItemTouchHelper touchHelper;
     @Nullable private SwipeRefreshLayout refreshLayout;
 
     private RecyclerView recyclerView;
@@ -42,7 +43,7 @@ public class ScrollManager {
     private ScrollManager(@Nullable EndlessScroller scroller,
                           @Nullable EmptyViewHolder viewHolder,
                           @Nullable SwipeRefreshLayout refreshLayout,
-                          @Nullable SwipeDragOptions swipeDragOptions,
+                          @Nullable SwipeDragOptions options,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
                           List<OnScrollListener> listeners) {
 
@@ -57,7 +58,8 @@ public class ScrollManager {
         recyclerView.setAdapter(adapter);
 
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
-        if (swipeDragOptions != null) fromSwipeDragOptions(this, swipeDragOptions);
+        if (options != null) touchHelper = fromSwipeDragOptions(this, options);
+        if(touchHelper!=null)touchHelper.attachToRecyclerView(recyclerView);
         for (OnScrollListener listener : listeners) recyclerView.addOnScrollListener(listener);
     }
 
@@ -115,9 +117,11 @@ public class ScrollManager {
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
-    public void setRefreshing() {
-        if (refreshLayout != null) refreshLayout.setRefreshing(true);
+    public void startDrag(RecyclerView.ViewHolder viewHolder) {
+        if (touchHelper != null) touchHelper.startDrag(viewHolder);
     }
+
+    public void setRefreshing() { if (refreshLayout != null) refreshLayout.setRefreshing(true); }
 
     public void reset() {
         if (scroller != null) scroller.reset();
@@ -336,17 +340,14 @@ public class ScrollManager {
         }
     }
 
-    private static void fromSwipeDragOptions(ScrollManager scrollManager, SwipeDragOptions options) {
-        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+    private static ItemTouchHelper fromSwipeDragOptions(ScrollManager scrollManager, SwipeDragOptions options) {
+        return new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            @Override
+            public boolean isItemViewSwipeEnabled() { return options.itemViewSwipeSupplier.get(); }
 
             @Override
             public boolean isLongPressDragEnabled() {
                 return options.longPressDragEnabledSupplier.get();
-            }
-
-            @Override
-            public boolean isItemViewSwipeEnabled() {
-                return options.itemViewSwipeSupplier.get();
             }
 
             @Override
@@ -376,8 +377,6 @@ public class ScrollManager {
                 scrollManager.notifyItemRemoved(position);
             }
         });
-
-        helper.attachToRecyclerView(scrollManager.recyclerView);
     }
 
     public static class SwipeDragOptionsBuilder {

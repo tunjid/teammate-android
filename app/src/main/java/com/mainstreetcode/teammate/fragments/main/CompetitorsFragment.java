@@ -20,7 +20,6 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -71,11 +70,11 @@ public final class CompetitorsFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
+                .withAdapter(new CompetitorAdapter(items, viewHolder -> scrollManager.startDrag(viewHolder)))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new CompetitorAdapter(items, new BaseRecyclerViewAdapter.AdapterListener() {}))
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder()
-                        .setLongPressDragEnabledSupplier(() -> true)
+                        .setLongPressDragEnabledSupplier(() -> false)
                         .setListSupplier(() -> items)
                         .build())
                 .build();

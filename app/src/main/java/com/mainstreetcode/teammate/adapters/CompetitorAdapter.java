@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -16,11 +17,11 @@ import java.util.List;
  * Adapter for {@link Event}
  */
 
-public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHolder, CompetitorAdapter.AdapterListener> {
 
     private final List<Competitor> items;
 
-    public CompetitorAdapter(List<Competitor> items, BaseRecyclerViewAdapter.AdapterListener listener) {
+    public CompetitorAdapter(List<Competitor> items, CompetitorAdapter.AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -48,4 +49,7 @@ public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHol
         return items.get(position).getEntity().hashCode();
     }
 
+    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+        void onDragStarted(RecyclerView.ViewHolder viewHolder);
+    }
 }
