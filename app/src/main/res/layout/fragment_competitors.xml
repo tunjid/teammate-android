@@ -37,6 +37,7 @@
         android:backgroundTint="@color/colorAccent"
         android:buttonTint="@color/white"
         android:drawablePadding="@dimen/single_margin"
+        android:drawableStart="@drawable/ic_add_white_24dp"
         android:gravity="center"
         android:paddingBottom="@dimen/half_margin"
         android:paddingLeft="@dimen/single_margin"
