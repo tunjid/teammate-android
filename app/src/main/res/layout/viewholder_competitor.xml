@@ -74,19 +74,12 @@
             android:ellipsize="end"
             android:gravity="start|bottom"
             android:maxLines="1"
-            android:paddingBottom="@dimen/half_margin"
-            android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
-            android:paddingTop="@dimen/quarter_margin"
+            android:paddingLeft="@dimen/quarter_margin"
+            android:paddingRight="@dimen/quarter_margin"
             android:textColor="@color/dark_grey"
-            app:autoSizeMinTextSize="@dimen/tiny_text"
-            app:autoSizeTextType="uniform"
             app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
-            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_title"
-            tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
+            app:layout_constraintTop_toTopOf="@+id/item_title"
+            tools:text="1" />
     </android.support.constraint.ConstraintLayout>
 </android.support.design.card.MaterialCardView>

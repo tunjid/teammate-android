@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.model.Team;
 /**
  * Viewholder for a {@link Team}
  */
-public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, CompetitorAdapter.AdapterListener>{
+public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, CompetitorAdapter.AdapterListener> {
 
     private View dragHandle;
 
@@ -29,7 +29,9 @@ public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, Compet
 
     public void bind(Competitor model) {
         super.bind(model);
+        if (model.isEmpty()) model.setSeed(getAdapterPosition() + 1);
         title.setText(model.getName());
+        subtitle.setText(model.getSeedText());
         dragHandle.setVisibility(model.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }

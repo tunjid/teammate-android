@@ -27,15 +27,15 @@ public class Competitor extends CompetitorEntity
         Model<Competitor> {
 
     public static Competitor empty() {
-        return new Competitor("", "", "", new EmptyCompetitor(), new Date());
+        return new Competitor("", "", "", new EmptyCompetitor(), new Date(), -1);
     }
 
     public static Competitor empty(Competitive entity) {
-        return new Competitor("", "", "", entity, new Date());
+        return new Competitor("", "", "", entity, new Date(), -1);
     }
 
-    public Competitor(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created) {
-        super(id, refPath, tournamentId, entity, created);
+    public Competitor(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created, int seed) {
+        super(id, refPath, tournamentId, entity, created, seed);
     }
 
     protected Competitor(Parcel in) {
@@ -120,6 +120,7 @@ public class Competitor extends CompetitorEntity
         private static final String ENTITY = "entity";
         private static final String TOURNAMENT = "tournament";
         private static final String CREATED = "created";
+        private static final String SEED = "seed";
 
         @Override
         public JsonElement serialize(Competitor src, Type typeOfSrc, JsonSerializationContext context) {
@@ -130,11 +131,12 @@ public class Competitor extends CompetitorEntity
         public Competitor deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
             if (json.isJsonPrimitive()) {
-                return new Competitor(json.getAsString(), "", "", new EmptyCompetitor(), new Date());
+                return new Competitor(json.getAsString(), "", "", new EmptyCompetitor(), new Date(), -1);
             }
 
             JsonObject jsonObject = json.getAsJsonObject();
 
+            int seed = (int)ModelUtils.asFloat(SEED, jsonObject);
             String id = ModelUtils.asString(ID, jsonObject);
             String refPath = ModelUtils.asString(REF_PATH, jsonObject);
             String tournament = ModelUtils.asString(TOURNAMENT, jsonObject);
@@ -142,7 +144,7 @@ public class Competitor extends CompetitorEntity
             Competitive competitive = context.deserialize(jsonObject.get(ENTITY),
                     User.COMPETITOR_TYPE.equals(refPath) ? User.class : Team.class);
 
-            return new Competitor(id, refPath, tournament, competitive, ModelUtils.parseDate(created));
+            return new Competitor(id, refPath, tournament, competitive, ModelUtils.parseDate(created), seed);
         }
     }
 }

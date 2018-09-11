@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "a5d0c03d3689e7582f9375cbc8e1a2bc",
+    "identityHash": "0d1b6f5b42164436f9045171749b2d2a",
     "entities": [
       {
         "tableName": "users",
@@ -593,7 +593,7 @@
       },
       {
         "tableName": "competitors",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`competitor_id` TEXT NOT NULL, `competitor_ref_path` TEXT, `competitor_tournament_id` TEXT, `competitor_entity_id` TEXT, `competitor_created` INTEGER, PRIMARY KEY(`competitor_id`), FOREIGN KEY(`competitor_tournament_id`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`competitor_id` TEXT NOT NULL, `competitor_ref_path` TEXT, `competitor_tournament_id` TEXT, `competitor_entity_id` TEXT, `competitor_created` INTEGER, `competitor_seed` INTEGER NOT NULL, PRIMARY KEY(`competitor_id`), FOREIGN KEY(`competitor_tournament_id`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -624,6 +624,12 @@
             "columnName": "competitor_created",
             "affinity": "INTEGER",
             "notNull": false
+          },
+          {
+            "fieldPath": "seed",
+            "columnName": "competitor_seed",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -1021,7 +1027,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a5d0c03d3689e7582f9375cbc8e1a2bc\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"0d1b6f5b42164436f9045171749b2d2a\")"
     ]
   }
 }

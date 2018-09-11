@@ -62,6 +62,7 @@ public class Migration3To4 extends Migration {
                 "`competitor_tournament_id` TEXT, " +
                 "`competitor_entity_id` TEXT, " +
                 "`competitor_created` INTEGER, " +
+                "`competitor_seed` INTEGER, " +
                 "PRIMARY KEY(`competitor_id`), " +
                 "FOREIGN KEY(`competitor_tournament_id`) " +
                 "REFERENCES `tournaments`(`tournament_id`) " +

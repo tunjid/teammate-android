@@ -29,7 +29,7 @@ import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 )
 public class GameEntity implements Parcelable {
 
-    public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("dd MMM", Locale.US);
+    private static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("dd MMM", Locale.US);
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "game_id") protected String id;

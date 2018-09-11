@@ -32,13 +32,15 @@ public class CompetitorEntity implements Parcelable {
     @ColumnInfo(name = "competitor_tournament_id") protected String tournamentId;
     @ColumnInfo(name = "competitor_entity_id") protected Competitive entity;
     @ColumnInfo(name = "competitor_created") protected Date created;
+    @ColumnInfo(name = "competitor_seed") protected int seed;
 
-    public CompetitorEntity(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created) {
+    public CompetitorEntity(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created, int seed) {
         this.id = id;
         this.refPath = refPath;
         this.tournamentId = tournamentId;
         this.entity = entity;
         this.created = created;
+        this.seed = seed;
     }
 
     protected CompetitorEntity(Parcel in) {
@@ -47,17 +49,24 @@ public class CompetitorEntity implements Parcelable {
         tournamentId = in.readString();
         entity = fromParcel(refPath, in);
         created = new Date(in.readLong());
+        seed = in.readInt();
     }
 
     public String getId() { return id; }
 
     public String getRefPath() { return refPath; }
 
+    public String getSeedText() {return seed > 0 ? String.valueOf(seed) : "";}
+
     public String getTournamentId() { return tournamentId; }
 
     public Competitive getEntity() { return entity; }
 
     public Date getCreated() { return created; }
+
+    public int getSeed() { return seed; }
+
+    public void setSeed(int seed) { this.seed = seed; }
 
     private static Competitive fromParcel(String refPath, Parcel in) {
         switch (refPath) {
@@ -101,6 +110,7 @@ public class CompetitorEntity implements Parcelable {
         dest.writeString(tournamentId);
         writeToParcel(entity, dest);
         dest.writeLong(created.getTime());
+        dest.writeInt(seed);
     }
 
     public static final Creator<CompetitorEntity> CREATOR = new Creator<CompetitorEntity>() {
