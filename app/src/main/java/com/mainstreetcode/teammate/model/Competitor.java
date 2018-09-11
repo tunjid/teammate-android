@@ -13,6 +13,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -46,6 +47,12 @@ public class Competitor extends CompetitorEntity
         return getRefType().equals(other.getRefType());
     }
 
+    public Tournament getTournament() {
+        return new Tournament(tournamentId, Config.getDefaultTournamentLogo(), "", "", "", new Date(), Team.empty(), Sport.empty(),
+                Config.tournamentTypeFromCode(""), Config.tournamentStyleFromCode(""), Competitor.empty(),
+                1, 1, 0, 0, false);
+    }
+
     @Override
     public boolean hasMajorFields() {
         return areNotEmpty(id, refPath);
@@ -65,7 +72,8 @@ public class Competitor extends CompetitorEntity
     public void update(Competitor updated) {
         Competitive other = updated.entity;
         if (entity instanceof User && other instanceof User) ((User) entity).update(((User) other));
-        if (entity instanceof Team && other instanceof Team) ((Team) entity).update(((Team) other));
+        else if (entity instanceof Team && other instanceof Team)
+            ((Team) entity).update(((Team) other));
         else entity = updated.entity;
     }
 
@@ -136,7 +144,7 @@ public class Competitor extends CompetitorEntity
 
             JsonObject jsonObject = json.getAsJsonObject();
 
-            int seed = (int)ModelUtils.asFloat(SEED, jsonObject);
+            int seed = (int) ModelUtils.asFloat(SEED, jsonObject);
             String id = ModelUtils.asString(ID, jsonObject);
             String refPath = ModelUtils.asString(REF_PATH, jsonObject);
             String tournament = ModelUtils.asString(TOURNAMENT, jsonObject);

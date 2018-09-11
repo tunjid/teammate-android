@@ -234,7 +234,11 @@ public class Tournament extends TournamentEntity
             TournamentType type = Config.tournamentTypeFromCode(typeCode);
             TournamentStyle style = Config.tournamentStyleFromCode(styleCode);
 
-            Competitor winner = body.has(WINNER) ? context.deserialize(body.get(WINNER), Competitor.class) : Competitor.empty();
+            JsonObject winnerObject = body.has(WINNER) && body.get(WINNER).isJsonObject()
+                    ? body.get(WINNER).getAsJsonObject() : null;
+
+            if (winnerObject != null) winnerObject.addProperty("tournament", id);
+            Competitor winner = winnerObject != null ? context.deserialize(winnerObject, Competitor.class) : Competitor.empty();
 
             if (host == null) host = Team.empty();
 

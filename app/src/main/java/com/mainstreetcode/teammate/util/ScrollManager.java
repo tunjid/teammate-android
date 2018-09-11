@@ -59,7 +59,7 @@ public class ScrollManager {
 
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
         if (options != null) touchHelper = fromSwipeDragOptions(this, options);
-        if(touchHelper!=null)touchHelper.attachToRecyclerView(recyclerView);
+        if (touchHelper != null) touchHelper.attachToRecyclerView(recyclerView);
         for (OnScrollListener listener : listeners) recyclerView.addOnScrollListener(listener);
     }
 
@@ -114,6 +114,11 @@ public class ScrollManager {
 
     public void notifyItemMoved(int from, int to) {
         if (adapter != null) adapter.notifyItemMoved(from, to);
+        if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
+    }
+
+    public void notifyItemRangeChanged(int start, int count) {
+        if (adapter != null) adapter.notifyItemRangeChanged(start, count);
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
@@ -327,12 +332,18 @@ public class ScrollManager {
     }
 
     static class SwipeDragOptions {
+        ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer;
         Supplier<Boolean> itemViewSwipeSupplier;
         Supplier<Boolean> longPressDragEnabledSupplier;
         Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier;
         Supplier<List> listSupplier;
 
-        SwipeDragOptions(Supplier<Boolean> itemViewSwipeSupplier, Supplier<Boolean> longPressDragEnabledSupplier, Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier, Supplier<List> listSupplier) {
+        SwipeDragOptions(ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer,
+                         Supplier<Boolean> itemViewSwipeSupplier,
+                         Supplier<Boolean> longPressDragEnabledSupplier,
+                         Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier,
+                         Supplier<List> listSupplier) {
+            this.swipeDragEndConsumerConsumer = swipeDragEndConsumerConsumer;
             this.itemViewSwipeSupplier = itemViewSwipeSupplier;
             this.longPressDragEnabledSupplier = longPressDragEnabledSupplier;
             this.movementFlagsSupplier = movementFlagsSupplier;
@@ -376,14 +387,26 @@ public class ScrollManager {
                 options.listSupplier.get().remove(position);
                 scrollManager.notifyItemRemoved(position);
             }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                options.swipeDragEndConsumerConsumer.accept(viewHolder);
+            }
         });
     }
 
     public static class SwipeDragOptionsBuilder {
+        private ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer = viewHolder -> {};
         private Supplier<Boolean> itemViewSwipeSupplier = () -> false;
         private Supplier<Boolean> longPressDragEnabledSupplier = () -> false;
         private Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier = viewHolder -> defaultMovements();
         private Supplier<List> listSupplier;
+
+        public SwipeDragOptionsBuilder setSwipeDragEndConsumer(ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer) {
+            this.swipeDragEndConsumerConsumer = swipeDragEndConsumerConsumer;
+            return this;
+        }
 
         public SwipeDragOptionsBuilder setItemViewSwipeSupplier(Supplier<Boolean> itemViewSwipeSupplier) {
             this.itemViewSwipeSupplier = itemViewSwipeSupplier;
@@ -406,7 +429,7 @@ public class ScrollManager {
         }
 
         public ScrollManager.SwipeDragOptions build() {
-            return new ScrollManager.SwipeDragOptions(itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
+            return new ScrollManager.SwipeDragOptions(swipeDragEndConsumerConsumer, itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
         }
     }
 

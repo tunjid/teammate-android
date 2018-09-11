@@ -3,6 +3,8 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class CompetitorsFragment extends MainActivityFragment
         implements
@@ -37,6 +40,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     private Tournament tournament;
     private List<Competitor> items;
     private Set<Competitive> set = new HashSet<>();
+    AtomicReference<Pair<Long, Integer>> dragRef = new AtomicReference<>();
 
     public static CompetitorsFragment newInstance(Tournament tournament) {
         CompetitorsFragment fragment = new CompetitorsFragment();
@@ -70,13 +74,13 @@ public final class CompetitorsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
-
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(new CompetitorAdapter(items, viewHolder -> scrollManager.startDrag(viewHolder)))
+                .withAdapter(new CompetitorAdapter(items, this::onDragStarted))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder()
+                        .setSwipeDragEndConsumer(this::onSwipeDragEnded)
                         .setLongPressDragEnabledSupplier(() -> false)
                         .setListSupplier(() -> items)
                         .build())
@@ -155,5 +159,19 @@ public final class CompetitorsFragment extends MainActivityFragment
 
     private void addCompetitors() {
         disposables.add(tournamentViewModel.addCompetitors(tournament, items).subscribe(added -> requireActivity().onBackPressed(), defaultErrorHandler));
+    }
+
+    private void onDragStarted(RecyclerView.ViewHolder viewHolder) {
+        dragRef.set(new Pair<>(viewHolder.getItemId(), viewHolder.getAdapterPosition()));
+        scrollManager.startDrag(viewHolder);
+    }
+
+    private void onSwipeDragEnded(RecyclerView.ViewHolder viewHolder) {
+        Pair<Long, Integer> pair = dragRef.get();
+        if (pair == null || pair.first != viewHolder.getItemId()) return;
+        int from = pair.second;
+        int to = viewHolder.getAdapterPosition();
+        scrollManager.notifyItemRangeChanged(Math.min(from, to), 1+Math.abs(from - to));
+        dragRef.set(null);
     }
 }
