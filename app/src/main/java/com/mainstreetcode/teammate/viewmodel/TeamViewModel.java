@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -71,12 +72,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return repository.delete(team).doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)));
     }
 
-    public Flowable<List<Team>> findTeams() {
+    public Flowable<List<Team>> findTeams(TeamSearchRequest request) {
         if (searchRef.get() == null) searchRef.set(PublishProcessor.create());
         return searchRef.get()
                 .debounce(SEARCH_DEBOUNCE, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
-                .switchMap(query -> repository.findTeams(query).toFlowable())
+                .switchMap(query -> repository.findTeams(request.query(query)).toFlowable())
                 .doFinally(() -> searchRef.set(null))
                 .observeOn(mainThread());
     }

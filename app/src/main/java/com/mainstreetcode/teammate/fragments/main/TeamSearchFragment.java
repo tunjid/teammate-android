@@ -16,6 +16,8 @@ import com.mainstreetcode.teammate.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamSearchRequest;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.ArrayList;
@@ -32,10 +34,12 @@ public final class TeamSearchFragment extends MainActivityFragment
         TeamAdapter.TeamAdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
+    public static final String ARG_TOURNAMENT = "tournament";
 
     private View createTeam;
-    private final List<Identifiable> teams = new ArrayList<>();
     private SearchView searchView;
+    private TeamSearchRequest request;
+    private final List<Identifiable> teams = new ArrayList<>();
 
     public static TeamSearchFragment newInstance() {
         TeamSearchFragment fragment = new TeamSearchFragment();
@@ -45,10 +49,20 @@ public final class TeamSearchFragment extends MainActivityFragment
         return fragment;
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public static TeamSearchFragment newInstance(Tournament tournament) {
+        TeamSearchFragment fragment = newInstance();
+        fragment.getArguments().putParcelable(ARG_TOURNAMENT, tournament);
+
+        return fragment;
+    }
+
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        request = TeamSearchRequest.from(getArguments().getParcelable(ARG_TOURNAMENT));
     }
 
     @Override
@@ -127,7 +141,7 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     private void postSearch(String queryText) {
         if (teamViewModel.postSearch(queryText)) return;
-        disposables.add(teamViewModel.findTeams()
+        disposables.add(teamViewModel.findTeams(request)
                 .doOnSubscribe(subscription -> postSearch(queryText))
                 .subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }

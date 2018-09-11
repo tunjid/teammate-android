@@ -114,7 +114,7 @@ public interface TeammateApi {
     Single<Team> deleteTeam(@Path(ID_PATH) String teamId);
 
     @GET("api/teams")
-    Single<List<Team>> findTeam(@Query("name") String teamName);
+    Single<List<Team>> findTeam(@Query("name") String teamName, @Query("sport") String sport);
 
     @GET("api/teams/{id}/members")
     Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);

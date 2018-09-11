@@ -13,12 +13,13 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
@@ -27,13 +28,15 @@ import java.util.List;
 import java.util.Set;
 
 public final class CompetitorsFragment extends MainActivityFragment
-        implements TeamAdapter.TeamAdapterListener {
+        implements
+        TeamAdapter.TeamAdapterListener,
+        ViewHolderUtil.SimpleAdapterListener<User> {
 
     private static final String ARG_TOURNAMENT = "tournament";
 
     private Tournament tournament;
     private List<Competitor> items;
-    private Set<Model> set = new HashSet<>();
+    private Set<Competitive> set = new HashSet<>();
 
     public static CompetitorsFragment newInstance(Tournament tournament) {
         CompetitorsFragment fragment = new CompetitorsFragment();
@@ -110,6 +113,12 @@ public final class CompetitorsFragment extends MainActivityFragment
     }
 
     @Override
+    public void onItemClicked(User item) {
+        if (set.contains(item)) showSnackbar(getString(R.string.competitor_exists));
+        else addCompetitor(item);
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab:
@@ -122,7 +131,7 @@ public final class CompetitorsFragment extends MainActivityFragment
         BaseFragment fragment = User.COMPETITOR_TYPE.equals(tournament.getRefPath())
                 ? TeamMembersFragment.newInstance(tournament.getHost())
                 : Team.COMPETITOR_TYPE.equals(tournament.getRefPath())
-                ? TeamSearchFragment.newInstance()
+                ? TeamSearchFragment.newInstance(tournament)
                 : null;
 
         if (fragment == null) return;
@@ -134,7 +143,9 @@ public final class CompetitorsFragment extends MainActivityFragment
                 .build());
     }
 
-    private void addCompetitor(Team item) {
+    private void addCompetitor(Competitive item) {
+        if (!tournament.getRefPath().equals(item.getRefType())) return;
+
         set.add(item);
         items.add(Competitor.empty(item));
         scrollManager.notifyDataSetChanged();
