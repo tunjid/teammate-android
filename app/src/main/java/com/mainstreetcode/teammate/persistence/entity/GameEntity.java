@@ -8,6 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
@@ -161,6 +162,10 @@ public class GameEntity implements Parcelable {
     public boolean isCanDraw() {
         return canDraw;
     }
+
+    public boolean betweenUsers() {return User.COMPETITOR_TYPE.equals(refPath);}
+
+    public boolean isCompeting(Competitive competitive) {return home.getEntity().equals(competitive) || away.getEntity().equals(competitive);}
 
     public void setEnded(boolean ended) {
         this.ended = ended;

@@ -8,7 +8,7 @@
     android:layout_marginRight="@dimen/single_margin"
     android:padding="@dimen/eigth_margin">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/home_thumbnail"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -19,7 +19,7 @@
         app:layout_constraintRight_toLeftOf="@+id/score"
         app:layout_constraintTop_toTopOf="@+id/score" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/away_thumbnail"
         android:layout_width="0dp"
         android:layout_height="0dp"

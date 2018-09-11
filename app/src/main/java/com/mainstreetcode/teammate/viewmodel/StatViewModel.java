@@ -66,10 +66,13 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     }
 
     public Single<Boolean> canEditGameStats(Game game) {
+        User current = UserRepository.getInstance().getCurrentUser();
+        if (game.betweenUsers()) return Single.just(game.isCompeting(current));
         return getEligibleTeamsForGame(game).count().map(value -> value > 0);
     }
 
     private Flowable<Team> getEligibleTeamsForGame(Game game) {
+        if (game.betweenUsers()) return Flowable.just(game.getTournament().getHost());
         return Flowable.fromIterable(RoleViewModel.roles)
                 .filter(identifiable -> identifiable instanceof Role).cast(Role.class)
                 .filter(Role::isPrivilegedRole).map(RoleEntity::getTeam)

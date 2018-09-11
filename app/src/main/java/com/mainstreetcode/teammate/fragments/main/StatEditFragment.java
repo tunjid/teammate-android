@@ -85,7 +85,7 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_delete).setVisible(gofer.canEdit() && !stat.getGame().isEnded());
+        menu.findItem(R.id.action_delete).setVisible(gofer.canEdit() && !stat.getGame().isEnded() && !stat.isEmpty());
     }
 
     @Override
