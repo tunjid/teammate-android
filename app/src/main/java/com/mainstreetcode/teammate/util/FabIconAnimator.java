@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.util;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.support.annotation.DrawableRes;
@@ -15,16 +14,10 @@ import android.view.View;
 
 import com.mainstreetcode.teammate.R;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-
 public class FabIconAnimator {
 
-    private static final String SCALE_X_PROPERTY = "scaleX";
-    private static final String SCALE_Y_PROPERTY = "scaleY";
     private static final String ROTATION_Y_PROPERTY = "rotationY";
-    private static final float FULL_SCALE = 1F;
-    private static final float FIFTH_SCALE = 0.2F;
+
     private static final float TWITCH_END = 60F;
     private static final float TWITCH_START = 0F;
     private static final int DURATION = 200;
@@ -34,7 +27,6 @@ public class FabIconAnimator {
 
     private final MaterialButton button;
     private final ConstraintLayout container;
-    private final ScaleListener scaleListener = new ScaleListener();
 
     public FabIconAnimator(ConstraintLayout container) {
         this.container = container;
@@ -43,14 +35,9 @@ public class FabIconAnimator {
 
     public void update(@DrawableRes int icon, @StringRes int text) {
         boolean isSame = currentIcon == icon && currentText == text;
-
         currentIcon = icon;
         currentText = text;
         animateChange(icon, text, isSame);
-//        if (isSame) twitch();
-//        else animateChange(icon, text);
-//        else if (fab.getVisibility() == View.GONE) fab.setImageResource(icon, text);
-//        else scale();
     }
 
     public void setExtended(boolean extended) {
@@ -59,10 +46,6 @@ public class FabIconAnimator {
 
     public void setOnClickListener(@Nullable View.OnClickListener clickListener) {
         button.setOnClickListener(clickListener);
-    }
-
-    public int getVisibility() {
-        return button.getVisibility() == VISIBLE || button.getVisibility() == VISIBLE ? VISIBLE : GONE;
     }
 
     private boolean isExtended() {
@@ -107,36 +90,43 @@ public class FabIconAnimator {
         return ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION);
     }
 
-    private void scale() {
-        AnimatorSet set = new AnimatorSet();
-        ObjectAnimator scaleDownX = animateProperty(SCALE_X_PROPERTY, FULL_SCALE, FIFTH_SCALE);
-        ObjectAnimator scaleDownY = animateProperty(SCALE_Y_PROPERTY, FULL_SCALE, FIFTH_SCALE);
+    //    private final ScaleListener scaleListener = new ScaleListener();
 
-        ObjectAnimator scaleUpX = animateProperty(SCALE_X_PROPERTY, FIFTH_SCALE, FULL_SCALE);
-        ObjectAnimator scaleUpY = animateProperty(SCALE_Y_PROPERTY, FIFTH_SCALE, FULL_SCALE);
+    //    private static final String SCALE_X_PROPERTY = "scaleX";
+//    private static final String SCALE_Y_PROPERTY = "scaleY";
+//    private static final float FULL_SCALE = 1F;
+//    private static final float FIFTH_SCALE = 0.2F;
 
-        scaleDownX.addListener(scaleListener);
-
-        set.play(scaleUpY).after(scaleDownY);
-        set.play(scaleUpX).after(scaleDownX);
-        set.playTogether(scaleDownX, scaleDownY);
-
-        set.start();
-    }
-
-    private final class ScaleListener implements Animator.AnimatorListener {
-        @Override
-        public void onAnimationEnd(Animator animator) {
-            //  fab.setImageResource(currentIcon, currentText);
-        }
-
-        @Override
-        public void onAnimationStart(Animator animator) {}
-
-        @Override
-        public void onAnimationCancel(Animator animator) {}
-
-        @Override
-        public void onAnimationRepeat(Animator animator) {}
-    }
+//    private void scale() {
+//        AnimatorSet set = new AnimatorSet();
+//        ObjectAnimator scaleDownX = animateProperty(SCALE_X_PROPERTY, FULL_SCALE, FIFTH_SCALE);
+//        ObjectAnimator scaleDownY = animateProperty(SCALE_Y_PROPERTY, FULL_SCALE, FIFTH_SCALE);
+//
+//        ObjectAnimator scaleUpX = animateProperty(SCALE_X_PROPERTY, FIFTH_SCALE, FULL_SCALE);
+//        ObjectAnimator scaleUpY = animateProperty(SCALE_Y_PROPERTY, FIFTH_SCALE, FULL_SCALE);
+//
+//        scaleDownX.addListener(scaleListener);
+//
+//        set.play(scaleUpY).after(scaleDownY);
+//        set.play(scaleUpX).after(scaleDownX);
+//        set.playTogether(scaleDownX, scaleDownY);
+//
+//        set.start();
+//    }
+//
+//    private final class ScaleListener implements Animator.AnimatorListener {
+//        @Override
+//        public void onAnimationEnd(Animator animator) {
+//            //  fab.setImageResource(currentIcon, currentText);
+//        }
+//
+//        @Override
+//        public void onAnimationStart(Animator animator) {}
+//
+//        @Override
+//        public void onAnimationCancel(Animator animator) {}
+//
+//        @Override
+//        public void onAnimationRepeat(Animator animator) {}
+//    }
 }

@@ -138,7 +138,7 @@ public final class GameFragment extends MainActivityFragment {
 
     @Override
     @StringRes
-    protected int getFabStringResource() { return R.string.stat_create; }
+    protected int getFabStringResource() { return R.string.stat_add; }
 
     @Override
     @DrawableRes

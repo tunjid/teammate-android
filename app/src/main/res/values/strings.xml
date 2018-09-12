@@ -234,7 +234,9 @@
     <string name="stat_type">Stat type</string>
     <string name="stat_time">Stat time</string>
     <string name="choose_stat">Choose stat</string>
-    <string name="stat_create">Add stat</string>
+    <string name="stat_add">Add stat</string>
+    <string name="stat_create">Create stat</string>
+    <string name="stat_update">Update stat</string>
     <string name="stat_edit">Edit stat</string>
     <string name="stat_game_ended">This game has ended</string>
     <string name="stat_already_added">This stat can only have it\'s time changed</string>
