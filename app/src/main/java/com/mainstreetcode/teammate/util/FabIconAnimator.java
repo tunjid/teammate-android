@@ -46,7 +46,7 @@ public class FabIconAnimator {
 
         currentIcon = icon;
         currentText = text;
-        animateChange(icon, text);
+        animateChange(icon, text, isSame);
 //        if (isSame) twitch();
 //        else animateChange(icon, text);
 //        else if (fab.getVisibility() == View.GONE) fab.setImageResource(icon, text);
@@ -54,19 +54,7 @@ public class FabIconAnimator {
     }
 
     public void setExtended(boolean extended) {
-        //if (extended && isExtended()) return;
-
-        ConstraintSet from = new ConstraintSet();
-        ConstraintSet to = new ConstraintSet();
-        from.clone(container);
-        to.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
-
-        TransitionManager.beginDelayedTransition(container);
-
-        if (extended) button.setText(currentText);
-        else button.setText("");
-
-        to.applyTo(container);
+        setExtended(extended, false);
     }
 
     public void setOnClickListener(@Nullable View.OnClickListener clickListener) {
@@ -81,12 +69,28 @@ public class FabIconAnimator {
         return button.getLayoutParams().height != button.getResources().getDimensionPixelSize(R.dimen.triple_and_half_margin);
     }
 
-    private void animateChange(@DrawableRes int icon, @StringRes int text) {
+    private void animateChange(@DrawableRes int icon, @StringRes int text, boolean isSame) {
+        boolean extended = isExtended();
         button.setText(text);
         button.setIconResource(icon);
-        boolean extended = isExtended();
-        setExtended(extended);
+        setExtended(extended, !isSame);
         if (!extended) twitch();
+    }
+
+    private void setExtended(boolean extended, boolean force) {
+        if (extended && isExtended() && !force) return;
+
+        ConstraintSet from = new ConstraintSet();
+        ConstraintSet to = new ConstraintSet();
+        from.clone(container);
+        to.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
+
+        TransitionManager.beginDelayedTransition(container);
+
+        if (extended) button.setText(currentText);
+        else button.setText("");
+
+        to.applyTo(container);
     }
 
     private void twitch() {
