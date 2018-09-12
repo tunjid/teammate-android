@@ -88,7 +88,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.action_edit).setVisible(localRoleViewModel.hasPrivilegedRole());
-        menu.findItem(R.id.action_standings).setVisible(!tournament.isKnockOut());
     }
 
     @Override

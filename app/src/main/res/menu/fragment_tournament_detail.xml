@@ -13,6 +13,5 @@
         android:enabled="true"
         android:icon="@drawable/ic_table_24dp"
         android:title="@string/tournament_standings"
-        android:visible="false"
         app:showAsAction="ifRoom" />
 </menu>
