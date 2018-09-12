@@ -3,8 +3,10 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
@@ -116,11 +118,19 @@ public class StatEditFragment extends HeaderedFragment<Stat>
 
     @Override
     public void togglePersistentUi() {
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(stat.isEmpty() ? R.string.stat_create : R.string.stat_edit));
         super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.stat_create; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
     public boolean[] insetState() {return VERTICAL;}

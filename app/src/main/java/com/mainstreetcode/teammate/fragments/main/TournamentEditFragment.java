@@ -3,8 +3,10 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -120,11 +122,19 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
 
     @Override
     public void togglePersistentUi() {
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(gofer.getToolbarTitle(this));
         super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return tournament.isEmpty() ? R.string.tournament_create : R.string.tournament_update; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
     public boolean[] insetState() {return VERTICAL;}

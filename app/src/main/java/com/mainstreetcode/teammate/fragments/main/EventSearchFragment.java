@@ -6,8 +6,10 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.transition.AutoTransition;
 import android.support.transition.TransitionManager;
@@ -152,9 +154,17 @@ public class EventSearchFragment extends MainActivityFragment {
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_crosshairs_gps_white_24dp);
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.event_my_location; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_crosshairs_gps_white_24dp; }
 
     @Override
     public void onClick(View view) {

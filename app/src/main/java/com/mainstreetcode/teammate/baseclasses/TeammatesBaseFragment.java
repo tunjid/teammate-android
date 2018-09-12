@@ -102,7 +102,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
-    protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon, getFabStringResource());}
+    protected void updateFabIcon() {getPersistentUiController().setFabIcon(getFabIconResource(), getFabStringResource());}
 
     protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
@@ -128,9 +128,10 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     }
 
     @StringRes
-    protected int getFabStringResource() {
-        return R.string.add_competitor;
-    }
+    protected int getFabStringResource() { return R.string.add_competitor; }
+
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -98,10 +100,18 @@ public final class CompetitorsFragment extends MainActivityFragment
     }
 
     @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.save_tournament_competitors; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(getString(R.string.add_tournament_competitors));
     }
 

@@ -46,15 +46,15 @@ public class FabIconAnimator {
 
         currentIcon = icon;
         currentText = text;
-
-        if (isSame) twitch();
-        else animateChange(icon, text);
+        animateChange(icon, text);
+//        if (isSame) twitch();
+//        else animateChange(icon, text);
 //        else if (fab.getVisibility() == View.GONE) fab.setImageResource(icon, text);
 //        else scale();
     }
 
     public void setExtended(boolean extended) {
-        if (extended && isExtended()) return;
+        //if (extended && isExtended()) return;
 
         ConstraintSet from = new ConstraintSet();
         ConstraintSet to = new ConstraintSet();
@@ -63,10 +63,10 @@ public class FabIconAnimator {
 
         TransitionManager.beginDelayedTransition(container);
 
-        to.applyTo(container);
-
         if (extended) button.setText(currentText);
         else button.setText("");
+
+        to.applyTo(container);
     }
 
     public void setOnClickListener(@Nullable View.OnClickListener clickListener) {
@@ -84,7 +84,9 @@ public class FabIconAnimator {
     private void animateChange(@DrawableRes int icon, @StringRes int text) {
         button.setText(text);
         button.setIconResource(icon);
-        setExtended(isExtended());
+        boolean extended = isExtended();
+        setExtended(extended);
+        if (!extended) twitch();
     }
 
     private void twitch() {

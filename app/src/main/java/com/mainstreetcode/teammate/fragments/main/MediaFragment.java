@@ -3,8 +3,10 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
@@ -113,12 +115,20 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
+        updateFabIcon();
+        setFabClickListener(this);
         setAltToolbarMenu(R.menu.fragment_media_context);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
-        setFabIcon(R.drawable.ic_add_white_24dp);
-        setFabClickListener(this);
+        super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.media_add; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     private void fetchMedia(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();

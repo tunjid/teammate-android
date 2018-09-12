@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
@@ -113,6 +114,22 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
                 : state == WAITING
                 ? R.string.pending_request
                 : state == APPROVING ? R.string.approve_request : R.string.accept_request);
+    }
+
+    @StringRes
+    public int getFabTitle() {
+        switch (state) {
+            case JOINING:
+                return R.string.join_team;
+            case INVITING:
+                return R.string.invite;
+            case APPROVING:
+                return R.string.approve;
+            default:
+            case WAITING:
+            case ACCEPTING:
+                return R.string.accept;
+        }
     }
 
     @Nullable

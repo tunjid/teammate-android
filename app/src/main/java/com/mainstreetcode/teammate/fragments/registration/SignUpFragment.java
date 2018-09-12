@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.view.ViewCompat;
 import android.text.SpannableString;
 import android.text.TextPaint;
@@ -89,11 +91,19 @@ public class SignUpFragment extends RegistrationActivityFragment
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setFabIcon(R.drawable.ic_check_white_24dp);
+        updateFabIcon();
         setFabClickListener(this);
         setToolbarTitle(getString(R.string.sign_up));
+        super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.submit; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
     public void onDestroyView() {

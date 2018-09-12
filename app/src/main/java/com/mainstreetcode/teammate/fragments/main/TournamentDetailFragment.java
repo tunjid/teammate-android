@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -119,11 +121,19 @@ public class TournamentDetailFragment extends MainActivityFragment {
 
     @Override
     public void togglePersistentUi() {
+        updateFabIcon();
         setToolbarTitle(getString(R.string.tournament_fixtures));
-        setFabIcon(R.drawable.ic_group_add_white_24dp);
         requireActivity().invalidateOptionsMenu();
         super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.add_tournament_competitors; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_group_add_white_24dp; }
 
     @Override
     public boolean showsFab() {

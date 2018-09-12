@@ -107,6 +107,9 @@
 
     <!--TeamDetailFragment-->
     <string name="invite">invite</string>
+    <string name="team_create">Create team</string>
+    <string name="team_update">Update team</string>
+    <string name="team_search_create">Find or create team</string>
     <string name="user_invited">Has been invited as a %1$s</string>
     <string name="user_requests_join">Has requested to join as a %1$s</string>
     <string name="create_team_first">Please create the team first</string>
@@ -115,10 +118,12 @@
     <string name="deleted_team">Deleted %1$s</string>
 
     <!--RoleEditFragment-->
-    <string name="edit_role">Edit Role</string>
+    <string name="role_edit">Edit Role</string>
+    <string name="role_update">Update role</string>
 
     <!--JoinRequestFragment-->
     <string name="invite_user">Invite User</string>
+    <string name="approve">Approve</string>
     <string name="approve_request">Approve User</string>
     <string name="pending_request">Pending Request</string>
     <string name="accept_request">Accept Request</string>
@@ -130,9 +135,11 @@
     <string name="profile_picture">Profile Picture</string>
     <string name="user_info">User Info</string>
     <string name="user_about">About</string>
-    <string name="edit_user">Edit User</string>
+    <string name="user_edit">Edit User</string>
+    <string name="user_update">Update user</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="submit">Submit</string>
     <string name="okay">okay</string>
     <string name="cancel">Cancel</string>
     <string name="cancelled">Cancelled</string>
@@ -154,6 +161,9 @@
     <string name="create_event">Create Event</string>
     <string name="edit_event">Event: %1$s</string>
     <string name="event_name">Event Name</string>
+    <string name="event_add">Add event</string>
+    <string name="event_create">Create event</string>
+    <string name="event_update">Update event</string>
     <string name="event_spots">Spots Available</string>
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
@@ -181,6 +191,9 @@
     <string name="create_tournament">Create Tournament</string>
     <string name="create_tournament_first">Please create the tournament first</string>
     <string name="edit_tournament">Tournament: %1$s</string>
+    <string name="tournament_add">Add tournament</string>
+    <string name="tournament_create">Create tournament</string>
+    <string name="tournament_update">Update tournament</string>
     <string name="tournament_name">Tournament Name</string>
     <string name="tournament_fixtures">Tournament Fixtures</string>
     <string name="tournament_stats">Tournament Stats</string>
@@ -202,6 +215,7 @@
     <!--CompetitorsFragment-->
     <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>
     <string name="add_tournament_competitors">Add Competitors</string>
+    <string name="save_tournament_competitors">Save Competitors</string>
     <string name="competitor_exists">This competitor is already added</string>
     <string name="add_competitor">Add Competitor</string>
     <string name="competitor">Competitors</string>
@@ -236,12 +250,14 @@
     <string name="blocked_users">Blocked Users</string>
     <string name="blocked_users_title">Blocked Users for %1$s</string>
     <string name="unblocked_user">Unblocked %1$s</string>
+    <string name="unblock_user">Unblock user</string>
     <string name="no_blocked_users">No people have been blocked.</string>
 
     <!--PublicEventFragment-->
     <string name="event_public_search">Search for Public Events</string>
     <string name="event_public_start_search">Search</string>
     <string name="event_distance">Distance</string>
+    <string name="event_my_location">My Location</string>
     <string name="event_public_distance">%1$d miles</string>
     <string name="event_public_location_unknown">Unable to get current location</string>
     <string name="event_public_location_prompt">Location permission required</string>
@@ -265,6 +281,7 @@
     <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
 
     <!--MediaFragment-->
+    <string name="media_add">Add media</string>
     <string name="media_title">Media for %1$s</string>
     <string name="media_upload_channel_name">Media upload</string>
     <string name="media_upload_channel_description">Notifications for media uploads</string>
