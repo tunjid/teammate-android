@@ -5,10 +5,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.transition.AutoTransition;
 import android.support.transition.Transition;
@@ -69,17 +70,16 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     private CoordinatorLayout coordinatorLayout;
     private ConstraintLayout constraintLayout;
-    private FloatingActionButton fab;
     private LoadingBar loadingBar;
     private Toolbar toolbar;
 
+    private FabIconAnimator fabIconAnimator;
     @Nullable private ViewHider fabHider;
     @Nullable private ViewHider toolbarHider;
-    @Nullable private FabIconAnimator fabIconAnimator;
 
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
-        public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
+        public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, Bundle savedInstanceState) {
             if (isNotInMainFragmentContainer(v)) return;
 
             adjustSystemInsets(f);
@@ -100,20 +100,18 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
 
+        ConstraintLayout extendedFabContainer = findViewById(R.id.extend_fab_container);
         keyboardPadding = findViewById(R.id.keyboard_padding);
         coordinatorLayout = findViewById(R.id.coordinator);
         constraintLayout = findViewById(R.id.content_view);
         bottomInsetView = findViewById(R.id.bottom_inset);
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
-        fab = findViewById(R.id.fab);
 
         if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
 
-        if (fab != null) {
-            fabHider = ViewHider.of(fab).setDirection(BOTTOM).build();
-            fabIconAnimator = new FabIconAnimator(fab);
-        }
+        fabHider = ViewHider.of(extendedFabContainer).setDirection(BOTTOM).build();
+        fabIconAnimator = new FabIconAnimator(extendedFabContainer);
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPadding.setOnTouchListener((view, event) -> {
@@ -170,8 +168,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void setFabIcon(@DrawableRes int icon) {
-        if (fabIconAnimator != null) fabIconAnimator.setCurrentIcon(icon);
+    public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
+        if (fabIconAnimator != null) fabIconAnimator.update(icon, title);
+    }
+
+    @Override
+    public void setFabExtended(boolean expanded) {
+        if (fabIconAnimator != null) fabIconAnimator.setExtended(expanded);
     }
 
     @Override
@@ -209,7 +212,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabClickListener(@Nullable View.OnClickListener clickListener) {
-        fab.setOnClickListener(clickListener);
+        fabIconAnimator.setOnClickListener(clickListener);
     }
 
     public void onDialogDismissed() {

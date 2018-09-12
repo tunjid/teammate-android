@@ -5,8 +5,18 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
+import android.support.design.button.MaterialButton;
+import android.transition.TransitionManager;
 import android.view.View;
+
+import com.mainstreetcode.teammate.R;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class FabIconAnimator {
 
@@ -19,23 +29,76 @@ public class FabIconAnimator {
     private static final float TWITCH_START = 0F;
     private static final int DURATION = 200;
 
-    @DrawableRes
-    private int currentIcon;
-    private FloatingActionButton fab;
+    @DrawableRes private int currentIcon;
+    @StringRes private int currentText;
+
+    private final MaterialButton button;
+    private final ConstraintLayout container;
     private final ScaleListener scaleListener = new ScaleListener();
 
-    public FabIconAnimator(FloatingActionButton fab) {
-        this.fab = fab;
+    public FabIconAnimator(ConstraintLayout container) {
+        this.container = container;
+        this.button = container.findViewById(R.id.fab);
     }
 
-    public void setCurrentIcon(@DrawableRes int resource) {
-        boolean sameIcon = currentIcon == resource;
+    public void update(@DrawableRes int icon, @StringRes int text) {
+        boolean isSame = currentIcon == icon && currentText == text;
 
-        currentIcon = resource;
+        currentIcon = icon;
+        currentText = text;
 
-        if (sameIcon) twitch();
-        else if (fab.getVisibility() == View.GONE) fab.setImageResource(resource);
-        else scale();
+        if (isSame) twitch();
+        else animateChange(icon, text);
+//        else if (fab.getVisibility() == View.GONE) fab.setImageResource(icon, text);
+//        else scale();
+    }
+
+    public void setExtended(boolean extended) {
+        if (extended && isExtended()) return;
+
+        ConstraintSet from = new ConstraintSet();
+        ConstraintSet to = new ConstraintSet();
+        from.clone(container);
+        to.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
+
+        TransitionManager.beginDelayedTransition(container);
+
+        to.applyTo(container);
+
+        if (extended) button.setText(currentText);
+        else button.setText("");
+    }
+
+    public void setOnClickListener(@Nullable View.OnClickListener clickListener) {
+        button.setOnClickListener(clickListener);
+    }
+
+    public int getVisibility() {
+        return button.getVisibility() == VISIBLE || button.getVisibility() == VISIBLE ? VISIBLE : GONE;
+    }
+
+    private boolean isExtended() {
+        return button.getLayoutParams().height != button.getResources().getDimensionPixelSize(R.dimen.triple_and_half_margin);
+    }
+
+    private void animateChange(@DrawableRes int icon, @StringRes int text) {
+        button.setText(text);
+        button.setIconResource(icon);
+        setExtended(isExtended());
+    }
+
+    private void twitch() {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator twitchA = animateProperty(ROTATION_Y_PROPERTY, TWITCH_START, TWITCH_END);
+        ObjectAnimator twitchB = animateProperty(ROTATION_Y_PROPERTY, TWITCH_END, TWITCH_START);
+
+        set.play(twitchB).after(twitchA);
+        set.start();
+    }
+
+    @NonNull
+    private ObjectAnimator animateProperty(String property, float start, float end) {
+        return ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION);
     }
 
     private void scale() {
@@ -55,24 +118,10 @@ public class FabIconAnimator {
         set.start();
     }
 
-    private void twitch() {
-        AnimatorSet set = new AnimatorSet();
-        ObjectAnimator twitchA = animateProperty(ROTATION_Y_PROPERTY, TWITCH_START, TWITCH_END);
-        ObjectAnimator twitchB = animateProperty(ROTATION_Y_PROPERTY, TWITCH_END, TWITCH_START);
-
-        set.play(twitchB).after(twitchA);
-        set.start();
-    }
-
-    @NonNull
-    private ObjectAnimator animateProperty(String property, float start, float end) {
-        return ObjectAnimator.ofFloat(fab, property, start, end).setDuration(DURATION);
-    }
-
     private final class ScaleListener implements Animator.AnimatorListener {
         @Override
         public void onAnimationEnd(Animator animator) {
-            fab.setImageResource(currentIcon);
+            //  fab.setImageResource(currentIcon, currentText);
         }
 
         @Override

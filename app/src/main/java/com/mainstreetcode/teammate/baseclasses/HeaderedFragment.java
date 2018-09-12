@@ -78,6 +78,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, i) -> setFabExtended(i == 0));
         view.findViewById(R.id.header).setVisibility(canExpandAppBar() ? View.VISIBLE : View.GONE);
     }
 

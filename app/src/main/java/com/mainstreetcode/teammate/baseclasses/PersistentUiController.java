@@ -20,7 +20,9 @@ public interface PersistentUiController {
 
     void toggleSystemUI(boolean show);
 
-    void setFabIcon(@DrawableRes int icon);
+    void setFabIcon(@DrawableRes int icon, @StringRes int textRes);
+
+    void setFabExtended(boolean expanded);
 
     void showSnackBar(CharSequence message);
 

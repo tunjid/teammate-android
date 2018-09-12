@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout android:id="@+id/extend_fab_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:background="@drawable/bg_fab"
+    android:layout_height="wrap_content">
+
+    <android.support.design.button.MaterialButton
+        android:id="@+id/fab"
+        android:layout_width="@dimen/triple_and_half_margin"
+        android:layout_height="@dimen/triple_and_half_margin"
+        app:cornerRadius="@dimen/triple_and_half_margin"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>

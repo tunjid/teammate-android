@@ -102,7 +102,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
-    protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon);}
+    protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon, getFabStringResource());}
+
+    protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
     protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
 
@@ -123,6 +125,11 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         return beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    @StringRes
+    protected int getFabStringResource() {
+        return R.string.add_competitor;
     }
 
     protected void setEnterExitTransitions() {
@@ -213,7 +220,10 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         public void toggleSystemUI(boolean show) {}
 
         @Override
-        public void setFabIcon(int icon) {}
+        public void setFabIcon(int icon, int textRes) {}
+
+        @Override
+        public void setFabExtended(boolean expanded) {}
 
         @Override
         public void showSnackBar(CharSequence message) {}

@@ -28,12 +28,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
+        <include
+            layout="@layout/fab_extended"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/single_margin" />
+            android:layout_margin="@dimen/single_margin"
+            app:layout_behavior="com.mainstreetcode.teammate.util.SnackBarBehavior" />
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
