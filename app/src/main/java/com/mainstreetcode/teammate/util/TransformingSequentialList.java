@@ -20,7 +20,7 @@ public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> 
         this(fromList, fromFunction, null);
     }
 
-    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> fromFunction, Function<? super T, ? extends F> toFunction) {
+    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> fromFunction, @Nullable Function<? super T, ? extends F> toFunction) {
         this.fromList = fromList;
         this.toFunction = toFunction;
         this.fromFunction = fromFunction;
@@ -31,19 +31,16 @@ public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> 
      * can be overkill. That's why we forward this call directly to the backing list.
      */
     @Override
-    public void clear() {
-        fromList.clear();
-    }
+    public void clear() { fromList.clear(); }
 
     @Override
-    public int size() {
-        return fromList.size();
-    }
+    public int size() { return fromList.size(); }
 
     @NonNull
     @Override
     public ListIterator<T> listIterator(final int index) {
         final ListIterator<F> fromListIterator = fromList.listIterator(index);
+
         return new TransformedListIterator<F, T>(fromListIterator) {
             @Override
             T transform(F from) { return fromFunction.apply(from); }
@@ -64,6 +61,7 @@ public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> 
 
     abstract static class TransformedListIterator<F, T> extends TransformedIterator<F, T>
             implements ListIterator<T> {
+
         TransformedListIterator(ListIterator<? extends F> backingIterator) {
             super(backingIterator);
         }
@@ -73,34 +71,22 @@ public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> 
         }
 
         @Override
-        public final boolean hasPrevious() {
-            return backingIterator().hasPrevious();
-        }
+        public final boolean hasPrevious() { return backingIterator().hasPrevious(); }
 
         @Override
-        public final T previous() {
-            return transform(backingIterator().previous());
-        }
+        public final T previous() { return transform(backingIterator().previous()); }
 
         @Override
-        public final int nextIndex() {
-            return backingIterator().nextIndex();
-        }
+        public final int nextIndex() { return backingIterator().nextIndex(); }
 
         @Override
-        public final int previousIndex() {
-            return backingIterator().previousIndex();
-        }
+        public final int previousIndex() { return backingIterator().previousIndex(); }
 
         @Override
-        public void set(T element) {
-            throw new UnsupportedOperationException();
-        }
+        public void set(T element) { throw new UnsupportedOperationException(); }
 
         @Override
-        public void add(T element) {
-            throw new UnsupportedOperationException();
-        }
+        public void add(T element) { throw new UnsupportedOperationException(); }
 
         private static <T> ListIterator<T> cast(Iterator<T> iterator) {
             return (ListIterator<T>) iterator;
