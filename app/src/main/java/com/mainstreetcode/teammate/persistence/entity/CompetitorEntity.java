@@ -56,7 +56,7 @@ public class CompetitorEntity implements Parcelable {
 
     public String getRefPath() { return refPath; }
 
-    public String getSeedText() {return seed > 0 ? String.valueOf(seed) : "";}
+    public String getSeedText() {return seed > -1 ? String.valueOf(seed + 1) : "";}
 
     public String getTournamentId() { return tournamentId; }
 

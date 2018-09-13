@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,26 +22,32 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
+import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIPE;
 
 public final class CompetitorsFragment extends MainActivityFragment
         implements
         TeamAdapter.TeamAdapterListener,
         ViewHolderUtil.SimpleAdapterListener<User> {
 
+    private static final int SWIPE_DELAY = 200;
+    private static final int NO_SWIPE_OR_DRAG = 0;
     private static final String ARG_TOURNAMENT = "tournament";
 
+    private boolean canMove = true;
     private Tournament tournament;
-    private List<Competitor> items;
-    private Set<Competitive> set = new HashSet<>();
-    AtomicReference<Pair<Long, Integer>> dragRef = new AtomicReference<>();
+    private List<Competitive> entities;
+    private List<Competitor> competitors;
+    private AtomicReference<SwipeDragData<Integer>> dragRef = new AtomicReference<>();
+    private AtomicReference<SwipeDragData<Integer>> swipeRef = new AtomicReference<>();
 
     public static CompetitorsFragment newInstance(Tournament tournament) {
         CompetitorsFragment fragment = new CompetitorsFragment();
@@ -70,7 +75,8 @@ public final class CompetitorsFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
-        items = new ArrayList<>();
+        entities = new ArrayList<>();
+        competitors = new TransformingSequentialList<>(entities, Competitor::empty, Competitor::getEntity);
     }
 
     @Override
@@ -78,13 +84,16 @@ public final class CompetitorsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(new CompetitorAdapter(items, this::onDragStarted))
+                .withAdapter(new CompetitorAdapter(competitors, this::onDragStarted))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder()
+                        .setMovementFlagsSupplier(viewHolder -> getMovementFlags())
+                        .setSwipeDragStartConsumerConsumer(this::onSwipeStarted)
                         .setSwipeDragEndConsumer(this::onSwipeDragEnded)
                         .setLongPressDragEnabledSupplier(() -> false)
-                        .setListSupplier(() -> items)
+                        .setItemViewSwipeSupplier(() -> true)
+                        .setListSupplier(() -> competitors)
                         .build())
                 .build();
 
@@ -117,18 +126,18 @@ public final class CompetitorsFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return !items.isEmpty();
+        return !competitors.isEmpty();
     }
 
     @Override
     public void onTeamClicked(Team item) {
-        if (set.contains(item)) showSnackbar(getString(R.string.competitor_exists));
+        if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists));
         else addCompetitor(item);
     }
 
     @Override
     public void onItemClicked(User item) {
-        if (set.contains(item)) showSnackbar(getString(R.string.competitor_exists));
+        if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists));
         else addCompetitor(item);
     }
 
@@ -160,28 +169,67 @@ public final class CompetitorsFragment extends MainActivityFragment
     private void addCompetitor(Competitive item) {
         if (!tournament.getRefPath().equals(item.getRefType())) return;
 
-        set.add(item);
-        items.add(Competitor.empty(item));
+        entities.add(item);
         scrollManager.notifyDataSetChanged();
         scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 
     private void addCompetitors() {
-        disposables.add(tournamentViewModel.addCompetitors(tournament, items).subscribe(added -> requireActivity().onBackPressed(), defaultErrorHandler));
+        disposables.add(tournamentViewModel.addCompetitors(tournament, competitors).subscribe(added -> requireActivity().onBackPressed(), defaultErrorHandler));
     }
 
     private void onDragStarted(RecyclerView.ViewHolder viewHolder) {
-        dragRef.set(new Pair<>(viewHolder.getItemId(), viewHolder.getAdapterPosition()));
+        dragRef.set(new SwipeDragData<>(viewHolder.getItemId(), viewHolder.getAdapterPosition(), ACTION_STATE_DRAG, 0));
         scrollManager.startDrag(viewHolder);
     }
 
+    private void onSwipeStarted(RecyclerView.ViewHolder viewHolder, int state) {
+        if (state != ACTION_STATE_SWIPE) return;
+        swipeRef.set(new SwipeDragData<>(viewHolder.getItemId(), viewHolder.getAdapterPosition(), ACTION_STATE_SWIPE, competitors.size()));
+    }
+
     private void onSwipeDragEnded(RecyclerView.ViewHolder viewHolder) {
-        Pair<Long, Integer> pair = dragRef.get();
-        if (pair == null || pair.first != viewHolder.getItemId()) return;
-        int from = pair.second;
+        long id = viewHolder.getItemId();
+        SwipeDragData<Integer> dragData = dragRef.get();
+        SwipeDragData<Integer> swipeData = swipeRef.get();
+
+        if (dragData != null && id == dragData.id) completeDrag(viewHolder, dragData);
+        else if (swipeData != null && id == swipeData.id) completeSwipe(swipeData);
+    }
+
+    private void completeDrag(RecyclerView.ViewHolder viewHolder, SwipeDragData<Integer> dragData) {
+        int from = dragData.position;
         int to = viewHolder.getAdapterPosition();
-        scrollManager.notifyItemRangeChanged(Math.min(from, to), 1+Math.abs(from - to));
+        scrollManager.notifyItemRangeChanged(Math.min(from, to), 1 + Math.abs(from - to));
         dragRef.set(null);
+    }
+
+    private void completeSwipe(SwipeDragData<Integer> swipeData) {
+        if (competitors.size() == swipeData.meta) return;
+        swipeRef.set(null);
+        canMove = false;
+        scrollManager.getRecyclerView().postDelayed(() -> {
+            canMove = true;
+            scrollManager.notifyDataSetChanged();
+        }, SWIPE_DELAY);
+    }
+
+    private int getMovementFlags() {
+        return canMove ? ScrollManager.defaultMovements() : NO_SWIPE_OR_DRAG;
+    }
+
+    static class SwipeDragData<T> {
+        long id;
+        int position;
+        int dragSwipeType;
+        T meta;
+
+        SwipeDragData(long id, int position, int dragSwipeType, T meta) {
+            this.id = id;
+            this.position = position;
+            this.dragSwipeType = dragSwipeType;
+            this.meta = meta;
+        }
     }
 }

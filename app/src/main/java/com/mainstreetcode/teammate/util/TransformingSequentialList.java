@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.util;
 
 import android.arch.core.util.Function;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.AbstractSequentialList;
 import java.util.Iterator;
@@ -10,11 +11,19 @@ import java.util.ListIterator;
 
 public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> {
     private final List<F> fromList;
-    private final Function<? super F, ? extends T> function;
 
-    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> function) {
+    @Nullable
+    private final Function<? super T, ? extends F> toFunction;
+    private final Function<? super F, ? extends T> fromFunction;
+
+    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> fromFunction) {
+        this(fromList, fromFunction, null);
+    }
+
+    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> fromFunction, Function<? super T, ? extends F> toFunction) {
         this.fromList = fromList;
-        this.function = function;
+        this.toFunction = toFunction;
+        this.fromFunction = fromFunction;
     }
 
     /**
@@ -34,10 +43,21 @@ public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> 
     @NonNull
     @Override
     public ListIterator<T> listIterator(final int index) {
-        return new TransformedListIterator<F, T>(fromList.listIterator(index)) {
+        final ListIterator<F> fromListIterator = fromList.listIterator(index);
+        return new TransformedListIterator<F, T>(fromListIterator) {
             @Override
-            T transform(F from) {
-                return function.apply(from);
+            T transform(F from) { return fromFunction.apply(from); }
+
+            @Override
+            public void set(T element) {
+                if (toFunction == null) throw new UnsupportedOperationException();
+                else fromListIterator.set(toFunction.apply(element));
+            }
+
+            @Override
+            public void add(T element) {
+                if (toFunction == null) throw new UnsupportedOperationException();
+                else fromListIterator.add(toFunction.apply(element));
             }
         };
     }

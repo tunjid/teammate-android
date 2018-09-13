@@ -353,19 +353,22 @@ public class ScrollManager {
 
     static class SwipeDragOptions {
         ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer;
+        BiConsumer<RecyclerView.ViewHolder, Integer> swipeDragStartConsumerConsumer;
         Supplier<Boolean> itemViewSwipeSupplier;
-        Supplier<Boolean> longPressDragEnabledSupplier;
+        Supplier<Boolean> longPressDragSupplier;
         Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier;
         Supplier<List> listSupplier;
 
         SwipeDragOptions(ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer,
+                         BiConsumer<RecyclerView.ViewHolder, Integer> swipeDragStartConsumerConsumer,
                          Supplier<Boolean> itemViewSwipeSupplier,
-                         Supplier<Boolean> longPressDragEnabledSupplier,
+                         Supplier<Boolean> longPressDragSupplier,
                          Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier,
                          Supplier<List> listSupplier) {
             this.swipeDragEndConsumerConsumer = swipeDragEndConsumerConsumer;
+            this.swipeDragStartConsumerConsumer = swipeDragStartConsumerConsumer;
             this.itemViewSwipeSupplier = itemViewSwipeSupplier;
-            this.longPressDragEnabledSupplier = longPressDragEnabledSupplier;
+            this.longPressDragSupplier = longPressDragSupplier;
             this.movementFlagsSupplier = movementFlagsSupplier;
             this.listSupplier = listSupplier;
         }
@@ -377,9 +380,7 @@ public class ScrollManager {
             public boolean isItemViewSwipeEnabled() { return options.itemViewSwipeSupplier.get(); }
 
             @Override
-            public boolean isLongPressDragEnabled() {
-                return options.longPressDragEnabledSupplier.get();
-            }
+            public boolean isLongPressDragEnabled() { return options.longPressDragSupplier.get(); }
 
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
@@ -409,6 +410,13 @@ public class ScrollManager {
             }
 
             @Override
+            public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+                try { options.swipeDragStartConsumerConsumer.accept(viewHolder, actionState); }
+                catch (Exception e) { e.printStackTrace(); }
+            }
+
+            @Override
             public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 super.clearView(recyclerView, viewHolder);
                 options.swipeDragEndConsumerConsumer.accept(viewHolder);
@@ -418,6 +426,7 @@ public class ScrollManager {
 
     public static class SwipeDragOptionsBuilder {
         private ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer = viewHolder -> {};
+        private BiConsumer<RecyclerView.ViewHolder, Integer> swipeDragStartConsumerConsumer  = (viewHolder, state) -> {};
         private Supplier<Boolean> itemViewSwipeSupplier = () -> false;
         private Supplier<Boolean> longPressDragEnabledSupplier = () -> false;
         private Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier = viewHolder -> defaultMovements();
@@ -425,6 +434,11 @@ public class ScrollManager {
 
         public SwipeDragOptionsBuilder setSwipeDragEndConsumer(ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer) {
             this.swipeDragEndConsumerConsumer = swipeDragEndConsumerConsumer;
+            return this;
+        }
+
+        public SwipeDragOptionsBuilder setSwipeDragStartConsumerConsumer(BiConsumer<RecyclerView.ViewHolder, Integer> swipeDragStartConsumerConsumer) {
+            this.swipeDragStartConsumerConsumer = swipeDragStartConsumerConsumer;
             return this;
         }
 
@@ -449,11 +463,11 @@ public class ScrollManager {
         }
 
         public ScrollManager.SwipeDragOptions build() {
-            return new ScrollManager.SwipeDragOptions(swipeDragEndConsumerConsumer, itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
+            return new ScrollManager.SwipeDragOptions(swipeDragEndConsumerConsumer, swipeDragStartConsumerConsumer,itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
         }
     }
 
-    static int defaultMovements() {
+    public static int defaultMovements() {
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
         int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
         return makeMovementFlags(dragFlags, swipeFlags);
