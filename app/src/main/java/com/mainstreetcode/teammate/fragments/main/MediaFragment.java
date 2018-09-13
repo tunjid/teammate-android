@@ -93,9 +93,9 @@ public class MediaFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchMedia(false))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new MediaAdapter(items, this))
-                .addStateListener(this::updateFabForScrollState)
                 .addScrollListener(this::updateFabOnScroll)
                 .withGridLayoutManager(4)
                 .build();

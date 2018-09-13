@@ -84,9 +84,9 @@ public final class TournamentsFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchTournaments(false))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TournamentAdapter(items, this))
-                .addStateListener(this::updateFabForScrollState)
                 .withLinearLayoutManager()
                 .build();
 

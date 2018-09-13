@@ -144,17 +144,17 @@ public class ScrollManager {
         adapter = null;
     }
 
-    public int getFirstCompletelyVisiblePosition() {
+    public int getFirstVisiblePosition() {
         LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             LinearLayoutManager castedManager = (LinearLayoutManager) layoutManager;
-            return castedManager.findFirstCompletelyVisibleItemPosition();
+            return castedManager.findFirstVisibleItemPosition();
         }
         else if (layoutManager instanceof StaggeredGridLayoutManager) {
             StaggeredGridLayoutManager castedManager = (StaggeredGridLayoutManager) layoutManager;
 
             int[] positions = new int[castedManager.getSpanCount()];
-            castedManager.findFirstCompletelyVisibleItemPositions(positions);
+            castedManager.findFirstVisibleItemPositions(positions);
 
             List<Integer> indexes = new ArrayList<>(positions.length);
             for (int i : positions) indexes.add(i);

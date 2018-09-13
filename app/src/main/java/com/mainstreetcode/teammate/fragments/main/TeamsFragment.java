@@ -65,9 +65,9 @@ public final class TeamsFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
-                .addStateListener(this::updateFabForScrollState)
                 .withStaggeredGridLayoutManager(2)
                 .build();
 

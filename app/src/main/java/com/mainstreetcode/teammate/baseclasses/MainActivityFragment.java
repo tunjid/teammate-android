@@ -28,8 +28,6 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 
-import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
-
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammate.activities.MainActivity}
  */
@@ -126,9 +124,9 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (activity != null) activity.onBackPressed();
     }
 
-    protected void updateFabForScrollState(int scrollState) {
-        if (scrollState != SCROLL_STATE_IDLE) return;
-        int position = scrollManager.getFirstCompletelyVisiblePosition();
+    protected void updateFabForScrollState(int dy) {
+        if (Math.abs(dy) < 3) return;
+        int position = scrollManager.getFirstVisiblePosition();
         if (position < 0) return;
         setFabExtended(position == 0);
     }

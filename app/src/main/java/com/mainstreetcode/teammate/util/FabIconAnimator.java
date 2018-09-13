@@ -9,6 +9,7 @@ import android.support.annotation.StringRes;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.design.button.MaterialButton;
+import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.View;
 
@@ -68,7 +69,7 @@ public class FabIconAnimator {
         from.clone(container);
         to.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
 
-        TransitionManager.beginDelayedTransition(container);
+        TransitionManager.beginDelayedTransition(container, new AutoTransition().setDuration(150));
 
         if (extended) button.setText(currentText);
         else button.setText("");

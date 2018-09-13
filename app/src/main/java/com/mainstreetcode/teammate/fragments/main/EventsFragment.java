@@ -83,9 +83,9 @@ public final class EventsFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchEvents(false))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
-                .addStateListener(this::updateFabForScrollState)
                 .withLinearLayoutManager()
                 .build();
 
