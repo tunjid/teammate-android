@@ -144,6 +144,26 @@ public class ScrollManager {
         adapter = null;
     }
 
+    public int getFirstCompletelyVisiblePosition() {
+        LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager) {
+            LinearLayoutManager castedManager = (LinearLayoutManager) layoutManager;
+            return castedManager.findFirstCompletelyVisibleItemPosition();
+        }
+        else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            StaggeredGridLayoutManager castedManager = (StaggeredGridLayoutManager) layoutManager;
+
+            int[] positions = new int[castedManager.getSpanCount()];
+            castedManager.findFirstCompletelyVisibleItemPositions(positions);
+
+            List<Integer> indexes = new ArrayList<>(positions.length);
+            for (int i : positions) indexes.add(i);
+
+            return Collections.min(indexes);
+        }
+        return -1;
+    }
+
     public RecyclerView getRecyclerView() {
         return recyclerView;
     }

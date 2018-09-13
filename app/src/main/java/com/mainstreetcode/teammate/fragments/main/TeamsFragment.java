@@ -67,6 +67,7 @@ public final class TeamsFragment extends MainActivityFragment
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
+                .addStateListener(this::updateFabForScrollState)
                 .withStaggeredGridLayoutManager(2)
                 .build();
 
@@ -82,9 +83,9 @@ public final class TeamsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         updateFabIcon();
-        super.togglePersistentUi();
         setFabClickListener(this);
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
+        super.togglePersistentUi();
     }
 
     @Override

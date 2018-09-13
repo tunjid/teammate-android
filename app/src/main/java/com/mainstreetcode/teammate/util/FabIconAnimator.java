@@ -18,7 +18,7 @@ public class FabIconAnimator {
 
     private static final String ROTATION_Y_PROPERTY = "rotationY";
 
-    private static final float TWITCH_END = 60F;
+    private static final float TWITCH_END = 30F;
     private static final float TWITCH_START = 0F;
     private static final int DURATION = 200;
 

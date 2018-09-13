@@ -86,6 +86,7 @@ public final class TournamentsFragment extends MainActivityFragment
                 .withEndlessScrollCallback(() -> fetchTournaments(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TournamentAdapter(items, this))
+                .addStateListener(this::updateFabForScrollState)
                 .withLinearLayoutManager()
                 .build();
 

@@ -28,6 +28,8 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
+
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammate.activities.MainActivity}
  */
@@ -79,6 +81,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (!restoredFromBackStack() && scrollManager != null) setFabExtended(true);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (scrollManager != null) scrollManager.clear();
@@ -116,6 +124,13 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         Logger.log(getStableTag(), "Inconsistent Recyclerview", exception);
         Activity activity = getActivity();
         if (activity != null) activity.onBackPressed();
+    }
+
+    protected void updateFabForScrollState(int scrollState) {
+        if (scrollState != SCROLL_STATE_IDLE) return;
+        int position = scrollManager.getFirstCompletelyVisiblePosition();
+        if (position < 0) return;
+        setFabExtended(position == 0);
     }
 
     @SuppressLint("CheckResult")

@@ -85,6 +85,7 @@ public final class EventsFragment extends MainActivityFragment
                 .withEndlessScrollCallback(() -> fetchEvents(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
+                .addStateListener(this::updateFabForScrollState)
                 .withLinearLayoutManager()
                 .build();
 
