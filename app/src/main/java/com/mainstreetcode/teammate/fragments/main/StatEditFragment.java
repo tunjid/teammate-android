@@ -220,7 +220,7 @@ public class StatEditFragment extends HeaderedFragment<Stat>
 
         showBottomSheet(BottomSheetController.Args.builder()
                 .setMenuRes(R.menu.empty)
-                .setTitle(getString(R.string.pick_team))
+                .setTitle(getString(R.string.pick_user))
                 .setFragment(fragment)
                 .build());
     }

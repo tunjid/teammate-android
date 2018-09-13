@@ -64,17 +64,15 @@ public class FabIconAnimator {
     private void setExtended(boolean extended, boolean force) {
         if (extended && isExtended() && !force) return;
 
-        ConstraintSet from = new ConstraintSet();
-        ConstraintSet to = new ConstraintSet();
-        from.clone(container);
-        to.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
+        ConstraintSet set = new ConstraintSet();
+        set.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
 
         TransitionManager.beginDelayedTransition(container, new AutoTransition().setDuration(150));
 
         if (extended) button.setText(currentText);
         else button.setText("");
 
-        to.applyTo(container);
+        set.applyTo(container);
     }
 
     private void twitch() {

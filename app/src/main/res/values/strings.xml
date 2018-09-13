@@ -231,6 +231,7 @@
 
     <!--StatEditFragment-->
     <string name="user">User</string>
+    <string name="pick_user">Pick a user</string>
     <string name="stat_type">Stat type</string>
     <string name="stat_time">Stat time</string>
     <string name="choose_stat">Choose stat</string>
