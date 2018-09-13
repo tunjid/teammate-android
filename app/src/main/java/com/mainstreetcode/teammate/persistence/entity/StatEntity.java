@@ -66,11 +66,11 @@ public class StatEntity implements Parcelable {
     protected StatEntity(Parcel in) {
         id = in.readString();
         created = new Date(in.readLong());
-        statType = Config.statTypeFromCode(in.readString());
-        sport = Config.sportFromCode(in.readString());
         user = (User) in.readValue(User.class.getClassLoader());
         team = (Team) in.readValue(Team.class.getClassLoader());
         game = (Game) in.readValue(Game.class.getClassLoader());
+        sport = Config.sportFromCode(in.readString());
+        statType = sport.statTypeFromCode(in.readString());
         value = in.readInt();
         time = in.readFloat();
     }
@@ -113,7 +113,7 @@ public class StatEntity implements Parcelable {
     public boolean contains(StatAttribute attribute) {return attributes.contains(attribute);}
 
     protected void setStatType(String statType) {
-        this.statType = Config.statTypeFromCode(statType);
+        this.statType = sport.statTypeFromCode(statType);
         attributes.clear();
     }
 
@@ -158,11 +158,11 @@ public class StatEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeLong(created.getTime());
-        dest.writeString(statType.getCode());
-        dest.writeString(sport.getCode());
         dest.writeValue(user);
         dest.writeValue(team);
         dest.writeValue(game);
+        dest.writeString(sport.getCode());
+        dest.writeString(statType.getCode());
         dest.writeInt(value);
         dest.writeFloat(time);
     }

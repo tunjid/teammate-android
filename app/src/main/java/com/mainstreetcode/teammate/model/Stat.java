@@ -43,7 +43,8 @@ public class Stat extends StatEntity
     @Ignore private static final IdCache holder = IdCache.cache(2);
 
     public static Stat empty(Game game) {
-        return new Stat("", new Date(), Config.statTypeFromCode(""), game.getSport(), User.empty(),
+        Sport sport = game.getSport();
+        return new Stat("", new Date(), sport.statTypeFromCode(""), sport, User.empty(),
                 Team.empty(), game, new StatAttributes(), 0, 0);
     }
 
@@ -62,7 +63,7 @@ public class Stat extends StatEntity
         return Arrays.asList(
                 Item.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this),
                 Item.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
-                        .textTransformer(value -> Config.statTypeFromCode(value.toString()).getName())
+                        .textTransformer(value -> sport.statTypeFromCode(value.toString()).getName())
         );
     }
 
@@ -184,11 +185,12 @@ public class Stat extends StatEntity
             int value = (int) ModelUtils.asFloat(VALUE, body);
             float time = ModelUtils.asFloat(TIME, body);
 
-            StatType statType = Config.statTypeFromCode(typeCode);
-            Sport sport = Config.sportFromCode(sportCode);
             User user = context.deserialize(body.get(USER), User.class);
             Team team = context.deserialize(body.get(TEAM), Team.class);
             Game game = context.deserialize(body.get(GAME), Game.class);
+
+            Sport sport = Config.sportFromCode(sportCode);
+            StatType statType = sport.statTypeFromCode(typeCode);
             StatAttributes attributes = new StatAttributes();
 
             Stat stat = new Stat(id, ModelUtils.parseDate(created), statType, sport,

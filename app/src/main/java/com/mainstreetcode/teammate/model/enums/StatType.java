@@ -25,8 +25,6 @@ public class StatType extends MetaData {
         return new StatType("", "", "", "");
     }
 
-    public String getSportCode() { return sportCode; }
-
     public CharSequence getEmoji() { return ModelUtils.processString(emoji); }
 
     public CharSequence getEmojiAndName() {

@@ -8,11 +8,11 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatTypeAdapter;
-import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
 import com.mainstreetcode.teammate.model.enums.StatType;
+import com.mainstreetcode.teammate.model.enums.StatTypes;
 import com.mainstreetcode.teammate.util.Supplier;
 
 import java.util.List;
@@ -21,6 +21,7 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
 
     private final StatTypeAdapter adapter;
     private final StatType statType = StatType.empty();
+    private final StatTypes statTypes;
 
     public StatAttributeViewHolder(View itemView,
                                    int titleRes,
@@ -28,8 +29,9 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
                                    Supplier<Boolean> enabler,
                                    Supplier<Boolean> errorChecker) {
 
-        super(itemView, titleRes, Config.getStatTypes(stat.getSport()), StatType::getEmojiAndName, StatType::getCode, enabler, errorChecker);
+        super(itemView, titleRes, stat.getSport().getStats(), StatType::getEmojiAndName, StatType::getCode, enabler, errorChecker);
 
+        statTypes = stat.getSport().getStats();
         adapter = new StatTypeAdapter(new StatTypeAdapter.AdapterListener() {
             @Override
             public List<StatAttribute> getAttributes() {
@@ -63,7 +65,7 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
     @Override
     public void bind(Item item) {
         super.bind(item);
-        statType.update(Config.statTypeFromCode(item.getRawValue()));
+        statType.update(statTypes.fromCodeOrFirst(item.getRawValue()));
         adapter.notifyDataSetChanged();
     }
 

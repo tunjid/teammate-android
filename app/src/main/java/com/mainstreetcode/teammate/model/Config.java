@@ -17,10 +17,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
-import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.MetaData;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
@@ -31,7 +31,6 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Flowable;
 
@@ -96,12 +95,6 @@ public class Config implements Model<Config> {
 
     public static List<BlockReason> getBlockReasons() {
         return getList(config -> config.blockReasons);
-    }
-
-    public static List<StatType> getStatTypes(Sport sport) {
-        return getList(config -> Flowable.fromIterable(config.statTypes)
-                .filter(sport::matchesStatType)
-                .collect((Callable<ArrayList<StatType>>) ArrayList::new, List::add).blockingGet());
     }
 
     public static List<TournamentType> getTournamentTypes() {

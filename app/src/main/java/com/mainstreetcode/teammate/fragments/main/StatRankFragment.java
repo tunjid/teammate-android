@@ -15,7 +15,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatRankAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -63,7 +62,7 @@ public final class StatRankFragment extends MainActivityFragment {
         setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         statRanks = tournamentViewModel.getStatRanks(tournament);
-        type = Config.statTypeFromCode("");
+        type = tournament.getSport().statTypeFromCode("");
     }
 
     @Override
@@ -80,7 +79,7 @@ public final class StatRankFragment extends MainActivityFragment {
 
         scrollManager.setViewHolderColor(R.color.dark_grey);
 
-        StatType[] statTypes = Config.getStatTypes(tournament.getSport()).toArray(new StatType[]{});
+        StatType[] statTypes = tournament.getSport().getStats().toArray(new StatType[]{});
         ArrayAdapter<StatType> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, statTypes);
 
         spinner.setAdapter(adapter);
