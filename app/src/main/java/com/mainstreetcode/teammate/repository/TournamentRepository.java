@@ -97,7 +97,7 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
         if (date == null) date = getFutureDate();
         // To concatenate team to account for the way the id is stored in the db to accommodate users and teams
         String teamId = team.getId();
-        return tournamentDao.getTournaments(teamId,"team," + teamId,  date).subscribeOn(io());
+        return tournamentDao.getTournaments(teamId, "team," + teamId, date).subscribeOn(io());
     }
 
     @Override
@@ -121,14 +121,16 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
                 competitors.add(competitor);
 
                 Competitive competitive = competitor.getEntity();
+                if (competitive.isEmpty()) continue;
+
                 if (competitive instanceof User) users.add((User) competitive);
                 if (competitive instanceof Team) teams.add((Team) competitive);
             }
 
             userRepository.saveAsNested().apply(users);
             teamRepository.saveAsNested().apply(teams);
-            competitorRepository.saveAsNested().apply(competitors);
             tournamentDao.upsert(Collections.unmodifiableList(models));
+            competitorRepository.saveAsNested().apply(competitors);
 
             return models;
         };

@@ -64,6 +64,19 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="2:0" />
 
+                <View
+                    android:id="@+id/highlight"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/eigth_margin"
+                    android:layout_marginLeft="@dimen/single_margin"
+                    android:layout_marginRight="@dimen/single_margin"
+                    android:background="@color/white"
+                    app:layout_constraintBottom_toBottomOf="@+id/score"
+                    app:layout_constraintLeft_toLeftOf="@+id/score"
+                    app:layout_constraintRight_toRightOf="@+id/score"
+                    app:layout_constraintTop_toTopOf="@+id/score"
+                    app:layout_constraintVertical_bias="0.85" />
+
                 <TextView
                     android:id="@+id/ended"
                     android:layout_width="wrap_content"

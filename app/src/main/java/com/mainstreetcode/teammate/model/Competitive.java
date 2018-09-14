@@ -10,6 +10,7 @@ public interface Competitive extends RemoteImage, Parcelable {
 
     CharSequence getName();
 
-    boolean hasMajorFields();
+    boolean isEmpty();
 
+    boolean hasMajorFields();
 }

@@ -20,6 +20,7 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
 
     protected Game model;
 
+    private View highlight;
     private TextView homeText;
     private TextView awayText;
     private TextView ended;
@@ -35,6 +36,7 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         ended = itemView.findViewById(R.id.ended);
         homeText = itemView.findViewById(R.id.home);
         awayText = itemView.findViewById(R.id.away);
+        highlight = itemView.findViewById(R.id.highlight);
         homeThumbnail = itemView.findViewById(R.id.home_thumbnail);
         awayThumbnail = itemView.findViewById(R.id.away_thumbnail);
 
@@ -52,6 +54,7 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         homeText.setText(home.getName());
         awayText.setText(away.getName());
         ended.setVisibility(model.isEnded() ? View.VISIBLE : View.INVISIBLE);
+        highlight.setVisibility(model.isEnded() ? View.INVISIBLE : View.VISIBLE);
         homeText.setTypeface(homeText.getTypeface(), home.equals(winner) ? Typeface.BOLD : Typeface.NORMAL);
         awayText.setTypeface(awayText.getTypeface(), away.equals(winner) ? Typeface.BOLD : Typeface.NORMAL);
 

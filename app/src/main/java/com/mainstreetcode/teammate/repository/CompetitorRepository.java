@@ -81,18 +81,15 @@ public class CompetitorRepository extends QueryRepository<Competitor, Tournament
         return models -> {
             List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
-            List<Tournament> tournaments = new ArrayList<>(models.size());
 
             for (Competitor competitor : models) {
                 Competitive entity = competitor.getEntity();
                 if (entity instanceof Team) teams.add((Team) entity);
                 else if (entity instanceof User) users.add((User) entity);
-                tournaments.add(competitor.getTournament());
             }
 
             UserRepository.getInstance().saveAsNested().apply(users);
             TeamRepository.getInstance().saveAsNested().apply(teams);
-            TournamentRepository.getInstance().saveAsNested().apply(tournaments);
             competitorDao.upsert(Collections.unmodifiableList(models));
 
             return models;
