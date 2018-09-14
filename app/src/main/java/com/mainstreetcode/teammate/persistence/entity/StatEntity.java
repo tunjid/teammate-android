@@ -127,11 +127,8 @@ public class StatEntity implements Parcelable {
     }
 
     public boolean isHome() {
-        String refPath = game.refPath;
         Competitive home = game.home.entity;
-        return User.COMPETITOR_TYPE.equals(refPath)
-                ? user.equals(home)
-                : team.equals(home);
+        return user.equals(home) || team.equals(home);
     }
 
     @Override

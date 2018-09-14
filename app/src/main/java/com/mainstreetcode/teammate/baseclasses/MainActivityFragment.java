@@ -128,7 +128,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (Math.abs(dy) < 3) return;
         int position = scrollManager.getFirstVisiblePosition();
         if (position < 0) return;
-        setFabExtended(position == 0);
+        setFabExtended(position < 1);
     }
 
     @SuppressLint("CheckResult")

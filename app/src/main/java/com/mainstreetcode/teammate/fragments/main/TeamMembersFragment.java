@@ -105,17 +105,24 @@ public class TeamMembersFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_team_detail, menu);
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
         boolean visible = showsFab();
 
         MenuItem editItem = menu.findItem(R.id.action_edit);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
         MenuItem blockedItem = menu.findItem(R.id.action_blocked);
+        MenuItem tournamentItem = menu.findItem(R.id.action_tournaments);
 
         editItem.setVisible(visible);
         deleteItem.setVisible(visible);
         blockedItem.setVisible(visible);
+        tournamentItem.setVisible(team.getSport().supportsTournaments());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_team_detail, menu);
     }
 
     @Override

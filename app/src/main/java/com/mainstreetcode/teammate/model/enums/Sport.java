@@ -30,6 +30,8 @@ public class Sport extends MetaData {
         return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
     }
 
+    public boolean supportsTournaments() { return !tournamentStyles.isEmpty(); }
+
     public boolean supportsTournamentType(TournamentType type) {
         return tournamentTypes.contains(type.code);
     }
