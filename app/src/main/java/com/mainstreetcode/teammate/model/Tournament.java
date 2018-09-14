@@ -46,8 +46,9 @@ public class Tournament extends TournamentEntity
 
     public static Tournament empty(Team host) {
         Date date = new Date();
-        return new Tournament("", Config.getDefaultTournamentLogo(), "", "", "", date, host, host.getSport(),
-                Config.tournamentTypeFromCode(""), Config.tournamentStyleFromCode(""), Competitor.empty(),
+        Sport sport = host.getSport();
+        return new Tournament("", Config.getDefaultTournamentLogo(), "", "", "", date, host, sport,
+                sport.defaultTournamentType(), sport.defaultTournamentStyle(), Competitor.empty(),
                 1, 1, 0, 0, false);
     }
 

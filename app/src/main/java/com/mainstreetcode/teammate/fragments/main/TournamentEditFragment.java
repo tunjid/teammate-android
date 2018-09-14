@@ -23,6 +23,7 @@ import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
@@ -194,6 +195,9 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public boolean canEditAfterCreation() {
         return gofer.canEditAfterCreation();
     }
+
+    @Override
+    public Sport getSport() { return tournament.getSport(); }
 
     private void deleteTournament() {
         disposables.add(gofer.remove().subscribe(this::onTournamentDeleted, defaultErrorHandler));

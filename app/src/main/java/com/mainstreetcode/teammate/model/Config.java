@@ -97,12 +97,16 @@ public class Config implements Model<Config> {
         return getList(config -> config.blockReasons);
     }
 
-    public static List<TournamentType> getTournamentTypes() {
-        return getList(config -> config.tournamentTypes);
+    public static List<TournamentType> getTournamentTypes(Sport sport) {
+        return Flowable.fromIterable(getList(config -> config.tournamentTypes))
+                .filter(sport::supportsTournamentType)
+                .collect(ArrayList<TournamentType>::new, List::add).blockingGet();
     }
 
-    public static List<TournamentStyle> getTournamentStyles() {
-        return getList(config -> config.tournamentStyles);
+    public static List<TournamentStyle> getTournamentStyles(Sport sport) {
+        return Flowable.fromIterable(getList(config -> config.tournamentStyles))
+                .filter(sport::supportsTournamentStyle)
+                .collect(ArrayList<TournamentStyle>::new, List::add).blockingGet();
     }
 
     public static boolean isStaticVariant() {

@@ -5,35 +5,49 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Sport extends MetaData {
 
     private static final String THONK = "\uD83E\uDD14";
 
-    private boolean supportsLeague;
-    private boolean supportsKnockout;
-
     private String emoji;
     private StatTypes stats = new StatTypes();
+    private List<String> tournamentTypes = new ArrayList<>();
+    private List<String> tournamentStyles = new ArrayList<>();
 
-    Sport(String code, String name, String emoji, boolean supportsLeague, boolean supportsKnockout) {
+    Sport(String code, String name, String emoji) {
         super(code, name);
         this.emoji = emoji;
-        this.supportsLeague = supportsLeague;
-        this.supportsKnockout = supportsKnockout;
     }
 
     public static Sport empty() {
-        return new Sport("", App.getInstance().getString(R.string.any_sport), THONK, false, false);
+        return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
     }
 
-    public CharSequence appendEmoji(CharSequence text) {
-        return new SpanBuilder(App.getInstance(), getEmoji())
-                .appendCharsequence("   ")
-                .appendCharsequence(text)
-                .build();
+    public boolean supportsTournamentType(TournamentType type) {
+        return tournamentTypes.contains(type.code);
+    }
+
+    public boolean supportsTournamentStyle(TournamentStyle style) {
+        return tournamentStyles.contains(style.code);
+    }
+
+    public TournamentType defaultTournamentType() {
+        return tournamentTypes.isEmpty()
+                ? TournamentType.empty()
+                : Config.tournamentTypeFromCode(tournamentTypes.get(0));
+    }
+
+    public TournamentStyle defaultTournamentStyle() {
+        return tournamentStyles.isEmpty()
+                ? TournamentStyle.empty()
+                : Config.tournamentStyleFromCode(tournamentStyles.get(0));
     }
 
     public StatType statTypeFromCode(String code) {
@@ -50,6 +64,13 @@ public class Sport extends MetaData {
         return ModelUtils.processString(emoji);
     }
 
+    public CharSequence appendEmoji(CharSequence text) {
+        return new SpanBuilder(App.getInstance(), getEmoji())
+                .appendCharsequence("   ")
+                .appendCharsequence(text)
+                .build();
+    }
+
     public void update(Sport updated) {
         super.update(updated);
         this.emoji = updated.emoji;
@@ -59,26 +80,27 @@ public class Sport extends MetaData {
 
         private static final String EMOJI = "emoji";
         private static final String STAT_TYPES = "statTypes";
-        private static final String SUPPORTS_LEAGUE = "supportsLeague";
-        private static final String SUPPORTS_KNOCKOUT = "supportsKnockout";
+        private static final String TOURNAMENT_TYPES = "tournamentTypes";
+        private static final String TOURNAMENT_STYLES = "tournamentStyles";
 
         @Override
         Sport fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
-            boolean supportsLeague = ModelUtils.asBoolean(SUPPORTS_LEAGUE, body);
-            boolean supportsKnockout = ModelUtils.asBoolean(SUPPORTS_KNOCKOUT, body);
             String emoji = ModelUtils.asString(EMOJI, body);
 
-            Sport sport = new Sport(code, name, emoji, supportsLeague, supportsKnockout);
+            Sport sport = new Sport(code, name, emoji);
             ModelUtils.deserializeList(context, body.get(STAT_TYPES), sport.stats, StatType.class);
+            ModelUtils.deserializeList(context, body.get(TOURNAMENT_TYPES), sport.tournamentTypes, String.class);
+            ModelUtils.deserializeList(context, body.get(TOURNAMENT_STYLES), sport.tournamentStyles, String.class);
+
             return sport;
         }
 
         @Override
         JsonObject toJson(JsonObject serialized, Sport src, JsonSerializationContext context) {
             serialized.addProperty(EMOJI, src.emoji);
-            serialized.addProperty(SUPPORTS_LEAGUE, src.supportsLeague);
-            serialized.addProperty(SUPPORTS_KNOCKOUT, src.supportsKnockout);
             serialized.add(STAT_TYPES, context.serialize(src.stats));
+            serialized.add(TOURNAMENT_TYPES, context.serialize(src.tournamentTypes));
+            serialized.add(TOURNAMENT_STYLES, context.serialize(src.tournamentStyles));
             return serialized;
         }
     }
