@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.fragments.main;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -7,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -89,7 +92,9 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_edit).setVisible(localRoleViewModel.hasPrivilegedRole());
+        boolean hasPrivilegedRole = localRoleViewModel.hasPrivilegedRole();
+        menu.findItem(R.id.action_edit).setVisible(hasPrivilegedRole);
+        menu.findItem(R.id.action_delete).setVisible(hasPrivilegedRole);
     }
 
     @Override
@@ -106,6 +111,14 @@ public class TournamentDetailFragment extends MainActivityFragment {
             case R.id.action_standings:
                 showFragment(StatDetailFragment.newInstance(tournament));
                 break;
+            case R.id.action_delete:
+                Context context = getContext();
+                if (context == null) return true;
+                new AlertDialog.Builder(context).setTitle(getString(R.string.delete_tournament_prompt))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteTournament())
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                        .show();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -143,6 +156,20 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament));
+    }
+
+    private void deleteTournament() {
+        disposables.add(tournamentViewModel.delete(tournament).subscribe(this::onTournamentDeleted, defaultErrorHandler));
+    }
+
+    private void onTournamentDeleted(Tournament deleted) {
+        showSnackbar(getString(R.string.deleted_team, deleted.getName()));
+        removeEnterExitTransitions();
+
+        Activity activity;
+        if ((activity = getActivity()) == null) return;
+
+        activity.onBackPressed();
     }
 
     @SuppressWarnings("unchecked")

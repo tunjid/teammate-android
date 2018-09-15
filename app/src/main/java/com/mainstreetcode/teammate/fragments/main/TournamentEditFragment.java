@@ -1,13 +1,11 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -102,14 +100,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         switch (item.getItemId()) {
             case R.id.action_rounds:
                 showFragment(TournamentDetailFragment.newInstance(tournament));
-                break;
-            case R.id.action_delete:
-                Context context = getContext();
-                if (context == null) return true;
-                new AlertDialog.Builder(context).setTitle(getString(R.string.delete_tournament_prompt))
-                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteTournament())
-                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
-                        .show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -198,20 +188,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
 
     @Override
     public Sport getSport() { return tournament.getSport(); }
-
-    private void deleteTournament() {
-        disposables.add(gofer.remove().subscribe(this::onTournamentDeleted, defaultErrorHandler));
-    }
-
-    private void onTournamentDeleted() {
-        showSnackbar(getString(R.string.deleted_team, tournament.getName()));
-        removeEnterExitTransitions();
-
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        activity.onBackPressed();
-    }
 
     private void promptForCompetitors() {
         showSnackbar(getString(R.string.add_tournament_competitors_prompt), R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament)));
