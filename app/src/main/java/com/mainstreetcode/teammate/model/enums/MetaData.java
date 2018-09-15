@@ -15,7 +15,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class MetaData implements Identifiable{
+public class MetaData implements Identifiable {
 
     String code;
     String name;
@@ -47,6 +47,13 @@ public class MetaData implements Identifiable{
         if (!(o instanceof MetaData)) return false;
         MetaData metaData = (MetaData) o;
         return Objects.equals(code, metaData.code);
+    }
+
+    @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof MetaData)) return getId().equals(other.getId());
+        MetaData casted = (MetaData) other;
+        return this.code.equals(casted.code) && this.name.equals(casted.name);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
@@ -39,7 +40,7 @@ public class StatType extends MetaData {
     }
 
     public StatAttribute fromCode(String code) {
-        for (StatAttribute attribute : attributes) if (attribute.code.equals(code)) return attribute;
+        for (StatAttribute attr : attributes) if (attr.code.equals(code)) return attr;
         return StatAttribute.empty();
     }
 
@@ -53,6 +54,13 @@ public class StatType extends MetaData {
         this.emoji = updated.emoji;
         this.sportCode = updated.sportCode;
         ModelUtils.replaceList(attributes, updated.attributes);
+    }
+
+    @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        boolean result = super.areContentsTheSame(other);
+        if (!(other instanceof StatType)) return result;
+        return result && sportCode.equals(((StatType) other).sportCode);
     }
 
     @Override
@@ -87,6 +95,7 @@ public class StatType extends MetaData {
         @Override
         JsonObject toJson(JsonObject serialized, StatType src, JsonSerializationContext context) {
             serialized.addProperty(EMOJI_KEY, src.emoji);
+            serialized.addProperty(SPORT, src.sportCode);
             serialized.add(ATTRIBUTES, context.serialize(src.attributes));
 
             return serialized;

@@ -76,7 +76,7 @@ public class Stat extends StatEntity
     public boolean areContentsTheSame(Identifiable other) {
         if (!(other instanceof Stat)) return id.equals(other.getId());
         Stat casted = (Stat) other;
-        return statType.equals(casted.statType) && user.equals(casted.user)
+        return statType.areContentsTheSame(casted.statType) && user.areContentsTheSame(casted.user)
                 && value == casted.value && time == casted.time;
     }
 
