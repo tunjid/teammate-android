@@ -87,7 +87,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.action_rounds).setVisible(!tournament.isEmpty());
-        menu.findItem(R.id.action_delete).setVisible(gofer.canEditAfterCreation());
     }
 
     @Override
