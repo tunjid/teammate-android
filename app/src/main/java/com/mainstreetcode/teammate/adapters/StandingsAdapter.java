@@ -7,6 +7,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Row;
+import com.mainstreetcode.teammate.util.SyncedScrollView;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -16,11 +17,11 @@ import java.util.List;
  * Adapter for {@link Event}
  */
 
-public class StandingsAdapter extends BaseRecyclerViewAdapter<StandingRowViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class StandingsAdapter extends BaseRecyclerViewAdapter<StandingRowViewHolder, StandingsAdapter.AdapterListener> {
 
     private final List<Row> items;
 
-    public StandingsAdapter(List<Row> items, BaseRecyclerViewAdapter.AdapterListener listener) {
+    public StandingsAdapter(List<Row> items, StandingsAdapter.AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -47,6 +48,10 @@ public class StandingsAdapter extends BaseRecyclerViewAdapter<StandingRowViewHol
     @Override
     public long getItemId(int position) {
         return items.get(position).hashCode();
+    }
+
+    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener{
+        void addScrollNotifier(SyncedScrollView notifier);
     }
 
 }

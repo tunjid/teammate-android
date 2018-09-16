@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StandingsAdapter;
+import com.mainstreetcode.teammate.util.SyncedScrollManager;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
@@ -16,7 +17,6 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 /**
  * Lists {@link Event tournaments}
@@ -29,6 +29,7 @@ public final class StandingsFragment extends MainActivityFragment {
     private Tournament tournament;
     private Standings standings;
     private StandingRowViewHolder viewHolder;
+    private SyncedScrollManager syncedScrollManager = new SyncedScrollManager();
 
     public static StandingsFragment newInstance(Tournament team) {
         StandingsFragment fragment = new StandingsFragment();
@@ -71,11 +72,11 @@ public final class StandingsFragment extends MainActivityFragment {
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchStandings(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new StandingsAdapter(standings.getTable(), new BaseRecyclerViewAdapter.AdapterListener() {}))
+                .withAdapter(new StandingsAdapter(standings.getTable(), syncedScrollManager::addScrollClient))
                 .withLinearLayoutManager()
                 .build();
 
-        viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), new BaseRecyclerViewAdapter.AdapterListener() {});
+        viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), syncedScrollManager::addScrollClient);
         viewHolder.thumbnail.setVisibility(View.GONE);
         viewHolder.position.setVisibility(View.GONE);
 
@@ -86,6 +87,12 @@ public final class StandingsFragment extends MainActivityFragment {
     public void onResume() {
         super.onResume();
         fetchStandings(false);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        syncedScrollManager.clearClients();
     }
 
     @Override
@@ -105,5 +112,6 @@ public final class StandingsFragment extends MainActivityFragment {
         scrollManager.notifyDataSetChanged();
         viewHolder.bindColumns(standings.getColumnNames());
         toggleProgress(false);
+        if (!restoredFromBackStack()) syncedScrollManager.jog();
     }
 }

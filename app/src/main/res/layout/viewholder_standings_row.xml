@@ -61,17 +61,24 @@
         app:layout_constraintRight_toRightOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/item_row"
+    <com.mainstreetcode.teammate.util.SyncedScrollView
+        android:id="@+id/synced_scrollview"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/half_margin"
-        android:paddingLeft="@dimen/single_margin"
-        android:paddingRight="@dimen/single_margin"
-        android:paddingTop="@dimen/half_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/item_title"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/item_row"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/quarter_margin"
+            android:paddingLeft="@dimen/single_margin"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingTop="@dimen/quarter_margin" />
+    </com.mainstreetcode.teammate.util.SyncedScrollView>
 </android.support.constraint.ConstraintLayout>
