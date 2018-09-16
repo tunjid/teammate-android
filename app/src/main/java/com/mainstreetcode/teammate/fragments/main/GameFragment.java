@@ -158,6 +158,7 @@ public final class GameFragment extends MainActivityFragment {
     private void endGameRequest() {
         new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.game_end_request)
+                .setMessage(R.string.game_end_prompt)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
                     toggleProgress(true);
                     disposables.add(gameViewModel.endGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
