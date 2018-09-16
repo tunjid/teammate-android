@@ -18,10 +18,13 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Flowable;
 
 /**
  * Searches for teams
@@ -59,6 +62,15 @@ public final class TeamSearchFragment extends MainActivityFragment
 
     @Override
     @SuppressWarnings("ConstantConditions")
+    public String getStableTag() {
+        String superResult = super.getStableTag();
+        Identifiable identifiable = getArguments().getParcelable(ARG_TOURNAMENT);
+
+        return identifiable == null ? superResult : superResult + "-" + identifiable.hashCode();
+    }
+
+    @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -82,9 +94,11 @@ public final class TeamSearchFragment extends MainActivityFragment
         searchView.setIconified(false);
         createTeam.setOnClickListener(this);
 
-        if (getTargetFragment() != null) {
+        if (getTargetRequestCode() != 0) {
             teams.clear();
-            teams.addAll(teamViewModel.getModelList(Team.class));
+            disposables.add(Flowable.fromIterable(teamViewModel.getModelList(Team.class))
+                    .filter(this::IsEligibleTeam)
+                    .subscribe(teams::add, ErrorHandler.EMPTY));
         }
 
         return rootView;
@@ -150,5 +164,10 @@ public final class TeamSearchFragment extends MainActivityFragment
         this.teams.clear();
         this.teams.addAll(teams);
         scrollManager.notifyDataSetChanged();
+    }
+
+    private boolean IsEligibleTeam(Identifiable team) {
+        return TextUtils.isEmpty(request.getSport()) || (!(team instanceof Team)
+                || ((Team) team).getSport().getCode().equals(request.getSport()));
     }
 }

@@ -193,7 +193,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return canEditEvent();}
+    public boolean showsFab() {return gofer.hasPrivilegedRole();}
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}

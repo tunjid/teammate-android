@@ -151,7 +151,8 @@ public final class CompetitorsFragment extends MainActivityFragment
     }
 
     private void findCompetitor() {
-        BaseFragment fragment = User.COMPETITOR_TYPE.equals(tournament.getRefPath())
+        boolean isBetweenUsers = User.COMPETITOR_TYPE.equals(tournament.getRefPath());
+        BaseFragment fragment = isBetweenUsers
                 ? TeamMembersFragment.newInstance(tournament.getHost())
                 : Team.COMPETITOR_TYPE.equals(tournament.getRefPath())
                 ? TeamSearchFragment.newInstance(tournament)
@@ -160,10 +161,12 @@ public final class CompetitorsFragment extends MainActivityFragment
         if (fragment == null) return;
         fragment.setTargetFragment(this, R.id.request_competitor_pick);
 
-        showBottomSheet(BottomSheetController.Args.builder()
+        BottomSheetController.Builder builder = BottomSheetController.Args.builder()
                 .setMenuRes(R.menu.empty)
-                .setFragment(fragment)
-                .build());
+                .setFragment(fragment);
+
+        if (isBetweenUsers) builder.setTitle(getString(R.string.add_competitor));
+        showBottomSheet(builder.build());
     }
 
     private void addCompetitor(Competitive item) {

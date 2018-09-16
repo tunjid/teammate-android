@@ -167,7 +167,7 @@ public class TeamMembersFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return getParentFragment() == null && localRoleViewModel.hasPrivilegedRole();
+        return getTargetRequestCode() == 0 && localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
