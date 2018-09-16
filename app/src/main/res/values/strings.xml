@@ -202,10 +202,10 @@
     <string name="tournament_description">Tournament Description</string>
     <string name="tournament_type">Tournament Type</string>
     <string name="tournament_style">Tournament Style</string>
-    <string name="tournament_legs">Number of legs</string>
+    <string name="tournament_legs">Number of legs / sets per match up</string>
     <string name="tournament_round">Number of rounds</string>
     <string name="tournament_round_index">Round %1$d</string>
-    <string name="tournament_single_final">One game final</string>
+    <string name="tournament_single_final">One game final (Valid for knockout only)</string>
     <string name="tournament_winner">🥇  CHAMPION   🏆</string>
     <string name="tournament_edit">Edit Tournament</string>
     <string name="tournament_standings">Standings</string>

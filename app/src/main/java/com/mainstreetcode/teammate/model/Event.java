@@ -65,7 +65,7 @@ public class Event extends EventEntity
     }
 
     public  void setName(Game game) {
-        name = game.getHome().getName() + " Vs." + game.getAway().getName();
+        name = game.getHome().getName() + " Vs. " + game.getAway().getName();
     }
 
     @Override

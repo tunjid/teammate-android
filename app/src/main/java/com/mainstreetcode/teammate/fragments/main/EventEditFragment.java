@@ -91,6 +91,9 @@ public class EventEditFragment extends HeaderedFragment<Event>
         Bundle args = getArguments();
         game = args.getParcelable(ARG_GAME);
         event = game != null ? game.getEvent() : args.getParcelable(ARG_EVENT);
+
+        assert event != null;
+        if (game != null && event.isEmpty()) event.setName(game);
         gofer = eventViewModel.gofer(event);
     }
 
