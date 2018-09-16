@@ -42,7 +42,7 @@
     <string name="home">Home</string>
     <string name="events">Events</string>
     <string name="chats">Chats</string>
-    <string name="media">Media</string>
+    <string name="media">Gallery</string>
     <string name="my_teams">My Teams</string>
 
     <string name="team">Team</string>
@@ -155,7 +155,7 @@
     <string name="confirm_user_leave">Leave this team?</string>
 
     <!--EventsFragment-->
-    <string name="events_title">Events for %1$s</string>
+    <string name="events_title">%1$s Events</string>
 
     <!--EventDetailFragment-->
     <string name="create_event">Create Event</string>
@@ -285,7 +285,7 @@
 
     <!--MediaFragment-->
     <string name="media_add">Add media</string>
-    <string name="media_title">Media for %1$s</string>
+    <string name="media_title">%1$s Gallery</string>
     <string name="media_upload_channel_name">Media upload</string>
     <string name="media_upload_channel_description">Notifications for media uploads</string>
     <string name="uploading_media">Uploading files</string>
@@ -315,8 +315,8 @@
     <string name="join_requests">Join Requests</string>
     <string name="chats_notification_title">%1$s • %2$s</string>
     <string name="chats_notifier_description">Notifications for team chats</string>
-    <string name="team_notifier_description">Notifications for media</string>
-    <string name="role_notifier_description">Notifications for media</string>
+    <string name="team_notifier_description">Notifications for teams</string>
+    <string name="role_notifier_description">Notifications for roles</string>
     <string name="events_notifier_description">Notifications for events</string>
     <string name="media_notifier_description">Notifications for media</string>
     <string name="join_requests_notifier_description">Notifications for join requests</string>
