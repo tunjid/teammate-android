@@ -100,6 +100,7 @@ public final class GameFragment extends MainActivityFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.action_end_game).setVisible(showsFab());
+        menu.findItem(R.id.action_event).setVisible(!game.getEvent().isEmpty() || fabStatus.get());
     }
 
     @Override
