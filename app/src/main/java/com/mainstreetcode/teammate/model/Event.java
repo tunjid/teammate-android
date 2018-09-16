@@ -64,6 +64,10 @@ public class Event extends EventEntity
         super(in);
     }
 
+    public  void setName(Game game) {
+        name = game.getHome().getName() + " Vs." + game.getAway().getName();
+    }
+
     @Override
     public List<Item<Event>> asItems() {
         return Arrays.asList(

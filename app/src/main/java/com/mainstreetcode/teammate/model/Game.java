@@ -190,8 +190,12 @@ public class Game extends GameEntity
 
             if (event == null) event = Event.empty();
 
-            return new Game(id, refPath, score, ModelUtils.parseDate(created), sport,
+            Game game = new Game(id, refPath, score, ModelUtils.parseDate(created), sport,
                     event, tournament, home, away, winner, seed, leg, round, ended, canDraw);
+
+            if (event.isEmpty()) event.setName(game);
+
+            return game;
         }
     }
 }
