@@ -16,16 +16,27 @@ import java.util.Map;
  * Event events
  */
 
-public class Row implements Identifiable{
+public class Row implements Identifiable {
 
     private final String id;
     private final Competitor competitor;
     private final List<String> tableValues = new ArrayList<>();
 
+    public static Row empty() {
+        return new Row("", Competitor.empty());
+    }
+
     private Row(String id, Competitor competitor) {
         this.id = id;
         this.competitor = competitor;
     }
+
+    public void update(Row updated) {
+        tableValues.clear();
+        tableValues.addAll(updated.tableValues);
+    }
+
+    public void add(String column) { tableValues.add(column); }
 
     public String getId() { return id; }
 
@@ -33,7 +44,7 @@ public class Row implements Identifiable{
 
     public CharSequence getName() { return competitor.getName(); }
 
-    public List<String>  getColumns() { return tableValues; }
+    public List<String> getColumns() { return tableValues; }
 
     public static class GsonAdapter
             implements

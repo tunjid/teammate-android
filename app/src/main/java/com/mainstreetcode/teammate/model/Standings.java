@@ -26,8 +26,9 @@ public class Standings {
 
     private String id;
     private String tournamentId;
+
+    private Row titleRow = Row.empty();
     private List<Row> table = new ArrayList<>();
-    private List<String> columnNames = new ArrayList<>();
 
     public static Standings forTournament(Tournament tournament) {
         return new Standings("", tournament.getId());
@@ -38,15 +39,14 @@ public class Standings {
         this.tournamentId = tournamentId;
     }
 
-    public List<String> getColumnNames() { return columnNames; }
+    public List<String> getColumnNames() { return titleRow.getColumns(); }
 
     public Standings update(Standings other) {
         this.id = other.id;
         this.tournamentId = other.tournamentId;
         table.clear();
         table.addAll(other.table);
-        columnNames.clear();
-        columnNames.addAll(other.columnNames);
+        titleRow.update(other.titleRow);
         return this;
     }
 
@@ -80,7 +80,7 @@ public class Standings {
             Flowable.fromIterable(columnObject.entrySet())
                     .filter(entry -> !entry.getKey().equals("competitor"))
                     .map(Map.Entry::getKey).map(Object::toString)
-                    .subscribe(standings.columnNames::add, ErrorHandler.EMPTY);
+                    .subscribe(standings.titleRow::add, ErrorHandler.EMPTY);
 
             return standings;
         }
