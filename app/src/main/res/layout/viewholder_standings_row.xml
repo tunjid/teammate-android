@@ -66,6 +66,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
+        android:paddingLeft="@dimen/single_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:scrollbarThumbHorizontal="@drawable/bg_fab"
+        android:scrollbarTrackHorizontal="@drawable/bg_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/item_title"
         app:layout_constraintRight_toRightOf="parent"
@@ -77,8 +81,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:paddingBottom="@dimen/quarter_margin"
-            android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/quarter_margin" />
     </com.mainstreetcode.teammate.util.SyncedScrollView>
 </android.support.constraint.ConstraintLayout>

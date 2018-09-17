@@ -25,6 +25,7 @@ public class StandingRowViewHolder extends BaseViewHolder<StandingsAdapter.Adapt
     public TextView position;
     public ImageView thumbnail;
     private LinearLayout columns;
+    private SyncedScrollView scrollView;
 
     public StandingRowViewHolder(View itemView, StandingsAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
@@ -32,9 +33,7 @@ public class StandingRowViewHolder extends BaseViewHolder<StandingsAdapter.Adapt
         position = itemView.findViewById(R.id.item_position);
         thumbnail = itemView.findViewById(R.id.thumbnail);
         columns = itemView.findViewById(R.id.item_row);
-
-        SyncedScrollView scrollView = itemView.findViewById(R.id.synced_scrollview);
-        scrollView.setHorizontalScrollBarEnabled(false);
+        scrollView = itemView.findViewById(R.id.synced_scrollview);
 
         adapterListener.addScrollNotifier(scrollView);
     }
@@ -44,6 +43,8 @@ public class StandingRowViewHolder extends BaseViewHolder<StandingsAdapter.Adapt
 
         int adapterPosition = getAdapterPosition();
         position.setText(String.valueOf(adapterPosition + 1));
+        scrollView.setHorizontalScrollBarEnabled(adapterPosition < 0);
+
 
         String imageUrl = model.getImageUrl();
         if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey);
