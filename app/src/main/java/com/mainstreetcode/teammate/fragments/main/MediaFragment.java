@@ -96,7 +96,6 @@ public class MediaFragment extends MainActivityFragment
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new MediaAdapter(items, this))
-                .addScrollListener(this::updateFabOnScroll)
                 .withGridLayoutManager(4)
                 .build();
 
