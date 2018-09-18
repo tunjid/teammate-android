@@ -40,7 +40,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         Consumer<Throwable> onError = throwable -> checkForInvalidObject(throwable, stat, stat.getGame());
         Function<Team, User> userFunction = team -> UserRepository.getInstance().getCurrentUser();
         Function<Stat, Flowable<Team>> eligibleTeamSource = sourceStat -> GameViewModel.getEligibleTeamsForGame(stat.getGame());
-        return new StatGofer(stat, onError, userFunction, this::createOrUpdateStat, this::delete, eligibleTeamSource);
+        return new StatGofer(stat, onError, userFunction, repository::get, repository::createOrUpdate, this::delete, eligibleTeamSource);
     }
 
     @Override
@@ -53,10 +53,6 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         if (!modelListMap.containsKey(game)) modelListMap.put(game, modelList = new ArrayList<>());
 
         return modelList;
-    }
-
-    private Single<Stat> createOrUpdateStat(final Stat tournament) {
-        return repository.createOrUpdate(tournament);
     }
 
     public Single<Stat> delete(final Stat stat) {

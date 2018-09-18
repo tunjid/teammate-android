@@ -95,9 +95,11 @@ public class Game extends GameEntity
         this.id = updatedGame.id;
         this.score = updatedGame.score;
         this.created = updatedGame.created;
+        this.leg = updatedGame.leg;
         this.seed = updatedGame.seed;
         this.round = updatedGame.round;
-        this.leg = updatedGame.leg;
+        this.homeScore = updatedGame.homeScore;
+        this.awayScore = updatedGame.awayScore;
         this.ended = updatedGame.ended;
         this.canDraw = updatedGame.canDraw;
         this.sport.update(updatedGame.sport);
@@ -166,6 +168,8 @@ public class Game extends GameEntity
         public JsonElement serialize(Game src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject body = new JsonObject();
             body.addProperty(ENDED, src.ended);
+            body.addProperty(HOME_SCORE, src.homeScore);
+            body.addProperty(AWAY_SCORE, src.awayScore);
             if (!src.event.isEmpty()) body.addProperty(EVENT, src.event.getId());
             return body;
         }

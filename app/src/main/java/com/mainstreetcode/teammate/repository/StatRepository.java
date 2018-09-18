@@ -57,7 +57,7 @@ public class StatRepository extends QueryRepository<Stat, Game, Date> {
     public Single<Stat> createOrUpdate(Stat stat) {
         Single<Stat> statSingle = stat.isEmpty()
                 ? api.createStat(stat.getGame().getId(), stat).map(getLocalUpdateFunction(stat))
-                : api.updateStat(stat.getGame().getId(), stat.getId(), stat)
+                : api.updateStat(stat.getId(), stat)
                 .map(getLocalUpdateFunction(stat))
                 .doOnError(throwable -> deleteInvalidModel(stat, throwable));
 
@@ -66,12 +66,15 @@ public class StatRepository extends QueryRepository<Stat, Game, Date> {
 
     @Override
     public Flowable<Stat> get(String id) {
-        return statDao.get(id).subscribeOn(io()).toFlowable();
+        Maybe<Stat> local = statDao.get(id).subscribeOn(io());
+        Maybe<Stat> remote = api.getStat(id).subscribeOn(io()).toMaybe();
+
+        return fetchThenGetModel(local, remote);
     }
 
     @Override
     public Single<Stat> delete(Stat stat) {
-        return api.deleteStat(stat.getGame().getId(), stat.getId())
+        return api.deleteStat(stat.getId())
                 .map(this::deleteLocally)
                 .doOnError(throwable -> deleteInvalidModel(stat, throwable));
     }

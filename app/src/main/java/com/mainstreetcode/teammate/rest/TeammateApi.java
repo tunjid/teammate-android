@@ -316,11 +316,14 @@ public interface TeammateApi {
     @POST("api/games/{gameId}/stats")
     Single<Stat> createStat(@Path(GAME_PATH) String gameId, @Body Stat stat);
 
-    @PUT("api/games/{gameId}/stats/{statId}")
-    Single<Stat> updateStat(@Path(GAME_PATH) String gameId, @Path(STAT_PATH) String statId, @Body Stat stat);
+    @GET("api/stats/{statId}")
+    Single<Stat> getStat(@Path(STAT_PATH) String statId);
 
-    @DELETE("/api/games/{gameId}/stats/{statId}")
-    Single<Stat> deleteStat(@Path(GAME_PATH) String gameId, @Path(STAT_PATH) String statId);
+    @PUT("api/stats/{statId}")
+    Single<Stat> updateStat(@Path(STAT_PATH) String statId, @Body Stat stat);
+
+    @DELETE("/api/stats/{statId}")
+    Single<Stat> deleteStat(@Path(STAT_PATH) String statId);
 
     @GET("api/games/{gameId}/stats")
     Single<List<Stat>> getStats(@Path(GAME_PATH) String gameId, @Query(DATE_QUERY) Date date);

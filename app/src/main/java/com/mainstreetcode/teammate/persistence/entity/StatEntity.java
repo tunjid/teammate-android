@@ -60,7 +60,7 @@ public class StatEntity implements Parcelable {
         this.game = game;
         this.value = value;
         this.time = time;
-        this.attributes = attributes;
+        this.attributes = attributes == null ? new StatAttributes() : attributes;
     }
 
     protected StatEntity(Parcel in) {

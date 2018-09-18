@@ -30,6 +30,7 @@ public class StatGofer extends Gofer<Stat> {
     private final List<Identifiable> items;
     private final List<Team> eligibleTeams;
     private final Function<Team, User> teamUserFunction;
+    private final Function<Stat, Flowable<Stat>> getFunction;
     private final Function<Stat, Single<Stat>> upsertFunction;
     private final Function<Stat, Single<Stat>> deleteFunction;
     private final Function<Stat, Flowable<Team>> eligibleTeamSource;
@@ -37,11 +38,13 @@ public class StatGofer extends Gofer<Stat> {
 
     public StatGofer(Stat model, Consumer<Throwable> onError,
                      Function<Team, User> teamUserFunction,
+                     Function<Stat, Flowable<Stat>> getFunction,
                      Function<Stat, Single<Stat>> upsertFunction,
                      Function<Stat, Single<Stat>> deleteFunction,
                      Function<Stat, Flowable<Team>> eligibleTeamSource) {
         super(model, onError);
         this.teamUserFunction = teamUserFunction;
+        this.getFunction = getFunction;
         this.upsertFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
         this.eligibleTeamSource = eligibleTeamSource;
@@ -75,7 +78,8 @@ public class StatGofer extends Gofer<Stat> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        return Flowable.empty();
+        Flowable<List<Identifiable>> source = Flowable.defer(() -> getFunction.apply(model)).map(Stat::asIdentifiables);
+        return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
