@@ -5,17 +5,22 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.repository.GameRepository;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -25,6 +30,12 @@ public class GameViewModel extends BaseViewModel {
     private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
     private final GameRepository gameRepository = GameRepository.getInstance();
 
+    public GameGofer gofer(Game game) {
+        Consumer<Throwable> onError = throwable -> {};
+        android.arch.core.util.Function<Game, Flowable<Team>> eligibleTeamSource = sourceStat -> getEligibleTeamsForGame(game);
+        return new GameGofer(game, onError, this::getGame, this::updateGame, eligibleTeamSource);
+    }
+
     @SuppressLint("UseSparseArrays")
     public List<Identifiable> getGamesForRound(Tournament tournament, int round) {
         Map<Integer, List<Identifiable>> roundMap = ModelUtils.get(tournament, gameRoundMap, HashMap::new);
@@ -33,22 +44,34 @@ public class GameViewModel extends BaseViewModel {
 
     public Flowable<DiffUtil.DiffResult> fetchGamesInRound(Tournament tournament, int round) {
         Flowable<List<Game>> flowable = gameRepository.modelsBefore(tournament, round);
-        Function<List<Game>, List<Identifiable>> listMapper = items -> new ArrayList<>(items);
+        Function<List<Game>, List<Identifiable>> listMapper = ArrayList<Identifiable>::new;
         return Identifiable.diff(flowable.map(listMapper), () -> getGamesForRound(tournament, round), this::preserveList);
 
     }
 
-    public Completable getGame(Game game) {
-        return gameRepository.get(game).ignoreElements().observeOn(mainThread());
+    public Flowable<Game> getGame(Game game) {
+        return gameRepository.get(game).observeOn(mainThread());
     }
 
-    public Completable endGame(Game game) {
+    public Single<Game> endGame(Game game) {
         game.setEnded(true);
         return updateGame(game);
     }
 
-    public Completable updateGame(Game game) {
-        return gameRepository.createOrUpdate(game).toCompletable()
+    public Single<Game> updateGame(Game game) {
+        return gameRepository.createOrUpdate(game)
                 .doOnError(throwable -> game.setEnded(false)).observeOn(mainThread());
+    }
+
+    static Flowable<Team> getEligibleTeamsForGame(Game game) {
+        if (game.betweenUsers()) return Flowable.just(game.getTournament().getHost());
+        return Flowable.fromIterable(RoleViewModel.roles)
+                .filter(identifiable -> identifiable instanceof Role).cast(Role.class)
+                .filter(Role::isPrivilegedRole).map(RoleEntity::getTeam)
+                .filter(team -> isParticipant(game, team));
+    }
+
+    private static boolean isParticipant(Game game, Team team) {
+        return game.getHome().getEntity().equals(team) || game.getAway().getEntity().equals(team);
     }
 }

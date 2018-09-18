@@ -240,7 +240,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
                     showSnackbar(getString(stringRes, event.getName()));
                     if (game != null) {
                         toggleProgress(true);
-                        disposables.add(gameViewModel.updateGame(game).subscribe(requireActivity()::onBackPressed, defaultErrorHandler));
+                        disposables.add(gameViewModel.updateGame(game).subscribe(ignored -> requireActivity().onBackPressed(), defaultErrorHandler));
                     }
                 }, defaultErrorHandler));
                 break;

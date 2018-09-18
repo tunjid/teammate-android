@@ -1,0 +1,78 @@
+package com.mainstreetcode.teammate.viewmodel.gofers;
+
+import android.arch.core.util.Function;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.util.DiffUtil;
+
+import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Team;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
+
+public class GameGofer extends Gofer<Game> {
+
+    private final List<Identifiable> items;
+    private final List<Team> eligibleTeams;
+    private final Function<Game, Flowable<Game>> getFunction;
+    private final Function<Game, Single<Game>> upsertFunction;
+    private final Function<Game, Flowable<Team>> eligibleTeamSource;
+
+
+    public GameGofer(Game model, Consumer<Throwable> onError,
+                     Function<Game, Flowable<Game>> getFunction,
+                     Function<Game, Single<Game>> upsertFunction,
+                     Function<Game, Flowable<Team>> eligibleTeamSource) {
+        super(model, onError);
+        this.getFunction = getFunction;
+        this.upsertFunction = upsertFunction;
+        this.eligibleTeamSource = eligibleTeamSource;
+
+        this.eligibleTeams = new ArrayList<>();
+        this.items = new ArrayList<>(model.asItems());
+    }
+
+    public List<Identifiable> getItems() {
+        return items;
+    }
+
+    public boolean canEdit() {
+        return !model.isEnded() && !eligibleTeams.isEmpty();
+    }
+
+    @Override
+    public Completable prepare() {
+        eligibleTeams.clear();
+        return Flowable.defer(() -> eligibleTeamSource.apply(model))
+                .doOnNext(eligibleTeams::add).ignoreElements();
+    }
+
+    @Override
+    public Flowable<DiffUtil.DiffResult> fetch() {
+        Flowable<List<Identifiable>> source = Flowable.defer(() -> getFunction.apply(model)).map(Game::asIdentifiables);
+        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
+    }
+
+    @Override
+    Completable delete() {
+        return Completable.complete();
+    }
+
+    @Override
+    @Nullable
+    public String getImageClickMessage(Fragment fragment) {
+        return null;
+    }
+
+    Single<DiffUtil.DiffResult> upsert() {
+        Single<List<Identifiable>> source = Single.defer(() -> upsertFunction.apply(model)).map(Game::asIdentifiables);
+        return Identifiable.diff(source, this::getItems, this::preserveItems);
+    }
+}

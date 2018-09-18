@@ -223,9 +223,18 @@
     <!--GameFragment-->
     <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
+    <string name="game_add">Add game</string>
+    <string name="game_edit">Edit game</string>
+    <string name="game_create">Create game</string>
+    <string name="game_update">Update game</string>
+    <string name="game_home_score">Home score</string>
+    <string name="game_away_score">Away score</string>
+    <string name="game_round">Round</string>
+    <string name="game_leg">Leg</string>
     <string name="game_stats">Game stats</string>
     <string name="game_end">End game</string>
     <string name="game_end_request">End game?</string>
+    <string name="game_manual_score_request">Enter scores manually?</string>
     <string name="game_end_prompt">This will end the game for everyone.\n\nStats will not be able to be added or deleted, but the times can be changed.</string>
     <string name="game_event">Game event</string>
     <string name="game_ended">FT</string>

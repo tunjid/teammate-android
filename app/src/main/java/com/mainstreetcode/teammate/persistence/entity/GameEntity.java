@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
+import static com.mainstreetcode.teammate.util.ModelUtils.parse;
 
 
 @Entity(tableName = "games",
@@ -48,6 +49,8 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_leg") protected int leg;
     @ColumnInfo(name = "game_seed") protected int seed;
     @ColumnInfo(name = "game_round") protected int round;
+    @ColumnInfo(name = "game_home_score") protected int homeScore;
+    @ColumnInfo(name = "game_away_score") protected int awayScore;
 
     @ColumnInfo(name = "game_ended") protected boolean ended;
     @ColumnInfo(name = "game_can_draw") protected boolean canDraw;
@@ -55,7 +58,7 @@ public class GameEntity implements Parcelable {
     public GameEntity(@NonNull String id, String refPath, String score,
                       Date created, Sport sport, Event event, Tournament tournament,
                       Competitor home, Competitor away, Competitor winner,
-                      int seed, int leg, int round,
+                      int seed, int leg, int round, int homeScore, int awayScore,
                       boolean ended, boolean canDraw) {
         this.id = id;
         this.refPath = refPath;
@@ -70,6 +73,8 @@ public class GameEntity implements Parcelable {
         this.seed = seed;
         this.leg = leg;
         this.round = round;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
         this.ended = ended;
         this.canDraw = canDraw;
     }
@@ -88,6 +93,8 @@ public class GameEntity implements Parcelable {
         seed = in.readInt();
         leg = in.readInt();
         round = in.readInt();
+        homeScore = in.readInt();
+        awayScore = in.readInt();
         ended = in.readByte() != 0x00;
         canDraw = in.readByte() != 0x00;
     }
@@ -129,10 +136,6 @@ public class GameEntity implements Parcelable {
         return away;
     }
 
-    public int getSeed() {
-        return seed;
-    }
-
     public String getScore() { return score; }
 
     public Sport getSport() {
@@ -151,9 +154,17 @@ public class GameEntity implements Parcelable {
         return leg;
     }
 
+    public int getSeed() {
+        return seed;
+    }
+
     public int getRound() {
         return round;
     }
+
+    public int getHomeScore() { return homeScore; }
+
+    public int getAwayScore() { return awayScore; }
 
     public boolean isEnded() {
         return ended;
@@ -170,6 +181,12 @@ public class GameEntity implements Parcelable {
     public void setEnded(boolean ended) {
         this.ended = ended;
     }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setHomeScore(String homeScore) { this.homeScore = parse(homeScore); }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setAwayScore(String awayScore) { this.awayScore = parse(awayScore); }
 
     @Override
     public boolean equals(Object o) {
@@ -207,6 +224,8 @@ public class GameEntity implements Parcelable {
         dest.writeInt(seed);
         dest.writeInt(leg);
         dest.writeInt(round);
+        dest.writeInt(homeScore);
+        dest.writeInt(awayScore);
         dest.writeByte((byte) (ended ? 0x01 : 0x00));
         dest.writeByte((byte) (canDraw ? 0x01 : 0x00));
     }

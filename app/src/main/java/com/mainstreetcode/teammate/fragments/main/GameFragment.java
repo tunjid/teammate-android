@@ -75,7 +75,8 @@ public final class GameFragment extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game, container, false);
-        gameViewHolder = new GameViewHolder(rootView.findViewById(R.id.app_bar), ignored -> {});
+        View appBar = rootView.findViewById(R.id.app_bar);
+        gameViewHolder = new GameViewHolder(appBar, ignored -> {});
         gameViewHolder.bind(game);
 
         Runnable refreshAction = () -> disposables.add(statViewModel.refresh(game).subscribe(GameFragment.this::onGamesUpdated, defaultErrorHandler));
@@ -91,6 +92,8 @@ public final class GameFragment extends MainActivityFragment {
 
         scrollManager.setViewHolderColor(R.color.dark_grey);
 
+
+        rootView.findViewById(R.id.score).setOnClickListener(view -> showFragment(GameEditFragment.newInstance(game)));
         rootView.findViewById(R.id.date).setOnClickListener(view -> showFragment(EventEditFragment.newInstance(game)));
 
         return rootView;
@@ -184,7 +187,7 @@ public final class GameFragment extends MainActivityFragment {
         scrollManager.onDiff(result);
     }
 
-    private void onGameUpdated() {
+    private void onGameUpdated(Game game) {
         gameViewHolder.bind(game);
         toggleProgress(false);
         togglePersistentUi();

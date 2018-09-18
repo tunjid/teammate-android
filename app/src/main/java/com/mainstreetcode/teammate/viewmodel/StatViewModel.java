@@ -4,11 +4,9 @@ import android.arch.core.util.Function;
 
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.repository.StatRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
@@ -41,7 +39,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     public StatGofer gofer(Stat stat) {
         Consumer<Throwable> onError = throwable -> checkForInvalidObject(throwable, stat, stat.getGame());
         Function<Team, User> userFunction = team -> UserRepository.getInstance().getCurrentUser();
-        Function<Stat, Flowable<Team>> eligibleTeamSource = sourceStat -> getEligibleTeamsForGame(stat.getGame());
+        Function<Stat, Flowable<Team>> eligibleTeamSource = sourceStat -> GameViewModel.getEligibleTeamsForGame(stat.getGame());
         return new StatGofer(stat, onError, userFunction, this::createOrUpdateStat, this::delete, eligibleTeamSource);
     }
 
@@ -68,19 +66,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     public Single<Boolean> canEditGameStats(Game game) {
         User current = UserRepository.getInstance().getCurrentUser();
         if (game.betweenUsers()) return Single.just(game.isCompeting(current));
-        return getEligibleTeamsForGame(game).count().map(value -> value > 0);
-    }
-
-    private Flowable<Team> getEligibleTeamsForGame(Game game) {
-        if (game.betweenUsers()) return Flowable.just(game.getTournament().getHost());
-        return Flowable.fromIterable(RoleViewModel.roles)
-                .filter(identifiable -> identifiable instanceof Role).cast(Role.class)
-                .filter(Role::isPrivilegedRole).map(RoleEntity::getTeam)
-                .filter(team -> isParticipant(game, team));
-    }
-
-    private boolean isParticipant(Game game, Team team) {
-        return game.getHome().getEntity().equals(team) || game.getAway().getEntity().equals(team);
+        return GameViewModel.getEligibleTeamsForGame(game).count().map(value -> value > 0);
     }
 
     private Date getQueryDate(Game game, boolean fetchLatest) {

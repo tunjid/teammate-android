@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -14,10 +15,11 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.GameEntity;
+import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -34,12 +36,14 @@ public class Game extends GameEntity
         HeaderedModel<Game>,
         ListableModel<Game> {
 
+    @Ignore private static final IdCache holder = IdCache.cache(4);
+
     public Game(@NonNull String id, String refPath, String score,
                 Date created, Sport sport, Event event, Tournament tournament,
                 Competitor home, Competitor away, Competitor winner,
-                int seed, int leg, int round,
+                int seed, int leg, int round, int homeScore, int awayScore,
                 boolean ended, boolean canDraw) {
-        super(id, refPath, score, created, sport, event, tournament, home, away, winner, seed, leg, round, ended, canDraw);
+        super(id, refPath, score, created, sport, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
     }
 
     protected Game(Parcel in) {
@@ -48,7 +52,12 @@ public class Game extends GameEntity
 
     @Override
     public List<Item<Game>> asItems() {
-        return Collections.emptyList();
+        return Arrays.asList(
+                Item.number(holder.get(0), 0, Item.INPUT, R.string.game_home_score, () -> String.valueOf(homeScore), this::setHomeScore, this),
+                Item.number(holder.get(1), 1, Item.INPUT, R.string.game_away_score, () -> String.valueOf(awayScore), this::setAwayScore, this),
+                Item.number(holder.get(2), 1, Item.NUMBER, R.string.game_round, () -> String.valueOf(round), ignored -> {}, this),
+                Item.number(holder.get(3), 1, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this)
+        );
     }
 
     @Override
@@ -148,6 +157,8 @@ public class Game extends GameEntity
         private static final String LEG = "leg";
         private static final String SEED = "seed";
         private static final String ROUND = "round";
+        private static final String HOME_SCORE = "homeScore";
+        private static final String AWAY_SCORE = "awayScore";
         private static final String ENDED = "ended";
         private static final String CAN_DRAW = "canDraw";
 
@@ -164,7 +175,7 @@ public class Game extends GameEntity
             if (json.isJsonPrimitive()) {
                 return new Game(json.getAsString(), "", "TBD", new Date(), Sport.empty(), Event.empty(),
                         Tournament.empty(Team.empty()), Competitor.empty(), Competitor.empty(), Competitor.empty(),
-                        0, 0, 0, false, false);
+                        0, 0, 0, 0, 0, false, false);
             }
 
             JsonObject body = json.getAsJsonObject();
@@ -178,6 +189,8 @@ public class Game extends GameEntity
             int seed = (int) ModelUtils.asFloat(SEED, body);
             int leg = (int) ModelUtils.asFloat(LEG, body);
             int round = (int) ModelUtils.asFloat(ROUND, body);
+            int homeScore = (int) ModelUtils.asFloat(HOME_SCORE, body);
+            int awayScore = (int) ModelUtils.asFloat(AWAY_SCORE, body);
             boolean ended = ModelUtils.asBoolean(ENDED, body);
             boolean canDraw = ModelUtils.asBoolean(CAN_DRAW, body);
 
@@ -191,7 +204,7 @@ public class Game extends GameEntity
             if (event == null) event = Event.empty();
 
             return new Game(id, refPath, score, ModelUtils.parseDate(created), sport,
-                    event, tournament, home, away, winner, seed, leg, round, ended, canDraw);
+                    event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
         }
     }
 }

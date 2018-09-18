@@ -49,6 +49,8 @@ public class Migration3To4 extends Migration {
                 "`game_leg` INTEGER NOT NULL, " +
                 "`game_seed` INTEGER NOT NULL, " +
                 "`game_round` INTEGER NOT NULL, " +
+                "`game_home_score` INTEGER NOT NULL, " +
+                "`game_away_score` INTEGER NOT NULL, " +
                 "`game_ended` INTEGER NOT NULL, " +
                 "`game_can_draw` INTEGER NOT NULL, " +
                 "PRIMARY KEY(`game_id`), " +
