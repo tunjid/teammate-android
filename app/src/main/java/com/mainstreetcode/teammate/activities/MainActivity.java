@@ -48,7 +48,6 @@ import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
-import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 import static android.view.View.GONE;
@@ -73,7 +72,7 @@ public class MainActivity extends TeammatesBaseActivity
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
-        public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
+        public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, Bundle savedInstanceState) {
             if (isNotInMainFragmentContainer(v)) return;
 
             Menu menu = bottomNavigationView.getMenu();
@@ -122,7 +121,7 @@ public class MainActivity extends TeammatesBaseActivity
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState != STATE_COLLAPSED) return;
+                if (newState != STATE_HIDDEN) return;
                 restoreHiddenViewState();
             }
 
@@ -251,18 +250,20 @@ public class MainActivity extends TeammatesBaseActivity
 
         BaseFragment toShow = args.getFragment();
         TeammatesBaseFragment current = getCurrentFragment();
+
         int topPadding = current != null && current.insetState()[TOP_INSET] ? TeammatesBaseActivity.topInset : 0;
+        topPadding += getResources().getDimensionPixelSize(R.dimen.quarter_margin);
+        bottomSheetContainer.setPadding(0, topPadding, 0, 0);
 
         toShow.setEnterTransition(getBottomSheetTransition());
         toShow.setExitTransition(getBottomSheetTransition());
 
         fragmentManager.beginTransaction()
-                .replace(R.id.bottom_sheet, toShow, toShow.getStableTag())
+                .replace(R.id.bottom_sheet_view, toShow, toShow.getStableTag())
                 .commit();
 
         bottomToolbarState = args.getToolbarState();
         bottomSheetBehavior.setState(STATE_EXPANDED);
-        bottomSheetContainer.setPadding(0, topPadding, 0, 0);
         refreshBottomToolbar();
     }
 
