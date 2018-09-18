@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.location.Address;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
@@ -93,10 +92,5 @@ public class TeamGofer extends TeamHostingGofer<Team> {
 
     public String getToolbarTitle(Fragment fragment) {
         return fragment.getString(state == CREATING ? R.string.create_team : R.string.edit_team);
-    }
-
-    @NonNull
-    public String getModelUpdateMessage(Fragment fragment) {
-        return state == CREATING ? fragment.getString(R.string.created_team, model.getName()) : fragment.getString(R.string.updated_team);
     }
 }

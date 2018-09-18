@@ -111,11 +111,13 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
 
+        boolean wasEmpty = team.isEmpty();
         toggleProgress(true);
         disposables.add(gofer.save()
                 .subscribe(result -> {
-                    showSnackbar(gofer.getModelUpdateMessage(this));
+                    String message = wasEmpty ? getString(R.string.created_team, team.getName()) : getString(R.string.updated_team);
                     onModelUpdated(result);
+                    showSnackbar(message);
                 }, defaultErrorHandler));
     }
 

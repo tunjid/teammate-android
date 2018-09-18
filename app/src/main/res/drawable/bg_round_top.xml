@@ -5,6 +5,6 @@
         android:width="1px"
         android:color="@color/black_75" />
     <corners
-        android:topLeftRadius="@dimen/single_margin"
-        android:topRightRadius="@dimen/single_margin" />
+        android:topLeftRadius="@dimen/single_and_half_margin"
+        android:topRightRadius="@dimen/single_and_half_margin" />
 </shape>
