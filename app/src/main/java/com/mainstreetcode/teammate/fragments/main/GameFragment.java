@@ -79,11 +79,9 @@ public final class GameFragment extends MainActivityFragment {
         gameViewHolder = new GameViewHolder(appBar, ignored -> {});
         gameViewHolder.bind(game);
 
-        Runnable refreshAction = () -> disposables.add(statViewModel.refresh(game).subscribe(GameFragment.this::onGamesUpdated, defaultErrorHandler));
-
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withEndlessScrollCallback(() -> fetchStats(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new StatAdapter(items, stat -> showFragment(StatEditFragment.newInstance(stat))))
@@ -172,6 +170,11 @@ public final class GameFragment extends MainActivityFragment {
 
     private void fetchGame() {
         disposables.add(gameViewModel.getGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+    }
+
+    private void refresh() {
+        fetchGame();
+        disposables.add(statViewModel.refresh(game).subscribe(GameFragment.this::onGamesUpdated, defaultErrorHandler));
     }
 
     private void fetchStats(boolean fetchLatest) {
