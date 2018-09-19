@@ -1,6 +1,8 @@
 package com.mainstreetcode.teammate.adapters;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -29,6 +31,15 @@ public class TeamSearchAdapter extends TeamAdapter {
                 ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
                 ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : new TeamViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
+                : getTeamViewHolder(viewGroup);
+    }
+
+    @NonNull
+    private TeamViewHolder getTeamViewHolder(@NonNull ViewGroup viewGroup) {
+        View itemView = ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup);
+        Resources resources = itemView.getResources();
+        ViewGroup.MarginLayoutParams params = ViewHolderUtil.getLayoutParams(itemView);
+        params.leftMargin = params.rightMargin = resources.getDimensionPixelSize(R.dimen.half_margin);
+        return new TeamViewHolder(itemView, adapterListener);
     }
 }

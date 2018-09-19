@@ -260,11 +260,11 @@ public class MainActivity extends TeammatesBaseActivity
 
         fragmentManager.beginTransaction()
                 .replace(R.id.bottom_sheet_view, toShow, toShow.getStableTag())
-                .commit();
-
-        bottomToolbarState = args.getToolbarState();
-        bottomSheetBehavior.setState(STATE_EXPANDED);
-        refreshBottomToolbar();
+                .runOnCommit(() -> {
+                    bottomToolbarState = args.getToolbarState();
+                    bottomSheetBehavior.setState(STATE_EXPANDED);
+                    refreshBottomToolbar();
+                }).commit();
     }
 
     @Override

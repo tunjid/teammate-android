@@ -75,7 +75,7 @@
     <string name="team_search">Team Search</string>
     <string name="team_search_hint">Search</string>
     <string name="team_logo">Team Logo</string>
-    <string name="create_team_prompt">Can\'t find your team? Create a new team</string>
+    <string name="create_team_prompt">Can\'t find your team?</string>
     <string name="team_name">Team Name</string>
     <string name="team_info">Team Info</string>
     <string name="city">City</string>

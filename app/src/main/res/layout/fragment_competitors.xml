@@ -25,7 +25,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/add_competitor" />
 
-    <TextView
+    <android.support.design.button.MaterialButton
         android:id="@+id/add_competitor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,18 +33,11 @@
         android:layout_marginLeft="@dimen/single_margin"
         android:layout_marginRight="@dimen/single_margin"
         android:layout_marginTop="@dimen/single_margin"
-        android:background="@drawable/bg_chat_box"
-        android:backgroundTint="@color/colorAccent"
-        android:buttonTint="@color/white"
-        android:drawablePadding="@dimen/single_margin"
-        android:drawableStart="@drawable/ic_add_white_24dp"
         android:gravity="center"
-        android:paddingBottom="@dimen/half_margin"
-        android:paddingLeft="@dimen/single_margin"
-        android:paddingRight="@dimen/single_margin"
-        android:paddingTop="@dimen/half_margin"
         android:text="@string/add_competitor"
         android:textColor="@color/white"
+        app:cornerRadius="@dimen/single_margin"
+        app:icon="@drawable/ic_add_white_24dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spacer_toolbar" />
