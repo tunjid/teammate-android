@@ -10,6 +10,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.design.button.MaterialButton;
 import android.transition.AutoTransition;
+import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.View;
 
@@ -19,15 +20,27 @@ public class FabIconAnimator {
 
     private static final String ROTATION_Y_PROPERTY = "rotationY";
 
-    private static final float TWITCH_END = 30F;
+    private static final float TWITCH_END = 20F;
     private static final float TWITCH_START = 0F;
     private static final int DURATION = 200;
 
     @DrawableRes private int currentIcon;
     @StringRes private int currentText;
+    private boolean isAnimating;
 
     private final MaterialButton button;
     private final ConstraintLayout container;
+    private final Transition.TransitionListener listener = new Transition.TransitionListener() {
+        public void onTransitionStart(Transition transition) { isAnimating = true; }
+
+        public void onTransitionEnd(Transition transition) { isAnimating = false; }
+
+        public void onTransitionCancel(Transition transition) { isAnimating = false; }
+
+        public void onTransitionPause(Transition transition) { }
+
+        public void onTransitionResume(Transition transition) { }
+    };
 
     public FabIconAnimator(ConstraintLayout container) {
         this.container = container;
@@ -62,12 +75,13 @@ public class FabIconAnimator {
     }
 
     private void setExtended(boolean extended, boolean force) {
-        if (extended && isExtended() && !force) return;
+        if (isAnimating || (extended && isExtended() && !force)) return;
 
         ConstraintSet set = new ConstraintSet();
         set.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
 
-        TransitionManager.beginDelayedTransition(container, new AutoTransition().setDuration(150));
+        TransitionManager.beginDelayedTransition(container, new AutoTransition()
+                .addListener(listener).setDuration(150));
 
         if (extended) button.setText(currentText);
         else button.setText("");

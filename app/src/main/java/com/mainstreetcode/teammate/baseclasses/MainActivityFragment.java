@@ -130,10 +130,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     }
 
     protected void updateFabForScrollState(int dy) {
-        if (Math.abs(dy) < 3) return;
-        int position = scrollManager.getFirstVisiblePosition();
-        if (position < 0) return;
-        setFabExtended(position < 1);
+        if (Math.abs(dy) < 9) return;
+//        int position = scrollManager.getFirstVisiblePosition();
+//        if (position < 0) return;
+        setFabExtended(dy < 0);
     }
 
     @SuppressLint("CheckResult")
