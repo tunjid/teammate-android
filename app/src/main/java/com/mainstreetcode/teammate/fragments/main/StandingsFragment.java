@@ -79,6 +79,8 @@ public final class StandingsFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
+        scrollManager.setViewHolderColor(R.color.dark_grey);
+
         viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), this);
         viewHolder.thumbnail.setVisibility(View.GONE);
         viewHolder.position.setVisibility(View.GONE);
