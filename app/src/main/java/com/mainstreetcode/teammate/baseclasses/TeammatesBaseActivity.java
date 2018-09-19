@@ -33,6 +33,7 @@ import com.tunjid.androidbootstrap.core.view.ViewHider;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
+import static android.support.design.widget.Snackbar.LENGTH_LONG;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
@@ -192,7 +193,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_LONG);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
@@ -202,7 +203,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_INDEFINITE)
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_LONG)
                 .setAction(stringRes, clickListener);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
