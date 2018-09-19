@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
@@ -25,7 +24,7 @@ import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
 public class UserEditFragment extends HeaderedFragment<User>
         implements
-        ImageWorkerFragment.ImagePickerListener {
+        UserAdapter.AdapterListener {
 
     private static final String ARG_USER = "user";
 
@@ -76,7 +75,7 @@ public class UserEditFragment extends HeaderedFragment<User>
     public void togglePersistentUi() {
         updateFabIcon();
         setFabClickListener(this);
-        setToolbarTitle(getString(R.string.user_edit));
+        setToolbarTitle(getString(canEdit() ? R.string.user_edit : R.string.user_info));
         super.togglePersistentUi();
     }
 
@@ -92,13 +91,16 @@ public class UserEditFragment extends HeaderedFragment<User>
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return true;}
+    public boolean showsFab() {return canEdit();}
 
     @Override
     protected User getHeaderedModel() {return user;}
 
     @Override
     protected Gofer<User> gofer() { return gofer; }
+
+    @Override
+    public boolean canEdit() { return userViewModel.getCurrentUser().equals(user); }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StandingsAdapter;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.util.SyncedScrollManager;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder;
@@ -17,12 +18,14 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.SyncedScrollView;
 
 /**
  * Lists {@link Event tournaments}
  */
 
-public final class StandingsFragment extends MainActivityFragment {
+public final class StandingsFragment extends MainActivityFragment
+        implements StandingsAdapter.AdapterListener {
 
     private static final String ARG_TOURNAMENT = "team";
 
@@ -72,11 +75,11 @@ public final class StandingsFragment extends MainActivityFragment {
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchStandings(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new StandingsAdapter(standings.getTable(), syncedScrollManager::addScrollClient))
+                .withAdapter(new StandingsAdapter(standings.getTable(), this))
                 .withLinearLayoutManager()
                 .build();
 
-        viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), syncedScrollManager::addScrollClient);
+        viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), this);
         viewHolder.thumbnail.setVisibility(View.GONE);
         viewHolder.position.setVisibility(View.GONE);
 
@@ -100,6 +103,16 @@ public final class StandingsFragment extends MainActivityFragment {
 
     @Override
     public boolean showsFab() { return false; }
+
+    @Override
+    public void addScrollNotifier(SyncedScrollView notifier) {
+        syncedScrollManager.addScrollClient(notifier);
+    }
+
+    @Override
+    public void onCompetitorClicked(Competitor competitor) {
+        showCompetitor(competitor);
+    }
 
     void fetchStandings(boolean isRefreshing) {
         if (isRefreshing) scrollManager.setRefreshing();

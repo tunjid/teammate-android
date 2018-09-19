@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Row;
 import com.mainstreetcode.teammate.util.SyncedScrollView;
@@ -50,8 +51,10 @@ public class StandingsAdapter extends BaseRecyclerViewAdapter<StandingRowViewHol
         return items.get(position).hashCode();
     }
 
-    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener{
+    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
         void addScrollNotifier(SyncedScrollView notifier);
+
+        void onCompetitorClicked(Competitor competitor);
     }
 
 }

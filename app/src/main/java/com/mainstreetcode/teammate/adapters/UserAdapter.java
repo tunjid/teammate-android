@@ -23,11 +23,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
  * Adapter for {@link User}
  */
 
-public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, UserAdapter.AdapterListener> {
 
     private final List<Item<User>> items;
 
-    public UserAdapter(List<Item<User>> items, ImageWorkerFragment.ImagePickerListener listener) {
+    public UserAdapter(List<Item<User>> items, UserAdapter.AdapterListener listener) {
         super(listener);
         this.items = items;
     }
@@ -40,10 +40,10 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
 
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.TRUE)
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit)
                         .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.TRUE, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, Item.FALSE);
             default:
                 return new BaseItemViewHolder(itemView);
         }
@@ -70,6 +70,10 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Ima
     }
 
     private boolean showsChangePicture(Item item) {
-        return item.getStringRes() == R.string.first_name;
+        return adapterListener.canEdit() && item.getStringRes() == R.string.first_name;
+    }
+
+    public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
+        boolean canEdit();
     }
 }

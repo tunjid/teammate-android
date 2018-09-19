@@ -73,7 +73,7 @@ public final class StatRankFragment extends MainActivityFragment {
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_medal_24dp, R.string.no_stat_ranks))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new StatRankAdapter(statRanks, statRank -> showFragment(TeamMembersFragment.newInstance(statRank.getTeam()))))
+                .withAdapter(new StatRankAdapter(statRanks, statRank -> showFragment(UserEditFragment.newInstance(statRank.getUser()))))
                 .withLinearLayoutManager()
                 .build();
 

@@ -31,12 +31,14 @@ public class Row implements Identifiable {
         this.competitor = competitor;
     }
 
+    public Competitor getCompetitor() { return competitor; }
+
+    public void add(String column) { tableValues.add(column); }
+
     public void update(Row updated) {
         tableValues.clear();
         tableValues.addAll(updated.tableValues);
     }
-
-    public void add(String column) { tableValues.add(column); }
 
     public String getId() { return id; }
 

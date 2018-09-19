@@ -21,6 +21,8 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class StandingRowViewHolder extends BaseViewHolder<StandingsAdapter.AdapterListener> {
 
+    private Row row;
+
     public TextView title;
     public TextView position;
     public ImageView thumbnail;
@@ -35,10 +37,19 @@ public class StandingRowViewHolder extends BaseViewHolder<StandingsAdapter.Adapt
         columns = itemView.findViewById(R.id.item_row);
         scrollView = itemView.findViewById(R.id.synced_scrollview);
 
+        View.OnClickListener listener = view -> {
+            if (row != null) adapterListener.onCompetitorClicked(row.getCompetitor());
+        };
+
+        title.setOnClickListener(listener);
+        position.setOnClickListener(listener);
+        thumbnail.setOnClickListener(listener);
+
         adapterListener.addScrollNotifier(scrollView);
     }
 
     public void bind(Row model) {
+        this.row = model;
         title.setText(model.getName());
 
         int adapterPosition = getAdapterPosition();

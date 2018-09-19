@@ -9,8 +9,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.activities.MainActivity;
+import com.mainstreetcode.teammate.fragments.main.TeamEditFragment;
+import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
+import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.BlockedUserViewModel;
@@ -137,5 +142,11 @@ public class MainActivityFragment extends TeammatesBaseFragment {
                 success -> MainActivity.startRegistrationActivity(getActivity()),
                 throwable -> MainActivity.startRegistrationActivity(getActivity())
         );
+    }
+
+    protected void showCompetitor(Competitor competitor) {
+        Competitive entity = competitor.getEntity();
+        if (entity instanceof Team) showFragment(TeamEditFragment.newEditInstance((Team) entity));
+        else if (entity instanceof User) showFragment(UserEditFragment.newInstance((User) entity));
     }
 }

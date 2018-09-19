@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Supplier;
 
 import static android.view.View.GONE;
@@ -68,7 +69,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         super.bind(item);
         inputLayout.setEnabled(isEnabled());
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
-        editText.setText(item.getValue());
+        editText.setText(ModelUtils.processString(item.getValue()));
         editText.setInputType(item.getInputType());
 
         checkForErrors();
