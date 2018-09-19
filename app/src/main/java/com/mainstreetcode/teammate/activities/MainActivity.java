@@ -252,7 +252,7 @@ public class MainActivity extends TeammatesBaseActivity
         TeammatesBaseFragment current = getCurrentFragment();
 
         int topPadding = current != null && current.insetState()[TOP_INSET] ? TeammatesBaseActivity.topInset : 0;
-        topPadding += getResources().getDimensionPixelSize(R.dimen.half_margin);
+        topPadding += getResources().getDimensionPixelSize(R.dimen.single_margin);
         bottomSheetContainer.setPadding(0, topPadding, 0, 0);
 
         toShow.setEnterTransition(getBottomSheetTransition());
