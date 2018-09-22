@@ -211,6 +211,7 @@
     <string name="tournament_standings">Standings</string>
     <string name="tournament_no_standings">The ultimate test of consistency, tournament standings show up here</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
+    <string name="no_tournament_support">Tournament support for your team\'s sport is coming soon!</string>
 
     <!--CompetitorsFragment-->
     <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>

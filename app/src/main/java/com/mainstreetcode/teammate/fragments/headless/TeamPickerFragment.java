@@ -16,6 +16,7 @@ import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
+import com.mainstreetcode.teammate.fragments.main.TournamentsFragment;
 import com.mainstreetcode.teammate.model.Team;
 
 public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.TeamAdapterListener {
@@ -97,6 +98,9 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
                 break;
             case R.id.request_media_team_pick:
                 showFragment(MediaFragment.newInstance(item));
+                break;
+            case R.id.request_tournament_team_pick:
+                showFragment(TournamentsFragment.newInstance(item));
                 break;
         }
         hideBottomSheet();

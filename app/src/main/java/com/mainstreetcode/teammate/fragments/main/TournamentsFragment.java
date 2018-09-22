@@ -103,7 +103,7 @@ public final class TournamentsFragment extends MainActivityFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-       // inflater.inflate(R.menu.fragment_tournaments, menu);
+        inflater.inflate(R.menu.fragment_tournaments, menu);
     }
 
     @Override
@@ -183,7 +183,10 @@ public final class TournamentsFragment extends MainActivityFragment
     }
 
     private void onTournamentsUpdated(DiffUtil.DiffResult result) {
-        scrollManager.onDiff(result);
         toggleProgress(false);
+        boolean supportsTournaments = team.getSport().supportsTournaments();
+        scrollManager.onDiff(result);
+        scrollManager.updateForEmptyList(R.drawable.ic_trophy_white_24dp, supportsTournaments
+                ? R.string.no_tournaments : R.string.no_tournament_support);
     }
 }
