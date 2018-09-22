@@ -8,14 +8,12 @@ import android.os.Bundle;
 import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Transition;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +41,7 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
+import com.mainstreetcode.teammate.util.BottomNav;
 import com.mainstreetcode.teammate.util.Supplier;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -63,8 +62,8 @@ public class MainActivity extends TeammatesBaseActivity
     private ViewHider bottombarHider;
     @Nullable
     private ToolbarState bottomToolbarState;
+    private BottomNav bottomNav;
 
-    private BottomNavigationView bottomNavigationView;
     private BottomSheetBehavior bottomSheetBehavior;
     private ViewGroup bottomSheetContainer;
     private Toolbar bottomSheetToolbar;
@@ -74,8 +73,6 @@ public class MainActivity extends TeammatesBaseActivity
         @Override
         public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, Bundle savedInstanceState) {
             if (isNotInMainFragmentContainer(v)) return;
-
-            Menu menu = bottomNavigationView.getMenu();
             String t = f.getTag();
 
             if (t == null) return;
@@ -88,9 +85,7 @@ public class MainActivity extends TeammatesBaseActivity
             else if (t.contains(TeamsFragment.class.getSimpleName())) id = R.id.action_team;
 
             if (id == 0) return;
-            MenuItem menuItem = menu.findItem(id);
-
-            if (menuItem != null) menuItem.setChecked(true);
+            bottomNav.highlight(id);
         }
     };
 
@@ -112,12 +107,11 @@ public class MainActivity extends TeammatesBaseActivity
         altToolbar = findViewById(R.id.alt_toolbar);
         bottomSheetToolbar = findViewById(R.id.bottom_toolbar);
         bottomSheetContainer = findViewById(R.id.bottom_sheet);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
         altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-        bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
+//        bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -128,6 +122,15 @@ public class MainActivity extends TeammatesBaseActivity
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
+
+        bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation)).setListener(this::onNavItemSelected)
+                .setItems(BottomNav.Item.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
+                        BottomNav.Item.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
+                        BottomNav.Item.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
+                        BottomNav.Item.create(R.id.action_media, R.string.media, R.drawable.ic_video_library_black_24dp),
+                        BottomNav.Item.create(R.id.action_team, R.string.team, R.drawable.ic_group_black_24dp))
+                .createBottomNav();
+
 
         if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
         refreshBottomToolbar();
@@ -164,21 +167,6 @@ public class MainActivity extends TeammatesBaseActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_home:
-                showFragment(FeedFragment.newInstance());
-                return true;
-            case R.id.action_events:
-                TeamPickerFragment.pick(this, R.id.request_event_team_pick);
-                return true;
-            case R.id.action_messages:
-                TeamPickerFragment.pick(this, R.id.request_chat_team_pick);
-                return true;
-            case R.id.action_media:
-                TeamPickerFragment.pick(this, R.id.request_media_team_pick);
-                return true;
-            case R.id.action_team:
-                showFragment(TeamsFragment.newInstance());
-                return true;
             case R.id.action_settings:
                 showFragment(SettingsFragment.newInstance());
                 return true;
@@ -276,6 +264,26 @@ public class MainActivity extends TeammatesBaseActivity
     private boolean onAltMenuItemSelected(MenuItem item) {
         Fragment current = getCurrentFragment();
         return current != null && current.onOptionsItemSelected(item);
+    }
+
+    private void onNavItemSelected(View view) {
+        switch (view.getId()) {
+            case R.id.action_home:
+                showFragment(FeedFragment.newInstance());
+                break;
+            case R.id.action_events:
+                TeamPickerFragment.pick(this, R.id.request_event_team_pick);
+                break;
+            case R.id.action_messages:
+                TeamPickerFragment.pick(this, R.id.request_chat_team_pick);
+                break;
+            case R.id.action_media:
+                TeamPickerFragment.pick(this, R.id.request_media_team_pick);
+                break;
+            case R.id.action_team:
+                showFragment(TeamsFragment.newInstance());
+                break;
+        }
     }
 
     private Transition getBottomSheetTransition() {
