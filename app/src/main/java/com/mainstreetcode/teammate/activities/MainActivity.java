@@ -42,10 +42,14 @@ import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.BottomNav;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Supplier;
+import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
@@ -68,6 +72,8 @@ public class MainActivity extends TeammatesBaseActivity
     private ViewGroup bottomSheetContainer;
     private Toolbar bottomSheetToolbar;
     private Toolbar altToolbar;
+
+    private CompositeDisposable disposables;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -104,6 +110,8 @@ public class MainActivity extends TeammatesBaseActivity
 
         TeammatesInstanceIdService.updateFcmToken();
 
+        disposables = new CompositeDisposable();
+
         altToolbar = findViewById(R.id.alt_toolbar);
         bottomSheetToolbar = findViewById(R.id.bottom_toolbar);
         bottomSheetContainer = findViewById(R.id.bottom_sheet);
@@ -111,7 +119,6 @@ public class MainActivity extends TeammatesBaseActivity
 
         altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-//        bottomNavigationView.setOnNavigationItemSelectedListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -128,9 +135,8 @@ public class MainActivity extends TeammatesBaseActivity
                         BottomNav.Item.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
                         BottomNav.Item.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
                         BottomNav.Item.create(R.id.action_media, R.string.media, R.drawable.ic_video_library_black_24dp),
-                        BottomNav.Item.create(R.id.action_team, R.string.team, R.drawable.ic_group_black_24dp))
+                        BottomNav.Item.create(R.id.action_team, R.string.teams, R.drawable.ic_group_black_24dp))
                 .createBottomNav();
-
 
         if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
         refreshBottomToolbar();
@@ -165,6 +171,17 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
+
+        disposables.add(teamViewModel.getTeamChangeFlowable().subscribe(team -> {
+            BottomNav.ViewHolder viewHolder = bottomNav.getViewHolder(R.id.action_team);
+            if (viewHolder != null) viewHolder.setImageUrl(team.getImageUrl());
+        }, ErrorHandler.EMPTY));
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -184,6 +201,12 @@ public class MainActivity extends TeammatesBaseActivity
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onStop() {
+        disposables.clear();
+        super.onStop();
     }
 
     @Override

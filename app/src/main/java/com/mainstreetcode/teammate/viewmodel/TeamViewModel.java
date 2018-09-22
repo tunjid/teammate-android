@@ -37,13 +37,15 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     static final List<Identifiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepository repository;
+    private final PublishProcessor<Team> teamChangeProcessor;
     private AtomicReference<PublishProcessor<String>> searchRef;
 
     @SuppressLint("CheckResult")
     public TeamViewModel() {
         searchRef = new AtomicReference<>();
         repository = TeamRepository.getInstance();
-        repository.getDefaultTeam().subscribe(defaultTeam::update, ErrorHandler.EMPTY);
+        teamChangeProcessor = PublishProcessor.create();
+        repository.getDefaultTeam().subscribe(this::updateDefaultTeam, ErrorHandler.EMPTY);
     }
 
     @Override
@@ -58,6 +60,10 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public TeamGofer gofer(Team team) {
         return new TeamGofer(team, throwable -> checkForInvalidObject(throwable, team, Team.class), this::getTeam, this::createOrUpdate, this::deleteTeam);
+    }
+
+    public Flowable<Team> getTeamChangeFlowable() {
+        return Flowable.just(defaultTeam).concatWith(teamChangeProcessor);
     }
 
     private Flowable<Team> getTeam(Team team) {
@@ -91,6 +97,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     public void updateDefaultTeam(Team newDefault) {
         defaultTeam.update(newDefault);
         repository.saveDefaultTeam(defaultTeam);
+        teamChangeProcessor.onNext(defaultTeam);
     }
 
     public boolean isOnATeam() {

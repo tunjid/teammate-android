@@ -5,15 +5,19 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -41,6 +45,12 @@ public class BottomNav {
             viewHolder.tint(viewHolder.itemView.getId() == highlighted ? R.color.colorPrimary : R.color.dark_grey);
     }
 
+    @Nullable
+    public ViewHolder getViewHolder(@IdRes int id) {
+        for (ViewHolder holder : viewHolders) if (holder.itemView.getId() == id) return holder;
+        return null;
+    }
+
     private ViewHolder addViewHolder(ViewHolder viewHolder) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT);
         params.weight = 1;
@@ -64,22 +74,31 @@ public class BottomNav {
         }
     }
 
-    static class ViewHolder {
+    public static class ViewHolder {
+        private boolean hasCustomImage;
+
+        private Item item;
         private View itemView;
         private TextView title;
         private CircleImageView icon;
+        private final ImageCallback callback;
 
         ViewHolder(View view) {
             itemView = view;
             title = view.findViewById(R.id.title);
             icon = view.findViewById(R.id.icon);
             icon.setDisableCircularTransformation(true);
+            callback = new ImageCallback(this);
             tint(R.color.dark_grey);
         }
+
+        public void setImageUrl(String imageUrl) { callback.loadUrl(imageUrl); }
 
         void tint(@ColorRes int colorRes) {
             int color = ContextCompat.getColor(itemView.getContext(), colorRes);
             title.setTextColor(color);
+            icon.setBorderColor(color);
+            if (hasCustomImage) return;
 
             Drawable drawable = icon.getDrawable();
             if (drawable == null) return;
@@ -91,7 +110,15 @@ public class BottomNav {
             icon.setImageDrawable(drawable);
         }
 
+        void onCustomImageLoaded(boolean succeeded) {
+            hasCustomImage = succeeded;
+            icon.setDisableCircularTransformation(!succeeded);
+            icon.setBorderWidth(succeeded ? itemView.getResources().getDimensionPixelSize(R.dimen.sixteenth_margin) : 0);
+            if (!hasCustomImage) bind(item);
+        }
+
         ViewHolder bind(Item item) {
+            this.item = item;
             itemView.setId(item.idRes);
             title.setText(item.titleRes);
             icon.setImageResource(item.drawableRes);
@@ -102,6 +129,30 @@ public class BottomNav {
             itemView.setOnClickListener(listener);
             return this;
         }
+    }
+
+    private static class ImageCallback implements Callback {
+        boolean loaded = false;
+        String currentImage;
+        final ViewHolder viewHolder;
+
+        private ImageCallback(ViewHolder viewHolder) {this.viewHolder = viewHolder;}
+
+        private void loadUrl(String imageUrl) {
+            boolean sameImage = currentImage != null && currentImage.equals(imageUrl);
+            if ((sameImage && loaded) || TextUtils.isEmpty(imageUrl)) return;
+
+            currentImage = imageUrl;
+            viewHolder.hasCustomImage = true;
+            Picasso.with(viewHolder.itemView.getContext())
+                    .load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this);
+        }
+
+        @Override
+        public void onSuccess() { viewHolder.onCustomImageLoaded(loaded = true); }
+
+        @Override
+        public void onError() { viewHolder.onCustomImageLoaded(loaded = false); }
     }
 
     public static class BottomNavBuilder {
