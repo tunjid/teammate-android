@@ -44,6 +44,7 @@
     <string name="chats">Chats</string>
     <string name="media">Gallery</string>
     <string name="my_teams">My Teams</string>
+    <string name="expand_nav">Expand bottom nav</string>
 
     <string name="team">Team</string>
     <string name="teams">Teams</string>

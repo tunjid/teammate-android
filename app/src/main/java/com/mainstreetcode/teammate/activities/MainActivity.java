@@ -5,6 +5,7 @@ import android.arch.core.util.Function;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,18 +33,21 @@ import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.FeedFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
-import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
+import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
-import com.mainstreetcode.teammate.util.BottomNav;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Supplier;
+import com.mainstreetcode.teammate.util.nav.BottomNav;
+import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
+import com.mainstreetcode.teammate.util.nav.NavItem;
+import com.mainstreetcode.teammate.util.nav.ViewHolder;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -73,6 +77,8 @@ public class MainActivity extends TeammatesBaseActivity
     private Toolbar bottomSheetToolbar;
     private Toolbar altToolbar;
 
+    private UserViewModel userViewModel;
+
     private CompositeDisposable disposables;
 
     final FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -101,7 +107,7 @@ public class MainActivity extends TeammatesBaseActivity
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
 
-        UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
         if (!userViewModel.isSignedIn()) {
             startRegistrationActivity(this);
@@ -130,12 +136,14 @@ public class MainActivity extends TeammatesBaseActivity
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
 
-        bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation)).setListener(this::onNavItemSelected)
-                .setItems(BottomNav.Item.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
-                        BottomNav.Item.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
-                        BottomNav.Item.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
-                        BottomNav.Item.create(R.id.action_media, R.string.media, R.drawable.ic_video_library_black_24dp),
-                        BottomNav.Item.create(R.id.action_team, R.string.teams, R.drawable.ic_group_black_24dp))
+        bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation))
+                .setListener(view -> onNavItemSelected(view.getId()))
+                .setSwipeRunnable(this::showNavOverflow)
+                .setNavItems(NavItem.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
+                        NavItem.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
+                        NavItem.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
+                        NavItem.create(R.id.action_media, R.string.media, R.drawable.ic_video_library_black_24dp),
+                        NavItem.create(R.id.action_team, R.string.my_teams, R.drawable.ic_group_black_24dp))
                 .createBottomNav();
 
         if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
@@ -176,25 +184,14 @@ public class MainActivity extends TeammatesBaseActivity
         TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
 
         disposables.add(teamViewModel.getTeamChangeFlowable().subscribe(team -> {
-            BottomNav.ViewHolder viewHolder = bottomNav.getViewHolder(R.id.action_team);
+            ViewHolder viewHolder = bottomNav.getViewHolder(R.id.action_team);
             if (viewHolder != null) viewHolder.setImageUrl(team.getImageUrl());
         }, ErrorHandler.EMPTY));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                showFragment(SettingsFragment.newInstance());
-                return true;
-            case R.id.action_rsvp_list:
-                showFragment(MyEventsFragment.newInstance());
-                return true;
-            case R.id.action_public_events:
-                showFragment(EventSearchFragment.newInstance());
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return onNavItemSelected(item.getItemId());
     }
 
     @Override
@@ -289,23 +286,51 @@ public class MainActivity extends TeammatesBaseActivity
         return current != null && current.onOptionsItemSelected(item);
     }
 
-    private void onNavItemSelected(View view) {
-        switch (view.getId()) {
+    private void showNavOverflow() {
+        NavDialogFragment.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    private boolean onNavItemSelected(@IdRes int id) {
+        switch (id) {
             case R.id.action_home:
                 showFragment(FeedFragment.newInstance());
-                break;
+                return true;
             case R.id.action_events:
                 TeamPickerFragment.pick(this, R.id.request_event_team_pick);
-                break;
+                return true;
             case R.id.action_messages:
                 TeamPickerFragment.pick(this, R.id.request_chat_team_pick);
-                break;
+                return true;
             case R.id.action_media:
                 TeamPickerFragment.pick(this, R.id.request_media_team_pick);
-                break;
+                return true;
+            case R.id.action_tournaments:
+                TeamPickerFragment.pick(this, R.id.request_tournament_team_pick);
+                return true;
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());
-                break;
+                return true;
+            case R.id.action_settings:
+                showNavOverflow();
+                return true;
+            case R.id.action_rsvp_list:
+                showFragment(MyEventsFragment.newInstance());
+                return true;
+            case R.id.action_public_events:
+                showFragment(EventSearchFragment.newInstance());
+                return true;
+            case R.id.action_my_profile:
+                showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
+                return true;
+            case R.id.action_sign_out:
+                toggleProgress(true);
+                userViewModel.signOut().subscribe(
+                        success -> MainActivity.startRegistrationActivity(this),
+                        throwable -> MainActivity.startRegistrationActivity(this)
+                );
+                return true;
+            default:
+                return false;
         }
     }
 

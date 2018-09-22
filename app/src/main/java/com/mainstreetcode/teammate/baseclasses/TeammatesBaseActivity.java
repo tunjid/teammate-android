@@ -225,7 +225,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     protected boolean isNotInMainFragmentContainer(View view) {
         View parent = (View) view.getParent();
-        return parent.getId() != R.id.main_fragment_container;
+        return parent == null || parent.getId() != R.id.main_fragment_container;
     }
 
     protected void initTransition() {

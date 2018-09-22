@@ -2,33 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_home"
+        android:id="@+id/action_tournaments"
         android:enabled="true"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/home"
+        android:icon="@drawable/ic_trophy_white_24dp"
+        android:title="@string/tournaments"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_events"
+        android:id="@+id/action_my_profile"
         android:enabled="true"
-        android:icon="@drawable/ic_event_white_24dp"
-        android:title="@string/events"
+        android:icon="@drawable/ic_account_white_24dp"
+        android:title="@string/my_profile"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_messages"
+        android:id="@+id/action_sign_out"
         android:enabled="true"
-        android:icon="@drawable/ic_message_black_24dp"
-        android:title="@string/chats"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_media"
-        android:enabled="true"
-        android:icon="@drawable/ic_video_library_black_24dp"
-        android:title="@string/media"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_team"
-        android:enabled="true"
-        android:icon="@drawable/ic_group_black_24dp"
-        android:title="@string/team"
+        android:icon="@drawable/ic_logout_white_24dp"
+        android:title="@string/sign_out"
         app:showAsAction="ifRoom" />
 </menu>
