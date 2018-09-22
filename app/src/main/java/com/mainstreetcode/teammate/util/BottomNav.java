@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.util;
 
+import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
@@ -9,8 +10,10 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -83,16 +86,35 @@ public class BottomNav {
         private CircleImageView icon;
         private final ImageCallback callback;
 
+        @SuppressLint("ClickableViewAccessibility")
         ViewHolder(View view) {
             itemView = view;
             title = view.findViewById(R.id.title);
             icon = view.findViewById(R.id.icon);
             icon.setDisableCircularTransformation(true);
             callback = new ImageCallback(this);
+
+            GestureDetectorCompat detector = new GestureDetectorCompat(itemView.getContext(), new NavGestureListener(this));
+            itemView.setOnTouchListener((v, event) -> onItemViewTouched(detector, v, event));
+
             tint(R.color.dark_grey);
         }
 
         public void setImageUrl(String imageUrl) { callback.loadUrl(imageUrl); }
+
+        boolean onItemViewTouched(GestureDetectorCompat detector, View v, MotionEvent event) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.setPressed(true);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_OUTSIDE:
+                    v.setPressed(false);
+                    break;
+            }
+            return detector.onTouchEvent(event);
+        }
 
         void tint(@ColorRes int colorRes) {
             int color = ContextCompat.getColor(itemView.getContext(), colorRes);
@@ -153,6 +175,27 @@ public class BottomNav {
 
         @Override
         public void onError() { viewHolder.onCustomImageLoaded(loaded = false); }
+    }
+
+    private static class NavGestureListener extends GestureListener {
+        final ViewHolder viewHolder;
+
+        private NavGestureListener(ViewHolder viewHolder) {this.viewHolder = viewHolder;}
+
+        @Override
+        public boolean onDown(MotionEvent e) { return true; }
+
+
+        @Override
+        public boolean onSwipe(GestureListener.Direction direction) {
+            return super.onSwipe(direction);
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            viewHolder.itemView.performClick();
+            return true;
+        }
     }
 
     public static class BottomNavBuilder {
