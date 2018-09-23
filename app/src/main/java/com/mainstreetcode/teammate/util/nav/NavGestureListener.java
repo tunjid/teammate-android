@@ -13,7 +13,6 @@ class NavGestureListener extends GestureListener {
     @Override
     public boolean onDown(MotionEvent e) { return true; }
 
-
     @Override
     public boolean onSwipe(Direction direction) {
         if (direction != Direction.up) return false;
@@ -25,5 +24,11 @@ class NavGestureListener extends GestureListener {
     public boolean onSingleTapConfirmed(MotionEvent e) {
         viewHolder.click();
         return true;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+        super.onLongPress(e);
+        viewHolder.onSwipedUp();
     }
 }

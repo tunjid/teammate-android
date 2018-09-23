@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
+import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 
 public class NavDialogFragment extends BottomSheetDialogFragment {
@@ -41,7 +42,7 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_bottom_nav, container, false);
         View itemView = root.findViewById(R.id.item_container);
-        TeamViewHolder teamViewHolder = new TeamViewHolder(itemView, item -> {});
+        TeamViewHolder teamViewHolder = new TeamViewHolder(itemView, item -> switchTeam());
         NavigationView navigationView = root.findViewById(R.id.bottom_nav_view);
 
         itemView.setElevation(0);
@@ -63,5 +64,10 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         dismiss();
         return requireActivity().onOptionsItemSelected(item);
+    }
+
+    private void switchTeam() {
+        dismiss();
+        TeamPickerFragment.change(requireActivity(), R.id.request_default_team_pick);
     }
 }
