@@ -106,6 +106,7 @@ public class User extends UserEntity implements
         this.firstName = updatedUser.firstName;
         this.lastName = updatedUser.lastName;
         this.imageUrl = updatedUser.imageUrl;
+        this.screenName = updatedUser.screenName;
         this.primaryEmail = updatedUser.primaryEmail;
     }
 

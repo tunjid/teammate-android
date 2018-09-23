@@ -113,6 +113,12 @@ public class Game extends GameEntity
         this.ended = updatedGame.ended;
         this.canDraw = updatedGame.canDraw;
         this.sport.update(updatedGame.sport);
+        this.hostId = updatedGame.hostId;
+        this.homeEntityId = updatedGame.homeEntityId;
+        this.awayEntityId = updatedGame.awayEntityId;
+        this.winnerEntityId = updatedGame.winnerEntityId;
+        if (updatedGame.referee.hasMajorFields())
+            this.referee.update(updatedGame.referee);
         if (updatedGame.tournament.hasMajorFields())
             this.tournament.update(updatedGame.tournament);
         if (updatedGame.home.hasMajorFields() && this.home.hasSameType(updatedGame.home))

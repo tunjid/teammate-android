@@ -117,6 +117,7 @@ public class Event extends EventEntity
         this.name = updatedEvent.name;
         this.notes = updatedEvent.notes;
         this.spots = updatedEvent.spots;
+        this.gameId = updatedEvent.gameId;
         this.imageUrl = updatedEvent.imageUrl;
         this.endDate = updatedEvent.endDate;
         this.startDate = updatedEvent.startDate;

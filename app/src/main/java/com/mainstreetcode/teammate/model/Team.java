@@ -121,6 +121,7 @@ public class Team extends TeamEntity
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
         this.name = updatedTeam.name;
+        this.screenName = updatedTeam.screenName;
         this.city = updatedTeam.city;
         this.state = updatedTeam.state;
         this.zip = updatedTeam.zip;
