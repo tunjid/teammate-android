@@ -11,6 +11,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.persistence.entity.GameEntity;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -26,6 +27,15 @@ public abstract class GameDao extends EntityDao<GameEntity> {
     protected String getTableName() {
         return "events";
     }
+
+    @Query("SELECT * FROM games as game" +
+            " WHERE :teamId = game_host_id" +
+            " OR :teamId = game_home_entity_id" +
+            " OR :teamId = game_away_entity_id" +
+            " AND game_created < :date" +
+            " ORDER BY game_created DESC" +
+            " LIMIT 40")
+    public abstract Maybe<List<Game>> getGames(String teamId, Date date);
 
     @Query("SELECT * FROM games as game" +
             " WHERE :tournamentId = game_tournament" +

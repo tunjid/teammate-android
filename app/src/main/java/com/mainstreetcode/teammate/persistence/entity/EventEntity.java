@@ -30,6 +30,7 @@ public class EventEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "event_id") protected String id;
+    @ColumnInfo(name = "event_game_id") protected String gameId;
     @ColumnInfo(name = "event_image_url") protected String imageUrl;
     @ColumnInfo(name = "event_name") protected CharSequence name;
     @ColumnInfo(name = "event_notes") protected CharSequence notes;
@@ -43,11 +44,12 @@ public class EventEntity implements Parcelable {
 
     @ColumnInfo(name = "event_spots") protected int spots;
 
-    public EventEntity(@NonNull String id, String imageUrl,
+    public EventEntity(@NonNull String id, String gameId, String imageUrl,
                        CharSequence name, CharSequence notes, CharSequence locationName,
                        Date startDate, Date endDate, Team team, LatLng location, Visibility visibility,
                        int spots) {
         this.id = id;
+        this.gameId = gameId;
         this.imageUrl = imageUrl;
         this.name = name;
         this.notes = notes;
@@ -62,6 +64,7 @@ public class EventEntity implements Parcelable {
 
     protected EventEntity(Parcel in) {
         id = in.readString();
+        gameId = in.readString();
         imageUrl = in.readString();
         name = in.readString();
         notes = in.readString();
@@ -78,6 +81,8 @@ public class EventEntity implements Parcelable {
     public String getId() {
         return id;
     }
+
+    public String getGameId() { return gameId; }
 
     public CharSequence getName() {
         return processString(name);
@@ -183,6 +188,7 @@ public class EventEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeString(gameId);
         dest.writeString(imageUrl);
         dest.writeString(name.toString());
         dest.writeString(notes.toString());

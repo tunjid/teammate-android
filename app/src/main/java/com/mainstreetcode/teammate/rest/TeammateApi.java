@@ -306,8 +306,14 @@ public interface TeammateApi {
     @PUT("api/games/{gameId}")
     Single<Game> updateGame(@Path(GAME_PATH) String gameId, @Body Game game);
 
+    @DELETE("api/games/{gameId}")
+    Single<Game> deleteGame(@Path(GAME_PATH) String gameId);
+
+    @GET("api/teams/{teamId}/games")
+    Single<List<Game>> getGames(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+
     @GET("api/tournaments/{tournamentId}/games")
-    Single<List<Game>> getGames(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round);
+    Single<List<Game>> getGamesForRound(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round);
 
     // =============================================================================================
     // Stat endpoints

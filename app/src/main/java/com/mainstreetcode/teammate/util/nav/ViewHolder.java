@@ -40,8 +40,6 @@ public class ViewHolder {
 
         GestureDetectorCompat detector = new GestureDetectorCompat(itemView.getContext(), new NavGestureListener(this));
         itemView.setOnTouchListener((v, event) -> onItemViewTouched(detector, v, event));
-
-        tint(R.color.dark_grey);
     }
 
    public void setImageUrl(String imageUrl) { callback.loadUrl(imageUrl); }
@@ -92,6 +90,7 @@ public class ViewHolder {
         itemView.setId(navItem.idRes);
         title.setText(navItem.titleRes);
         icon.setImageResource(navItem.drawableRes);
+        tint(R.color.dark_grey);
         return this;
     }
 

@@ -44,6 +44,8 @@ public class Tournament extends TournamentEntity
 
     @Ignore private static final IdCache holder = IdCache.cache(6);
 
+    public static Tournament empty() { return empty(Team.empty()); }
+
     public static Tournament empty(Team host) {
         Date date = new Date();
         Sport sport = host.getSport();

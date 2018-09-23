@@ -40,6 +40,10 @@ public class Sport extends MetaData {
         return tournamentStyles.contains(style.code);
     }
 
+    public String refType() {
+        return tournamentTypes.isEmpty() ? "" : Config.tournamentTypeFromCode(tournamentTypes.get(0)).getRefPath();
+    }
+
     public TournamentType defaultTournamentType() {
         return tournamentTypes.isEmpty()
                 ? TournamentType.empty()

@@ -225,6 +225,7 @@
     <!--GameFragment-->
     <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
+    <string name="games">Games</string>
     <string name="game_add">Add game</string>
     <string name="game_edit">Edit game</string>
     <string name="game_create">Create game</string>
@@ -240,7 +241,8 @@
     <string name="game_end_prompt">This will end the game for everyone.\n\nStats will not be able to be added or deleted, but the times can be changed.</string>
     <string name="game_event">Game event</string>
     <string name="game_ended">FT</string>
-
+    <string name="no_games">Come. See. Conquer. Your team\'s games live here.</string>
+    <string name="no_game_support">Game support for your team\'s sport is coming soon!</string>
     <!--StatEditFragment-->
     <string name="user">User</string>
     <string name="pick_user">Pick a user</string>

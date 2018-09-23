@@ -7,7 +7,6 @@ import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
@@ -18,6 +17,7 @@ import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -27,7 +27,7 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
+public class GameRepository extends TeamQueryRepository<Game> {
 
     private static GameRepository ourInstance;
 
@@ -75,20 +75,18 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
 
     @Override
     public Single<Game> delete(Game game) {
-        return Single.error(new TeammateException(""));
+        return api.deleteGame(game.getId());
     }
 
     @Override
-    Maybe<List<Game>> localModelsBefore(Tournament tournament, @Nullable Integer round) {
-        if (round == null) round = 0;
-        return gameDao.getGames(tournament.getId(), round).subscribeOn(io())
-                .doOnSuccess(games -> updateGameEvent(tournament, games));
+    Maybe<List<Game>> localModelsBefore(Team team, @Nullable Date date) {
+        if (date == null) date = getFutureDate();
+        return gameDao.getGames(team.getId(), date).subscribeOn(io());
     }
 
     @Override
-    Maybe<List<Game>> remoteModelsBefore(Tournament tournament, @Nullable Integer round) {
-        return api.getGames(tournament.getId(), round == null ? 0 : round).map(getSaveManyFunction()).toMaybe()
-                .doOnSuccess(games -> updateGameEvent(tournament, games));
+    Maybe<List<Game>> remoteModelsBefore(Team team, @Nullable Date date) {
+        return api.getGames(team.getId(), date).map(getSaveManyFunction()).toMaybe();
     }
 
     @Override
@@ -121,20 +119,5 @@ public class GameRepository extends QueryRepository<Game, Tournament, Integer> {
         Competitive entity = competitor.getEntity();
         if (entity instanceof User) users.add((User) entity);
         if (entity instanceof Team) teams.add((Team) entity);
-    }
-
-    private void updateGameEvent(Tournament tournament, List<Game> games) {
-        for (Game game : games) {
-            if (!game.getEvent().isEmpty() || !game.hasValidRefType()) continue;
-
-            String refPath = game.getRefPath();
-            Team eventTeam = game.getEvent().getTeam();
-            Competitive home = game.getHome().getEntity();
-
-            if (User.COMPETITOR_TYPE.equals(refPath) && home instanceof User)
-                eventTeam.update(tournament.getTeam());
-            else if (Team.COMPETITOR_TYPE.equals(refPath) && home instanceof Team)
-                eventTeam.update((Team) home);
-        }
     }
 }

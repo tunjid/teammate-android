@@ -307,6 +307,9 @@ public class MainActivity extends TeammatesBaseActivity
             case R.id.action_tournaments:
                 TeamPickerFragment.pick(this, R.id.request_tournament_team_pick);
                 return true;
+            case R.id.action_games:
+                TeamPickerFragment.pick(this, R.id.request_game_team_pick);
+                return true;
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());
                 return true;
@@ -373,7 +376,7 @@ public class MainActivity extends TeammatesBaseActivity
 
         BaseFragment fragment = BlankBottomSheetFragment.newInstance();
         fragmentManager.beginTransaction()
-                .replace(R.id.bottom_sheet, fragment, fragment.getStableTag())
+                .replace(R.id.bottom_sheet_view, fragment, fragment.getStableTag())
                 .runOnCommit(onCommit)
                 .commit();
     }

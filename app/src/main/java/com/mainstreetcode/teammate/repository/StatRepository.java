@@ -40,7 +40,7 @@ public class StatRepository extends QueryRepository<Stat, Game, Date> {
         statDao = AppDatabase.getInstance().statDao();
         userRepository = UserRepository.getInstance();
         teamRepository = TeamRepository.getInstance();
-        gameRepository = GameRepository.getInstance();
+        gameRepository = GameRoundRepository.getInstance();
     }
 
     public static StatRepository getInstance() {

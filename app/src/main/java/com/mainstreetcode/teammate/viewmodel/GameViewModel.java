@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
@@ -10,10 +11,12 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.repository.GameRepository;
+import com.mainstreetcode.teammate.repository.GameRoundRepository;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,17 +26,25 @@ import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
-public class GameViewModel extends BaseViewModel {
+public class GameViewModel extends TeamMappedViewModel<Game> {
 
     private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
+    private final GameRoundRepository gameRoundRepository = GameRoundRepository.getInstance();
     private final GameRepository gameRepository = GameRepository.getInstance();
 
     public GameGofer gofer(Game game) {
         Consumer<Throwable> onError = throwable -> {};
         android.arch.core.util.Function<Game, Flowable<Team>> eligibleTeamSource = sourceStat -> getEligibleTeamsForGame(game);
         return new GameGofer(game, onError, this::getGame, this::updateGame, eligibleTeamSource);
+    }
+
+    @Override
+    Flowable<List<Game>> fetch(Team key, boolean fetchLatest) {
+        return gameRepository.modelsBefore(key, getQueryDate(key, fetchLatest))
+                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
     }
 
     @SuppressLint("UseSparseArrays")
@@ -43,14 +54,13 @@ public class GameViewModel extends BaseViewModel {
     }
 
     public Flowable<DiffUtil.DiffResult> fetchGamesInRound(Tournament tournament, int round) {
-        Flowable<List<Game>> flowable = gameRepository.modelsBefore(tournament, round);
+        Flowable<List<Game>> flowable = gameRoundRepository.modelsBefore(tournament, round);
         Function<List<Game>, List<Identifiable>> listMapper = ArrayList<Identifiable>::new;
         return Identifiable.diff(flowable.map(listMapper), () -> getGamesForRound(tournament, round), this::preserveList);
-
     }
 
     public Flowable<Game> getGame(Game game) {
-        return gameRepository.get(game).observeOn(mainThread());
+        return gameRoundRepository.get(game).observeOn(mainThread());
     }
 
     public Single<Game> endGame(Game game) {
@@ -59,7 +69,7 @@ public class GameViewModel extends BaseViewModel {
     }
 
     public Single<Game> updateGame(Game game) {
-        return gameRepository.createOrUpdate(game)
+        return gameRoundRepository.createOrUpdate(game)
                 .doOnError(throwable -> game.setEnded(false)).observeOn(mainThread());
     }
 
@@ -69,6 +79,13 @@ public class GameViewModel extends BaseViewModel {
                 .filter(identifiable -> identifiable instanceof Role).cast(Role.class)
                 .filter(Role::isPrivilegedRole).map(RoleEntity::getTeam)
                 .filter(team -> isParticipant(game, team));
+    }
+
+    private Date getQueryDate(Team team, boolean fetchLatest) {
+        if (fetchLatest) return null;
+
+        Game game = findLast(getModelList(team), Game.class);
+        return game == null ? null : game.getCreated();
     }
 
     private static boolean isParticipant(Game game, Team team) {

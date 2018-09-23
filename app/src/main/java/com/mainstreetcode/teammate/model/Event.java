@@ -52,19 +52,19 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
+        return new Event("", "", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
     }
 
-    public Event(String id, String imageUrl, CharSequence name, CharSequence notes, CharSequence locationName,
+    public Event(String id, String gameId, String imageUrl, CharSequence name, CharSequence notes, CharSequence locationName,
                  Date startDate, Date endDate, Team team, LatLng location, Visibility visibility, int spots) {
-        super(id, imageUrl, name, notes, locationName, startDate, endDate, team, location, visibility, spots);
+        super(id, gameId, imageUrl, name, notes, locationName, startDate, endDate, team, location, visibility, spots);
     }
 
     protected Event(Parcel in) {
         super(in);
     }
 
-    public  void setName(Game game) {
+    public void setName(Game game) {
         name = game.getHome().getName() + " Vs. " + game.getAway().getName();
     }
 
@@ -179,6 +179,7 @@ public class Event extends EventEntity
             JsonDeserializer<Event> {
 
         private static final String ID_KEY = "_id";
+        private static final String GAME = "game";
         private static final String NAME_KEY = "name";
         private static final String TEAM_KEY = "team";
         private static final String NOTES_KEY = "notes";
@@ -194,6 +195,7 @@ public class Event extends EventEntity
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
+            serialized.addProperty(GAME, src.gameId);
             serialized.addProperty(NAME_KEY, src.name.toString());
             serialized.addProperty(NOTES_KEY, src.notes.toString());
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName.toString());
@@ -219,12 +221,13 @@ public class Event extends EventEntity
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Event(json.getAsString(), "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
+                return new Event(json.getAsString(), "", "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
             }
 
             JsonObject eventJson = json.getAsJsonObject();
 
             String id = ModelUtils.asString(ID_KEY, eventJson);
+            String gameId = ModelUtils.asString(GAME, eventJson);
             String name = ModelUtils.asString(NAME_KEY, eventJson);
             String notes = ModelUtils.asString(NOTES_KEY, eventJson);
             String imageUrl = ModelUtils.asString(IMAGE_KEY, eventJson);
@@ -242,7 +245,7 @@ public class Event extends EventEntity
 
             if (team == null) team = Team.empty();
 
-            return new Event(id, imageUrl, name, notes, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility, spots);
+            return new Event(id, gameId, imageUrl, name, notes, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility, spots);
         }
     }
 }

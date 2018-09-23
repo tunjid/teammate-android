@@ -145,12 +145,16 @@ public final class TeamsFragment extends MainActivityFragment
     @DrawableRes
     private int getEmptyDrawable() {
         switch (getTargetRequestCode()) {
-            case R.id.request_event_team_pick:
-                return R.drawable.ic_event_white_24dp;
             case R.id.request_chat_team_pick:
                 return R.drawable.ic_message_black_24dp;
+            case R.id.request_game_team_pick:
+                return R.drawable.ic_score_white_24dp;
+            case R.id.request_event_team_pick:
+                return R.drawable.ic_event_white_24dp;
             case R.id.request_media_team_pick:
                 return R.drawable.ic_video_library_black_24dp;
+            case R.id.request_tournament_team_pick:
+                return R.drawable.ic_trophy_white_24dp;
             default:
                 return R.drawable.ic_group_black_24dp;
         }

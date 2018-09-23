@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
+import com.mainstreetcode.teammate.fragments.main.GamesFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
@@ -91,11 +92,14 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     public void onTeamClicked(Team item) {
         teamViewModel.updateDefaultTeam(item);
         switch (requestCode) {
-            case R.id.request_event_team_pick:
-                showFragment(EventsFragment.newInstance(item));
+            case R.id.request_game_team_pick:
+                showFragment(GamesFragment.newInstance(item));
                 break;
             case R.id.request_chat_team_pick:
                 showFragment(ChatFragment.newInstance(item));
+                break;
+            case R.id.request_event_team_pick:
+                showFragment(EventsFragment.newInstance(item));
                 break;
             case R.id.request_media_team_pick:
                 showFragment(MediaFragment.newInstance(item));

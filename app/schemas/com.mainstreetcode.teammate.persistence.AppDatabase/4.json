@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "6ef5f70e42a89baf3b5b3195c2462036",
+    "identityHash": "994f2c49ddb533006696aba9701efb0d",
     "entities": [
       {
         "tableName": "users",
@@ -154,13 +154,19 @@
       },
       {
         "tableName": "events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `event_image_url` TEXT, `event_name` TEXT, `event_notes` TEXT, `event_location_name` TEXT, `event_team` TEXT, `event_start_date` INTEGER, `event_end_date` INTEGER, `event_location` TEXT, `event_visibility` TEXT, `event_spots` INTEGER NOT NULL, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `event_game_id` TEXT, `event_image_url` TEXT, `event_name` TEXT, `event_notes` TEXT, `event_location_name` TEXT, `event_team` TEXT, `event_start_date` INTEGER, `event_end_date` INTEGER, `event_location` TEXT, `event_visibility` TEXT, `event_spots` INTEGER NOT NULL, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_team`) REFERENCES `teams`(`team_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "event_id",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "gameId",
+            "columnName": "event_game_id",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "imageUrl",
@@ -655,7 +661,7 @@
       },
       {
         "tableName": "games",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `game_ref_path` TEXT, `game_score` TEXT, `game_created` INTEGER, `game_sport` TEXT, `game_event` TEXT, `game_tournament` TEXT, `game_home` TEXT, `game_away` TEXT, `game_winner` TEXT, `game_leg` INTEGER NOT NULL, `game_seed` INTEGER NOT NULL, `game_round` INTEGER NOT NULL, `game_home_score` INTEGER NOT NULL, `game_away_score` INTEGER NOT NULL, `game_ended` INTEGER NOT NULL, `game_can_draw` INTEGER NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `game_ref_path` TEXT, `game_score` TEXT, `game_host_id` TEXT, `game_home_entity_id` TEXT, `game_away_entity_id` TEXT, `game_winner_entity_id` TEXT, `game_created` INTEGER, `game_sport` TEXT, `game_event` TEXT, `game_tournament` TEXT, `game_home` TEXT, `game_away` TEXT, `game_winner` TEXT, `game_leg` INTEGER NOT NULL, `game_seed` INTEGER NOT NULL, `game_round` INTEGER NOT NULL, `game_home_score` INTEGER NOT NULL, `game_away_score` INTEGER NOT NULL, `game_ended` INTEGER NOT NULL, `game_can_draw` INTEGER NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -672,6 +678,30 @@
           {
             "fieldPath": "score",
             "columnName": "game_score",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hostId",
+            "columnName": "game_host_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "homeEntityId",
+            "columnName": "game_home_entity_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "awayEntityId",
+            "columnName": "game_away_entity_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "winnerEntityId",
+            "columnName": "game_winner_entity_id",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1039,7 +1069,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6ef5f70e42a89baf3b5b3195c2462036\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"994f2c49ddb533006696aba9701efb0d\")"
     ]
   }
 }
