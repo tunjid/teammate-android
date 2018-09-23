@@ -97,7 +97,7 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
         if (date == null) date = getFutureDate();
         // To concatenate team to account for the way the id is stored in the db to accommodate users and teams
         String teamId = team.getId();
-        return tournamentDao.getTournaments(teamId, "team," + teamId, date).subscribeOn(io());
+        return tournamentDao.getTournaments(teamId, date).subscribeOn(io());
     }
 
     @Override

@@ -29,14 +29,15 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
     }
 
     @Query("SELECT * FROM tournaments as tournament" +
-            " INNER JOIN competitors AS competitor" +
-            " ON tournament.tournament_id = competitor.competitor_tournament_id" +
-            " WHERE :teamCompetitorId = competitor.competitor_entity_id" +
-            " OR :teamId = tournament.tournament_host" +
+            " INNER JOIN games AS game" +
+            " ON tournament.tournament_id = game.game_tournament" +
+            " WHERE :teamId = game.game_host_id" +
+            " OR :teamId = game.game_home_entity_id" +
+            " OR :teamId = game.game_away_entity_id" +
             " AND tournament.tournament_created < :date" +
             " ORDER BY tournament.tournament_created DESC" +
             " LIMIT 40")
-    public abstract Maybe<List<Tournament>> getTournaments(String teamId, String teamCompetitorId, Date date);
+    public abstract Maybe<List<Tournament>> getTournaments(String teamId, Date date);
 
     @Query("SELECT * FROM tournaments" +
             " WHERE :id = tournament_id")
