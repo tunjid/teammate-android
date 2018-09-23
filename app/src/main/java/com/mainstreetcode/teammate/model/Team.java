@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
+import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 
 /**
  * Teams
@@ -46,13 +47,14 @@ public class Team extends TeamEntity
     public static final String COMPETITOR_TYPE = "team";
     private static final String NEW_TEAM = "new.team";
 
-    @Ignore private static final IdCache holder = IdCache.cache(9);
+    @Ignore private static final IdCache holder = IdCache.cache(10);
 
-    public Team(@NonNull String id, String imageUrl, String city, String state, String zip,
+    public Team(@NonNull String id, String imageUrl, String screenName,
+                String city, String state, String zip,
                 CharSequence name, CharSequence description,
                 Date created, LatLng location, Sport sport,
                 long storageUsed, long maxStorage, int minAge, int maxAge) {
-        super(id, imageUrl, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+        super(id, imageUrl, screenName, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
     }
 
     private Team(Parcel in) {
@@ -60,7 +62,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
+        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
     @Override
@@ -174,6 +176,7 @@ public class Team extends TeamEntity
 
         private static final String UID_KEY = "_id";
         private static final String NAME_KEY = "name";
+        private static final String SCREEN_NAME = "screenName";
         private static final String CITY_KEY = "city";
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
@@ -190,13 +193,14 @@ public class Team extends TeamEntity
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Team(json.getAsString(), "", "", "", "", "", "", new Date(), new LatLng(0, 0), Sport.empty(), 0, 0, 0, 0);
+                return new Team(json.getAsString(), "", "","", "", "", "", "", new Date(), new LatLng(0, 0), Sport.empty(), 0, 0, 0, 0);
             }
 
             JsonObject teamJson = json.getAsJsonObject();
 
             String id = ModelUtils.asString(UID_KEY, teamJson);
             String name = ModelUtils.asString(NAME_KEY, teamJson);
+            String screenName = asString(SCREEN_NAME, teamJson);
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
@@ -211,7 +215,7 @@ public class Team extends TeamEntity
             int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
             int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            return new Team(id, imageUrl, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+            return new Team(id, imageUrl, screenName, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         }
 
         @Override
@@ -224,6 +228,7 @@ public class Team extends TeamEntity
             team.addProperty(DESCRIPTION_KEY, src.description.toString());
             team.addProperty(MIN_AGE_KEY, src.minAge);
             team.addProperty(MAX_AGE_KEY, src.maxAge);
+            if (!TextUtils.isEmpty(src.screenName)) team.addProperty(SCREEN_NAME, src.screenName);
 
             String sportCode = src.sport != null ? src.sport.getCode() : "";
             if (!TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);

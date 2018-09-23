@@ -37,22 +37,22 @@ public class Game extends GameEntity
         HeaderedModel<Game>,
         ListableModel<Game> {
 
-    @Ignore private static final IdCache holder = IdCache.cache(4);
+    @Ignore private static final IdCache holder = IdCache.cache(5);
 
     public Game(@NonNull String id, String refPath, String score,
                 String hostId, String homeEntityId, String awayEntityId, String winnerEntityId,
-                Date created, Sport sport, Event event, Tournament tournament,
+                Date created, Sport sport, User referee, Event event, Tournament tournament,
                 Competitor home, Competitor away, Competitor winner,
                 int seed, int leg, int round, int homeScore, int awayScore,
                 boolean ended, boolean canDraw) {
-        super(id, refPath, score, hostId, homeEntityId, awayEntityId, winnerEntityId, created, sport, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
+        super(id, refPath, score, hostId, homeEntityId, awayEntityId, winnerEntityId, created, sport, referee, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
     }
 
     public static Game empty(Team team) {
         Sport sport = team.getSport();
-      return new Game("", sport.refType(), "TBD", team.getId(), "", "", "", new Date(),
-              sport, Event.empty(), Tournament.empty(),
-              Competitor.empty(), Competitor.empty(), Competitor.empty(), 0, 0, 0, 0, 0, false, true);
+        return new Game("", sport.refType(), "TBD", team.getId(), "", "", "", new Date(),
+                sport, User.empty(), Event.empty(), Tournament.empty(),
+                Competitor.empty(), Competitor.empty(), Competitor.empty(), 0, 0, 0, 0, 0, false, true);
     }
 
     protected Game(Parcel in) {
@@ -65,7 +65,8 @@ public class Game extends GameEntity
                 Item.number(holder.get(0), 0, Item.INPUT, R.string.game_home_score, () -> String.valueOf(homeScore), this::setHomeScore, this),
                 Item.number(holder.get(1), 1, Item.INPUT, R.string.game_away_score, () -> String.valueOf(awayScore), this::setAwayScore, this),
                 Item.number(holder.get(2), 1, Item.NUMBER, R.string.game_round, () -> String.valueOf(round), ignored -> {}, this),
-                Item.number(holder.get(3), 1, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this)
+                Item.number(holder.get(3), 1, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this),
+                Item.text(holder.get(4), 1, Item.INFO, R.string.game_referee, referee::getName, ignored -> {}, this)
         );
     }
 
@@ -160,6 +161,7 @@ public class Game extends GameEntity
         private static final String SCORE = "score";
         private static final String CREATED_KEY = "created";
         private static final String SPORT_KEY = "sport";
+        private static final String REFEREE = "referee";
         private static final String EVENT = "event";
         private static final String TOURNAMENT = "tournament";
         private static final String HOST_ID = "host";
@@ -183,6 +185,7 @@ public class Game extends GameEntity
             body.addProperty(ENDED, src.ended);
             body.addProperty(HOME_SCORE, src.homeScore);
             body.addProperty(AWAY_SCORE, src.awayScore);
+            if (!src.referee.isEmpty()) body.addProperty(REFEREE, src.referee.getId());
             if (!src.event.isEmpty()) body.addProperty(EVENT, src.event.getId());
             return body;
         }
@@ -190,8 +193,9 @@ public class Game extends GameEntity
         @Override
         public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Game(json.getAsString(), "", "TBD", "", "", "", "", new Date(), Sport.empty(), Event.empty(),
-                        Tournament.empty(Team.empty()), Competitor.empty(), Competitor.empty(), Competitor.empty(),
+                return new Game(json.getAsString(), "", "TBD", "", "", "", "", new Date(),
+                        Sport.empty(), User.empty(), Event.empty(), Tournament.empty(Team.empty()),
+                        Competitor.empty(), Competitor.empty(), Competitor.empty(),
                         0, 0, 0, 0, 0, false, false);
             }
 
@@ -216,16 +220,19 @@ public class Game extends GameEntity
             boolean canDraw = ModelUtils.asBoolean(CAN_DRAW, body);
 
             Sport sport = Config.sportFromCode(sportCode);
+            User referee = context.deserialize(body.get(REFEREE), User.class);
             Event event = context.deserialize(body.get(EVENT), Event.class);
             Tournament tournament = context.deserialize(body.get(TOURNAMENT), Tournament.class);
             Competitor home = context.deserialize(body.get(HOME), Competitor.class);
             Competitor away = context.deserialize(body.get(AWAY), Competitor.class);
             Competitor winner = body.has(WINNER) ? context.deserialize(body.get(WINNER), Competitor.class) : Competitor.empty();
 
+            if (referee == null) referee = User.empty();
             if (event == null) event = Event.empty();
 
-            return new Game(id, refPath, score, hostId, homeEntityId, awayEntityId, winnerEntityId, ModelUtils.parseDate(created), sport,
-                    event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
+            return new Game(id, refPath, score, hostId, homeEntityId, awayEntityId, winnerEntityId,
+                    ModelUtils.parseDate(created), sport, referee, event, tournament,
+                    home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
         }
     }
 }

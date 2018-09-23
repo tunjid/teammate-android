@@ -44,6 +44,7 @@ public class GameEntity implements Parcelable {
 
     @ColumnInfo(name = "game_created") protected Date created;
     @ColumnInfo(name = "game_sport") protected Sport sport;
+    @ColumnInfo(name = "game_referee") protected User referee;
     @ColumnInfo(name = "game_event") protected Event event;
     @ColumnInfo(name = "game_tournament") protected Tournament tournament;
     @ColumnInfo(name = "game_home") protected Competitor home;
@@ -61,7 +62,7 @@ public class GameEntity implements Parcelable {
 
     public GameEntity(@NonNull String id, String refPath, String score,
                       String hostId, String homeEntityId, String awayEntityId, String winnerEntityId,
-                      Date created, Sport sport, Event event, Tournament tournament,
+                      Date created, Sport sport, User referee, Event event, Tournament tournament,
                       Competitor home, Competitor away, Competitor winner,
                       int seed, int leg, int round, int homeScore, int awayScore,
                       boolean ended, boolean canDraw) {
@@ -74,6 +75,7 @@ public class GameEntity implements Parcelable {
         this.winnerEntityId = winnerEntityId;
         this.created = created;
         this.sport = sport;
+        this.referee = referee;
         this.event = event;
         this.tournament = tournament;
         this.home = home;
@@ -98,6 +100,7 @@ public class GameEntity implements Parcelable {
         winnerEntityId = in.readString();
         created = new Date(in.readLong());
         sport = Config.sportFromCode(in.readString());
+        referee = (User) in.readValue(User.class.getClassLoader());
         event = (Event) in.readValue(Event.class.getClassLoader());
         tournament = (Tournament) in.readValue(Tournament.class.getClassLoader());
         home = (Competitor) in.readValue(Competitor.class.getClassLoader());
@@ -167,6 +170,10 @@ public class GameEntity implements Parcelable {
 
     public Sport getSport() {
         return sport;
+    }
+
+    public User getReferee() {
+        return referee;
     }
 
     public Event getEvent() {
@@ -247,6 +254,7 @@ public class GameEntity implements Parcelable {
         dest.writeString(winnerEntityId);
         dest.writeLong(created.getTime());
         dest.writeString(sport.getCode());
+        dest.writeValue(referee);
         dest.writeValue(event);
         dest.writeValue(tournament);
         dest.writeValue(home);

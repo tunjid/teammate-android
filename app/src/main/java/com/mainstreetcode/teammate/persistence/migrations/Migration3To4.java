@@ -13,6 +13,10 @@ public class Migration3To4 extends Migration {
     @Override
     public void migrate(@NonNull SupportSQLiteDatabase database) {
 
+        database.execSQL("ALTER TABLE users ADD COLUMN user_screen_name TEXT DEFAULT ''");
+
+        database.execSQL("ALTER TABLE teams ADD COLUMN team_screen_name TEXT DEFAULT ''");
+
         database.execSQL("ALTER TABLE events ADD COLUMN event_game_id TEXT DEFAULT ''");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS `tournaments` (" +
@@ -46,6 +50,7 @@ public class Migration3To4 extends Migration {
                 "`game_away_entity_id` TEXT, " +
                 "`game_created` INTEGER, " +
                 "`game_sport` TEXT, " +
+                "`game_referee` TEXT, " +
                 "`game_event` TEXT, " +
                 "`game_tournament` TEXT, " +
                 "`game_home` TEXT, " +

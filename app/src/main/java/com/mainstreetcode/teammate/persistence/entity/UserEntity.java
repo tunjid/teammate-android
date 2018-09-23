@@ -18,14 +18,17 @@ public class UserEntity implements Parcelable {
     @NonNull @PrimaryKey
     @ColumnInfo(name = "user_id") protected String id;
     @ColumnInfo(name = "user_image_url") protected String imageUrl;
+    @ColumnInfo(name = "user_screen_name") protected String screenName;
     @ColumnInfo(name = "user_primary_email") protected String primaryEmail;
     @ColumnInfo(name = "user_first_name") protected CharSequence firstName;
     @ColumnInfo(name = "user_last_name") protected CharSequence lastName;
     @ColumnInfo(name = "user_about") protected CharSequence about;
 
-    public UserEntity(@NonNull String id, String imageUrl, String primaryEmail, CharSequence firstName, CharSequence lastName, CharSequence about) {
+    public UserEntity(@NonNull String id, String imageUrl, String screenName, String primaryEmail,
+                      CharSequence firstName, CharSequence lastName, CharSequence about) {
         this.id = id;
         this.imageUrl = imageUrl;
+        this.screenName = screenName;
         this.primaryEmail = primaryEmail;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -55,8 +58,9 @@ public class UserEntity implements Parcelable {
 
     public CharSequence getFirstName() {return processString(this.firstName);}
 
-    @SuppressWarnings("unused")
     public CharSequence getLastName() {return processString(this.lastName);}
+
+    public String getScreenName() { return screenName; }
 
     public String getPrimaryEmail() {return this.primaryEmail;}
 
@@ -72,9 +76,9 @@ public class UserEntity implements Parcelable {
         this.firstName = firstName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public void setScreenName(String screenName) { this.screenName = screenName; }
 
     public void setPrimaryEmail(String primaryEmail) {
         this.primaryEmail = primaryEmail;
@@ -92,6 +96,7 @@ public class UserEntity implements Parcelable {
     protected UserEntity(Parcel in) {
         id = in.readString();
         imageUrl = in.readString();
+        screenName = in.readString();
         primaryEmail = in.readString();
         firstName = in.readString();
         lastName = in.readString();
@@ -107,6 +112,7 @@ public class UserEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(imageUrl);
+        dest.writeString(screenName);
         dest.writeString(primaryEmail);
         dest.writeString(firstName.toString());
         dest.writeString(lastName.toString());

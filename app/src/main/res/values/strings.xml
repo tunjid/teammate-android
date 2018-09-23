@@ -26,6 +26,7 @@
     <!--SignUpFragment-->
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
+    <string name="screen_name">Handle</string>
     <string name="nickname">Nickname</string>
     <string name="member_information">Member Information</string>
     <string name="sign_up">Sign Up</string>
@@ -236,6 +237,7 @@
     <string name="game_leg">Leg</string>
     <string name="game_stats">Game stats</string>
     <string name="game_end">End game</string>
+    <string name="game_referee">Referee / umpire / Match official</string>
     <string name="game_end_request">End game?</string>
     <string name="game_manual_score_request">Enter scores manually?</string>
     <string name="game_end_prompt">This will end the game for everyone.\n\nStats will not be able to be added or deleted, but the times can be changed.</string>

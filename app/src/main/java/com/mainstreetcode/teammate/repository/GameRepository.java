@@ -97,8 +97,12 @@ public class GameRepository extends TeamQueryRepository<Game> {
             List<Competitor> competitors = new ArrayList<>(models.size());
 
             for (Game game : models) {
+                User referee = game.getReferee();
                 Competitor home = game.getHome();
                 Competitor away = game.getAway();
+
+                if (!referee.isEmpty()) users.add(referee);
+
                 addIfValid(home, users, teams);
                 addIfValid(away, users, teams);
                 competitors.add(home);
