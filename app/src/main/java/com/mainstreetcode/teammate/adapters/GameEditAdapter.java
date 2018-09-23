@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.ClickInputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -39,6 +40,8 @@ public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Gam
         switch (viewType) {
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditGame);
+            case Item.INFO:
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditGame, adapterListener::onRefereeClicked);
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             default:
@@ -68,5 +71,7 @@ public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Gam
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
         boolean canEditGame();
+
+        void onRefereeClicked();
     }
 }

@@ -55,9 +55,9 @@ public class User extends UserEntity implements
         return Arrays.asList(
                 Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
                 Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-                Item.text(holder.get(2), 1, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), this::setScreenName, this),
-                Item.email(holder.get(3), 2, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.text(holder.get(4), 3, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+                Item.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), this::setScreenName, this),
+                Item.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
         );
     }
 

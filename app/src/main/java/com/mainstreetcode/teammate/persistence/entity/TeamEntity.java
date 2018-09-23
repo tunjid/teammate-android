@@ -137,6 +137,8 @@ public class TeamEntity implements Parcelable {
 
     protected void setName(String name) {this.name = name; }
 
+    protected void setScreenName(String screenName) { this.screenName = screenName; }
+
     protected void setCity(String city) {this.city = city; }
 
     protected void setState(String state) {this.state = state; }

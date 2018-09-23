@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * Static methods for models
@@ -34,9 +35,15 @@ public class ModelUtils {
     public static final SimpleDateFormat dateFormatter;
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
+    private static final Pattern alphaNumeric = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+
     static {
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    public static boolean hasNoSpecialChars(CharSequence sequence) {
+        return !alphaNumeric.matcher(sequence).find();
     }
 
     public static boolean asBoolean(String key, JsonObject jsonObject) {

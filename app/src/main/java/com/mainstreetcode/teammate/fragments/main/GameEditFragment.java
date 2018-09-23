@@ -127,6 +127,11 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public boolean canEditGame() { return gofer.canEdit(); }
 
     @Override
+    public void onRefereeClicked() {
+
+    }
+
+    @Override
     protected void onPrepComplete() {
         scrollManager.notifyDataSetChanged();
         requireActivity().invalidateOptionsMenu();
