@@ -40,9 +40,9 @@ public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE)
                         .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.ALL_INPUT_VALID);
             case Item.NICKNAME:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canChangeRoleFields, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canChangeRoleFields, Item.ALL_INPUT_VALID);
             case Item.ROLE:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canChangeRolePosition);
             default:

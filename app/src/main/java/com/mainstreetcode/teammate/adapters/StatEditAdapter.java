@@ -20,7 +20,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
 import java.util.List;
 
-import static com.mainstreetcode.teammate.model.Item.FALSE;
+import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
@@ -47,7 +47,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case Item.STAT_TYPE:
-                return new StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup), R.string.choose_stat, adapterListener.getStat(), adapterListener::canChangeStat, FALSE);
+                return new StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup), R.string.choose_stat, adapterListener.getStat(), adapterListener::canChangeStat, ALL_INPUT_VALID);
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
             case TEAM:

@@ -14,10 +14,12 @@ import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -41,20 +43,20 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
             case Item.ABOUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, ViewHolderUtil.allowsSpecialCharacters);
             case Item.INPUT:
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields)
                         .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, ALL_INPUT_VALID);
             case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::canEditFields, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::canEditFields, ALL_INPUT_VALID);
             case Item.CITY:
             case Item.STATE:
                 return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked);
             case Item.ZIP:
-                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked, () -> false);
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked, ALL_INPUT_VALID);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

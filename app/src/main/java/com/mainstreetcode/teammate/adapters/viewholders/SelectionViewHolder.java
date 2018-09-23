@@ -19,7 +19,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
     private final int titleRes;
     private final List<T> items;
     private final Function<T, CharSequence> displayFunction;
-    protected final Function<T, String> valueFunction;
+    private final Function<T, String> valueFunction;
 
     public SelectionViewHolder(View itemView,
                                @StringRes int titleRes,  List<T> items,
@@ -38,7 +38,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
                                Function<T, CharSequence> displayFunction,
                                Function<T, String> valueFunction,
                                Supplier<Boolean> enabler,
-                               Supplier<Boolean> errorChecker) {
+                               Function<CharSequence, CharSequence> errorChecker) {
         super(itemView, enabler, () -> {}, errorChecker);
         this.titleRes = titleRes;
         this.items = items;

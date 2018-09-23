@@ -31,7 +31,7 @@ public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Im
     @NonNull
     @Override
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.ALL_INPUT_VALID);
     }
 
     @Override

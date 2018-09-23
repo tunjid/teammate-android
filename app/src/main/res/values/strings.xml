@@ -3,6 +3,7 @@
     <string name="teammates">Teammate</string>
     <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
     <string name="empty_string"> </string>
+    <string name="no_special_characters">No special characters</string>
     <string name="no_permission">You don\'t have permission to edit this item</string>
 
     <!--Splash Fragment-->

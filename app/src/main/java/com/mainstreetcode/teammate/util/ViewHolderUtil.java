@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.util;
 
 
 import android.app.Activity;
+import android.arch.core.util.Function;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.annotation.IdRes;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 public class ViewHolderUtil {
@@ -33,6 +36,9 @@ public class ViewHolderUtil {
     public static final int BLOCKED_USER = 14;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
+
+    public static Function<CharSequence, CharSequence> allowsSpecialCharacters =
+            input -> ModelUtils.hasNoSpecialChars(input) ? "" : App.getInstance().getResources().getString(R.string.no_special_characters);
 
     public static View getItemView(@LayoutRes int res, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);

@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
+import android.arch.core.util.Function;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -27,7 +28,7 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
                                    int titleRes,
                                    Stat stat,
                                    Supplier<Boolean> enabler,
-                                   Supplier<Boolean> errorChecker) {
+                                   Function<CharSequence, CharSequence> errorChecker) {
 
         super(itemView, titleRes, stat.getSport().getStats(), StatType::getEmojiAndName, StatType::getCode, enabler, errorChecker);
 

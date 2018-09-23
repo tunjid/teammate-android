@@ -89,6 +89,8 @@ public class TeamEntity implements Parcelable {
 
     public CharSequence getSportAndName() {return sport.appendEmoji(name);}
 
+    public String getScreenName() { return screenName; }
+
     public String getCity() {return this.city;}
 
     public Date getCreated() {

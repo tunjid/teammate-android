@@ -48,6 +48,8 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final Supplier<Boolean> TRUE = () -> true;
     public static final Supplier<Boolean> FALSE = () -> false;
 
+    public static final Function<CharSequence, CharSequence> ALL_INPUT_VALID = sequence -> "";
+
     @SuppressWarnings("unused")
     public static <T> void ignore(T ignored) {}
 

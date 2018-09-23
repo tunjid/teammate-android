@@ -13,10 +13,12 @@ import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -43,9 +45,9 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Use
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit)
                         .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, ViewHolderUtil.allowsSpecialCharacters);
             case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, ALL_INPUT_VALID);
             default:
                 return new BaseItemViewHolder(itemView);
         }

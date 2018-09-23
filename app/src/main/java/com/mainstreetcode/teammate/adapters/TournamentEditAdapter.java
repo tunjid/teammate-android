@@ -24,7 +24,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mainstreetcode.teammate.model.Item.FALSE;
+import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -50,14 +50,14 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditBeforeCreation)
                         .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditAfterCreation, FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditAfterCreation, ALL_INPUT_VALID);
             case Item.TOURNAMENT_TYPE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_type, Config.getTournamentTypes(adapterListener.getSport()), TournamentType::getName, TournamentType::getCode, adapterListener::canEditBeforeCreation, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_type, Config.getTournamentTypes(adapterListener.getSport()), TournamentType::getName, TournamentType::getCode, adapterListener::canEditBeforeCreation, ALL_INPUT_VALID);
             case Item.TOURNAMENT_STYLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_style, Config.getTournamentStyles(adapterListener.getSport()), TournamentStyle::getName, TournamentStyle::getCode, adapterListener::canEditBeforeCreation, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_style, Config.getTournamentStyles(adapterListener.getSport()), TournamentStyle::getName, TournamentStyle::getCode, adapterListener::canEditBeforeCreation, ALL_INPUT_VALID);
             case Item.INFO:
                 Resources resources = viewGroup.getResources();
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_single_final, Arrays.asList(true, false), flag -> resources.getString(flag ? R.string.yes : R.string.no), String::valueOf, adapterListener::canEditBeforeCreation, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_single_final, Arrays.asList(true, false), flag -> resources.getString(flag ? R.string.yes : R.string.no), String::valueOf, adapterListener::canEditBeforeCreation, ALL_INPUT_VALID);
             case TOURNAMENT:
                 return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), viewHolder -> {});
             default:
