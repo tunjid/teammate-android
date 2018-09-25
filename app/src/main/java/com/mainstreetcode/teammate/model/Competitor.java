@@ -149,6 +149,9 @@ public class Competitor extends CompetitorEntity
             String refPath = ModelUtils.asString(REF_PATH, jsonObject);
             String tournament = ModelUtils.asString(TOURNAMENT, jsonObject);
             String created = ModelUtils.asString(CREATED, jsonObject);
+
+            if (tournament.isEmpty()) tournament = null;
+
             Competitive competitive = context.deserialize(jsonObject.get(ENTITY),
                     User.COMPETITOR_TYPE.equals(refPath) ? User.class : Team.class);
 

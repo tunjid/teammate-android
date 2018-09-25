@@ -115,6 +115,8 @@ public class Tournament extends TournamentEntity
         return TextUtils.isEmpty(id);
     }
 
+    public void updateHost(Team team) { host.update(team); }
+
     @Override
     @SuppressWarnings("unchecked")
     public void update(Tournament updatedTournament) {
@@ -141,7 +143,6 @@ public class Tournament extends TournamentEntity
     @Override
     public int compareTo(@NonNull Tournament o) {
         int createdComparison = created.compareTo(o.created);
-
         return createdComparison != 0 ? createdComparison : id.compareTo(o.id);
     }
 

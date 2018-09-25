@@ -7,6 +7,7 @@ import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
@@ -33,16 +34,10 @@ public class GameRepository extends TeamQueryRepository<Game> {
 
     private final TeammateApi api;
     private final GameDao gameDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
-    private final ModelRepository<Competitor> competitorRepository;
 
     private GameRepository() {
         api = TeammateService.getApiInstance();
         gameDao = AppDatabase.getInstance().gameDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-        competitorRepository = CompetitorRepository.getInstance();
     }
 
     public static GameRepository getInstance() {
@@ -94,14 +89,20 @@ public class GameRepository extends TeamQueryRepository<Game> {
         return models -> {
             List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
+            List<Tournament> tournaments = new ArrayList<>(models.size());
             List<Competitor> competitors = new ArrayList<>(models.size());
 
             for (Game game : models) {
                 User referee = game.getReferee();
                 Competitor home = game.getHome();
                 Competitor away = game.getAway();
+                Tournament tournament = game.getTournament();
 
                 if (!referee.isEmpty()) users.add(referee);
+                if (!tournament.isEmpty()) {
+                    tournament.updateHost(game.getTeam());
+                    tournaments.add(tournament);
+                }
 
                 addIfValid(home, users, teams);
                 addIfValid(away, users, teams);
@@ -109,9 +110,10 @@ public class GameRepository extends TeamQueryRepository<Game> {
                 competitors.add(away);
             }
 
-            teamRepository.saveAsNested().apply(teams);
-            userRepository.saveAsNested().apply(users);
-            competitorRepository.saveAsNested().apply(competitors);
+            UserRepository.getInstance().saveAsNested().apply(users);
+            TeamRepository.getInstance().saveAsNested().apply(teams);
+            TournamentRepository.getInstance().saveAsNested().apply(tournaments);
+            CompetitorRepository.getInstance().saveAsNested().apply(competitors);
 
             gameDao.upsert(Collections.unmodifiableList(models));
 
