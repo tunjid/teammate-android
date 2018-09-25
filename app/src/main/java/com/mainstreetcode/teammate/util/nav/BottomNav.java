@@ -13,10 +13,10 @@ public class BottomNav {
     private final LinearLayout container;
     private final ViewHolder[] viewHolders;
 
-    BottomNav(LinearLayout container,
-              Runnable onSwipe,
-              View.OnClickListener onClick,
-              NavItem... navItems) {
+    private BottomNav(LinearLayout container,
+                      Runnable onSwipe,
+                      View.OnClickListener onClick,
+                      NavItem... navItems) {
         this.container = container;
         LayoutInflater inflater = LayoutInflater.from(container.getContext());
 
