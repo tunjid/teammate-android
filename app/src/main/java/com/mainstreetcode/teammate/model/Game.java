@@ -107,6 +107,7 @@ public class Game extends GameEntity
         Event event = super.getEvent();
         Team team = event.getTeam();
         if (!team.hasMajorFields()) team.update(host);
+        if (TextUtils.isEmpty(event.getGameId())) event.setGame(this);
         return event;
     }
 

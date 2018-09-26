@@ -1,8 +1,11 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import android.annotation.SuppressLint;
+
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +22,11 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
 
     static final List<Identifiable> roles = new ArrayList<>();
 
+    @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public RoleViewModel() {
         roleRepository = RoleRepository.getInstance();
+        fetch(Role.class, false).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 
     @Override

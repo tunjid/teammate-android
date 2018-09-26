@@ -149,6 +149,10 @@ public class Event extends EventEntity
         location = place.getLatLng();
     }
 
+    void setGame(Game game) {
+        this.gameId = game.getId();
+    }
+
     public MarkerOptions getMarkerOptions() {
         return new MarkerOptions()
                 .title(name.toString())
