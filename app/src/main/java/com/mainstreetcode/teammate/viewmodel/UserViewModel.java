@@ -6,6 +6,7 @@ import com.facebook.login.LoginResult;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.TeammateException;
 import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
@@ -36,6 +37,10 @@ public class UserViewModel extends ViewModel {
 
     public UserGofer gofer(User user) {
         return new UserGofer(user, getCurrentUser()::equals, this::getUser, this::updateUser);
+    }
+
+    public InstantSearch<String, User> instantSearch() {
+        return new InstantSearch<>(repository::findUser);
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {

@@ -93,6 +93,9 @@ public interface TeammateApi {
     @POST("api/resetPassword")
     Single<Message> resetPassword(@Body JsonObject json);
 
+    @GET("api/users")
+    Single<List<User>> findUser(@Query("screenName") String teamName);
+
     // =============================================================================================
     // Team endpoints
     // =============================================================================================

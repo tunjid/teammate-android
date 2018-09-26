@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.UserAdapter;
+import com.mainstreetcode.teammate.adapters.UserEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -24,7 +24,7 @@ import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
 public class UserEditFragment extends HeaderedFragment<User>
         implements
-        UserAdapter.AdapterListener {
+        UserEditAdapter.AdapterListener {
 
     private static final String ARG_USER = "user";
 
@@ -62,7 +62,7 @@ public class UserEditFragment extends HeaderedFragment<User>
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new UserAdapter(gofer.getItems(), this))
+                .withAdapter(new UserEditAdapter(gofer.getItems(), this))
                 .withLinearLayoutManager()
                 .build();
 

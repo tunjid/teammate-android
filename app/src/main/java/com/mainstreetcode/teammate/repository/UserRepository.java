@@ -154,6 +154,10 @@ public class UserRepository extends ModelRepository<User> {
                 .subscribeOn(io());
     }
 
+    public Single<List<User>> findUser(String screenName) {
+        return api.findUser(screenName);
+    }
+
     public boolean isSignedIn() {
         return getUserId() != null;
     }

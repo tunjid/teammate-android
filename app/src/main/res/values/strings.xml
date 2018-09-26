@@ -75,7 +75,7 @@
     <string name="error_socket">Unable to connect</string>
 
     <!--TeamSearchFragment-->
-    <string name="team_search">Team Search</string>
+    <string name="team_search">Search by name @handles</string>
     <string name="team_search_hint">Search</string>
     <string name="team_logo">Team Logo</string>
     <string name="create_team_prompt">Can\'t find your team?</string>

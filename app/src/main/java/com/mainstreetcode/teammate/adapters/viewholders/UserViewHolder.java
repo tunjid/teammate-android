@@ -3,16 +3,16 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
-public class UserViewHolder extends ModelCardViewHolder<User, ViewHolderUtil.SimpleAdapterListener<User>>
+public class UserViewHolder extends ModelCardViewHolder<User, UserAdapter.AdapterListener>
         implements View.OnClickListener {
 
-    public UserViewHolder(View itemView, ViewHolderUtil.SimpleAdapterListener<User> adapterListener) {
+    public UserViewHolder(View itemView, UserAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
         itemView.setOnClickListener(this);
     }
@@ -29,6 +29,6 @@ public class UserViewHolder extends ModelCardViewHolder<User, ViewHolderUtil.Sim
 
     @Override
     public void onClick(View view) {
-        adapterListener.onItemClicked(model);
+        adapterListener.onUserClicked(model);
     }
 }

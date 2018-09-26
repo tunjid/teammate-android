@@ -35,6 +35,10 @@ public interface Identifiable {
         return null;
     }
 
+    static Identifiable fromString(String string) {
+        return () -> string;
+    }
+
     static <T extends Identifiable> Flowable<DiffUtil.DiffResult> diff(Flowable<List<T>> sourceFlowable,
                                                                        Callable<List<T>> sourceSupplier,
                                                                        BiFunction<List<T>, List<T>, List<T>> accumulator) {

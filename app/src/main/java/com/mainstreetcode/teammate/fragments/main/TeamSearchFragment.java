@@ -19,6 +19,7 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public final class TeamSearchFragment extends MainActivityFragment
     private View createTeam;
     private SearchView searchView;
     private TeamSearchRequest request;
+    private InstantSearch<TeamSearchRequest, Team> instantSearch;
+
     private final List<Identifiable> teams = new ArrayList<>();
 
     public static TeamSearchFragment newInstance() {
@@ -75,6 +78,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         request = TeamSearchRequest.from(getArguments().getParcelable(ARG_TOURNAMENT));
+        instantSearch = teamViewModel.instantSearch();
     }
 
     @Override
@@ -107,7 +111,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        postSearch(searchView.getQuery().toString());
+        subscribeToSearch(request.query(searchView.getQuery().toString()));
     }
 
     @Override
@@ -130,7 +134,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onTeamClicked(Team team) {
         Fragment target = getTargetFragment();
-        boolean canPick = target != null && target instanceof TeamAdapter.TeamAdapterListener;
+        boolean canPick = target instanceof TeamAdapter.TeamAdapterListener;
 
         if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
         else showFragment(JoinRequestFragment.joinInstance(team, userViewModel.getCurrentUser()));
@@ -149,14 +153,14 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public boolean onQueryTextChange(String queryText) {
         if (getView() == null || TextUtils.isEmpty(queryText)) return true;
-        teamViewModel.postSearch(queryText);
+        instantSearch.postSearch(request.query(queryText));
         return true;
     }
 
-    private void postSearch(String queryText) {
-        if (teamViewModel.postSearch(queryText)) return;
-        disposables.add(teamViewModel.findTeams(request)
-                .doOnSubscribe(subscription -> postSearch(queryText))
+    private void subscribeToSearch(TeamSearchRequest searchRequest) {
+        if (instantSearch.postSearch(searchRequest)) return;
+        disposables.add(instantSearch.subscribe()
+                .doOnSubscribe(subscription -> subscribeToSearch(searchRequest))
                 .subscribe(this::onTeamsUpdated, defaultErrorHandler));
     }
 

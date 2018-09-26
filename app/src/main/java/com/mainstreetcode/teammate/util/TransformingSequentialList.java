@@ -16,11 +16,25 @@ public class TransformingSequentialList<F, T> extends AbstractSequentialList<T> 
     private final Function<? super T, ? extends F> toFunction;
     private final Function<? super F, ? extends T> fromFunction;
 
-    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> fromFunction) {
+    public static <F, T> List<T> transform(List<F> fromList,
+                                           Function<? super F, ? extends T> fromFunction) {
+        return new TransformingSequentialList<>(fromList, fromFunction);
+    }
+
+    public static <F, T> List<T> transform(List<F> fromList,
+                                           Function<? super F, ? extends T> fromFunction,
+                                           @Nullable Function<? super T, ? extends F> toFunction) {
+        return new TransformingSequentialList<>(fromList, fromFunction, toFunction);
+    }
+
+    public TransformingSequentialList(List<F> fromList,
+                                      Function<? super F, ? extends T> fromFunction) {
         this(fromList, fromFunction, null);
     }
 
-    public TransformingSequentialList(List<F> fromList, Function<? super F, ? extends T> fromFunction, @Nullable Function<? super T, ? extends F> toFunction) {
+    public TransformingSequentialList(List<F> fromList,
+                                      Function<? super F, ? extends T> fromFunction,
+                                      @Nullable Function<? super T, ? extends F> toFunction) {
         this.fromList = fromList;
         this.toFunction = toFunction;
         this.fromFunction = fromFunction;
