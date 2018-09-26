@@ -74,6 +74,9 @@
     <string name="error_network">Unable to connect, please try again later.</string>
     <string name="error_socket">Unable to connect</string>
 
+    <!--UserSearchFragment-->
+    <string name="user_search">Search by user @handles</string>
+
     <!--TeamSearchFragment-->
     <string name="team_search">Search by name @handles</string>
     <string name="team_search_hint">Search</string>
