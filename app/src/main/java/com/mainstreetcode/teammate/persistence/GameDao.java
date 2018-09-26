@@ -29,7 +29,7 @@ public abstract class GameDao extends EntityDao<GameEntity> {
     }
 
     @Query("SELECT * FROM games as game" +
-            " WHERE :teamId = game_host_id" +
+            " WHERE :teamId = game_host" +
             " OR :teamId = game_home_entity_id" +
             " OR :teamId = game_away_entity_id" +
             " AND game_created < :date" +

@@ -45,12 +45,12 @@ public class Migration3To4 extends Migration {
                 "(`game_id` TEXT NOT NULL, " +
                 "`game_ref_path` TEXT, " +
                 "`game_score` TEXT, " +
-                "`game_host_id` TEXT, " +
                 "`game_home_entity_id` TEXT, " +
                 "`game_away_entity_id` TEXT, " +
                 "`game_created` INTEGER, " +
                 "`game_sport` TEXT, " +
                 "`game_referee` TEXT, " +
+                "`game_host` TEXT, " +
                 "`game_event` TEXT, " +
                 "`game_tournament` TEXT, " +
                 "`game_home` TEXT, " +

@@ -80,8 +80,6 @@ public class TeamEntity implements Parcelable {
         maxAge = in.readInt();
     }
 
-    void setId(@NonNull String id) { this.id = id; }
-
     @NonNull
     public String getId() {return this.id;}
 

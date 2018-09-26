@@ -40,18 +40,18 @@ public class Game extends GameEntity
     @Ignore private static final IdCache holder = IdCache.cache(5);
 
     public Game(@NonNull String id, String refPath, String score,
-                String hostId, String homeEntityId, String awayEntityId, String winnerEntityId,
-                Date created, Sport sport, User referee, Event event, Tournament tournament,
+                String homeEntityId, String awayEntityId, String winnerEntityId,
+                Date created, Sport sport, User referee, Team host, Event event, Tournament tournament,
                 Competitor home, Competitor away, Competitor winner,
                 int seed, int leg, int round, int homeScore, int awayScore,
                 boolean ended, boolean canDraw) {
-        super(id, refPath, score, hostId, homeEntityId, awayEntityId, winnerEntityId, created, sport, referee, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
+        super(id, refPath, score, homeEntityId, awayEntityId, winnerEntityId, created, sport, referee, host, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
     }
 
     public static Game empty(Team team) {
         Sport sport = team.getSport();
-        return new Game("", sport.refType(), "TBD", team.getId(), "", "", "", new Date(),
-                sport, User.empty(), Event.empty(), Tournament.empty(),
+        return new Game("", sport.refType(), "TBD", "", "", "", new Date(),
+                sport, User.empty(), team, Event.empty(), Tournament.empty(),
                 Competitor.empty(), Competitor.empty(), Competitor.empty(), 0, 0, 0, 0, 0, false, true);
     }
 
@@ -100,6 +100,17 @@ public class Game extends GameEntity
     }
 
     @Override
+    public Team getTeam() { return host; }
+
+    @Override
+    public Event getEvent() {
+        Event event = super.getEvent();
+        Team team = event.getTeam();
+        if (!team.hasMajorFields()) team.update(host);
+        return event;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public void update(Game updatedGame) {
         this.id = updatedGame.id;
@@ -113,12 +124,13 @@ public class Game extends GameEntity
         this.ended = updatedGame.ended;
         this.canDraw = updatedGame.canDraw;
         this.sport.update(updatedGame.sport);
-        this.hostId = updatedGame.hostId;
         this.homeEntityId = updatedGame.homeEntityId;
         this.awayEntityId = updatedGame.awayEntityId;
         this.winnerEntityId = updatedGame.winnerEntityId;
         if (updatedGame.referee.hasMajorFields())
             this.referee.update(updatedGame.referee);
+        if (updatedGame.host.hasMajorFields())
+            this.host.update(updatedGame.host);
         if (updatedGame.tournament.hasMajorFields())
             this.tournament.update(updatedGame.tournament);
         if (updatedGame.home.hasMajorFields() && this.home.hasSameType(updatedGame.home))
@@ -170,7 +182,7 @@ public class Game extends GameEntity
         private static final String REFEREE = "referee";
         private static final String EVENT = "event";
         private static final String TOURNAMENT = "tournament";
-        private static final String HOST_ID = "host";
+        private static final String HOST = "host";
         private static final String HOME_ENTITY_ID = "homeEntity";
         private static final String AWAY_ENTITY_ID = "awayEntity";
         private static final String WINNER_ENTITY_ID = "winnerEntity";
@@ -199,8 +211,8 @@ public class Game extends GameEntity
         @Override
         public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Game(json.getAsString(), "", "TBD", "", "", "", "", new Date(),
-                        Sport.empty(), User.empty(), Event.empty(), Tournament.empty(Team.empty()),
+                return new Game(json.getAsString(), "", "TBD", "", "", "", new Date(),
+                        Sport.empty(), User.empty(), Team.empty(), Event.empty(), Tournament.empty(Team.empty()),
                         Competitor.empty(), Competitor.empty(), Competitor.empty(),
                         0, 0, 0, 0, 0, false, false);
             }
@@ -210,7 +222,6 @@ public class Game extends GameEntity
             String id = ModelUtils.asString(ID_KEY, body);
             String refPath = ModelUtils.asString(REF_PATH, body);
             String score = ModelUtils.asString(SCORE, body);
-            String hostId = ModelUtils.asString(HOST_ID, body);
             String homeEntityId = ModelUtils.asString(HOME_ENTITY_ID, body);
             String awayEntityId = ModelUtils.asString(AWAY_ENTITY_ID, body);
             String winnerEntityId = ModelUtils.asString(WINNER_ENTITY_ID, body);
@@ -227,6 +238,7 @@ public class Game extends GameEntity
 
             Sport sport = Config.sportFromCode(sportCode);
             User referee = context.deserialize(body.get(REFEREE), User.class);
+            Team host = context.deserialize(body.get(HOST), Team.class);
             Event event = context.deserialize(body.get(EVENT), Event.class);
             Tournament tournament = context.deserialize(body.get(TOURNAMENT), Tournament.class);
             Competitor home = context.deserialize(body.get(HOME), Competitor.class);
@@ -234,10 +246,11 @@ public class Game extends GameEntity
             Competitor winner = body.has(WINNER) ? context.deserialize(body.get(WINNER), Competitor.class) : Competitor.empty();
 
             if (referee == null) referee = User.empty();
+            if (host == null) host = Team.empty();
             if (event == null) event = Event.empty();
 
-            return new Game(id, refPath, score, hostId, homeEntityId, awayEntityId, winnerEntityId,
-                    ModelUtils.parseDate(created), sport, referee, event, tournament,
+            return new Game(id, refPath, score, homeEntityId, awayEntityId, winnerEntityId,
+                    ModelUtils.parseDate(created), sport, referee, host, event, tournament,
                     home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
         }
     }

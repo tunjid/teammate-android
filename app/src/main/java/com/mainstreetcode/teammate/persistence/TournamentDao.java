@@ -31,7 +31,7 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
     @Query("SELECT * FROM tournaments as tournament" +
             " INNER JOIN games AS game" +
             " ON tournament.tournament_id = game.game_tournament" +
-            " WHERE :teamId = game.game_host_id" +
+            " WHERE :teamId = game.game_host" +
             " OR :teamId = game.game_home_entity_id" +
             " OR :teamId = game.game_away_entity_id" +
             " AND tournament.tournament_created < :date" +

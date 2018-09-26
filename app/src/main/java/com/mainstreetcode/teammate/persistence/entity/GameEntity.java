@@ -37,7 +37,6 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_id") protected String id;
     @ColumnInfo(name = "game_ref_path") protected String refPath;
     @ColumnInfo(name = "game_score") protected String score;
-    @ColumnInfo(name = "game_host_id") protected String hostId;
     @ColumnInfo(name = "game_home_entity_id") protected String homeEntityId;
     @ColumnInfo(name = "game_away_entity_id") protected String awayEntityId;
     @ColumnInfo(name = "game_winner_entity_id") protected String winnerEntityId;
@@ -45,6 +44,7 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_created") protected Date created;
     @ColumnInfo(name = "game_sport") protected Sport sport;
     @ColumnInfo(name = "game_referee") protected User referee;
+    @ColumnInfo(name = "game_host") protected Team host;
     @ColumnInfo(name = "game_event") protected Event event;
     @ColumnInfo(name = "game_tournament") protected Tournament tournament;
     @ColumnInfo(name = "game_home") protected Competitor home;
@@ -61,21 +61,21 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_can_draw") protected boolean canDraw;
 
     public GameEntity(@NonNull String id, String refPath, String score,
-                      String hostId, String homeEntityId, String awayEntityId, String winnerEntityId,
-                      Date created, Sport sport, User referee, Event event, Tournament tournament,
+                      String homeEntityId, String awayEntityId, String winnerEntityId,
+                      Date created, Sport sport, User referee, Team host, Event event, Tournament tournament,
                       Competitor home, Competitor away, Competitor winner,
                       int seed, int leg, int round, int homeScore, int awayScore,
                       boolean ended, boolean canDraw) {
         this.id = id;
         this.refPath = refPath;
         this.score = score;
-        this.hostId = hostId;
         this.homeEntityId = homeEntityId;
         this.awayEntityId = awayEntityId;
         this.winnerEntityId = winnerEntityId;
         this.created = created;
         this.sport = sport;
         this.referee = referee;
+        this.host = host;
         this.event = event;
         this.tournament = tournament;
         this.home = home;
@@ -94,13 +94,13 @@ public class GameEntity implements Parcelable {
         id = in.readString();
         refPath = in.readString();
         score = in.readString();
-        hostId = in.readString();
         homeEntityId = in.readString();
         awayEntityId = in.readString();
         winnerEntityId = in.readString();
         created = new Date(in.readLong());
         sport = Config.sportFromCode(in.readString());
         referee = (User) in.readValue(User.class.getClassLoader());
+        host = (Team) in.readValue(Team.class.getClassLoader());
         event = (Event) in.readValue(Event.class.getClassLoader());
         tournament = (Tournament) in.readValue(Tournament.class.getClassLoader());
         home = (Competitor) in.readValue(Competitor.class.getClassLoader());
@@ -136,8 +136,6 @@ public class GameEntity implements Parcelable {
         return event.isEmpty() ? "" : prettyPrinter.format(event.startDate);
     }
 
-    public String getHostId() { return hostId; }
-
     public String getHomeEntityId() { return homeEntityId; }
 
     public String getAwayEntityId() { return awayEntityId; }
@@ -146,12 +144,6 @@ public class GameEntity implements Parcelable {
 
     public Date getCreated() {
         return created;
-    }
-
-    public Team getTeam() {
-        Team team = Team.empty();
-        ((TeamEntity) team).setId(hostId); // Package access.
-        return team;
     }
 
     public Competitor getWinner() {
@@ -176,9 +168,9 @@ public class GameEntity implements Parcelable {
         return referee;
     }
 
-    public Event getEvent() {
-        return event;
-    }
+    public Team getHost() { return host; }
+
+    public Event getEvent() { return event; }
 
     public Tournament getTournament() {
         return tournament;
@@ -248,13 +240,13 @@ public class GameEntity implements Parcelable {
         dest.writeString(id);
         dest.writeString(refPath);
         dest.writeString(score);
-        dest.writeString(hostId);
         dest.writeString(homeEntityId);
         dest.writeString(awayEntityId);
         dest.writeString(winnerEntityId);
         dest.writeLong(created.getTime());
         dest.writeString(sport.getCode());
         dest.writeValue(referee);
+        dest.writeValue(host);
         dest.writeValue(event);
         dest.writeValue(tournament);
         dest.writeValue(home);
