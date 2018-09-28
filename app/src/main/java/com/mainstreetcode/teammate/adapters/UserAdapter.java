@@ -22,7 +22,7 @@ import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
 
 /**
  * Adapter for {@link Team}
@@ -45,7 +45,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, UserAda
                 ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
                 ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : new UserViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener);
+                : new UserViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UserAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, UserAda
     @Override
     public int getItemViewType(int position) {
         Identifiable item = items.get(position);
-        return item instanceof Team ? TEAM : item instanceof Role ? TEAM : ((Ad) item).getType();
+        return item instanceof User ? USER : ((Ad) item).getType();
     }
 
     public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

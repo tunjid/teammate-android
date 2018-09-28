@@ -5,9 +5,13 @@ import android.app.Activity;
 import android.arch.core.util.Function;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +19,11 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+
+import io.reactivex.Single;
 
 public class ViewHolderUtil {
 
@@ -60,6 +68,22 @@ public class ViewHolderUtil {
             context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
+    }
+
+    public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {
+        return Single.create(emitter -> Picasso.with(context).load(url).resize(size, size).centerCrop()
+                .into(new Target() {
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmap);
+                        imageDrawable.setCircular(true);
+                        imageDrawable.setCornerRadius(size);
+                        emitter.onSuccess(imageDrawable);
+                    }
+
+                    public void onBitmapFailed(Drawable errorDrawable) { emitter.onError(new TeammateException("failed")); }
+
+                    public void onPrepareLoad(Drawable placeHolderDrawable) { emitter.onError(new TeammateException("failed")); }
+                }));
     }
 
     public interface SimpleAdapterListener<T> extends BaseRecyclerViewAdapter.AdapterListener {

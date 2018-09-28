@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.chip.Chip;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
@@ -16,14 +17,20 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatAdapter;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,13 +39,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Lists {@link Event games}
  */
 
-public final class GameFragment extends MainActivityFragment {
+public final class GameFragment extends MainActivityFragment
+        implements UserAdapter.AdapterListener {
 
     private static final String ARG_GAME = "game";
 
     private Game game;
     private AtomicBoolean fabStatus;
     private GameViewHolder gameViewHolder;
+
+    private Chip refereeChip;
 
     private List<Identifiable> items;
 
@@ -76,6 +86,7 @@ public final class GameFragment extends MainActivityFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game, container, false);
         View appBar = rootView.findViewById(R.id.app_bar);
+        refereeChip = rootView.findViewById(R.id.referee_chip);
         gameViewHolder = new GameViewHolder(appBar, ignored -> {});
         gameViewHolder.bind(game);
 
@@ -90,6 +101,19 @@ public final class GameFragment extends MainActivityFragment {
 
         scrollManager.setViewHolderColor(R.color.dark_grey);
 
+        refereeChip.setCloseIconResource(R.drawable.ic_close_24dp);
+        refereeChip.setOnCloseIconClickListener(v -> {
+            game.getReferee().update(User.empty());
+            bindReferee();
+        });
+        refereeChip.setOnClickListener(v -> {
+            BaseFragment fragment = UserSearchFragment.newInstance();
+            fragment.setTargetFragment(this, R.id.request_user_pick);
+            showBottomSheet(BottomSheetController.Args.builder()
+                    .setMenuRes(R.menu.empty)
+                    .setFragment(fragment)
+                    .build());
+        });
         rootView.findViewById(R.id.home_thumbnail).setOnClickListener(view -> showCompetitor(game.getHome()));
         rootView.findViewById(R.id.away_thumbnail).setOnClickListener(view -> showCompetitor(game.getAway()));
         rootView.findViewById(R.id.score).setOnClickListener(view -> showFragment(GameEditFragment.newInstance(game)));
@@ -157,6 +181,14 @@ public final class GameFragment extends MainActivityFragment {
         if (v.getId() == R.id.fab) showFragment(StatEditFragment.newInstance(Stat.empty(game)));
     }
 
+    @Override
+    public void onUserClicked(User item) {
+        game.getReferee().update(item);
+        refereeChip.postDelayed(this::hideBottomSheet, 200);
+        bindReferee();
+        hideKeyboard();
+    }
+
     private void endGameRequest() {
         new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.game_end_request)
@@ -195,5 +227,14 @@ public final class GameFragment extends MainActivityFragment {
         gameViewHolder.bind(game);
         toggleProgress(false);
         togglePersistentUi();
+        bindReferee();
+    }
+
+    private void bindReferee() {
+        int size = refereeChip.getResources().getDimensionPixelSize(R.dimen.double_margin);
+        User referee = game.getReferee();
+        refereeChip.setText(referee.getName());
+        disposables.add(ViewHolderUtil.fetchRoundedDrawable(refereeChip.getContext(), referee.getImageUrl(), size)
+                .subscribe(refereeChip::setChipIcon, ErrorHandler.EMPTY));
     }
 }

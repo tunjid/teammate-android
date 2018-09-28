@@ -21,7 +21,7 @@ import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.fragments.main.TournamentsFragment;
 import com.mainstreetcode.teammate.model.Team;
 
-public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.TeamAdapterListener {
+public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.AdapterListener {
 
     private static final String TAG = "TeamPickerFragment";
     private static final String ARGS_CHANGING = "ARGS_CHANGING";

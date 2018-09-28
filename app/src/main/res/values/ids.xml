@@ -11,6 +11,7 @@
     <item name="viewholder_role" type="id"/>
     <item name="viewholder_join_request" type="id"/>
     <item name="request_default_team_pick" type="id"/>
+    <item name="request_user_pick" type="id"/>
     <item name="request_chat_team_pick" type="id"/>
     <item name="request_stat_edit_pick" type="id"/>
     <item name="request_game_team_pick" type="id"/>

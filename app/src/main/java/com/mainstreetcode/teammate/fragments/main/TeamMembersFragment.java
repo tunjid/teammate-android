@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -30,7 +31,6 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -172,15 +172,19 @@ public class TeamMembersFragment extends MainActivityFragment
 
     @Override
     public void onRoleClicked(Role role) {
-        ViewHolderUtil.SimpleAdapterListener<User> target = isPicking();
-        if (target != null) target.onItemClicked(role.getUser());
+        Fragment target = getTargetFragment();
+        boolean canPick = target instanceof UserAdapter.AdapterListener;
+
+        if (canPick) ((UserAdapter.AdapterListener) target).onUserClicked(role.getUser());
         else showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
     public void onJoinRequestClicked(JoinRequest request) {
-        ViewHolderUtil.SimpleAdapterListener<User> target = isPicking();
-        if (target != null) showSnackbar(getString(R.string.stat_user_not_on_team));
+        Fragment target = getTargetFragment();
+        boolean canPick = target instanceof UserAdapter.AdapterListener;
+
+        if (canPick) showSnackbar(getString(R.string.stat_user_not_on_team));
         else showFragment(JoinRequestFragment.viewInstance(request));
     }
 
@@ -261,12 +265,5 @@ public class TeamMembersFragment extends MainActivityFragment
         toggleFab(showsFab());
         Activity activity = getActivity();
         if (activity != null) activity.invalidateOptionsMenu();
-    }
-
-    @Nullable
-    private ViewHolderUtil.SimpleAdapterListener<User> isPicking() {
-        Fragment target = getTargetFragment();
-        return target == null || !(target instanceof ViewHolderUtil.SimpleAdapterListener)
-                ? null : ((ViewHolderUtil.SimpleAdapterListener) target);
     }
 }

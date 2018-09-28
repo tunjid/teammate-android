@@ -8,10 +8,10 @@ import com.mainstreetcode.teammate.model.Team;
 /**
  * Viewholder for a {@link Team}
  */
-public class TeamViewHolder extends ModelCardViewHolder<Team, TeamAdapter.TeamAdapterListener>
+public class TeamViewHolder extends ModelCardViewHolder<Team, TeamAdapter.AdapterListener>
         implements View.OnClickListener {
 
-    public TeamViewHolder(View itemView, TeamAdapter.TeamAdapterListener adapterListener) {
+    public TeamViewHolder(View itemView, TeamAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
         itemView.setOnClickListener(this);
     }

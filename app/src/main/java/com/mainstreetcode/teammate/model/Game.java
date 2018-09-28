@@ -204,8 +204,7 @@ public class Game extends GameEntity
             body.addProperty(ENDED, src.ended);
             body.addProperty(HOME_SCORE, src.homeScore);
             body.addProperty(AWAY_SCORE, src.awayScore);
-            if (!src.referee.isEmpty()) body.addProperty(REFEREE, src.referee.getId());
-            if (!src.event.isEmpty()) body.addProperty(EVENT, src.event.getId());
+            body.addProperty(REFEREE, src.referee.isEmpty() ? null : src.referee.getId());
             return body;
         }
 

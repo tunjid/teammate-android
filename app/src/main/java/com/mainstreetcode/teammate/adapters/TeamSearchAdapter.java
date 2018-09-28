@@ -20,7 +20,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class TeamSearchAdapter extends TeamAdapter {
 
-    public TeamSearchAdapter(List<Identifiable> items, TeamAdapterListener listener) {
+    public TeamSearchAdapter(List<Identifiable> items, AdapterListener listener) {
         super(items, listener);
     }
 

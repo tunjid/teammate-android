@@ -101,7 +101,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     }
 
     public interface EventEditAdapterListener extends
-            TeamAdapter.TeamAdapterListener,
+            TeamAdapter.AdapterListener,
             ImageWorkerFragment.ImagePickerListener {
 
         void selectTeam();

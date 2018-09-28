@@ -18,12 +18,12 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatEditAdapter;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
@@ -33,8 +33,8 @@ import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 public class StatEditFragment extends HeaderedFragment<Stat>
         implements
-        StatEditAdapter.AdapterListener,
-        ViewHolderUtil.SimpleAdapterListener<User> {
+        UserAdapter.AdapterListener,
+        StatEditAdapter.AdapterListener{
 
     public static final String ARG_STAT = "stat";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
@@ -160,7 +160,7 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     }
 
     @Override
-    public void onItemClicked(User item) {
+    public void onUserClicked(User item) {
         disposables.add(gofer.chooseUser(item).subscribe(this::onModelUpdated, defaultErrorHandler));
         hideBottomSheet();
     }

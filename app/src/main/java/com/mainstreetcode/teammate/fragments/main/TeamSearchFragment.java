@@ -35,7 +35,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         implements
         View.OnClickListener,
         SearchView.OnQueryTextListener,
-        TeamAdapter.TeamAdapterListener {
+        TeamAdapter.AdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
     public static final String ARG_TOURNAMENT = "tournament";
@@ -134,9 +134,9 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onTeamClicked(Team team) {
         Fragment target = getTargetFragment();
-        boolean canPick = target instanceof TeamAdapter.TeamAdapterListener;
+        boolean canPick = target instanceof TeamAdapter.AdapterListener;
 
-        if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
+        if (canPick) ((TeamAdapter.AdapterListener) target).onTeamClicked(team);
         else showFragment(JoinRequestFragment.joinInstance(team, userViewModel.getCurrentUser()));
     }
 

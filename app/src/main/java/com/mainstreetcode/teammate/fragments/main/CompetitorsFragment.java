@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
@@ -23,7 +24,6 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.TransformingSequentialList;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
@@ -35,8 +35,8 @@ import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIP
 
 public final class CompetitorsFragment extends MainActivityFragment
         implements
-        TeamAdapter.TeamAdapterListener,
-        ViewHolderUtil.SimpleAdapterListener<User> {
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener {
 
     private static final int SWIPE_DELAY = 200;
     private static final int NO_SWIPE_OR_DRAG = 0;
@@ -130,13 +130,13 @@ public final class CompetitorsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onTeamClicked(Team item) {
+    public void onUserClicked(User item) {
         if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists));
         else addCompetitor(item);
     }
 
     @Override
-    public void onItemClicked(User item) {
+    public void onTeamClicked(Team item) {
         if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists));
         else addCompetitor(item);
     }

@@ -26,7 +26,7 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public RoleViewModel() {
         roleRepository = RoleRepository.getInstance();
-        fetch(Role.class, false).subscribe(ignored -> {}, ErrorHandler.EMPTY);
+        getMore(Role.class).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 
     @Override
