@@ -62,7 +62,10 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     public Single<Boolean> canEditGameStats(Game game) {
         User current = UserRepository.getInstance().getCurrentUser();
         if (game.betweenUsers()) return Single.just(game.isCompeting(current));
-        return GameViewModel.getEligibleTeamsForGame(game).count().map(value -> value > 0);
+        return GameViewModel.getEligibleTeamsForGame(game).count().map(value -> {
+            User referee = game.getReferee();
+            return referee.isEmpty() ? value > 0 : current.equals(referee);
+        });
     }
 
     private Date getQueryDate(Game game, boolean fetchLatest) {
