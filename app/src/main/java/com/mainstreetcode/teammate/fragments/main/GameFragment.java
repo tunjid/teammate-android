@@ -8,6 +8,8 @@ import android.support.annotation.StringRes;
 import android.support.design.chip.Chip;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +47,7 @@ public final class GameFragment extends MainActivityFragment
     private static final String ARG_GAME = "game";
 
     private Game game;
+    private AtomicBoolean editableStatus;
     private AtomicBoolean privilegeStatus;
     private GameViewHolder gameViewHolder;
 
@@ -79,6 +82,7 @@ public final class GameFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         game = getArguments().getParcelable(ARG_GAME);
         items = statViewModel.getModelList(game);
+        editableStatus = new AtomicBoolean();
         privilegeStatus = new AtomicBoolean();
     }
 
@@ -102,19 +106,8 @@ public final class GameFragment extends MainActivityFragment
         scrollManager.setViewHolderColor(R.color.dark_grey);
 
         refereeChip.setCloseIconResource(R.drawable.ic_close_24dp);
-        refereeChip.setOnCloseIconClickListener(v -> {
-            game.getReferee().update(User.empty());
-            toggleProgress(true);
-            updateGame();
-        });
-        refereeChip.setOnClickListener(v -> {
-            BaseFragment fragment = UserSearchFragment.newInstance();
-            fragment.setTargetFragment(this, R.id.request_user_pick);
-            showBottomSheet(BottomSheetController.Args.builder()
-                    .setMenuRes(R.menu.empty)
-                    .setFragment(fragment)
-                    .build());
-        });
+        refereeChip.setOnCloseIconClickListener(v -> onRemoveRefereeClicked());
+        refereeChip.setOnClickListener(v -> onRefereeClicked());
         rootView.findViewById(R.id.home_thumbnail).setOnClickListener(view -> showCompetitor(game.getHome()));
         rootView.findViewById(R.id.away_thumbnail).setOnClickListener(view -> showCompetitor(game.getAway()));
         rootView.findViewById(R.id.score).setOnClickListener(view -> showFragment(GameEditFragment.newInstance(game)));
@@ -158,7 +151,7 @@ public final class GameFragment extends MainActivityFragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        refereeChip=null;
+        refereeChip = null;
     }
 
     @Override
@@ -180,7 +173,7 @@ public final class GameFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return privilegeStatus.get() && !game.isEnded();
+        return editableStatus.get() && !game.isEnded();
     }
 
     @Override
@@ -193,7 +186,7 @@ public final class GameFragment extends MainActivityFragment
         hideKeyboard();
         refereeChip.postDelayed(() -> {
             hideBottomSheet();
-            addRefereeRequest(item);
+            refereeChip.postDelayed(() -> addRefereeRequest(item),150);
         }, 200);
     }
 
@@ -210,9 +203,32 @@ public final class GameFragment extends MainActivityFragment
         disposables.add(statViewModel.refresh(game).subscribe(GameFragment.this::onStatsFetched, defaultErrorHandler));
     }
 
-    private void updateFabStatus() {
-        disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(privilegeStatus::set)
+    private void updateStatuses() {
+        disposables.add(statViewModel.isPrivilegedInGame(game)
+                .subscribe(privilegeStatus::set, defaultErrorHandler));
+        disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(editableStatus::set)
                 .subscribe(ignored -> togglePersistentUi(), defaultErrorHandler));
+    }
+
+    private void onRemoveRefereeClicked() {
+        if (!privilegeStatus.get()) return;
+        game.getReferee().update(User.empty());
+        toggleProgress(true);
+        updateGame();
+    }
+
+    private void onRefereeClicked() {
+        User referee = game.getReferee();
+        boolean hasReferee = !referee.isEmpty();
+        if (hasReferee) showFragment(UserEditFragment.newInstance(referee));
+        else if (privilegeStatus.get()) {
+            BaseFragment fragment = UserSearchFragment.newInstance();
+            fragment.setTargetFragment(this, R.id.request_user_pick);
+            showBottomSheet(BottomSheetController.Args.builder()
+                    .setMenuRes(R.menu.empty)
+                    .setFragment(fragment)
+                    .build());
+        }
     }
 
     private void endGameRequest() {
@@ -245,7 +261,7 @@ public final class GameFragment extends MainActivityFragment
         else toggleProgress(true);
 
         disposables.add(statViewModel.getMany(game, fetchLatest).subscribe(this::onStatsFetched, defaultErrorHandler));
-        updateFabStatus();
+        updateStatuses();
     }
 
     private void onStatsFetched(DiffUtil.DiffResult result) {
@@ -256,13 +272,18 @@ public final class GameFragment extends MainActivityFragment
     private void onGameUpdated(Game game) {
         gameViewHolder.bind(game);
         toggleProgress(false);
-        updateFabStatus();
+        updateStatuses();
         bindReferee();
     }
 
     private void bindReferee() {
+        ViewGroup root = (ViewGroup) getView();
+        if (root == null) return;
+
         int size = refereeChip.getResources().getDimensionPixelSize(R.dimen.double_margin);
         User referee = game.getReferee();
+        TransitionManager.beginDelayedTransition(root, new AutoTransition().addTarget(refereeChip));
+
         refereeChip.setText(referee.getName());
         refereeChip.setCloseIconVisible(!referee.isEmpty() && privilegeStatus.get());
         disposables.add(ViewHolderUtil.fetchRoundedDrawable(refereeChip.getContext(), referee.getImageUrl(), size)

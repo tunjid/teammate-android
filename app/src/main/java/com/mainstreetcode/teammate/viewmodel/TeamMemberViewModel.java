@@ -82,6 +82,10 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         return new RoleGofer(role, onError(TeamMember.fromModel(role)), RoleRepository.getInstance()::get, this::deleteRole, this::updateRole);
     }
 
+    public Flowable<User> getAllUsers() {
+        return getAllModels().filter(model -> model instanceof UserHost)
+                .cast(UserHost.class).map(UserHost::getUser).distinct();
+    }
     private Single<Role> deleteRole(Role role) {
         return asTypedTeamMember(role, (member, repository) -> repository.delete(member).doOnSuccess(getModelList(role.getTeam())::remove).map(deleted -> role));
     }

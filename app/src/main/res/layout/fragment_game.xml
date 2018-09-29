@@ -154,7 +154,7 @@
                     android:layout_marginLeft="@dimen/half_margin"
                     android:layout_marginRight="@dimen/half_margin"
                     android:layout_marginTop="@dimen/quarter_margin"
-                    android:text="@string/game_referee"
+                    android:text="@string/empty_string"
                     app:layout_constraintLeft_toRightOf="@+id/referee_label"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ended" />

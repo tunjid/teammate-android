@@ -14,7 +14,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
@@ -22,8 +21,6 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Flowable;
 
 /**
  * Searches for teams
@@ -74,10 +71,8 @@ public final class UserSearchFragment extends MainActivityFragment
 
         if (getTargetRequestCode() != 0) {
             items.clear();
-            disposables.add(Flowable.fromIterable(roleViewModel.getModelList(Role.class))
-                    .filter(item -> item instanceof Role)
-                    .map(item -> ((Role) item).getUser())
-                    .filter(this::IsEligibleUser)
+            disposables.add(teamMemberViewModel.getAllUsers()
+                    .startWith(userViewModel.getCurrentUser())
                     .subscribe(items::add, ErrorHandler.EMPTY));
         }
 
@@ -138,9 +133,5 @@ public final class UserSearchFragment extends MainActivityFragment
         this.items.clear();
         this.items.addAll(users);
         scrollManager.notifyDataSetChanged();
-    }
-
-    private boolean IsEligibleUser(Identifiable user) {
-        return user instanceof User && !items.contains(user);
     }
 }

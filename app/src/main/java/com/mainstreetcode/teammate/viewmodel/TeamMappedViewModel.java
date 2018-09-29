@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
@@ -52,5 +53,9 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
 
     Consumer<Throwable> onError(V model) {
         return throwable -> checkForInvalidObject(throwable, model, model.getTeam());
+    }
+
+    Flowable<Identifiable> getAllModels() {
+        return Flowable.fromIterable(modelListMap.values()).flatMap(Flowable::fromIterable);
     }
 }
