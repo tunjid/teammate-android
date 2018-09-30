@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.annotation.SuppressLint;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
@@ -14,17 +13,10 @@ import com.mainstreetcode.teammate.model.Team;
  */
 public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, CompetitorAdapter.AdapterListener> {
 
-    private View dragHandle;
-
     @SuppressLint("ClickableViewAccessibility")
     public CompetitorViewHolder(View itemView, CompetitorAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
-        dragHandle = itemView.findViewById(R.id.drag_handle);
-        dragHandle.setOnTouchListener(((view, motionEvent) -> {
-            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN)
-                adapterListener.onDragStarted(this);
-            return false;
-        }));
+        itemView.setOnClickListener(view -> adapterListener.onCompetitorClicked(model));
     }
 
     public void bind(Competitor model) {
@@ -32,6 +24,7 @@ public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, Compet
         if (model.isEmpty()) model.setSeed(getAdapterPosition());
         title.setText(model.getName());
         subtitle.setText(model.getSeedText());
-        dragHandle.setVisibility(model.isEmpty() ? View.VISIBLE : View.GONE);
     }
+
+    public View getDragHandle() { return itemView.findViewById(R.id.drag_handle); }
 }

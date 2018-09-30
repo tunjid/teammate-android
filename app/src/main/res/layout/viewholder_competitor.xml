@@ -42,6 +42,7 @@
             android:contentDescription="@string/team_logo"
             android:padding="@dimen/single_margin"
             android:tint="@color/dark_grey"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

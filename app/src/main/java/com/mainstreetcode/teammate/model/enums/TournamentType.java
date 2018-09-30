@@ -11,7 +11,7 @@ public class TournamentType extends MetaData {
 
     private String refPath;
 
-    TournamentType(String code, String name, String refPath) {
+    private TournamentType(String code, String name, String refPath) {
         super(code, name);
         this.refPath = refPath;
     }

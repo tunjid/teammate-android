@@ -8,7 +8,7 @@
         android:title="@string/edit_team"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_tournaments"
+        android:id="@+id/action_team_tournaments"
         android:enabled="true"
         android:icon="@drawable/ic_trophy_white_24dp"
         android:title="@string/tournaments"

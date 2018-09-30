@@ -14,6 +14,12 @@
         android:title="@string/games"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_head_to_head"
+        android:enabled="true"
+        android:icon="@drawable/ic_head_to_head_24dp"
+        android:title="@string/game_head_to_head"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_my_profile"
         android:enabled="true"
         android:icon="@drawable/ic_account_white_24dp"

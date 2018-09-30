@@ -131,7 +131,7 @@ public class TeamMembersFragment extends MainActivityFragment
             case R.id.action_edit:
                 showFragment(TeamEditFragment.newEditInstance(team));
                 return true;
-            case R.id.action_tournaments:
+            case R.id.action_team_tournaments:
                 showFragment(TournamentsFragment.newInstance(team));
                 return true;
             case R.id.action_blocked:

@@ -31,6 +31,7 @@ import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.FeedFragment;
+import com.mainstreetcode.teammate.fragments.main.HeadToHeadFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
@@ -322,15 +323,18 @@ public class MainActivity extends TeammatesBaseActivity
             case R.id.action_public_events:
                 showFragment(EventSearchFragment.newInstance());
                 return true;
+            case R.id.action_head_to_head:
+                showFragment(HeadToHeadFragment.newInstance());
+                return true;
             case R.id.action_my_profile:
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
                 return true;
             case R.id.action_sign_out:
                 toggleProgress(true);
-                userViewModel.signOut().subscribe(
+                disposables.add(userViewModel.signOut().subscribe(
                         success -> MainActivity.startRegistrationActivity(this),
                         throwable -> MainActivity.startRegistrationActivity(this)
-                );
+                ));
                 return true;
             default:
                 return false;

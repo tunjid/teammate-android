@@ -3,8 +3,8 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
-import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.model.HeadToHeadRequest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -12,6 +12,8 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.repository.GameRepository;
 import com.mainstreetcode.teammate.repository.GameRoundRepository;
+import com.mainstreetcode.teammate.rest.TeammateApi;
+import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 
@@ -31,7 +33,11 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class GameViewModel extends TeamMappedViewModel<Game> {
 
+    private final TeammateApi api = TeammateService.getApiInstance();
+
     private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
+    private final List<Identifiable> headToHeadMatchUps = new ArrayList<>();
+
     private final GameRoundRepository gameRoundRepository = GameRoundRepository.getInstance();
     private final GameRepository gameRepository = GameRepository.getInstance();
 
@@ -53,10 +59,20 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         return ModelUtils.get(round, roundMap, ArrayList::new);
     }
 
+    public List<Identifiable> getHeadToHeadMatchUps() {
+        return headToHeadMatchUps;
+    }
+
     public Flowable<DiffUtil.DiffResult> fetchGamesInRound(Tournament tournament, int round) {
         Flowable<List<Game>> flowable = gameRoundRepository.modelsBefore(tournament, round);
         Function<List<Game>, List<Identifiable>> listMapper = ArrayList<Identifiable>::new;
         return Identifiable.diff(flowable.map(listMapper), () -> getGamesForRound(tournament, round), this::preserveList);
+    }
+
+
+    public Single<DiffUtil.DiffResult> getMatchUps(HeadToHeadRequest request) {
+        Single<List<Identifiable>> sourceSingle = api.matchUps(request).map(ArrayList<Identifiable>::new);
+        return Identifiable.diff(sourceSingle, () -> headToHeadMatchUps, ModelUtils::replaceList).observeOn(mainThread());
     }
 
     public Flowable<Game> getGame(Game game) {

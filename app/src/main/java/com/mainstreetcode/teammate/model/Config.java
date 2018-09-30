@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.functions.Predicate;
 
 @SuppressLint("ParcelCreator")
 public class Config implements Model<Config> {
@@ -97,15 +98,15 @@ public class Config implements Model<Config> {
         return getList(config -> config.blockReasons);
     }
 
-    public static List<TournamentType> getTournamentTypes(Sport sport) {
+    public static List<TournamentType> getTournamentTypes(Predicate<TournamentType> predicate) {
         return Flowable.fromIterable(getList(config -> config.tournamentTypes))
-                .filter(sport::supportsTournamentType)
+                .filter(predicate)
                 .collect(ArrayList<TournamentType>::new, List::add).blockingGet();
     }
 
-    public static List<TournamentStyle> getTournamentStyles(Sport sport) {
+    public static List<TournamentStyle> getTournamentStyles(Predicate<TournamentStyle> predicate) {
         return Flowable.fromIterable(getList(config -> config.tournamentStyles))
-                .filter(sport::supportsTournamentStyle)
+                .filter(predicate)
                 .collect(ArrayList<TournamentStyle>::new, List::add).blockingGet();
     }
 
