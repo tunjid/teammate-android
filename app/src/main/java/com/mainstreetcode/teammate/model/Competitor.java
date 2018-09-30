@@ -54,19 +54,16 @@ public class Competitor extends CompetitorEntity
     }
 
     @Override
-    public boolean hasMajorFields() {
-        return areNotEmpty(id, refPath);
-    }
+    public boolean hasMajorFields() { return areNotEmpty(id, refPath); }
 
     @Override
-    public String getRefType() {
-        return entity.getRefType();
-    }
+    public String getRefType() { return entity.getRefType(); }
 
     @Override
-    public CharSequence getName() {
-        return entity.getName();
-    }
+    public CharSequence getName() { return entity.getName(); }
+
+    @Override
+    public Competitive makeCopy() { return entity.makeCopy(); }
 
     @Override
     public void update(Competitor updated) {

@@ -136,6 +136,20 @@ public class Team extends TeamEntity
     }
 
     @Override
+    public boolean update(Competitive other) {
+        if (!(other instanceof Team)) return false;
+        update((Team) other);
+        return true;
+    }
+
+    @Override
+    public Competitive makeCopy() {
+        Team copy = Team.empty();
+        copy.update(this);
+        return copy;
+    }
+
+    @Override
     public int compareTo(@NonNull Team o) {
         int nameComparision = name.toString().compareTo(o.name.toString());
         return nameComparision != 0 ? nameComparision : id.compareTo(o.id);

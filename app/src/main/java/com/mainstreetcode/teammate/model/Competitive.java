@@ -10,7 +10,11 @@ public interface Competitive extends RemoteImage, Parcelable {
 
     CharSequence getName();
 
+    Competitive makeCopy();
+
     boolean isEmpty();
 
     boolean hasMajorFields();
+
+    default boolean update(Competitive other) { return false; }
 }

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -57,9 +58,9 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case HOME:
-                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onHomeClicked);
+                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onHomeClicked);
             case AWAY:
-                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked);
+                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onAwayClicked);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -84,6 +85,12 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
     public int getItemViewType(int position) {
         Identifiable identifiable = request.getItems().get(position);
         return identifiable instanceof Item ? ((Item) identifiable).getItemType() : position == 2 ? HOME : AWAY;
+    }
+
+    private View getCompetitorItemView(@NonNull ViewGroup viewGroup) {
+        View itemView = getItemView(R.layout.viewholder_competitor, viewGroup);
+        itemView.findViewById(R.id.item_subtitle).setVisibility(View.INVISIBLE);
+        return itemView;
     }
 
     public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

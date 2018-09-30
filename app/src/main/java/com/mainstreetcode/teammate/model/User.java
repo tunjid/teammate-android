@@ -111,6 +111,20 @@ public class User extends UserEntity implements
     }
 
     @Override
+    public boolean update(Competitive other) {
+        if (!(other instanceof User)) return false;
+        update((User) other);
+        return true;
+    }
+
+    @Override
+    public Competitive makeCopy() {
+        User copy = User.empty();
+        copy.update(this);
+        return copy;
+    }
+
+    @Override
     public int compareTo(@NonNull User o) {
         int firstNameComparison = firstName.toString().compareTo(o.firstName.toString());
         int lastNameComparison = lastName.toString().compareTo(o.lastName.toString());

@@ -16,6 +16,9 @@ public class EmptyCompetitor implements Competitive {
     public CharSequence getName() { return ""; }
 
     @Override
+    public Competitive makeCopy() { return new EmptyCompetitor(); }
+
+    @Override
     public boolean isEmpty() { return true; }
 
     public boolean hasMajorFields() { return false; }
