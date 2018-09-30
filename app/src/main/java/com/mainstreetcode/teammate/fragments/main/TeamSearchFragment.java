@@ -17,7 +17,7 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
-import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -38,7 +38,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         TeamAdapter.AdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
-    public static final String ARG_TOURNAMENT = "tournament";
+    public static final String ARG_SPORT = "sport-code";
 
     private View createTeam;
     private SearchView searchView;
@@ -56,9 +56,9 @@ public final class TeamSearchFragment extends MainActivityFragment
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static TeamSearchFragment newInstance(Tournament tournament) {
+    public static TeamSearchFragment newInstance(Sport sport) {
         TeamSearchFragment fragment = newInstance();
-        fragment.getArguments().putParcelable(ARG_TOURNAMENT, tournament);
+        fragment.getArguments().putString(ARG_SPORT, sport.getCode());
 
         return fragment;
     }
@@ -67,9 +67,9 @@ public final class TeamSearchFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
         String superResult = super.getStableTag();
-        Identifiable identifiable = getArguments().getParcelable(ARG_TOURNAMENT);
+        String sportCode = getArguments().getString(ARG_SPORT);
 
-        return identifiable == null ? superResult : superResult + "-" + identifiable.hashCode();
+        return sportCode == null ? superResult : superResult + "-" + sportCode;
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        request = TeamSearchRequest.from(getArguments().getParcelable(ARG_TOURNAMENT));
+        request = TeamSearchRequest.from(getArguments().getString(ARG_SPORT));
         instantSearch = teamViewModel.instantSearch();
     }
 

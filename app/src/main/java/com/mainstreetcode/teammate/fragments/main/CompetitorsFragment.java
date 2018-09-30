@@ -157,7 +157,7 @@ public final class CompetitorsFragment extends MainActivityFragment
         BaseFragment fragment = isBetweenUsers
                 ? TeamMembersFragment.newInstance(tournament.getHost())
                 : Team.COMPETITOR_TYPE.equals(tournament.getRefPath())
-                ? TeamSearchFragment.newInstance(tournament)
+                ? TeamSearchFragment.newInstance(tournament.getSport())
                 : null;
 
         if (fragment == null) return;

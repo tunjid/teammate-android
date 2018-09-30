@@ -122,7 +122,7 @@ public class HeadToHeadFragment extends MainActivityFragment
         BaseFragment fragment = isBetweenUsers
                 ? UserSearchFragment.newInstance()
                 : Team.COMPETITOR_TYPE.equals(refPath)
-                ? TeamSearchFragment.newInstance()
+                ? TeamSearchFragment.newInstance(request.getSport())
                 : null;
 
         if (fragment == null) return;

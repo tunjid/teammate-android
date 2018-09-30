@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.model;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import java.util.Objects;
 
@@ -9,9 +10,9 @@ public class TeamSearchRequest {
     private String name;
     private String sport;
 
-    public static TeamSearchRequest from(@Nullable Tournament tournament) {
+    public static TeamSearchRequest from(@Nullable String sportCode) {
         TeamSearchRequest request = new TeamSearchRequest();
-        if (tournament != null) request.sport = tournament.getSport().getCode();
+        if (!TextUtils.isEmpty(sportCode)) request.sport = sportCode;
         return request;
     }
 

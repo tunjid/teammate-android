@@ -42,6 +42,8 @@ public class HeadToHeadRequest {
 
     public String getRefPath() { return type.getRefPath(); }
 
+    public Sport getSport() { return sport; }
+
     public void setSport(String sport) { this.sport = Config.sportFromCode(sport); }
 
     public void setType(String type) { this.type = Config.tournamentTypeFromCode(type); }
