@@ -71,6 +71,7 @@ public class EventSearchFragment extends MainActivityFragment {
         mapView.getMapAsync(this::onMapReady);
 
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), () -> mapView.getMapAsync(this::fetchPublicEvents));
+        expandingToolbar.setTitle(R.string.event_public_search);
         expandingToolbar.setTitleIcon(false);
 
         return root;
@@ -112,7 +113,7 @@ public class EventSearchFragment extends MainActivityFragment {
     public void onDestroyView() {
         mapView.onDestroy();
         mapView = null;
-        expandingToolbar=null;
+        expandingToolbar = null;
         super.onDestroyView();
     }
 

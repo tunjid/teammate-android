@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.util;
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.transition.AutoTransition;
 import android.support.transition.Transition;
@@ -40,6 +41,10 @@ public class ExpandingToolbar {
         searchButton.setOnClickListener(searchClickListener);
     }
 
+    public void setTitle(@StringRes int titleRes) {
+        searchTitle.setText(searchTitle.getContext().getText(titleRes));
+    }
+
     @SuppressLint("ResourceAsColor")
     public void setTitleIcon(boolean isDown) {
         int resVal = isDown ? R.drawable.anim_vect_down_to_right_arrow : R.drawable.anim_vect_right_to_down_arrow;
@@ -52,19 +57,19 @@ public class ExpandingToolbar {
 
     public void changeVisibility(boolean invisible) {
         TransitionManager.beginDelayedTransition(container, new AutoTransition()
-        .addListener(new Transition.TransitionListener() {
-            public void onTransitionEnd(@NonNull Transition transition) {
-                if (invisible) onCollapsed.run();
-            }
+                .addListener(new Transition.TransitionListener() {
+                    public void onTransitionEnd(@NonNull Transition transition) {
+                        if (invisible) onCollapsed.run();
+                    }
 
-            public void onTransitionStart(@NonNull Transition transition) { }
+                    public void onTransitionStart(@NonNull Transition transition) { }
 
-            public void onTransitionCancel(@NonNull Transition transition) { }
+                    public void onTransitionCancel(@NonNull Transition transition) { }
 
-            public void onTransitionPause(@NonNull Transition transition) { }
+                    public void onTransitionPause(@NonNull Transition transition) { }
 
-            public void onTransitionResume(@NonNull Transition transition) { }
-        }));
+                    public void onTransitionResume(@NonNull Transition transition) { }
+                }));
 
         setTitleIcon(invisible);
 
