@@ -253,7 +253,7 @@
     <string name="game_event">Game event</string>
     <string name="game_ended">FT</string>
     <string name="game_head_to_head_params">Head to head search</string>
-    <string name="game_head_to_head_prompt">Who\'s got the edge? Find out!</string>
+    <string name="game_head_to_head_prompt">Mano e mano, who\'s got the edge?</string>
     <string name="game_head_to_head">Head to Head</string>
     <string name="game_select_tournament_type">Please pick a tournament type</string>
     <string name="no_games">Come. See. Conquer. Your team\'s games live here.</string>

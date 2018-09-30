@@ -89,20 +89,17 @@ public class HeadToHeadFragment extends MainActivityFragment
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchMatchUps);
         expandingToolbar.setTitleIcon(false);
 
+        scrollManager.notifyDataSetChanged();
         updateHeadToHead(0, 0, 0);
-        return root;
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        setToolbarTitle(getString(R.string.game_head_to_head));
+        return root;
     }
 
     @Override
     public void onDestroyView() {
         expandingToolbar = null;
         searchScrollManager = null;
+        wins = draws = losses = null;
         super.onDestroyView();
     }
 

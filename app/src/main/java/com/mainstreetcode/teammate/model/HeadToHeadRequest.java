@@ -52,9 +52,9 @@ public class HeadToHeadRequest {
 
     public void setType(String type) { this.type = Config.tournamentTypeFromCode(type); }
 
-    public void updateHome(Competitive entity) { this.home.update(Competitor.empty(entity)); }
+    public void updateHome(Competitive entity) { this.home = Competitor.empty(entity); }
 
-    public void updateAway(Competitive entity) { this.away.update(Competitor.empty(entity)); }
+    public void updateAway(Competitive entity) { this.away =  Competitor.empty(entity); }
 
     public List<Identifiable> getItems() { return items; }
 

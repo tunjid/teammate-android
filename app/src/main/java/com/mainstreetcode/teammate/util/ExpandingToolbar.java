@@ -2,8 +2,10 @@ package com.mainstreetcode.teammate.util;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.transition.AutoTransition;
+import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
 import android.support.v4.widget.TextViewCompat;
 import android.view.View;
@@ -48,17 +50,30 @@ public class ExpandingToolbar {
         TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(searchTitle, null, null, icon, null);
     }
 
-    public void changeVisibility(boolean inVisible) {
-        TransitionManager.beginDelayedTransition(container, new AutoTransition());
+    public void changeVisibility(boolean invisible) {
+        TransitionManager.beginDelayedTransition(container, new AutoTransition()
+        .addListener(new Transition.TransitionListener() {
+            public void onTransitionEnd(@NonNull Transition transition) {
+                if (invisible) onCollapsed.run();
+            }
 
-        setTitleIcon(inVisible);
+            public void onTransitionStart(@NonNull Transition transition) { }
+
+            public void onTransitionCancel(@NonNull Transition transition) { }
+
+            public void onTransitionPause(@NonNull Transition transition) { }
+
+            public void onTransitionResume(@NonNull Transition transition) { }
+        }));
+
+        setTitleIcon(invisible);
 
         AnimatedVectorDrawableCompat animatedDrawable = (AnimatedVectorDrawableCompat)
                 TextViewCompat.getCompoundDrawablesRelative(searchTitle)[2];
 
         animatedDrawable.start();
 
-        int visibility = inVisible ? View.GONE : View.VISIBLE;
+        int visibility = invisible ? View.GONE : View.VISIBLE;
         searchButton.setVisibility(visibility);
         optionsList.setVisibility(visibility);
     }
@@ -66,8 +81,5 @@ public class ExpandingToolbar {
     private void toggleVisibility() {
         boolean invisible = optionsList.getVisibility() == View.VISIBLE;
         changeVisibility(invisible);
-
-        // Search
-        if (invisible) onCollapsed.run();
     }
 }

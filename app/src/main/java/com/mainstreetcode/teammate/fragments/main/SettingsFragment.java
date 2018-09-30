@@ -13,14 +13,13 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.SettingsItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public final class SettingsFragment extends MainActivityFragment
         implements SettingsAdapter.SettingsAdapterListener {
 
-    private static final List<SettingsItem> items = Arrays.asList(
-            new SettingsItem(R.string.my_profile,R.drawable.ic_account_white_24dp),
+    private static final List<SettingsItem> items = Collections.singletonList(
             new SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp)
     );
 

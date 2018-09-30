@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.fragments.main.FeedFragment;
 import com.mainstreetcode.teammate.fragments.main.HeadToHeadFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
+import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
@@ -314,8 +315,11 @@ public class MainActivity extends TeammatesBaseActivity
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());
                 return true;
-            case R.id.action_settings:
+            case R.id.action_expand_home_nav:
                 showNavOverflow();
+                return true;
+            case R.id.action_settings:
+                showFragment(SettingsFragment.newInstance());
                 return true;
             case R.id.action_rsvp_list:
                 showFragment(MyEventsFragment.newInstance());
@@ -328,13 +332,6 @@ public class MainActivity extends TeammatesBaseActivity
                 return true;
             case R.id.action_my_profile:
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
-                return true;
-            case R.id.action_sign_out:
-                toggleProgress(true);
-                disposables.add(userViewModel.signOut().subscribe(
-                        success -> MainActivity.startRegistrationActivity(this),
-                        throwable -> MainActivity.startRegistrationActivity(this)
-                ));
                 return true;
             default:
                 return false;
