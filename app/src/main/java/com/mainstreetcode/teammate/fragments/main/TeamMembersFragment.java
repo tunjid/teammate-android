@@ -112,7 +112,7 @@ public class TeamMembersFragment extends MainActivityFragment
         MenuItem editItem = menu.findItem(R.id.action_edit);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
         MenuItem blockedItem = menu.findItem(R.id.action_blocked);
-        MenuItem tournamentItem = menu.findItem(R.id.action_tournaments);
+        MenuItem tournamentItem = menu.findItem(R.id.action_team_tournaments);
 
         editItem.setVisible(visible);
         deleteItem.setVisible(visible);

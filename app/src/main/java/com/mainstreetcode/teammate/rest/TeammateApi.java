@@ -12,6 +12,7 @@ import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.HeadToHeadRequest;
+import com.mainstreetcode.teammate.model.HeadToHeadResult;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
@@ -323,7 +324,7 @@ public interface TeammateApi {
     Single<List<Game>> matchUps(@Body HeadToHeadRequest request);
 
     @POST("api/games/head-to-head")
-    Single<List<Game>> headToHead(@Body HeadToHeadRequest request);
+    Single<HeadToHeadResult> headToHead(@Body HeadToHeadRequest request);
 
     // =============================================================================================
     // Stat endpoints

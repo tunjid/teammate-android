@@ -235,6 +235,9 @@
     <string name="game_edit">Edit game</string>
     <string name="game_create">Create game</string>
     <string name="game_update">Update game</string>
+    <string name="game_wins">Wins: %1$d</string>
+    <string name="game_draws">Draws: %1$d</string>
+    <string name="game_losses">Losses: %1$d</string>
     <string name="game_home_score">Home score</string>
     <string name="game_away_score">Away score</string>
     <string name="game_round">Round</string>

@@ -22,6 +22,7 @@ import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.HeadToHeadRequest;
+import com.mainstreetcode.teammate.model.HeadToHeadResult;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
@@ -150,6 +151,7 @@ public class TeammateService {
                 .registerTypeAdapter(AndroidVariant.class, new AndroidVariant.GsonAdapter())
                 .registerTypeAdapter(TournamentType.class, new TournamentType.GsonAdapter())
                 .registerTypeAdapter(TournamentStyle.class, new TournamentStyle.GsonAdapter())
+                .registerTypeAdapter(HeadToHeadResult.class, new HeadToHeadResult.GsonAdapter())
                 .registerTypeAdapter(HeadToHeadRequest.class, new HeadToHeadRequest.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
