@@ -1,18 +1,11 @@
 package com.mainstreetcode.teammate.fragments.main;
 
-import android.annotation.SuppressLint;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.transition.AutoTransition;
-import android.support.transition.TransitionManager;
-import android.support.v4.widget.TextViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameAdapter;
@@ -25,6 +18,7 @@ import com.mainstreetcode.teammate.model.HeadToHeadRequest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -36,13 +30,10 @@ public class HeadToHeadFragment extends MainActivityFragment
         TeamAdapter.AdapterListener {
 
     private HeadToHeadRequest request;
-
-    private TextView searchButton;
-    private TextView searchTitle;
-    private ViewGroup cardView;
+    private ExpandingToolbar expandingToolbar;
+    private ScrollManager searchScrollManager;
 
     private List<Identifiable> matchUps;
-    private ScrollManager searchScrollManager;
 
     public static HeadToHeadFragment newInstance() {
         HeadToHeadFragment fragment = new HeadToHeadFragment();
@@ -77,16 +68,9 @@ public class HeadToHeadFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
-        View.OnClickListener searchClickListener = clicked -> toggleVisibility();
+        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchMatchUps);
+        expandingToolbar.setTitleIcon(false);
 
-        cardView = root.findViewById(R.id.card_view_wrapper);
-        searchTitle = root.findViewById(R.id.search_title);
-        searchButton = root.findViewById(R.id.search);
-
-        searchTitle.setOnClickListener(searchClickListener);
-        searchButton.setOnClickListener(searchClickListener);
-
-        setTitleIcon(false);
         return root;
     }
 
@@ -98,9 +82,8 @@ public class HeadToHeadFragment extends MainActivityFragment
 
     @Override
     public void onDestroyView() {
-        searchButton = null;
-        searchTitle = null;
-        cardView = null;
+        expandingToolbar = null;
+        searchScrollManager = null;
         super.onDestroyView();
     }
 
@@ -126,40 +109,6 @@ public class HeadToHeadFragment extends MainActivityFragment
 
     private void fetchMatchUps() {
         disposables.add(gameViewModel.getMatchUps(request).subscribe(searchScrollManager::onDiff, defaultErrorHandler));
-    }
-
-    @SuppressLint("ResourceAsColor")
-    private void setTitleIcon(boolean isDown) {
-        int resVal = isDown ? R.drawable.anim_vect_down_to_right_arrow : R.drawable.anim_vect_right_to_down_arrow;
-
-        Drawable icon = AnimatedVectorDrawableCompat.create(searchTitle.getContext(), resVal);
-        if (icon == null) return;
-
-        TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(searchTitle, null, null, icon, null);
-    }
-
-    private void changeVisibility(boolean inVisible) {
-        TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
-
-        setTitleIcon(inVisible);
-
-        AnimatedVectorDrawableCompat animatedDrawable = (AnimatedVectorDrawableCompat)
-                TextViewCompat.getCompoundDrawablesRelative(searchTitle)[2];
-
-        animatedDrawable.start();
-
-        int visibility = inVisible ? View.GONE : View.VISIBLE;
-        searchButton.setVisibility(visibility);
-        searchScrollManager.getRecyclerView().setVisibility(visibility);
-    }
-
-    private void toggleVisibility() {
-        View view = searchScrollManager.getRecyclerView();
-        boolean invisible = view.getVisibility() == View.VISIBLE;
-        changeVisibility(invisible);
-
-        // Search
-        if (invisible) fetchMatchUps();
     }
 
     private void findCompetitor() {
