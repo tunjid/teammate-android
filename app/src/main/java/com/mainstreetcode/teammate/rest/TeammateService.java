@@ -21,8 +21,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.HeadToHeadRequest;
-import com.mainstreetcode.teammate.model.HeadToHeadResult;
+import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
@@ -30,6 +29,7 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Row;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.StatRank;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -151,9 +151,11 @@ public class TeammateService {
                 .registerTypeAdapter(AndroidVariant.class, new AndroidVariant.GsonAdapter())
                 .registerTypeAdapter(TournamentType.class, new TournamentType.GsonAdapter())
                 .registerTypeAdapter(TournamentStyle.class, new TournamentStyle.GsonAdapter())
-                .registerTypeAdapter(HeadToHeadResult.class, new HeadToHeadResult.GsonAdapter())
-                .registerTypeAdapter(HeadToHeadRequest.class, new HeadToHeadRequest.GsonAdapter())
+                .registerTypeAdapter(HeadToHead.Result.class, new HeadToHead.Result.GsonAdapter())
+                .registerTypeAdapter(HeadToHead.Request.class, new HeadToHead.Request.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
+                .registerTypeAdapter(StatAggregate.Result.class, new StatAggregate.Result.GsonAdapter())
+                .registerTypeAdapter(StatAggregate.Request.class, new StatAggregate.Request.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();
                     body.addProperty("access_token", src.getAccessToken().getToken());

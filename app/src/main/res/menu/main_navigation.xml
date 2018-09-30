@@ -20,6 +20,12 @@
         android:title="@string/game_head_to_head"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_stats_aggregate"
+        android:enabled="true"
+        android:icon="@drawable/ic_stat_white_24dp"
+        android:title="@string/stat_aggregate"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_my_profile"
         android:enabled="true"
         android:icon="@drawable/ic_account_white_24dp"

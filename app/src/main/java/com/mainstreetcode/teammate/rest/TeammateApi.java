@@ -11,14 +11,14 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.HeadToHeadRequest;
-import com.mainstreetcode.teammate.model.HeadToHeadResult;
+import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.StatRank;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -321,10 +321,10 @@ public interface TeammateApi {
     Single<List<Game>> getGamesForRound(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round);
 
     @POST("api/games/match-ups")
-    Single<List<Game>> matchUps(@Body HeadToHeadRequest request);
+    Single<List<Game>> matchUps(@Body HeadToHead.Request request);
 
     @POST("api/games/head-to-head")
-    Single<HeadToHeadResult> headToHead(@Body HeadToHeadRequest request);
+    Single<HeadToHead.Result> headToHead(@Body HeadToHead.Request request);
 
     // =============================================================================================
     // Stat endpoints
@@ -344,4 +344,7 @@ public interface TeammateApi {
 
     @GET("api/games/{gameId}/stats")
     Single<List<Stat>> getStats(@Path(GAME_PATH) String gameId, @Query(DATE_QUERY) Date date);
+
+    @POST("api/stats/aggregate")
+    Single<StatAggregate.Result> statsAggregate(@Body StatAggregate.Request request);
 }

@@ -258,6 +258,7 @@
     <string name="game_select_tournament_type">Please pick a tournament type</string>
     <string name="no_games">Come. See. Conquer. Your team\'s games live here.</string>
     <string name="no_game_support">Game support for your team\'s sport is coming soon!</string>
+
     <!--StatEditFragment-->
     <string name="user">User</string>
     <string name="pick_user">Pick a user</string>
@@ -269,6 +270,8 @@
     <string name="stat_update">Update stat</string>
     <string name="stat_edit">Edit stat</string>
     <string name="stat_game_ended">This game has ended</string>
+    <string name="stat_aggregate">Aggregated stats</string>
+    <string name="stat_aggregate_get">Get aggregated stats</string>
     <string name="stat_already_added">This stat can only have it\'s time changed</string>
     <string name="delete_stat_prompt">Delete stat?</string>
     <string name="stat_user_not_on_team">This person is not on your team yet</string>

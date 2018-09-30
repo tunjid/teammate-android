@@ -3,53 +3,43 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameAdapter;
-import com.mainstreetcode.teammate.adapters.HeadToHeadRequestAdapter;
+import com.mainstreetcode.teammate.adapters.StatAggregateRequestAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
-import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
-import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.List;
 
-public class HeadToHeadFragment extends MainActivityFragment
+public class StatAggregateFragment extends MainActivityFragment
         implements
         UserAdapter.AdapterListener,
         TeamAdapter.AdapterListener,
-        HeadToHeadRequestAdapter.AdapterListener {
+        StatAggregateRequestAdapter.AdapterListener {
 
-    private boolean isHome = true;
-    private HeadToHead.Request request;
+    private StatAggregate.Request request;
     private ExpandingToolbar expandingToolbar;
     private ScrollManager searchScrollManager;
 
-    private TextView wins;
-    private TextView draws;
-    private TextView losses;
-
     private List<Identifiable> matchUps;
 
-    public static HeadToHeadFragment newInstance() {
-        HeadToHeadFragment fragment = new HeadToHeadFragment();
+    public static StatAggregateFragment newInstance() {
+        StatAggregateFragment fragment = new StatAggregateFragment();
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
@@ -60,22 +50,18 @@ public class HeadToHeadFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        request = HeadToHead.Request.empty();
+        request = StatAggregate.Request.empty();
         matchUps = gameViewModel.getHeadToHeadMatchUps();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_head_to_head, container, false);
-
-        wins = root.findViewById(R.id.wins);
-        draws = root.findViewById(R.id.draws);
-        losses = root.findViewById(R.id.losses);
+        View root = inflater.inflate(R.layout.fragment_stat_aggregate, container, false);
 
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchMatchUps)
-                .withAdapter(new HeadToHeadRequestAdapter(request, this))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchAggregates)
+                .withAdapter(new StatAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -87,12 +73,11 @@ public class HeadToHeadFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
-        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchMatchUps);
-        expandingToolbar.setTitle(R.string.game_head_to_head_params);
+        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchAggregates);
+        expandingToolbar.setTitle(R.string.stat_aggregate_get);
         expandingToolbar.setTitleIcon(false);
 
         scrollManager.notifyDataSetChanged();
-        updateHeadToHead(0, 0, 0);
 
         return root;
     }
@@ -101,7 +86,6 @@ public class HeadToHeadFragment extends MainActivityFragment
     public void onDestroyView() {
         expandingToolbar = null;
         searchScrollManager = null;
-        wins = draws = losses = null;
         super.onDestroyView();
     }
 
@@ -119,73 +103,49 @@ public class HeadToHeadFragment extends MainActivityFragment
     }
 
     @Override
-    public void onUserClicked(User item) { updateCompetitor(item); }
-
-    @Override
-    public void onTeamClicked(Team item) { updateCompetitor(item); }
-
-    @Override
-    public void onHomeClicked(Competitor home) {
-        isHome = true;
-        findCompetitor();
+    public void onUserPicked(User item) {
+        pick(UserSearchFragment.newInstance());
     }
 
     @Override
-    public void onAwayClicked(Competitor away) {
-        isHome = false;
-        findCompetitor();
+    public void onTeamPicked(Team item) {
+        pick(TeamSearchFragment.newInstance(request.getSport()));
     }
 
-    private void fetchMatchUps() {
+    @Override
+    public void onTeamClicked(Team item) {
+        updateEntity(item);
+    }
+
+    @Override
+    public void onUserClicked(User item) {
+        updateEntity(item);
+    }
+
+    private void fetchAggregates() {
         toggleProgress(true);
-        disposables.add(gameViewModel.headToHead(request).subscribe(summary -> updateHeadToHead(summary.getWins(), summary.getDraws(), summary.getLosses()), ErrorHandler.EMPTY));
-        disposables.add(gameViewModel.getMatchUps(request).subscribe(diffResult -> {
+        disposables.add(statViewModel.aggregate(request).subscribe(result -> {
             toggleProgress(false);
-            scrollManager.onDiff(diffResult);
+            scrollManager.onDiff(result);
         }, defaultErrorHandler));
     }
 
-    private void updateHeadToHead(int numWins, int numDraws, int numLosses) {
-        wins.setText(getText(R.string.game_wins, numWins));
-        draws.setText(getText(R.string.game_draws, numDraws));
-        losses.setText(getText(R.string.game_losses, numLosses));
-    }
+    private void updateEntity(Competitive item) {
+        if (item instanceof User) request.updateUser((User) item);
+        else if (item instanceof Team) request.updateTeam((Team) item);
+        else return;
 
-    private void updateCompetitor(Competitive item) {
-        if (isHome) request.updateHome(item);
-        else request.updateAway(item);
         searchScrollManager.notifyDataSetChanged();
         searchScrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 
-    private void findCompetitor() {
-        if (request.hasInvalidType()) {
-            showSnackbar(getString(R.string.game_select_tournament_type));
-            return;
-        }
-
-        String refPath = request.getRefPath();
-        boolean isBetweenUsers = User.COMPETITOR_TYPE.equals(refPath);
-        BaseFragment fragment = isBetweenUsers
-                ? UserSearchFragment.newInstance()
-                : Team.COMPETITOR_TYPE.equals(refPath)
-                ? TeamSearchFragment.newInstance(request.getSport())
-                : null;
-
-        if (fragment == null) return;
+    private void pick(BaseFragment fragment) {
         fragment.setTargetFragment(this, R.id.request_competitor_pick);
-
         showBottomSheet(BottomSheetController.Args.builder()
                 .setMenuRes(R.menu.empty)
                 .setFragment(fragment)
                 .build());
     }
 
-    private CharSequence getText(@StringRes int stringRes, int count) {
-        return new SpanBuilder(requireContext(), String.valueOf(count)).resize(1.4F).bold()
-                .appendCharsequence(new SpanBuilder(requireContext(), getString(stringRes))
-                        .prependNewLine()
-                        .build()).build();
-    }
 }

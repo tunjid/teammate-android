@@ -1,14 +1,19 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.arch.core.util.Function;
+import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.StatRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.rest.TeammateApi;
+import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 import java.util.ArrayList;
@@ -22,6 +27,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * ViewModel for {@link Stat tournaments}
@@ -29,8 +35,12 @@ import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 
 public class StatViewModel extends MappedViewModel<Game, Stat> {
 
-    private final StatRepository repository;
+    private final TeammateApi api = TeammateService.getApiInstance();
+
     private final Map<Game, List<Identifiable>> modelListMap = new HashMap<>();
+    private final List<Identifiable> aggregates = new ArrayList<>();
+
+    private final StatRepository repository;
 
     public StatViewModel() {
         repository = StatRepository.getInstance();
@@ -68,6 +78,13 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         User current = UserRepository.getInstance().getCurrentUser();
         if (game.betweenUsers()) return Single.just(game.isCompeting(current));
         return GameViewModel.getEligibleTeamsForGame(game).count().map(value -> value > 0);
+    }
+
+    public Single<DiffUtil.DiffResult> aggregate(StatAggregate.Request request) {
+        Single<List<Identifiable>> sourceSingle = api.statsAggregate(request)
+                .map(StatAggregate.Result::getAggregates)
+                .map(ArrayList<Identifiable>::new);
+        return Identifiable.diff(sourceSingle, () -> aggregates, ModelUtils::replaceList).observeOn(mainThread());
     }
 
     private boolean isPrivilegedOrIsReferee(boolean isPrivileged, User current, Game game) {

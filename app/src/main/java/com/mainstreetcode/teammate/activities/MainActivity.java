@@ -35,6 +35,7 @@ import com.mainstreetcode.teammate.fragments.main.HeadToHeadFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
 import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
+import com.mainstreetcode.teammate.fragments.main.StatAggregateFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
@@ -329,6 +330,9 @@ public class MainActivity extends TeammatesBaseActivity
                 return true;
             case R.id.action_head_to_head:
                 showFragment(HeadToHeadFragment.newInstance());
+                return true;
+            case R.id.action_stats_aggregate:
+                showFragment(StatAggregateFragment.newInstance());
                 return true;
             case R.id.action_my_profile:
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
