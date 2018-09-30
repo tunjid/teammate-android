@@ -127,6 +127,10 @@ public class StatAggregate {
             this.type = type;
         }
 
+        public String getCount() { return String.valueOf(count); }
+
+        public CharSequence getType() { return type.getEmojiAndName();}
+
         @Override
         public String getId() { return type.getId(); }
     }

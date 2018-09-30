@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.GameAdapter;
+import com.mainstreetcode.teammate.adapters.StatAggregateAdapter;
 import com.mainstreetcode.teammate.adapters.StatAggregateRequestAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
@@ -36,7 +36,7 @@ public class StatAggregateFragment extends MainActivityFragment
     private ExpandingToolbar expandingToolbar;
     private ScrollManager searchScrollManager;
 
-    private List<Identifiable> matchUps;
+    private List<Identifiable> items;
 
     public static StatAggregateFragment newInstance() {
         StatAggregateFragment fragment = new StatAggregateFragment();
@@ -51,7 +51,7 @@ public class StatAggregateFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         request = StatAggregate.Request.empty();
-        matchUps = gameViewModel.getHeadToHeadMatchUps();
+        items = statViewModel.getStatAggregates();
     }
 
     @Nullable
@@ -67,9 +67,9 @@ public class StatAggregateFragment extends MainActivityFragment
                 .build();
 
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
-                .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
-                .withAdapter(new GameAdapter(matchUps, game -> showFragment(GameFragment.newInstance(game))))
+                .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withAdapter(new StatAggregateAdapter(items))
                 .withLinearLayoutManager()
                 .build();
 

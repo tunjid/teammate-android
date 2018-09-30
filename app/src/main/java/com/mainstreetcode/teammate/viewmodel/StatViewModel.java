@@ -65,6 +65,10 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         return modelList;
     }
 
+    public List<Identifiable> getStatAggregates() {
+        return aggregates;
+    }
+
     public Single<Stat> delete(final Stat stat) {
         return repository.delete(stat).doOnSuccess(deleted -> getModelList(stat.getGame()).remove(deleted));
     }
