@@ -12,8 +12,11 @@ import com.mainstreetcode.teammate.adapters.GameAdapter;
 import com.mainstreetcode.teammate.adapters.HeadToHeadRequestAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.HeadToHeadRequest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
@@ -27,8 +30,10 @@ import java.util.List;
 public class HeadToHeadFragment extends MainActivityFragment
         implements
         UserAdapter.AdapterListener,
-        TeamAdapter.AdapterListener {
+        TeamAdapter.AdapterListener,
+        HeadToHeadRequestAdapter.AdapterListener {
 
+    private boolean isHome = true;
     private HeadToHeadRequest request;
     private ExpandingToolbar expandingToolbar;
     private ScrollManager searchScrollManager;
@@ -57,12 +62,13 @@ public class HeadToHeadFragment extends MainActivityFragment
         View root = inflater.inflate(R.layout.fragment_head_to_head, container, false);
 
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
-                .withAdapter(new HeadToHeadRequestAdapter(request, competitor -> findCompetitor()))
+                .withAdapter(new HeadToHeadRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
 
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
+                .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
                 .withAdapter(new GameAdapter(matchUps, game -> showFragment(GameFragment.newInstance(game))))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
@@ -98,17 +104,37 @@ public class HeadToHeadFragment extends MainActivityFragment
     }
 
     @Override
-    public void onUserClicked(User item) {
+    public void onUserClicked(User item) { updateCompetitor(item); }
 
+    @Override
+    public void onTeamClicked(Team item) { updateCompetitor(item); }
+
+    @Override
+    public void onHomeClicked(Competitor home) {
+        isHome = true;
+        findCompetitor();
     }
 
     @Override
-    public void onTeamClicked(Team item) {
-
+    public void onAwayClicked(Competitor away) {
+        isHome = false;
+        findCompetitor();
     }
 
     private void fetchMatchUps() {
-        disposables.add(gameViewModel.getMatchUps(request).subscribe(searchScrollManager::onDiff, defaultErrorHandler));
+        toggleProgress(true);
+        disposables.add(gameViewModel.getMatchUps(request).subscribe(diffResult -> {
+            toggleProgress(false);
+            scrollManager.onDiff(diffResult);
+        }, defaultErrorHandler));
+    }
+
+    private void updateCompetitor(Competitive item) {
+        if (isHome) request.updateHome(item);
+        else request.updateAway(item);
+        searchScrollManager.notifyDataSetChanged();
+        searchScrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
+        hideKeyboard();
     }
 
     private void findCompetitor() {

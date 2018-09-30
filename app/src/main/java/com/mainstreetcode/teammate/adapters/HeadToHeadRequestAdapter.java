@@ -30,13 +30,16 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
  * Adapter for {@link Event}
  */
 
-public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, HeadToHeadRequestAdapter.EventSearchAdapterListener> {
+public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, HeadToHeadRequestAdapter.AdapterListener> {
+
+    private static final int HOME = 1;
+    private static final int AWAY = 2;
 
     private final HeadToHeadRequest request;
     private final List<Sport> sports;
 
     public HeadToHeadRequestAdapter(HeadToHeadRequest request,
-                                    HeadToHeadRequestAdapter.EventSearchAdapterListener listener) {
+                                    AdapterListener listener) {
         super(listener);
         this.request = request;
         sports = new ArrayList<>(Config.getSports());
@@ -53,8 +56,10 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, ALL_INPUT_VALID);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
-            case Item.COMPETITOR:
-                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onCompetitorClicked);
+            case HOME:
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onHomeClicked);
+            case AWAY:
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -78,10 +83,12 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
     @Override
     public int getItemViewType(int position) {
         Identifiable identifiable = request.getItems().get(position);
-        return identifiable instanceof Item ? ((Item) identifiable).getItemType() : Item.COMPETITOR;
+        return identifiable instanceof Item ? ((Item) identifiable).getItemType() : position == 2 ? HOME : AWAY;
     }
 
-    public interface EventSearchAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
-        void onCompetitorClicked(Competitor home);
+    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+        void onHomeClicked(Competitor home);
+
+        void onAwayClicked(Competitor away);
     }
 }
