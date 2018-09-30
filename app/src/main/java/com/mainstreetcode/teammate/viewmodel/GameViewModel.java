@@ -5,6 +5,7 @@ import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHeadRequest;
+import com.mainstreetcode.teammate.model.HeadToHeadResult;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -69,6 +70,9 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         return Identifiable.diff(flowable.map(listMapper), () -> getGamesForRound(tournament, round), this::preserveList);
     }
 
+    public Single<HeadToHeadResult.Summary> headToHead(HeadToHeadRequest request) {
+        return api.headToHead(request).map(headToHeadResult -> headToHeadResult.getSummary(request)).observeOn(mainThread());
+    }
 
     public Single<DiffUtil.DiffResult> getMatchUps(HeadToHeadRequest request) {
         Single<List<Identifiable>> sourceSingle = api.matchUps(request).map(ArrayList<Identifiable>::new);

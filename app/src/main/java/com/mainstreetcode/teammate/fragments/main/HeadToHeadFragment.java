@@ -3,9 +3,11 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameAdapter;
@@ -21,9 +23,11 @@ import com.mainstreetcode.teammate.model.HeadToHeadRequest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.List;
 
@@ -37,6 +41,10 @@ public class HeadToHeadFragment extends MainActivityFragment
     private HeadToHeadRequest request;
     private ExpandingToolbar expandingToolbar;
     private ScrollManager searchScrollManager;
+
+    private TextView wins;
+    private TextView draws;
+    private TextView losses;
 
     private List<Identifiable> matchUps;
 
@@ -61,6 +69,10 @@ public class HeadToHeadFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_head_to_head, container, false);
 
+        wins = root.findViewById(R.id.wins);
+        draws = root.findViewById(R.id.draws);
+        losses = root.findViewById(R.id.losses);
+
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
                 .withAdapter(new HeadToHeadRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -77,6 +89,7 @@ public class HeadToHeadFragment extends MainActivityFragment
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchMatchUps);
         expandingToolbar.setTitleIcon(false);
 
+        updateHeadToHead(0, 0, 0);
         return root;
     }
 
@@ -92,6 +105,9 @@ public class HeadToHeadFragment extends MainActivityFragment
         searchScrollManager = null;
         super.onDestroyView();
     }
+
+    @Override
+    public boolean showsToolBar() { return false; }
 
     @Override
     public boolean showsFab() { return false; }
@@ -123,10 +139,17 @@ public class HeadToHeadFragment extends MainActivityFragment
 
     private void fetchMatchUps() {
         toggleProgress(true);
+        disposables.add(gameViewModel.headToHead(request).subscribe(summary -> updateHeadToHead(summary.getWins(), summary.getDraws(), summary.getLosses()), ErrorHandler.EMPTY));
         disposables.add(gameViewModel.getMatchUps(request).subscribe(diffResult -> {
             toggleProgress(false);
             scrollManager.onDiff(diffResult);
         }, defaultErrorHandler));
+    }
+
+    private void updateHeadToHead(int numWins, int numDraws, int numLosses) {
+        wins.setText(getText(R.string.game_wins, numWins));
+        draws.setText(getText(R.string.game_draws, numDraws));
+        losses.setText(getText(R.string.game_losses, numLosses));
     }
 
     private void updateCompetitor(Competitive item) {
@@ -158,5 +181,12 @@ public class HeadToHeadFragment extends MainActivityFragment
                 .setMenuRes(R.menu.empty)
                 .setFragment(fragment)
                 .build());
+    }
+
+    private CharSequence getText(@StringRes int stringRes, int count) {
+        return new SpanBuilder(requireContext(), String.valueOf(count)).resize(1.4F).bold()
+                .appendCharsequence(new SpanBuilder(requireContext(), getString(stringRes))
+                        .prependNewLine()
+                        .build()).build();
     }
 }

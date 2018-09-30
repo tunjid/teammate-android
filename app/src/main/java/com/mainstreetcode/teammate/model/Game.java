@@ -37,7 +37,7 @@ public class Game extends GameEntity
         HeaderedModel<Game>,
         ListableModel<Game> {
 
-    @Ignore private static final IdCache holder = IdCache.cache(5);
+    @Ignore private static final IdCache holder = IdCache.cache(4);
 
     public Game(@NonNull String id, String refPath, String score,
                 String homeEntityId, String awayEntityId, String winnerEntityId,
@@ -65,8 +65,7 @@ public class Game extends GameEntity
                 Item.number(holder.get(0), 0, Item.INPUT, R.string.game_home_score, () -> String.valueOf(homeScore), this::setHomeScore, this),
                 Item.number(holder.get(1), 1, Item.INPUT, R.string.game_away_score, () -> String.valueOf(awayScore), this::setAwayScore, this),
                 Item.number(holder.get(2), 1, Item.NUMBER, R.string.game_round, () -> String.valueOf(round), ignored -> {}, this),
-                Item.number(holder.get(3), 1, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this),
-                Item.text(holder.get(4), 1, Item.INFO, R.string.game_referee, referee::getName, ignored -> {}, this)
+                Item.number(holder.get(3), 1, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this)
         );
     }
 

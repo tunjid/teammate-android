@@ -20,6 +20,34 @@ public class HeadToHeadResult {
 
     private final List<Aggregate> aggregates = new ArrayList<>();
 
+    public Summary getSummary(HeadToHeadRequest request) {
+        String homeId = request.getHomeId();
+        String awayId = request.getAwayId();
+        Summary summary = new Summary();
+
+        for (Aggregate aggregate : aggregates) {
+            if (aggregate.id == null) summary.losses = aggregate.count;
+            else if (aggregate.id.equals(homeId)) summary.wins = aggregate.count;
+            else if (aggregate.id.equals(awayId)) summary.losses = aggregate.count;
+        }
+
+        return summary;
+    }
+
+    public static class Summary {
+        int wins;
+        int draws;
+        int losses;
+
+        private Summary() {}
+
+        public int getWins() { return wins; }
+
+        public int getDraws() { return draws; }
+
+        public int getLosses() { return losses; }
+    }
+
     private static class Aggregate {
         int count;
         String id;

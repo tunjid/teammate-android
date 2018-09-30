@@ -40,6 +40,10 @@ public class HeadToHeadRequest {
 
     public boolean hasInvalidType() { return type.isInvalid(); }
 
+    String getHomeId() { return home.getEntity().getId(); }
+
+    String getAwayId() { return away.getEntity().getId(); }
+
     public String getRefPath() { return type.getRefPath(); }
 
     public Sport getSport() { return sport; }
