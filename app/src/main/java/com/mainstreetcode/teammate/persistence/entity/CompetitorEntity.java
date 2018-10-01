@@ -21,8 +21,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(
         tableName = "competitors",
         foreignKeys = {
-                @ForeignKey(entity = TournamentEntity.class, parentColumns = "tournament_id", childColumns = "competitor_tournament_id", onDelete = CASCADE),
-                @ForeignKey(entity = GameEntity.class, parentColumns = "game_id", childColumns = "competitor_game_id", onDelete = CASCADE),
+                @ForeignKey(entity = TournamentEntity.class, parentColumns = "tournament_id", childColumns = "competitor_tournament", onDelete = CASCADE),
+                @ForeignKey(entity = GameEntity.class, parentColumns = "game_id", childColumns = "competitor_game", onDelete = CASCADE),
         }
 )
 public class CompetitorEntity implements Parcelable {
@@ -30,9 +30,9 @@ public class CompetitorEntity implements Parcelable {
     @NonNull @PrimaryKey
     @ColumnInfo(name = "competitor_id") protected String id;
     @ColumnInfo(name = "competitor_ref_path") protected String refPath;
-    @ColumnInfo(name = "competitor_tournament_id") protected String tournamentId;
-    @ColumnInfo(name = "competitor_game_id") protected String gameId;
-    @ColumnInfo(name = "competitor_entity_id") protected Competitive entity;
+    @ColumnInfo(name = "competitor_tournament") protected String tournamentId;
+    @ColumnInfo(name = "competitor_game") protected String gameId;
+    @ColumnInfo(name = "competitor_entity") protected Competitive entity;
     @ColumnInfo(name = "competitor_created") protected Date created;
     @ColumnInfo(name = "competitor_seed") protected int seed;
     @ColumnInfo(name = "competitor_accepted") protected boolean accepted;

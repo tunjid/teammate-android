@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "5fad6a2ca1bceeee65af0390bfdf9ce2",
+    "identityHash": "48d817974d0f0dcd2a525d40dc2117fc",
     "entities": [
       {
         "tableName": "users",
@@ -611,7 +611,7 @@
       },
       {
         "tableName": "competitors",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`competitor_id` TEXT NOT NULL, `competitor_ref_path` TEXT, `competitor_tournament_id` TEXT, `competitor_entity_id` TEXT, `competitor_created` INTEGER, `competitor_seed` INTEGER NOT NULL, PRIMARY KEY(`competitor_id`), FOREIGN KEY(`competitor_tournament_id`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`competitor_id` TEXT NOT NULL, `competitor_ref_path` TEXT, `competitor_tournament` TEXT, `competitor_game` TEXT, `competitor_entity` TEXT, `competitor_created` INTEGER, `competitor_seed` INTEGER NOT NULL, `competitor_accepted` INTEGER NOT NULL, `competitor_declined` INTEGER NOT NULL, PRIMARY KEY(`competitor_id`), FOREIGN KEY(`competitor_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`competitor_game`) REFERENCES `games`(`game_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -627,13 +627,19 @@
           },
           {
             "fieldPath": "tournamentId",
-            "columnName": "competitor_tournament_id",
+            "columnName": "competitor_tournament",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "gameId",
+            "columnName": "competitor_game",
             "affinity": "TEXT",
             "notNull": false
           },
           {
             "fieldPath": "entity",
-            "columnName": "competitor_entity_id",
+            "columnName": "competitor_entity",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -646,6 +652,18 @@
           {
             "fieldPath": "seed",
             "columnName": "competitor_seed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accepted",
+            "columnName": "competitor_accepted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "declined",
+            "columnName": "competitor_declined",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -663,17 +681,28 @@
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "competitor_tournament_id"
+              "competitor_tournament"
             ],
             "referencedColumns": [
               "tournament_id"
+            ]
+          },
+          {
+            "table": "games",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "competitor_game"
+            ],
+            "referencedColumns": [
+              "game_id"
             ]
           }
         ]
       },
       {
         "tableName": "games",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `game_ref_path` TEXT, `game_score` TEXT, `game_home_entity_id` TEXT, `game_away_entity_id` TEXT, `game_winner_entity_id` TEXT, `game_created` INTEGER, `game_sport` TEXT, `game_referee` TEXT, `game_host` TEXT, `game_event` TEXT, `game_tournament` TEXT, `game_home` TEXT, `game_away` TEXT, `game_winner` TEXT, `game_leg` INTEGER NOT NULL, `game_seed` INTEGER NOT NULL, `game_round` INTEGER NOT NULL, `game_home_score` INTEGER NOT NULL, `game_away_score` INTEGER NOT NULL, `game_ended` INTEGER NOT NULL, `game_can_draw` INTEGER NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `game_ref_path` TEXT, `game_score` TEXT, `game_match_up` TEXT, `game_home_entity` TEXT, `game_away_entity` TEXT, `game_winner_entity` TEXT, `game_created` INTEGER, `game_sport` TEXT, `game_referee` TEXT, `game_host` TEXT, `game_event` TEXT, `game_tournament` TEXT, `game_home` TEXT, `game_away` TEXT, `game_winner` TEXT, `game_leg` INTEGER NOT NULL, `game_seed` INTEGER NOT NULL, `game_round` INTEGER NOT NULL, `game_home_score` INTEGER NOT NULL, `game_away_score` INTEGER NOT NULL, `game_ended` INTEGER NOT NULL, `game_can_draw` INTEGER NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -694,20 +723,26 @@
             "notNull": false
           },
           {
+            "fieldPath": "matchUp",
+            "columnName": "game_match_up",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "homeEntityId",
-            "columnName": "game_home_entity_id",
+            "columnName": "game_home_entity",
             "affinity": "TEXT",
             "notNull": false
           },
           {
             "fieldPath": "awayEntityId",
-            "columnName": "game_away_entity_id",
+            "columnName": "game_away_entity",
             "affinity": "TEXT",
             "notNull": false
           },
           {
             "fieldPath": "winnerEntityId",
-            "columnName": "game_winner_entity_id",
+            "columnName": "game_winner_entity",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1087,7 +1122,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"5fad6a2ca1bceeee65af0390bfdf9ce2\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"48d817974d0f0dcd2a525d40dc2117fc\")"
     ]
   }
 }

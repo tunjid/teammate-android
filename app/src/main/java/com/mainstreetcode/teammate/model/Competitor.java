@@ -69,6 +69,13 @@ public class Competitor extends CompetitorEntity
 
     @Override
     public void update(Competitor updated) {
+        this.seed = updated.seed;
+        this.accepted = updated.accepted;
+        this.declined = updated.declined;
+
+        if (!TextUtils.isEmpty(updated.tournamentId)) this.tournamentId = updated.tournamentId;
+        if (!TextUtils.isEmpty(updated.gameId)) this.gameId = updated.gameId;
+
         Competitive other = updated.entity;
         if (entity instanceof User && other instanceof User) ((User) entity).update(((User) other));
         else if (entity instanceof Team && other instanceof Team)
@@ -141,27 +148,31 @@ public class Competitor extends CompetitorEntity
         public Competitor deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
             if (json.isJsonPrimitive()) {
-                return new Competitor(json.getAsString(), "", "","", new EmptyCompetitor(), new Date(), -1, false,false);
+                return new Competitor(json.getAsString(), "", "", "", new EmptyCompetitor(), new Date(), -1, false, false);
             }
 
             JsonObject jsonObject = json.getAsJsonObject();
 
+            Tournament tournament = context.deserialize(jsonObject.get(TOURNAMENT), Tournament.class);
+            Game game = context.deserialize(jsonObject.get(GAME), Game.class);
+
+            if (tournament == null) tournament = Tournament.empty();
+            if (game == null) game = Game.empty(Team.empty());
+
             String id = ModelUtils.asString(ID, jsonObject);
             String refPath = ModelUtils.asString(REF_PATH, jsonObject);
-            String tournament = ModelUtils.asString(TOURNAMENT, jsonObject);
-            String game = ModelUtils.asString(GAME, jsonObject);
             String created = ModelUtils.asString(CREATED, jsonObject);
-            int seed = (int) ModelUtils.asFloat(SEED, jsonObject);
-            boolean accepted =  ModelUtils.asBoolean(ACCEPTED, jsonObject);
-            boolean declined =  ModelUtils.asBoolean(DECLINED, jsonObject);
+            String tournamentId = tournament.isEmpty() ? null : tournament.getId();
+            String gameId = game.isEmpty() ? null : game.getId();
 
-            if (tournament.isEmpty()) tournament = null;
-            if (game.isEmpty()) game = null;
+            int seed = (int) ModelUtils.asFloat(SEED, jsonObject);
+            boolean accepted = ModelUtils.asBoolean(ACCEPTED, jsonObject);
+            boolean declined = ModelUtils.asBoolean(DECLINED, jsonObject);
 
             Competitive competitive = context.deserialize(jsonObject.get(ENTITY),
                     User.COMPETITOR_TYPE.equals(refPath) ? User.class : Team.class);
 
-            return new Competitor(id, refPath, tournament, game,
+            return new Competitor(id, refPath, tournamentId, gameId,
                     competitive, ModelUtils.parseDate(created),
                     seed, accepted, declined);
         }

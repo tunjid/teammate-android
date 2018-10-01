@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -84,7 +85,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         viewHolder.setColor(R.color.dark_grey);
         viewHolder.toggle(!hasCompetitors);
 
-        setUpWinner(root);
+        setUpWinner(root, tournament.getNumRounds());
 
         return root;
     }
@@ -126,10 +127,11 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     public void onResume() {
         super.onResume();
+        int rounds = tournament.getNumRounds();
         User user = userViewModel.getCurrentUser();
         Team team = tournament.getHost();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::togglePersistentUi, emptyErrorHandler));
-        disposables.add(tournamentViewModel.checkForWinner(tournament).subscribe(changed -> setUpWinner(getView()), defaultErrorHandler));
+        disposables.add(tournamentViewModel.checkForWinner(tournament).subscribe(changed -> setUpWinner(getView(), rounds), defaultErrorHandler));
     }
 
     @Override
@@ -173,8 +175,13 @@ public class TournamentDetailFragment extends MainActivityFragment {
     }
 
     @SuppressWarnings("unchecked")
-    private void setUpWinner(@Nullable View root) {
+    private void setUpWinner(@Nullable View root, int prevAdapterCount) {
         if (root == null) return;
+
+        PagerAdapter adapter = root.<ViewPager>findViewById(R.id.view_pager).getAdapter();
+
+        if (prevAdapterCount != tournament.getNumRounds() && adapter != null)
+            adapter.notifyDataSetChanged();
 
         Competitor winner = tournament.getWinner();
         if (winner.isEmpty()) return;

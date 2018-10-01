@@ -30,8 +30,8 @@ public abstract class GameDao extends EntityDao<GameEntity> {
 
     @Query("SELECT * FROM games as game" +
             " WHERE :teamId = game_host" +
-            " OR :teamId = game_home_entity_id" +
-            " OR :teamId = game_away_entity_id" +
+            " OR :teamId = game_home_entity" +
+            " OR :teamId = game_away_entity" +
             " AND game_created < :date" +
             " ORDER BY game_created DESC" +
             " LIMIT 40")

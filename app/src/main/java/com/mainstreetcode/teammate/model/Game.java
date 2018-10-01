@@ -115,6 +115,7 @@ public class Game extends GameEntity
     public void update(Game updatedGame) {
         this.id = updatedGame.id;
         this.score = updatedGame.score;
+        this.matchUp = updatedGame.matchUp;
         this.created = updatedGame.created;
         this.leg = updatedGame.leg;
         this.seed = updatedGame.seed;

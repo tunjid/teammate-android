@@ -38,9 +38,9 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_ref_path") protected String refPath;
     @ColumnInfo(name = "game_score") protected String score;
     @ColumnInfo(name = "game_match_up") protected String matchUp;
-    @ColumnInfo(name = "game_home_entity_id") protected String homeEntityId;
-    @ColumnInfo(name = "game_away_entity_id") protected String awayEntityId;
-    @ColumnInfo(name = "game_winner_entity_id") protected String winnerEntityId;
+    @ColumnInfo(name = "game_home_entity") protected String homeEntityId;
+    @ColumnInfo(name = "game_away_entity") protected String awayEntityId;
+    @ColumnInfo(name = "game_winner_entity") protected String winnerEntityId;
 
     @ColumnInfo(name = "game_created") protected Date created;
     @ColumnInfo(name = "game_sport") protected Sport sport;
@@ -138,6 +138,8 @@ public class GameEntity implements Parcelable {
     public String getDate() {
         return event.isEmpty() ? "" : prettyPrinter.format(event.startDate);
     }
+
+    public String getMatchUp() { return matchUp; }
 
     public String getHomeEntityId() { return homeEntityId; }
 

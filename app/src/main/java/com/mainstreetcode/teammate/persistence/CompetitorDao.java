@@ -28,7 +28,7 @@ public abstract class CompetitorDao extends EntityDao<CompetitorEntity> {
     }
 
     @Query("SELECT * FROM competitors" +
-            " WHERE :tournamentId = competitor_tournament_id" +
+            " WHERE :tournamentId = competitor_tournament" +
             " ORDER BY competitor_created DESC" +
             " LIMIT 40")
     public abstract Maybe<List<Competitor>> getCompetitors(String tournamentId);

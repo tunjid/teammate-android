@@ -32,8 +32,8 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
             " INNER JOIN games AS game" +
             " ON tournament.tournament_id = game.game_tournament" +
             " WHERE :teamId = game.game_host" +
-            " OR :teamId = game.game_home_entity_id" +
-            " OR :teamId = game.game_away_entity_id" +
+            " OR :teamId = game.game_home_entity" +
+            " OR :teamId = game.game_away_entity" +
             " AND tournament.tournament_created < :date" +
             " ORDER BY tournament.tournament_created DESC" +
             " LIMIT 40")
