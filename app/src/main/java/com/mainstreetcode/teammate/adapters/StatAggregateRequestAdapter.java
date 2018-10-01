@@ -55,9 +55,11 @@ public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseVie
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case USER:
-                return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onUserPicked);
+                return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onUserPicked)
+                        .withTitle(R.string.pick_user);
             case TEAM:
-                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onTeamPicked);
+                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onTeamPicked)
+                        .withTitle(R.string.pick_team);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

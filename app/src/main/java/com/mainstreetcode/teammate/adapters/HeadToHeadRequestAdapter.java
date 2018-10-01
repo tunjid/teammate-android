@@ -58,9 +58,11 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case HOME:
-                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onHomeClicked);
+                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onHomeClicked)
+                        .withTitle(R.string.pick_home_competitor);
             case AWAY:
-                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onAwayClicked);
+                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onAwayClicked)
+                        .withTitle(R.string.pick_away_competitor);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

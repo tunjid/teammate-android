@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -43,6 +44,24 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
     public ImageView getThumbnail() { return thumbnail; }
 
     public boolean isThumbnail() {return true;}
+
+    public ModelCardViewHolder<H, T> withTitle(@StringRes int titleRes) {
+        title.setText(titleRes);
+        return this;
+    }
+
+    public ModelCardViewHolder<H, T> withSubTitle(@StringRes int subTitleRes) {
+        subtitle.setText(subTitleRes);
+        return this;
+    }
+
+    void setTitle(CharSequence title) {
+        if (!TextUtils.isEmpty(title)) this.title.setText(title);
+    }
+
+    void setSubTitle(CharSequence subTitle) {
+        if (!TextUtils.isEmpty(subTitle)) this.subtitle.setText(subTitle);
+    }
 
     void load(String imageUrl, ImageView destination) {
         RequestCreator creator = Picasso.with(itemView.getContext()).load(imageUrl);

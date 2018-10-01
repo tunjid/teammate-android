@@ -225,6 +225,8 @@
     <string name="save_tournament_competitors">Save Competitors</string>
     <string name="competitor_exists">This competitor is already added</string>
     <string name="add_competitor">Add Competitor</string>
+    <string name="pick_home_competitor">Pick home side</string>
+    <string name="pick_away_competitor">Pick away side</string>
     <string name="competitor">Competitors</string>
 
     <!--GameFragment-->
@@ -238,6 +240,8 @@
     <string name="game_wins">Wins</string>
     <string name="game_draws">Draws</string>
     <string name="game_losses">Losses</string>
+    <string name="game_home">Home</string>
+    <string name="game_away">Away</string>
     <string name="game_home_score">Home score</string>
     <string name="game_away_score">Away score</string>
     <string name="game_round">Round</string>

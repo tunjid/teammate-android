@@ -11,7 +11,7 @@ public class EmptyCompetitor implements Competitive {
 
     public String getRefType() { return ""; }
 
-    public String getImageUrl() { return ""; }
+    public String getImageUrl() { return Config.getDefaultTeamLogo(); }
 
     public CharSequence getName() { return ""; }
 

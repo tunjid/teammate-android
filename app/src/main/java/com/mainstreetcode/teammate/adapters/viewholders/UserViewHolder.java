@@ -20,8 +20,8 @@ public class UserViewHolder extends ModelCardViewHolder<User, UserAdapter.Adapte
     public void bind(User model) {
         super.bind(model);
 
-        title.setText(model.getFirstName());
-        subtitle.setText(model.getLastName());
+        setTitle(model.getFirstName());
+        setSubTitle(model.getLastName());
 
         setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background));
         setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail));

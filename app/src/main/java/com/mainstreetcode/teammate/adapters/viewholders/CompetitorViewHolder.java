@@ -22,8 +22,9 @@ public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, Compet
     public void bind(Competitor model) {
         super.bind(model);
         if (model.isEmpty()) model.setSeed(getAdapterPosition());
-        title.setText(model.getName());
-        subtitle.setText(model.getSeedText());
+
+        setTitle(model.getName());
+        setSubTitle(model.getSeedText());
     }
 
     public View getDragHandle() { return itemView.findViewById(R.id.drag_handle); }
