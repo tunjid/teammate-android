@@ -74,8 +74,9 @@ public class StatAggregateFragment extends MainActivityFragment
                 .build();
 
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchAggregates);
-        expandingToolbar.setTitle(R.string.stat_aggregate_get);
         expandingToolbar.setTitleIcon(false);
+        expandingToolbar.changeVisibility(false);
+        expandingToolbar.setTitle(R.string.stat_aggregate_get);
 
         scrollManager.notifyDataSetChanged();
 

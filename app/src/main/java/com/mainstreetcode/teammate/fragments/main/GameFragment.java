@@ -186,7 +186,7 @@ public final class GameFragment extends MainActivityFragment
         hideKeyboard();
         refereeChip.postDelayed(() -> {
             hideBottomSheet();
-            refereeChip.postDelayed(() -> addRefereeRequest(item),150);
+            refereeChip.postDelayed(() -> addRefereeRequest(item), 150);
         }, 200);
     }
 
@@ -284,8 +284,12 @@ public final class GameFragment extends MainActivityFragment
         User referee = game.getReferee();
         TransitionManager.beginDelayedTransition(root, new AutoTransition().addTarget(refereeChip));
 
-        refereeChip.setText(referee.getName());
         refereeChip.setCloseIconVisible(!referee.isEmpty() && privilegeStatus.get());
+        refereeChip.setText(referee.isEmpty()
+                ? getString(privilegeStatus.get()
+                ? R.string.game_choose_referee : R.string.game_no_referee)
+                : getString(R.string.game_referee, referee.getName()));
+
         disposables.add(ViewHolderUtil.fetchRoundedDrawable(refereeChip.getContext(), referee.getImageUrl(), size)
                 .subscribe(refereeChip::setChipIcon, ErrorHandler.EMPTY));
     }

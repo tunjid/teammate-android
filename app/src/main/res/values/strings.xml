@@ -78,7 +78,7 @@
     <string name="user_search">Search by user @handles</string>
 
     <!--TeamSearchFragment-->
-    <string name="team_search">Search by name @handles</string>
+    <string name="team_search">Search by team name or team @handles</string>
     <string name="team_search_hint">Search</string>
     <string name="team_logo">Team Logo</string>
     <string name="create_team_prompt">Can\'t find your team?</string>
@@ -248,7 +248,9 @@
     <string name="game_leg">Leg</string>
     <string name="game_stats">Game stats</string>
     <string name="game_end">End game</string>
-    <string name="game_referee">Referee:</string>
+    <string name="game_referee">Referee: %1$s</string>
+    <string name="game_choose_referee">Choose referee</string>
+    <string name="game_no_referee">No referee</string>
     <string name="game_end_request">End game?</string>
     <string name="game_add_referee_title">Add Referee?</string>
     <string name="game_manual_score_request">Enter scores manually?</string>

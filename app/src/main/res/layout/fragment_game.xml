@@ -133,19 +133,6 @@
                     app:layout_constraintTop_toTopOf="@id/home_thumbnail"
                     tools:text="hi" />
 
-                <TextView
-                    android:id="@+id/referee_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/game_referee"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/small_text"
-                    app:layout_constraintBottom_toBottomOf="@+id/referee_chip"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@+id/referee_chip"
-                    app:layout_constraintTop_toTopOf="@+id/referee_chip" />
-
                 <android.support.design.chip.Chip
                     android:id="@+id/referee_chip"
                     style="@style/Widget.MaterialComponents.Chip.Action"
@@ -155,7 +142,7 @@
                     android:layout_marginRight="@dimen/half_margin"
                     android:layout_marginTop="@dimen/quarter_margin"
                     android:text="@string/empty_string"
-                    app:layout_constraintLeft_toRightOf="@+id/referee_label"
+                    app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ended" />
             </android.support.constraint.ConstraintLayout>
@@ -164,6 +151,7 @@
                 android:id="@+id/header_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:elevation="@dimen/single_margin"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -188,5 +176,6 @@
         layout="@layout/viewholder_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/quadruple_margin" />
 </android.support.design.widget.CoordinatorLayout>
