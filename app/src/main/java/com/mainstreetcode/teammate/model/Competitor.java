@@ -28,15 +28,17 @@ public class Competitor extends CompetitorEntity
         Model<Competitor> {
 
     public static Competitor empty() {
-        return new Competitor("", "", "", new EmptyCompetitor(), new Date(), -1);
+        return new Competitor("", "", "", "", new EmptyCompetitor(), new Date(), -1, false, false);
     }
 
     public static Competitor empty(Competitive entity) {
-        return new Competitor("", "", "", entity, new Date(), -1);
+        return new Competitor("", "", "", "", entity, new Date(), -1, false, false);
     }
 
-    public Competitor(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created, int seed) {
-        super(id, refPath, tournamentId, entity, created, seed);
+    public Competitor(@NonNull String id, String refPath, String tournamentId, String gameId,
+                      Competitive entity, Date created,
+                      int seed, boolean accepted, boolean declined) {
+        super(id, refPath, tournamentId, gameId, entity, created, seed, accepted, declined);
     }
 
     protected Competitor(Parcel in) {
@@ -124,8 +126,11 @@ public class Competitor extends CompetitorEntity
         private static final String REF_PATH = "refPath";
         private static final String ENTITY = "entity";
         private static final String TOURNAMENT = "tournament";
+        private static final String GAME = "game";
         private static final String CREATED = "created";
         private static final String SEED = "seed";
+        private static final String ACCEPTED = "accepted";
+        private static final String DECLINED = "declined";
 
         @Override
         public JsonElement serialize(Competitor src, Type typeOfSrc, JsonSerializationContext context) {
@@ -136,23 +141,29 @@ public class Competitor extends CompetitorEntity
         public Competitor deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
             if (json.isJsonPrimitive()) {
-                return new Competitor(json.getAsString(), "", "", new EmptyCompetitor(), new Date(), -1);
+                return new Competitor(json.getAsString(), "", "","", new EmptyCompetitor(), new Date(), -1, false,false);
             }
 
             JsonObject jsonObject = json.getAsJsonObject();
 
-            int seed = (int) ModelUtils.asFloat(SEED, jsonObject);
             String id = ModelUtils.asString(ID, jsonObject);
             String refPath = ModelUtils.asString(REF_PATH, jsonObject);
             String tournament = ModelUtils.asString(TOURNAMENT, jsonObject);
+            String game = ModelUtils.asString(GAME, jsonObject);
             String created = ModelUtils.asString(CREATED, jsonObject);
+            int seed = (int) ModelUtils.asFloat(SEED, jsonObject);
+            boolean accepted =  ModelUtils.asBoolean(ACCEPTED, jsonObject);
+            boolean declined =  ModelUtils.asBoolean(DECLINED, jsonObject);
 
             if (tournament.isEmpty()) tournament = null;
+            if (game.isEmpty()) game = null;
 
             Competitive competitive = context.deserialize(jsonObject.get(ENTITY),
                     User.COMPETITOR_TYPE.equals(refPath) ? User.class : Team.class);
 
-            return new Competitor(id, refPath, tournament, competitive, ModelUtils.parseDate(created), seed);
+            return new Competitor(id, refPath, tournament, game,
+                    competitive, ModelUtils.parseDate(created),
+                    seed, accepted, declined);
         }
     }
 }

@@ -37,6 +37,7 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_id") protected String id;
     @ColumnInfo(name = "game_ref_path") protected String refPath;
     @ColumnInfo(name = "game_score") protected String score;
+    @ColumnInfo(name = "game_match_up") protected String matchUp;
     @ColumnInfo(name = "game_home_entity_id") protected String homeEntityId;
     @ColumnInfo(name = "game_away_entity_id") protected String awayEntityId;
     @ColumnInfo(name = "game_winner_entity_id") protected String winnerEntityId;
@@ -60,7 +61,7 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_ended") protected boolean ended;
     @ColumnInfo(name = "game_can_draw") protected boolean canDraw;
 
-    public GameEntity(@NonNull String id, String refPath, String score,
+    public GameEntity(@NonNull String id, String refPath, String score, String matchUp,
                       String homeEntityId, String awayEntityId, String winnerEntityId,
                       Date created, Sport sport, User referee, Team host, Event event, Tournament tournament,
                       Competitor home, Competitor away, Competitor winner,
@@ -69,6 +70,7 @@ public class GameEntity implements Parcelable {
         this.id = id;
         this.refPath = refPath;
         this.score = score;
+        this.matchUp = matchUp;
         this.homeEntityId = homeEntityId;
         this.awayEntityId = awayEntityId;
         this.winnerEntityId = winnerEntityId;
@@ -94,6 +96,7 @@ public class GameEntity implements Parcelable {
         id = in.readString();
         refPath = in.readString();
         score = in.readString();
+        matchUp = in.readString();
         homeEntityId = in.readString();
         awayEntityId = in.readString();
         winnerEntityId = in.readString();
@@ -240,6 +243,7 @@ public class GameEntity implements Parcelable {
         dest.writeString(id);
         dest.writeString(refPath);
         dest.writeString(score);
+        dest.writeString(matchUp);
         dest.writeString(homeEntityId);
         dest.writeString(awayEntityId);
         dest.writeString(winnerEntityId);

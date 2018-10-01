@@ -39,19 +39,19 @@ public class Game extends GameEntity
 
     @Ignore private static final IdCache holder = IdCache.cache(4);
 
-    public Game(@NonNull String id, String refPath, String score,
+    public Game(@NonNull String id, String refPath, String score, String matchUp,
                 String homeEntityId, String awayEntityId, String winnerEntityId,
                 Date created, Sport sport, User referee, Team host, Event event, Tournament tournament,
                 Competitor home, Competitor away, Competitor winner,
                 int seed, int leg, int round, int homeScore, int awayScore,
                 boolean ended, boolean canDraw) {
-        super(id, refPath, score, homeEntityId, awayEntityId, winnerEntityId, created, sport, referee, host, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
+        super(id, refPath, score, matchUp, homeEntityId, awayEntityId, winnerEntityId, created, sport, referee, host, event, tournament, home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
     }
 
     public static Game empty(Team team) {
         Sport sport = team.getSport();
-        return new Game("", sport.refType(), "TBD", "", "", "", new Date(),
-                sport, User.empty(), team, Event.empty(), Tournament.empty(),
+        return new Game("", sport.refType(), "TBD", "", "", "", "",
+                new Date(), sport, User.empty(), team, Event.empty(), Tournament.empty(),
                 Competitor.empty(), Competitor.empty(), Competitor.empty(), 0, 0, 0, 0, 0, false, true);
     }
 
@@ -177,6 +177,7 @@ public class Game extends GameEntity
         private static final String ID_KEY = "_id";
         private static final String REF_PATH = "refPath";
         private static final String SCORE = "score";
+        private static final String MATCH_UP = "matchUp";
         private static final String CREATED_KEY = "created";
         private static final String SPORT_KEY = "sport";
         private static final String REFEREE = "referee";
@@ -210,8 +211,8 @@ public class Game extends GameEntity
         @Override
         public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Game(json.getAsString(), "", "TBD", "", "", "", new Date(),
-                        Sport.empty(), User.empty(), Team.empty(), Event.empty(), Tournament.empty(Team.empty()),
+                return new Game(json.getAsString(), "", "TBD", "", "", "", "",
+                        new Date(), Sport.empty(), User.empty(), Team.empty(), Event.empty(), Tournament.empty(Team.empty()),
                         Competitor.empty(), Competitor.empty(), Competitor.empty(),
                         0, 0, 0, 0, 0, false, false);
             }
@@ -221,6 +222,7 @@ public class Game extends GameEntity
             String id = ModelUtils.asString(ID_KEY, body);
             String refPath = ModelUtils.asString(REF_PATH, body);
             String score = ModelUtils.asString(SCORE, body);
+            String matchUp = ModelUtils.asString(MATCH_UP, body);
             String homeEntityId = ModelUtils.asString(HOME_ENTITY_ID, body);
             String awayEntityId = ModelUtils.asString(AWAY_ENTITY_ID, body);
             String winnerEntityId = ModelUtils.asString(WINNER_ENTITY_ID, body);
@@ -248,7 +250,7 @@ public class Game extends GameEntity
             if (host == null) host = Team.empty();
             if (event == null) event = Event.empty();
 
-            return new Game(id, refPath, score, homeEntityId, awayEntityId, winnerEntityId,
+            return new Game(id, refPath, score, matchUp, homeEntityId, awayEntityId, winnerEntityId,
                     ModelUtils.parseDate(created), sport, referee, host, event, tournament,
                     home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw);
         }

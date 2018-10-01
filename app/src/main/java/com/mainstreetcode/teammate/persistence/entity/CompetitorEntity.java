@@ -22,6 +22,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "competitors",
         foreignKeys = {
                 @ForeignKey(entity = TournamentEntity.class, parentColumns = "tournament_id", childColumns = "competitor_tournament_id", onDelete = CASCADE),
+                @ForeignKey(entity = GameEntity.class, parentColumns = "game_id", childColumns = "competitor_game_id", onDelete = CASCADE),
         }
 )
 public class CompetitorEntity implements Parcelable {
@@ -30,26 +31,37 @@ public class CompetitorEntity implements Parcelable {
     @ColumnInfo(name = "competitor_id") protected String id;
     @ColumnInfo(name = "competitor_ref_path") protected String refPath;
     @ColumnInfo(name = "competitor_tournament_id") protected String tournamentId;
+    @ColumnInfo(name = "competitor_game_id") protected String gameId;
     @ColumnInfo(name = "competitor_entity_id") protected Competitive entity;
     @ColumnInfo(name = "competitor_created") protected Date created;
     @ColumnInfo(name = "competitor_seed") protected int seed;
+    @ColumnInfo(name = "competitor_accepted") protected boolean accepted;
+    @ColumnInfo(name = "competitor_declined") protected boolean declined;
 
-    public CompetitorEntity(@NonNull String id, String refPath, String tournamentId, Competitive entity, Date created, int seed) {
+    public CompetitorEntity(@NonNull String id, String refPath, String tournamentId, String gameId,
+                            Competitive entity, Date created,
+                            int seed, boolean accepted, boolean declined) {
         this.id = id;
         this.refPath = refPath;
         this.tournamentId = tournamentId;
+        this.gameId = gameId;
         this.entity = entity;
         this.created = created;
         this.seed = seed;
+        this.accepted = accepted;
+        this.declined = declined;
     }
 
     protected CompetitorEntity(Parcel in) {
         id = in.readString();
         refPath = in.readString();
         tournamentId = in.readString();
+        gameId = in.readString();
         entity = fromParcel(refPath, in);
         created = new Date(in.readLong());
         seed = in.readInt();
+        accepted = in.readByte() != 0x00;
+        declined = in.readByte() != 0x00;
     }
 
     public String getId() { return id; }
@@ -60,6 +72,8 @@ public class CompetitorEntity implements Parcelable {
 
     public String getTournamentId() { return tournamentId; }
 
+    public String getGameId() { return gameId; }
+
     public Competitive getEntity() { return entity; }
 
     public Date getCreated() { return created; }
@@ -67,6 +81,10 @@ public class CompetitorEntity implements Parcelable {
     public int getSeed() { return seed; }
 
     public void setSeed(int seed) { this.seed = seed; }
+
+    public boolean isAccepted() { return accepted; }
+
+    public boolean isDeclined() { return declined; }
 
     private static Competitive fromParcel(String refPath, Parcel in) {
         switch (refPath) {
@@ -108,9 +126,12 @@ public class CompetitorEntity implements Parcelable {
         dest.writeString(id);
         dest.writeString(refPath);
         dest.writeString(tournamentId);
+        dest.writeString(gameId);
         writeToParcel(entity, dest);
         dest.writeLong(created.getTime());
         dest.writeInt(seed);
+        dest.writeByte((byte) (accepted ? 0x01 : 0x00));
+        dest.writeByte((byte) (declined ? 0x01 : 0x00));
     }
 
     public static final Creator<CompetitorEntity> CREATOR = new Creator<CompetitorEntity>() {
