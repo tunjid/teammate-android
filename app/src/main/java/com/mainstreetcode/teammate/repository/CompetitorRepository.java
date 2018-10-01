@@ -50,15 +50,21 @@ public class CompetitorRepository extends QueryRepository<Competitor, Tournament
 
     @Override
     public Single<Competitor> createOrUpdate(Competitor competitor) {
-        return Single.error(new TeammateException(""));
+        Single<Competitor> competitorSingle = competitor.isEmpty()
+                ? Single.error(new TeammateException(""))
+                : api.updateCompetitor(competitor.getId(), competitor)
+                .map(getLocalUpdateFunction(competitor))
+                .doOnError(throwable -> deleteInvalidModel(competitor, throwable));
+
+        return competitorSingle.map(getSaveFunction());
     }
 
     @Override
     public Flowable<Competitor> get(String id) {
         Maybe<Competitor> local = competitorDao.get(id).subscribeOn(io());
-        //Maybe<Competitor> remote = api.getCompetitor(id).map(getSaveFunction()).toMaybe();
+        Maybe<Competitor> remote = api.getCompetitor(id).map(getSaveFunction()).toMaybe();
 
-        return local.toFlowable();
+        return fetchThenGetModel(local, remote);
     }
 
     @Override

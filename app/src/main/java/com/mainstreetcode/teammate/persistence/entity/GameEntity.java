@@ -209,6 +209,10 @@ public class GameEntity implements Parcelable {
 
     public boolean isCompeting(Competitive competitive) {return home.getEntity().equals(competitive) || away.getEntity().equals(competitive);}
 
+    public boolean competitorsNotAccepted() { return !home.accepted || !away.accepted; }
+
+    public boolean competitorsDeclined() { return home.declined || away.declined; }
+
     public void setEnded(boolean ended) {
         this.ended = ended;
     }

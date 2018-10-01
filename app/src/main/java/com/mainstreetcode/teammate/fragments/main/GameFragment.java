@@ -208,6 +208,14 @@ public final class GameFragment extends MainActivityFragment
                 .subscribe(privilegeStatus::set, defaultErrorHandler));
         disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(editableStatus::set)
                 .subscribe(ignored -> togglePersistentUi(), defaultErrorHandler));
+
+        if (game.competitorsNotAccepted())
+            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance);
+
+        else if (game.competitorsDeclined())
+            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined);
+
+        else scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_stats);
     }
 
     private void onRemoveRefereeClicked() {

@@ -60,7 +60,6 @@ public class StatAggregateFragment extends MainActivityFragment
         View root = inflater.inflate(R.layout.fragment_stat_aggregate, container, false);
 
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchAggregates)
                 .withAdapter(new StatAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
@@ -68,6 +67,7 @@ public class StatAggregateFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchAggregates)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new StatAggregateAdapter(items))
                 .withLinearLayoutManager()

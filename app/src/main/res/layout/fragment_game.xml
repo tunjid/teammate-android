@@ -177,5 +177,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="@dimen/quadruple_margin" />
+        android:layout_marginTop="@dimen/sextuple_margin" />
 </android.support.design.widget.CoordinatorLayout>

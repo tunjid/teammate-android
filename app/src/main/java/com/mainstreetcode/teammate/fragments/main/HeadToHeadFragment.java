@@ -74,7 +74,6 @@ public class HeadToHeadFragment extends MainActivityFragment
         losses = root.findViewById(R.id.losses);
 
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchMatchUps)
                 .withAdapter(new HeadToHeadRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
@@ -83,6 +82,7 @@ public class HeadToHeadFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
                 .withAdapter(new GameAdapter(matchUps, game -> showFragment(GameFragment.newInstance(game))))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchMatchUps)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();

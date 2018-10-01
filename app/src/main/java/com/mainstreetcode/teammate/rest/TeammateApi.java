@@ -56,6 +56,7 @@ public interface TeammateApi {
     String STAT_PATH = "statId";
     String REQUEST_PATH = "requestId";
     String TOURNAMENT_PATH = "tournamentId";
+    String COMPETITOR_PATH = "competitorId";
 
     @GET("api/config")
     Single<Config> getConfig();
@@ -325,6 +326,16 @@ public interface TeammateApi {
 
     @POST("api/games/head-to-head")
     Single<HeadToHead.Result> headToHead(@Body HeadToHead.Request request);
+
+    // =============================================================================================
+    // Competitor endpoints
+    // =============================================================================================
+
+    @GET("api/competitor/{competitorId}")
+    Single<Competitor> getCompetitor(@Path(COMPETITOR_PATH) String competitorId);
+
+    @PUT("api/competitor/{competitorId}")
+    Single<Competitor> updateCompetitor(@Path(COMPETITOR_PATH) String competitorId, @Body Competitor competitor);
 
     // =============================================================================================
     // Stat endpoints

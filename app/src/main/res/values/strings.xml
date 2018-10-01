@@ -232,6 +232,8 @@
     <!--GameFragment-->
     <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
+    <string name="no_competitor_acceptance">Waiting for all sides to accept to play.</string>
+    <string name="no_competitor_declined">A side has opted not to play.</string>
     <string name="games">Games</string>
     <string name="game_add">Add game</string>
     <string name="game_edit">Edit game</string>

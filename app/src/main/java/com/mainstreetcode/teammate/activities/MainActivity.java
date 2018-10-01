@@ -31,6 +31,7 @@ import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
 import com.mainstreetcode.teammate.fragments.main.FeedFragment;
+import com.mainstreetcode.teammate.fragments.main.GameFragment;
 import com.mainstreetcode.teammate.fragments.main.HeadToHeadFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
 import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
@@ -38,11 +39,14 @@ import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammate.fragments.main.StatAggregateFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
+import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -352,8 +356,10 @@ public class MainActivity extends TeammatesBaseActivity
 
         if (model != null) route = route(
                 () -> route(model, Chat.class, Chat::getTeam, ChatFragment::newInstance),
+                () -> route(model, Game.class, game -> game, GameFragment::newInstance),
                 () -> route(model, Event.class, event -> event, EventEditFragment::newInstance),
-                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamMembersFragment::newInstance)
+                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamMembersFragment::newInstance),
+                () -> route(model, Tournament.class, tournament -> tournament, TournamentDetailFragment::newInstance)
         );
 
         if (route != null) showFragment(route);
