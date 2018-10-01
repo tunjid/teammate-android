@@ -114,13 +114,13 @@ public interface Identifiable {
                 identifiable = ((TeamMember) identifiable).getWrappedModel();
             if (identifiable.getClass().equals(Item.class)) return 0;
             if (identifiable.getClass().equals(JoinRequest.class)) return 5;
-            if (identifiable.getClass().equals(Role.class)) return 10;
-            if (identifiable.getClass().equals(Event.class)) return 15;
-            if (identifiable.getClass().equals(Media.class)) return 20;
-            if (identifiable.getClass().equals(Team.class)) return 25;
-            if (identifiable.getClass().equals(User.class)) return 30;
-            if (identifiable.getClass().equals(Guest.class)) return 35;
-            if (identifiable.getClass().equals(Competitor.class)) return 40;
+            if (identifiable.getClass().equals(Competitor.class)) return 10;
+            if (identifiable.getClass().equals(Role.class)) return 15;
+            if (identifiable.getClass().equals(Event.class)) return 20;
+            if (identifiable.getClass().equals(Media.class)) return 25;
+            if (identifiable.getClass().equals(Team.class)) return 30;
+            if (identifiable.getClass().equals(User.class)) return 35;
+            if (identifiable.getClass().equals(Guest.class)) return 40;
             return 0;
         }
 

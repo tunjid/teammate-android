@@ -350,8 +350,11 @@
     <string name="chats_notifier_description">Notifications for team chats</string>
     <string name="team_notifier_description">Notifications for teams</string>
     <string name="role_notifier_description">Notifications for roles</string>
+    <string name="games_notifier_description">Notifications for games</string>
     <string name="events_notifier_description">Notifications for events</string>
     <string name="media_notifier_description">Notifications for media</string>
+    <string name="tournaments_notifier_description">Notifications for tournaments</string>
+    <string name="competitors_notifier_description">Notifications for competitors</string>
     <string name="join_requests_notifier_description">Notifications for join requests</string>
 
     <!--Empty ViewHolder-->
