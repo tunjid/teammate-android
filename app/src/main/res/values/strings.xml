@@ -228,6 +228,7 @@
     <string name="pick_home_competitor">Pick home side</string>
     <string name="pick_away_competitor">Pick away side</string>
     <string name="competitor">Competitors</string>
+    <string name="accept_competition">Join this competition?</string>
 
     <!--GameFragment-->
     <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>

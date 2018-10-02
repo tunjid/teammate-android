@@ -13,7 +13,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -49,11 +48,9 @@ public class Competitor extends CompetitorEntity
         return getRefType().equals(other.getRefType());
     }
 
-    public Tournament getTournament() {
-        return new Tournament(tournamentId, Config.getDefaultTournamentLogo(), "", "", "", new Date(), Team.empty(), Sport.empty(),
-                Config.tournamentTypeFromCode(""), Config.tournamentStyleFromCode(""), Competitor.empty(),
-                1, 1, 0, 0, false);
-    }
+    public Tournament getTournament() { return Tournament.withId(tournamentId); }
+
+    public Game getGame() { return Game.withId(gameId); }
 
     @Override
     public boolean hasMajorFields() { return areNotEmpty(id, refPath); }

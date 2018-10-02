@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.adapters.FeedAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.FeedItemViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
@@ -124,6 +125,21 @@ public final class FeedFragment extends MainActivityFragment
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, true)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, false)))
                     .setNeutralButton(R.string.event_details, ((dialog, which) -> showFragment(EventEditFragment.newInstance((Event) model))))
+                    .show();
+        }
+        if (model instanceof Competitor) {
+            builder.setTitle(getString(R.string.accept_competition))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processCompetitor(item, true)))
+                    .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processCompetitor(item, false)))
+                    .setNeutralButton(R.string.event_details, ((dialog, which) -> {
+                        Competitor competitor = (Competitor) model;
+                        BaseFragment fragment = !competitor.getGame().isEmpty()
+                                ? GameFragment.newInstance(competitor.getGame())
+                                : !competitor.getTournament().isEmpty()
+                                ? TournamentDetailFragment.newInstance(competitor.getTournament())
+                                : null;
+                        if (fragment != null) showFragment(fragment);
+                    }))
                     .show();
         }
         else if (model instanceof JoinRequest) {

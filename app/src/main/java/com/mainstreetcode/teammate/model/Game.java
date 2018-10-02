@@ -55,6 +55,12 @@ public class Game extends GameEntity
                 Competitor.empty(), Competitor.empty(), Competitor.empty(), 0, 0, 0, 0, 0, false, true);
     }
 
+    public static Game withId(String id) {
+        Game empty = empty(Team.empty());
+        empty.id = id;
+        return empty;
+    }
+
     protected Game(Parcel in) {
         super(in);
     }

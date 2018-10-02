@@ -54,6 +54,12 @@ public class Tournament extends TournamentEntity
                 1, 1, 0, 0, false);
     }
 
+    public static Tournament withId(String id) {
+        Tournament empty = empty();
+        empty.id = id;
+        return empty;
+    }
+
     public Tournament(@NonNull String id, String imageUrl, String refPath,
                       CharSequence name, CharSequence description,
                       Date created, Team host, Sport sport, TournamentType type, TournamentStyle style,

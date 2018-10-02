@@ -86,6 +86,10 @@ public class CompetitorEntity implements Parcelable {
 
     public boolean isDeclined() { return declined; }
 
+    public void accept() { declined = !(accepted = true); }
+
+    public void decline() { accepted = !(declined = true); }
+
     private static Competitive fromParcel(String refPath, Parcel in) {
         switch (refPath) {
             case User.COMPETITOR_TYPE:

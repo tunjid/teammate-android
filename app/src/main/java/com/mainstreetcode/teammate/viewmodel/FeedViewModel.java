@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -10,6 +11,7 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.notifications.FeedItem;
+import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.GuestRepository;
 import com.mainstreetcode.teammate.repository.JoinRequestRepository;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
@@ -32,6 +34,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     private final TeammateApi api = TeammateService.getApiInstance();
 
     private final GuestRepository guestRepository = GuestRepository.getInstance();
+    private final CompetitorRepository competitorRepository = CompetitorRepository.getInstance();
     private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
     private final TeamMemberRepository<JoinRequest> memberRepository = TeamMemberRepository.getInstance();
 
@@ -72,6 +75,20 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
         Flowable<List<Identifiable>> sourceFlowable = guestRepository.createOrUpdate(Guest.forEvent(feedItem.getModel(), attending))
                 .map(model -> feedItem)
+                .cast(FeedItem.class)
+                .map(Collections::singletonList)
+                .toFlowable().map(this::toIdentifiable);
+
+        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(false)).firstOrError();
+    }
+
+    public Single<DiffUtil.DiffResult> processCompetitor(final FeedItem<Competitor> feedItem, boolean accepted) {
+        Competitor model = feedItem.getModel();
+        if (accepted) model.accept();
+        else model.decline();
+
+        Flowable<List<Identifiable>> sourceFlowable = competitorRepository.createOrUpdate(model)
+                .map(mapped -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
                 .toFlowable().map(this::toIdentifiable);

@@ -331,10 +331,10 @@ public interface TeammateApi {
     // Competitor endpoints
     // =============================================================================================
 
-    @GET("api/competitor/{competitorId}")
+    @GET("api/competitors/{competitorId}")
     Single<Competitor> getCompetitor(@Path(COMPETITOR_PATH) String competitorId);
 
-    @PUT("api/competitor/{competitorId}")
+    @PUT("api/competitors/{competitorId}")
     Single<Competitor> updateCompetitor(@Path(COMPETITOR_PATH) String competitorId, @Body Competitor competitor);
 
     // =============================================================================================
