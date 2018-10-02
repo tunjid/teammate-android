@@ -6,7 +6,6 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
-import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
@@ -16,11 +15,9 @@ import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
-import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -99,9 +96,6 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         teams.remove(deleted);
         if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
 
-        Completable.fromRunnable(() -> AppDatabase.getInstance().teamDao()
-                .delete(deleted))
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> {}, ErrorHandler.EMPTY);
+        repository.queueForLocalDeletion(deleted);
     }
 }

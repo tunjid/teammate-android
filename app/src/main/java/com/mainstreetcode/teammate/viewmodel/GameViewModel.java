@@ -62,6 +62,8 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         Competitive away = game.getAway().getEntity();
         if (home instanceof Team) getModelList((Team) home).remove(game);
         if (away instanceof Team) getModelList((Team) away).remove(game);
+
+        gameRepository.queueForLocalDeletion(game);
     }
 
     @Override

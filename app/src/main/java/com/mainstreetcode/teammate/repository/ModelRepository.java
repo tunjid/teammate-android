@@ -1,18 +1,24 @@
 package com.mainstreetcode.teammate.repository;
 
 
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.EntityDao;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.io.File;
 import java.util.Arrays;
@@ -20,10 +26,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -58,6 +66,14 @@ public abstract class ModelRepository<T extends Model<T>> {
                 : get(model.getId()).map(getLocalUpdateFunction(model));
     }
 
+    @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public final void queueForLocalDeletion(T model) {
+        Completable.fromRunnable(() -> deleteLocally(model))
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> {}, ErrorHandler.EMPTY);
+    }
+
     final Function<T, T> getLocalUpdateFunction(T original) {
         return emitted -> {
             original.update(emitted);
@@ -84,7 +100,6 @@ public abstract class ModelRepository<T extends Model<T>> {
             return models;
         };
     }
-
 
     final Flowable<T> fetchThenGetModel(Maybe<T> local, Maybe<T> remote) {
         AtomicReference<T> reference = new AtomicReference<>();
@@ -138,8 +153,12 @@ public abstract class ModelRepository<T extends Model<T>> {
             if (itemClass.equals(Team.class)) repository = TeamRepository.getInstance();
             if (itemClass.equals(Role.class)) repository = RoleRepository.getInstance();
             if (itemClass.equals(Chat.class)) repository = ChatRepository.getInstance();
+            if (itemClass.equals(Stat.class)) repository = StatRepository.getInstance();
+            if (itemClass.equals(Game.class)) repository = GameRepository.getInstance();
             if (itemClass.equals(Media.class)) repository = MediaRepository.getInstance();
             if (itemClass.equals(Event.class)) repository = EventRepository.getInstance();
+            if (itemClass.equals(Tournament.class)) repository = TournamentRepository.getInstance();
+            if (itemClass.equals(Competitor.class)) repository = CompetitorRepository.getInstance();
             if (itemClass.equals(JoinRequest.class))
                 repository = JoinRequestRepository.getInstance();
 
