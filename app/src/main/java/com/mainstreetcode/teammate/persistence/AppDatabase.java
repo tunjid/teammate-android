@@ -118,6 +118,10 @@ public abstract class AppDatabase extends RoomDatabase {
         final List<Single<Pair<String, Integer>>> singles = new ArrayList<>();
         final List<Pair<String, Integer>> collector = new ArrayList<>();
 
+        singles.add(clearTable(competitorDao()));
+        singles.add(clearTable(statDao()));
+        singles.add(clearTable(gameDao()));
+        singles.add(clearTable(tournamentDao()));
         singles.add(clearTable(teamChatDao()));
         singles.add(clearTable(joinRequestDao()));
         singles.add(clearTable(guestDao()));

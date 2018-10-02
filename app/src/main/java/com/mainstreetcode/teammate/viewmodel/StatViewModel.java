@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 import java.util.ArrayList;
@@ -63,6 +64,12 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         if (!modelListMap.containsKey(game)) modelListMap.put(game, modelList = new ArrayList<>());
 
         return modelList;
+    }
+
+    @Override
+    void onInvalidKey(Game key) {
+        super.onInvalidKey(key);
+        pushModelAlert(Alert.gameDeletion(key));
     }
 
     public List<Identifiable> getStatAggregates() {

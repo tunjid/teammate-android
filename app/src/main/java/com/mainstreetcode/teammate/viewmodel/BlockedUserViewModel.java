@@ -33,8 +33,7 @@ public class BlockedUserViewModel extends TeamMappedViewModel<BlockedUser> {
 
     @Override
     Flowable<List<BlockedUser>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     public Single<BlockedUser> blockUser(BlockedUser blockedUser) {

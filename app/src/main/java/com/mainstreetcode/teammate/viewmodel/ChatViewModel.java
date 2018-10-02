@@ -61,8 +61,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     @Override
     Flowable<List<Chat>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     private Function<Throwable, Flowable<Chat>> listenRetryFunction(Team team) {

@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel.events;
 
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
@@ -16,6 +17,8 @@ public abstract class Alert<T extends Model<T>> {
 
     public static Alert<Team> teamDeletion(Team team) {return new TeamDeletion(team);}
 
+    public static Alert<Game> gameDeletion(Game game) {return new GameDeletion(game);}
+
     public static Alert<Event> eventAbsentee(Event event) {return new EventAbsentee(event);}
 
     public static Alert<BlockedUser> userBlocked(BlockedUser blockedUser) {return new UserBlocked(blockedUser);}
@@ -24,6 +27,10 @@ public abstract class Alert<T extends Model<T>> {
 
     public static class TeamDeletion extends Alert<Team> {
         private TeamDeletion(Team model) { super(model); }
+    }
+
+    public static class GameDeletion extends Alert<Game> {
+        private GameDeletion(Game model) { super(model); }
     }
 
     public static class EventAbsentee extends Alert<Event> {

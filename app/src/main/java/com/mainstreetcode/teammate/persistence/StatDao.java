@@ -25,7 +25,7 @@ public abstract class StatDao extends EntityDao<StatEntity> {
 
     @Override
     protected String getTableName() {
-        return "events";
+        return "stats";
     }
 
     @Query("SELECT * FROM stats as stat" +

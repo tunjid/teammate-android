@@ -47,8 +47,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     @Override
     Flowable<List<Media>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {

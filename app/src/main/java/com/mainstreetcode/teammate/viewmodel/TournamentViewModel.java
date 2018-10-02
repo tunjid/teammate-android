@@ -56,8 +56,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     @Override
     Flowable<List<Tournament>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     @Override
@@ -91,7 +90,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     public Single<DiffUtil.DiffResult> getStatRank(Tournament tournament, StatType type) {
-        Single<List<Identifiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(fetched -> new ArrayList<>(fetched));
+        Single<List<Identifiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(ArrayList<Identifiable>::new);
         return Identifiable.diff(sourceSingle, () -> getStatRanks(tournament), ModelUtils::replaceList).observeOn(mainThread());
     }
 

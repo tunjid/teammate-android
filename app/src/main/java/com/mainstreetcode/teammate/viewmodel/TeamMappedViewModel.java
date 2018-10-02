@@ -16,8 +16,6 @@ import java.util.Map;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
 
-import static com.mainstreetcode.teammate.model.Message.fromThrowable;
-
 public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> extends MappedViewModel<Team, V> {
 
     final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
@@ -41,18 +39,14 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
         if (message.isIllegalTeamMember()) pushModelAlert(Alert.teamDeletion(key));
     }
 
-    boolean checkForInvalidTeam(Throwable throwable, Team team) {
-        Message message = fromThrowable(throwable);
-        boolean isValidModel = message == null || message.isValidModel();
-
-        if (isValidModel) return false;
-
-        pushModelAlert(Alert.teamDeletion(team));
-        return true;
-    }
-
     Consumer<Throwable> onError(V model) {
         return throwable -> checkForInvalidObject(throwable, model, model.getTeam());
+    }
+
+    @Override
+    void onInvalidKey(Team key) {
+        super.onInvalidKey(key);
+        pushModelAlert(Alert.teamDeletion(key));
     }
 
     Flowable<Identifiable> getAllModels() {

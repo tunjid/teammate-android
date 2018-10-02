@@ -94,8 +94,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
     @Override
     Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     private Flowable<Event> getEvent(Event event) {

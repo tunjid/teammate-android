@@ -68,10 +68,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     @Override
     @SuppressWarnings("unchecked")
     Flowable<List<TeamMember>> fetch(Team key, boolean fetchLatest) {
-        Flowable<List<TeamMember>> flowable = repository.modelsBefore(key, getQueryDate(key, fetchLatest));
-        flowable = flowable.doOnError(throwable -> checkForInvalidTeam(throwable, key));
-
-        return flowable;
+        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     public JoinRequestGofer gofer(JoinRequest joinRequest) {

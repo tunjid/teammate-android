@@ -24,7 +24,7 @@ public abstract class CompetitorDao extends EntityDao<CompetitorEntity> {
 
     @Override
     protected String getTableName() {
-        return "events";
+        return "competitors";
     }
 
     @Query("SELECT * FROM competitors" +

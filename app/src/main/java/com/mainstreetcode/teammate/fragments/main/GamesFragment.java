@@ -85,7 +85,7 @@ public final class GamesFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_score_white_24dp, R.string.no_games))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchTournaments(false))
+                .withEndlessScrollCallback(() -> fetchGames(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new GameAdapter(items, this))
@@ -98,7 +98,7 @@ public final class GamesFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        fetchTournaments(true);
+        fetchGames(true);
         User user = userViewModel.getCurrentUser();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
     }
@@ -182,7 +182,7 @@ public final class GamesFragment extends MainActivityFragment
         return superResult;
     }
 
-    void fetchTournaments(boolean fetchLatest) {
+    void fetchGames(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 

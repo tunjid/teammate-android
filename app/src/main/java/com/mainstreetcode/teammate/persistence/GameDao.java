@@ -25,11 +25,11 @@ public abstract class GameDao extends EntityDao<GameEntity> {
 
     @Override
     protected String getTableName() {
-        return "events";
+        return "games";
     }
 
     @Query("SELECT * FROM games as game" +
-            " WHERE :teamId = game_host" +
+            " WHERE (:teamId = game_host AND game_ref_path = 'user')" +
             " OR :teamId = game_home_entity" +
             " OR :teamId = game_away_entity" +
             " AND game_created < :date" +
@@ -49,11 +49,11 @@ public abstract class GameDao extends EntityDao<GameEntity> {
     public abstract Maybe<Game> get(String id);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<GameEntity> stats);
+    public abstract void insert(List<GameEntity> games);
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<GameEntity> stats);
+    protected abstract void update(List<GameEntity> games);
 
     @Delete
-    public abstract void delete(GameEntity stat);
+    public abstract void delete(GameEntity game);
 }

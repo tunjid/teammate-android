@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -15,6 +16,7 @@ import com.mainstreetcode.teammate.repository.GameRoundRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 
 import java.util.ArrayList;
@@ -46,6 +48,23 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     @Override
+    @SuppressLint("CheckResult")
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+        if (!(alert instanceof Alert.GameDeletion)) return;
+
+        Game game = ((Alert.GameDeletion) alert).getModel();
+
+        headToHeadMatchUps.remove(game);
+        getModelList(game.getHost()).remove(game);
+
+        Competitive home = game.getHome().getEntity();
+        Competitive away = game.getAway().getEntity();
+        if (home instanceof Team) getModelList((Team) home).remove(game);
+        if (away instanceof Team) getModelList((Team) away).remove(game);
+    }
+
+    @Override
     void onErrorMessage(Message message, Team key, Identifiable invalid) {
         super.onErrorMessage(message, key, invalid);
         if (message.isInvalidObject()) headToHeadMatchUps.remove(invalid);
@@ -54,8 +73,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     @Override
     Flowable<List<Game>> fetch(Team key, boolean fetchLatest) {
-        return gameRepository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return gameRepository.modelsBefore(key, getQueryDate(key, fetchLatest));
     }
 
     @SuppressLint("UseSparseArrays")
