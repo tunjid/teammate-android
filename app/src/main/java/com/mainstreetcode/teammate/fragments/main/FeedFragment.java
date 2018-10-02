@@ -89,6 +89,7 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
+        toggleProgress(true);
         disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
@@ -136,7 +137,7 @@ public final class FeedFragment extends MainActivityFragment
                         BaseFragment fragment = !competitor.getGame().isEmpty()
                                 ? GameFragment.newInstance(competitor.getGame())
                                 : !competitor.getTournament().isEmpty()
-                                ? TournamentDetailFragment.newInstance(competitor.getTournament())
+                                ? TournamentEditFragment.newInstance(competitor.getTournament())
                                 : null;
                         if (fragment != null) showFragment(fragment);
                     }))
