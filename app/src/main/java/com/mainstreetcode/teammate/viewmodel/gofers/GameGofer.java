@@ -28,16 +28,19 @@ public class GameGofer extends Gofer<Game> {
     private final List<Team> eligibleTeams;
     private final Function<Game, Flowable<Game>> getFunction;
     private final Function<Game, Single<Game>> upsertFunction;
+    private final Function<Game, Single<Game>> deleteFunction;
     private final Function<Game, Flowable<Team>> eligibleTeamSource;
 
 
     public GameGofer(Game model, Consumer<Throwable> onError,
                      Function<Game, Flowable<Game>> getFunction,
                      Function<Game, Single<Game>> upsertFunction,
+                     Function<Game, Single<Game>> deleteFunction,
                      Function<Game, Flowable<Team>> eligibleTeamSource) {
         super(model, onError);
         this.getFunction = getFunction;
         this.upsertFunction = upsertFunction;
+        this.deleteFunction = deleteFunction;
         this.eligibleTeamSource = eligibleTeamSource;
 
         this.eligibleTeams = new ArrayList<>();
@@ -56,9 +59,13 @@ public class GameGofer extends Gofer<Game> {
 
     public boolean canDelete(User user) {
         if (!model.getTournament().isEmpty()) return false;
+        if (model.getHome().isEmpty()) return true;
+        if (model.getAway().isEmpty()) return true;
+
         Competitive entity = model.getHome().getEntity();
         if (entity.equals(user)) return true;
         for (Team team : eligibleTeams) if (entity.equals(team)) return true;
+
         return false;
     }
 
@@ -75,9 +82,8 @@ public class GameGofer extends Gofer<Game> {
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
-    @Override
-    Completable delete() {
-        return Completable.complete();
+    public Completable delete() {
+        return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
     }
 
     @Override

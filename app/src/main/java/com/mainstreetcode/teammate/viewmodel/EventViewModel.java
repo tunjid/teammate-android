@@ -106,7 +106,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return repository.createOrUpdate(event);
     }
 
-    public Single<Event> delete(final Event event) {
+    private Single<Event> delete(final Event event) {
         return repository.delete(event).doOnSuccess(deleted -> {
             getModelList(event.getTeam()).remove(deleted);
             pushModelAlert(Alert.eventAbsentee(deleted));

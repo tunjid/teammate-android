@@ -110,8 +110,8 @@ public class GameRepository extends TeamQueryRepository<Game> {
 
                 addIfValid(home, users, teams);
                 addIfValid(away, users, teams);
-                competitors.add(home);
-                competitors.add(away);
+                if (!home.isEmpty()) competitors.add(home);
+                if (!away.isEmpty()) competitors.add(away);
             }
 
             UserRepository.getInstance().saveAsNested().apply(users);

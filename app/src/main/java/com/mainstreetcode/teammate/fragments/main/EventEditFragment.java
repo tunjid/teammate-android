@@ -296,17 +296,13 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     private void deleteEvent() {
-        disposables.add(eventViewModel.delete(event).subscribe(this::onEventDeleted, defaultErrorHandler));
+        disposables.add(gofer.remove().subscribe(this::onEventDeleted, defaultErrorHandler));
     }
 
-    private void onEventDeleted(Event deleted) {
-        showSnackbar(getString(R.string.deleted_team, deleted.getName()));
+    private void onEventDeleted() {
+        showSnackbar(getString(R.string.deleted_team, event.getName()));
         removeEnterExitTransitions();
-
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        activity.onBackPressed();
+        requireActivity().onBackPressed();
     }
 
     private void rsvpToEvent() {

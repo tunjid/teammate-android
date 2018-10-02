@@ -53,7 +53,7 @@ public class Competitor extends CompetitorEntity
     public Game getGame() { return Game.withId(gameId); }
 
     @Override
-    public boolean hasMajorFields() { return areNotEmpty(id, refPath); }
+    public boolean hasMajorFields() { return areNotEmpty(id, refPath) && entity.hasMajorFields(); }
 
     @Override
     public String getRefType() { return entity.getRefType(); }

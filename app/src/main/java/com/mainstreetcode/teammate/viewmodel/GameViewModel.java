@@ -42,13 +42,14 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private final GameRepository gameRepository = GameRepository.getInstance();
 
     public GameGofer gofer(Game game) {
-        return new GameGofer(game, onError(game), this::getGame, this::updateGame, GameViewModel::getEligibleTeamsForGame);
+        return new GameGofer(game, onError(game), this::getGame, this::updateGame, this::delete, GameViewModel::getEligibleTeamsForGame);
     }
 
     @Override
     void onErrorMessage(Message message, Team key, Identifiable invalid) {
         super.onErrorMessage(message, key, invalid);
         if (message.isInvalidObject()) headToHeadMatchUps.remove(invalid);
+        if (invalid instanceof Game) ((Game) invalid).setEnded(false);
     }
 
     @Override
@@ -96,7 +97,11 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     public Single<Game> updateGame(Game game) {
         return gameRoundRepository.createOrUpdate(game)
-                .doOnError(throwable -> game.setEnded(false)).observeOn(mainThread());
+                .doOnError(onError(game)).observeOn(mainThread());
+    }
+
+    private Single<Game> delete(final Game game) {
+        return gameRepository.delete(game).doOnSuccess(getModelList(game.getTeam())::remove);
     }
 
     static Flowable<Team> getEligibleTeamsForGame(Game game) {

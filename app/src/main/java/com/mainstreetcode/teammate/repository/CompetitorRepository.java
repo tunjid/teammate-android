@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
@@ -87,15 +88,19 @@ public class CompetitorRepository extends QueryRepository<Competitor, Tournament
         return models -> {
             List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
+            List<Game> games = new ArrayList<>(models.size());
 
             for (Competitor competitor : models) {
+                Game game = competitor.getGame();
                 Competitive entity = competitor.getEntity();
                 if (entity instanceof Team) teams.add((Team) entity);
                 else if (entity instanceof User) users.add((User) entity);
+                if(!game.isEmpty())games.add(game);
             }
 
             UserRepository.getInstance().saveAsNested().apply(users);
             TeamRepository.getInstance().saveAsNested().apply(teams);
+            GameRepository.getInstance().saveAsNested().apply(games);
             competitorDao.upsert(Collections.unmodifiableList(models));
 
             return models;

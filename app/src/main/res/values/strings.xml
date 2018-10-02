@@ -252,6 +252,8 @@
     <string name="game_stats">Game stats</string>
     <string name="game_end">End game</string>
     <string name="game_delete">Delete game</string>
+    <string name="game_delete_prompt">Delete game?</string>
+    <string name="game_deleted">Game deleted</string>
     <string name="game_referee">Referee: %1$s</string>
     <string name="game_choose_referee">Choose referee</string>
     <string name="game_no_referee">No referee</string>

@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -140,6 +141,14 @@ public final class GameFragment extends MainActivityFragment
                 return true;
             case R.id.action_event:
                 showFragment(EventEditFragment.newInstance(game));
+                return true;
+            case R.id.action_delete_game:
+                Context context = getContext();
+                if (context == null) return true;
+                new AlertDialog.Builder(context).setTitle(getString(R.string.game_delete_prompt))
+                        .setPositiveButton(R.string.yes, (dialog, which) -> deleteGame())
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                        .show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -287,6 +296,16 @@ public final class GameFragment extends MainActivityFragment
         toggleProgress(false);
         updateStatuses();
         bindReferee();
+    }
+
+    private void deleteGame() {
+        disposables.add(gofer.remove().subscribe(this::onGameDeleted, defaultErrorHandler));
+    }
+
+    private void onGameDeleted() {
+        showSnackbar(getString(R.string.game_deleted));
+        removeEnterExitTransitions();
+        requireActivity().onBackPressed();
     }
 
     private void bindReferee() {
