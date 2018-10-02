@@ -32,8 +32,8 @@ public abstract class StatDao extends EntityDao<StatEntity> {
             " WHERE :game_id = stat_game" +
             " AND stat_created < :date" +
             " ORDER BY stat_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Stat>> getStats(String game_id, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Stat>> getStats(String game_id, Date date, int limit);
 
     @Query("SELECT * FROM stats" +
             " WHERE :id = stat_id")

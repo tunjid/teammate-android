@@ -34,15 +34,15 @@ public abstract class GameDao extends EntityDao<GameEntity> {
             " OR :teamId = game_away_entity" +
             " AND game_created < :date" +
             " ORDER BY game_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Game>> getGames(String teamId, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Game>> getGames(String teamId, Date date, int limit);
 
     @Query("SELECT * FROM games as game" +
             " WHERE :tournamentId = game_tournament" +
             " AND game_round = :round" +
             " ORDER BY game_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Game>> getGames(String tournamentId, int round);
+            " LIMIT :limit")
+    public abstract Maybe<List<Game>> getGames(String tournamentId, int round, int limit);
 
     @Query("SELECT * FROM games" +
             " WHERE :id = game_id")

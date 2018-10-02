@@ -49,7 +49,6 @@ import retrofit2.http.Query;
 public interface TeammateApi {
 
     String ID_PATH = "id";
-    String DATE_QUERY = "date";
     String TEAM_PATH = "teamId";
     String ROLE_PATH = "roleId";
     String GAME_PATH = "gameId";
@@ -57,6 +56,9 @@ public interface TeammateApi {
     String REQUEST_PATH = "requestId";
     String TOURNAMENT_PATH = "tournamentId";
     String COMPETITOR_PATH = "competitorId";
+
+    String DATE_QUERY = "date";
+    String LIMIT_QUERY = "limit";
 
     @GET("api/config")
     Single<Config> getConfig();
@@ -123,7 +125,7 @@ public interface TeammateApi {
     Single<List<Team>> findTeam(@Query("name") String teamName, @Query("sport") String sport);
 
     @GET("api/teams/{id}/members")
-    Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     // =============================================================================================
     // Role endpoints
@@ -172,10 +174,10 @@ public interface TeammateApi {
     // =============================================================================================
 
     @GET("/api/teams/{teamId}/events")
-    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @GET("/api/events/attending")
-    Single<List<Event>> eventsAttending(@Query(DATE_QUERY) Date date);
+    Single<List<Event>> eventsAttending(@Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @POST("/api/events/public")
     Single<List<Event>> getPublicEvents(@Body EventSearchRequest request);
@@ -194,7 +196,7 @@ public interface TeammateApi {
     Single<Event> getEvent(@Path(ID_PATH) String eventId);
 
     @GET("api/events/{id}/guests")
-    Single<List<Guest>> getEventGuests(@Path(ID_PATH) String eventId, @Query(DATE_QUERY) Date date);
+    Single<List<Guest>> getEventGuests(@Path(ID_PATH) String eventId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @DELETE("api/events/{id}")
     Single<Event> deleteEvent(@Path(ID_PATH) String eventId);
@@ -216,7 +218,7 @@ public interface TeammateApi {
     Single<Chat> deleteChat(@Path(ID_PATH) String chatId);
 
     @GET("/api/teams/{teamId}/chats")
-    Single<List<Chat>> chatsBefore(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Chat>> chatsBefore(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     // =============================================================================================
     // Team Media endpoints
@@ -232,7 +234,7 @@ public interface TeammateApi {
     Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 
     @GET("/api/teams/{teamId}/media")
-    Single<List<Media>> getTeamMedia(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Media>> getTeamMedia(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @Multipart
     @POST("api/teams/{teamId}/media")
@@ -265,7 +267,7 @@ public interface TeammateApi {
     Single<BlockedUser> unblockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
 
     @GET("api/teams/{id}/blocked")
-    Single<List<BlockedUser>> blockedUsers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<BlockedUser>> blockedUsers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     // =============================================================================================
     // Tournament endpoints
@@ -288,7 +290,7 @@ public interface TeammateApi {
     Single<Tournament> deleteTournament(@Path(ID_PATH) String tournamentId);
 
     @GET("api/teams/{teamId}/tournaments")
-    Single<List<Tournament>> getTournaments(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Tournament>> getTournaments(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @GET("api/tournaments/{tournamentId}/competitors")
     Single<List<Competitor>> getCompetitors(@Path(TOURNAMENT_PATH) String tournamentId);
@@ -319,10 +321,10 @@ public interface TeammateApi {
     Single<Game> deleteGame(@Path(GAME_PATH) String gameId);
 
     @GET("api/teams/{teamId}/games")
-    Single<List<Game>> getGames(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Game>> getGames(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @GET("api/tournaments/{tournamentId}/games")
-    Single<List<Game>> getGamesForRound(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round);
+    Single<List<Game>> getGamesForRound(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round, @Query(LIMIT_QUERY) int limit);
 
     @POST("api/games/match-ups")
     Single<List<Game>> matchUps(@Body HeadToHead.Request request);
@@ -341,7 +343,7 @@ public interface TeammateApi {
     Single<Competitor> updateCompetitor(@Path(COMPETITOR_PATH) String competitorId, @Body Competitor competitor);
 
     @GET("api/competitors")
-    Single<List<Competitor>> getDeclinedCompetitors(@Query(DATE_QUERY) Date date);
+    Single<List<Competitor>> getDeclinedCompetitors(@Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     // =============================================================================================
     // Stat endpoints
@@ -360,7 +362,7 @@ public interface TeammateApi {
     Single<Stat> deleteStat(@Path(STAT_PATH) String statId);
 
     @GET("api/games/{gameId}/stats")
-    Single<List<Stat>> getStats(@Path(GAME_PATH) String gameId, @Query(DATE_QUERY) Date date);
+    Single<List<Stat>> getStats(@Path(GAME_PATH) String gameId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @POST("api/stats/aggregate")
     Single<StatAggregate.Result> statsAggregate(@Body StatAggregate.Request request);

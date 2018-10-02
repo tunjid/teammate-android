@@ -82,12 +82,12 @@ public class StatRepository extends QueryRepository<Stat, Game, Date> {
     @Override
     Maybe<List<Stat>> localModelsBefore(Game game, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return statDao.getStats(game.getId(), date).subscribeOn(io());
+        return statDao.getStats(game.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Stat>> remoteModelsBefore(Game game, @Nullable Date date) {
-        return api.getStats(game.getId(), date).map(getSaveManyFunction())
+        return api.getStats(game.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction())
                 .doOnSuccess(stats -> { for (Stat stat : stats) stat.getGame().update(game); })
                 .toMaybe();
     }

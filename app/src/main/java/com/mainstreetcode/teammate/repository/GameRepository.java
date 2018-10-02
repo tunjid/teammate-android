@@ -14,7 +14,6 @@ import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.GameDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
-import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,12 +75,12 @@ public class GameRepository extends TeamQueryRepository<Game> {
     @Override
     Maybe<List<Game>> localModelsBefore(Team team, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return gameDao.getGames(team.getId(), date).subscribeOn(io());
+        return gameDao.getGames(team.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Game>> remoteModelsBefore(Team team, @Nullable Date date) {
-        return api.getGames(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.getGames(team.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     @Override

@@ -36,8 +36,8 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
             " OR :teamId = game.game_away_entity" +
             " AND tournament.tournament_created < :date" +
             " ORDER BY tournament.tournament_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Tournament>> getTournaments(String teamId, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Tournament>> getTournaments(String teamId, Date date, int limit);
 
     @Query("SELECT * FROM tournaments" +
             " WHERE :id = tournament_id")

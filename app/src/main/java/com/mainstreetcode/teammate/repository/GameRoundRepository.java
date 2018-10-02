@@ -60,12 +60,12 @@ public class GameRoundRepository extends QueryRepository<Game, Tournament, Integ
     @Override
     Maybe<List<Game>> localModelsBefore(Tournament tournament, @Nullable Integer round) {
         if (round == null) round = 0;
-        return gameDao.getGames(tournament.getId(), round).subscribeOn(io());
+        return gameDao.getGames(tournament.getId(), round, 30).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Game>> remoteModelsBefore(Tournament tournament, @Nullable Integer round) {
-        return api.getGamesForRound(tournament.getId(), round == null ? 0 : round).map(getSaveManyFunction()).toMaybe();
+        return api.getGamesForRound(tournament.getId(), round == null ? 0 : round, 30).map(getSaveManyFunction()).toMaybe();
     }
 
     @Override

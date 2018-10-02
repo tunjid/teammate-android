@@ -48,6 +48,6 @@ public abstract class MediaDao extends EntityDao<Media> {
             " AND media_created < :date" +
             " AND media_flagged = 0" +
             " ORDER BY media_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Media>> getTeamMedia(Team team, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Media>> getTeamMedia(Team team, Date date, int limit);
 }

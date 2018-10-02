@@ -69,12 +69,12 @@ public class GuestRepository extends QueryRepository<Guest, Event, Date> {
     @Override
     Maybe<List<Guest>> localModelsBefore(Event key, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return guestDao.getGuests(key.getId(), date).subscribeOn(io());
+        return guestDao.getGuests(key.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Guest>> remoteModelsBefore(Event key, @Nullable Date date) {
-        return api.getEventGuests(key.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.getEventGuests(key.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     @Override

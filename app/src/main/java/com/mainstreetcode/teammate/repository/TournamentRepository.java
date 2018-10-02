@@ -97,12 +97,12 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
         if (date == null) date = getFutureDate();
         // To concatenate team to account for the way the id is stored in the db to accommodate users and teams
         String teamId = team.getId();
-        return tournamentDao.getTournaments(teamId, date).subscribeOn(io());
+        return tournamentDao.getTournaments(teamId, date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Tournament>> remoteModelsBefore(Team team, @Nullable Date date) {
-        return api.getTournaments(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.getTournaments(team.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     @Override

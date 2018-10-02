@@ -37,6 +37,8 @@ import static io.reactivex.Maybe.concatDelayError;
 
 public abstract class ModelRepository<T extends Model<T>> {
 
+    static final int DEF_QUERY_LIMIT = 12;
+
     private final Function<List<T>, List<T>> saveListFunction = provideSaveManyFunction();
     private final Function<T, T> saveFunction = model -> saveListFunction.apply(Collections.singletonList(model)).get(0);
 

@@ -85,12 +85,12 @@ public class EventRepository extends TeamQueryRepository<Event> {
     @Override
     Maybe<List<Event>> localModelsBefore(Team team, @Nullable Date date) {
         if (date == null) date = getFutureDate();
-        return eventDao.getEvents(team.getId(), date).subscribeOn(io());
+        return eventDao.getEvents(team.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Event>> remoteModelsBefore(Team team, @Nullable Date date) {
-        return api.getEvents(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.getEvents(team.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     public Flowable<List<Event>> attending(@Nullable Date date) {
@@ -101,7 +101,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
                 .map(guests -> (List<Event>) new ArrayList<>(new TransformingSequentialList<>(guests, Guest::getEvent)))
                 .subscribeOn(io());
 
-        Maybe<List<Event>> remote = api.eventsAttending(date).map(getSaveManyFunction()).toMaybe();
+        Maybe<List<Event>> remote = api.eventsAttending(date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
 
         return fetchThenGet(local, remote);
     }
