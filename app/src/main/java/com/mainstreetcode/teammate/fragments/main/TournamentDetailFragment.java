@@ -11,6 +11,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +44,9 @@ public class TournamentDetailFragment extends MainActivityFragment {
     public static final String ARG_TOURNAMENT = "role";
 
     private Tournament tournament;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    private EmptyViewHolder viewHolder;
 
     public static TournamentDetailFragment newInstance(Tournament tournament) {
         TournamentDetailFragment fragment = new TournamentDetailFragment();
@@ -72,20 +77,14 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_games_parent, container, false);
-        ViewPager viewPager = root.findViewById(R.id.view_pager);
-        TabLayout tabLayout = root.findViewById(R.id.tab_layout);
-        EmptyViewHolder viewHolder = new EmptyViewHolder(root, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc);
+        viewPager = root.findViewById(R.id.view_pager);
+        tabLayout = root.findViewById(R.id.tab_layout);
+        viewHolder = new EmptyViewHolder(root, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc);
 
-        boolean hasCompetitors = tournament.getNumCompetitors() > 0;
         viewPager.setAdapter(new TournamentRoundAdapter(tournament, getChildFragmentManager()));
         viewPager.setCurrentItem(tournament.getCurrentRound());
-        tabLayout.setTabMode(tournament.getNumRounds() > 4 ? MODE_SCROLLABLE : MODE_FIXED);
-        tabLayout.setVisibility(hasCompetitors ? View.VISIBLE : View.GONE);
-        tabLayout.setupWithViewPager(viewPager);
-        viewHolder.setColor(R.color.dark_grey);
-        viewHolder.toggle(!hasCompetitors);
 
-        setUpWinner(root, tournament.getNumRounds());
+        setUpWinner((ViewGroup) root, tournament.getNumRounds());
 
         return root;
     }
@@ -131,7 +130,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         User user = userViewModel.getCurrentUser();
         Team team = tournament.getHost();
         disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::togglePersistentUi, emptyErrorHandler));
-        disposables.add(tournamentViewModel.checkForWinner(tournament).subscribe(changed -> setUpWinner(getView(), rounds), defaultErrorHandler));
+        disposables.add(tournamentViewModel.checkForWinner(tournament).subscribe(changed -> setUpWinner((ViewGroup) getView(), rounds), defaultErrorHandler));
     }
 
     @Override
@@ -140,6 +139,14 @@ public class TournamentDetailFragment extends MainActivityFragment {
         setToolbarTitle(getString(R.string.tournament_fixtures));
         requireActivity().invalidateOptionsMenu();
         super.togglePersistentUi();
+    }
+
+    @Override
+    public void onDestroyView() {
+        viewPager = null;
+        tabLayout = null;
+        viewHolder = null;
+        super.onDestroyView();
     }
 
     @Override
@@ -175,34 +182,46 @@ public class TournamentDetailFragment extends MainActivityFragment {
     }
 
     @SuppressWarnings("unchecked")
-    private void setUpWinner(@Nullable View root, int prevAdapterCount) {
+    private void setUpWinner(@Nullable ViewGroup root, int prevAdapterCount) {
         if (root == null) return;
 
+        TextView winnerText = root.findViewById(R.id.winner);
+        ViewGroup winnerView = root.findViewById(R.id.item_container);
         PagerAdapter adapter = root.<ViewPager>findViewById(R.id.view_pager).getAdapter();
 
         if (prevAdapterCount != tournament.getNumRounds() && adapter != null)
             adapter.notifyDataSetChanged();
+
+        TransitionManager.beginDelayedTransition(root, new AutoTransition()
+                .addTarget(tabLayout)
+                .addTarget(viewPager)
+                .addTarget(winnerView)
+                .addTarget(winnerText));
+
+        boolean hasCompetitors = tournament.getNumCompetitors() > 0;
+        tabLayout.setTabMode(tournament.getNumRounds() > 4 ? MODE_SCROLLABLE : MODE_FIXED);
+        tabLayout.setVisibility(hasCompetitors ? View.VISIBLE : View.GONE);
+        tabLayout.setupWithViewPager(viewPager);
+        viewHolder.setColor(R.color.dark_grey);
+        viewHolder.toggle(!hasCompetitors);
 
         Competitor winner = tournament.getWinner();
         if (winner.isEmpty()) return;
 
         Competitive competitive = winner.getEntity();
 
-        View winnerText = root.findViewById(R.id.winner);
-        ViewGroup itemView = root.findViewById(R.id.item_container);
-
         ModelCardViewHolder viewHolder = competitive instanceof User
-                ? new UserViewHolder(itemView, user -> {})
+                ? new UserViewHolder(winnerView, user -> {})
                 : competitive instanceof Team
-                ? new TeamViewHolder(itemView, team -> {})
+                ? new TeamViewHolder(winnerView, team -> {})
                 : null;
 
         if (viewHolder == null) return;
         viewHolder.bind(competitive);
 
         winnerText.setVisibility(View.VISIBLE);
-        itemView.setVisibility(View.VISIBLE);
+        winnerView.setVisibility(View.VISIBLE);
 
-        root.<TextView>findViewById(R.id.winner).setText(ModelUtils.processString(getString(R.string.tournament_winner)));
+        winnerText.setText(ModelUtils.processString(getString(R.string.tournament_winner)));
     }
 }

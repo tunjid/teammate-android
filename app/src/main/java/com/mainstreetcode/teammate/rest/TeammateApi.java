@@ -337,6 +337,9 @@ public interface TeammateApi {
     @PUT("api/competitors/{competitorId}")
     Single<Competitor> updateCompetitor(@Path(COMPETITOR_PATH) String competitorId, @Body Competitor competitor);
 
+    @GET("api/competitors")
+    Single<List<Competitor>> getDeclinedCompetitors(@Query(DATE_QUERY) Date date);
+
     // =============================================================================================
     // Stat endpoints
     // =============================================================================================

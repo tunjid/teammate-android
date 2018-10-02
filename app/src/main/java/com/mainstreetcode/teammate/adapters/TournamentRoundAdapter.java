@@ -10,11 +10,14 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.main.GamesChildFragment;
 import com.mainstreetcode.teammate.model.Tournament;
 
-public class TournamentRoundAdapter extends FragmentStatePagerAdapter{
+public class TournamentRoundAdapter extends FragmentStatePagerAdapter {
+
+    private int count; // num rounds in tournament is concurrent
     private final Tournament tournament;
 
     public TournamentRoundAdapter(Tournament tournament, FragmentManager fm) {
         super(fm);
+        this.count = tournament.getNumRounds();
         this.tournament = tournament;
     }
 
@@ -25,7 +28,13 @@ public class TournamentRoundAdapter extends FragmentStatePagerAdapter{
 
     @Override
     public int getCount() {
-        return tournament.getNumRounds();
+        return count;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        count = tournament.getNumRounds();
+        super.notifyDataSetChanged();
     }
 
     @Nullable

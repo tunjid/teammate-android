@@ -9,7 +9,6 @@ import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.enums.StatType;
-import com.mainstreetcode.teammate.persistence.entity.TournamentEntity;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.TournamentRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
@@ -25,7 +24,6 @@ import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
@@ -82,10 +80,10 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
                 .observeOn(mainThread()).map(getStandings(tournament)::update).toCompletable();
     }
 
-    public Maybe<Boolean> checkForWinner(Tournament tournament) {
-        if (tournament.isEmpty()) return Maybe.empty();
-        return repository.get(tournament).lastElement()
-                .map(TournamentEntity::hasWinner).observeOn(mainThread());
+    public Flowable<Boolean> checkForWinner(Tournament tournament) {
+        if (tournament.isEmpty()) return Flowable.empty();
+        return repository.get(tournament)
+                .map(Tournament::hasWinner).observeOn(mainThread());
     }
 
     public Single<Tournament> delete(final Tournament tournament) {
