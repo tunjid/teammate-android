@@ -259,6 +259,9 @@ public class Game extends GameEntity
             if (referee == null) referee = User.empty();
             if (host == null) host = Team.empty();
             if (event == null) event = Event.empty();
+            if (home == null) home = Competitor.empty();
+            if (away == null) away = Competitor.empty();
+            if (tournament == null) tournament = Tournament.empty();
 
             return new Game(id, refPath, score, matchUp, homeEntityId, awayEntityId, winnerEntityId,
                     ModelUtils.parseDate(created), sport, referee, host, event, tournament,

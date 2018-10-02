@@ -11,7 +11,7 @@ public class TournamentTypeConverter {
 
     @TypeConverter
     public String toId(Tournament tournament) {
-        return tournament.getId();
+        return tournament.isEmpty() ? null : tournament.getId();
     }
 
     @TypeConverter

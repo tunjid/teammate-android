@@ -136,7 +136,7 @@ public final class GamesFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return localRoleViewModel.hasPrivilegedRole();
+        return team.getSport().supportsTournaments() && localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
