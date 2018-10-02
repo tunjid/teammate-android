@@ -40,7 +40,7 @@ public class GameGofer extends Gofer<Game> {
 
         this.eligibleTeams = new ArrayList<>();
         this.items = new ArrayList<>(model.isEmpty()
-                ? Arrays.asList(Competitor.empty(), Competitor.empty())
+                ? Arrays.asList(model.getHome(), model.getAway())
                 : model.asItems());
     }
 
@@ -49,7 +49,7 @@ public class GameGofer extends Gofer<Game> {
     }
 
     public boolean canEdit() {
-        return !model.isEnded() && !eligibleTeams.isEmpty();
+        return model.isEmpty() || !model.isEnded() && !eligibleTeams.isEmpty();
     }
 
     @Override

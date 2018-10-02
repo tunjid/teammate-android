@@ -13,11 +13,19 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameEditAdapter;
+import com.mainstreetcode.teammate.adapters.TeamAdapter;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
+import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 /**
  * Edits a Team member
@@ -25,6 +33,8 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 public class GameEditFragment extends HeaderedFragment<Game>
         implements
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener,
         GameEditAdapter.AdapterListener {
 
     public static final String ARG_GAME = "stat";
@@ -127,6 +137,19 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public boolean canEditGame() { return gofer.canEdit(); }
 
     @Override
+    public void onUserClicked(User item) { updateCompetitor(item); }
+
+    @Override
+    public void onTeamClicked(Team item) { updateCompetitor(item); }
+
+    @Override
+    public void onAwayClicked(Competitor away) {
+        if (!game.isEmpty()) return;
+        if (game.getHome() == away) showSnackbar(getString(R.string.game_create_prompt));
+        else pickAwaySide();
+    }
+
+    @Override
     protected void onPrepComplete() {
         scrollManager.notifyDataSetChanged();
         requireActivity().invalidateOptionsMenu();
@@ -143,8 +166,34 @@ public class GameEditFragment extends HeaderedFragment<Game>
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
                     toggleProgress(true);
                     toggleProgress(true);
-                    disposables.add(gameViewModel.endGame(game).subscribe(diffResult -> requireActivity().onBackPressed(), defaultErrorHandler));                })
+                    disposables.add(gameViewModel.endGame(game).subscribe(diffResult -> requireActivity().onBackPressed(), defaultErrorHandler));
+                })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void updateCompetitor(Competitive item) {
+        game.getAway().updateEntity(item);
+        scrollManager.notifyDataSetChanged();
+        scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
+        hideKeyboard();
+    }
+
+    private void pickAwaySide() {
+        String refPath = game.getRefPath();
+        boolean isBetweenUsers = User.COMPETITOR_TYPE.equals(refPath);
+        BaseFragment fragment = isBetweenUsers
+                ? UserSearchFragment.newInstance()
+                : Team.COMPETITOR_TYPE.equals(refPath)
+                ? TeamSearchFragment.newInstance(game.getSport())
+                : null;
+
+        if (fragment == null) return;
+        fragment.setTargetFragment(this, R.id.request_competitor_pick);
+
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setFragment(fragment)
+                .build());
     }
 }

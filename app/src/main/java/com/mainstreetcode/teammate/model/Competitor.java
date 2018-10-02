@@ -73,11 +73,12 @@ public class Competitor extends CompetitorEntity
         if (!TextUtils.isEmpty(updated.tournamentId)) this.tournamentId = updated.tournamentId;
         if (!TextUtils.isEmpty(updated.gameId)) this.gameId = updated.gameId;
 
-        Competitive other = updated.entity;
-        if (entity instanceof User && other instanceof User) ((User) entity).update(((User) other));
-        else if (entity instanceof Team && other instanceof Team)
-            ((Team) entity).update(((Team) other));
-        else entity = updated.entity;
+        updateEntity(updated.entity);
+    }
+
+   public void updateEntity(Competitive updated) {
+        if (entity.update(updated)) return;
+        entity = updated.makeCopy();
     }
 
     @Override

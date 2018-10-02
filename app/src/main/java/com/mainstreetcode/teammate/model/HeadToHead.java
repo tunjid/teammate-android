@@ -67,9 +67,7 @@ public class HeadToHead {
         public void updateAway(Competitive entity) { update(away, entity); }
 
         private void update(Competitor competitor, Competitive entity) {
-            Competitive current = competitor.getEntity();
-            if (current.update(entity)) return;
-            competitor.update(Competitor.empty(entity.makeCopy()));
+            competitor.updateEntity(entity);
         }
 
         public List<Identifiable> getItems() { return items; }

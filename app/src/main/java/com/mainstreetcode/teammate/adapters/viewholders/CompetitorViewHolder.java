@@ -27,5 +27,10 @@ public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, Compet
         setSubTitle(model.getSeedText());
     }
 
+    public CompetitorViewHolder hideSubtitle() {
+        subtitle.setVisibility(View.INVISIBLE);
+        return this;
+    }
+
     public View getDragHandle() { return itemView.findViewById(R.id.drag_handle); }
 }

@@ -1,7 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.support.annotation.NonNull;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -23,8 +22,10 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.provider.Contacts.PresenceColumns.AWAY;
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.HOME;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
@@ -32,9 +33,6 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
  */
 
 public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, HeadToHeadRequestAdapter.AdapterListener> {
-
-    private static final int HOME = 1;
-    private static final int AWAY = 2;
 
     private final HeadToHead.Request request;
     private final List<Sport> sports;
@@ -58,11 +56,11 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             case HOME:
-                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onHomeClicked)
-                        .withTitle(R.string.pick_home_competitor);
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onHomeClicked)
+                        .hideSubtitle().withTitle(R.string.pick_home_competitor);
             case AWAY:
-                return new CompetitorViewHolder(getCompetitorItemView(viewGroup), adapterListener::onAwayClicked)
-                        .withTitle(R.string.pick_away_competitor);
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked)
+                        .hideSubtitle().withTitle(R.string.pick_away_competitor);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -87,12 +85,6 @@ public class HeadToHeadRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHo
     public int getItemViewType(int position) {
         Identifiable identifiable = request.getItems().get(position);
         return identifiable instanceof Item ? ((Item) identifiable).getItemType() : position == 2 ? HOME : AWAY;
-    }
-
-    private View getCompetitorItemView(@NonNull ViewGroup viewGroup) {
-        View itemView = getItemView(R.layout.viewholder_competitor, viewGroup);
-        itemView.findViewById(R.id.item_subtitle).setVisibility(View.INVISIBLE);
-        return itemView;
     }
 
     public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {

@@ -260,6 +260,7 @@
     <string name="game_add_referee_prompt">If you add a referee, only the referee can add stats or end the game.\n\n You can remove or change the referee at any time.</string>
     <string name="game_end_prompt">This will end the game for everyone.\n\nStats will not be able to be added or deleted, but the times can be changed.</string>
     <string name="game_event">Game event</string>
+    <string name="game_create_prompt">You have to host games you create</string>
     <string name="game_ended">FT</string>
     <string name="game_head_to_head_params">Head to head search</string>
     <string name="game_head_to_head_prompt">Head to head, who\'s got the edge?</string>

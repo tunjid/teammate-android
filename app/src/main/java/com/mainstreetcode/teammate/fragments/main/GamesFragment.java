@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -148,6 +149,11 @@ public final class GamesFragment extends MainActivityFragment
         switch (view.getId()) {
             case R.id.fab:
                 Game game = Game.empty(team);
+                Competitive entity = User.COMPETITOR_TYPE.equals(game.getRefPath())
+                        ? userViewModel.getCurrentUser()
+                        : teamViewModel.getDefaultTeam();
+
+                game.getHome().updateEntity(entity);
                 showFragment(GameEditFragment.newInstance(game));
                 break;
         }
