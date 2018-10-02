@@ -306,6 +306,9 @@ public interface TeammateApi {
     // Game endpoints
     // =============================================================================================
 
+    @POST("api/teams/{teamId}/games")
+    Single<Game> createGame(@Path(TEAM_PATH) String teamId, @Body Game game);
+
     @GET("api/games/{gameId}")
     Single<Game> getGame(@Path(GAME_PATH) String gameId);
 

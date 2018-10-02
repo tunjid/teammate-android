@@ -160,7 +160,9 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
 
-        new AlertDialog.Builder(requireActivity())
+        if (game.isEmpty()) disposables.add(gofer.save()
+                .subscribe(ignored -> showFragment(GameFragment.newInstance(game)), defaultErrorHandler));
+        else new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.game_manual_score_request)
                 .setMessage(R.string.game_end_prompt)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {

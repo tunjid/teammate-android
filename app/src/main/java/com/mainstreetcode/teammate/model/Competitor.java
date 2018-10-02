@@ -76,7 +76,7 @@ public class Competitor extends CompetitorEntity
         updateEntity(updated.entity);
     }
 
-   public void updateEntity(Competitive updated) {
+    public void updateEntity(Competitive updated) {
         if (entity.update(updated)) return;
         entity = updated.makeCopy();
     }
@@ -139,7 +139,13 @@ public class Competitor extends CompetitorEntity
 
         @Override
         public JsonElement serialize(Competitor src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(src.entity.getId());
+            if (src.isEmpty()) return new JsonPrimitive(src.entity.getId());
+
+            JsonObject json = new JsonObject();
+            json.addProperty(ACCEPTED, src.accepted);
+            json.addProperty(DECLINED, src.declined);
+
+            return json;
         }
 
         @Override

@@ -209,8 +209,11 @@ public class Game extends GameEntity
         public JsonElement serialize(Game src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject body = new JsonObject();
             body.addProperty(ENDED, src.ended);
+            body.addProperty(REF_PATH, src.refPath);
             body.addProperty(HOME_SCORE, src.homeScore);
             body.addProperty(AWAY_SCORE, src.awayScore);
+            body.addProperty(HOME, src.home.getEntity().getId());
+            body.addProperty(AWAY, src.away.getEntity().getId());
             body.addProperty(REFEREE, src.referee.isEmpty() ? null : src.referee.getId());
             return body;
         }
