@@ -105,6 +105,7 @@ public interface Identifiable {
         return Integer.compare(a, b);
     };
 
+    Comparator<Identifiable> DESCENDING_COMPARATOR = (modelA, modelB) -> -COMPARATOR.compare(modelA, modelB);
 
     class Util {
         static int getPoints(Identifiable identifiable) {

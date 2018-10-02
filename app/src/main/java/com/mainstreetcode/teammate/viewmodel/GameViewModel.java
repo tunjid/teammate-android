@@ -6,10 +6,10 @@ import android.support.v7.util.DiffUtil;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.repository.GameRepository;
 import com.mainstreetcode.teammate.repository.GameRoundRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,6 @@ import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
@@ -42,9 +42,13 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private final GameRepository gameRepository = GameRepository.getInstance();
 
     public GameGofer gofer(Game game) {
-        Consumer<Throwable> onError = throwable -> {};
-        android.arch.core.util.Function<Game, Flowable<Team>> eligibleTeamSource = sourceStat -> getEligibleTeamsForGame(game);
-        return new GameGofer(game, onError, this::getGame, this::updateGame, eligibleTeamSource);
+        return new GameGofer(game, onError(game), this::getGame, this::updateGame, GameViewModel::getEligibleTeamsForGame);
+    }
+
+    @Override
+    void onErrorMessage(Message message, Team key, Identifiable invalid) {
+        super.onErrorMessage(message, key, invalid);
+        if (message.isInvalidObject()) headToHeadMatchUps.remove(invalid);
     }
 
     @Override
@@ -74,7 +78,10 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     public Single<DiffUtil.DiffResult> getMatchUps(HeadToHead.Request request) {
-        Single<List<Identifiable>> sourceSingle = api.matchUps(request).map(ArrayList<Identifiable>::new);
+        Single<List<Identifiable>> sourceSingle = api.matchUps(request).map(games -> {
+            Collections.sort(games, Identifiable.COMPARATOR);
+            return new ArrayList<>(games);
+        });
         return Identifiable.diff(sourceSingle, () -> headToHeadMatchUps, ModelUtils::replaceList).observeOn(mainThread());
     }
 
@@ -93,10 +100,10 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     static Flowable<Team> getEligibleTeamsForGame(Game game) {
-        if (game.betweenUsers()) return Flowable.just(game.getTournament().getHost());
+        if (game.betweenUsers()) return Flowable.just(game.getHost());
         return Flowable.fromIterable(RoleViewModel.roles)
                 .filter(identifiable -> identifiable instanceof Role).cast(Role.class)
-                .filter(Role::isPrivilegedRole).map(RoleEntity::getTeam)
+                .filter(Role::isPrivilegedRole).map(Role::getTeam)
                 .filter(team -> isParticipant(game, team));
     }
 

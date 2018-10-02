@@ -32,6 +32,7 @@ import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
+import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public final class GameFragment extends MainActivityFragment
     private static final String ARG_GAME = "game";
 
     private Game game;
+    private GameGofer gofer;
     private AtomicBoolean editableStatus;
     private AtomicBoolean privilegeStatus;
     private GameViewHolder gameViewHolder;
@@ -84,6 +86,7 @@ public final class GameFragment extends MainActivityFragment
         items = statViewModel.getModelList(game);
         editableStatus = new AtomicBoolean();
         privilegeStatus = new AtomicBoolean();
+        gofer = gameViewModel.gofer(game);
     }
 
     @Override
@@ -119,6 +122,7 @@ public final class GameFragment extends MainActivityFragment
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.action_delete_game).setVisible(gofer.canDelete(userViewModel.getCurrentUser()));
         menu.findItem(R.id.action_end_game).setVisible(showsFab());
         menu.findItem(R.id.action_event).setVisible(true);
     }
@@ -191,11 +195,11 @@ public final class GameFragment extends MainActivityFragment
     }
 
     private void updateGame() {
-        disposables.add(gameViewModel.updateGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+        disposables.add(gofer.save().subscribe(ignored -> onGameUpdated(), defaultErrorHandler));
     }
 
     private void fetchGame() {
-        disposables.add(gameViewModel.getGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+        disposables.add(gofer.fetch().subscribe(ignored -> onGameUpdated(), defaultErrorHandler));
     }
 
     private void refresh() {
@@ -244,8 +248,9 @@ public final class GameFragment extends MainActivityFragment
                 .setTitle(R.string.game_end_request)
                 .setMessage(R.string.game_end_prompt)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    game.setEnded(true);
                     toggleProgress(true);
-                    disposables.add(gameViewModel.endGame(game).subscribe(this::onGameUpdated, defaultErrorHandler));
+                    disposables.add(gofer.save().subscribe(ignored -> onGameUpdated(), defaultErrorHandler));
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
@@ -277,7 +282,7 @@ public final class GameFragment extends MainActivityFragment
         scrollManager.onDiff(result);
     }
 
-    private void onGameUpdated(Game game) {
+    private void onGameUpdated() {
         gameViewHolder.bind(game);
         toggleProgress(false);
         updateStatuses();

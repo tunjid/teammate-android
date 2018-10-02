@@ -42,7 +42,7 @@ public class ModelUtils {
         dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    public static boolean hasNoSpecialChars(CharSequence sequence) {
+    static boolean hasNoSpecialChars(CharSequence sequence) {
         return !alphaNumeric.matcher(sequence).find();
     }
 
@@ -125,7 +125,7 @@ public class ModelUtils {
 
     public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, (a, b) -> -Identifiable.COMPARATOR.compare(a, b));
+        Collections.sort(source, Identifiable.DESCENDING_COMPARATOR);
     }
 
     public static <T extends Identifiable> List<T> replaceList(List<T> source, List<T> additions) {

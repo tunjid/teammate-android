@@ -5,10 +5,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
+import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +52,14 @@ public class GameGofer extends Gofer<Game> {
 
     public boolean canEdit() {
         return model.isEmpty() || !model.isEnded() && !eligibleTeams.isEmpty();
+    }
+
+    public boolean canDelete(User user) {
+        if (!model.getTournament().isEmpty()) return false;
+        Competitive entity = model.getHome().getEntity();
+        if (entity.equals(user)) return true;
+        for (Team team : eligibleTeams) if (entity.equals(team)) return true;
+        return false;
     }
 
     @Override

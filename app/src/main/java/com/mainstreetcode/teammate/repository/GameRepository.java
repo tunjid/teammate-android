@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -88,16 +89,19 @@ public class GameRepository extends TeamQueryRepository<Game> {
         return models -> {
             List<Team> teams = new ArrayList<>(models.size());
             List<User> users = new ArrayList<>(models.size());
+            List<Event> events = new ArrayList<>(models.size());
             List<Tournament> tournaments = new ArrayList<>(models.size());
             List<Competitor> competitors = new ArrayList<>(models.size());
 
             for (Game game : models) {
                 User referee = game.getReferee();
                 Team team = game.getTeam();
+                Event event = game.getEvent();
                 Competitor home = game.getHome();
                 Competitor away = game.getAway();
                 Tournament tournament = game.getTournament();
 
+                if (!event.isEmpty()) events.add(event);
                 if (!referee.isEmpty()) users.add(referee);
                 if (!tournament.isEmpty() && !team.isEmpty()) {
                     tournament.updateHost(team);
@@ -112,6 +116,7 @@ public class GameRepository extends TeamQueryRepository<Game> {
 
             UserRepository.getInstance().saveAsNested().apply(users);
             TeamRepository.getInstance().saveAsNested().apply(teams);
+            EventRepository.getInstance().saveAsNested().apply(events);
             TournamentRepository.getInstance().saveAsNested().apply(tournaments);
             CompetitorRepository.getInstance().saveAsNested().apply(competitors);
 
