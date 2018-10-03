@@ -135,9 +135,9 @@ public final class FeedFragment extends MainActivityFragment
                     .setNeutralButton(R.string.event_details, ((dialog, which) -> {
                         Competitor competitor = (Competitor) model;
                         BaseFragment fragment = !competitor.getGame().isEmpty()
-                                ? GameFragment.newInstance(competitor.getGame())
+                                ? GameFragment.newInstance(competitor.getGame()).pending(competitor)
                                 : !competitor.getTournament().isEmpty()
-                                ? TournamentEditFragment.newInstance(competitor.getTournament())
+                                ? TournamentEditFragment.newInstance(competitor.getTournament()).pending(competitor)
                                 : null;
                         if (fragment != null) showFragment(fragment);
                     }))

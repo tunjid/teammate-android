@@ -35,6 +35,8 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         TournamentEditAdapter.AdapterListener {
 
     public static final String ARG_TOURNAMENT = "tournament";
+    private static final String ARG_COMPETITOR = "competitor";
+
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Tournament tournament;
@@ -49,6 +51,12 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         fragment.setEnterExitTransitions();
 
         return fragment;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public TournamentEditFragment pending(Competitor competitor) {
+        getArguments().putParcelable(ARG_COMPETITOR, competitor);
+        return this;
     }
 
     @Override

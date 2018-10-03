@@ -25,6 +25,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -47,6 +48,7 @@ public final class GameFragment extends MainActivityFragment
         implements UserAdapter.AdapterListener {
 
     private static final String ARG_GAME = "game";
+    private static final String ARG_COMPETITOR = "competitor";
 
     private Game game;
     private GameGofer gofer;
@@ -65,6 +67,12 @@ public final class GameFragment extends MainActivityFragment
         args.putParcelable(ARG_GAME, game);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public GameFragment pending(Competitor competitor) {
+        getArguments().putParcelable(ARG_COMPETITOR, competitor);
+        return this;
     }
 
     @Override
