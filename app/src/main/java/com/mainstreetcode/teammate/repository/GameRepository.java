@@ -53,7 +53,7 @@ public class GameRepository extends TeamQueryRepository<Game> {
     @Override
     public Single<Game> createOrUpdate(Game game) {
         return game.isEmpty()
-                ? api.createGame(game.getHost().getId(), game)
+                ? api.createGame(game.getHost().getId(), game).map(getLocalUpdateFunction(game))
                 : api.updateGame(game.getId(), game)
                 .doOnError(throwable -> deleteInvalidModel(game, throwable))
                 .map(getLocalUpdateFunction(game))

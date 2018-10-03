@@ -7,7 +7,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
@@ -69,7 +68,7 @@ public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Gam
                 : AWAY;
     }
 
-    public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
+    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
         boolean canEditGame();
 
         void onAwayClicked(Competitor away);

@@ -82,6 +82,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new TournamentEditAdapter(gofer.getItems(), this))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)

@@ -70,6 +70,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new RoleEditAdapter(gofer.getItems(), this))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();

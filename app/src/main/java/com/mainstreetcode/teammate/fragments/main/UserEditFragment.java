@@ -61,8 +61,9 @@ public class UserEditFragment extends HeaderedFragment<User>
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
-                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new UserEditAdapter(gofer.getItems(), this))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
 
