@@ -215,6 +215,7 @@
     <string name="tournament_winner">🥇  CHAMPION   🏆</string>
     <string name="tournament_edit">Edit Tournament</string>
     <string name="tournament_standings">Standings</string>
+    <string name="tournament_accept">Join this tournament?</string>
     <string name="tournament_no_standings">The ultimate test of consistency, tournament standings show up here</string>
     <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
     <string name="no_tournament_support">Tournament support for your team\'s sport is coming soon!</string>
@@ -265,6 +266,7 @@
     <string name="game_event">Game event</string>
     <string name="game_create_prompt">You have to host games you create</string>
     <string name="game_ended">FT</string>
+    <string name="game_accept">Join this game?</string>
     <string name="game_head_to_head_params">Head to head search</string>
     <string name="game_head_to_head_prompt">Head to head, who\'s got the edge?</string>
     <string name="game_head_to_head">Head to Head</string>

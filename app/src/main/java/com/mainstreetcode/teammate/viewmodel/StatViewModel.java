@@ -100,7 +100,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
 
     private boolean isPrivilegedOrIsReferee(boolean isPrivileged, User current, Game game) {
         User referee = game.getReferee();
-        return referee.isEmpty() ? isPrivileged : current.equals(referee);
+        return (referee.isEmpty() ? isPrivileged : current.equals(referee)) && !game.competitorsNotAccepted();
     }
 
     private Date getQueryDate(Game game, boolean fetchLatest) {

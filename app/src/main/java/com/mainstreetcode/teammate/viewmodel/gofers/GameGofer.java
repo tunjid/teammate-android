@@ -54,7 +54,8 @@ public class GameGofer extends Gofer<Game> {
     }
 
     public boolean canEdit() {
-        return model.isEmpty() || !model.isEnded() && !eligibleTeams.isEmpty();
+        boolean canEdit = !model.isEnded() && !eligibleTeams.isEmpty() && !model.competitorsNotAccepted();
+        return model.isEmpty() || canEdit;
     }
 
     public boolean canDelete(User user) {

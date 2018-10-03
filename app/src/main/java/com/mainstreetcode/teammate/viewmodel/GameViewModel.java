@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -11,6 +12,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.GameRepository;
 import com.mainstreetcode.teammate.repository.GameRoundRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
@@ -40,6 +42,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
     private final List<Identifiable> headToHeadMatchUps = new ArrayList<>();
 
+    private final CompetitorRepository competitorRepository = CompetitorRepository.getInstance();
     private final GameRoundRepository gameRoundRepository = GameRoundRepository.getInstance();
     private final GameRepository gameRepository = GameRepository.getInstance();
 
@@ -118,6 +121,12 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     public Single<Game> updateGame(Game game) {
         return gameRoundRepository.createOrUpdate(game)
                 .doOnError(onError(game)).observeOn(mainThread());
+    }
+
+    public Single<Boolean> respondToCompetition(final Competitor competitor, boolean accept) {
+        if (accept) competitor.accept();
+        else competitor.decline();
+        return competitorRepository.createOrUpdate(competitor).map(ignored -> accept).observeOn(mainThread());
     }
 
     private Single<Game> delete(final Game game) {

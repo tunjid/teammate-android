@@ -40,6 +40,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Tournament tournament;
+    private Competitor competitor;
     private TournamentGofer gofer;
 
     public static TournamentEditFragment newInstance(Tournament tournament) {
@@ -70,7 +71,11 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        tournament = getArguments().getParcelable(ARG_TOURNAMENT);
+        Bundle arguments = getArguments();
+        tournament = arguments.getParcelable(ARG_TOURNAMENT);
+        competitor = arguments.getParcelable(ARG_COMPETITOR);
+
+        if (competitor == null) competitor = Competitor.empty();
         gofer = tournamentViewModel.gofer(tournament);
     }
 
@@ -116,6 +121,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @Override
     public void onResume() {
         super.onResume();
+        checkCompetitor();
         tournamentViewModel.clearNotifications(tournament);
     }
 
@@ -198,7 +204,23 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public Sport getSport() { return tournament.getSport(); }
 
     private void promptForCompetitors() {
-        showSnackbar(getString(R.string.add_tournament_competitors_prompt), R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament)));
+        showSnackbar(snackbar -> snackbar.setText(getString(R.string.add_tournament_competitors_prompt))
+                .setAction(R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament))));
+    }
+
+    private void checkCompetitor() {
+        if (!competitor.isEmpty() && !competitor.isAccepted())
+            showChoices(choiceBar -> choiceBar.setText(getString(R.string.tournament_accept))
+                    .setPositiveText(getText(R.string.accept))
+                    .setNegativeText(getText(R.string.decline))
+                    .setPositiveClickListener(v -> respond(true))
+                    .setNegativeClickListener(v -> respond(false)));
+    }
+
+    private void respond(boolean accept) {
+        toggleProgress(true);
+        disposables.add(gameViewModel.respondToCompetition(competitor, accept)
+                .subscribe(ignored -> toggleProgress(false), defaultErrorHandler));
     }
 
     private void setSpanSizeLookUp(RecyclerView.LayoutManager layoutManager) {

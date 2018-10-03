@@ -51,14 +51,15 @@ public final class GameFragment extends MainActivityFragment
     private static final String ARG_COMPETITOR = "competitor";
 
     private Game game;
+    private Competitor competitor;
+    private List<Identifiable> items;
+
     private GameGofer gofer;
     private AtomicBoolean editableStatus;
     private AtomicBoolean privilegeStatus;
     private GameViewHolder gameViewHolder;
 
     private Chip refereeChip;
-
-    private List<Identifiable> items;
 
     public static GameFragment newInstance(Game game) {
         GameFragment fragment = new GameFragment();
@@ -91,7 +92,13 @@ public final class GameFragment extends MainActivityFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        game = getArguments().getParcelable(ARG_GAME);
+
+        Bundle arguments = getArguments();
+        game = arguments.getParcelable(ARG_GAME);
+        competitor = arguments.getParcelable(ARG_COMPETITOR);
+
+        if (competitor == null) competitor = Competitor.empty();
+
         items = statViewModel.getModelList(game);
         editableStatus = new AtomicBoolean();
         privilegeStatus = new AtomicBoolean();
@@ -168,6 +175,7 @@ public final class GameFragment extends MainActivityFragment
         super.onResume();
         fetchGame();
         fetchStats(true);
+        checkCompetitor();
     }
 
     @Override
@@ -308,6 +316,15 @@ public final class GameFragment extends MainActivityFragment
         bindReferee();
     }
 
+    private void respond(boolean accept) {
+        toggleProgress(true);
+        disposables.add(gameViewModel.respondToCompetition(competitor, accept)
+                .subscribe(ignored -> {
+                    if (accept) fetchGame();
+                    else toggleProgress(false);
+                }, defaultErrorHandler));
+    }
+
     private void deleteGame() {
         disposables.add(gofer.remove().subscribe(this::onGameDeleted, defaultErrorHandler));
     }
@@ -316,6 +333,15 @@ public final class GameFragment extends MainActivityFragment
         showSnackbar(getString(R.string.game_deleted));
         removeEnterExitTransitions();
         requireActivity().onBackPressed();
+    }
+
+    private void checkCompetitor() {
+        if (!competitor.isEmpty() && !competitor.isAccepted())
+            showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))
+                    .setPositiveText(getText(R.string.accept))
+                    .setNegativeText(getText(R.string.decline))
+                    .setPositiveClickListener(v -> respond(true))
+                    .setNegativeClickListener(v -> respond(false)));
     }
 
     private void bindReferee() {

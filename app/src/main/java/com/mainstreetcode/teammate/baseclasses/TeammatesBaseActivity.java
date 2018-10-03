@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.transition.AutoTransition;
@@ -26,10 +27,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
 import com.mainstreetcode.teammate.util.FabIconAnimator;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
@@ -78,11 +84,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Nullable private ViewHider fabHider;
     @Nullable private ViewHider toolbarHider;
 
+    private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
+
+    private final BaseTransientBottomBar.BaseCallback callback = new BaseTransientBottomBar.BaseCallback() {
+        @SuppressWarnings("SuspiciousMethodCalls")
+        public void onDismissed(Object bar, int event) { transientBottomBars.remove(bar); }
+    };
+
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, Bundle savedInstanceState) {
             if (isNotInMainFragmentContainer(v)) return;
 
+            clearTransientBars();
             adjustSystemInsets(f);
             setOnApplyWindowInsetsListener(v, (view, insets) -> consumeFragmentInsets(insets));
         }
@@ -94,6 +108,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+    }
+
+    @Override
+    protected void onPause() {
+        clearTransientBars();
+        super.onPause();
     }
 
     @Override
@@ -201,14 +221,25 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
+    @SuppressWarnings("unchecked")
+    public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_LONG)
-                .setAction(stringRes, clickListener);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout,"", LENGTH_INDEFINITE).addCallback(callback);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
+        consumer.accept(snackbar);
+        transientBottomBars.add(snackbar);
         snackbar.show();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {
+        ChoiceBar bar = ChoiceBar.make(coordinatorLayout, LENGTH_INDEFINITE).addCallback(callback);
+        consumer.accept(bar);
+        transientBottomBars.add(bar);
+        bar.show();
     }
 
     @Override
@@ -295,6 +326,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private void showSystemUI() {
         int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         getDecorView().setSystemUiVisibility(visibility);
+    }
+
+    private void clearTransientBars() {
+        for (BaseTransientBottomBar bar : transientBottomBars) bar.dismiss();
+        transientBottomBars.clear();
     }
 
     private boolean isInLandscape() {

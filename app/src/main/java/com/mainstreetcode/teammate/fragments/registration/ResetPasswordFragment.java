@@ -122,7 +122,9 @@ public final class ResetPasswordFragment extends RegistrationActivityFragment
             String password = passwordInput.getText().toString();
 
             disposables.add(viewModel.resetPassword(email, token, password)
-                    .subscribe(message -> showSnackbar(message.getMessage(), R.string.sign_in, view -> showFragment(SignInFragment.newInstance())), defaultErrorHandler));
+                    .subscribe(message -> showSnackbar(snackbar -> snackbar.setText(message.getMessage())
+                            .setAction(R.string.sign_in, view -> showFragment(SignInFragment.newInstance()))),
+                            defaultErrorHandler));
         }
     }
 }
