@@ -89,7 +89,7 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        toggleProgress(true);
+        scrollManager.setRefreshing();
         disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 

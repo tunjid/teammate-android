@@ -70,7 +70,9 @@ public class GameRepository extends TeamQueryRepository<Game> {
 
     @Override
     public Single<Game> delete(Game game) {
-        return api.deleteGame(game.getId());
+        return api.deleteGame(game.getId())
+                .map(this::deleteLocally)
+                .doOnError(throwable -> deleteInvalidModel(game, throwable));
     }
 
     @Override
@@ -124,6 +126,12 @@ public class GameRepository extends TeamQueryRepository<Game> {
 
             return models;
         };
+    }
+
+    @Override
+    Game deleteLocally(Game model) {
+        AppDatabase.getInstance().eventDao().delete(model.getEvent());
+        return super.deleteLocally(model);
     }
 
     private void addIfValid(Competitor competitor, List<User> users, List<Team> teams) {

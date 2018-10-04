@@ -116,7 +116,7 @@ public abstract class ModelRepository<T extends Model<T>> {
         if (message.isInvalidObject() || message.isIllegalTeamMember()) deleteLocally(model);
     }
 
-    final T deleteLocally(T model) {
+    T deleteLocally(T model) {
         dao().delete(model);
         return model;
     }

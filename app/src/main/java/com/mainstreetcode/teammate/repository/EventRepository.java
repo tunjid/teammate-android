@@ -4,6 +4,7 @@ package com.mainstreetcode.teammate.repository;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -117,5 +118,12 @@ public class EventRepository extends TeamQueryRepository<Event> {
 
             return models;
         };
+    }
+
+    @Override
+    Event deleteLocally(Event model) {
+        Game game = Game.withId(model.getGameId());
+        if (!game.isEmpty()) AppDatabase.getInstance().gameDao().delete(game);
+        return super.deleteLocally(model);
     }
 }
