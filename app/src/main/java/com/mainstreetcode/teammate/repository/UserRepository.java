@@ -146,9 +146,8 @@ public class UserRepository extends ModelRepository<User> {
         AppDatabase database = AppDatabase.getInstance();
         Single<Boolean> local = database.clearTables().flatMap(result -> clearUser());
         Device device = database.deviceDao().getCurrent();
-        String deviceId = device != null ? device.getId() : "";
 
-        return api.signOut(deviceId)
+        return api.signOut(device.getId())
                 .flatMap(result -> local)
                 .onErrorResumeNext(throwable -> local)
                 .subscribeOn(io());
@@ -212,6 +211,7 @@ public class UserRepository extends ModelRepository<User> {
      * Used to update changes to the current signed in user
      */
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private Single<User> updateCurrent(Single<User> source) {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe

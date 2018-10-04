@@ -58,6 +58,8 @@
 
     <!--FeedFragment-->
     <string name="home_greeting">Good %1$s, %2$s</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
     <string name="clarify_invitation">Do you still want to join %1$s?</string>

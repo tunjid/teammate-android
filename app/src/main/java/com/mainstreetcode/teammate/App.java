@@ -55,6 +55,7 @@ public class App extends MultiDexApplication {
     }
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void prime() {
         // Load user from cache if they exist
         UserRepository userRepository = UserRepository.getInstance();

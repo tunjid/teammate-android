@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="on_boarding" translatable="true">
+        <item>Hi there, and welcome to Teammate! tap "Next" to continue onboarding or swipe to dismiss.</item>
+        <item>The navbar is your primary mode of navigation. Swipe up or long press on it for more options.</item>
+        <item>The navbar also contains your current team in focus. You can switch teams at anytime from navbar or in context menus on various screens.</item>
+        <item>That\'s it! Hope you enjoy using Teammate!</item>
+    </array>
+</resources>

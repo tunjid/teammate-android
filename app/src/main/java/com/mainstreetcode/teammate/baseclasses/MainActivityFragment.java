@@ -26,6 +26,7 @@ import com.mainstreetcode.teammate.viewmodel.GameViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocalRoleViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammate.viewmodel.MediaViewModel;
+import com.mainstreetcode.teammate.viewmodel.PrefsViewModel;
 import com.mainstreetcode.teammate.viewmodel.RoleViewModel;
 import com.mainstreetcode.teammate.viewmodel.StatViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel;
@@ -44,11 +45,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected RoleViewModel roleViewModel;
     protected UserViewModel userViewModel;
     protected TeamViewModel teamViewModel;
+    protected ChatViewModel chatViewModel;
     protected GameViewModel gameViewModel;
     protected StatViewModel statViewModel;
+    protected PrefsViewModel prefsViewModel;
     protected EventViewModel eventViewModel;
     protected MediaViewModel mediaViewModel;
-    protected ChatViewModel chatViewModel;
     protected LocationViewModel locationViewModel;
     protected LocalRoleViewModel localRoleViewModel;
     protected TeamMemberViewModel teamMemberViewModel;
@@ -70,11 +72,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         roleViewModel = provider.get(RoleViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         teamViewModel = provider.get(TeamViewModel.class);
+        chatViewModel = provider.get(ChatViewModel.class);
         gameViewModel = provider.get(GameViewModel.class);
         statViewModel = provider.get(StatViewModel.class);
+        prefsViewModel = provider.get(PrefsViewModel.class);
         eventViewModel = provider.get(EventViewModel.class);
         mediaViewModel = provider.get(MediaViewModel.class);
-        chatViewModel = provider.get(ChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
         teamMemberViewModel = provider.get(TeamMemberViewModel.class);
         tournamentViewModel = provider.get(TournamentViewModel.class);
@@ -135,6 +138,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     }
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
         userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),

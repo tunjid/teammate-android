@@ -340,9 +340,12 @@ public final class GameFragment extends MainActivityFragment
     }
 
     private void checkCompetitor() {
-        if (competitor.isEmpty() && !game.getHome().isAccepted()) competitor.update(game.getHome());
-        if (competitor.isEmpty() && !game.getAway().isAccepted()) competitor.update(game.getAway());
-        if (competitor.isEmpty() || competitor.isAccepted() || hasChoiceBar) return;
+        boolean competitorEmpty = competitor.isEmpty();
+        if (hasChoiceBar) return;
+        if (competitorEmpty && !roleViewModel.partakesInGame(game)) return;
+        if (competitorEmpty && !game.getHome().isAccepted()) competitor.update(game.getHome());
+        if (competitorEmpty && !game.getAway().isAccepted()) competitor.update(game.getAway());
+        if (competitorEmpty || competitor.isAccepted()) return;
 
         hasChoiceBar = true;
         showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))

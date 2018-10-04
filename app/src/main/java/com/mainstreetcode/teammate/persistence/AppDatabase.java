@@ -108,6 +108,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract JoinRequestDao joinRequestDao();
 
 
+    public PrefsDao prefsDao() {return new PrefsDao();}
+
     public DeviceDao deviceDao() {return new DeviceDao();}
 
     public ConfigDao configDao() {return new ConfigDao();}

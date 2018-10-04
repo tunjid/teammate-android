@@ -224,7 +224,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @SuppressWarnings("unchecked")
     public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout,"", LENGTH_INDEFINITE).addCallback(callback);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, "", LENGTH_INDEFINITE).addCallback(callback);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
@@ -329,7 +329,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     private void clearTransientBars() {
-        for (BaseTransientBottomBar bar : transientBottomBars) bar.dismiss();
+        for (BaseTransientBottomBar bar : transientBottomBars)
+            if (bar instanceof ChoiceBar) ((ChoiceBar) bar).dismissAsTimeout();
+            else bar.dismiss();
         transientBottomBars.clear();
     }
 

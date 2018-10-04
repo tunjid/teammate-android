@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.FeedAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.FeedItemViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
@@ -30,11 +32,16 @@ import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Single;
 
+import static android.support.design.widget.Snackbar.Callback.DISMISS_EVENT_MANUAL;
+import static android.support.design.widget.Snackbar.Callback.DISMISS_EVENT_SWIPE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
@@ -89,6 +96,7 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
+        onBoard();
         scrollManager.setRefreshing();
         disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
@@ -232,6 +240,29 @@ public final class FeedFragment extends MainActivityFragment
 
     private void setToolbarTitle(User user) {
         setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName()));
+    }
+
+    private void onBoard() {
+        if (prefsViewModel.isOnBoarded()) return;
+        Iterator<String> iterator = Arrays.asList(getResources().getStringArray(R.array.on_boarding)).iterator();
+        AtomicReference<Runnable> ref = new AtomicReference<>();
+
+        ref.set(() -> showChoices(choiceBar -> choiceBar.setText(iterator.next())
+                .setPositiveText(getString(iterator.hasNext() ? R.string.next : R.string.finish))
+                .setPositiveClickListener(view -> {
+                    if (iterator.hasNext()) ref.get().run();
+                    else choiceBar.dismiss();
+                })
+                .addCallback(new BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
+                    public void onDismissed(ChoiceBar bar, int event) {onBoardDismissed(event); }
+                })
+        ));
+        ref.get().run();
+    }
+
+    private void onBoardDismissed(int event) {
+        if (event != DISMISS_EVENT_SWIPE && event != DISMISS_EVENT_MANUAL) return;
+        prefsViewModel.setOnBoarded(true);
     }
 
     private static String getTimeOfDay() {

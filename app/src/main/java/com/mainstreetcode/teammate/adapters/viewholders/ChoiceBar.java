@@ -4,6 +4,7 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.v4.view.ViewCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,15 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 
+import static android.support.design.widget.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION;
+import static android.support.design.widget.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT;
 import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.findSuitableParent;
 import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.forceAnimation;
 
 public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
+
+    private TextView positiveButton;
+    private TextView negativeButton;
 
     /**
      * Constructor for the transient bottom bar.
@@ -25,6 +31,9 @@ public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
      */
     private ChoiceBar(ViewGroup parent, View content, android.support.design.snackbar.ContentViewCallback callback) {
         super(parent, content, callback);
+
+        positiveButton = content.findViewById(R.id.positive_button);
+        negativeButton = content.findViewById(R.id.negative_button);
 
         // Remove the default insets applied that account for the keyboard showing up
         // since it's handled by us
@@ -46,33 +55,43 @@ public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
         return choiceBar;
     }
 
+    @Override
+    public void show() {
+        if (TextUtils.isEmpty(positiveButton.getText())) positiveButton.setVisibility(View.GONE);
+        if (TextUtils.isEmpty(negativeButton.getText())) negativeButton.setVisibility(View.GONE);
+        positiveButton = negativeButton = null;
+        super.show();
+    }
+
+    public void dismissAsTimeout() { dispatchDismiss(DISMISS_EVENT_TIMEOUT); }
+
     public ChoiceBar setText(CharSequence message) {
         getView().<TextView>findViewById(R.id.text).setText(message);
         return this;
     }
 
     public ChoiceBar setPositiveText(CharSequence message) {
-        getView().<TextView>findViewById(R.id.positive_button).setText(message);
+        positiveButton.setText(message);
         return this;
     }
 
     public ChoiceBar setNegativeText(CharSequence message) {
-        getView().<TextView>findViewById(R.id.negative_button).setText(message);
+        negativeButton.setText(message);
         return this;
     }
 
     public ChoiceBar setPositiveClickListener(View.OnClickListener listener) {
-        getView().findViewById(R.id.positive_button).setOnClickListener(view -> {
+        positiveButton.setOnClickListener(view -> {
             listener.onClick(view);
-            dismiss();
+            dispatchDismiss(DISMISS_EVENT_ACTION);
         });
         return this;
     }
 
     public ChoiceBar setNegativeClickListener(View.OnClickListener listener) {
-        getView().findViewById(R.id.negative_button).setOnClickListener(view -> {
+        negativeButton.setOnClickListener(view -> {
             listener.onClick(view);
-            dismiss();
+            dispatchDismiss(DISMISS_EVENT_ACTION);
         });
         return this;
     }

@@ -66,6 +66,7 @@ public class Competitor extends CompetitorEntity
 
     @Override
     public void update(Competitor updated) {
+        this.id = updated.id;
         this.seed = updated.seed;
         this.accepted = updated.accepted;
         this.declined = updated.declined;
