@@ -61,6 +61,7 @@
     <string name="next">Next</string>
     <string name="finish">Finish</string>
     <string name="accept">Accept</string>
+    <string name="show_on_boarding">Show tutorial</string>
     <string name="decline">Decline</string>
     <string name="clarify_invitation">Do you still want to join %1$s?</string>
     <string name="accept_invitation">Join %1$s?</string>

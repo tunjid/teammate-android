@@ -13,14 +13,15 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.SettingsItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public final class SettingsFragment extends MainActivityFragment
         implements SettingsAdapter.SettingsAdapterListener {
 
-    private static final List<SettingsItem> items = Collections.singletonList(
-            new SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp)
+    private static final List<SettingsItem> items = Arrays.asList(
+            new SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp),
+            new SettingsItem(R.string.show_on_boarding, R.drawable.ic_teach_24dp)
     );
 
     public static SettingsFragment newInstance() {
@@ -60,6 +61,10 @@ public final class SettingsFragment extends MainActivityFragment
         switch (item.getStringRes()) {
             case R.string.sign_out:
                 signOut();
+                break;
+            case R.string.show_on_boarding:
+                prefsViewModel.setOnBoarded(false);
+                showFragment(FeedFragment.newInstance());
                 break;
             case R.string.my_profile:
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
