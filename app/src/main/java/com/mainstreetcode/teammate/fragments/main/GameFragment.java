@@ -368,7 +368,7 @@ public final class GameFragment extends MainActivityFragment
 
         refereeChip.setCloseIconVisible(!referee.isEmpty() && privilegeStatus.get());
         refereeChip.setText(referee.isEmpty()
-                ? getString(privilegeStatus.get()
+                ? getString(privilegeStatus.get() && !game.isEnded()
                 ? R.string.game_choose_referee : R.string.game_no_referee)
                 : getString(R.string.game_referee, referee.getName()));
 

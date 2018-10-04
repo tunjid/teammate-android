@@ -35,6 +35,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -52,6 +53,8 @@ public final class FeedFragment extends MainActivityFragment
         implements FeedAdapter.FeedItemAdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.feed_list};
+
+    private int onBoardingIndex;
     private AtomicBoolean bottomBarState;
 
     public static FeedFragment newInstance() {
@@ -244,12 +247,16 @@ public final class FeedFragment extends MainActivityFragment
 
     private void onBoard() {
         if (prefsViewModel.isOnBoarded()) return;
-        Iterator<String> iterator = Arrays.asList(getResources().getStringArray(R.array.on_boarding)).iterator();
+        List<String> prompts = Arrays.asList(getResources().getStringArray(R.array.on_boarding));
+        prompts = prompts.subList(onBoardingIndex, prompts.size());
+
+        Iterator<String> iterator = prompts.iterator();
         AtomicReference<Runnable> ref = new AtomicReference<>();
 
         ref.set(() -> showChoices(choiceBar -> choiceBar.setText(iterator.next())
                 .setPositiveText(getString(iterator.hasNext() ? R.string.next : R.string.finish))
                 .setPositiveClickListener(view -> {
+                    onBoardingIndex++;
                     if (iterator.hasNext()) ref.get().run();
                     else choiceBar.dismiss();
                 })
@@ -262,6 +269,7 @@ public final class FeedFragment extends MainActivityFragment
 
     private void onBoardDismissed(int event) {
         if (event != DISMISS_EVENT_SWIPE && event != DISMISS_EVENT_MANUAL) return;
+        onBoardingIndex = 0;
         prefsViewModel.setOnBoarded(true);
     }
 
