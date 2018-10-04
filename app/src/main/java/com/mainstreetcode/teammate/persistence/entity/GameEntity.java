@@ -35,6 +35,7 @@ public class GameEntity implements Parcelable {
 
     @NonNull @PrimaryKey
     @ColumnInfo(name = "game_id") protected String id;
+    @ColumnInfo(name = "game_name") protected String name;
     @ColumnInfo(name = "game_ref_path") protected String refPath;
     @ColumnInfo(name = "game_score") protected String score;
     @ColumnInfo(name = "game_match_up") protected String matchUp;
@@ -61,13 +62,14 @@ public class GameEntity implements Parcelable {
     @ColumnInfo(name = "game_ended") protected boolean ended;
     @ColumnInfo(name = "game_can_draw") protected boolean canDraw;
 
-    public GameEntity(@NonNull String id, String refPath, String score, String matchUp,
+    public GameEntity(@NonNull String id, String name, String refPath, String score, String matchUp,
                       String homeEntityId, String awayEntityId, String winnerEntityId,
                       Date created, Sport sport, User referee, Team host, Event event, Tournament tournament,
                       Competitor home, Competitor away, Competitor winner,
                       int seed, int leg, int round, int homeScore, int awayScore,
                       boolean ended, boolean canDraw) {
         this.id = id;
+        this.name = name;
         this.refPath = refPath;
         this.score = score;
         this.matchUp = matchUp;
@@ -94,6 +96,7 @@ public class GameEntity implements Parcelable {
 
     protected GameEntity(Parcel in) {
         id = in.readString();
+        name = in.readString();
         refPath = in.readString();
         score = in.readString();
         matchUp = in.readString();
@@ -123,21 +126,15 @@ public class GameEntity implements Parcelable {
     }
 
     @NonNull
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
 
-    public String getImageUrl() {
-        return EMPTY_STRING;
-    }
+    public String getName() { return name; }
 
-    public String getRefPath() {
-        return refPath;
-    }
+    public String getImageUrl() { return EMPTY_STRING; }
 
-    public String getDate() {
-        return event.isEmpty() ? "" : prettyPrinter.format(event.startDate);
-    }
+    public String getRefPath() { return refPath; }
+
+    public String getDate() { return event.isEmpty() ? "" : prettyPrinter.format(event.startDate); }
 
     public String getMatchUp() { return matchUp; }
 
@@ -247,6 +244,7 @@ public class GameEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeString(name);
         dest.writeString(refPath);
         dest.writeString(score);
         dest.writeString(matchUp);

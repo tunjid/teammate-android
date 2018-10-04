@@ -246,6 +246,7 @@
     <string name="game_losses">Losses</string>
     <string name="game_home">Home</string>
     <string name="game_away">Away</string>
+    <string name="game_competitors">Competitors</string>
     <string name="game_home_score">Home score</string>
     <string name="game_away_score">Away score</string>
     <string name="game_round">Round</string>

@@ -43,6 +43,7 @@ public class Migration3To4 extends Migration {
 
         database.execSQL("CREATE TABLE IF NOT EXISTS `games` " +
                 "(`game_id` TEXT NOT NULL, " +
+                "`game_name` TEXT, " +
                 "`game_ref_path` TEXT, " +
                 "`game_score` TEXT, " +
                 "`game_home_entity` TEXT, " +

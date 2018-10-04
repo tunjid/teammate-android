@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.chip.Chip;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.transition.AutoTransition;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
@@ -54,6 +56,7 @@ public final class GameFragment extends MainActivityFragment
     private Competitor competitor;
     private List<Identifiable> items;
 
+    private boolean hasChoiceBar;
     private GameGofer gofer;
     private AtomicBoolean editableStatus;
     private AtomicBoolean privilegeStatus;
@@ -312,6 +315,7 @@ public final class GameFragment extends MainActivityFragment
         disposables.add(gofer.prepare().subscribe(requireActivity()::invalidateOptionsMenu, ErrorHandler.EMPTY));
         gameViewHolder.bind(game);
         toggleProgress(false);
+        checkCompetitor();
         updateStatuses();
         bindReferee();
     }
@@ -336,12 +340,19 @@ public final class GameFragment extends MainActivityFragment
     }
 
     private void checkCompetitor() {
-        if (!competitor.isEmpty() && !competitor.isAccepted())
-            showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))
-                    .setPositiveText(getText(R.string.accept))
-                    .setNegativeText(getText(R.string.decline))
-                    .setPositiveClickListener(v -> respond(true))
-                    .setNegativeClickListener(v -> respond(false)));
+        if (competitor.isEmpty() && !game.getHome().isAccepted()) competitor.update(game.getHome());
+        if (competitor.isEmpty() && !game.getAway().isAccepted()) competitor.update(game.getAway());
+        if (competitor.isEmpty() || competitor.isAccepted() || hasChoiceBar) return;
+
+        hasChoiceBar = true;
+        showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))
+                .setPositiveText(getText(R.string.accept))
+                .setNegativeText(getText(R.string.decline))
+                .setPositiveClickListener(v -> respond(true))
+                .setNegativeClickListener(v -> respond(false))
+                .addCallback(new BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
+                    public void onDismissed(ChoiceBar shown, int event) { hasChoiceBar = false; }
+                }));
     }
 
     private void bindReferee() {

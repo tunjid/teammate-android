@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "48d817974d0f0dcd2a525d40dc2117fc",
+    "identityHash": "cebfb5964c91f0de8be8fe8ce86544a6",
     "entities": [
       {
         "tableName": "users",
@@ -702,13 +702,19 @@
       },
       {
         "tableName": "games",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `game_ref_path` TEXT, `game_score` TEXT, `game_match_up` TEXT, `game_home_entity` TEXT, `game_away_entity` TEXT, `game_winner_entity` TEXT, `game_created` INTEGER, `game_sport` TEXT, `game_referee` TEXT, `game_host` TEXT, `game_event` TEXT, `game_tournament` TEXT, `game_home` TEXT, `game_away` TEXT, `game_winner` TEXT, `game_leg` INTEGER NOT NULL, `game_seed` INTEGER NOT NULL, `game_round` INTEGER NOT NULL, `game_home_score` INTEGER NOT NULL, `game_away_score` INTEGER NOT NULL, `game_ended` INTEGER NOT NULL, `game_can_draw` INTEGER NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `game_name` TEXT, `game_ref_path` TEXT, `game_score` TEXT, `game_match_up` TEXT, `game_home_entity` TEXT, `game_away_entity` TEXT, `game_winner_entity` TEXT, `game_created` INTEGER, `game_sport` TEXT, `game_referee` TEXT, `game_host` TEXT, `game_event` TEXT, `game_tournament` TEXT, `game_home` TEXT, `game_away` TEXT, `game_winner` TEXT, `game_leg` INTEGER NOT NULL, `game_seed` INTEGER NOT NULL, `game_round` INTEGER NOT NULL, `game_home_score` INTEGER NOT NULL, `game_away_score` INTEGER NOT NULL, `game_ended` INTEGER NOT NULL, `game_can_draw` INTEGER NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_tournament`) REFERENCES `tournaments`(`tournament_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "game_id",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "game_name",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "refPath",
@@ -1122,7 +1128,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"48d817974d0f0dcd2a525d40dc2117fc\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"cebfb5964c91f0de8be8fe8ce86544a6\")"
     ]
   }
 }
