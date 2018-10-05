@@ -98,9 +98,9 @@ public class Team extends TeamEntity
     }
 
     @Override
-    public String getRefType() {
-        return COMPETITOR_TYPE;
-    }
+    public String getRefType() { return COMPETITOR_TYPE; }
+
+    public String getImageUrl() { return TextUtils.isEmpty(imageUrl) ? Config.getDefaultTeamLogo() : imageUrl; }
 
     @Override
     public Object getChangePayload(Identifiable other) {
