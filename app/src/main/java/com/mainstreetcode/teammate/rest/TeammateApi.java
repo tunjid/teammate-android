@@ -79,6 +79,9 @@ public interface TeammateApi {
     @PUT("api/users/{id}")
     Single<User> updateUser(@Path(ID_PATH) String userId, @Body User user);
 
+    @DELETE("api/users/{id}")
+    Single<User> deleteUser(@Path(ID_PATH) String userId);
+
     @Multipart
     @POST("api/users/{id}")
     Single<User> uploadUserPhoto(@Path(ID_PATH) String userId, @Part MultipartBody.Part file);

@@ -1,13 +1,19 @@
 package com.mainstreetcode.teammate.fragments.main;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.adapters.SettingsAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.SettingsItem;
@@ -33,6 +39,12 @@ public final class SettingsFragment extends MainActivityFragment
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
@@ -46,14 +58,39 @@ public final class SettingsFragment extends MainActivityFragment
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_settings, menu);
+    }
+
+    @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
         setToolbarTitle(getString(R.string.settings));
     }
 
     @Override
-    public boolean showsFab() {
-        return false;
+    public boolean showsFab() { return false; }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() != R.id.action_delete_account)
+            return super.onOptionsItemSelected(item);
+
+        new AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_user_prompt))
+                .setMessage(R.string.delete_user_prompt_body)
+                .setPositiveButton(R.string.yes, (dialog, which) -> deleteAccount())
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .show();
+
+        return true;
+    }
+
+    private void deleteAccount() {
+        disposables.add(userViewModel.deleteAccount().subscribe(deleted -> {
+            Activity activity = requireActivity();
+            MainActivity.startRegistrationActivity(activity);
+            activity.finish();
+        }, defaultErrorHandler));
     }
 
     @Override

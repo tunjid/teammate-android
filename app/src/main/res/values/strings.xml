@@ -70,7 +70,12 @@
     <string name="sign_out">Sign Out</string>
     <string name="join_team">Join Team</string>
     <string name="my_profile">My Profile</string>
-
+    <string name="delete_user">Delete account</string>
+    <string name="delete_user_prompt">Delete your account?</string>
+    <string name="delete_user_prompt_body">This is permanent and cannot be undone.
+        \n\nAll your roles will be deleted as well, however chats and media in teams will remain unless those teams are deleted too.
+        \n\nGames and stats will remain after deletion as they involve other people and teams.
+        \n\nIf you are the only admin on a team, you will need to make someone else the admin or delete the team too.</string>
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
     <string name="error_default">Sorry, an error occurred</string>

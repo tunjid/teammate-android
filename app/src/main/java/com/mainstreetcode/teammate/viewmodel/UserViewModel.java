@@ -55,6 +55,11 @@ public class UserViewModel extends ViewModel {
         return repository.signIn(email, password).observeOn(mainThread());
     }
 
+    public Single<User> deleteAccount() {
+        TeamViewModel.teams.clear();
+        return repository.delete(getCurrentUser()).observeOn(mainThread());
+    }
+
     public Single<Boolean> signOut() {
         TeamViewModel.teams.clear();
         return repository.signOut().observeOn(mainThread());

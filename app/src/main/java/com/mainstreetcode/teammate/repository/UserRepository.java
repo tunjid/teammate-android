@@ -100,8 +100,11 @@ public class UserRepository extends ModelRepository<User> {
 
     @Override
     public Single<User> delete(User model) {
-        userDao.delete(model);
-        return just(model);
+        return api.deleteUser(model.getId())
+                .map(this::deleteLocally)
+                .flatMap(user -> clearTables())
+                .map(clearedTables -> model)
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 
     @Override
@@ -143,13 +146,11 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<Boolean> signOut() {
-        AppDatabase database = AppDatabase.getInstance();
-        Single<Boolean> local = database.clearTables().flatMap(result -> clearUser());
-        Device device = database.deviceDao().getCurrent();
+        Device device = AppDatabase.getInstance().deviceDao().getCurrent();
 
         return api.signOut(device.getId())
-                .flatMap(result -> local)
-                .onErrorResumeNext(throwable -> local)
+                .flatMap(result -> clearTables())
+                .onErrorResumeNext(throwable -> clearTables())
                 .subscribeOn(io());
     }
 
@@ -205,6 +206,11 @@ public class UserRepository extends ModelRepository<User> {
     private User saveUserId(User user) {
         app.getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(USER_ID, user.getId()).apply();
         return user;
+    }
+
+    private Single<Boolean> clearTables() {
+        AppDatabase database = AppDatabase.getInstance();
+        return database.clearTables().flatMap(result -> clearUser()).onErrorReturn(throwable -> false);
     }
 
     /**
