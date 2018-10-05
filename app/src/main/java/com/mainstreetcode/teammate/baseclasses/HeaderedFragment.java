@@ -23,6 +23,7 @@ import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
+import com.mainstreetcode.teammate.util.AppBarListener;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
@@ -50,6 +51,8 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
 
+    private AppBarListener appBarListener;
+
     protected abstract T getHeaderedModel();
 
     protected abstract Gofer<T> gofer();
@@ -60,6 +63,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ImageWorkerFragment.attach(this);
+        appBarListener = AppBarListener.with(this::updateFabForScrollState);
     }
 
     @Override
@@ -78,7 +82,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
-        appBarLayout.addOnOffsetChangedListener((appBarLayout, i) -> setFabExtended(i == 0));
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, i) -> appBarListener.onOffsetChanged(i));
         view.findViewById(R.id.header).setVisibility(canExpandAppBar() ? View.VISIBLE : View.GONE);
     }
 
@@ -132,7 +136,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         if (appBarLayout != null) appBarLayout.setExpanded(false);
         if (showsFab()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
                 .observeOn(mainThread())
-                .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
+                .subscribe(() -> toggleFab(showsFab()), ErrorHandler.EMPTY));
     }
 
     protected final void refresh() {
@@ -158,7 +162,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
         new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.block_user)
-                .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialog, index) -> {
+                .setItems(sequences.toArray(new CharSequence[0]), (dialog, index) -> {
                     BlockReason reason = reasons.get(index);
                     BlockedUser request = BlockedUser.block(user, team, reason);
 

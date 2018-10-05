@@ -141,6 +141,7 @@ public class TeamMembersFragment extends MainActivityFragment
                 Context context = getContext();
                 if (context == null) return true;
                 new AlertDialog.Builder(context).setTitle(getString(R.string.delete_team_prompt, team.getName()))
+                        .setMessage(R.string.delete_team_prompt_body)
                         .setPositiveButton(R.string.yes, (dialog, which) -> deleteTeam())
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();

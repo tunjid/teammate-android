@@ -124,6 +124,9 @@
     <string name="create_team_first">Please create the team first</string>
     <string name="delete_team">Delete team</string>
     <string name="delete_team_prompt">Delete %1$s?</string>
+    <string name="delete_team_prompt_body">This is permanent and cannot be undone.
+        \n\nAll roles and events that do not have games will be deleted as well, along with chats and media.
+        \n\nGames and stats will remain after deletion as they involve other people and teams. </string>
     <string name="deleted_team">Deleted %1$s</string>
 
     <!--RoleEditFragment-->
