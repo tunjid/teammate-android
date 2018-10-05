@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.fragments.main;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
@@ -41,9 +40,12 @@ import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
 
 public class TournamentDetailFragment extends MainActivityFragment {
 
-    public static final String ARG_TOURNAMENT = "role";
+    public static final String ARG_TOURNAMENT = "tournament";
+    private static final String ARG_COMPETITOR = "competitor";
 
     private Tournament tournament;
+    private Competitor competitor;
+
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private EmptyViewHolder viewHolder;
@@ -59,6 +61,12 @@ public class TournamentDetailFragment extends MainActivityFragment {
         return fragment;
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public TournamentDetailFragment pending(Competitor competitor) {
+        getArguments().putParcelable(ARG_COMPETITOR, competitor);
+        return this;
+    }
+
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
@@ -70,7 +78,11 @@ public class TournamentDetailFragment extends MainActivityFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        tournament = getArguments().getParcelable(ARG_TOURNAMENT);
+        Bundle args = getArguments();
+        tournament = args.getParcelable(ARG_TOURNAMENT);
+        competitor = args.getParcelable(ARG_COMPETITOR);
+
+        if (competitor == null) competitor = Competitor.empty();
     }
 
     @Nullable
@@ -126,6 +138,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     public void onResume() {
         super.onResume();
+        checkCompetitor();
         int rounds = tournament.getNumRounds();
         User user = userViewModel.getCurrentUser();
         Team team = tournament.getHost();
@@ -167,6 +180,21 @@ public class TournamentDetailFragment extends MainActivityFragment {
         if (v.getId() == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament));
     }
 
+    private void checkCompetitor() {
+        if (competitor.isEmpty() || competitor.isAccepted()) return;
+        showChoices(choiceBar -> choiceBar.setText(getString(R.string.tournament_accept))
+                .setPositiveText(getText(R.string.accept))
+                .setNegativeText(getText(R.string.decline))
+                .setPositiveClickListener(v -> respond(true))
+                .setNegativeClickListener(v -> respond(false)));
+    }
+
+    private void respond(boolean accept) {
+        toggleProgress(true);
+        disposables.add(gameViewModel.respondToCompetition(competitor, accept)
+                .subscribe(ignored -> toggleProgress(false), defaultErrorHandler));
+    }
+
     private void deleteTournament() {
         disposables.add(tournamentViewModel.delete(tournament).subscribe(this::onTournamentDeleted, defaultErrorHandler));
     }
@@ -174,11 +202,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
     private void onTournamentDeleted(Tournament deleted) {
         showSnackbar(getString(R.string.deleted_team, deleted.getName()));
         removeEnterExitTransitions();
-
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        activity.onBackPressed();
+        requireActivity().onBackPressed();
     }
 
     @SuppressWarnings("unchecked")

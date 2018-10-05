@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
-            app:layout_behavior="com.mainstreetcode.teammate.util.SnackBarBehavior" />
+            app:layout_behavior="com.mainstreetcode.teammate.util.TransientBarBehavior" />
     </android.support.design.widget.CoordinatorLayout>
 
     <View

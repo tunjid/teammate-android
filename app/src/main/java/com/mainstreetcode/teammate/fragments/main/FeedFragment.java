@@ -148,7 +148,7 @@ public final class FeedFragment extends MainActivityFragment
                         BaseFragment fragment = !competitor.getGame().isEmpty()
                                 ? GameFragment.newInstance(competitor.getGame()).pending(competitor)
                                 : !competitor.getTournament().isEmpty()
-                                ? TournamentEditFragment.newInstance(competitor.getTournament()).pending(competitor)
+                                ? TournamentDetailFragment.newInstance(competitor.getTournament()).pending(competitor)
                                 : null;
                         if (fragment != null) showFragment(fragment);
                     }))
