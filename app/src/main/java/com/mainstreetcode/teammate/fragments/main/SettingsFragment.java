@@ -107,6 +107,5 @@ public final class SettingsFragment extends MainActivityFragment
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));
                 break;
         }
-
     }
 }
