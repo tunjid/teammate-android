@@ -71,8 +71,8 @@ public class Competitor extends CompetitorEntity
         this.accepted = updated.accepted;
         this.declined = updated.declined;
 
-        if (!TextUtils.isEmpty(updated.tournamentId)) this.tournamentId = updated.tournamentId;
-        if (!TextUtils.isEmpty(updated.gameId)) this.gameId = updated.gameId;
+        this.tournamentId = updated.tournamentId;
+        this.gameId = updated.gameId;
 
         updateEntity(updated.entity);
     }

@@ -51,8 +51,6 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     private AppBarLayout appBarLayout;
     protected HeaderedImageViewHolder viewHolder;
 
-    private AppBarListener appBarListener;
-
     protected abstract T getHeaderedModel();
 
     protected abstract Gofer<T> gofer();
@@ -63,7 +61,6 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ImageWorkerFragment.attach(this);
-        appBarListener = AppBarListener.with(this::updateFabForScrollState);
     }
 
     @Override
@@ -82,8 +79,13 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
-        appBarLayout.addOnOffsetChangedListener((appBarLayout, i) -> appBarListener.onOffsetChanged(i));
         view.findViewById(R.id.header).setVisibility(canExpandAppBar() ? View.VISIBLE : View.GONE);
+
+        AppBarListener.builder()
+                .setAppBarLayout(appBarLayout)
+                .setOffsetDiffListener(offsetProps -> updateFabForScrollState(offsetProps.getDy()))
+                .create();
+
     }
 
     @Override
