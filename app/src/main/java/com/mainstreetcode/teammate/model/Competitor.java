@@ -27,11 +27,11 @@ public class Competitor extends CompetitorEntity
         Model<Competitor> {
 
     public static Competitor empty() {
-        return new Competitor("", "", "", "", new EmptyCompetitor(), new Date(), -1, false, false);
+        return new Competitor("", "", null, null, new EmptyCompetitor(), new Date(), -1, false, false);
     }
 
     public static Competitor empty(Competitive entity) {
-        return new Competitor("", "", "", "", entity, new Date(), -1, false, false);
+        return new Competitor("", "", null, null, entity, new Date(), -1, false, false);
     }
 
     public Competitor(@NonNull String id, String refPath, String tournamentId, String gameId,
@@ -48,9 +48,9 @@ public class Competitor extends CompetitorEntity
         return getRefType().equals(other.getRefType());
     }
 
-    public Tournament getTournament() { return Tournament.withId(tournamentId); }
+    public Tournament getTournament() { return TextUtils.isEmpty(tournamentId) ? Tournament.empty() : Tournament.withId(tournamentId); }
 
-    public Game getGame() { return Game.withId(gameId); }
+    public Game getGame() { return TextUtils.isEmpty(gameId) ? Game.empty(Team.empty()) : Game.withId(gameId); }
 
     @Override
     public boolean hasMajorFields() { return areNotEmpty(id, refPath) && entity.hasMajorFields(); }
