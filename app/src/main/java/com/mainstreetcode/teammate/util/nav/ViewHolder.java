@@ -78,13 +78,6 @@ public class ViewHolder {
         icon.setImageDrawable(drawable);
     }
 
-    void onCustomImageLoaded(boolean succeeded) {
-        hasCustomImage = succeeded;
-        icon.setDisableCircularTransformation(!succeeded);
-        icon.setBorderWidth(succeeded ? itemView.getResources().getDimensionPixelSize(R.dimen.sixteenth_margin) : 0);
-        if (!hasCustomImage) bind(navItem);
-    }
-
     ViewHolder bind(NavItem navItem) {
         this.navItem = navItem;
         itemView.setId(navItem.idRes);
@@ -97,6 +90,13 @@ public class ViewHolder {
     ViewHolder setOnClickListener(View.OnClickListener listener) {
         itemView.setOnClickListener(listener);
         return this;
+    }
+
+    private void onCustomImageLoaded(boolean succeeded) {
+        hasCustomImage = succeeded;
+        icon.setDisableCircularTransformation(!succeeded);
+        icon.setBorderWidth(succeeded ? itemView.getResources().getDimensionPixelSize(R.dimen.sixteenth_margin) : 0);
+        if (!hasCustomImage) bind(navItem);
     }
 
     private static class ImageCallback implements Callback {

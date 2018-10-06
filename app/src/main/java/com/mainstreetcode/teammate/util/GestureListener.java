@@ -54,7 +54,7 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
      * @param y2 the y position of the second point
      * @return the direction
      */
-    private Direction getDirection(float x1, float y1, float x2, float y2) {
+    protected Direction getDirection(float x1, float y1, float x2, float y2) {
         double angle = getAngle(x1, y1, x2, y2);
         return Direction.fromAngle(angle);
     }
