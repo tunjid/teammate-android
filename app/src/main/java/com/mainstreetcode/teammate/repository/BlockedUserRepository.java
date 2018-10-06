@@ -62,7 +62,7 @@ public class BlockedUserRepository extends TeamQueryRepository<BlockedUser> {
 
     @Override
     Maybe<List<BlockedUser>> remoteModelsBefore(Team key, @Nullable Date date) {
-        return api.blockedUsers(key.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.blockedUsers(key.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     @Override

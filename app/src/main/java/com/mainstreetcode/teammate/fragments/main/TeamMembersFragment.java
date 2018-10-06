@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
@@ -18,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
+import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -84,8 +88,8 @@ public class TeamMembersFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withAdapter(new TeamMemberAdapter(teamModels, this))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addScrollListener(this::updateFabOnScroll)
                 .withStaggeredGridLayoutManager(2)
                 .build();
 
@@ -101,17 +105,24 @@ public class TeamMembersFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_team_detail, menu);
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
         boolean visible = showsFab();
 
         MenuItem editItem = menu.findItem(R.id.action_edit);
         MenuItem deleteItem = menu.findItem(R.id.action_delete);
         MenuItem blockedItem = menu.findItem(R.id.action_blocked);
+        MenuItem tournamentItem = menu.findItem(R.id.action_team_tournaments);
 
         editItem.setVisible(visible);
         deleteItem.setVisible(visible);
         blockedItem.setVisible(visible);
+        tournamentItem.setVisible(team.getSport().supportsTournaments());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_team_detail, menu);
     }
 
     @Override
@@ -120,6 +131,9 @@ public class TeamMembersFragment extends MainActivityFragment
             case R.id.action_edit:
                 showFragment(TeamEditFragment.newEditInstance(team));
                 return true;
+            case R.id.action_team_tournaments:
+                showFragment(TournamentsFragment.newInstance(team));
+                return true;
             case R.id.action_blocked:
                 showFragment(BlockedUsersFragment.newInstance(team));
                 return true;
@@ -127,6 +141,7 @@ public class TeamMembersFragment extends MainActivityFragment
                 Context context = getContext();
                 if (context == null) return true;
                 new AlertDialog.Builder(context).setTitle(getString(R.string.delete_team_prompt, team.getName()))
+                        .setMessage(R.string.delete_team_prompt_body)
                         .setPositiveButton(R.string.yes, (dialog, which) -> deleteTeam())
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                         .show();
@@ -137,28 +152,41 @@ public class TeamMembersFragment extends MainActivityFragment
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_group_add_white_24dp);
-        setToolbarTitle(getString(R.string.team_name_prefix, team.getName()));
+        setToolbarTitle(getTargetFragment() != null ? "" : getString(R.string.team_name_prefix, team.getName()));
+        super.togglePersistentUi();
     }
 
     @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.invite_user; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_group_add_white_24dp; }
+
+    @Override
     public boolean showsFab() {
-        return localRoleViewModel.hasPrivilegedRole();
+        return getTargetRequestCode() == 0 && localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
     public void onRoleClicked(Role role) {
-        View rootView = getView();
-        if (rootView == null) return;
+        Fragment target = getTargetFragment();
+        boolean canPick = target instanceof UserAdapter.AdapterListener;
 
-        showFragment(RoleEditFragment.newInstance(role));
+        if (canPick) ((UserAdapter.AdapterListener) target).onUserClicked(role.getUser());
+        else showFragment(RoleEditFragment.newInstance(role));
     }
 
     @Override
     public void onJoinRequestClicked(JoinRequest request) {
-        showFragment(JoinRequestFragment.viewInstance(request));
+        Fragment target = getTargetFragment();
+        boolean canPick = target instanceof UserAdapter.AdapterListener;
+
+        if (canPick) showSnackbar(getString(R.string.stat_user_not_on_team));
+        else showFragment(JoinRequestFragment.viewInstance(request));
     }
 
     @Override

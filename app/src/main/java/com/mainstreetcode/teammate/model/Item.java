@@ -41,9 +41,15 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final int VISIBILITY = 15;
     public static final int ABOUT = 16;
     public static final int NICKNAME = 17;
+    public static final int STAT_TYPE = 18;
+    public static final int TOURNAMENT_TYPE = 19;
+    public static final int TOURNAMENT_STYLE = 20;
+    public static final int COMPETITOR = 21;
 
     public static final Supplier<Boolean> TRUE = () -> true;
     public static final Supplier<Boolean> FALSE = () -> false;
+
+    public static final Function<CharSequence, CharSequence> ALL_INPUT_VALID = sequence -> "";
 
     @SuppressWarnings("unused")
     public static <T> void ignore(T ignored) {}
@@ -116,6 +122,8 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public int getStringRes() {return this.stringRes;}
 
     public CharSequence getValue() {return textTransformer == null ? value : textTransformer.apply(value);}
+
+    public String getRawValue() {return value.toString();}
 
     @Override
     public String getId() {return id;}

@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.util;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
@@ -19,21 +20,21 @@ import java.util.List;
  * Created by tj.dahunsi on 4/15/17.
  */
 @SuppressWarnings("unused") // Constructed via xml
-public class SnackBarBehavior extends CoordinatorLayout.Behavior<View> {
+public class TransientBarBehavior extends CoordinatorLayout.Behavior<View> {
 
     private static final Interpolator fastOutSlowInInterpolator = new FastOutSlowInInterpolator();
 
-    public SnackBarBehavior(Context context, AttributeSet attrs) {
+    public TransientBarBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
+    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency) {
         return dependency instanceof Snackbar.SnackbarLayout;
     }
 
     @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
+    public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency) {
         if (child.getVisibility() == View.VISIBLE) {
             float translationY = this.getViewTranslationYForSnackbar(parent, child);
             child.setTranslationY(translationY);
@@ -42,7 +43,7 @@ public class SnackBarBehavior extends CoordinatorLayout.Behavior<View> {
     }
 
     @Override
-    public void onDependentViewRemoved(CoordinatorLayout parent, View child, View dependency) {
+    public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency) {
         if (dependency instanceof Snackbar.SnackbarLayout && child.getTranslationY() != 0.0F) {
             ViewCompat.animate(child).translationY(0.0F).scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
                     .setInterpolator(fastOutSlowInInterpolator);

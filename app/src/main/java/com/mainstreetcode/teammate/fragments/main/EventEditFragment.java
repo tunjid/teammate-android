@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,7 +28,9 @@ import com.mainstreetcode.teammate.adapters.EventEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
@@ -44,9 +48,12 @@ public class EventEditFragment extends HeaderedFragment<Event>
         implements
         EventEditAdapter.EventEditAdapterListener {
 
+    public static final String ARG_GAME = "game";
     public static final String ARG_EVENT = "event";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
+    @Nullable
+    private Game game;
     private Event event;
     private EventGofer gofer;
 
@@ -61,10 +68,19 @@ public class EventEditFragment extends HeaderedFragment<Event>
         return fragment;
     }
 
+    @SuppressWarnings("ConstantConditions")
+    public static EventEditFragment newInstance(Game game) {
+        EventEditFragment fragment = newInstance(game.getEvent());
+        fragment.getArguments().putParcelable(ARG_GAME, game);
+        return fragment;
+    }
+
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {
-        return Gofer.tag(super.getStableTag(), getArguments().getParcelable(ARG_EVENT));
+        Bundle args = getArguments();
+        Model model = args.getParcelable(args.containsKey(ARG_EVENT) ? ARG_EVENT : ARG_GAME);
+        return Gofer.tag(super.getStableTag(), model);
     }
 
     @Override
@@ -72,7 +88,12 @@ public class EventEditFragment extends HeaderedFragment<Event>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        event = getArguments().getParcelable(ARG_EVENT);
+        Bundle args = getArguments();
+        game = args.getParcelable(ARG_GAME);
+        event = game != null ? game.getEvent() : args.getParcelable(ARG_EVENT);
+
+        assert event != null;
+        if (game != null && event.isEmpty()) event.setName(game);
         gofer = eventViewModel.gofer(event);
     }
 
@@ -157,17 +178,25 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void togglePersistentUi() {
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
         setToolbarTitle(gofer.getToolbarTitle(this));
         super.togglePersistentUi();
     }
 
     @Override
+    @StringRes
+    protected int getFabStringResource() { return event.isEmpty() ? R.string.event_create : R.string.event_update; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return canEditEvent();}
+    public boolean showsFab() {return gofer.hasPrivilegedRole();}
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}
@@ -209,6 +238,10 @@ public class EventEditFragment extends HeaderedFragment<Event>
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
+                    if (game != null) {
+                        toggleProgress(true);
+                        disposables.add(gameViewModel.updateGame(game).subscribe(ignored -> requireActivity().onBackPressed(), defaultErrorHandler));
+                    }
                 }, defaultErrorHandler));
                 break;
         }
@@ -230,7 +263,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void selectTeam() {
-        if (gofer.hasPrivilegedRole()) chooseTeam();
+        if (game != null) showSnackbar(getString(R.string.game_event_team_change));
+        else if (gofer.hasPrivilegedRole()) chooseTeam();
         else if (!gofer.hasRole())
             showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));
     }
@@ -262,17 +296,13 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     private void deleteEvent() {
-        disposables.add(eventViewModel.delete(event).subscribe(this::onEventDeleted, defaultErrorHandler));
+        disposables.add(gofer.remove().subscribe(this::onEventDeleted, defaultErrorHandler));
     }
 
-    private void onEventDeleted(Event deleted) {
-        showSnackbar(getString(R.string.deleted_team, deleted.getName()));
+    private void onEventDeleted() {
+        showSnackbar(getString(R.string.deleted_team, event.getName()));
         removeEnterExitTransitions();
-
-        Activity activity;
-        if ((activity = getActivity()) == null) return;
-
-        activity.onBackPressed();
+        requireActivity().onBackPressed();
     }
 
     private void rsvpToEvent() {

@@ -16,10 +16,6 @@ public class BaseItemViewHolder<T extends ImageWorkerFragment.ImagePickerListene
         super(itemView);
     }
 
-    BaseItemViewHolder(View itemView, T listener) {
-        super(itemView, listener);
-    }
-
     public void bind(Item item) {
         this.item = item;
     }

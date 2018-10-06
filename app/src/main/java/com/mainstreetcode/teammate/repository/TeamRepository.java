@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.TeamDao;
@@ -91,8 +92,8 @@ public class TeamRepository extends ModelRepository<Team> {
         };
     }
 
-    public Single<List<Team>> findTeams(String queryText) {
-        return api.findTeam(queryText);
+    public Single<List<Team>> findTeams(TeamSearchRequest request) {
+        return api.findTeam(request.getName(), request.getSport());
     }
 
     public Maybe<Team> getDefaultTeam() {

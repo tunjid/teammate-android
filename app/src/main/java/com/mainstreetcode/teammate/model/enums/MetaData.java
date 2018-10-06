@@ -9,12 +9,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class MetaData {
+public class MetaData implements Identifiable {
 
     String code;
     String name;
@@ -27,6 +28,9 @@ public class MetaData {
     public boolean isInvalid() {
         return TextUtils.isEmpty(code);
     }
+
+    @Override
+    public String getId() { return code; }
 
     public CharSequence getName() { return name; }
 
@@ -43,6 +47,13 @@ public class MetaData {
         if (!(o instanceof MetaData)) return false;
         MetaData metaData = (MetaData) o;
         return Objects.equals(code, metaData.code);
+    }
+
+    @Override
+    public boolean areContentsTheSame(Identifiable other) {
+        if (!(other instanceof MetaData)) return getId().equals(other.getId());
+        MetaData casted = (MetaData) other;
+        return this.code.equals(casted.code) && this.name.equals(casted.name);
     }
 
     @Override
@@ -65,7 +76,7 @@ public class MetaData {
             String code = ModelUtils.asString(CODE_KEY, baseEnumJson);
             String name = ModelUtils.asString(NAME_KEY, baseEnumJson);
 
-            return fromJson(code, name, baseEnumJson);
+            return fromJson(code, name, baseEnumJson, context);
         }
 
         @Override
@@ -75,12 +86,12 @@ public class MetaData {
             serialized.addProperty(CODE_KEY, src.code);
             serialized.addProperty(NAME_KEY, src.name);
 
-            return toJson(serialized, src);
+            return toJson(serialized, src, context);
         }
 
-        abstract T fromJson(String code, String name, JsonObject body);
+        abstract T fromJson(String code, String name, JsonObject body, JsonDeserializationContext context);
 
-        JsonObject toJson(JsonObject serialized, T src) {
+        JsonObject toJson(JsonObject serialized, T src, JsonSerializationContext context) {
             return serialized;
         }
     }

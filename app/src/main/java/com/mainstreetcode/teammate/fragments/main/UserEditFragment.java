@@ -1,17 +1,18 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.UserAdapter;
+import com.mainstreetcode.teammate.adapters.UserEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
-import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
@@ -23,7 +24,7 @@ import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
 public class UserEditFragment extends HeaderedFragment<User>
         implements
-        ImageWorkerFragment.ImagePickerListener {
+        UserEditAdapter.AdapterListener {
 
     private static final String ARG_USER = "user";
 
@@ -60,8 +61,9 @@ public class UserEditFragment extends HeaderedFragment<User>
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
+                .withAdapter(new UserEditAdapter(gofer.getItems(), this))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new UserAdapter(gofer.getItems(), this))
                 .withLinearLayoutManager()
                 .build();
 
@@ -72,23 +74,34 @@ public class UserEditFragment extends HeaderedFragment<User>
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
-        setToolbarTitle(getString(R.string.edit_user));
+        setToolbarTitle(getString(canEdit() ? R.string.user_edit : R.string.user_info));
+        super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.user_update; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return true;}
+    public boolean showsFab() {return canEdit();}
 
     @Override
     protected User getHeaderedModel() {return user;}
 
     @Override
     protected Gofer<User> gofer() { return gofer; }
+
+    @Override
+    public boolean canEdit() { return userViewModel.getCurrentUser().equals(user); }
 
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {

@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,8 +55,9 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withAdapter(new BlockedUserViewAdapter(gofer.getItems()))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
 
@@ -64,9 +67,17 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     }
 
     @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.unblock_user; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_unlock_white; }
+
+    @Override
     public void togglePersistentUi() {
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_unlock_white);
         setToolbarTitle(getString(R.string.blocked_user));
         super.togglePersistentUi();
     }

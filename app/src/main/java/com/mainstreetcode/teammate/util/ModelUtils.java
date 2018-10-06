@@ -20,8 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * Static methods for models
@@ -33,9 +35,15 @@ public class ModelUtils {
     public static final SimpleDateFormat dateFormatter;
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
+    private static final Pattern alphaNumeric = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+
     static {
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    static boolean hasNoSpecialChars(CharSequence sequence) {
+        return !alphaNumeric.matcher(sequence).find();
     }
 
     public static boolean asBoolean(String key, JsonObject jsonObject) {
@@ -67,6 +75,13 @@ public class ModelUtils {
         }
     }
 
+    public static <K, V> V get(K key, Map<K, V> map, Supplier<V> instantiator) {
+        V value = map.get(key);
+        if (value == null) map.put(key, value = instantiator.get());
+
+        return value;
+    }
+
     public static Date parseDate(String date) {
         Date result;
         synchronized (dateFormatter) {result = parseDate(date, dateFormatter);}
@@ -95,12 +110,8 @@ public class ModelUtils {
 
     public static Date parseDate(String date, SimpleDateFormat formatter) {
         if (TextUtils.isEmpty(date)) return new Date();
-        try {
-            return formatter.parse(date);
-        }
-        catch (ParseException e) {
-            return new Date();
-        }
+        try { return formatter.parse(date); }
+        catch (ParseException e) { return new Date(); }
     }
 
     public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
@@ -114,7 +125,14 @@ public class ModelUtils {
 
     public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, (a, b) -> -Identifiable.COMPARATOR.compare(a, b));
+        Collections.sort(source, Identifiable.DESCENDING_COMPARATOR);
+    }
+
+    public static <T extends Identifiable> List<T> replaceList(List<T> source, List<T> additions) {
+        source.clear();
+        source.addAll(additions);
+        Collections.sort(source, Identifiable.COMPARATOR);
+        return source;
     }
 
     @Nullable
@@ -147,6 +165,20 @@ public class ModelUtils {
         try { return Integer.valueOf(number); }
         catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
         return 0;
+    }
+
+    public static float parseFloat(String number) {
+        if (TextUtils.isEmpty(number)) return 0;
+        try { return Float.valueOf(number); }
+        catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
+        return 0;
+    }
+
+    public static boolean parseBoolean(String number) {
+        if (TextUtils.isEmpty(number)) return false;
+        try { return Boolean.valueOf(number); }
+        catch (Exception e) { Logger.log("ModelUtils", "Number Format Exception", e);}
+        return false;
     }
 
     public static boolean areNotEmpty(CharSequence... values) {

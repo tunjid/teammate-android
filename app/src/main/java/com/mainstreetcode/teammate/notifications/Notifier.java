@@ -19,12 +19,15 @@ import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
@@ -72,6 +75,7 @@ public abstract class Notifier<T extends Model<T>> {
 
     @SuppressLint("CheckResult")
     public final void notify(FeedItem<T> item) {
+        //noinspection ResultOfMethodCallIgnored
         getRepository().get(item.getModel()).lastElement()
                 .filter(getNotificationFilter())
                 .map(model -> item)
@@ -143,8 +147,11 @@ public abstract class Notifier<T extends Model<T>> {
             if (itemClass.equals(Team.class)) notifier = TeamNotifier.getInstance();
             if (itemClass.equals(Role.class)) notifier = RoleNotifier.getInstance();
             if (itemClass.equals(Chat.class)) notifier = ChatNotifier.getInstance();
+            if (itemClass.equals(Game.class)) notifier = GameNotifier.getInstance();
             if (itemClass.equals(Media.class)) notifier = MediaNotifier.getInstance();
             if (itemClass.equals(Event.class)) notifier = EventNotifier.getInstance();
+            if (itemClass.equals(Tournament.class)) notifier = TournamentNotifier.getInstance();
+            if (itemClass.equals(Competitor.class)) notifier = CompetitorNotifier.getInstance();
             if (itemClass.equals(JoinRequest.class)) notifier = JoinRequestNotifier.getInstance();
 
             return (Notifier<T>) notifier;

@@ -5,7 +5,11 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.MenuRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.view.View;
+
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
 public interface PersistentUiController {
     void toggleToolbar(boolean show);
@@ -20,7 +24,9 @@ public interface PersistentUiController {
 
     void toggleSystemUI(boolean show);
 
-    void setFabIcon(@DrawableRes int icon);
+    void setFabIcon(@DrawableRes int icon, @StringRes int textRes);
+
+    void setFabExtended(boolean expanded);
 
     void showSnackBar(CharSequence message);
 
@@ -30,7 +36,9 @@ public interface PersistentUiController {
 
     void setAltToolbarMenu(@MenuRes int menu);
 
-    void showSnackBar(CharSequence message, @StringRes int stringRes, View.OnClickListener clickListener);
+    void showSnackBar(ModelUtils.Consumer<Snackbar> consumer);
+
+    void showChoices(ModelUtils.Consumer<ChoiceBar> consumer);
 
     void setFabClickListener(@Nullable View.OnClickListener clickListener);
 }

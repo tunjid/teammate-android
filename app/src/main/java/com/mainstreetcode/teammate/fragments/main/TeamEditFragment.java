@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,6 +76,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new TeamEditAdapter(gofer.getItems(), this))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
@@ -84,10 +87,18 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     @Override
     public void togglePersistentUi() {
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_check_white_24dp);
         super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return team.isEmpty() ? R.string.team_create : R.string.team_update; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
     public boolean[] insetState() {return VERTICAL;}
@@ -101,11 +112,13 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
 
+        boolean wasEmpty = team.isEmpty();
         toggleProgress(true);
         disposables.add(gofer.save()
                 .subscribe(result -> {
-                    showSnackbar(gofer.getModelUpdateMessage(this));
+                    String message = wasEmpty ? getString(R.string.created_team, team.getName()) : getString(R.string.updated_team);
                     onModelUpdated(result);
+                    showSnackbar(message);
                 }, defaultErrorHandler));
     }
 

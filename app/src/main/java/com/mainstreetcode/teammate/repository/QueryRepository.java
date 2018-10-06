@@ -12,17 +12,17 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 
-abstract class QueryRepository<T extends Model<T>, S extends Model<S>> extends ModelRepository<T> {
+abstract class QueryRepository<T extends Model<T>, S extends Model<S>, R> extends ModelRepository<T> {
 
     QueryRepository() {}
 
-    public final Flowable<List<T>> modelsBefore(S key, @Nullable Date date) {
-        return fetchThenGet(localModelsBefore(key, date), remoteModelsBefore(key, date));
+    public final Flowable<List<T>> modelsBefore(S key, @Nullable R pagination) {
+        return fetchThenGet(localModelsBefore(key, pagination), remoteModelsBefore(key, pagination));
     }
 
-    abstract Maybe<List<T>> localModelsBefore(S key, @Nullable Date date);
+    abstract Maybe<List<T>> localModelsBefore(S key, @Nullable R pagination);
 
-    abstract Maybe<List<T>> remoteModelsBefore(S key, @Nullable Date date);
+    abstract Maybe<List<T>> remoteModelsBefore(S key, @Nullable R pagination);
 
     Date getFutureDate() {
         Calendar calendar = Calendar.getInstance();

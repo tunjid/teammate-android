@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
@@ -81,6 +83,7 @@ public final class EventsFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchEvents(false))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
                 .withLinearLayoutManager()
@@ -115,10 +118,18 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.events_title, team.getName()));
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.event_add; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     @Override
     public boolean showsFab() {

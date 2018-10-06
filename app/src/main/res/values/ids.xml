@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="action_home" type="id"/>
+    <item name="action_events" type="id"/>
+    <item name="action_messages" type="id"/>
+    <item name="action_media" type="id"/>
+    <item name="action_team" type="id"/>
     <item name="viewholder_date" type="id"/>
     <item name="viewholder_team" type="id"/>
     <item name="viewholder_user" type="id"/>
     <item name="viewholder_role" type="id"/>
     <item name="viewholder_join_request" type="id"/>
+    <item name="request_default_team_pick" type="id"/>
+    <item name="request_user_pick" type="id"/>
     <item name="request_chat_team_pick" type="id"/>
+    <item name="request_stat_edit_pick" type="id"/>
+    <item name="request_game_team_pick" type="id"/>
     <item name="request_media_team_pick" type="id"/>
     <item name="request_event_team_pick" type="id"/>
     <item name="request_event_edit_pick" type="id"/>
+    <item name="request_tournament_team_pick" type="id"/>
+    <item name="request_competitor_pick" type="id"/>
     <item name="request_code_image_pick" type="id"/>
     <item name="fragment_header_background" type="id"/>
     <item name="fragment_header_thumbnail" type="id"/>

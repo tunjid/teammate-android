@@ -6,6 +6,8 @@ import com.facebook.login.LoginResult;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.util.InstantSearch;
+import com.mainstreetcode.teammate.util.TeammateException;
 import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
 
 import io.reactivex.Flowable;
@@ -33,8 +35,12 @@ public class UserViewModel extends ViewModel {
         return repository.getCurrentUser();
     }
 
-    public UserGofer gofer(User user){
-        return new UserGofer(user, this::getUser, this::updateUser);
+    public UserGofer gofer(User user) {
+        return new UserGofer(user, getCurrentUser()::equals, this::getUser, this::updateUser);
+    }
+
+    public InstantSearch<String, User> instantSearch() {
+        return new InstantSearch<>(repository::findUser);
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
@@ -47,6 +53,11 @@ public class UserViewModel extends ViewModel {
 
     public Single<User> signIn(String email, String password) {
         return repository.signIn(email, password).observeOn(mainThread());
+    }
+
+    public Single<User> deleteAccount() {
+        TeamViewModel.teams.clear();
+        return repository.delete(getCurrentUser()).observeOn(mainThread());
     }
 
     public Single<Boolean> signOut() {
@@ -63,10 +74,10 @@ public class UserViewModel extends ViewModel {
     }
 
     private Single<User> updateUser(User user) {
-        return repository.createOrUpdate(user);
+        return getCurrentUser().equals(user) ? repository.createOrUpdate(user) : Single.error(new TeammateException(""));
     }
 
     private Flowable<User> getUser(User user) {
-        return repository.get(user);
+        return getCurrentUser().equals(user) ? repository.get(user) : Flowable.empty();
     }
 }

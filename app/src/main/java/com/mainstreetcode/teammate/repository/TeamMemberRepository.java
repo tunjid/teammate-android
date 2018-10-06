@@ -102,8 +102,8 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
         AppDatabase database = AppDatabase.getInstance();
         String teamId = key.getId();
 
-        Maybe<List<Role>> rolesMaybe = database.roleDao().getRoles(key.getId(), date).defaultIfEmpty(new ArrayList<>());
-        Maybe<List<JoinRequest>> requestsMaybe = database.joinRequestDao().getRequests(teamId, date).defaultIfEmpty(new ArrayList<>());
+        Maybe<List<Role>> rolesMaybe = database.roleDao().getRoles(key.getId(), date, DEF_QUERY_LIMIT).defaultIfEmpty(new ArrayList<>());
+        Maybe<List<JoinRequest>> requestsMaybe = database.joinRequestDao().getRequests(teamId, date, DEF_QUERY_LIMIT).defaultIfEmpty(new ArrayList<>());
 
         Maybe<List<TeamMember>> listMaybe = Maybe.zip(rolesMaybe, requestsMaybe, (roles, requests) -> {
             List<TeamMember> result = new ArrayList<>(roles.size() + requests.size());
@@ -123,7 +123,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
     }
 
     private Single<TeamMember<T>> createRole(JoinRequest request) {
-       return request.isUserApproved() ? approveUser(request) : acceptInvite(request);
+        return request.isUserApproved() ? approveUser(request) : acceptInvite(request);
     }
 
     private Single<TeamMember<T>> acceptInvite(JoinRequest request) {
@@ -145,7 +145,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
 
     @Override
     Maybe<List<TeamMember<T>>> remoteModelsBefore(Team key, @Nullable Date date) {
-        Maybe<List<TeamMember<T>>> maybe = TeamMemberRepository.unsafeCastList(api.getTeamMembers(key.getId(), date).toMaybe());
+        Maybe<List<TeamMember<T>>> maybe = TeamMemberRepository.unsafeCastList(api.getTeamMembers(key.getId(), date, DEF_QUERY_LIMIT).toMaybe());
         return maybe.map(getSaveManyFunction());
     }
 

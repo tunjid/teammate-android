@@ -17,6 +17,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
+import static android.text.TextUtils.isEmpty;
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public class DeviceRepository extends ModelRepository<Device> {
@@ -46,22 +47,23 @@ public class DeviceRepository extends ModelRepository<Device> {
         Device current = dao.getCurrent();
         Consumer<Device> saveFunction = device -> dao.upsert(Collections.singletonList(device));
 
-        if (current == null) return api.createDevice(model).doOnSuccess(saveFunction);
+        if (isEmpty(current.getFcmToken())) return Single.error(new TeammateException("No token"));
+        else if (current.isEmpty()) return api.createDevice(model).doOnSuccess(saveFunction);
         else return api.updateDevice(current.setFcmToken(model.getFcmToken()).getId(), model)
-                .doOnSuccess(saveFunction)
-                .doOnError(throwable -> deleteInvalidModel(current, throwable))
-                .onErrorResumeNext(throwable -> {
-                    Message message = fromThrowable(throwable);
-                    return message != null && message.isInvalidObject()
-                            ? api.createDevice(current).doOnSuccess(saveFunction)
-                            : Single.error(throwable);
-                });
+                    .doOnSuccess(saveFunction)
+                    .doOnError(throwable -> deleteInvalidModel(current, throwable))
+                    .onErrorResumeNext(throwable -> {
+                        Message message = fromThrowable(throwable);
+                        return message != null && message.isInvalidObject()
+                                ? api.createDevice(current).doOnSuccess(saveFunction)
+                                : Single.error(throwable);
+                    });
     }
 
     @Override
     public Flowable<Device> get(String id) {
         Device device = dao.getCurrent();
-        return device == null
+        return device.isEmpty()
                 ? Flowable.error(new TeammateException("No stored device"))
                 : Flowable.just(device);
     }

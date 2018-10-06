@@ -46,14 +46,14 @@
         app:layout_constraintRight_toRightOf="@+id/border"
         app:layout_constraintTop_toBottomOf="@+id/title" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/facebook_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/single_and_half_margin"
         android:backgroundTint="@color/com_facebook_button_background_color"
         android:drawablePadding="@dimen/single_margin"
-        android:drawableStart="@drawable/ic_facebook_box_24dp"
+        app:icon="@drawable/ic_facebook_box_24dp"
         android:gravity="center"
         android:paddingBottom="@dimen/half_margin"
         android:paddingLeft="@dimen/single_margin"
@@ -68,14 +68,14 @@
         app:layout_constraintTop_toBottomOf="@+id/sub_title"
         app:layout_constraintWidth_percent=".8" />
 
-    <Button
+    <android.support.design.button.MaterialButton
         android:id="@+id/email_sign_up"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/single_and_half_margin"
         android:backgroundTint="@color/colorPrimaryDarker"
         android:drawablePadding="@dimen/single_margin"
-        android:drawableStart="@drawable/ic_email_white_24dp"
+        app:icon="@drawable/ic_email_white_24dp"
         android:gravity="center"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"

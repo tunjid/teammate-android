@@ -100,8 +100,11 @@ public class UserRepository extends ModelRepository<User> {
 
     @Override
     public Single<User> delete(User model) {
-        userDao.delete(model);
-        return just(model);
+        return api.deleteUser(model.getId())
+                .map(this::deleteLocally)
+                .flatMap(user -> clearTables())
+                .map(clearedTables -> model)
+                .doOnError(throwable -> deleteInvalidModel(model, throwable));
     }
 
     @Override
@@ -117,7 +120,7 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {
-        User newUser = new User("", "", primaryEmail, firstName, lastName, "");
+        User newUser = new User("", "", "", primaryEmail, firstName, lastName, "");
         newUser.setPassword(password);
 
         return createOrUpdate(newUser);
@@ -143,15 +146,16 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public Single<Boolean> signOut() {
-        AppDatabase database = AppDatabase.getInstance();
-        Single<Boolean> local = database.clearTables().flatMap(result -> clearUser());
-        Device device = database.deviceDao().getCurrent();
-        String deviceId = device != null ? device.getId() : "";
+        Device device = AppDatabase.getInstance().deviceDao().getCurrent();
 
-        return api.signOut(deviceId)
-                .flatMap(result -> local)
-                .onErrorResumeNext(throwable -> local)
+        return api.signOut(device.getId())
+                .flatMap(result -> clearTables())
+                .onErrorResumeNext(throwable -> clearTables())
                 .subscribeOn(io());
+    }
+
+    public Single<List<User>> findUser(String screenName) {
+        return api.findUser(screenName);
     }
 
     public boolean isSignedIn() {
@@ -204,10 +208,16 @@ public class UserRepository extends ModelRepository<User> {
         return user;
     }
 
+    private Single<Boolean> clearTables() {
+        AppDatabase database = AppDatabase.getInstance();
+        return database.clearTables().flatMap(result -> clearUser()).onErrorReturn(throwable -> false);
+    }
+
     /**
      * Used to update changes to the current signed in user
      */
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private Single<User> updateCurrent(Single<User> source) {
         Single<User> result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe

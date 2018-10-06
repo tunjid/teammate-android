@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Supplier;
 
 import static android.view.View.GONE;
@@ -31,15 +32,15 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     EditText editText;
     private final ImageButton button;
     private final TextInputLayout inputLayout;
-    private final Supplier<Boolean> errorChecker;
     private final Supplier<Boolean> enabler;
+    private final Function<CharSequence, CharSequence> errorChecker;
 
     @Nullable private Function<Item, Boolean> visibilitySupplier;
 
-    public InputViewHolder(View itemView, Supplier<Boolean> enabler, @Nullable Supplier<Boolean> errorChecker) {
+    public InputViewHolder(View itemView, Supplier<Boolean> enabler, @Nullable Function<CharSequence, CharSequence> errorChecker) {
         super(itemView);
         this.enabler = enabler;
-        this.errorChecker = errorChecker == null ? this::hasText : errorChecker;
+        this.errorChecker = errorChecker == null ? this::emptyTextChecker : errorChecker;
         inputLayout = itemView.findViewById(R.id.input_layout);
         button = itemView.findViewById(R.id.button);
         editText = inputLayout.getEditText();
@@ -68,7 +69,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         super.bind(item);
         inputLayout.setEnabled(isEnabled());
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
-        editText.setText(item.getValue());
+        editText.setText(ModelUtils.processString(item.getValue()));
         editText.setInputType(item.getInputType());
 
         checkForErrors();
@@ -92,8 +93,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     private void checkForErrors() {
-        if (!errorChecker.get()) editText.setError(null);
-        else editText.setError(editText.getContext().getString(R.string.team_invalid_empty_field));
+        CharSequence errorMessage = errorChecker.apply(editText.getText());
+        if (TextUtils.isEmpty(errorMessage)) editText.setError(null);
+        else editText.setError(errorMessage);
     }
 
     private void setClickableState() {
@@ -104,8 +106,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         button.setVisibility(visibility);
     }
 
-    private boolean hasText() {
-        return TextUtils.isEmpty(editText.getText());
+    private CharSequence emptyTextChecker(CharSequence input) {
+        return TextUtils.isEmpty(input) ? editText.getContext().getString(R.string.team_invalid_empty_field) : "";
     }
 
     protected boolean isEnabled() {

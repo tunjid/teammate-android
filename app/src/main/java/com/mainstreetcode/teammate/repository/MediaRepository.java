@@ -119,12 +119,12 @@ public class MediaRepository extends TeamQueryRepository<Media> {
     @Override
     Maybe<List<Media>> localModelsBefore(Team team, @Nullable Date date) {
         if (date == null) date = new Date();
-        return mediaDao.getTeamMedia(team, date).subscribeOn(io());
+        return mediaDao.getTeamMedia(team, date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Media>> remoteModelsBefore(Team team, @Nullable Date date) {
-        return api.getTeamMedia(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.getTeamMedia(team.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     public Single<List<Media>> ownerDelete(List<Media> models) {

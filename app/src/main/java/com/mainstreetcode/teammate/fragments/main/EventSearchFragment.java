@@ -1,22 +1,17 @@
 package com.mainstreetcode.teammate.fragments.main;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.transition.AutoTransition;
-import android.support.transition.TransitionManager;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.TextViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
@@ -29,6 +24,7 @@ import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -47,9 +43,7 @@ public class EventSearchFragment extends MainActivityFragment {
     private boolean leaveMap;
 
     private MapView mapView;
-    private TextView searchButton;
-    private TextView searchTitle;
-    private ViewGroup cardView;
+    private ExpandingToolbar expandingToolbar;
 
     public static EventSearchFragment newInstance() {
         EventSearchFragment fragment = new EventSearchFragment();
@@ -76,16 +70,10 @@ public class EventSearchFragment extends MainActivityFragment {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this::onMapReady);
 
-        View.OnClickListener searchClickListener = clicked -> toggleVisibility();
+        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), () -> mapView.getMapAsync(this::fetchPublicEvents));
+        expandingToolbar.setTitle(R.string.event_public_search);
+        expandingToolbar.setTitleIcon(false);
 
-        cardView = root.findViewById(R.id.card_view_wrapper);
-        searchTitle = root.findViewById(R.id.search_title);
-        searchButton = root.findViewById(R.id.search);
-
-        searchTitle.setOnClickListener(searchClickListener);
-        searchButton.setOnClickListener(searchClickListener);
-
-        setTitleIcon(false);
         return root;
     }
 
@@ -124,10 +112,8 @@ public class EventSearchFragment extends MainActivityFragment {
     @Override
     public void onDestroyView() {
         mapView.onDestroy();
-        searchButton = null;
-        searchTitle = null;
-        cardView = null;
         mapView = null;
+        expandingToolbar = null;
         super.onDestroyView();
     }
 
@@ -152,9 +138,17 @@ public class EventSearchFragment extends MainActivityFragment {
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_crosshairs_gps_white_24dp);
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.event_my_location; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_crosshairs_gps_white_24dp; }
 
     @Override
     public void onClick(View view) {
@@ -228,7 +222,7 @@ public class EventSearchFragment extends MainActivityFragment {
 
     private void onCameraMoveStarted(int reason) {
         if (scrollManager.getRecyclerView().getVisibility() == View.VISIBLE)
-            changeVisibility(true);
+            expandingToolbar.changeVisibility(true);
 
         switch (reason) {
             case GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION:
@@ -243,46 +237,12 @@ public class EventSearchFragment extends MainActivityFragment {
 
     private void onMarkerInfoWindowClicked(Marker marker) {
         Object tag = marker.getTag();
-        if (tag == null || !(tag instanceof Event)) return;
+        if (!(tag instanceof Event)) return;
         showFragment(EventEditFragment.newInstance((Event) tag));
     }
 
     private void onAddressFound(Address address) {
         eventViewModel.getEventRequest().setAddress(address);
         scrollManager.notifyItemChanged(0);
-    }
-
-    @SuppressLint("ResourceAsColor")
-    private void setTitleIcon(boolean isDown) {
-        int resVal = isDown ? R.drawable.anim_vect_down_to_right_arrow : R.drawable.anim_vect_right_to_down_arrow;
-
-        Drawable icon = AnimatedVectorDrawableCompat.create(searchTitle.getContext(), resVal);
-        if (icon == null) return;
-
-        TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(searchTitle, null, null, icon, null);
-    }
-
-    private void changeVisibility(boolean inVisible) {
-        TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
-
-        setTitleIcon(inVisible);
-
-        AnimatedVectorDrawableCompat animatedDrawable = (AnimatedVectorDrawableCompat)
-                TextViewCompat.getCompoundDrawablesRelative(searchTitle)[2];
-
-        animatedDrawable.start();
-
-        int visibility = inVisible ? View.GONE : View.VISIBLE;
-        searchButton.setVisibility(visibility);
-        scrollManager.getRecyclerView().setVisibility(visibility);
-    }
-
-    private void toggleVisibility() {
-        View view = scrollManager.getRecyclerView();
-        boolean invisible = view.getVisibility() == View.VISIBLE;
-        changeVisibility(invisible);
-
-        // Search
-        if (invisible) mapView.getMapAsync(this::fetchPublicEvents);
     }
 }

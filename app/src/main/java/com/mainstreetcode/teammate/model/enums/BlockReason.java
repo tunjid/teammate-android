@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model.enums;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
 public class BlockReason extends MetaData {
@@ -14,7 +15,7 @@ public class BlockReason extends MetaData {
 
     public static class GsonAdapter extends MetaData.GsonAdapter<BlockReason> {
         @Override
-        BlockReason fromJson(String code, String name, JsonObject body) {
+        BlockReason fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
             return new BlockReason(code, name);
         }
     }

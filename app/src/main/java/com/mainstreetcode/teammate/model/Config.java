@@ -20,6 +20,9 @@ import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.MetaData;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
+import com.mainstreetcode.teammate.model.enums.StatType;
+import com.mainstreetcode.teammate.model.enums.TournamentStyle;
+import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.repository.ConfigRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -30,27 +33,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.functions.Predicate;
 
 @SuppressLint("ParcelCreator")
 public class Config implements Model<Config> {
 
     private static final String EMPTY_STRING = "";
 
-    public static Config empty() {return new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);}
+    public static Config empty() {return new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);}
 
     private String defaultTeamLogo;
     private String defaultEventLogo;
     private String defaultUserAvatar;
+    private String defaultTournamentLogo;
     private List<Sport> sports = new ArrayList<>();
+    private List<String> privileged = new ArrayList<>();
     private List<Position> positions = new ArrayList<>();
+    private List<StatType> statTypes = new ArrayList<>();
     private List<Visibility> visibilities = new ArrayList<>();
     private List<BlockReason> blockReasons = new ArrayList<>();
     private List<AndroidVariant> staticVariants = new ArrayList<>();
+    private List<TournamentType> tournamentTypes = new ArrayList<>();
+    private List<TournamentStyle> tournamentStyles = new ArrayList<>();
 
-    Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar) {
+    Config(String defaultTeamLogo, String defaultEventLogo, String defaultUserAvatar, String defaultTournamentLogo) {
         this.defaultTeamLogo = defaultTeamLogo;
         this.defaultEventLogo = defaultEventLogo;
         this.defaultUserAvatar = defaultUserAvatar;
+        this.defaultTournamentLogo = defaultTournamentLogo;
     }
 
     static String getDefaultTeamLogo() {
@@ -68,9 +78,19 @@ public class Config implements Model<Config> {
         return getCurrentConfig().defaultUserAvatar;
     }
 
+    static String getDefaultTournamentLogo() {
+        if (getCurrentConfig().isEmpty()) fetchConfig();
+        return getCurrentConfig().defaultTournamentLogo;
+    }
+
     public static List<Sport> getSports() {
         return getList(config -> config.sports);
     }
+
+    public static List<String> getPrivileged() {
+        return getList(config -> config.privileged);
+    }
+
 
     public static List<Position> getPositions() {
         return getList(config -> config.positions);
@@ -82,6 +102,18 @@ public class Config implements Model<Config> {
 
     public static List<BlockReason> getBlockReasons() {
         return getList(config -> config.blockReasons);
+    }
+
+    public static List<TournamentType> getTournamentTypes(Predicate<TournamentType> predicate) {
+        return Flowable.fromIterable(getList(config -> config.tournamentTypes))
+                .filter(predicate)
+                .collect(ArrayList<TournamentType>::new, List::add).blockingGet();
+    }
+
+    public static List<TournamentStyle> getTournamentStyles(Predicate<TournamentStyle> predicate) {
+        return Flowable.fromIterable(getList(config -> config.tournamentStyles))
+                .filter(predicate)
+                .collect(ArrayList<TournamentStyle>::new, List::add).blockingGet();
     }
 
     public static boolean isStaticVariant() {
@@ -104,6 +136,18 @@ public class Config implements Model<Config> {
         return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
     }
 
+    public static StatType statTypeFromCode(String code) {
+        return getFromCode(code, config -> config.statTypes, StatType.empty());
+    }
+
+    public static TournamentType tournamentTypeFromCode(String code) {
+        return getFromCode(code, config -> config.tournamentTypes, TournamentType.empty());
+    }
+
+    public static TournamentStyle tournamentStyleFromCode(String code) {
+        return getFromCode(code, config -> config.tournamentStyles, TournamentStyle.empty());
+    }
+
     private static Config getCurrentConfig() {
         return ConfigRepository.getInstance().getCurrent();
     }
@@ -120,9 +164,10 @@ public class Config implements Model<Config> {
     private static <T extends MetaData> T getFromCode(String code, Function<Config, List<T>> function, T defaultItem) {
         Config config = getCurrentConfig();
         String matcher = code != null ? code : "";
-        return Flowable.fromIterable(function.apply(config))
+        List<T> list = function.apply(config);
+        return Flowable.fromIterable(list)
                 .filter(metaData -> matcher.equals(metaData.getCode()))
-                .first(defaultItem)
+                .first(list.isEmpty() ? defaultItem : list.get(0))
                 .blockingGet();
     }
 
@@ -169,6 +214,7 @@ public class Config implements Model<Config> {
     }
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void fetchConfig() {
         ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
     }
@@ -181,11 +227,16 @@ public class Config implements Model<Config> {
         private static final String TEAM_LOGO_KEY = "defaultTeamLogo";
         private static final String EVENT_LOGO_KEY = "defaultEventLogo";
         private static final String USER_AVATAR_KEY = "defaultUserAvatar";
+        private static final String TOURNAMENT_LOGO_KEY = "defaultTournamentLogo";
         private static final String SPORTS_KEY = "sports";
         private static final String POSITIONS_KEY = "roles";
+        private static final String PRIVILEGED = "privilegedRoles";
         private static final String VISIBILITIES_KEY = "visibility";
         private static final String BLOCKED_REASONS_KEY = "blockReasons";
         private static final String STATIC_VARIANTS_KEY = "staticAndroidVariants";
+        private static final String GAME_STATS_KEY = "stats";
+        private static final String TOURNAMENT_TYPE_KEY = "tournamentTypes";
+        private static final String TOURNAMENT_STYLE_KEY = "tournamentStyles";
 
         @Override
         public JsonElement serialize(Config src, Type typeOfSrc, JsonSerializationContext context) {
@@ -194,24 +245,41 @@ public class Config implements Model<Config> {
             serialized.addProperty(TEAM_LOGO_KEY, src.defaultTeamLogo);
             serialized.addProperty(EVENT_LOGO_KEY, src.defaultEventLogo);
             serialized.addProperty(USER_AVATAR_KEY, src.defaultUserAvatar);
+            serialized.addProperty(TOURNAMENT_LOGO_KEY, src.defaultTournamentLogo);
 
+            JsonArray statsArray = new JsonArray();
             JsonArray sportsArray = new JsonArray();
             JsonArray positionArray = new JsonArray();
             JsonArray visibilityArray = new JsonArray();
+            JsonArray privilegedArray = new JsonArray();
             JsonArray blockedReasonArray = new JsonArray();
             JsonArray staticVariantsArray = new JsonArray();
+            JsonArray tournamentTypesArray = new JsonArray();
+            JsonArray tournamentStylesArray = new JsonArray();
 
             for (Sport item : src.sports) sportsArray.add(context.serialize(item));
+            for (StatType item : src.statTypes) statsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
+            for (String item : src.privileged) privilegedArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
-            for (BlockReason item : src.blockReasons) blockedReasonArray.add(context.serialize(item));
-            for (AndroidVariant item : src.staticVariants) staticVariantsArray.add(context.serialize(item));
+            for (BlockReason item : src.blockReasons)
+                blockedReasonArray.add(context.serialize(item));
+            for (AndroidVariant item : src.staticVariants)
+                staticVariantsArray.add(context.serialize(item));
+            for (TournamentType item : src.tournamentTypes)
+                tournamentTypesArray.add(context.serialize(item));
+            for (TournamentStyle item : src.tournamentStyles)
+                tournamentStylesArray.add(context.serialize(item));
 
             serialized.add(SPORTS_KEY, sportsArray);
+            serialized.add(GAME_STATS_KEY, statsArray);
+            serialized.add(PRIVILEGED, privilegedArray);
             serialized.add(POSITIONS_KEY, positionArray);
             serialized.add(VISIBILITIES_KEY, visibilityArray);
             serialized.add(BLOCKED_REASONS_KEY, blockedReasonArray);
             serialized.add(STATIC_VARIANTS_KEY, staticVariantsArray);
+            serialized.add(TOURNAMENT_TYPE_KEY, tournamentTypesArray);
+            serialized.add(TOURNAMENT_STYLE_KEY, tournamentStylesArray);
 
             return serialized;
         }
@@ -223,14 +291,19 @@ public class Config implements Model<Config> {
             String defaultTeamLogo = ModelUtils.asString(TEAM_LOGO_KEY, deviceJson);
             String defaultEventLogo = ModelUtils.asString(EVENT_LOGO_KEY, deviceJson);
             String defaultUserAvatar = ModelUtils.asString(USER_AVATAR_KEY, deviceJson);
+            String defaultTournamentLogo = ModelUtils.asString(TOURNAMENT_LOGO_KEY, deviceJson);
 
-            Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar);
+            Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar, defaultTournamentLogo);
 
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
+            ModelUtils.deserializeList(context, deviceJson.get(PRIVILEGED), config.privileged, String.class);
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
+            ModelUtils.deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType.class);
             ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
             ModelUtils.deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason.class);
             ModelUtils.deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant.class);
+            ModelUtils.deserializeList(context, deviceJson.get(TOURNAMENT_TYPE_KEY), config.tournamentTypes, TournamentType.class);
+            ModelUtils.deserializeList(context, deviceJson.get(TOURNAMENT_STYLE_KEY), config.tournamentStyles, TournamentStyle.class);
 
             return config;
         }

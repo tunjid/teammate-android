@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.notifications;
 
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -17,14 +18,13 @@ public class TeammatesInstanceIdService extends FirebaseInstanceIdService {
         updateFcmToken();
     }
 
+    @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void updateFcmToken() {
         String token = FirebaseInstanceId.getInstance().getToken();
         if (TextUtils.isEmpty(token) || UserRepository.getInstance().getCurrentUser() == null)
             return;
 
-        Device device = new Device();
-        device.setFcmToken(token);
-
-        DeviceRepository.getInstance().createOrUpdate(device).subscribe(ignored -> {}, ErrorHandler.EMPTY);
+        DeviceRepository.getInstance().createOrUpdate(Device.withFcmToken(token)).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 }

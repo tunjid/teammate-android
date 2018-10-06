@@ -3,6 +3,7 @@
     <string name="teammates">Teammate</string>
     <string name="splash_subtitle">Sign up to connect, coordinate, and collaborate with your team</string>
     <string name="empty_string"> </string>
+    <string name="no_special_characters">No special characters</string>
     <string name="no_permission">You don\'t have permission to edit this item</string>
 
     <!--Splash Fragment-->
@@ -26,6 +27,7 @@
     <!--SignUpFragment-->
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
+    <string name="screen_name">Handle</string>
     <string name="nickname">Nickname</string>
     <string name="member_information">Member Information</string>
     <string name="sign_up">Sign Up</string>
@@ -42,8 +44,9 @@
     <string name="home">Home</string>
     <string name="events">Events</string>
     <string name="chats">Chats</string>
-    <string name="media">Media</string>
+    <string name="media">Gallery</string>
     <string name="my_teams">My Teams</string>
+    <string name="expand_nav">Expand bottom nav</string>
 
     <string name="team">Team</string>
     <string name="teams">Teams</string>
@@ -55,7 +58,10 @@
 
     <!--FeedFragment-->
     <string name="home_greeting">Good %1$s, %2$s</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
     <string name="accept">Accept</string>
+    <string name="show_on_boarding">Show tutorial</string>
     <string name="decline">Decline</string>
     <string name="clarify_invitation">Do you still want to join %1$s?</string>
     <string name="accept_invitation">Join %1$s?</string>
@@ -64,18 +70,26 @@
     <string name="sign_out">Sign Out</string>
     <string name="join_team">Join Team</string>
     <string name="my_profile">My Profile</string>
-
+    <string name="delete_user">Delete account</string>
+    <string name="delete_user_prompt">Delete your account?</string>
+    <string name="delete_user_prompt_body">This is permanent and cannot be undone.
+        \n\nAll your roles will be deleted as well, however chats and media in teams will remain unless those teams are deleted too.
+        \n\nGames and stats will remain after deletion as they involve other people and teams.
+        \n\nIf you are the only admin on a team, you will need to make someone else the admin or delete the team too.</string>
     <!--ForgotPasswordFragment-->
     <string name="email_sent">Email sent!</string>
     <string name="error_default">Sorry, an error occurred</string>
     <string name="error_network">Unable to connect, please try again later.</string>
     <string name="error_socket">Unable to connect</string>
 
+    <!--UserSearchFragment-->
+    <string name="user_search">Search by user @handles</string>
+
     <!--TeamSearchFragment-->
-    <string name="team_search">Team Search</string>
+    <string name="team_search">Search by team name or team @handles</string>
     <string name="team_search_hint">Search</string>
     <string name="team_logo">Team Logo</string>
-    <string name="create_team_prompt">Can\'t find your team? Create a new team</string>
+    <string name="create_team_prompt">Can\'t find your team?</string>
     <string name="team_name">Team Name</string>
     <string name="team_info">Team Info</string>
     <string name="city">City</string>
@@ -107,18 +121,26 @@
 
     <!--TeamDetailFragment-->
     <string name="invite">invite</string>
+    <string name="team_create">Create team</string>
+    <string name="team_update">Update team</string>
+    <string name="team_search_create">Find or create team</string>
     <string name="user_invited">Has been invited as a %1$s</string>
     <string name="user_requests_join">Has requested to join as a %1$s</string>
     <string name="create_team_first">Please create the team first</string>
     <string name="delete_team">Delete team</string>
     <string name="delete_team_prompt">Delete %1$s?</string>
+    <string name="delete_team_prompt_body">This is permanent and cannot be undone.
+        \n\nAll roles and events that do not have games will be deleted as well, along with chats and media.
+        \n\nGames and stats will remain after deletion as they involve other people and teams. </string>
     <string name="deleted_team">Deleted %1$s</string>
 
     <!--RoleEditFragment-->
-    <string name="edit_role">Edit Role</string>
+    <string name="role_edit">Edit Role</string>
+    <string name="role_update">Update role</string>
 
     <!--JoinRequestFragment-->
     <string name="invite_user">Invite User</string>
+    <string name="approve">Approve</string>
     <string name="approve_request">Approve User</string>
     <string name="pending_request">Pending Request</string>
     <string name="accept_request">Accept Request</string>
@@ -130,9 +152,12 @@
     <string name="profile_picture">Profile Picture</string>
     <string name="user_info">User Info</string>
     <string name="user_about">About</string>
-    <string name="edit_user">Edit User</string>
+    <string name="user_edit">Edit User</string>
+    <string name="user_update">Update user</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="submit">Submit</string>
+    <string name="okay">okay</string>
     <string name="cancel">Cancel</string>
     <string name="cancelled">Cancelled</string>
     <string name="add_user_to_team">Add %1$s to team?</string>
@@ -147,12 +172,15 @@
     <string name="confirm_user_leave">Leave this team?</string>
 
     <!--EventsFragment-->
-    <string name="events_title">Events for %1$s</string>
+    <string name="events_title">%1$s Events</string>
 
     <!--EventDetailFragment-->
     <string name="create_event">Create Event</string>
     <string name="edit_event">Event: %1$s</string>
     <string name="event_name">Event Name</string>
+    <string name="event_add">Add event</string>
+    <string name="event_create">Create event</string>
+    <string name="event_update">Update event</string>
     <string name="event_spots">Spots Available</string>
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
@@ -172,17 +200,131 @@
     <string name="event_attending">Going</string>
     <string name="event_not_attending">Not Going</string>
 
+    <!--TournamentDetailFragment-->
+    <string name="tournaments">Tournaments</string>
+    <string name="editing_competitors">Editing</string>
+    <string name="add_tournament_competitors_prompt">Add Competitors?</string>
+    <string name="delete_tournament_prompt">Delete tournament?</string>
+    <string name="create_tournament">Create Tournament</string>
+    <string name="create_tournament_first">Please create the tournament first</string>
+    <string name="edit_tournament">Tournament: %1$s</string>
+    <string name="tournament_add">Add tournament</string>
+    <string name="tournament_create">Create tournament</string>
+    <string name="tournament_update">Update tournament</string>
+    <string name="tournament_name">Tournament Name</string>
+    <string name="tournament_fixtures">Tournament Fixtures</string>
+    <string name="tournament_stats">Tournament Stats</string>
+    <string name="tournament_games">View scores</string>
+    <string name="tournament_games_desc">Games to play show up here.\nAdd competitors to create fixtures</string>
+    <string name="tournament_description">Tournament Description</string>
+    <string name="tournament_type">Tournament Type</string>
+    <string name="tournament_style">Tournament Style</string>
+    <string name="tournament_legs">Number of legs / sets per match up</string>
+    <string name="tournament_round">Number of rounds</string>
+    <string name="tournament_round_index">Round %1$d</string>
+    <string name="tournament_single_final">One game final (Valid for knockout only)</string>
+    <string name="tournament_winner">🥇  CHAMPION   🏆</string>
+    <string name="tournament_edit">Edit Tournament</string>
+    <string name="tournament_standings">Standings</string>
+    <string name="tournament_accept">Join this tournament?</string>
+    <string name="tournament_no_standings">The ultimate test of consistency, tournament standings show up here</string>
+    <string name="no_tournaments">Plan. Train. Execute. Your team\'s tournaments live here.</string>
+    <string name="no_tournament_support">Tournament support for your team\'s sport is coming soon!</string>
+
+    <!--CompetitorsFragment-->
+    <string name="add_tournament_competitors_detail">Add competitors to the tournament.\nFor knockout games, list order determines seeding.</string>
+    <string name="add_tournament_competitors">Add Competitors</string>
+    <string name="save_tournament_competitors">Save Competitors</string>
+    <string name="competitor_exists">This competitor is already added</string>
+    <string name="add_competitor">Add Competitor</string>
+    <string name="pick_home_competitor">Pick home side</string>
+    <string name="pick_away_competitor">Pick away side</string>
+    <string name="competitor">Competitors</string>
+    <string name="accept_competition">Join this competition?</string>
+
+    <!--GameFragment-->
+    <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>
+    <string name="no_stats">Keep Score. Earn bragging rights.</string>
+    <string name="no_competitor_acceptance">Waiting for all sides to accept to play.</string>
+    <string name="no_competitor_declined">A side has opted not to play.</string>
+    <string name="games">Games</string>
+    <string name="game_add">Add game</string>
+    <string name="game_edit">Edit game</string>
+    <string name="game_create">Create game</string>
+    <string name="game_update">Update game</string>
+    <string name="game_wins">Wins</string>
+    <string name="game_draws">Draws</string>
+    <string name="game_losses">Losses</string>
+    <string name="game_home">Home</string>
+    <string name="game_away">Away</string>
+    <string name="game_competitors">Competitors</string>
+    <string name="game_home_score">Home score</string>
+    <string name="game_away_score">Away score</string>
+    <string name="game_round">Round</string>
+    <string name="game_leg">Leg</string>
+    <string name="game_stats">Game stats</string>
+    <string name="game_end">End game</string>
+    <string name="game_delete">Delete game</string>
+    <string name="game_delete_prompt">Delete game?</string>
+    <string name="game_deleted">Game deleted</string>
+    <string name="game_referee">Referee: %1$s</string>
+    <string name="game_choose_referee">Choose referee</string>
+    <string name="game_no_referee">No referee</string>
+    <string name="game_end_request">End game?</string>
+    <string name="game_add_referee_title">Add Referee?</string>
+    <string name="game_manual_score_request">Enter scores manually?</string>
+    <string name="game_add_referee_prompt">If you add a referee, only the referee can add stats or end the game.\n\n You can remove or change the referee at any time.</string>
+    <string name="game_end_prompt">This will end the game for everyone.\n\nStats will not be able to be added or deleted, but the times can be changed.</string>
+    <string name="game_event">Game event</string>
+    <string name="game_create_prompt">You have to host games you create</string>
+    <string name="game_ended">FT</string>
+    <string name="game_accept">Join this game?</string>
+    <string name="game_head_to_head_params">Head to head search</string>
+    <string name="game_head_to_head_prompt">Head to head, who\'s got the edge?</string>
+    <string name="game_head_to_head">Head to Head</string>
+    <string name="game_select_tournament_type">Please pick a tournament type</string>
+    <string name="no_games">Come. See. Conquer. Your team\'s games live here.</string>
+    <string name="no_game_support">Game support for your team\'s sport is coming soon!</string>
+
+    <!--CompetitorsFragment-->
+    <string name="competitors_declined">Declined Competitions</string>
+    <string name="no_competitors_declined">Change your mind? Competitions you\'ve declined show up here</string>
+
+    <!--StatEditFragment-->
+    <string name="user">User</string>
+    <string name="pick_user">Pick a user</string>
+    <string name="stat_type">Stat type</string>
+    <string name="stat_time">Stat time</string>
+    <string name="choose_stat">Choose stat</string>
+    <string name="stat_add">Add stat</string>
+    <string name="stat_create">Create stat</string>
+    <string name="stat_update">Update stat</string>
+    <string name="stat_edit">Edit stat</string>
+    <string name="stat_game_ended">This game has ended</string>
+    <string name="stat_aggregate">Aggregated stats</string>
+    <string name="stat_aggregate_get">Get aggregated stats</string>
+    <string name="stat_aggregate_empty">Find out who\'s doing what, and where</string>
+    <string name="stat_already_added">This stat can only have it\'s time changed</string>
+    <string name="delete_stat_prompt">Delete stat?</string>
+    <string name="stat_user_not_on_team">This person is not on your team yet</string>
+    <string name="stat_only_team">You can only add stats for team\'s you\'re a part of</string>
+    <string name="no_stat_ranks">Who\'s the MVP? Individual stats show here.</string>
+    <string name="stat_ranks">Leaderboard</string>
+
+
     <!--BlockUserFragment-->
     <string name="blocked_user">Blocked User</string>
     <string name="blocked_users">Blocked Users</string>
     <string name="blocked_users_title">Blocked Users for %1$s</string>
     <string name="unblocked_user">Unblocked %1$s</string>
+    <string name="unblock_user">Unblock user</string>
     <string name="no_blocked_users">No people have been blocked.</string>
 
     <!--PublicEventFragment-->
     <string name="event_public_search">Search for Public Events</string>
     <string name="event_public_start_search">Search</string>
     <string name="event_distance">Distance</string>
+    <string name="event_my_location">My Location</string>
     <string name="event_public_distance">%1$d miles</string>
     <string name="event_public_location_unknown">Unable to get current location</string>
     <string name="event_public_location_prompt">Location permission required</string>
@@ -206,7 +348,8 @@
     <string name="chat_notification_multiline_title">%1$d new chats from %2$s</string>
 
     <!--MediaFragment-->
-    <string name="media_title">Media for %1$s</string>
+    <string name="media_add">Add media</string>
+    <string name="media_title">%1$s Gallery</string>
     <string name="media_upload_channel_name">Media upload</string>
     <string name="media_upload_channel_description">Notifications for media uploads</string>
     <string name="uploading_media">Uploading files</string>
@@ -236,10 +379,13 @@
     <string name="join_requests">Join Requests</string>
     <string name="chats_notification_title">%1$s • %2$s</string>
     <string name="chats_notifier_description">Notifications for team chats</string>
-    <string name="team_notifier_description">Notifications for media</string>
-    <string name="role_notifier_description">Notifications for media</string>
+    <string name="team_notifier_description">Notifications for teams</string>
+    <string name="role_notifier_description">Notifications for roles</string>
+    <string name="games_notifier_description">Notifications for games</string>
     <string name="events_notifier_description">Notifications for events</string>
     <string name="media_notifier_description">Notifications for media</string>
+    <string name="tournaments_notifier_description">Notifications for tournaments</string>
+    <string name="competitors_notifier_description">Notifications for competitors</string>
     <string name="join_requests_notifier_description">Notifications for join requests</string>
 
     <!--Empty ViewHolder-->

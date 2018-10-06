@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.app.Activity;
+import android.arch.core.util.Function;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
@@ -24,7 +25,7 @@ public class ClickInputViewHolder extends InputViewHolder
         this.clickAction = clickAction;
     }
 
-    public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Supplier<Boolean> errorChecker) {
+    public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Function<CharSequence, CharSequence> errorChecker) {
         super(itemView, enabler, errorChecker);
         editText.removeTextChangedListener(this);
         this.clickAction = clickAction;

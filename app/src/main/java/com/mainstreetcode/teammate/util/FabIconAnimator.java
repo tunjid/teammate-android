@@ -1,58 +1,92 @@
 package com.mainstreetcode.teammate.util;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
+import android.support.design.button.MaterialButton;
+import android.transition.AutoTransition;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.view.View;
+
+import com.mainstreetcode.teammate.R;
 
 public class FabIconAnimator {
 
-    private static final String SCALE_X_PROPERTY = "scaleX";
-    private static final String SCALE_Y_PROPERTY = "scaleY";
     private static final String ROTATION_Y_PROPERTY = "rotationY";
-    private static final float FULL_SCALE = 1F;
-    private static final float FIFTH_SCALE = 0.2F;
-    private static final float TWITCH_END = 60F;
+
+    private static final float TWITCH_END = 20F;
     private static final float TWITCH_START = 0F;
     private static final int DURATION = 200;
 
-    @DrawableRes
-    private int currentIcon;
-    private FloatingActionButton fab;
-    private final ScaleListener scaleListener = new ScaleListener();
+    @DrawableRes private int currentIcon;
+    @StringRes private int currentText;
+    private boolean isAnimating;
 
-    public FabIconAnimator(FloatingActionButton fab) {
-        this.fab = fab;
+    private final MaterialButton button;
+    private final ConstraintLayout container;
+    private final Transition.TransitionListener listener = new Transition.TransitionListener() {
+        public void onTransitionStart(Transition transition) { isAnimating = true; }
+
+        public void onTransitionEnd(Transition transition) { isAnimating = false; }
+
+        public void onTransitionCancel(Transition transition) { isAnimating = false; }
+
+        public void onTransitionPause(Transition transition) { }
+
+        public void onTransitionResume(Transition transition) { }
+    };
+
+    public FabIconAnimator(ConstraintLayout container) {
+        this.container = container;
+        this.button = container.findViewById(R.id.fab);
     }
 
-    public void setCurrentIcon(@DrawableRes int resource) {
-        boolean sameIcon = currentIcon == resource;
-
-        currentIcon = resource;
-
-        if (sameIcon) twitch();
-        else if (fab.getVisibility() == View.GONE) fab.setImageResource(resource);
-        else scale();
+    public void update(@DrawableRes int icon, @StringRes int text) {
+        boolean isSame = currentIcon == icon && currentText == text;
+        currentIcon = icon;
+        currentText = text;
+        animateChange(icon, text, isSame);
     }
 
-    private void scale() {
-        AnimatorSet set = new AnimatorSet();
-        ObjectAnimator scaleDownX = animateProperty(SCALE_X_PROPERTY, FULL_SCALE, FIFTH_SCALE);
-        ObjectAnimator scaleDownY = animateProperty(SCALE_Y_PROPERTY, FULL_SCALE, FIFTH_SCALE);
+    public void setExtended(boolean extended) {
+        setExtended(extended, false);
+    }
 
-        ObjectAnimator scaleUpX = animateProperty(SCALE_X_PROPERTY, FIFTH_SCALE, FULL_SCALE);
-        ObjectAnimator scaleUpY = animateProperty(SCALE_Y_PROPERTY, FIFTH_SCALE, FULL_SCALE);
+    public void setOnClickListener(@Nullable View.OnClickListener clickListener) {
+        button.setOnClickListener(clickListener);
+    }
 
-        scaleDownX.addListener(scaleListener);
+    private boolean isExtended() {
+        return button.getLayoutParams().height != button.getResources().getDimensionPixelSize(R.dimen.triple_and_half_margin);
+    }
 
-        set.play(scaleUpY).after(scaleDownY);
-        set.play(scaleUpX).after(scaleDownX);
-        set.playTogether(scaleDownX, scaleDownY);
+    private void animateChange(@DrawableRes int icon, @StringRes int text, boolean isSame) {
+        boolean extended = isExtended();
+        button.setText(text);
+        button.setIconResource(icon);
+        setExtended(extended, !isSame);
+        if (!extended) twitch();
+    }
 
-        set.start();
+    private void setExtended(boolean extended, boolean force) {
+        if (isAnimating || (extended && isExtended() && !force)) return;
+
+        ConstraintSet set = new ConstraintSet();
+        set.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
+
+        TransitionManager.beginDelayedTransition(container, new AutoTransition()
+                .addListener(listener).setDuration(150));
+
+        if (extended) button.setText(currentText);
+        else button.setText("");
+
+        set.applyTo(container);
     }
 
     private void twitch() {
@@ -66,22 +100,46 @@ public class FabIconAnimator {
 
     @NonNull
     private ObjectAnimator animateProperty(String property, float start, float end) {
-        return ObjectAnimator.ofFloat(fab, property, start, end).setDuration(DURATION);
+        return ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION);
     }
 
-    private final class ScaleListener implements Animator.AnimatorListener {
-        @Override
-        public void onAnimationEnd(Animator animator) {
-            fab.setImageResource(currentIcon);
-        }
+    //    private final ScaleListener scaleListener = new ScaleListener();
 
-        @Override
-        public void onAnimationStart(Animator animator) {}
+    //    private static final String SCALE_X_PROPERTY = "scaleX";
+//    private static final String SCALE_Y_PROPERTY = "scaleY";
+//    private static final float FULL_SCALE = 1F;
+//    private static final float FIFTH_SCALE = 0.2F;
 
-        @Override
-        public void onAnimationCancel(Animator animator) {}
-
-        @Override
-        public void onAnimationRepeat(Animator animator) {}
-    }
+//    private void scale() {
+//        AnimatorSet set = new AnimatorSet();
+//        ObjectAnimator scaleDownX = animateProperty(SCALE_X_PROPERTY, FULL_SCALE, FIFTH_SCALE);
+//        ObjectAnimator scaleDownY = animateProperty(SCALE_Y_PROPERTY, FULL_SCALE, FIFTH_SCALE);
+//
+//        ObjectAnimator scaleUpX = animateProperty(SCALE_X_PROPERTY, FIFTH_SCALE, FULL_SCALE);
+//        ObjectAnimator scaleUpY = animateProperty(SCALE_Y_PROPERTY, FIFTH_SCALE, FULL_SCALE);
+//
+//        scaleDownX.addListener(scaleListener);
+//
+//        set.play(scaleUpY).after(scaleDownY);
+//        set.play(scaleUpX).after(scaleDownX);
+//        set.playTogether(scaleDownX, scaleDownY);
+//
+//        set.start();
+//    }
+//
+//    private final class ScaleListener implements Animator.AnimatorListener {
+//        @Override
+//        public void onAnimationEnd(Animator animator) {
+//            //  fab.setImageResource(currentIcon, currentText);
+//        }
+//
+//        @Override
+//        public void onAnimationStart(Animator animator) {}
+//
+//        @Override
+//        public void onAnimationCancel(Animator animator) {}
+//
+//        @Override
+//        public void onAnimationRepeat(Animator animator) {}
+//    }
 }

@@ -38,7 +38,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
                                Function<T, CharSequence> displayFunction,
                                Function<T, String> valueFunction,
                                Supplier<Boolean> enabler,
-                               Supplier<Boolean> errorChecker) {
+                               Function<CharSequence, CharSequence> errorChecker) {
         super(itemView, enabler, () -> {}, errorChecker);
         this.titleRes = titleRes;
         this.items = items;
@@ -59,15 +59,16 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
 
         AlertDialog dialog = new AlertDialog.Builder(itemView.getContext())
                 .setTitle(titleRes)
-                .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialogInterface, position) -> {
-                    T type = items.get(position);
-                    item.setValue(valueFunction.apply(type));
-                    editText.setText(sequences.get(position).toString());
-                    editText.setError(null);
-                })
+                .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialogInterface, position) -> onItemSelected(sequences, position, items.get(position)))
                 .create();
 
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
         dialog.show();
+    }
+
+    protected void onItemSelected(List<CharSequence> sequences, int position, T type) {
+        item.setValue(valueFunction.apply(type));
+        editText.setText(sequences.get(position).toString());
+        editText.setError(null);
     }
 }

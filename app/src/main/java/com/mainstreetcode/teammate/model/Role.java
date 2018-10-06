@@ -41,7 +41,6 @@ public class Role extends RoleEntity
         ListableModel<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
-    private static final List<String> PRIVILEGED_ROLES = Arrays.asList("Admin", "Coach", "Assistant Coach");
 
     @Ignore private static final IdCache holder = IdCache.cache(5);
 
@@ -121,7 +120,7 @@ public class Role extends RoleEntity
 
     public boolean isPrivilegedRole() {
         String positionCode = position != null ? position.getCode() : "";
-        return !TextUtils.isEmpty(positionCode) && !isEmpty() && PRIVILEGED_ROLES.contains(positionCode);
+        return !TextUtils.isEmpty(positionCode) && !isEmpty() && Config.getPrivileged().contains(positionCode);
     }
 
     public CharSequence getTitle() {

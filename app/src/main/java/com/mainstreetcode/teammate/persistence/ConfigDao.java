@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.persistence;
 
 import android.arch.persistence.room.Dao;
+import android.support.annotation.NonNull;
 
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.rest.TeammateService;
@@ -11,6 +12,10 @@ import com.mainstreetcode.teammate.rest.TeammateService;
 
 @Dao
 public class ConfigDao extends SharedPreferencesDao<Config> {
+
+    @NonNull
+    @Override
+    Config getEmpty() { return Config.empty(); }
 
     @Override
     String preferenceName() {return "config";}

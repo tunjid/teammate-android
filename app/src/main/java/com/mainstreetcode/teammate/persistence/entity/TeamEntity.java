@@ -23,6 +23,7 @@ public class TeamEntity implements Parcelable {
     @NonNull @PrimaryKey
     @ColumnInfo(name = "team_id") protected String id;
     @ColumnInfo(name = "team_image_url") protected String imageUrl;
+    @ColumnInfo(name = "team_screen_name") protected String screenName;
     @ColumnInfo(name = "team_city") protected String city;
     @ColumnInfo(name = "team_state") protected String state;
     @ColumnInfo(name = "team_zip") protected String zip;
@@ -38,13 +39,15 @@ public class TeamEntity implements Parcelable {
     @ColumnInfo(name = "team_min_age") protected int minAge;
     @ColumnInfo(name = "team_max_age") protected int maxAge;
 
-    public TeamEntity(@NonNull String id, String imageUrl, String city, String state, String zip,
+    public TeamEntity(@NonNull String id, String imageUrl, String screenName,
+                      String city, String state, String zip,
                       CharSequence name, CharSequence description,
                       Date created, LatLng location, Sport sport,
                       long storageUsed, long maxStorage,
                       int minAge, int maxAge) {
         this.id = id;
         this.imageUrl = imageUrl;
+        this.screenName = screenName;
         this.city = city;
         this.state = state;
         this.zip = zip;
@@ -62,6 +65,7 @@ public class TeamEntity implements Parcelable {
     protected TeamEntity(Parcel in) {
         id = in.readString();
         imageUrl = in.readString();
+        screenName = in.readString();
         city = in.readString();
         state = in.readString();
         zip = in.readString();
@@ -82,6 +86,8 @@ public class TeamEntity implements Parcelable {
     public CharSequence getName() {return processString(this.name);}
 
     public CharSequence getSportAndName() {return sport.appendEmoji(name);}
+
+    public String getScreenName() { return screenName; }
 
     public String getCity() {return this.city;}
 
@@ -130,6 +136,8 @@ public class TeamEntity implements Parcelable {
     }
 
     protected void setName(String name) {this.name = name; }
+
+    protected void setScreenName(String screenName) { this.screenName = screenName; }
 
     protected void setCity(String city) {this.city = city; }
 
@@ -181,6 +189,7 @@ public class TeamEntity implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(imageUrl);
+        dest.writeString(screenName);
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zip);

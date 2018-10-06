@@ -120,12 +120,12 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
     @Override
     Maybe<List<Chat>> localModelsBefore(Team team, @Nullable Date date) {
         if (date == null) date = new Date();
-        return chatDao.chatsBefore(team.getId(), date).subscribeOn(io());
+        return chatDao.chatsBefore(team.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io());
     }
 
     @Override
     Maybe<List<Chat>> remoteModelsBefore(Team team, @Nullable Date date) {
-        return api.chatsBefore(team.getId(), date).map(getSaveManyFunction()).toMaybe();
+        return api.chatsBefore(team.getId(), date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();
     }
 
     public Flowable<List<Chat>> fetchUnreadChats() {

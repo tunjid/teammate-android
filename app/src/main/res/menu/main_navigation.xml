@@ -2,33 +2,51 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_home"
+        android:id="@+id/action_tournaments"
         android:enabled="true"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/home"
+        android:icon="@drawable/ic_trophy_white_24dp"
+        android:title="@string/tournaments"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_events"
+        android:id="@+id/action_games"
         android:enabled="true"
-        android:icon="@drawable/ic_event_white_24dp"
-        android:title="@string/events"
+        android:icon="@drawable/ic_score_white_24dp"
+        android:title="@string/games"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_messages"
+        android:id="@+id/action_public_events"
         android:enabled="true"
-        android:icon="@drawable/ic_message_black_24dp"
-        android:title="@string/chats"
+        android:icon="@drawable/ic_globe_white_24dp"
+        android:title="@string/event_public"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_media"
+        android:id="@+id/action_head_to_head"
         android:enabled="true"
-        android:icon="@drawable/ic_video_library_black_24dp"
-        android:title="@string/media"
+        android:icon="@drawable/ic_head_to_head_24dp"
+        android:title="@string/game_head_to_head"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_team"
+        android:id="@+id/action_stats_aggregate"
         android:enabled="true"
-        android:icon="@drawable/ic_group_black_24dp"
-        android:title="@string/team"
+        android:icon="@drawable/ic_stat_white_24dp"
+        android:title="@string/stat_aggregate"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_declined_competitions"
+        android:enabled="true"
+        android:icon="@drawable/ic_thumb_down_24dp"
+        android:title="@string/competitors_declined"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_my_profile"
+        android:enabled="true"
+        android:icon="@drawable/ic_account_white_24dp"
+        android:title="@string/my_profile"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="@string/settings"
         app:showAsAction="ifRoom" />
 </menu>

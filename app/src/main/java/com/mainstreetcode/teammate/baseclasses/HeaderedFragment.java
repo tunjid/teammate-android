@@ -23,6 +23,7 @@ import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
+import com.mainstreetcode.teammate.util.AppBarListener;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
@@ -78,6 +79,13 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset;
 
         appBarLayout = view.findViewById(R.id.app_bar);
+        view.findViewById(R.id.header).setVisibility(canExpandAppBar() ? View.VISIBLE : View.GONE);
+
+        AppBarListener.with()
+                .appBarLayout(appBarLayout)
+                .offsetDiffListener(offsetProps -> updateFabForScrollState(offsetProps.getDy()))
+                .create();
+
     }
 
     @Override
@@ -115,6 +123,8 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         toggleFab(showsFab());
     }
 
+    protected boolean canExpandAppBar() {return true;}
+
     protected boolean canGetModel() {
         boolean result = !ImageWorkerFragment.isPicking(this) && !imageJustCropped;
         imageJustCropped = false;
@@ -128,7 +138,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         if (appBarLayout != null) appBarLayout.setExpanded(false);
         if (showsFab()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
                 .observeOn(mainThread())
-                .subscribe(() -> toggleFab(true), ErrorHandler.EMPTY));
+                .subscribe(() -> toggleFab(showsFab()), ErrorHandler.EMPTY));
     }
 
     protected final void refresh() {
@@ -154,7 +164,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
         new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.block_user)
-                .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialog, index) -> {
+                .setItems(sequences.toArray(new CharSequence[0]), (dialog, index) -> {
                     BlockReason reason = reasons.get(index);
                     BlockedUser request = BlockedUser.block(user, team, reason);
 

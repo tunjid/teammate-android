@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
@@ -17,9 +18,11 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.FeedAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.FeedItemViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
@@ -29,11 +32,17 @@ import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Single;
 
+import static android.support.design.widget.Snackbar.Callback.DISMISS_EVENT_MANUAL;
+import static android.support.design.widget.Snackbar.Callback.DISMISS_EVENT_SWIPE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**
@@ -44,6 +53,8 @@ public final class FeedFragment extends MainActivityFragment
         implements FeedAdapter.FeedItemAdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.feed_list};
+
+    private int onBoardingIndex;
     private AtomicBoolean bottomBarState;
 
     public static FeedFragment newInstance() {
@@ -88,6 +99,8 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
+        onBoard();
+        scrollManager.setRefreshing();
         disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
 
@@ -124,6 +137,21 @@ public final class FeedFragment extends MainActivityFragment
                     .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, true)))
                     .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.rsvpEvent(item, false)))
                     .setNeutralButton(R.string.event_details, ((dialog, which) -> showFragment(EventEditFragment.newInstance((Event) model))))
+                    .show();
+        }
+        if (model instanceof Competitor) {
+            builder.setTitle(getString(R.string.accept_competition))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> onFeedItemAction(feedViewModel.processCompetitor(item, true)))
+                    .setNegativeButton(R.string.no, (dialog, which) -> onFeedItemAction(feedViewModel.processCompetitor(item, false)))
+                    .setNeutralButton(R.string.event_details, ((dialog, which) -> {
+                        Competitor competitor = (Competitor) model;
+                        BaseFragment fragment = !competitor.getGame().isEmpty()
+                                ? GameFragment.newInstance(competitor.getGame())
+                                : !competitor.getTournament().isEmpty()
+                                ? TournamentDetailFragment.newInstance(competitor.getTournament()).pending(competitor)
+                                : null;
+                        if (fragment != null) showFragment(fragment);
+                    }))
                     .show();
         }
         else if (model instanceof JoinRequest) {
@@ -215,6 +243,34 @@ public final class FeedFragment extends MainActivityFragment
 
     private void setToolbarTitle(User user) {
         setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName()));
+    }
+
+    private void onBoard() {
+        if (prefsViewModel.isOnBoarded()) return;
+        List<String> prompts = Arrays.asList(getResources().getStringArray(R.array.on_boarding));
+        prompts = prompts.subList(onBoardingIndex, prompts.size());
+
+        Iterator<String> iterator = prompts.iterator();
+        AtomicReference<Runnable> ref = new AtomicReference<>();
+
+        ref.set(() -> showChoices(choiceBar -> choiceBar.setText(iterator.next())
+                .setPositiveText(getString(iterator.hasNext() ? R.string.next : R.string.finish))
+                .setPositiveClickListener(view -> {
+                    onBoardingIndex++;
+                    if (iterator.hasNext()) ref.get().run();
+                    else choiceBar.dismiss();
+                })
+                .addCallback(new BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
+                    public void onDismissed(ChoiceBar bar, int event) {onBoardDismissed(event); }
+                })
+        ));
+        ref.get().run();
+    }
+
+    private void onBoardDismissed(int event) {
+        if (event != DISMISS_EVENT_SWIPE && event != DISMISS_EVENT_MANUAL) return;
+        onBoardingIndex = 0;
+        prefsViewModel.setOnBoarded(true);
     }
 
     private static String getTimeOfDay() {

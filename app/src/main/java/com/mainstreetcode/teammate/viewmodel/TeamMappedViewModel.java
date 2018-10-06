@@ -5,6 +5,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamHost;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
@@ -12,13 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
-
-import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
 public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> extends MappedViewModel<Team, V> {
 
-    private final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
+    final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
 
     @Override
     void onModelAlert(Alert alert) {
@@ -30,10 +30,7 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
     }
 
     public List<Identifiable> getModelList(Team team) {
-        List<Identifiable> modelList = modelListMap.get(team);
-        if (!modelListMap.containsKey(team)) modelListMap.put(team, modelList = new ArrayList<>());
-
-        return modelList;
+        return ModelUtils.get(team, modelListMap, ArrayList::new);
     }
 
     @Override
@@ -42,17 +39,17 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
         if (message.isIllegalTeamMember()) pushModelAlert(Alert.teamDeletion(key));
     }
 
-    boolean checkForInvalidTeam(Throwable throwable, Team team) {
-        Message message = fromThrowable(throwable);
-        boolean isValidModel = message == null || message.isValidModel();
-
-        if (isValidModel) return false;
-
-        pushModelAlert(Alert.teamDeletion(team));
-        return true;
-    }
-
     Consumer<Throwable> onError(V model) {
         return throwable -> checkForInvalidObject(throwable, model, model.getTeam());
+    }
+
+    @Override
+    void onInvalidKey(Team key) {
+        super.onInvalidKey(key);
+        pushModelAlert(Alert.teamDeletion(key));
+    }
+
+    Flowable<Identifiable> getAllModels() {
+        return Flowable.fromIterable(modelListMap.values()).flatMap(Flowable::fromIterable);
     }
 }

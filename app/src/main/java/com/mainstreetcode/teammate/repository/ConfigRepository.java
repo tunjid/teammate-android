@@ -41,10 +41,7 @@ public class ConfigRepository extends ModelRepository<Config> {
         return ourInstance;
     }
 
-    public Config getCurrent() {
-        Config current = dao.getCurrent();
-        return current == null ? Config.empty() : current;
-    }
+    public Config getCurrent() { return dao.getCurrent(); }
 
     @Override
     public EntityDao<? super Config> dao() {
@@ -59,7 +56,7 @@ public class ConfigRepository extends ModelRepository<Config> {
     @Override
     public Flowable<Config> get(String ignored) {
         Config config = dao.getCurrent();
-        return config == null || config.isEmpty()
+        return config.isEmpty()
                 ? api.getConfig().map(getSaveFunction()).toFlowable()
                 : Flowable.just(config).doFinally(this::refreshConfig);
     }
@@ -79,6 +76,7 @@ public class ConfigRepository extends ModelRepository<Config> {
     }
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void refreshConfig() {
         if (numRefreshes++ % REFRESH_THRESHOLD != 0) return;
         api.getConfig().map(getSaveFunction())
