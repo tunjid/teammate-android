@@ -73,6 +73,7 @@ public final class UserSearchFragment extends MainActivityFragment
             items.clear();
             disposables.add(teamMemberViewModel.getAllUsers()
                     .startWith(userViewModel.getCurrentUser())
+                    .distinct()
                     .subscribe(items::add, ErrorHandler.EMPTY));
         }
 
