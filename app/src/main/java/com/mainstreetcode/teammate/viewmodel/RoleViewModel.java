@@ -51,13 +51,14 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
         return roles;
     }
 
-    public boolean partakesInGame(Game game) {
+    public boolean privilegedInGame(Game game) {
         Competitive home = game.getHome().getEntity();
         Competitive away = game.getAway().getEntity();
 
         for (Identifiable identifiable : roles) {
             if (!(identifiable instanceof Role)) continue;
             Role role = (Role) identifiable;
+            if (!game.betweenUsers() && !role.isPrivilegedRole()) continue;
             if (matches(role, home)) return true;
             if (matches(role, away)) return true;
         }

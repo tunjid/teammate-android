@@ -54,7 +54,6 @@ public final class GameFragment extends MainActivityFragment
     private static final String ARG_COMPETITOR = "competitor";
 
     private Game game;
-    private Competitor competitor;
     private List<Identifiable> items;
 
     private boolean hasChoiceBar;
@@ -99,10 +98,6 @@ public final class GameFragment extends MainActivityFragment
 
         Bundle arguments = getArguments();
         game = arguments.getParcelable(ARG_GAME);
-        competitor = arguments.getParcelable(ARG_COMPETITOR);
-
-        if (competitor == null) competitor = Competitor.empty();
-
         items = statViewModel.getModelList(game);
         editableStatus = new AtomicBoolean();
         privilegeStatus = new AtomicBoolean();
@@ -324,7 +319,7 @@ public final class GameFragment extends MainActivityFragment
         bindReferee();
     }
 
-    private void respond(boolean accept) {
+    private void respond(boolean accept, Competitor competitor) {
         toggleProgress(true);
         disposables.add(competitorViewModel.respond(competitor, accept)
                 .subscribe(ignored -> {
@@ -344,19 +339,22 @@ public final class GameFragment extends MainActivityFragment
     }
 
     private void checkCompetitor() {
-        boolean competitorEmpty = competitor.isEmpty();
         if (hasChoiceBar) return;
-        if (competitorEmpty && !roleViewModel.partakesInGame(game)) return;
-        if (competitorEmpty && !game.getHome().isAccepted()) competitor.update(game.getHome());
-        if (competitorEmpty && !game.getAway().isAccepted()) competitor.update(game.getAway());
-        if (competitorEmpty || competitor.isAccepted()) return;
+        if (!roleViewModel.privilegedInGame(game)) return;
+
+        Competitor competitor;
+        if (!game.getHome().isAccepted()) competitor = game.getHome();
+        else if (!game.getAway().isAccepted()) competitor = game.getAway();
+        else competitor = null;
+
+        if (competitor == null || competitor.isEmpty() || competitor.isAccepted()) return;
 
         hasChoiceBar = true;
         showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))
                 .setPositiveText(getText(R.string.accept))
                 .setNegativeText(getText(R.string.decline))
-                .setPositiveClickListener(v -> respond(true))
-                .setNegativeClickListener(v -> respond(false))
+                .setPositiveClickListener(v -> respond(true, competitor))
+                .setNegativeClickListener(v -> respond(false, competitor))
                 .addCallback(new BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
                     public void onDismissed(ChoiceBar shown, int event) { hasChoiceBar = false; }
                 }));

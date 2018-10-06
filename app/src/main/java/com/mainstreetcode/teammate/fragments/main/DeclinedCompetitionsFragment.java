@@ -88,7 +88,7 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .setNeutralButton(R.string.event_details, ((dialog, which) -> {
                     BaseFragment fragment = !competitor.getGame().isEmpty()
-                            ? GameFragment.newInstance(competitor.getGame()).pending(competitor)
+                            ? GameFragment.newInstance(competitor.getGame())
                             : !competitor.getTournament().isEmpty()
                             ? TournamentDetailFragment.newInstance(competitor.getTournament()).pending(competitor)
                             : null;
