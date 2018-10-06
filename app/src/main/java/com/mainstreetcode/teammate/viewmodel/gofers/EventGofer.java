@@ -39,6 +39,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     private final GuestRepository guestRepository;
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public EventGofer(Event model,
                       Consumer<Throwable> onError,
                       Flowable<BlockedUser> blockedUserFlowable,
