@@ -37,7 +37,7 @@ public class ExpandingToolbar {
         this.searchButton = container.findViewById(R.id.search);
 
         this.onCollapsed = onCollapsed;
-        searchTitle.setOnClickListener(searchClickListener);
+        container.setOnClickListener(searchClickListener);
         searchButton.setOnClickListener(searchClickListener);
     }
 
