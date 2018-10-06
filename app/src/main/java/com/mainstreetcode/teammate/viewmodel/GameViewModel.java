@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 import android.arch.core.util.Function;
+import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
@@ -12,9 +13,9 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.repository.GameRepository;
 import com.mainstreetcode.teammate.repository.GameRoundRepository;
+import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -25,6 +26,7 @@ import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +42,6 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
     private final List<Identifiable> headToHeadMatchUps = new ArrayList<>();
 
-    private final CompetitorRepository competitorRepository = CompetitorRepository.getInstance();
     private final GameRoundRepository gameRoundRepository = GameRoundRepository.getInstance();
     private final GameRepository gameRepository = GameRepository.getInstance();
 
@@ -69,7 +70,8 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     @Override
     Flowable<List<Game>> fetch(Team key, boolean fetchLatest) {
-        return gameRepository.modelsBefore(key, getQueryDate(fetchLatest, key, Game::getCreated));
+        return gameRepository.modelsBefore(key, getQueryDate(fetchLatest, key, Game::getCreated))
+                .map(games -> filterDeclinedGamed(key, games));
     }
 
     @SuppressLint("UseSparseArrays")
@@ -140,7 +142,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         Map<?, List<Identifiable>> tournamentMap = ModelUtils.get(tournament, gameRoundMap, Collections::emptyMap);
         Function<Map<?, List<Identifiable>>, Flowable<Identifiable>> mapListFunction = listMap ->
                 Flowable.fromIterable(listMap.values())
-                .flatMap(Flowable::fromIterable);
+                        .flatMap(Flowable::fromIterable);
 
         Flowable<Identifiable> teamMapped = mapListFunction.apply(modelListMap);
         Flowable<Identifiable> tournamentMapped = mapListFunction.apply(tournamentMap);
@@ -164,5 +166,18 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         if (away instanceof Team) getModelList((Team) away).remove(game);
 
         gameRepository.queueForLocalDeletion(game);
+    }
+
+    @NonNull
+    private List<Game> filterDeclinedGamed(Team key, List<Game> games) {
+        Iterator<Game> iterator = games.iterator();
+        while (iterator.hasNext()) {
+            Game game = iterator.next();
+            Competitive entity = game.betweenUsers() ? UserRepository.getInstance().getCurrentUser() : key;
+            boolean isAway = entity.equals(game.getAway().getEntity());
+            if (isAway && game.getAway().isDeclined()) iterator.remove();
+        }
+
+        return games;
     }
 }
