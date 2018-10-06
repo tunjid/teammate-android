@@ -143,6 +143,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
+        teamViewModel.updateDefaultTeam(Team.empty());
         userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),
                 throwable -> MainActivity.startRegistrationActivity(getActivity())
