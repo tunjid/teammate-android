@@ -5,12 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="@dimen/single_margin">
+    android:paddingLeft="@dimen/single_margin"
+    android:paddingRight="@dimen/single_margin"
+    android:paddingTop="@dimen/single_margin">
 
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:lineSpacingMultiplier="1.25"
         android:textColor="@color/white"
         android:textSize="@dimen/small_text"
         app:layout_constraintLeft_toLeftOf="parent"

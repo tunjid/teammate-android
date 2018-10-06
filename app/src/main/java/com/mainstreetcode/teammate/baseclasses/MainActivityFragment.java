@@ -117,6 +117,13 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (shouldGoBack) activity.onBackPressed();
     }
 
+    protected boolean isBottomSheetShowing() {
+        PersistentUiController controller = getPersistentUiController();
+        if (controller instanceof BottomSheetController)
+            return ((BottomSheetController) controller).isBottomSheetShowing();
+        return false;
+    }
+
     protected void hideBottomSheet() {
         PersistentUiController controller = getPersistentUiController();
         if (controller instanceof BottomSheetController)

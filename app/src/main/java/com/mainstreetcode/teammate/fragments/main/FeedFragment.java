@@ -55,6 +55,7 @@ public final class FeedFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.feed_list};
 
     private int onBoardingIndex;
+    private boolean isOnBoarding;
     private AtomicBoolean bottomBarState;
 
     public static FeedFragment newInstance() {
@@ -99,7 +100,6 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        onBoard();
         scrollManager.setRefreshing();
         disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
     }
@@ -107,6 +107,7 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        onBoard();
         setToolbarTitle(userViewModel.getCurrentUser());
     }
 
@@ -246,10 +247,11 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     private void onBoard() {
-        if (prefsViewModel.isOnBoarded()) return;
+        if (isOnBoarding || prefsViewModel.isOnBoarded() || isBottomSheetShowing()) return;
         List<String> prompts = Arrays.asList(getResources().getStringArray(R.array.on_boarding));
         prompts = prompts.subList(onBoardingIndex, prompts.size());
 
+        isOnBoarding = true;
         Iterator<String> iterator = prompts.iterator();
         AtomicReference<Runnable> ref = new AtomicReference<>();
 
@@ -268,6 +270,7 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     private void onBoardDismissed(int event) {
+        isOnBoarding = false;
         if (event != DISMISS_EVENT_SWIPE && event != DISMISS_EVENT_MANUAL) return;
         onBoardingIndex = 0;
         prefsViewModel.setOnBoarded(true);

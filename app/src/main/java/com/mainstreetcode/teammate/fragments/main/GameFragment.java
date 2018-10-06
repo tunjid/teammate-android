@@ -241,11 +241,11 @@ public final class GameFragment extends MainActivityFragment
         disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(editableStatus::set)
                 .subscribe(ignored -> togglePersistentUi(), defaultErrorHandler));
 
-        if (game.competitorsNotAccepted())
-            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance);
-
-        else if (game.competitorsDeclined())
+        if (game.competitorsDeclined())
             scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined);
+
+        else if (game.competitorsNotAccepted())
+            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance);
 
         else scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_stats);
     }

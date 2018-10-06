@@ -259,6 +259,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return parent == null || parent.getId() != R.id.main_fragment_container;
     }
 
+    protected void clearTransientBars() {
+        for (BaseTransientBottomBar bar : transientBottomBars)
+            if (bar instanceof ChoiceBar) ((ChoiceBar) bar).dismissAsTimeout();
+            else bar.dismiss();
+        transientBottomBars.clear();
+    }
+
     protected void initTransition() {
         Transition transition = new AutoTransition();
         transition.setDuration(200);
@@ -326,13 +333,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private void showSystemUI() {
         int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         getDecorView().setSystemUiVisibility(visibility);
-    }
-
-    private void clearTransientBars() {
-        for (BaseTransientBottomBar bar : transientBottomBars)
-            if (bar instanceof ChoiceBar) ((ChoiceBar) bar).dismissAsTimeout();
-            else bar.dismiss();
-        transientBottomBars.clear();
     }
 
     private boolean isInLandscape() {

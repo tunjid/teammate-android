@@ -254,6 +254,9 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
+    public boolean isBottomSheetShowing() { return bottomSheetBehavior.getState() != STATE_HIDDEN; }
+
+    @Override
     public void hideBottomSheet() {
         bottomSheetBehavior.setState(STATE_HIDDEN);
         restoreHiddenViewState();
@@ -263,6 +266,8 @@ public class MainActivity extends TeammatesBaseActivity
     public void showBottomSheet(Args args) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager == null) return;
+
+        clearTransientBars();
 
         BaseFragment toShow = args.getFragment();
         TeammatesBaseFragment current = getCurrentFragment();
