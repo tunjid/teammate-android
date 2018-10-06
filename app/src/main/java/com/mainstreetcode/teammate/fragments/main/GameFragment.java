@@ -73,12 +73,6 @@ public final class GameFragment extends MainActivityFragment
         return fragment;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public GameFragment pending(Competitor competitor) {
-        getArguments().putParcelable(ARG_COMPETITOR, competitor);
-        return this;
-    }
-
     @Override
     @SuppressWarnings("ConstantConditions")
     public String getStableTag() {

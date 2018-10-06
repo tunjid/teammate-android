@@ -6,6 +6,7 @@
     android:background="@drawable/bg_nav_dialog">
 
     <include
+        android:id="@+id/item_container"
         layout="@layout/viewholder_list_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
