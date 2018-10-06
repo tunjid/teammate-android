@@ -47,6 +47,7 @@ public class Config implements Model<Config> {
     private String defaultUserAvatar;
     private String defaultTournamentLogo;
     private List<Sport> sports = new ArrayList<>();
+    private List<String> privileged = new ArrayList<>();
     private List<Position> positions = new ArrayList<>();
     private List<StatType> statTypes = new ArrayList<>();
     private List<Visibility> visibilities = new ArrayList<>();
@@ -85,6 +86,11 @@ public class Config implements Model<Config> {
     public static List<Sport> getSports() {
         return getList(config -> config.sports);
     }
+
+    public static List<String> getPrivileged() {
+        return getList(config -> config.privileged);
+    }
+
 
     public static List<Position> getPositions() {
         return getList(config -> config.positions);
@@ -224,6 +230,7 @@ public class Config implements Model<Config> {
         private static final String TOURNAMENT_LOGO_KEY = "defaultTournamentLogo";
         private static final String SPORTS_KEY = "sports";
         private static final String POSITIONS_KEY = "roles";
+        private static final String PRIVILEGED = "privilegedRoles";
         private static final String VISIBILITIES_KEY = "visibility";
         private static final String BLOCKED_REASONS_KEY = "blockReasons";
         private static final String STATIC_VARIANTS_KEY = "staticAndroidVariants";
@@ -244,6 +251,7 @@ public class Config implements Model<Config> {
             JsonArray sportsArray = new JsonArray();
             JsonArray positionArray = new JsonArray();
             JsonArray visibilityArray = new JsonArray();
+            JsonArray privilegedArray = new JsonArray();
             JsonArray blockedReasonArray = new JsonArray();
             JsonArray staticVariantsArray = new JsonArray();
             JsonArray tournamentTypesArray = new JsonArray();
@@ -252,6 +260,7 @@ public class Config implements Model<Config> {
             for (Sport item : src.sports) sportsArray.add(context.serialize(item));
             for (StatType item : src.statTypes) statsArray.add(context.serialize(item));
             for (Position item : src.positions) positionArray.add(context.serialize(item));
+            for (String item : src.privileged) privilegedArray.add(context.serialize(item));
             for (Visibility item : src.visibilities) visibilityArray.add(context.serialize(item));
             for (BlockReason item : src.blockReasons)
                 blockedReasonArray.add(context.serialize(item));
@@ -264,6 +273,7 @@ public class Config implements Model<Config> {
 
             serialized.add(SPORTS_KEY, sportsArray);
             serialized.add(GAME_STATS_KEY, statsArray);
+            serialized.add(PRIVILEGED, privilegedArray);
             serialized.add(POSITIONS_KEY, positionArray);
             serialized.add(VISIBILITIES_KEY, visibilityArray);
             serialized.add(BLOCKED_REASONS_KEY, blockedReasonArray);
@@ -286,6 +296,7 @@ public class Config implements Model<Config> {
             Config config = new Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar, defaultTournamentLogo);
 
             ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport.class);
+            ModelUtils.deserializeList(context, deviceJson.get(PRIVILEGED), config.privileged, String.class);
             ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position.class);
             ModelUtils.deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType.class);
             ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility.class);
