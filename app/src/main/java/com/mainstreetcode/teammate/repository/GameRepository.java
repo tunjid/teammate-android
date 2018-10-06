@@ -103,8 +103,8 @@ public class GameRepository extends TeamQueryRepository<Game> {
                 Competitor away = game.getAway();
                 Tournament tournament = game.getTournament();
 
-                if (!event.isEmpty()) events.add(event);
                 if (!referee.isEmpty()) users.add(referee);
+                if (!event.isEmpty() && !event.getTeam().isEmpty()) events.add(event);
                 if (!tournament.isEmpty() && !team.isEmpty()) {
                     tournament.updateHost(team);
                     tournaments.add(tournament);

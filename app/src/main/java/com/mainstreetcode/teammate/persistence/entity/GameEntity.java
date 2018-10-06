@@ -121,10 +121,6 @@ public class GameEntity implements Parcelable {
         canDraw = in.readByte() != 0x00;
     }
 
-    public boolean hasValidRefType() {
-        return User.COMPETITOR_TYPE.equals(refPath) || Team.COMPETITOR_TYPE.equals(refPath);
-    }
-
     @NonNull
     public String getId() { return id; }
 

@@ -26,8 +26,8 @@ public final class SettingsFragment extends MainActivityFragment
         implements SettingsAdapter.SettingsAdapterListener {
 
     private static final List<SettingsItem> items = Arrays.asList(
-            new SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp),
-            new SettingsItem(R.string.show_on_boarding, R.drawable.ic_teach_24dp)
+            new SettingsItem(R.string.show_on_boarding, R.drawable.ic_teach_24dp),
+            new SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp)
     );
 
     public static SettingsFragment newInstance() {

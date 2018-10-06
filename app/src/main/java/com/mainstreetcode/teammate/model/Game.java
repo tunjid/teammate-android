@@ -109,15 +109,6 @@ public class Game extends GameEntity
     public Team getTeam() { return host; }
 
     @Override
-    public Event getEvent() {
-        Event event = super.getEvent();
-        Team team = event.getTeam();
-        if (!team.hasMajorFields()) team.update(host);
-        if (TextUtils.isEmpty(event.getGameId())) event.setGame(this);
-        return event;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public void update(Game updatedGame) {
         this.id = updatedGame.id;
