@@ -33,6 +33,7 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.AppBarListener;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -125,6 +126,9 @@ public final class GameFragment extends MainActivityFragment
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();
+
+        AppBarListener.with().appBarLayout(rootView.findViewById(R.id.app_bar))
+                .offsetDiffListener(gameViewHolder::animate).create();
 
         scrollManager.setViewHolderColor(R.color.dark_grey);
 

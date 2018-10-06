@@ -81,9 +81,9 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         appBarLayout = view.findViewById(R.id.app_bar);
         view.findViewById(R.id.header).setVisibility(canExpandAppBar() ? View.VISIBLE : View.GONE);
 
-        AppBarListener.builder()
-                .setAppBarLayout(appBarLayout)
-                .setOffsetDiffListener(offsetProps -> updateFabForScrollState(offsetProps.getDy()))
+        AppBarListener.with()
+                .appBarLayout(appBarLayout)
+                .offsetDiffListener(offsetProps -> updateFabForScrollState(offsetProps.getDy()))
                 .create();
 
     }

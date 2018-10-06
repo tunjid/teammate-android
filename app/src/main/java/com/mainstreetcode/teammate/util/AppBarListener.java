@@ -7,7 +7,7 @@ import android.view.ViewTreeObserver;
 public class AppBarListener implements
         View.OnAttachStateChangeListener,
         AppBarLayout.OnOffsetChangedListener,
-        ViewTreeObserver.OnGlobalLayoutListener{
+        ViewTreeObserver.OnGlobalLayoutListener {
 
     private int lastOffset;
     private int appBarHeight;
@@ -22,7 +22,7 @@ public class AppBarListener implements
         appBarLayout.addOnOffsetChangedListener(this);
     }
 
-    public static Builder builder() { return new Builder(); }
+    public static Builder with() { return new Builder(); }
 
     @Override
     public void onViewAttachedToWindow(View v) { }
@@ -57,18 +57,22 @@ public class AppBarListener implements
         }
 
         public int getDy() { return dy; }
+
+        public int getOffset() { return -offset; }
+
+        public float getFraction() { return ((float) -offset) / appBarHeight; }
     }
 
     public static class Builder {
         private AppBarLayout appBarLayout;
         private ModelUtils.Consumer<OffsetProps> offsetDiffListener;
 
-        public Builder setAppBarLayout(AppBarLayout appBarLayout) {
+        public Builder appBarLayout(AppBarLayout appBarLayout) {
             this.appBarLayout = appBarLayout;
             return this;
         }
 
-        public Builder setOffsetDiffListener(ModelUtils.Consumer<OffsetProps> offsetDiffListener) {
+        public Builder offsetDiffListener(ModelUtils.Consumer<OffsetProps> offsetDiffListener) {
             this.offsetDiffListener = offsetDiffListener;
             return this;
         }

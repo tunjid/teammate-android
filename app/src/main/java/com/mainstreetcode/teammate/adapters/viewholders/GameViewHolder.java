@@ -10,6 +10,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameAdapter;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.util.AppBarListener;
 import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -18,14 +19,17 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE;
 
 public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> {
 
-    protected Game model;
+    private static final float ONE_F = 1F;
 
+    private final int animationPadding;
+
+    private Game model;
     private View highlight;
-    private TextView homeText;
-    private TextView awayText;
     private TextView ended;
     private TextView score;
     private TextView date;
+    private TextView homeText;
+    private TextView awayText;
     private ImageView homeThumbnail;
     private ImageView awayThumbnail;
 
@@ -40,6 +44,7 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         homeThumbnail = itemView.findViewById(R.id.home_thumbnail);
         awayThumbnail = itemView.findViewById(R.id.away_thumbnail);
 
+        animationPadding = itemView.getResources().getDimensionPixelSize(R.dimen.quarter_margin);
         itemView.setOnClickListener(view -> adapterListener.onGameClicked(model));
     }
 
@@ -68,5 +73,21 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         if (TextUtils.isEmpty(awayUrl)) awayThumbnail.setImageResource(R.color.dark_grey);
         else Picasso.with(itemView.getContext()).load(awayUrl).
                 resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(awayThumbnail);
+    }
+
+    public void animate(AppBarListener.OffsetProps props) {
+        int offset = props.getOffset();
+        float fraction = props.getFraction();
+        float scale = ONE_F - (fraction * 1.8F);
+        int drop = Math.min(offset, (int) (homeText.getY() - homeThumbnail.getY()) - animationPadding);
+
+        homeThumbnail.setAlpha(scale);
+        awayThumbnail.setAlpha(scale);
+        homeThumbnail.setScaleX(scale);
+        awayThumbnail.setScaleX(scale);
+        homeThumbnail.setScaleY(scale);
+        awayThumbnail.setScaleY(scale);
+        homeThumbnail.setTranslationY(drop);
+        awayThumbnail.setTranslationY(drop);
     }
 }
