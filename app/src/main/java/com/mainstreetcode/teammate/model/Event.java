@@ -19,6 +19,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.persistence.entity.EventEntity;
@@ -27,6 +28,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.TextBitmapUtil;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +50,7 @@ public class Event extends EventEntity
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
     public static final int DEFAULT_NUM_SPOTS = 12;
 
-    @Ignore private static final IdCache holder = IdCache.cache(7);
+    @Ignore private static final IdCache holder = IdCache.cache(8);
 
     public static Event empty() {
         Date date = new Date();
@@ -70,7 +72,7 @@ public class Event extends EventEntity
 
     @Override
     public List<Item<Event>> asItems() {
-        return Arrays.asList(
+        List<Item<Event>> items = Arrays.asList(
                 Item.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
                 Item.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, visibility::getCode, this::setVisibility, this)
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
@@ -80,6 +82,12 @@ public class Event extends EventEntity
                 Item.text(holder.get(5), 5, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
                 Item.text(holder.get(6), 6, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this)
         );
+
+        if (!TextUtils.isEmpty(gameId)) {
+            items = new ArrayList<>(items);
+            items.add(Item.text(holder.get(7), -1, Item.INPUT, R.string.event_game, () -> App.getInstance().getString(R.string.event_game_view), ignored -> {}, this));
+        }
+        return items;
     }
 
     @Override
