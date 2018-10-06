@@ -191,7 +191,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
 
     private void respond(boolean accept) {
         toggleProgress(true);
-        disposables.add(gameViewModel.respondToCompetition(competitor, accept)
+        disposables.add(competitorViewModel.respond(competitor, accept)
                 .subscribe(ignored -> toggleProgress(false), defaultErrorHandler));
     }
 

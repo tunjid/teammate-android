@@ -286,6 +286,10 @@
     <string name="no_games">Come. See. Conquer. Your team\'s games live here.</string>
     <string name="no_game_support">Game support for your team\'s sport is coming soon!</string>
 
+    <!--CompetitorsFragment-->
+    <string name="competitors_declined">Declined Competitions</string>
+    <string name="no_competitors_declined">Change your mind? Competitions you\'ve declined show up here</string>
+
     <!--StatEditFragment-->
     <string name="user">User</string>
     <string name="pick_user">Pick a user</string>

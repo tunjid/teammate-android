@@ -27,6 +27,7 @@ import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
+import com.mainstreetcode.teammate.fragments.main.DeclinedCompetitionsFragment;
 import com.mainstreetcode.teammate.fragments.main.EventEditFragment;
 import com.mainstreetcode.teammate.fragments.main.EventSearchFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
@@ -337,6 +338,9 @@ public class MainActivity extends TeammatesBaseActivity
                 return true;
             case R.id.action_stats_aggregate:
                 showFragment(StatAggregateFragment.newInstance());
+                return true;
+            case R.id.action_declined_competitions:
+                showFragment(DeclinedCompetitionsFragment.newInstance());
                 return true;
             case R.id.action_my_profile:
                 showFragment(UserEditFragment.newInstance(userViewModel.getCurrentUser()));

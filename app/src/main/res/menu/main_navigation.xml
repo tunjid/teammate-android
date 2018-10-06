@@ -32,6 +32,12 @@
         android:title="@string/stat_aggregate"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_declined_competitions"
+        android:enabled="true"
+        android:icon="@drawable/ic_thumb_down_24dp"
+        android:title="@string/competitors_declined"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_my_profile"
         android:enabled="true"
         android:icon="@drawable/ic_account_white_24dp"

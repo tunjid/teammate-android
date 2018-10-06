@@ -5,7 +5,6 @@ import android.arch.core.util.Function;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
-import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -113,12 +112,6 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     public Single<Game> updateGame(Game game) {
         return gameRoundRepository.createOrUpdate(game)
                 .doOnError(onError(game)).observeOn(mainThread());
-    }
-
-    public Single<Boolean> respondToCompetition(final Competitor competitor, boolean accept) {
-        if (accept) competitor.accept();
-        else competitor.decline();
-        return competitorRepository.createOrUpdate(competitor).map(ignored -> accept).observeOn(mainThread());
     }
 
     private Single<Game> delete(final Game game) {
