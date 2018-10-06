@@ -41,6 +41,9 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     @Override
+    Class<Team> valueClass() { return Team.class; }
+
+    @Override
     public List<Identifiable> getModelList(Class<Team> key) {
         return teams;
     }

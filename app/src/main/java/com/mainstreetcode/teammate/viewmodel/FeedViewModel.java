@@ -43,14 +43,17 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     public FeedViewModel() {}
 
     @Override
+    boolean sortsAscending() {
+        return true;
+    }
+
+    @Override
     public List<Identifiable> getModelList(Class<FeedItem> key) {
         return feedItems;
     }
 
     @Override
-    boolean sortsAscending() {
-        return true;
-    }
+    Class<FeedItem> valueClass() { return FeedItem.class; }
 
     @Override
     void onModelAlert(Alert alert) {

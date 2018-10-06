@@ -13,6 +13,7 @@ import com.mainstreetcode.teammate.util.Logger;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +32,18 @@ public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
 
     private TeamMember(S wrappedModel) {this.wrappedModel = wrappedModel;}
 
-    public S getWrappedModel() {
-        return wrappedModel;
-    }
+    public S getWrappedModel() { return wrappedModel; }
 
-    public User getUser() {
-        return wrappedModel.getUser();
-    }
+    public User getUser() { return wrappedModel.getUser(); }
 
-    public Team getTeam() {
-        return wrappedModel.getTeam();
+    public Team getTeam() { return wrappedModel.getTeam(); }
+
+    public Date getCreated() {
+        return wrappedModel instanceof Role
+                ? ((Role) wrappedModel).getCreated()
+                : wrappedModel instanceof JoinRequest
+                ? ((JoinRequest) wrappedModel).getCreated()
+                : new Date();
     }
 
     public static <S extends Model<S> & TeamHost & UserHost> TeamMember<S> fromModel(final S wrappedModel) {
@@ -53,7 +56,7 @@ public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
     }
 
     @SuppressLint("CheckResult")
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
     public static void split(List<TeamMember> members,
                              BiConsumer<List<Role>, List<JoinRequest>> listBiConsumer) {
         Map<Class, List> classListMap = new HashMap<>();

@@ -27,7 +27,6 @@ import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 
 import static android.location.Location.distanceBetween;
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.Single.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -87,6 +85,9 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     @Override
+    Class<Event> valueClass() { return Event.class; }
+
+    @Override
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
@@ -98,7 +99,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
 
     @Override
     Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
+        return repository.modelsBefore(key, getQueryDate(fetchLatest, key, Event::getStartDate));
     }
 
     private Flowable<Event> getEvent(Event event) {
@@ -140,13 +141,6 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         if (location == null) return null;
         if (milesBetween(DEFAULT_BOUNDS.getCenter(), location) < DEFAULT_BAR_RANGE) return null;
         return location;
-    }
-
-    private Date getQueryDate(Team team, boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        Event event = findLast(getModelList(team), Event.class);
-        return event == null ? null : event.getStartDate();
     }
 
     private EventSearchRequest fromMap(GoogleMap map) {

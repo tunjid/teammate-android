@@ -25,7 +25,6 @@ import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.Map;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class GameViewModel extends TeamMappedViewModel<Game> {
@@ -50,6 +48,9 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     public GameGofer gofer(Game game) {
         return new GameGofer(game, onError(game), this::getGame, this::updateGame, this::delete, GameViewModel::getEligibleTeamsForGame);
     }
+
+    @Override
+    Class<Game> valueClass() { return Game.class; }
 
     @Override
     @SuppressLint("CheckResult")
@@ -69,7 +70,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     @Override
     Flowable<List<Game>> fetch(Team key, boolean fetchLatest) {
-        return gameRepository.modelsBefore(key, getQueryDate(key, fetchLatest));
+        return gameRepository.modelsBefore(key, getQueryDate(fetchLatest, key, Game::getCreated));
     }
 
     @SuppressLint("UseSparseArrays")
@@ -132,13 +133,6 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
                 .filter(identifiable -> identifiable instanceof Role).cast(Role.class)
                 .filter(Role::isPrivilegedRole).map(Role::getTeam)
                 .filter(team -> isParticipant(game, team));
-    }
-
-    private Date getQueryDate(Team team, boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        Game game = findLast(getModelList(team), Game.class);
-        return game == null ? null : game.getCreated();
     }
 
     private static boolean isParticipant(Game game, Team team) {

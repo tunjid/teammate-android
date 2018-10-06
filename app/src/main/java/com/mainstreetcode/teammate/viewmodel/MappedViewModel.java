@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
@@ -12,6 +13,7 @@ import com.mainstreetcode.teammate.notifications.Notifier;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,6 +21,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
+import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
 
@@ -26,6 +29,8 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
 
     MappedViewModel() {}
+
+    abstract Class<V> valueClass();
 
     public abstract List<Identifiable> getModelList(K key);
 
@@ -103,6 +108,13 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     void checkForInvalidObject(Throwable throwable, V model, K key) {
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
+    }
+
+    Date getQueryDate(boolean fetchLatest, K key, Function<V, Date> dateFunction) {
+        if (fetchLatest) return null;
+
+        V value = findLast(getModelList(key), valueClass());
+        return value == null ? null : dateFunction.apply(value);
     }
 
     private void checkForInvalidKey(Throwable throwable, K key) {

@@ -18,7 +18,6 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
@@ -55,8 +53,11 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     }
 
     @Override
+    Class<Stat> valueClass() { return Stat.class; }
+
+    @Override
     Flowable<List<Stat>> fetch(Game key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
+        return repository.modelsBefore(key, getQueryDate(fetchLatest, key, Stat::getCreated));
     }
 
     public List<Identifiable> getModelList(Game game) {
@@ -101,12 +102,5 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     private boolean isPrivilegedOrIsReferee(boolean isPrivileged, User current, Game game) {
         User referee = game.getReferee();
         return (referee.isEmpty() ? isPrivileged : current.equals(referee)) && !game.competitorsNotAccepted();
-    }
-
-    private Date getQueryDate(Game game, boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        Stat stat = findLast(getModelList(game), Stat.class);
-        return stat == null ? null : stat.getCreated();
     }
 }

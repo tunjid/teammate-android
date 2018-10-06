@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -26,6 +27,8 @@ public class Competitor extends CompetitorEntity
         Competitive,
         Model<Competitor> {
 
+    @Ignore private transient CharSequence competitonName = "";
+
     public static Competitor empty() {
         return new Competitor("", "", null, null, new EmptyCompetitor(), new Date(), -1, false, false);
     }
@@ -51,6 +54,8 @@ public class Competitor extends CompetitorEntity
     public Tournament getTournament() { return TextUtils.isEmpty(tournamentId) ? Tournament.empty() : Tournament.withId(tournamentId); }
 
     public Game getGame() { return TextUtils.isEmpty(gameId) ? Game.empty(Team.empty()) : Game.withId(gameId); }
+
+    public CharSequence getCompetitionName() { return  competitonName; }
 
     @Override
     public boolean hasMajorFields() { return areNotEmpty(id, refPath) && entity.hasMajorFields(); }
@@ -177,9 +182,14 @@ public class Competitor extends CompetitorEntity
             Competitive competitive = context.deserialize(jsonObject.get(ENTITY),
                     User.COMPETITOR_TYPE.equals(refPath) ? User.class : Team.class);
 
-            return new Competitor(id, refPath, tournamentId, gameId,
+            Competitor competitor = new Competitor(id, refPath, tournamentId, gameId,
                     competitive, ModelUtils.parseDate(created),
                     seed, accepted, declined);
+
+            if (!game.isEmpty()) competitor.competitonName = game.getName();
+            else if (!tournament.isEmpty()) competitor.competitonName = tournament.getName();
+
+            return competitor;
         }
     }
 }

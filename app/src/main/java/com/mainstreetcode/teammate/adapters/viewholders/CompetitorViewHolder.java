@@ -24,7 +24,7 @@ public class CompetitorViewHolder extends ModelCardViewHolder<Competitor, Compet
         if (model.isEmpty()) model.setSeed(getAdapterPosition());
 
         setTitle(model.getName());
-        setSubTitle(model.getSeedText());
+        setSubTitle(model.isDeclined() ? model.getCompetitionName() : model.getSeedText());
     }
 
     public CompetitorViewHolder hideSubtitle() {

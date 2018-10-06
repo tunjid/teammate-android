@@ -18,7 +18,6 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
@@ -51,13 +49,16 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
                 ignored -> CompetitorRepository.getInstance().modelsBefore(tournament, 0));
     }
 
+    @Override
+    Class<Tournament> valueClass() { return Tournament.class; }
+
     public Single<Tournament> addCompetitors(final Tournament tournament, List<Competitor> competitors) {
         return repository.addCompetitors(tournament, competitors).observeOn(mainThread());
     }
 
     @Override
     Flowable<List<Tournament>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest));
+        return repository.modelsBefore(key, getQueryDate(fetchLatest, key, Tournament::getCreated));
     }
 
     @Override
@@ -101,13 +102,6 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private Single<Tournament> createOrUpdateTournament(final Tournament tournament) {
         return repository.createOrUpdate(tournament);
-    }
-
-    private Date getQueryDate(Team team, boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        Tournament tournament = findLast(getModelList(team), Tournament.class);
-        return tournament == null ? null : tournament.getCreated();
     }
 
     private void removeTournament(Tournament tournament) {

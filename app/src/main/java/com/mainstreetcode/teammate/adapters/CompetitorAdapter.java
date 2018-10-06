@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
@@ -20,9 +21,9 @@ import static com.mainstreetcode.teammate.model.Item.COMPETITOR;
 
 public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHolder, CompetitorAdapter.AdapterListener> {
 
-    private final List<Competitor> items;
+    private final List<Identifiable> items;
 
-    public CompetitorAdapter(List<Competitor> items, AdapterListener listener) {
+    public CompetitorAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -37,7 +38,8 @@ public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHol
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull CompetitorViewHolder viewHolder, int position) {
-        viewHolder.bind(items.get(position));
+        Identifiable identifiable = items.get(position);
+        if (identifiable instanceof Competitor) viewHolder.bind((Competitor) identifiable);
     }
 
     @Override

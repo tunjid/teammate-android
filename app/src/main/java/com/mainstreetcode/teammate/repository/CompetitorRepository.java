@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -71,6 +72,10 @@ public class CompetitorRepository extends QueryRepository<Competitor, Tournament
     @Override
     public Single<Competitor> delete(Competitor competitor) {
         return Single.error(new TeammateException(""));
+    }
+
+    public Single<List<Competitor>> getDeclined(Date date) {
+        return api.getDeclinedCompetitors(date, DEF_QUERY_LIMIT).map(getSaveManyFunction());
     }
 
     @Override

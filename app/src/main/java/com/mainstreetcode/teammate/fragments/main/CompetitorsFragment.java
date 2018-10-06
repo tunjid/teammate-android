@@ -21,6 +21,7 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
@@ -48,6 +49,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     private Tournament tournament;
     private List<Competitive> entities;
     private List<Competitor> competitors;
+    private List<Identifiable> competitorIdentifiables;
     private AtomicReference<SwipeDragData<Integer>> dragRef = new AtomicReference<>();
     private AtomicReference<SwipeDragData<Integer>> swipeRef = new AtomicReference<>();
 
@@ -79,6 +81,7 @@ public final class CompetitorsFragment extends MainActivityFragment
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         entities = new ArrayList<>();
         competitors = new TransformingSequentialList<>(entities, Competitor::empty, Competitor::getEntity);
+        competitorIdentifiables = new TransformingSequentialList<>(competitors, identity -> identity, i -> (Competitor) i);
     }
 
     @Override
@@ -86,7 +89,7 @@ public final class CompetitorsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(new DragDropAdapter<>(new CompetitorAdapter(competitors, competitor -> {}), CompetitorViewHolder::getDragHandle, this::onDragStarted))
+                .withAdapter(new DragDropAdapter<>(new CompetitorAdapter(competitorIdentifiables, competitor -> {}), CompetitorViewHolder::getDragHandle, this::onDragStarted))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder()

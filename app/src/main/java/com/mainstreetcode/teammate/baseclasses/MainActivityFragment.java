@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.BlockedUserViewModel;
 import com.mainstreetcode.teammate.viewmodel.ChatViewModel;
+import com.mainstreetcode.teammate.viewmodel.CompetitorViewModel;
 import com.mainstreetcode.teammate.viewmodel.EventViewModel;
 import com.mainstreetcode.teammate.viewmodel.FeedViewModel;
 import com.mainstreetcode.teammate.viewmodel.GameViewModel;
@@ -54,6 +55,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected LocationViewModel locationViewModel;
     protected LocalRoleViewModel localRoleViewModel;
     protected TeamMemberViewModel teamMemberViewModel;
+    protected CompetitorViewModel competitorViewModel;
     protected TournamentViewModel tournamentViewModel;
     protected BlockedUserViewModel blockedUserViewModel;
 
@@ -80,6 +82,7 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         mediaViewModel = provider.get(MediaViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
         teamMemberViewModel = provider.get(TeamMemberViewModel.class);
+        competitorViewModel = provider.get(CompetitorViewModel.class);
         tournamentViewModel = provider.get(TournamentViewModel.class);
         blockedUserViewModel = provider.get(BlockedUserViewModel.class);
 

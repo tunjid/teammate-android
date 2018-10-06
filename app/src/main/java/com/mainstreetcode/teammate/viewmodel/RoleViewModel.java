@@ -39,6 +39,9 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
     }
 
     @Override
+    Class<Role> valueClass() { return Role.class; }
+
+    @Override
     Flowable<List<Role>> fetch(Class<Role> roleClass, boolean fetchLatest) {
         return roleRepository.getMyRoles();
     }
