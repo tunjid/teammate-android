@@ -55,7 +55,9 @@ public class Competitor extends CompetitorEntity
 
     public Game getGame() { return TextUtils.isEmpty(gameId) ? Game.empty(Team.empty()) : Game.withId(gameId); }
 
-    public CharSequence getCompetitionName() { return  competitonName; }
+    public CharSequence getCompetitionName() { return competitonName; }
+
+    public boolean inOneOffGame() { return !TextUtils.isEmpty(gameId);}
 
     @Override
     public boolean hasMajorFields() { return areNotEmpty(id, refPath) && entity.hasMajorFields(); }

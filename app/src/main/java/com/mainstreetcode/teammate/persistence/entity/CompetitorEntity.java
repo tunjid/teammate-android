@@ -86,6 +86,8 @@ public class CompetitorEntity implements Parcelable {
 
     public boolean isDeclined() { return declined; }
 
+    public boolean hasNotResponded() { return !isAccepted() && !isDeclined();}
+
     public void accept() { declined = !(accepted = true); }
 
     public void decline() { accepted = !(declined = true); }

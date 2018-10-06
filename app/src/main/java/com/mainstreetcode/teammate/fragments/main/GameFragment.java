@@ -343,8 +343,8 @@ public final class GameFragment extends MainActivityFragment
         if (!roleViewModel.privilegedInGame(game)) return;
 
         Competitor competitor;
-        if (!game.getHome().isAccepted()) competitor = game.getHome();
-        else if (!game.getAway().isAccepted()) competitor = game.getAway();
+        if (game.getHome().hasNotResponded()) competitor = game.getHome();
+        else if (game.getAway().hasNotResponded()) competitor = game.getAway();
         else competitor = null;
 
         if (competitor == null || competitor.isEmpty() || competitor.isAccepted()) return;

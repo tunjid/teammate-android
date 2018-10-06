@@ -83,7 +83,7 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
 
     @Override
     public void onCompetitorClicked(Competitor competitor) {
-        new AlertDialog.Builder(requireContext()).setTitle(getString(R.string.accept_competition))
+        new AlertDialog.Builder(requireActivity()).setTitle(getString(R.string.accept_competition))
                 .setPositiveButton(R.string.yes, (dialog, which) -> accept(competitor))
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .setNeutralButton(R.string.event_details, ((dialog, which) -> {

@@ -6,6 +6,7 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,13 @@ public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor
         return Identifiable.diff(single, () -> declined, (sourceCopy, fetched) -> {
             if (accept) sourceCopy.removeAll(fetched);
             else sourceCopy.addAll(fetched);
+
+            if (accept) return sourceCopy;
+
+            pushModelAlert(competitor.inOneOffGame()
+                    ? Alert.gameDeletion(competitor.getGame())
+                    : Alert.tournamentDeletion(competitor.getTournament()));
+
             return sourceCopy;
         });
     }
