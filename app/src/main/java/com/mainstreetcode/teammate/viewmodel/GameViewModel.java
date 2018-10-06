@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
@@ -31,7 +32,6 @@ import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -85,7 +85,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     public Flowable<DiffUtil.DiffResult> fetchGamesInRound(Tournament tournament, int round) {
         Flowable<List<Game>> flowable = gameRoundRepository.modelsBefore(tournament, round);
         Function<List<Game>, List<Identifiable>> listMapper = ArrayList<Identifiable>::new;
-        return Identifiable.diff(flowable.map(listMapper), () -> getGamesForRound(tournament, round), this::preserveList);
+        return Identifiable.diff(flowable.map(listMapper::apply), () -> getGamesForRound(tournament, round), this::preserveList);
     }
 
     public Single<HeadToHead.Summary> headToHead(HeadToHead.Request request) {
@@ -150,8 +150,14 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private void onTournamentDeleted(Alert.TournamentDeletion alert) {
         Tournament tournament = alert.getModel();
 
-        Flowable.fromIterable(modelListMap.values())
-                .flatMap(Flowable::fromIterable)
+        Map<?, List<Identifiable>> tournamentMap = ModelUtils.get(tournament, gameRoundMap, Collections::emptyMap);
+        Function<Map<?, List<Identifiable>>, Flowable<Identifiable>> mapListFunction = listMap ->
+                Flowable.fromIterable(listMap.values())
+                .flatMap(Flowable::fromIterable);
+
+        Flowable<Identifiable> teamMapped = mapListFunction.apply(modelListMap);
+        Flowable<Identifiable> tournamentMapped = mapListFunction.apply(tournamentMap);
+        Flowable.concat(teamMapped, tournamentMapped)
                 .distinct()
                 .filter(item -> item instanceof Game)
                 .cast(Game.class)
