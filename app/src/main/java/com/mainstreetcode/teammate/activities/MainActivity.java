@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammate.fragments.main.StatAggregateFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
-import com.mainstreetcode.teammate.fragments.main.TournamentEditFragment;
+import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
@@ -358,8 +358,8 @@ public class MainActivity extends TeammatesBaseActivity
                 () -> route(model, Game.class, game -> game, GameFragment::newInstance),
                 () -> route(model, Chat.class, Chat::getTeam, ChatFragment::newInstance),
                 () -> route(model, Event.class, event -> event, EventEditFragment::newInstance),
-                () -> route(model, Tournament.class, tournament -> tournament, TournamentEditFragment::newInstance),
-                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamMembersFragment::newInstance)
+                () -> route(model, JoinRequest.class, JoinRequestEntity::getTeam, TeamMembersFragment::newInstance),
+                () -> route(model, Tournament.class, tournament -> tournament, TournamentDetailFragment::newInstance)
         );
 
         if (route != null) showFragment(route);

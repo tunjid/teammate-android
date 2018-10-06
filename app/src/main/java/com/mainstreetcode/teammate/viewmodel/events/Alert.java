@@ -6,6 +6,7 @@ import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.Tournament;
 
 public abstract class Alert<T extends Model<T>> {
 
@@ -23,6 +24,8 @@ public abstract class Alert<T extends Model<T>> {
 
     public static Alert<BlockedUser> userBlocked(BlockedUser blockedUser) {return new UserBlocked(blockedUser);}
 
+    public static Alert<Tournament> tournamentDeletion(Tournament tournament) {return new TournamentDeletion(tournament);}
+
     public static Alert<JoinRequest> requestProcessed(JoinRequest joinRequest) {return new JoinRequestProcessed(joinRequest);}
 
     public static class TeamDeletion extends Alert<Team> {
@@ -39,6 +42,10 @@ public abstract class Alert<T extends Model<T>> {
 
     public static class UserBlocked extends Alert<BlockedUser> {
         private UserBlocked(BlockedUser model) { super(model); }
+    }
+
+    public static class TournamentDeletion extends Alert<Tournament> {
+        private TournamentDeletion(Tournament model) { super(model); }
     }
 
     public static class JoinRequestProcessed extends Alert<JoinRequest> {

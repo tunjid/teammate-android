@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.repository.GameRepository;
 import com.mainstreetcode.teammate.repository.GameRoundRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
@@ -54,19 +55,9 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (!(alert instanceof Alert.GameDeletion)) return;
-
-        Game game = ((Alert.GameDeletion) alert).getModel();
-
-        headToHeadMatchUps.remove(game);
-        getModelList(game.getHost()).remove(game);
-
-        Competitive home = game.getHome().getEntity();
-        Competitive away = game.getAway().getEntity();
-        if (home instanceof Team) getModelList((Team) home).remove(game);
-        if (away instanceof Team) getModelList((Team) away).remove(game);
-
-        gameRepository.queueForLocalDeletion(game);
+        if (alert instanceof Alert.GameDeletion) onGameDeleted((Alert.GameDeletion) alert);
+        else if (alert instanceof Alert.TournamentDeletion)
+            onTournamentDeleted((Alert.TournamentDeletion) alert);
     }
 
     @Override
@@ -130,7 +121,9 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     private Single<Game> delete(final Game game) {
-        return gameRepository.delete(game).doOnSuccess(getModelList(game.getTeam())::remove);
+        return gameRepository.delete(game)
+                .doOnSuccess(getModelList(game.getTeam())::remove)
+                .doOnSuccess(deleted -> pushModelAlert(Alert.gameDeletion(deleted)));
     }
 
     static Flowable<Team> getEligibleTeamsForGame(Game game) {
@@ -150,5 +143,33 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     private static boolean isParticipant(Game game, Team team) {
         return game.getHome().getEntity().equals(team) || game.getAway().getEntity().equals(team);
+    }
+
+    @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void onTournamentDeleted(Alert.TournamentDeletion alert) {
+        Tournament tournament = alert.getModel();
+
+        Flowable.fromIterable(modelListMap.values())
+                .flatMap(Flowable::fromIterable)
+                .distinct()
+                .filter(item -> item instanceof Game)
+                .cast(Game.class)
+                .filter(game -> tournament.equals(game.getTournament()))
+                .subscribe(game -> pushModelAlert(Alert.gameDeletion(game)), ErrorHandler.EMPTY);
+    }
+
+    private void onGameDeleted(Alert.GameDeletion alert) {
+        Game game = alert.getModel();
+
+        headToHeadMatchUps.remove(game);
+        getModelList(game.getHost()).remove(game);
+
+        Competitive home = game.getHome().getEntity();
+        Competitive away = game.getAway().getEntity();
+        if (home instanceof Team) getModelList((Team) home).remove(game);
+        if (away instanceof Team) getModelList((Team) away).remove(game);
+
+        gameRepository.queueForLocalDeletion(game);
     }
 }

@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.repository.TournamentRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     private final TeammateApi api;
     private final TournamentRepository repository;
     private final Map<Tournament, Standings> standingsMap = new HashMap<>();
-    private final Map<Tournament,List<Identifiable>> ranksMap = new HashMap<>();
+    private final Map<Tournament, List<Identifiable>> ranksMap = new HashMap<>();
 
     public TournamentViewModel() {
         api = TeammateService.getApiInstance();
@@ -111,5 +112,6 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private void removeTournament(Tournament tournament) {
         for (List<Identifiable> list : modelListMap.values()) list.remove(tournament);
+        pushModelAlert(Alert.tournamentDeletion(tournament));
     }
 }
