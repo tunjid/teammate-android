@@ -62,9 +62,11 @@ public class StatGofer extends Gofer<Stat> {
     Flowable<Boolean> changeEmitter() {
         int count = eligibleTeams.size();
         eligibleTeams.clear();
+
         return eligibleTeamSource.apply(model)
-                .doOnNext(eligibleTeams::add).ignoreElements().andThen(updateDefaultTeam())
-                .andThen(Flowable.just(eligibleTeams.size() != count));
+                .collectInto(eligibleTeams, List::add)
+                .flatMapPublisher(this::updateDefaultTeam)
+                .map(ignored -> count != eligibleTeams.size());
     }
 
     @Override
@@ -85,33 +87,27 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     public Single<DiffUtil.DiffResult> chooseUser(User otherUser) {
-        Single<List<Identifiable>> sourceSingle = Single.just(Collections.singletonList(otherUser));
-        return swap(sourceSingle, model::getUser, User::update);
+        return swap(otherUser, model::getUser, User::update);
     }
 
     public Flowable<DiffUtil.DiffResult> switchTeams() {
         if (eligibleTeams.size() <= 1)
             return Flowable.error(new TeammateException(App.getInstance().getString(R.string.stat_only_team)));
 
-        Single<List<Identifiable>> sourceSingle = Flowable.fromIterable(eligibleTeams)
-                .filter(team -> !model.getTeam().equals(team)).collect(ArrayList::new, List::add);
-
-        return swap(sourceSingle, model::getTeam, Team::update).concatWith(updateDefaultUser());
+        Team toSwap = eligibleTeams.get(0).equals(model.getTeam()) ? eligibleTeams.get(1) : eligibleTeams.get(0);
+        return swap(toSwap, model::getTeam, Team::update).concatWith(updateDefaultUser());
     }
 
     public Completable delete() {
         return deleteFunction.apply(model).toCompletable();
     }
 
-    private Completable updateDefaultTeam() {
-        return Completable.defer(() -> {
-            boolean hasNoDefaultTeam = !model.getTeam().isEmpty() || eligibleTeams.isEmpty();
-            if (hasNoDefaultTeam) return Completable.complete();
-            Single<List<Identifiable>> sourceSingle = Single.just(Collections.singletonList(eligibleTeams.get(0)));
-            return swap(sourceSingle, model::getTeam, Team::update)
-                    .concatWith(updateDefaultUser())
-                    .ignoreElements();
-        });
+    private Flowable<DiffUtil.DiffResult> updateDefaultTeam(List<Team> teams) {
+        boolean hasNoDefaultTeam = !model.getTeam().isEmpty() || teams.isEmpty();
+        if (hasNoDefaultTeam) return Flowable.empty();
+
+        Team toSwap = teams.get(0);
+        return swap(toSwap, model::getTeam, Team::update).concatWith(updateDefaultUser());
     }
 
     private Single<DiffUtil.DiffResult> updateDefaultUser() {
@@ -119,11 +115,12 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Identifiable> Single<DiffUtil.DiffResult> swap(Single<List<Identifiable>> swapSource,
+    private <T extends Identifiable> Single<DiffUtil.DiffResult> swap(Identifiable item,
                                                                       Supplier<T> swapDestination,
                                                                       BiConsumer<T, T> onSwapComplete) {
 
         AtomicReference<T> cache = new AtomicReference<>();
+        Single<List<Identifiable>> swapSource = Single.just(Collections.singletonList(item));
         return Identifiable.diff(swapSource, this::getItems, (sourceCopy, fetched) -> {
             T toSwap = (T) fetched.get(0);
             sourceCopy.remove(swapDestination.get());

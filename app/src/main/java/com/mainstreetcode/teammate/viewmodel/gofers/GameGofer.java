@@ -70,8 +70,9 @@ public class GameGofer extends Gofer<Game> {
         int count = eligibleTeams.size();
         eligibleTeams.clear();
         return eligibleTeamSource.apply(model)
-                .doOnNext(eligibleTeams::add).ignoreElements()
-                .andThen(Flowable.just(count != eligibleTeams.size()));
+                .collectInto(eligibleTeams, List::add)
+                .map(list -> count != list.size())
+                .toFlowable();
     }
 
     @Override
