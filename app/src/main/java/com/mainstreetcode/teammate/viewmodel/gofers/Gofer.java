@@ -9,7 +9,6 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -56,13 +55,8 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
         return delete().doOnError(onError).observeOn(mainThread());
     }
 
-    private int count = 0;
-
     public Flowable<Object> watchForChange() {
-        return changeEmitter().filter(changed -> {
-            Logger.log("TEST", "CHANGED: " + changed + " Count: " + ++count);
-            return changed;
-        }).cast(Object.class);
+        return changeEmitter().filter(changed -> changed).cast(Object.class);
     }
 
     public final Single<DiffUtil.DiffResult> save() {

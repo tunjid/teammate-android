@@ -162,4 +162,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (entity instanceof Team) showFragment(TeamEditFragment.newEditInstance((Team) entity));
         else if (entity instanceof User) showFragment(UserEditFragment.newInstance((User) entity));
     }
+
+    protected void watchForRoleChanges(Team team, Runnable onChanged) {
+        if (team.isEmpty()) return;
+        User user = userViewModel.getCurrentUser();
+        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe(object -> onChanged.run(), emptyErrorHandler));
+    }
 }

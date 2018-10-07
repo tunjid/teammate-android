@@ -24,7 +24,6 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -97,8 +96,7 @@ public final class TournamentsFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchTournaments(true);
-        User user = userViewModel.getCurrentUser();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
+        watchForRoleChanges(team, this::togglePersistentUi);
     }
 
     @Override

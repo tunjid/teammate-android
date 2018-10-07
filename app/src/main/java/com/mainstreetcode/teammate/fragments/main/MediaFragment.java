@@ -28,7 +28,6 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -109,8 +108,6 @@ public class MediaFragment extends MainActivityFragment
         super.onResume();
         fetchMedia(true);
         toggleContextMenu(mediaViewModel.hasSelections(team));
-        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
-                .subscribe(() -> {}, ErrorHandler.EMPTY));
     }
 
     @Override

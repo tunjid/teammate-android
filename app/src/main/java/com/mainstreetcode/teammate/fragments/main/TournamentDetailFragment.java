@@ -139,10 +139,9 @@ public class TournamentDetailFragment extends MainActivityFragment {
     public void onResume() {
         super.onResume();
         checkCompetitor();
+        watchForRoleChanges(tournament.getHost(), this::togglePersistentUi);
+
         int rounds = tournament.getNumRounds();
-        User user = userViewModel.getCurrentUser();
-        Team team = tournament.getHost();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(this::togglePersistentUi, emptyErrorHandler));
         disposables.add(tournamentViewModel.checkForWinner(tournament).subscribe(changed -> setUpWinner((ViewGroup) getView(), rounds), defaultErrorHandler));
     }
 

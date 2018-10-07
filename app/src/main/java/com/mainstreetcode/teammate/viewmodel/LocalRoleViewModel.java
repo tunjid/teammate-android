@@ -7,7 +7,7 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.RoleRepository;
 
-import io.reactivex.Completable;
+import io.reactivex.Flowable;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -29,13 +29,17 @@ public class LocalRoleViewModel extends ViewModel {
         return role.isPrivilegedRole();
     }
 
-    public Completable getRoleInTeam(User user, Team team) {
+    public Flowable<Object> watchRoleChanges(User user, Team team) {
         return repository.getRoleInTeam(user.getId(), team.getId())
-                .map(this::onRoleFound).observeOn(mainThread()).flatMapCompletable(sameRole -> Completable.complete());
+                .map(this::checkChanged)
+                .filter(flag -> flag)
+                .observeOn(mainThread())
+                .cast(Object.class);
     }
 
-    private Role onRoleFound(Role foundRole) {
+    private boolean checkChanged(Role foundRole) {
+        boolean changed = !role.getPosition().equals(foundRole.getPosition());
         role.update(foundRole);
-        return role;
+        return changed;
     }
 }
