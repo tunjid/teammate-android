@@ -24,7 +24,7 @@ public class TeammateMessagingService extends FirebaseMessagingService {
 
         if (item.isDeleteAction()) {
             ModelRepository<T> repository = repositoryFactory.forClass(item.getItemClass());
-            if (repository != null) repository.delete(item.getModel());
+            if (repository != null) repository.queueForLocalDeletion(item.getModel());
         }
         else {
             Notifier<T> notifier = factory.forClass(item.getItemClass());

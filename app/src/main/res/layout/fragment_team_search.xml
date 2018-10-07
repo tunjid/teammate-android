@@ -15,20 +15,38 @@
         app:queryHint="@string/team_search" />
 
     <TextView
+        android:id="@+id/create_team_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/half_margin"
+        android:layout_marginRight="@dimen/half_margin"
+        android:gravity="center"
+        android:paddingBottom="@dimen/eigth_margin"
+        android:paddingTop="@dimen/eigth_margin"
+        android:text="@string/create_team_prompt"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="@+id/create_team"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/create_team"
+        app:layout_constraintTop_toTopOf="@+id/create_team" />
+
+    <android.support.design.button.MaterialButton
         android:id="@+id/create_team"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_chat_box"
-        android:backgroundTint="@color/colorAccent"
+        android:layout_marginLeft="@dimen/quarter_margin"
+        android:layout_marginRight="@dimen/quarter_margin"
+        android:fontFamily="@font/roboto"
         android:gravity="center"
-        android:paddingBottom="@dimen/half_margin"
-        android:paddingLeft="@dimen/single_margin"
-        android:paddingRight="@dimen/single_margin"
-        android:paddingTop="@dimen/half_margin"
-        android:text="@string/create_team_prompt"
+        android:text="@string/create_team"
+        android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/small_text"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:cornerRadius="@dimen/single_margin"
+        app:layout_constraintLeft_toRightOf="@+id/create_team_prompt"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchView" />
 

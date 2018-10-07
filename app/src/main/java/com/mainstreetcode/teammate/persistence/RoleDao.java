@@ -64,6 +64,6 @@ public abstract class RoleDao extends EntityDao<RoleEntity> {
             " WHERE :teamId = role_team" +
             " AND role_created < :date" +
             " ORDER BY role_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Role>> getRoles(String teamId, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Role>> getRoles(String teamId, Date date, int limit);
 }

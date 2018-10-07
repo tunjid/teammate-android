@@ -1,24 +1,21 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.arch.core.util.Function;
 import android.location.Address;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class TeamGofer extends TeamHostingGofer<Team> {
 
@@ -27,7 +24,6 @@ public class TeamGofer extends TeamHostingGofer<Team> {
 
     private int state;
     private boolean isSettingAddress;
-    private final List<Item<Team>> items;
     private final Function<Team, Flowable<Team>> getFunction;
     private final Function<Team, Single<Team>> deleteFunction;
     private final Function<Team, Single<Team>> upsertFunction;
@@ -41,7 +37,8 @@ public class TeamGofer extends TeamHostingGofer<Team> {
         this.getFunction = getFunction;
         this.upsertFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
-        this.items = new ArrayList<>(model.asItems());
+
+        items.addAll(model.asItems());
         state = model.isEmpty() ? CREATING : EDITING;
     }
 
@@ -53,33 +50,29 @@ public class TeamGofer extends TeamHostingGofer<Team> {
         return isSettingAddress;
     }
 
-    public List<Item<Team>> getItems() {
-        return items;
-    }
-
     public boolean canEditTeam() {
         return state == CREATING || hasPrivilegedRole();
     }
 
     public Completable delete() {
-        return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+        return deleteFunction.apply(model).toCompletable();
     }
 
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingAddress) return Flowable.empty();
-        Flowable<List<Item<Team>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Team::asItems);
+        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Team::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Item<Team>>> source = Single.defer(() -> upsertFunction.apply(model)).map(Team::asItems);
+        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Team::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
     }
 
     public Single<DiffUtil.DiffResult> setAddress(Address address) {
         isSettingAddress = true;
         model.setAddress(address);
-        Single<List<Item<Team>>> source = Single.just(model.<List<Item<Team>>>asItems());
+        Single<List<Identifiable>> source = Single.just(model.<List<Identifiable>>asIdentifiables());
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doFinally(() -> isSettingAddress = false);
     }
 
@@ -93,10 +86,5 @@ public class TeamGofer extends TeamHostingGofer<Team> {
 
     public String getToolbarTitle(Fragment fragment) {
         return fragment.getString(state == CREATING ? R.string.create_team : R.string.edit_team);
-    }
-
-    @NonNull
-    public String getModelUpdateMessage(Fragment fragment) {
-        return state == CREATING ? fragment.getString(R.string.created_team, model.getName()) : fragment.getString(R.string.updated_team);
     }
 }

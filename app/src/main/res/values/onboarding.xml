@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="on_boarding" translatable="true">
+        <item>Hi there, and welcome to Teammate! Tap "Next" to continue onboarding or swipe to skip.</item>
+        <item>The navbar is your primary mode of navigation; swipe up or long press on it for more options and use the back button to go back at anytime.</item>
+        <item>The navbar also contains your current team in focus. You can switch teams at anytime from the expanded navbar, or in context menus on various screens.</item>
+        <item>When adding team roles, be careful who you make an admin! An admin cannot be downgraded, and can delete any team they\'re on.</item>
+        <item>That\'s it! Hope you enjoy using Teammate!</item>
+    </array>
+</resources>

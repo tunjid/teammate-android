@@ -28,7 +28,7 @@ import java.util.List;
 
 public final class TeamsFragment extends MainActivityFragment
         implements
-        TeamAdapter.TeamAdapterListener {
+        TeamAdapter.AdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
 
@@ -65,6 +65,7 @@ public final class TeamsFragment extends MainActivityFragment
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
                 .withStaggeredGridLayoutManager(2)
@@ -81,11 +82,19 @@ public final class TeamsFragment extends MainActivityFragment
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_search_white_24dp);
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
+        super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.team_search_create; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_search_white_24dp; }
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}
@@ -102,9 +111,9 @@ public final class TeamsFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onTeamClicked(Team team) {
         Fragment target = getTargetFragment();
-        boolean canPick = target != null && target instanceof TeamAdapter.TeamAdapterListener;
+        boolean canPick = target instanceof TeamAdapter.AdapterListener;
 
-        if (canPick) ((TeamAdapter.TeamAdapterListener) target).onTeamClicked(team);
+        if (canPick) ((TeamAdapter.AdapterListener) target).onTeamClicked(team);
         else showFragment(TeamMembersFragment.newInstance(team));
     }
 
@@ -136,12 +145,16 @@ public final class TeamsFragment extends MainActivityFragment
     @DrawableRes
     private int getEmptyDrawable() {
         switch (getTargetRequestCode()) {
-            case R.id.request_event_team_pick:
-                return R.drawable.ic_event_white_24dp;
             case R.id.request_chat_team_pick:
                 return R.drawable.ic_message_black_24dp;
+            case R.id.request_game_team_pick:
+                return R.drawable.ic_score_white_24dp;
+            case R.id.request_event_team_pick:
+                return R.drawable.ic_event_white_24dp;
             case R.id.request_media_team_pick:
                 return R.drawable.ic_video_library_black_24dp;
+            case R.id.request_tournament_team_pick:
+                return R.drawable.ic_trophy_white_24dp;
             default:
                 return R.drawable.ic_group_black_24dp;
         }

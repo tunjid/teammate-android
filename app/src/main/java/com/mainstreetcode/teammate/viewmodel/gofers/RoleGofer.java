@@ -1,28 +1,25 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.arch.core.util.Function;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class RoleGofer extends TeamHostingGofer<Role> {
 
-    private final List<Item<Role>> items;
     private final Function<Role, Flowable<Role>> getFunction;
     private final Function<Role, Single<Role>> deleteFunction;
     private final Function<Role, Single<Role>> updateFunction;
@@ -32,11 +29,7 @@ public class RoleGofer extends TeamHostingGofer<Role> {
         this.getFunction = getFunction;
         this.deleteFunction = deleteFunction;
         this.updateFunction = updateFunction;
-        this.items = new ArrayList<>(model.asItems());
-    }
-
-    public List<Item<Role>> getItems() {
-        return items;
+        this.items.addAll(model.asItems());
     }
 
     public boolean canChangeRoleFields() {
@@ -59,16 +52,16 @@ public class RoleGofer extends TeamHostingGofer<Role> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Item<Role>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Role::asItems);
+        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Role::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Item<Role>>> source = Single.defer(() -> updateFunction.apply(model)).map(Role::asItems);
+        Single<List<Identifiable>> source = updateFunction.apply(model).map(Role::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
     public Completable delete() {
-        return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+        return deleteFunction.apply(model).toCompletable();
     }
 }

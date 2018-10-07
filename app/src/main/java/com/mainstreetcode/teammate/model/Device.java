@@ -20,16 +20,21 @@ import java.lang.reflect.Type;
 @SuppressLint("ParcelCreator")
 public class Device implements Model<Device> {
 
-    private String id;
-    private String fcmToken;
+    private String id = "";
+    private String fcmToken = "";
     private final String operatingSystem = "Android";
 
-    public Device() {
+    public static Device empty() { return  new Device(); }
 
+    public static Device withFcmToken(String fcmToken) {
+        Device device = new Device();
+        device.fcmToken = fcmToken;
+        return device;
     }
-    public Device(String id) {
-        this.id = id;
-    }
+
+    private Device() {}
+
+    public Device(String id) { this.id = id; }
 
     public String getFcmToken() {
         return fcmToken;
@@ -52,29 +57,19 @@ public class Device implements Model<Device> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
-    }
+    public boolean isEmpty() { return TextUtils.isEmpty(id); }
 
     @Override
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
 
     @Override
-    public String getImageUrl() {
-        return "";
-    }
+    public String getImageUrl() { return ""; }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
+    public int describeContents() { return 0; }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-    }
+    public void writeToParcel(Parcel dest, int flags) { }
 
     public static class GsonAdapter
             implements
@@ -103,8 +98,8 @@ public class Device implements Model<Device> {
             String id = ModelUtils.asString(ID_KEY, deviceJson);
             String fcmToken = ModelUtils.asString(FCM_TOKEN_KEY, deviceJson);
 
-            Device device = new Device(fcmToken);
-            device.id = id;
+            Device device = new Device(id);
+            device.setFcmToken(fcmToken);
 
             return device;
         }

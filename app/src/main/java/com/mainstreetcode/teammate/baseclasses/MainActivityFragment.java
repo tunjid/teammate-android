@@ -9,20 +9,30 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.activities.MainActivity;
+import com.mainstreetcode.teammate.fragments.main.TeamEditFragment;
+import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
+import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.BlockedUserViewModel;
 import com.mainstreetcode.teammate.viewmodel.ChatViewModel;
+import com.mainstreetcode.teammate.viewmodel.CompetitorViewModel;
 import com.mainstreetcode.teammate.viewmodel.EventViewModel;
 import com.mainstreetcode.teammate.viewmodel.FeedViewModel;
+import com.mainstreetcode.teammate.viewmodel.GameViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocalRoleViewModel;
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel;
 import com.mainstreetcode.teammate.viewmodel.MediaViewModel;
+import com.mainstreetcode.teammate.viewmodel.PrefsViewModel;
 import com.mainstreetcode.teammate.viewmodel.RoleViewModel;
+import com.mainstreetcode.teammate.viewmodel.StatViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
+import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 
 /**
@@ -36,12 +46,17 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected RoleViewModel roleViewModel;
     protected UserViewModel userViewModel;
     protected TeamViewModel teamViewModel;
+    protected ChatViewModel chatViewModel;
+    protected GameViewModel gameViewModel;
+    protected StatViewModel statViewModel;
+    protected PrefsViewModel prefsViewModel;
     protected EventViewModel eventViewModel;
     protected MediaViewModel mediaViewModel;
-    protected ChatViewModel chatViewModel;
     protected LocationViewModel locationViewModel;
     protected LocalRoleViewModel localRoleViewModel;
     protected TeamMemberViewModel teamMemberViewModel;
+    protected CompetitorViewModel competitorViewModel;
+    protected TournamentViewModel tournamentViewModel;
     protected BlockedUserViewModel blockedUserViewModel;
 
     @Override
@@ -59,14 +74,25 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         roleViewModel = provider.get(RoleViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         teamViewModel = provider.get(TeamViewModel.class);
+        chatViewModel = provider.get(ChatViewModel.class);
+        gameViewModel = provider.get(GameViewModel.class);
+        statViewModel = provider.get(StatViewModel.class);
+        prefsViewModel = provider.get(PrefsViewModel.class);
         eventViewModel = provider.get(EventViewModel.class);
         mediaViewModel = provider.get(MediaViewModel.class);
-        chatViewModel = provider.get(ChatViewModel.class);
         locationViewModel = provider.get(LocationViewModel.class);
         teamMemberViewModel = provider.get(TeamMemberViewModel.class);
+        competitorViewModel = provider.get(CompetitorViewModel.class);
+        tournamentViewModel = provider.get(TournamentViewModel.class);
         blockedUserViewModel = provider.get(BlockedUserViewModel.class);
 
         defaultErrorHandler.addAction(() -> {if (scrollManager != null) scrollManager.reset();});
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!restoredFromBackStack() && scrollManager != null) setFabExtended(true);
     }
 
     @Override
@@ -91,6 +117,13 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (shouldGoBack) activity.onBackPressed();
     }
 
+    protected boolean isBottomSheetShowing() {
+        PersistentUiController controller = getPersistentUiController();
+        if (controller instanceof BottomSheetController)
+            return ((BottomSheetController) controller).isBottomSheetShowing();
+        return false;
+    }
+
     protected void hideBottomSheet() {
         PersistentUiController controller = getPersistentUiController();
         if (controller instanceof BottomSheetController)
@@ -109,11 +142,30 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (activity != null) activity.onBackPressed();
     }
 
+    protected void updateFabForScrollState(int dy) {
+        if (Math.abs(dy) < 9) return;
+        setFabExtended(dy < 0);
+    }
+
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
+        teamViewModel.updateDefaultTeam(Team.empty());
         userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),
                 throwable -> MainActivity.startRegistrationActivity(getActivity())
         );
+    }
+
+    protected void showCompetitor(Competitor competitor) {
+        Competitive entity = competitor.getEntity();
+        if (entity instanceof Team) showFragment(TeamEditFragment.newEditInstance((Team) entity));
+        else if (entity instanceof User) showFragment(UserEditFragment.newInstance((User) entity));
+    }
+
+    protected void watchForRoleChanges(Team team, Runnable onChanged) {
+        if (team.isEmpty()) return;
+        User user = userViewModel.getCurrentUser();
+        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe(object -> onChanged.run(), emptyErrorHandler));
     }
 }

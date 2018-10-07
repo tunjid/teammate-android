@@ -35,6 +35,10 @@ public interface Identifiable {
         return null;
     }
 
+    static Identifiable fromString(String string) {
+        return () -> string;
+    }
+
     static <T extends Identifiable> Flowable<DiffUtil.DiffResult> diff(Flowable<List<T>> sourceFlowable,
                                                                        Callable<List<T>> sourceSupplier,
                                                                        BiFunction<List<T>, List<T>, List<T>> accumulator) {
@@ -101,6 +105,7 @@ public interface Identifiable {
         return Integer.compare(a, b);
     };
 
+    Comparator<Identifiable> DESCENDING_COMPARATOR = (modelA, modelB) -> -COMPARATOR.compare(modelA, modelB);
 
     class Util {
         static int getPoints(Identifiable identifiable) {
@@ -110,11 +115,13 @@ public interface Identifiable {
                 identifiable = ((TeamMember) identifiable).getWrappedModel();
             if (identifiable.getClass().equals(Item.class)) return 0;
             if (identifiable.getClass().equals(JoinRequest.class)) return 5;
-            if (identifiable.getClass().equals(Role.class)) return 10;
-            if (identifiable.getClass().equals(Event.class)) return 15;
-            if (identifiable.getClass().equals(Media.class)) return 20;
-            if (identifiable.getClass().equals(Team.class)) return 25;
-            if (identifiable.getClass().equals(Guest.class)) return 30;
+            if (identifiable.getClass().equals(Competitor.class)) return 10;
+            if (identifiable.getClass().equals(Role.class)) return 15;
+            if (identifiable.getClass().equals(Event.class)) return 20;
+            if (identifiable.getClass().equals(Media.class)) return 25;
+            if (identifiable.getClass().equals(Team.class)) return 30;
+            if (identifiable.getClass().equals(User.class)) return 35;
+            if (identifiable.getClass().equals(Guest.class)) return 40;
             return 0;
         }
 

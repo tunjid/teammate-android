@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
 
@@ -12,6 +13,7 @@ import com.mainstreetcode.teammate.notifications.Notifier;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,6 +21,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
+import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 
 public abstract class MappedViewModel<K, V extends Identifiable> extends BaseViewModel {
 
@@ -26,6 +29,8 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
 
     MappedViewModel() {}
+
+    abstract Class<V> valueClass();
 
     public abstract List<Identifiable> getModelList(K key);
 
@@ -44,16 +49,19 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     public Flowable<DiffUtil.DiffResult> getMore(K key) {
-        return Identifiable.diff(fetch(key, false).map(this::toIdentifiable), () -> getModelList(key), this::preserveList);
+        return Identifiable.diff(fetch(key, false).map(this::toIdentifiable), () -> getModelList(key), this::preserveList)
+                .doOnError(throwable -> checkForInvalidKey(throwable, key));
     }
 
     public Flowable<DiffUtil.DiffResult> refresh(K key) {
         return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::pullToRefresh)
+                .doOnError(throwable -> checkForInvalidKey(throwable, key))
                 .doOnTerminate(() -> pullToRefreshCount.set(0));
     }
 
     private Flowable<DiffUtil.DiffResult> getLatest(K key) {
-        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList);
+        return Identifiable.diff(fetch(key, true).map(this::toIdentifiable), () -> getModelList(key), this::preserveList)
+                .doOnError(throwable -> checkForInvalidKey(throwable, key));
     }
 
     public void clearNotifications(V value) {
@@ -61,6 +69,7 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void clearNotifications(K key) {
         Flowable.fromIterable(getModelList(key))
                 .map(this::notificationCancelMap)
@@ -76,6 +85,8 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     }
 
     void afterPullToRefreshDiff(List<Identifiable> source) {}
+
+    void onInvalidKey(K key) {}
 
     void onErrorMessage(Message message, K key, Identifiable invalid) {
         if (message.isInvalidObject()) getModelList(key).remove(invalid);
@@ -97,6 +108,20 @@ public abstract class MappedViewModel<K, V extends Identifiable> extends BaseVie
     void checkForInvalidObject(Throwable throwable, V model, K key) {
         Message message = fromThrowable(throwable);
         if (message != null) onErrorMessage(message, key, model);
+    }
+
+    Date getQueryDate(boolean fetchLatest, K key, Function<V, Date> dateFunction) {
+        if (fetchLatest) return null;
+
+        V value = findLast(getModelList(key), valueClass());
+        return value == null ? null : dateFunction.apply(value);
+    }
+
+    private void checkForInvalidKey(Throwable throwable, K key) {
+        Message message = fromThrowable(throwable);
+        boolean isInvalidModel = message != null && !message.isValidModel();
+
+        if (isInvalidModel) onInvalidKey(key);
     }
 
     final List<Identifiable> toIdentifiable(List<V> source) {

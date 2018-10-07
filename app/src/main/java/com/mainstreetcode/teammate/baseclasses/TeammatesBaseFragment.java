@@ -8,6 +8,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.MenuRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
@@ -19,9 +20,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -102,7 +105,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
 
-    protected void setFabIcon(@DrawableRes int icon) {getPersistentUiController().setFabIcon(icon);}
+    protected void updateFabIcon() {getPersistentUiController().setFabIcon(getFabIconResource(), getFabStringResource());}
+
+    protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
     protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
 
@@ -112,7 +117,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
-    protected void showSnackbar(CharSequence message, @StringRes int stringRes, View.OnClickListener clickListener) {getPersistentUiController().showSnackBar(message, stringRes, clickListener);}
+    protected void showSnackbar(ModelUtils.Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}
+
+    protected void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {getPersistentUiController().showChoices(consumer);}
 
     protected void setFabClickListener(@Nullable View.OnClickListener clickListener) {getPersistentUiController().setFabClickListener(clickListener);}
 
@@ -124,6 +131,12 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
     }
+
+    @StringRes
+    protected int getFabStringResource() { return R.string.add_competitor; }
+
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -213,13 +226,19 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         public void toggleSystemUI(boolean show) {}
 
         @Override
-        public void setFabIcon(int icon) {}
+        public void setFabIcon(int icon, int textRes) {}
+
+        @Override
+        public void setFabExtended(boolean expanded) {}
 
         @Override
         public void showSnackBar(CharSequence message) {}
 
         @Override
-        public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {}
+        public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {}
+
+        @Override
+        public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {}
 
         @Override
         public void setToolbarTitle(CharSequence title) {}

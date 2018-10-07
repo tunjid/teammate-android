@@ -12,13 +12,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -38,6 +41,9 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
     static final String ROLE = "role";
     static final String CHAT = "team-chat";
     static final String MEDIA = "team-media";
+    static final String TOURNAMENT = "tournament";
+    static final String COMPETITOR = "competitor";
+    static final String GAME = "game";
 
     private static final Gson gson = TeammateService.getGson();
 
@@ -48,7 +54,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
     private final T model;
     private final Class<T> itemClass;
 
-    FeedItem(String action, String title, String body, String type, T model, Class<T> itemClass) {
+    private FeedItem(String action, String title, String body, String type, T model, Class<T> itemClass) {
         this.action = action;
         this.title = title;
         this.body = body;
@@ -136,6 +142,12 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
                 case JOIN_REQUEST:
                     typeClass = JoinRequest.class;
                     break;
+                case TOURNAMENT:
+                    typeClass = Tournament.class;
+                    break;
+                case COMPETITOR:
+                    typeClass = Competitor.class;
+                    break;
                 case EVENT:
                     typeClass = Event.class;
                     break;
@@ -147,6 +159,9 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
                     break;
                 case CHAT:
                     typeClass = Chat.class;
+                    break;
+                case GAME:
+                    typeClass = Game.class;
                     break;
                 case MEDIA:
                     typeClass = Media.class;

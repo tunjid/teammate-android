@@ -50,8 +50,8 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
             " WHERE :eventId = guest_event" +
             " AND guest_created < :date" +
             " ORDER BY guest_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Guest>> getGuests(String eventId, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Guest>> getGuests(String eventId, Date date, int limit);
 
     @Query("SELECT * FROM guests" +
             " WHERE :userId = guest_user" +

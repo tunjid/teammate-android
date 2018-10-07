@@ -68,6 +68,6 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
             " WHERE :teamId = join_request_team" +
             " AND join_request_created < :date" +
             " ORDER BY join_request_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<JoinRequest>> getRequests(String teamId, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<JoinRequest>> getRequests(String teamId, Date date, int limit);
 }

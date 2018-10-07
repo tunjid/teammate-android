@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.card.MaterialCardView android:id="@+id/item_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/half_margin"
+    android:layout_marginLeft="@dimen/single_margin"
+    android:layout_marginRight="@dimen/single_margin"
+    android:layout_marginTop="@dimen/half_margin"
+    app:cardCornerRadius="@dimen/half_margin">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.20"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/dark_grey"
+            android:contentDescription="@string/team_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/drag_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/team_logo"
+            android:padding="@dimen/single_margin"
+            android:tint="@color/dark_grey"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_menu_24dp" />
+
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="start|top"
+            android:maxLines="1"
+            android:paddingBottom="@dimen/quarter_margin"
+            android:paddingLeft="@dimen/single_margin"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingTop="@dimen/half_margin"
+            android:textColor="@color/dark_grey"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+            app:layout_constraintRight_toLeftOf="@id/drag_handle"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="start|bottom"
+            android:maxLines="1"
+            android:paddingLeft="@dimen/quarter_margin"
+            android:paddingRight="@dimen/quarter_margin"
+            android:textColor="@color/dark_grey"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+            app:layout_constraintTop_toTopOf="@+id/item_title"
+            tools:text="1" />
+    </android.support.constraint.ConstraintLayout>
+</android.support.design.card.MaterialCardView>

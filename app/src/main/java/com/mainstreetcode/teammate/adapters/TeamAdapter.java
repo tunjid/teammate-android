@@ -26,11 +26,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
  * Adapter for {@link Team}
  */
 
-public class TeamAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamAdapter.TeamAdapterListener> {
+public class TeamAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 
-    public TeamAdapter(List<Identifiable> items, TeamAdapterListener listener) {
+    public TeamAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -71,7 +71,7 @@ public class TeamAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TeamAda
         return item instanceof Team ? TEAM : item instanceof Role ? TEAM : ((Ad) item).getType();
     }
 
-    public interface TeamAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
         void onTeamClicked(Team item);
     }
 

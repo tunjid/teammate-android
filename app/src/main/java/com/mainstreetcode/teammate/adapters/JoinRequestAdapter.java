@@ -9,8 +9,8 @@ import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -18,6 +18,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
+import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
@@ -27,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
 
-    private final List<Item<JoinRequest>> items;
+    private final List<Identifiable> items;
 
-    public JoinRequestAdapter(List<Item<JoinRequest>> items, AdapterListener listener) {
+    public JoinRequestAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
     }
@@ -39,13 +40,13 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.SPORT:
-            return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, FALSE, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, FALSE, ALL_INPUT_VALID);
             case Item.ROLE:
-            return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
             case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, ALL_INPUT_VALID);
             case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, ALL_INPUT_VALID);
             case Item.INPUT:
             default:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields);
@@ -54,7 +55,8 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(items.get(i));
+        Identifiable item = items.get(i);
+        if (item instanceof Item) baseItemViewHolder.bind((Item) item);
     }
 
     @Override
@@ -64,7 +66,8 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getItemType();
+        Identifiable item = items.get(position);
+        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {

@@ -13,6 +13,8 @@ public interface BottomSheetController {
 
     void showBottomSheet(Args args);
 
+    boolean isBottomSheetShowing();
+
     class ToolbarState implements Parcelable {
         @MenuRes
         private final int menuRes;

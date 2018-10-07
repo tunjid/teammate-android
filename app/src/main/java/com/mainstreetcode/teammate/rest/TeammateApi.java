@@ -4,18 +4,27 @@ import com.facebook.login.LoginResult;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Standings;
+import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatAggregate;
+import com.mainstreetcode.teammate.model.StatRank;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 
 import java.util.Date;
@@ -40,10 +49,16 @@ import retrofit2.http.Query;
 public interface TeammateApi {
 
     String ID_PATH = "id";
-    String DATE_QUERY = "date";
     String TEAM_PATH = "teamId";
     String ROLE_PATH = "roleId";
+    String GAME_PATH = "gameId";
+    String STAT_PATH = "statId";
     String REQUEST_PATH = "requestId";
+    String TOURNAMENT_PATH = "tournamentId";
+    String COMPETITOR_PATH = "competitorId";
+
+    String DATE_QUERY = "date";
+    String LIMIT_QUERY = "limit";
 
     @GET("api/config")
     Single<Config> getConfig();
@@ -64,6 +79,9 @@ public interface TeammateApi {
     @PUT("api/users/{id}")
     Single<User> updateUser(@Path(ID_PATH) String userId, @Body User user);
 
+    @DELETE("api/users/{id}")
+    Single<User> deleteUser(@Path(ID_PATH) String userId);
+
     @Multipart
     @POST("api/users/{id}")
     Single<User> uploadUserPhoto(@Path(ID_PATH) String userId, @Part MultipartBody.Part file);
@@ -82,6 +100,9 @@ public interface TeammateApi {
 
     @POST("api/resetPassword")
     Single<Message> resetPassword(@Body JsonObject json);
+
+    @GET("api/users")
+    Single<List<User>> findUser(@Query("screenName") String teamName);
 
     // =============================================================================================
     // Team endpoints
@@ -104,10 +125,10 @@ public interface TeammateApi {
     Single<Team> deleteTeam(@Path(ID_PATH) String teamId);
 
     @GET("api/teams")
-    Single<List<Team>> findTeam(@Query("name") String teamName);
+    Single<List<Team>> findTeam(@Query("name") String teamName, @Query("sport") String sport);
 
     @GET("api/teams/{id}/members")
-    Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<TeamMember>> getTeamMembers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     // =============================================================================================
     // Role endpoints
@@ -156,10 +177,10 @@ public interface TeammateApi {
     // =============================================================================================
 
     @GET("/api/teams/{teamId}/events")
-    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Event>> getEvents(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @GET("/api/events/attending")
-    Single<List<Event>> eventsAttending(@Query(DATE_QUERY) Date date);
+    Single<List<Event>> eventsAttending(@Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @POST("/api/events/public")
     Single<List<Event>> getPublicEvents(@Body EventSearchRequest request);
@@ -178,7 +199,7 @@ public interface TeammateApi {
     Single<Event> getEvent(@Path(ID_PATH) String eventId);
 
     @GET("api/events/{id}/guests")
-    Single<List<Guest>> getEventGuests(@Path(ID_PATH) String eventId, @Query(DATE_QUERY) Date date);
+    Single<List<Guest>> getEventGuests(@Path(ID_PATH) String eventId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @DELETE("api/events/{id}")
     Single<Event> deleteEvent(@Path(ID_PATH) String eventId);
@@ -200,7 +221,7 @@ public interface TeammateApi {
     Single<Chat> deleteChat(@Path(ID_PATH) String chatId);
 
     @GET("/api/teams/{teamId}/chats")
-    Single<List<Chat>> chatsBefore(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Chat>> chatsBefore(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     // =============================================================================================
     // Team Media endpoints
@@ -216,7 +237,7 @@ public interface TeammateApi {
     Single<Media> deleteMedia(@Path("mediaId") String mediaId);
 
     @GET("/api/teams/{teamId}/media")
-    Single<List<Media>> getTeamMedia(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<Media>> getTeamMedia(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
 
     @Multipart
     @POST("api/teams/{teamId}/media")
@@ -249,5 +270,103 @@ public interface TeammateApi {
     Single<BlockedUser> unblockUser(@Path(ID_PATH) String teamId, @Body BlockedUser blockedUser);
 
     @GET("api/teams/{id}/blocked")
-    Single<List<BlockedUser>> blockedUsers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date);
+    Single<List<BlockedUser>> blockedUsers(@Path(ID_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
+
+    // =============================================================================================
+    // Tournament endpoints
+    // =============================================================================================
+
+    @GET("api/tournaments/{id}")
+    Single<Tournament> getTournament(@Path(ID_PATH) String tournamentId);
+
+    @POST("api/teams/{id}/tournaments")
+    Single<Tournament> createTournament(@Path(ID_PATH) String teamId, @Body Tournament tournament);
+
+    @Multipart
+    @POST("api/tournaments/{id}")
+    Single<Tournament> uploadTournamentPhoto(@Path(ID_PATH) String tournamentId, @Part MultipartBody.Part file);
+
+    @PUT("api/tournaments/{id}")
+    Single<Tournament> updateTournament(@Path(ID_PATH) String tournamentId, @Body Tournament tournament);
+
+    @DELETE("api/tournaments/{id}")
+    Single<Tournament> deleteTournament(@Path(ID_PATH) String tournamentId);
+
+    @GET("api/teams/{teamId}/tournaments")
+    Single<List<Tournament>> getTournaments(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
+
+    @GET("api/tournaments/{tournamentId}/competitors")
+    Single<List<Competitor>> getCompetitors(@Path(TOURNAMENT_PATH) String tournamentId);
+
+    @GET("api/tournaments/{tournamentId}/table")
+    Single<Standings> getStandings(@Path(TOURNAMENT_PATH) String tournamentId);
+
+    @POST("api/tournaments/{tournamentId}/competitors")
+    Single<Tournament> addCompetitors(@Path(TOURNAMENT_PATH) String tournamentId, @Body List<Competitor> competitors);
+
+    @POST("api/tournaments/{tournamentId}/stats")
+    Single<List<StatRank>> getStatRanks(@Path(TOURNAMENT_PATH) String tournamentId, @Body StatType statType);
+
+    // =============================================================================================
+    // Game endpoints
+    // =============================================================================================
+
+    @POST("api/teams/{teamId}/games")
+    Single<Game> createGame(@Path(TEAM_PATH) String teamId, @Body Game game);
+
+    @GET("api/games/{gameId}")
+    Single<Game> getGame(@Path(GAME_PATH) String gameId);
+
+    @PUT("api/games/{gameId}")
+    Single<Game> updateGame(@Path(GAME_PATH) String gameId, @Body Game game);
+
+    @DELETE("api/games/{gameId}")
+    Single<Game> deleteGame(@Path(GAME_PATH) String gameId);
+
+    @GET("api/teams/{teamId}/games")
+    Single<List<Game>> getGames(@Path(TEAM_PATH) String teamId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
+
+    @GET("api/tournaments/{tournamentId}/games")
+    Single<List<Game>> getGamesForRound(@Path(TOURNAMENT_PATH) String tournamentId, @Query("round") int round, @Query(LIMIT_QUERY) int limit);
+
+    @POST("api/games/match-ups")
+    Single<List<Game>> matchUps(@Body HeadToHead.Request request);
+
+    @POST("api/games/head-to-head")
+    Single<HeadToHead.Result> headToHead(@Body HeadToHead.Request request);
+
+    // =============================================================================================
+    // Competitor endpoints
+    // =============================================================================================
+
+    @GET("api/competitors/{competitorId}")
+    Single<Competitor> getCompetitor(@Path(COMPETITOR_PATH) String competitorId);
+
+    @PUT("api/competitors/{competitorId}")
+    Single<Competitor> updateCompetitor(@Path(COMPETITOR_PATH) String competitorId, @Body Competitor competitor);
+
+    @GET("api/competitors")
+    Single<List<Competitor>> getDeclinedCompetitors(@Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
+
+    // =============================================================================================
+    // Stat endpoints
+    // =============================================================================================
+
+    @POST("api/games/{gameId}/stats")
+    Single<Stat> createStat(@Path(GAME_PATH) String gameId, @Body Stat stat);
+
+    @GET("api/stats/{statId}")
+    Single<Stat> getStat(@Path(STAT_PATH) String statId);
+
+    @PUT("api/stats/{statId}")
+    Single<Stat> updateStat(@Path(STAT_PATH) String statId, @Body Stat stat);
+
+    @DELETE("/api/stats/{statId}")
+    Single<Stat> deleteStat(@Path(STAT_PATH) String statId);
+
+    @GET("api/games/{gameId}/stats")
+    Single<List<Stat>> getStats(@Path(GAME_PATH) String gameId, @Query(DATE_QUERY) Date date, @Query(LIMIT_QUERY) int limit);
+
+    @POST("api/stats/aggregate")
+    Single<StatAggregate.Result> statsAggregate(@Body StatAggregate.Request request);
 }

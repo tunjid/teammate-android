@@ -10,6 +10,7 @@ import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -94,8 +95,10 @@ public class RoleRepository extends ModelRepository<Role> {
         };
     }
 
-    public Maybe<Role> getRoleInTeam(String userId, String teamId) {
-        return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io());
+    public Flowable<Role> getRoleInTeam(String userId, String teamId) {
+        Function<Role, Flowable<Role>> function = role -> Maybe.concatDelayError(Arrays.asList(Maybe.just(role), api.getRole(role.getId()).toMaybe()));
+        return roleDao.getRoleInTeam(userId, teamId).subscribeOn(io())
+                .flatMapPublisher(function);
     }
 
     public Flowable<List<Role>> getMyRoles() {

@@ -14,11 +14,14 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.main.ChatFragment;
 import com.mainstreetcode.teammate.fragments.main.EventsFragment;
+import com.mainstreetcode.teammate.fragments.main.GamesFragment;
 import com.mainstreetcode.teammate.fragments.main.MediaFragment;
+import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
+import com.mainstreetcode.teammate.fragments.main.TournamentsFragment;
 import com.mainstreetcode.teammate.model.Team;
 
-public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.TeamAdapterListener {
+public class TeamPickerFragment extends MainActivityFragment implements TeamAdapter.AdapterListener {
 
     private static final String TAG = "TeamPickerFragment";
     private static final String ARGS_CHANGING = "ARGS_CHANGING";
@@ -89,14 +92,23 @@ public class TeamPickerFragment extends MainActivityFragment implements TeamAdap
     public void onTeamClicked(Team item) {
         teamViewModel.updateDefaultTeam(item);
         switch (requestCode) {
-            case R.id.request_event_team_pick:
-                showFragment(EventsFragment.newInstance(item));
+            case R.id.request_game_team_pick:
+                showFragment(GamesFragment.newInstance(item));
                 break;
             case R.id.request_chat_team_pick:
                 showFragment(ChatFragment.newInstance(item));
                 break;
+            case R.id.request_event_team_pick:
+                showFragment(EventsFragment.newInstance(item));
+                break;
             case R.id.request_media_team_pick:
                 showFragment(MediaFragment.newInstance(item));
+                break;
+            case R.id.request_tournament_team_pick:
+                showFragment(TournamentsFragment.newInstance(item));
+                break;
+            case R.id.request_default_team_pick:
+                showFragment(TeamMembersFragment.newInstance(item));
                 break;
         }
         hideBottomSheet();

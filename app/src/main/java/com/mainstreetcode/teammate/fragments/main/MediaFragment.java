@@ -3,8 +3,10 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v7.util.DiffUtil;
@@ -26,7 +28,6 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -91,9 +92,9 @@ public class MediaFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchMedia(false))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new MediaAdapter(items, this))
-                .addScrollListener(this::updateFabOnScroll)
                 .withGridLayoutManager(4)
                 .build();
 
@@ -107,18 +108,24 @@ public class MediaFragment extends MainActivityFragment
         super.onResume();
         fetchMedia(true);
         toggleContextMenu(mediaViewModel.hasSelections(team));
-        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
-                .subscribe(() -> {}, ErrorHandler.EMPTY));
     }
 
     @Override
     public void togglePersistentUi() {
-        super.togglePersistentUi();
+        updateFabIcon();
+        setFabClickListener(this);
         setAltToolbarMenu(R.menu.fragment_media_context);
         setToolbarTitle(getString(R.string.media_title, team.getName()));
-        setFabIcon(R.drawable.ic_add_white_24dp);
-        setFabClickListener(this);
+        super.togglePersistentUi();
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.media_add; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     private void fetchMedia(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();

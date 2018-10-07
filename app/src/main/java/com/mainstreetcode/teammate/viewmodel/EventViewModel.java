@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -10,7 +11,9 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -25,16 +28,14 @@ import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 
 import static android.location.Location.distanceBetween;
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 import static io.reactivex.Single.concat;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -84,18 +85,21 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     @Override
+    Class<Event> valueClass() { return Event.class; }
+
+    @Override
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (!(alert instanceof Alert.UserBlocked)) return;
-
-        blockedUserAlert.onNext(((Alert.UserBlocked) alert).getModel());
+        if (alert instanceof Alert.UserBlocked)
+            blockedUserAlert.onNext(((Alert.UserBlocked) alert).getModel());
+        else if (alert instanceof Alert.GameDeletion)
+            onGameDeleted(((Alert.GameDeletion) alert).getModel());
     }
 
     @Override
     Flowable<List<Event>> fetch(Team key, boolean fetchLatest) {
-        return repository.modelsBefore(key, getQueryDate(key, fetchLatest))
-                .doOnError(throwable -> checkForInvalidTeam(throwable, key));
+        return repository.modelsBefore(key, getQueryDate(fetchLatest, key, Event::getStartDate));
     }
 
     private Flowable<Event> getEvent(Event event) {
@@ -106,7 +110,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         return repository.createOrUpdate(event);
     }
 
-    public Single<Event> delete(final Event event) {
+    private Single<Event> delete(final Event event) {
         return repository.delete(event).doOnSuccess(deleted -> {
             getModelList(event.getTeam()).remove(deleted);
             pushModelAlert(Alert.eventAbsentee(deleted));
@@ -137,13 +141,6 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         if (location == null) return null;
         if (milesBetween(DEFAULT_BOUNDS.getCenter(), location) < DEFAULT_BAR_RANGE) return null;
         return location;
-    }
-
-    private Date getQueryDate(Team team, boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        Event event = findLast(getModelList(team), Event.class);
-        return event == null ? null : event.getStartDate();
     }
 
     private EventSearchRequest fromMap(GoogleMap map) {
@@ -183,5 +180,16 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
         distanceBetween(locationA.latitude, locationA.longitude, locationB.latitude, locationB.longitude, distance);
 
         return (int) (distance[0] * 0.000621371);
+    }
+
+    private void onGameDeleted(Game game) {
+        for (List<Identifiable> list : modelListMap.values()) {
+            Iterator<Identifiable> iterator = list.iterator();
+            while (iterator.hasNext()) {
+                Identifiable next = iterator.next();
+                if (!(next instanceof Event)) return;
+                if (game.getId().equals(((Event) next).getGameId())) iterator.remove();
+            }
+        }
     }
 }

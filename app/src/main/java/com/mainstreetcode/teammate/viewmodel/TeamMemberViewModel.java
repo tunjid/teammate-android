@@ -19,7 +19,6 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +28,6 @@ import java.util.Set;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
-
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 
 public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
 
@@ -44,6 +41,9 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     boolean sortsAscending() {
         return true;
     }
+
+    @Override
+    Class<TeamMember> valueClass() { return TeamMember.class; }
 
     @Override
     @SuppressLint("CheckResult")
@@ -68,10 +68,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     @Override
     @SuppressWarnings("unchecked")
     Flowable<List<TeamMember>> fetch(Team key, boolean fetchLatest) {
-        Flowable<List<TeamMember>> flowable = repository.modelsBefore(key, getQueryDate(key, fetchLatest));
-        flowable = flowable.doOnError(throwable -> checkForInvalidTeam(throwable, key));
-
-        return flowable;
+        return repository.modelsBefore(key, getQueryDate(fetchLatest, key, TeamMember::getCreated));
     }
 
     public JoinRequestGofer gofer(JoinRequest joinRequest) {
@@ -82,6 +79,10 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         return new RoleGofer(role, onError(TeamMember.fromModel(role)), RoleRepository.getInstance()::get, this::deleteRole, this::updateRole);
     }
 
+    public Flowable<User> getAllUsers() {
+        return getAllModels().filter(model -> model instanceof UserHost)
+                .cast(UserHost.class).map(UserHost::getUser).distinct();
+    }
     private Single<Role> deleteRole(Role role) {
         return asTypedTeamMember(role, (member, repository) -> repository.delete(member).doOnSuccess(getModelList(role.getTeam())::remove).map(deleted -> role));
     }
@@ -119,20 +120,6 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     private <T extends Model<T> & TeamHost & UserHost, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepository<T>, S> function) {
         try {return function.apply(TeamMember.fromModel(model), repository());}
         catch (Exception e) {throw new RuntimeException(e);}
-    }
-
-    private Date getQueryDate(Team team, boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        TeamMember member = findLast(getModelList(team), TeamMember.class);
-        if (member == null) return null;
-        Model model = member.getWrappedModel();
-
-        return model instanceof Role
-                ? ((Role) model).getCreated()
-                : model instanceof JoinRequest
-                ? ((JoinRequest) model).getCreated()
-                : null;
     }
 
     private void removeBlockedUser(BlockedUser blockedUser) {

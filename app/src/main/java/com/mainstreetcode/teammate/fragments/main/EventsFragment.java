@@ -1,8 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
@@ -21,7 +23,6 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -81,6 +82,7 @@ public final class EventsFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchEvents(false))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
                 .withLinearLayoutManager()
@@ -93,8 +95,7 @@ public final class EventsFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchEvents(true);
-        User user = userViewModel.getCurrentUser();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
+        watchForRoleChanges(team, this::togglePersistentUi);
     }
 
     @Override
@@ -115,10 +116,18 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
+        updateFabIcon();
         setFabClickListener(this);
-        setFabIcon(R.drawable.ic_add_white_24dp);
         setToolbarTitle(getString(R.string.events_title, team.getName()));
     }
+
+    @Override
+    @StringRes
+    protected int getFabStringResource() { return R.string.event_add; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     @Override
     public boolean showsFab() {

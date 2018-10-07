@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
+import static com.mainstreetcode.teammate.util.ModelUtils.asString;
 
 /**
  * Teams
@@ -37,20 +38,23 @@ import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
 public class Team extends TeamEntity
         implements
         TeamHost,
+        Competitive,
         Model<Team>,
         HeaderedModel<Team>,
         ListableModel<Team> {
 
     public static final String PHOTO_UPLOAD_KEY = "team-photo";
+    public static final String COMPETITOR_TYPE = "team";
     private static final String NEW_TEAM = "new.team";
 
-    @Ignore private static final IdCache holder = IdCache.cache(9);
+    @Ignore private static final IdCache holder = IdCache.cache(10);
 
-    public Team(@NonNull String id, String imageUrl, String city, String state, String zip,
+    public Team(@NonNull String id, String imageUrl, String screenName,
+                String city, String state, String zip,
                 CharSequence name, CharSequence description,
                 Date created, LatLng location, Sport sport,
                 long storageUsed, long maxStorage, int minAge, int maxAge) {
-        super(id, imageUrl, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+        super(id, imageUrl, screenName, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
     }
 
     private Team(Parcel in) {
@@ -58,7 +62,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
+        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
     @Override
@@ -67,13 +71,14 @@ public class Team extends TeamEntity
                 Item.text(holder.get(0), 0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
                 Item.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::getCode, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(holder.get(2), 2, Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
-                Item.text(holder.get(3), 3, Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
-                Item.text(holder.get(4), 4, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
-                Item.text(holder.get(5), 5, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
-                Item.number(holder.get(6), 6, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
-                Item.number(holder.get(7), 7, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
-                Item.text(holder.get(8), 8, Item.INFO, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
+                Item.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), this::setScreenName, this),
+                Item.text(holder.get(3), 3, Item.CITY, R.string.city, Item.nullToEmpty(city), this::setCity, this),
+                Item.text(holder.get(4), 4, Item.STATE, R.string.state, Item.nullToEmpty(state), this::setState, this),
+                Item.text(holder.get(5), 5, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), this::setZip, this),
+                Item.text(holder.get(6), 6, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
+                Item.number(holder.get(7), 7, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
+                Item.number(holder.get(8), 8, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
+                Item.text(holder.get(9), 9, Item.ABOUT, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
         );
     }
 
@@ -91,6 +96,11 @@ public class Team extends TeamEntity
 
         return same && (sport == null || sport.equals(casted.sport));
     }
+
+    @Override
+    public String getRefType() { return COMPETITOR_TYPE; }
+
+    public String getImageUrl() { return TextUtils.isEmpty(imageUrl) ? Config.getDefaultTeamLogo() : imageUrl; }
 
     @Override
     public Object getChangePayload(Identifiable other) {
@@ -111,6 +121,7 @@ public class Team extends TeamEntity
     public void update(Team updatedTeam) {
         this.id = updatedTeam.id;
         this.name = updatedTeam.name;
+        this.screenName = updatedTeam.screenName;
         this.city = updatedTeam.city;
         this.state = updatedTeam.state;
         this.zip = updatedTeam.zip;
@@ -122,6 +133,20 @@ public class Team extends TeamEntity
 
         this.location = updatedTeam.location;
         this.sport.update(updatedTeam.sport);
+    }
+
+    @Override
+    public boolean update(Competitive other) {
+        if (!(other instanceof Team)) return false;
+        update((Team) other);
+        return true;
+    }
+
+    @Override
+    public Competitive makeCopy() {
+        Team copy = Team.empty();
+        copy.update(this);
+        return copy;
     }
 
     @Override
@@ -167,6 +192,7 @@ public class Team extends TeamEntity
 
         private static final String UID_KEY = "_id";
         private static final String NAME_KEY = "name";
+        private static final String SCREEN_NAME = "screenName";
         private static final String CITY_KEY = "city";
         private static final String STATE_KEY = "state";
         private static final String ZIP_KEY = "zip";
@@ -183,13 +209,14 @@ public class Team extends TeamEntity
         @Override
         public Team deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Team(json.getAsString(), "", "", "", "", "", "", new Date(), new LatLng(0, 0), Sport.empty(), 0, 0, 0, 0);
+                return new Team(json.getAsString(), "", "", "", "", "", "", "", new Date(), new LatLng(0, 0), Sport.empty(), 0, 0, 0, 0);
             }
 
             JsonObject teamJson = json.getAsJsonObject();
 
             String id = ModelUtils.asString(UID_KEY, teamJson);
             String name = ModelUtils.asString(NAME_KEY, teamJson);
+            String screenName = asString(SCREEN_NAME, teamJson);
             String city = ModelUtils.asString(CITY_KEY, teamJson);
             String state = ModelUtils.asString(STATE_KEY, teamJson);
             String zip = ModelUtils.asString(ZIP_KEY, teamJson);
@@ -204,7 +231,7 @@ public class Team extends TeamEntity
             int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
             int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            return new Team(id, imageUrl, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+            return new Team(id, imageUrl, screenName, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         }
 
         @Override
@@ -217,6 +244,7 @@ public class Team extends TeamEntity
             team.addProperty(DESCRIPTION_KEY, src.description.toString());
             team.addProperty(MIN_AGE_KEY, src.minAge);
             team.addProperty(MAX_AGE_KEY, src.maxAge);
+            if (!TextUtils.isEmpty(src.screenName)) team.addProperty(SCREEN_NAME, src.screenName);
 
             String sportCode = src.sport != null ? src.sport.getCode() : "";
             if (!TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);

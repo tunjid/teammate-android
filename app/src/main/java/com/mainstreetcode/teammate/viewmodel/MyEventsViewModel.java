@@ -8,13 +8,10 @@ import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Flowable;
-
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
 
 /**
  * ViewModel for {@link Event events}
@@ -30,9 +27,10 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
     }
 
     @Override
-    public List<Identifiable> getModelList(Class<Event> key) {
-        return attending;
-    }
+    Class<Event> valueClass() { return Event.class; }
+
+    @Override
+    public List<Identifiable> getModelList(Class<Event> key) { return attending; }
 
     @Override
     void onModelAlert(Alert alert) {
@@ -50,14 +48,7 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
 
     @Override
     Flowable<List<Event>> fetch(Class<Event> key, boolean fetchLatest) {
-        return repository.attending(getQueryDate(fetchLatest));
-    }
-
-    private Date getQueryDate(boolean fetchLatest) {
-        if (fetchLatest) return null;
-
-        Event event = findLast(getModelList(Event.class), Event.class);
-        return event == null ? null : event.getStartDate();
+        return repository.attending(getQueryDate(fetchLatest, key, Event::getStartDate));
     }
 
     private void removeDeletedTeamEvents(Team matcher) {

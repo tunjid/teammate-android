@@ -8,10 +8,10 @@ import com.mainstreetcode.teammate.model.Team;
 /**
  * Viewholder for a {@link Team}
  */
-public class TeamViewHolder extends ModelCardViewHolder<Team, TeamAdapter.TeamAdapterListener>
+public class TeamViewHolder extends ModelCardViewHolder<Team, TeamAdapter.AdapterListener>
         implements View.OnClickListener {
 
-    public TeamViewHolder(View itemView, TeamAdapter.TeamAdapterListener adapterListener) {
+    public TeamViewHolder(View itemView, TeamAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
         itemView.setOnClickListener(this);
     }
@@ -20,8 +20,8 @@ public class TeamViewHolder extends ModelCardViewHolder<Team, TeamAdapter.TeamAd
         super.bind(model);
         if (model.isEmpty()) return;
 
-        title.setText(model.getSportAndName());
-        subtitle.setText(model.getCity());
+        setTitle(model.getSportAndName());
+        setSubTitle(model.getCity());
     }
 
     @Override

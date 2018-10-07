@@ -8,4 +8,6 @@
     <color name="black_50">#80000000</color>
     <color name="black_75">#C0000000</color>
     <color name="light_grey">#E0E0E0</color>
+    <color name="disabled_text">#C2C2C2</color>
+    <color name="tournament_gold">#DAA520</color>
 </resources>

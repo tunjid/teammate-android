@@ -14,22 +14,35 @@ import com.mainstreetcode.teammate.BuildConfig;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.EventSearchRequest;
+import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
-import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Row;
+import com.mainstreetcode.teammate.model.Standings;
+import com.mainstreetcode.teammate.model.Stat;
+import com.mainstreetcode.teammate.model.StatAggregate;
+import com.mainstreetcode.teammate.model.StatRank;
+import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.Tournament;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.AndroidVariant;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.StatAttribute;
+import com.mainstreetcode.teammate.model.enums.StatType;
+import com.mainstreetcode.teammate.model.enums.TournamentStyle;
+import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.Logger;
@@ -83,7 +96,7 @@ public class TeammateService {
     public static TeammateApi getApiInstance() {
         if (api == null) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
 
@@ -108,9 +121,12 @@ public class TeammateService {
     public static Gson getGson() {
 
         return new GsonBuilder()
+                .registerTypeAdapter(Row.class, new Row.GsonAdapter())
                 .registerTypeAdapter(Team.class, new Team.GsonAdapter())
                 .registerTypeAdapter(User.class, new User.GsonAdapter())
                 .registerTypeAdapter(Role.class, new Role.GsonAdapter())
+                .registerTypeAdapter(Game.class, new Game.GsonAdapter())
+                .registerTypeAdapter(Stat.class, new Stat.GsonAdapter())
                 .registerTypeAdapter(Chat.class, new Chat.GsonAdapter())
                 .registerTypeAdapter(Event.class, new Event.GsonAdapter())
                 .registerTypeAdapter(Media.class, new Media.GsonAdapter())
@@ -121,13 +137,25 @@ public class TeammateService {
                 .registerTypeAdapter(Message.class, new Message.GsonAdapter())
                 .registerTypeAdapter(FeedItem.class, new FeedItem.GsonAdapter())
                 .registerTypeAdapter(Position.class, new Position.GsonAdapter())
+                .registerTypeAdapter(StatRank.class, new StatRank.GsonAdapter())
+                .registerTypeAdapter(StatType.class, new StatType.GsonAdapter())
+                .registerTypeAdapter(Standings.class, new Standings.GsonAdapter())
+                .registerTypeAdapter(Tournament.class, new Tournament.GsonAdapter())
+                .registerTypeAdapter(Competitor.class, new Competitor.GsonAdapter())
                 .registerTypeAdapter(Visibility.class, new Visibility.GsonAdapter())
                 .registerTypeAdapter(TeamMember.class, new TeamMember.GsonAdapter())
                 .registerTypeAdapter(BlockReason.class, new BlockReason.GsonAdapter())
                 .registerTypeAdapter(JoinRequest.class, new JoinRequest.GsonAdapter())
                 .registerTypeAdapter(BlockedUser.class, new BlockedUser.GsonAdapter())
+                .registerTypeAdapter(StatAttribute.class, new StatAttribute.GsonAdapter())
                 .registerTypeAdapter(AndroidVariant.class, new AndroidVariant.GsonAdapter())
+                .registerTypeAdapter(TournamentType.class, new TournamentType.GsonAdapter())
+                .registerTypeAdapter(TournamentStyle.class, new TournamentStyle.GsonAdapter())
+                .registerTypeAdapter(HeadToHead.Result.class, new HeadToHead.Result.GsonAdapter())
+                .registerTypeAdapter(HeadToHead.Request.class, new HeadToHead.Request.GsonAdapter())
                 .registerTypeAdapter(EventSearchRequest.class, new EventSearchRequest.GsonAdapter())
+                .registerTypeAdapter(StatAggregate.Result.class, new StatAggregate.Result.GsonAdapter())
+                .registerTypeAdapter(StatAggregate.Request.class, new StatAggregate.Request.GsonAdapter())
                 .registerTypeAdapter(LoginResult.class, (JsonSerializer<LoginResult>) (src, typeOfSrc, context) -> {
                     JsonObject body = new JsonObject();
                     body.addProperty("access_token", src.getAccessToken().getToken());

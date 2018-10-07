@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.persistence;
 import android.arch.persistence.room.Dao;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
@@ -27,12 +27,15 @@ public abstract class SharedPreferencesDao<T> extends EntityDao<T> {
         return preferenceName();
     }
 
-    @Nullable
+    @NonNull
+    abstract T getEmpty();
+
+    @NonNull
     public T getCurrent() {
         SharedPreferences preferences = getPreferences();
         String deserialized = preferences.getString(KEY, "");
 
-        if (TextUtils.isEmpty(deserialized)) return null;
+        if (TextUtils.isEmpty(deserialized)) return getEmpty();
         return from(deserialized);
     }
 

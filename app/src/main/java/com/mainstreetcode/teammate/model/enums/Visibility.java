@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model.enums;
 
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
 public class Visibility extends MetaData {
@@ -19,7 +20,7 @@ public class Visibility extends MetaData {
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Visibility> {
         @Override
-        Visibility fromJson(String code, String name, JsonObject body) {
+        Visibility fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
             return new Visibility(code, name);
         }
     }

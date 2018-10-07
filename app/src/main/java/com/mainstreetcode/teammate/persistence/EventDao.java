@@ -31,8 +31,8 @@ public abstract class EventDao extends EntityDao<EventEntity> {
             " WHERE :teamId = event_team" +
             " AND event_start_date < :date" +
             " ORDER BY event_start_date DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Event>> getEvents(String teamId, Date date);
+            " LIMIT :limit")
+    public abstract Maybe<List<Event>> getEvents(String teamId, Date date, int limit);
 
     @Query("SELECT * FROM events" +
             " WHERE :id = event_id")

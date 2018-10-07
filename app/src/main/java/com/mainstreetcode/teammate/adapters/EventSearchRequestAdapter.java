@@ -20,6 +20,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
@@ -52,7 +53,7 @@ public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
             case Item.INFO:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, FALSE);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, ALL_INPUT_VALID);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
             default:

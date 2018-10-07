@@ -5,10 +5,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.transition.AutoTransition;
 import android.support.transition.Transition;
@@ -25,13 +27,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
 import com.mainstreetcode.teammate.util.FabIconAnimator;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.core.view.ViewHider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
+import static android.support.design.widget.Snackbar.LENGTH_LONG;
 import static android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
@@ -69,19 +77,26 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     private CoordinatorLayout coordinatorLayout;
     private ConstraintLayout constraintLayout;
-    private FloatingActionButton fab;
     private LoadingBar loadingBar;
     private Toolbar toolbar;
 
+    private FabIconAnimator fabIconAnimator;
     @Nullable private ViewHider fabHider;
     @Nullable private ViewHider toolbarHider;
-    @Nullable private FabIconAnimator fabIconAnimator;
+
+    private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
+
+    private final BaseTransientBottomBar.BaseCallback callback = new BaseTransientBottomBar.BaseCallback() {
+        @SuppressWarnings("SuspiciousMethodCalls")
+        public void onDismissed(Object bar, int event) { transientBottomBars.remove(bar); }
+    };
 
     final FragmentManager.FragmentLifecycleCallbacks fragmentViewCreatedCallback = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
-        public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
+        public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, Bundle savedInstanceState) {
             if (isNotInMainFragmentContainer(v)) return;
 
+            clearTransientBars();
             adjustSystemInsets(f);
             setOnApplyWindowInsetsListener(v, (view, insets) -> consumeFragmentInsets(insets));
         }
@@ -96,24 +111,28 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    protected void onPause() {
+        clearTransientBars();
+        super.onPause();
+    }
+
+    @Override
     @SuppressLint("WrongViewCast")
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
 
+        ConstraintLayout extendedFabContainer = findViewById(R.id.extend_fab_container);
         keyboardPadding = findViewById(R.id.keyboard_padding);
         coordinatorLayout = findViewById(R.id.coordinator);
         constraintLayout = findViewById(R.id.content_view);
         bottomInsetView = findViewById(R.id.bottom_inset);
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
-        fab = findViewById(R.id.fab);
 
         if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
 
-        if (fab != null) {
-            fabHider = ViewHider.of(fab).setDirection(BOTTOM).build();
-            fabIconAnimator = new FabIconAnimator(fab);
-        }
+        fabHider = ViewHider.of(extendedFabContainer).setDirection(BOTTOM).build();
+        fabIconAnimator = new FabIconAnimator(extendedFabContainer);
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPadding.setOnTouchListener((view, event) -> {
@@ -170,8 +189,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void setFabIcon(@DrawableRes int icon) {
-        if (fabIconAnimator != null) fabIconAnimator.setCurrentIcon(icon);
+    public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
+        if (fabIconAnimator != null) fabIconAnimator.update(icon, title);
+    }
+
+    @Override
+    public void setFabExtended(boolean expanded) {
+        if (fabIconAnimator != null) fabIconAnimator.setExtended(expanded);
     }
 
     @Override
@@ -189,7 +213,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void showSnackBar(CharSequence message) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_LONG);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
@@ -197,19 +221,30 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void showSnackBar(CharSequence message, int stringRes, View.OnClickListener clickListener) {
+    @SuppressWarnings("unchecked")
+    public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {
         toggleProgress(false);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_INDEFINITE)
-                .setAction(stringRes, clickListener);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, "", LENGTH_INDEFINITE).addCallback(callback);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.getView(), (view, insets) -> insets);
+        consumer.accept(snackbar);
+        transientBottomBars.add(snackbar);
         snackbar.show();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {
+        ChoiceBar bar = ChoiceBar.make(coordinatorLayout, LENGTH_INDEFINITE).addCallback(callback);
+        consumer.accept(bar);
+        transientBottomBars.add(bar);
+        bar.show();
     }
 
     @Override
     public void setFabClickListener(@Nullable View.OnClickListener clickListener) {
-        fab.setOnClickListener(clickListener);
+        fabIconAnimator.setOnClickListener(clickListener);
     }
 
     public void onDialogDismissed() {
@@ -221,7 +256,14 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     protected boolean isNotInMainFragmentContainer(View view) {
         View parent = (View) view.getParent();
-        return parent.getId() != R.id.main_fragment_container;
+        return parent == null || parent.getId() != R.id.main_fragment_container;
+    }
+
+    protected void clearTransientBars() {
+        for (BaseTransientBottomBar bar : transientBottomBars)
+            if (bar instanceof ChoiceBar) ((ChoiceBar) bar).dismissAsTimeout();
+            else bar.dismiss();
+        transientBottomBars.clear();
     }
 
     protected void initTransition() {

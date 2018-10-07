@@ -8,7 +8,7 @@ import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.RoleRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 
-import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -31,9 +31,10 @@ public abstract class TeamHostingGofer<T extends Model<T> & ListableModel<T> & T
         startPrep();
     }
 
-    public Completable prepare() {
+    @Override
+    Flowable<Boolean> changeEmitter() {
         return roleRepository.getRoleInTeam(userRepository.getCurrentUser().getId(), model.getTeam().getId())
-                .doOnSuccess(this::onRoleFound).ignoreElement().observeOn(mainThread());
+                .map(this::onRoleFound).observeOn(mainThread());
     }
 
     public boolean hasRole() {return !currentRole.isEmpty();}
@@ -46,7 +47,9 @@ public abstract class TeamHostingGofer<T extends Model<T> & ListableModel<T> & T
         return userRepository.getCurrentUser();
     }
 
-    private void onRoleFound(Role foundRole) {
+    private boolean onRoleFound(Role foundRole) {
+        boolean changed = !currentRole.getPosition().equals(foundRole.getPosition());
         currentRole.update(foundRole);
+        return changed;
     }
 }

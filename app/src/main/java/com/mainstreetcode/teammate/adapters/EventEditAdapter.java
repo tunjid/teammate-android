@@ -48,13 +48,13 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.TEXT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.ALL_INPUT_VALID);
             case Item.NUMBER:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.ALL_INPUT_VALID);
             case Item.DATE:
                 return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.LOCATION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.FALSE)
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.ALL_INPUT_VALID)
                         .setButtonRunnable(R.drawable.ic_location_on_white_24dp, this::onLocationClicked);
             case Item.VISIBILITY:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.event_visibility_selection, Config.getVisibilities(), Visibility::getName, Visibility::getCode, adapterListener::canEditEvent);
@@ -101,7 +101,7 @@ public class EventEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Ev
     }
 
     public interface EventEditAdapterListener extends
-            TeamAdapter.TeamAdapterListener,
+            TeamAdapter.AdapterListener,
             ImageWorkerFragment.ImagePickerListener {
 
         void selectTeam();
