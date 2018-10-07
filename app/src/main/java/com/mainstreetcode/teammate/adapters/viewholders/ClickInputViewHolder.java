@@ -24,6 +24,7 @@ public class ClickInputViewHolder extends InputViewHolder
         super(itemView, enabler);
         clickView = itemView.findViewById(R.id.click_view);
         editText.removeTextChangedListener(this);
+        clickView.setVisibility(View.VISIBLE);
         clickView.setOnClickListener(this);
         this.clickAction = clickAction;
     }
@@ -32,6 +33,7 @@ public class ClickInputViewHolder extends InputViewHolder
         super(itemView, enabler, errorChecker);
         clickView = itemView.findViewById(R.id.click_view);
         editText.removeTextChangedListener(this);
+        clickView.setVisibility(View.VISIBLE);
         clickView.setOnClickListener(this);
         this.clickAction = clickAction;
     }

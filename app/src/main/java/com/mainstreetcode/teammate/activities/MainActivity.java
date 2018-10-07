@@ -104,7 +104,6 @@ public class MainActivity extends TeammatesBaseActivity
             else if (t.contains(MediaFragment.class.getSimpleName())) id = R.id.action_media;
             else if (t.contains(TeamsFragment.class.getSimpleName())) id = R.id.action_team;
 
-            if (id == 0) return;
             bottomNav.highlight(id);
         }
     };
