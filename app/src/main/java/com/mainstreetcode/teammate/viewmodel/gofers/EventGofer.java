@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
@@ -17,6 +18,7 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,12 +28,10 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class EventGofer extends TeamHostingGofer<Event> {
 
     private boolean isSettingLocation;
-    private final List<Identifiable> items;
     private final Function<Guest, Single<Guest>> rsvpFunction;
     private final Function<Event, Flowable<Event>> getFunction;
     private final Function<Event, Single<Event>> deleteFunction;
@@ -52,10 +52,11 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.rsvpFunction = rsvpFunction;
         this.updateFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
-        this.items = new ArrayList<>(model.asItems());
         this.guestRepository = GuestRepository.getInstance();
 
+        items.addAll(model.asItems());
         items.add(model.getTeam());
+
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
@@ -65,10 +66,6 @@ public class EventGofer extends TeamHostingGofer<Event> {
 
     public boolean isSettingLocation() {
         return isSettingLocation;
-    }
-
-    public List<Identifiable> getItems() {
-        return items;
     }
 
     public String getToolbarTitle(Fragment fragment) {
@@ -87,19 +84,19 @@ public class EventGofer extends TeamHostingGofer<Event> {
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingLocation) return Flowable.empty();
-        Flowable<List<Identifiable>> eventFlowable = Flowable.defer(() -> getFunction.apply(model)).map(Event::asIdentifiables);
+        Flowable<List<Identifiable>> eventFlowable = getFunction.apply(model).map(Event::asIdentifiables);
         Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
-        Flowable<List<Identifiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, guestsFlowable);
+        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(eventFlowable, guestsFlowable));
         return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = Single.defer(() -> updateFunction.apply(model)).map(Event::asIdentifiables);
+        Single<List<Identifiable>> source = updateFunction.apply(model).map(Event::asIdentifiables);
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(boolean attending) {
-        Single<List<Identifiable>> single = Single.defer(() -> rsvpFunction.apply(Guest.forEvent(model, attending)).map(Collections::singletonList));
+        Single<List<Identifiable>> single = rsvpFunction.apply(Guest.forEvent(model, attending)).map(Collections::singletonList);
         return Identifiable.diff(single, this::getItems, (staleCopy, singletonGuestList) -> {
             staleCopy.removeAll(singletonGuestList);
             staleCopy.addAll(singletonGuestList);
@@ -120,7 +117,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     Completable delete() {
-        return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+        return deleteFunction.apply(model).toCompletable();
     }
 
     public Single<DiffUtil.DiffResult> setPlace(Place place) {

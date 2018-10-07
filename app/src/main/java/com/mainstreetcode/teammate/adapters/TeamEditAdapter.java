@@ -11,6 +11,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -29,10 +30,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
-    private final List<Item<Team>> items;
+    private final List<Identifiable> items;
 
-    public TeamEditAdapter(List<Item<Team>> items, TeamEditAdapter.TeamEditAdapterListener listener) {
+    public TeamEditAdapter(List<Identifiable> items, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
+        setHasStableIds(true);
         this.items = items;
     }
 
@@ -63,8 +65,9 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseItemViewHolder baseTeamViewHolder, int i) {
-        baseTeamViewHolder.bind(items.get(i));
+    public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
+        Identifiable item = items.get(i);
+        if (item instanceof Item) viewHolder.bind((Item) item);
     }
 
     @Override
@@ -74,7 +77,8 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getItemType();
+        Identifiable item = items.get(position);
+        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
     }
 
     private boolean showsChangePicture(Item item) {

@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
+import android.arch.core.util.Function;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
@@ -7,34 +8,27 @@ import android.support.v7.util.DiffUtil;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.TeammateException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class GuestGofer extends TeamHostingGofer<Guest> {
 
-    private final List<Item<Guest>> items;
     private final Function<Guest, Flowable<Guest>> getFunction;
 
     public GuestGofer(Guest model,
                       Consumer<Throwable> onError,
                       Function<Guest, Flowable<Guest>> getFunction) {
         super(model, onError);
-        this.items = new ArrayList<>(model.asItems());
         this.getFunction = getFunction;
+        items.addAll(model.asItems());
     }
 
-    public List<Item<Guest>> getItems() {
-        return items;
-    }
 
     @Nullable
     @Override
@@ -47,13 +41,8 @@ public class GuestGofer extends TeamHostingGofer<Guest> {
     }
 
     @Override
-    public Completable prepare() {
-        return Completable.complete();
-    }
-
-    @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Item<Guest>>> source = Flowable.defer(() -> getFunction.apply(model)).map(Guest::asItems);
+        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Guest::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 

@@ -7,6 +7,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.model.BlockedUser;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -20,9 +21,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class BlockedUserViewAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
 
-    private final List<Item<BlockedUser>> items;
+    private final List<Identifiable> items;
 
-    public BlockedUserViewAdapter(List<Item<BlockedUser>> items) {
+    public BlockedUserViewAdapter(List<Identifiable> items) {
         super(new AdapterListener() {});
         this.items = items;
     }
@@ -39,7 +40,8 @@ public class BlockedUserViewAdapter extends BaseRecyclerViewAdapter<BaseItemView
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
-        baseItemViewHolder.bind(items.get(i));
+        Identifiable item = items.get(i);
+        if (item instanceof Item) baseItemViewHolder.bind((Item) item);
     }
 
     @Override
@@ -49,6 +51,7 @@ public class BlockedUserViewAdapter extends BaseRecyclerViewAdapter<BaseItemView
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getItemType();
+        Identifiable item = items.get(position);
+        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
     }
 }

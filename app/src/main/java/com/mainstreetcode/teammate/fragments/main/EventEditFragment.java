@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,8 +53,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     public static final String ARG_EVENT = "event";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
-    @Nullable
-    private Game game;
     private Event event;
     private EventGofer gofer;
 
@@ -89,7 +88,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         Bundle args = getArguments();
-        game = args.getParcelable(ARG_GAME);
+        Game game = args.getParcelable(ARG_GAME);
         event = game != null ? game.getEvent() : args.getParcelable(ARG_EVENT);
 
         assert event != null;
@@ -212,8 +211,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
         toggleProgress(false);
         scrollManager.onDiff(result);
         viewHolder.bind(getHeaderedModel());
-        Activity activity;
-        if ((activity = getActivity()) != null) activity.invalidateOptionsMenu();
     }
 
     @Override
@@ -224,8 +221,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     @Override
-    protected boolean canGetModel() {
-        return super.canGetModel() && !gofer.isSettingLocation();
+    protected boolean cantGetModel() {
+        return super.cantGetModel() || gofer.isSettingLocation();
     }
 
     @Override
@@ -238,10 +235,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
                     int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
                     onModelUpdated(diffResult);
                     showSnackbar(getString(stringRes, event.getName()));
-                    if (game != null) {
-                        toggleProgress(true);
-                        disposables.add(gameViewModel.updateGame(game).subscribe(ignored -> requireActivity().onBackPressed(), defaultErrorHandler));
-                    }
                 }, defaultErrorHandler));
                 break;
         }
@@ -263,7 +256,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void selectTeam() {
-        if (game != null) showSnackbar(getString(R.string.game_event_team_change));
+        if (!TextUtils.isEmpty(event.getGameId()))
+            showSnackbar(getString(R.string.game_event_team_change));
         else if (gofer.hasPrivilegedRole()) chooseTeam();
         else if (!gofer.hasRole())
             showFragment(JoinRequestFragment.joinInstance(event.getTeam(), userViewModel.getCurrentUser()));

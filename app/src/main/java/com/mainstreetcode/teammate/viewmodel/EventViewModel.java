@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
+import android.arch.core.util.Function;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +33,6 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 import io.reactivex.processors.PublishProcessor;
 
 import static android.location.Location.distanceBetween;

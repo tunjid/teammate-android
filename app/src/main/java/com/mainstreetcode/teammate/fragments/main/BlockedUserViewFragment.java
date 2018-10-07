@@ -55,8 +55,8 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withAdapter(new BlockedUserViewAdapter(gofer.getItems()))
+                .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();

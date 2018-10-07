@@ -8,6 +8,8 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.migrations.Migration1To2;
+import com.mainstreetcode.teammate.persistence.migrations.Migration2To3;
+import com.mainstreetcode.teammate.persistence.migrations.Migration3To4;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +49,21 @@ public class MigrationTest {
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.
     }
+
+    @Test
+    public void migrate2To3() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 2);
+        db.close();
+        helper.runMigrationsAndValidate(TEST_DB, 3, true, new Migration2To3());
+    }
+
+    @Test
+    public void migrate3To4() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 3);
+        db.close();
+        helper.runMigrationsAndValidate(TEST_DB, 4, true, new Migration3To4());
+    }
+
 
 //    @Test
 //    public void migrationFrom2To3_containsCorrectData() throws

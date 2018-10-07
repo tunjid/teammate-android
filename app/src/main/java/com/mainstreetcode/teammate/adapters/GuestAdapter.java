@@ -8,6 +8,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
@@ -21,9 +22,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private final List<Item<Guest>> items;
+    private final List<Identifiable> items;
 
-    public GuestAdapter(List<Item<Guest>> items, ImageWorkerFragment.ImagePickerListener listener) {
+    public GuestAdapter(List<Identifiable> items, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
         this.items = items;
     }
@@ -36,7 +37,8 @@ public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Im
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
-        viewHolder.bind(items.get(i));
+        Identifiable item = items.get(i);
+        if (item instanceof Item) viewHolder.bind((Item) item);
     }
 
     @Override
@@ -46,7 +48,8 @@ public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, Im
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getItemType();
+        Identifiable item = items.get(position);
+        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
     }
 
     @Override

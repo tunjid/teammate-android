@@ -13,11 +13,11 @@ public class Migration3To4 extends Migration {
     @Override
     public void migrate(@NonNull SupportSQLiteDatabase database) {
 
-        database.execSQL("ALTER TABLE users ADD COLUMN user_screen_name TEXT DEFAULT ''");
+        database.execSQL("ALTER TABLE users ADD COLUMN user_screen_name TEXT DEFAULT null");
 
-        database.execSQL("ALTER TABLE teams ADD COLUMN team_screen_name TEXT DEFAULT ''");
+        database.execSQL("ALTER TABLE teams ADD COLUMN team_screen_name TEXT DEFAULT null");
 
-        database.execSQL("ALTER TABLE events ADD COLUMN event_game_id TEXT DEFAULT ''");
+        database.execSQL("ALTER TABLE events ADD COLUMN event_game_id TEXT DEFAULT null");
 
         database.execSQL("CREATE TABLE IF NOT EXISTS `tournaments` (" +
                 "`tournament_id` TEXT NOT NULL, " +
@@ -48,6 +48,7 @@ public class Migration3To4 extends Migration {
                 "`game_score` TEXT, " +
                 "`game_home_entity` TEXT, " +
                 "`game_away_entity` TEXT, " +
+                "`game_winner_entity` TEXT, " +
                 "`game_match_up` TEXT, " +
                 "`game_created` INTEGER, " +
                 "`game_sport` TEXT, " +
@@ -77,7 +78,7 @@ public class Migration3To4 extends Migration {
                 "`competitor_game` TEXT, " +
                 "`competitor_entity` TEXT, " +
                 "`competitor_created` INTEGER, " +
-                "`competitor_seed` INTEGER, " +
+                "`competitor_seed` INTEGER NOT NULL, " +
                 "`competitor_accepted` INTEGER NOT NULL, " +
                 "`competitor_declined` INTEGER NOT NULL, " +
                 "PRIMARY KEY(`competitor_id`), " +

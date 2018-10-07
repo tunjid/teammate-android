@@ -17,34 +17,40 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getActivity;
 public class ClickInputViewHolder extends InputViewHolder
         implements View.OnClickListener {
 
+    private final View clickView;
     private final Runnable clickAction;
 
     public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction) {
         super(itemView, enabler);
+        clickView = itemView.findViewById(R.id.click_view);
         editText.removeTextChangedListener(this);
+        clickView.setVisibility(View.VISIBLE);
+        clickView.setOnClickListener(this);
         this.clickAction = clickAction;
     }
 
     public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Function<CharSequence, CharSequence> errorChecker) {
         super(itemView, enabler, errorChecker);
+        clickView = itemView.findViewById(R.id.click_view);
         editText.removeTextChangedListener(this);
+        clickView.setVisibility(View.VISIBLE);
+        clickView.setOnClickListener(this);
         this.clickAction = clickAction;
     }
 
     @Override
     public void bind(Item item) {
         super.bind(item);
-        itemView.findViewById(R.id.click_view).setOnClickListener(isEnabled() ? this : null);
     }
 
     @Override
     public void onClick(View view) {
-        clickAction.run();
+       if(isEnabled()) clickAction.run();
     }
 
     void onDialogDismissed() {
         Activity activity = getActivity(this);
-        if (activity != null && activity instanceof TeammatesBaseActivity)
+        if (activity instanceof TeammatesBaseActivity)
             ((TeammatesBaseActivity) activity).onDialogDismissed();
     }
 }

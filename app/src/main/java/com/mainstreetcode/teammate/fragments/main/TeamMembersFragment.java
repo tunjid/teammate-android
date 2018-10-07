@@ -29,7 +29,6 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -99,9 +98,8 @@ public class TeamMembersFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        updateCurrentRole();
-
         fetchTeamMembers(true);
+        watchForRoleChanges(team, this::togglePersistentUi);
     }
 
     @Override
@@ -241,10 +239,8 @@ public class TeamMembersFragment extends MainActivityFragment
     }
 
     private void onTeamUpdated(DiffUtil.DiffResult diffResult) {
-        updateCurrentRole();
         scrollManager.onDiff(diffResult);
-        Activity activity = getActivity();
-        if (activity != null) activity.invalidateOptionsMenu();
+        requireActivity().invalidateOptionsMenu();
     }
 
     private void onTeamDeleted() {
@@ -253,18 +249,5 @@ public class TeamMembersFragment extends MainActivityFragment
 
         Activity activity = getActivity();
         if (activity != null) activity.onBackPressed();
-    }
-
-    private void updateCurrentRole() {
-        if (team.isEmpty()) return;
-
-        disposables.add(localRoleViewModel.getRoleInTeam(userViewModel.getCurrentUser(), team)
-                .subscribe(this::onRoleUpdated, ErrorHandler.EMPTY));
-    }
-
-    private void onRoleUpdated() {
-        toggleFab(showsFab());
-        Activity activity = getActivity();
-        if (activity != null) activity.invalidateOptionsMenu();
     }
 }

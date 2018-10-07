@@ -177,6 +177,8 @@
     <!--EventDetailFragment-->
     <string name="create_event">Create Event</string>
     <string name="edit_event">Event: %1$s</string>
+    <string name="event_game">Game</string>
+    <string name="event_game_view">View game</string>
     <string name="event_name">Event Name</string>
     <string name="event_add">Add event</string>
     <string name="event_create">Create event</string>

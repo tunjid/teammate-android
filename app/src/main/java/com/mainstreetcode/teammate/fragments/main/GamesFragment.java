@@ -99,8 +99,7 @@ public final class GamesFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchGames(true);
-        User user = userViewModel.getCurrentUser();
-        disposables.add(localRoleViewModel.getRoleInTeam(user, team).subscribe(() -> toggleFab(localRoleViewModel.hasPrivilegedRole()), emptyErrorHandler));
+        watchForRoleChanges(team, this::togglePersistentUi);
     }
 
     @Override

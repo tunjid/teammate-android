@@ -99,7 +99,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     private void setClickableState() {
-        int colorInt = ContextCompat.getColor(itemView.getContext(), isEnabled() ? R.color.black : R.color.light_grey);
+        int colorInt = ContextCompat.getColor(itemView.getContext(), isEnabled() ? R.color.black : R.color.disabled_text);
         editText.setTextColor(ColorStateList.valueOf(colorInt));
 
         int visibility = item == null || visibilitySupplier == null ? GONE : visibilitySupplier.apply(item) ? VISIBLE : GONE;

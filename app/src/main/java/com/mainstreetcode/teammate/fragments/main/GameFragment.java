@@ -305,7 +305,7 @@ public final class GameFragment extends MainActivityFragment
     }
 
     private void onGameUpdated() {
-        disposables.add(gofer.prepare().subscribe(requireActivity()::invalidateOptionsMenu, ErrorHandler.EMPTY));
+        disposables.add(gofer.watchForChange().subscribe(changed -> requireActivity().invalidateOptionsMenu(), ErrorHandler.EMPTY));
         gameViewHolder.bind(game);
         toggleProgress(false);
         checkCompetitor();

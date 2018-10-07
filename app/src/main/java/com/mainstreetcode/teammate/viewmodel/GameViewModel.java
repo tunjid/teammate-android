@@ -111,7 +111,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         return updateGame(game);
     }
 
-    public Single<Game> updateGame(Game game) {
+    private Single<Game> updateGame(Game game) {
         return gameRoundRepository.createOrUpdate(game)
                 .doOnError(onError(game)).observeOn(mainThread());
     }

@@ -29,7 +29,9 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
@@ -91,7 +93,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     @Override
     public void onResume() {
         super.onResume();
-        getData(false);
+        fetch();
     }
 
     @Override
@@ -114,9 +116,9 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         viewHolder = null;
         appBarLayout = null;
+        super.onDestroyView();
     }
 
     protected void onPrepComplete() {
@@ -125,10 +127,10 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     protected boolean canExpandAppBar() {return true;}
 
-    protected boolean canGetModel() {
+    protected boolean cantGetModel() {
         boolean result = !ImageWorkerFragment.isPicking(this) && !imageJustCropped;
         imageJustCropped = false;
-        return result;
+        return !result;
     }
 
     @Override
@@ -141,19 +143,25 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
                 .subscribe(() -> toggleFab(showsFab()), ErrorHandler.EMPTY));
     }
 
-    protected final void refresh() {
-        getData(true);
-    }
+    protected final void fetch() { getData(false); }
+
+    protected final void refresh() { getData(true); }
 
     private void getData(boolean refresh) {
-        Gofer<T> gofer = gofer();
-        disposables.add(gofer.prepare().subscribe(this::onPrepComplete, ErrorHandler.EMPTY));
+        checkIfChanged();
 
-        Flowable<DiffUtil.DiffResult> diffFlowable = gofer.get();
-        if (refresh) diffFlowable = diffFlowable.doOnComplete(scrollManager::notifyDataSetChanged);
+        int delay = refresh ? 100 : 2500;
+        Flowable<DiffUtil.DiffResult> diffFlowable = gofer().get().doOnComplete(() -> {
+            if (refresh) scrollManager.notifyDataSetChanged();
+        });
 
-        if (canGetModel())
-            disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler));
+        if (cantGetModel()) return;
+        disposables.add(Completable.timer(delay, TimeUnit.MILLISECONDS).andThen(diffFlowable)
+                .subscribe(this::onModelUpdated, defaultErrorHandler, this::checkIfChanged));
+    }
+
+    private void checkIfChanged() {
+        disposables.add(gofer().watchForChange().subscribe(value -> onPrepComplete(), ErrorHandler.EMPTY));
     }
 
     protected void blockUser(User user, Team team) {
