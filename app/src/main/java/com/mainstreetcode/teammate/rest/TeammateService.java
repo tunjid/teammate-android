@@ -96,7 +96,7 @@ public class TeammateService {
     public static TeammateApi getApiInstance() {
         if (api == null) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder().cookieJar(new SessionCookieJar());
 
