@@ -34,6 +34,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     public TeamEditAdapter(List<Identifiable> items, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
+        setHasStableIds(true);
         this.items = items;
     }
 

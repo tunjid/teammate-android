@@ -221,8 +221,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     @Override
-    protected boolean canGetModel() {
-        return super.canGetModel() && !gofer.isSettingLocation();
+    protected boolean cantGetModel() {
+        return super.cantGetModel() || gofer.isSettingLocation();
     }
 
     @Override

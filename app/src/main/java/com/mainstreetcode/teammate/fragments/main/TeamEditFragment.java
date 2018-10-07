@@ -143,8 +143,8 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    protected boolean canGetModel() {
-        return super.canGetModel() && !gofer.isSettingAddress();
+    protected boolean cantGetModel() {
+        return super.cantGetModel() || gofer.isSettingAddress();
     }
 
     @Override
