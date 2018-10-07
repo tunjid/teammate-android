@@ -80,6 +80,7 @@
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
             <View
+                android:id="@+id/bottom_sheet_indicator"
                 android:layout_width="@dimen/single_margin"
                 android:layout_height="@dimen/quarter_margin"
                 android:layout_gravity="top|center_horizontal"
