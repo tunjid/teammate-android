@@ -54,7 +54,7 @@ android {
             useProguard true
             minifyEnabled true
             signingConfig signingConfigs.staging
-            buildConfigField "boolean", "DEV", "false"
+            buildConfigField "boolean", "DEV", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
