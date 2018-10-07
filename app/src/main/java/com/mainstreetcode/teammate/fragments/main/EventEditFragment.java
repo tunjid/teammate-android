@@ -209,7 +209,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     protected void onModelUpdated(DiffUtil.DiffResult result) {
         toggleProgress(false);
-        requireActivity().invalidateOptionsMenu();
         scrollManager.onDiff(result);
         viewHolder.bind(getHeaderedModel());
     }

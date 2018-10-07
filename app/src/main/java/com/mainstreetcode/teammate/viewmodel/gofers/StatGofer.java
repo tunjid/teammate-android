@@ -59,10 +59,12 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     @Override
-    public Completable prepare() {
+    Flowable<Boolean> changeEmitter() {
+        int count = eligibleTeams.size();
         eligibleTeams.clear();
         return eligibleTeamSource.apply(model)
-                .doOnNext(eligibleTeams::add).ignoreElements().andThen(updateDefaultTeam());
+                .doOnNext(eligibleTeams::add).ignoreElements().andThen(updateDefaultTeam())
+                .andThen(Flowable.just(eligibleTeams.size() != count));
     }
 
     @Override
@@ -98,7 +100,7 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     public Completable delete() {
-        return  deleteFunction.apply(model).toCompletable();
+        return deleteFunction.apply(model).toCompletable();
     }
 
     private Completable updateDefaultTeam() {

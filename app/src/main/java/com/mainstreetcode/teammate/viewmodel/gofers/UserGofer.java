@@ -38,8 +38,8 @@ public class UserGofer extends Gofer<User> {
     }
 
     @Override
-    public Completable prepare() {
-        return Completable.complete();
+    Flowable<Boolean> changeEmitter() {
+        return Flowable.empty();
     }
 
     @Nullable

@@ -9,6 +9,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -43,9 +44,9 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
     @Nullable
     public abstract String getImageClickMessage(Fragment fragment);
 
-    public abstract Completable prepare();
-
     abstract Completable delete();
+
+    abstract Flowable<Boolean> changeEmitter();
 
     abstract Single<DiffUtil.DiffResult> upsert();
 
@@ -55,19 +56,28 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
         return delete().doOnError(onError).observeOn(mainThread());
     }
 
+    private int count = 0;
+
+    public Flowable<Object> watchForChange() {
+        return changeEmitter().filter(changed -> {
+            Logger.log("TEST", "CHANGED: " + changed + " Count: " + ++count);
+            return changed;
+        }).cast(Object.class);
+    }
+
     public final Single<DiffUtil.DiffResult> save() {
-        return upsert().doOnSuccess(ignored -> startPrep()).doOnError(onError);
+        return upsert().doOnError(onError);
     }
 
     public final Flowable<DiffUtil.DiffResult> get() {
-        return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> startPrep()).doOnError(onError);
+        return model.isEmpty() ? Flowable.empty() : fetch().doOnError(onError);
     }
 
     public final List<Identifiable> getItems() { return items; }
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    void startPrep() { prepare().subscribe(() -> {}, ErrorHandler.EMPTY); }
+    void startPrep() { watchForChange().subscribe(ignored -> {}, ErrorHandler.EMPTY); }
 
     List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
         ModelUtils.preserveAscending(old, fetched);

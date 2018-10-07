@@ -66,10 +66,12 @@ public class GameGofer extends Gofer<Game> {
     }
 
     @Override
-    public Completable prepare() {
+    Flowable<Boolean> changeEmitter() {
+        int count = eligibleTeams.size();
         eligibleTeams.clear();
         return eligibleTeamSource.apply(model)
-                .doOnNext(eligibleTeams::add).ignoreElements();
+                .doOnNext(eligibleTeams::add).ignoreElements()
+                .andThen(Flowable.just(count != eligibleTeams.size()));
     }
 
     @Override

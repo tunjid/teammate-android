@@ -41,11 +41,6 @@ public class GuestGofer extends TeamHostingGofer<Guest> {
     }
 
     @Override
-    public Completable prepare() {
-        return Completable.complete();
-    }
-
-    @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
         Flowable<List<Identifiable>> source = getFunction.apply(model).map(Guest::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);

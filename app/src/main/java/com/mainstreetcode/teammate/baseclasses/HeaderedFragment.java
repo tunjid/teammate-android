@@ -149,14 +149,14 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     protected final void refresh() { getData(true); }
 
     private void getData(boolean refresh) {
-        Gofer<T> gofer = gofer();
-        disposables.add(gofer.prepare().subscribe(this::onPrepComplete, ErrorHandler.EMPTY));
-
-        Flowable<DiffUtil.DiffResult> diffFlowable = gofer.get();
+        checkIfChanged();
+        Flowable<DiffUtil.DiffResult> diffFlowable = gofer().get();
         if (refresh) diffFlowable = diffFlowable.doOnComplete(scrollManager::notifyDataSetChanged);
+        if (canGetModel()) disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler, this::checkIfChanged));
+    }
 
-        if (canGetModel())
-            disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler));
+    private void checkIfChanged() {
+        disposables.add(gofer().watchForChange().subscribe(value -> onPrepComplete(), ErrorHandler.EMPTY));
     }
 
     protected void blockUser(User user, Team team) {
