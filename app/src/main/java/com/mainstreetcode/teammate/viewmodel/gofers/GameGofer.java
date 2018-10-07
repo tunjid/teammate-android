@@ -24,7 +24,6 @@ import io.reactivex.functions.Consumer;
 
 public class GameGofer extends Gofer<Game> {
 
-    private final List<Identifiable> items;
     private final List<Team> eligibleTeams;
     private final Function<Game, Flowable<Game>> getFunction;
     private final Function<Game, Single<Game>> upsertFunction;
@@ -44,13 +43,9 @@ public class GameGofer extends Gofer<Game> {
         this.eligibleTeamSource = eligibleTeamSource;
 
         this.eligibleTeams = new ArrayList<>();
-        this.items = new ArrayList<>(model.isEmpty()
+        this.items.addAll(model.isEmpty()
                 ? Arrays.asList(model.getHome(), model.getAway())
                 : model.asItems());
-    }
-
-    public List<Identifiable> getItems() {
-        return items;
     }
 
     public boolean canEdit() {
@@ -73,13 +68,13 @@ public class GameGofer extends Gofer<Game> {
     @Override
     public Completable prepare() {
         eligibleTeams.clear();
-        return Flowable.defer(() -> eligibleTeamSource.apply(model))
+        return eligibleTeamSource.apply(model)
                 .doOnNext(eligibleTeams::add).ignoreElements();
     }
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = Flowable.defer(() -> getFunction.apply(model)).map(Game::asIdentifiables);
+        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Game::asIdentifiables);
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
@@ -94,7 +89,7 @@ public class GameGofer extends Gofer<Game> {
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = Single.defer(() -> upsertFunction.apply(model)).map(Game::asIdentifiables);
+        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Game::asIdentifiables);
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 

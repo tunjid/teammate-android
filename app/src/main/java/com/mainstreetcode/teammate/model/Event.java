@@ -48,7 +48,7 @@ public class Event extends EventEntity
     public static final String PHOTO_UPLOAD_KEY = "event-photo";
     public static final int DEFAULT_NUM_SPOTS = 12;
 
-    @Ignore private static final IdCache holder = IdCache.cache(8);
+    @Ignore private static final IdCache holder = IdCache.cache(7);
 
     public static Event empty() {
         Date date = new Date();

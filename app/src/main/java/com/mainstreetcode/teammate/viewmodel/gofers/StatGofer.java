@@ -27,7 +27,6 @@ import io.reactivex.functions.Consumer;
 
 public class StatGofer extends Gofer<Stat> {
 
-    private final List<Identifiable> items;
     private final List<Team> eligibleTeams;
     private final Function<Team, User> teamUserFunction;
     private final Function<Stat, Flowable<Stat>> getFunction;
@@ -50,13 +49,9 @@ public class StatGofer extends Gofer<Stat> {
         this.eligibleTeamSource = eligibleTeamSource;
 
         this.eligibleTeams = new ArrayList<>();
-        this.items = new ArrayList<>(model.asItems());
+        items.addAll(model.asItems());
         items.add(model.getTeam());
         items.add(model.getUser());
-    }
-
-    public List<Identifiable> getItems() {
-        return items;
     }
 
     public boolean canEdit() {
@@ -66,7 +61,7 @@ public class StatGofer extends Gofer<Stat> {
     @Override
     public Completable prepare() {
         eligibleTeams.clear();
-        return Flowable.defer(() -> eligibleTeamSource.apply(model))
+        return eligibleTeamSource.apply(model)
                 .doOnNext(eligibleTeams::add).ignoreElements().andThen(updateDefaultTeam());
     }
 
@@ -78,12 +73,12 @@ public class StatGofer extends Gofer<Stat> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = Flowable.defer(() -> getFunction.apply(model)).map(Stat::asIdentifiables);
+        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Stat::asIdentifiables);
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = Single.defer(() -> upsertFunction.apply(model)).map(Stat::asIdentifiables);
+        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Stat::asIdentifiables);
         return Identifiable.diff(source, this::getItems, this::preserveItems);
     }
 
@@ -103,7 +98,7 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     public Completable delete() {
-        return Single.defer(() -> deleteFunction.apply(model)).toCompletable();
+        return  deleteFunction.apply(model).toCompletable();
     }
 
     private Completable updateDefaultTeam() {

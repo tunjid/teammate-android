@@ -11,6 +11,7 @@ import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,9 +27,12 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
     protected final T model;
     private final Consumer<Throwable> onError;
 
+    final List<Identifiable> items;
+
     Gofer(T model, Consumer<Throwable> onError) {
         this.model = model;
         this.onError = onError;
+        items = new ArrayList<>();
     }
 
     public static String tag(String seed, Model model) {
@@ -36,24 +40,33 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
         return seed + "-" + uuid;
     }
 
+    @Nullable
+    public abstract String getImageClickMessage(Fragment fragment);
+
+    public abstract Completable prepare();
+
+    abstract Completable delete();
+
     abstract Single<DiffUtil.DiffResult> upsert();
 
     abstract Flowable<DiffUtil.DiffResult> fetch();
 
-    abstract Completable delete();
+    public final Completable remove() {
+        return delete().doOnError(onError).observeOn(mainThread());
+    }
 
-    public final Single<DiffUtil.DiffResult> save() { return upsert().doOnSuccess(ignored -> startPrep()).doOnError(onError); }
+    public final Single<DiffUtil.DiffResult> save() {
+        return upsert().doOnSuccess(ignored -> startPrep()).doOnError(onError);
+    }
 
-    public final Flowable<DiffUtil.DiffResult> get() { return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> startPrep()).doOnError(onError); }
+    public final Flowable<DiffUtil.DiffResult> get() {
+        return model.isEmpty() ? Flowable.empty() : fetch().doOnNext(ignored -> startPrep()).doOnError(onError);
+    }
 
-    public final Completable remove() { return delete().doOnError(onError).observeOn(mainThread()); }
-
-    public abstract Completable prepare();
-
-    @Nullable
-    public abstract String getImageClickMessage(Fragment fragment);
+    public final List<Identifiable> getItems() { return items; }
 
     @SuppressLint("CheckResult")
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     void startPrep() { prepare().subscribe(() -> {}, ErrorHandler.EMPTY); }
 
     List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {

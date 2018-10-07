@@ -50,7 +50,7 @@ android {
             buildConfigField "boolean", "DEV", "true"
         }
         staging {
-            debuggable true
+            debuggable false
             useProguard true
             minifyEnabled true
             signingConfig signingConfigs.staging

@@ -11,6 +11,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -27,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 public class UserEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, UserEditAdapter.AdapterListener> {
 
-    private final List<Item<User>> items;
+    private final List<Identifiable> items;
 
-    public UserEditAdapter(List<Item<User>> items, UserEditAdapter.AdapterListener listener) {
+    public UserEditAdapter(List<Identifiable> items, UserEditAdapter.AdapterListener listener) {
         super(listener);
         this.items = items;
     }
@@ -55,7 +56,8 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
-        viewHolder.bind(items.get(i));
+        Identifiable item = items.get(i);
+        if (item instanceof Item) viewHolder.bind((Item) item);
     }
 
     @Override
@@ -65,7 +67,8 @@ public class UserEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getItemType();
+        Identifiable item = items.get(position);
+        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
     }
 
     @Override

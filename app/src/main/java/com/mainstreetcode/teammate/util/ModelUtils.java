@@ -195,4 +195,8 @@ public class ModelUtils {
     public interface Consumer<T> {
         void accept(T t);
     }
+
+    public interface BiFunction<R, S, T> {
+        T apply(R r, S s);
+    }
 }

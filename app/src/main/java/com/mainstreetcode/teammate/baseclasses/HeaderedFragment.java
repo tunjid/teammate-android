@@ -91,7 +91,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     @Override
     public void onResume() {
         super.onResume();
-        getData(false);
+        fetch();
     }
 
     @Override
@@ -114,9 +114,9 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         viewHolder = null;
         appBarLayout = null;
+        super.onDestroyView();
     }
 
     protected void onPrepComplete() {
@@ -141,9 +141,12 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
                 .subscribe(() -> toggleFab(showsFab()), ErrorHandler.EMPTY));
     }
 
-    protected final void refresh() {
-        getData(true);
+    protected final void fetch() {
+        scrollManager.notifyDataSetChanged();
+        getData(false);
     }
+
+    protected final void refresh() { getData(true); }
 
     private void getData(boolean refresh) {
         Gofer<T> gofer = gofer();

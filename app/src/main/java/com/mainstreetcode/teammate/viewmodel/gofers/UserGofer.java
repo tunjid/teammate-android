@@ -22,7 +22,6 @@ import io.reactivex.Single;
 
 public class UserGofer extends Gofer<User> {
 
-    private final List<Item<User>> items;
     private final Function<User, Boolean> authUserFunction;
     private final Function<User, Flowable<User>> getFunction;
     private final Function<User, Single<User>> updateFunction;
@@ -35,11 +34,7 @@ public class UserGofer extends Gofer<User> {
         this.authUserFunction = authUserFunction;
         this.getFunction = getFunction;
         this.updateFunction = updateFunction;
-        this.items = filter(new ArrayList<>(model.asItems()));
-    }
-
-    public List<Item<User>> getItems() {
-        return items;
+        items.addAll(filter(new ArrayList<>(model.asItems())));
     }
 
     @Override
@@ -55,12 +50,12 @@ public class UserGofer extends Gofer<User> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Item<User>>> listFlowable = Flowable.defer(() -> getFunction.apply(model)).map(User::asItems);
+        Flowable<List<Identifiable>> listFlowable = getFunction.apply(model).map(User::asIdentifiables);
         return Identifiable.diff(listFlowable, this::getItems, (stale, updated) -> filter(updated));
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Item<User>>> source = Single.defer(() -> updateFunction.apply(model)).map(User::asItems);
+        Single<List<Identifiable>> source = updateFunction.apply(model).map(User::asIdentifiables);
         return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
     }
 
@@ -68,12 +63,17 @@ public class UserGofer extends Gofer<User> {
         return Completable.error(new TeammateException("Cannot delete"));
     }
 
-    private List<Item<User>> filter(List<Item<User>> list) {
+    private List<Identifiable> filter(List<Identifiable> list) {
         boolean isAuthUser = authUserFunction.apply(model);
         if (isAuthUser) return list;
 
-        Iterator<Item<User>> it = list.iterator();
-        while (it.hasNext()) if (it.next().getStringRes() == R.string.email) it.remove();
+        Iterator<Identifiable> it = list.iterator();
+
+        while (it.hasNext()) {
+            Identifiable next = it.next();
+            if (!(next instanceof Item)) continue;
+            if (((Item) next).getStringRes() == R.string.email) it.remove();
+        }
 
         return list;
     }
