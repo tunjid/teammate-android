@@ -54,20 +54,17 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_title" />
 
-        <TextView
+        <android.support.design.button.MaterialButton
             android:id="@+id/search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/single_margin"
             android:background="@drawable/bg_chat_box"
             android:backgroundTint="@color/colorAccent"
-            android:paddingBottom="@dimen/half_margin"
-            android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
-            android:paddingTop="@dimen/half_margin"
             android:text="@string/event_public_start_search"
             android:textColor="@color/white"
             android:visibility="gone"
+            app:cornerRadius="@dimen/single_margin"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_options" />
     </android.support.constraint.ConstraintLayout>
