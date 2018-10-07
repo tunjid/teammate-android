@@ -56,6 +56,7 @@ public class AppBarListener implements
             this.appBarHeight = appBarHeight;
         }
 
+        public boolean appBarUnmeasured() { return appBarHeight == 0; }
         public int getDy() { return dy; }
 
         public int getOffset() { return -offset; }

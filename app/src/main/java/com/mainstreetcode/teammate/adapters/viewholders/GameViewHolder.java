@@ -76,11 +76,17 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
     }
 
     public void animate(AppBarListener.OffsetProps props) {
+        if (props.appBarUnmeasured()) return;
+
         int offset = props.getOffset();
         float fraction = props.getFraction();
-        float scale = ONE_F - (fraction * 2.25F);
+        float scale = ONE_F - (fraction * 1.8F);
         int drop = Math.min(offset, (int) (homeText.getY() - homeThumbnail.getY()) - animationPadding);
 
+        if (scale < 0 || scale > 1) return;
+
+        homeText.setAlpha(scale);
+        awayText.setAlpha(scale);
         homeThumbnail.setAlpha(scale);
         awayThumbnail.setAlpha(scale);
         homeThumbnail.setScaleX(scale);
