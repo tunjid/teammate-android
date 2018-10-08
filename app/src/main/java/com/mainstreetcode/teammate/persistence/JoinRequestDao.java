@@ -53,8 +53,8 @@ public abstract class JoinRequestDao extends EntityDao<JoinRequestEntity> {
     @Query("DELETE FROM join_requests WHERE join_request_user = :userId AND join_request_team = :teamId")
     public abstract void deleteUsers(String userId, String teamId);
 
-    @Query("DELETE FROM join_requests WHERE join_request_user IN :userIds AND join_request_team = :teamId")
-    public void deleteRequestsFromTeam(String teamId, String... userIds) {
+    @Query("DELETE FROM join_requests WHERE join_request_user IN (:userIds) AND join_request_team = :teamId")
+    public void deleteRequestsFromTeam(String teamId, String[] userIds) {
         for (int i = 0; i < userIds.length; i++) userIds[i] = "'" + userIds[i] + "'";
 
         String formattedIds = TextUtils.join(COMMA_DELIMITER, userIds);

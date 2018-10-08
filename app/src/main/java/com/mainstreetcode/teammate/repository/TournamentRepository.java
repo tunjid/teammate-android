@@ -135,4 +135,10 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
             return models;
         };
     }
+
+    @Override
+    Tournament deleteLocally(Tournament model) {
+        tournamentDao.deleteTournamentEvents(model.getId());
+        return super.deleteLocally(model);
+    }
 }
