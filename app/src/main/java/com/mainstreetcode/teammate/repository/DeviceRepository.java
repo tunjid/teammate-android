@@ -47,7 +47,7 @@ public class DeviceRepository extends ModelRepository<Device> {
         Device current = dao.getCurrent();
         Consumer<Device> saveFunction = device -> dao.upsert(Collections.singletonList(device));
 
-        if (isEmpty(current.getFcmToken())) return Single.error(new TeammateException("No token"));
+        if (isEmpty(model.getFcmToken())) return Single.error(new TeammateException("No token"));
         else if (current.isEmpty()) return api.createDevice(model).doOnSuccess(saveFunction);
         else return api.updateDevice(current.setFcmToken(model.getFcmToken()).getId(), model)
                     .doOnSuccess(saveFunction)
