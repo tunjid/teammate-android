@@ -2,20 +2,14 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 
 
 import android.support.design.snackbar.ContentViewCallback;
-import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.FrameLayout;
 
-import java.lang.reflect.Field;
-
-public class SnackBarUtils {
-
+ class SnackBarUtils {
 
     static ViewGroup findSuitableParent(View view) {
         ViewGroup fallback = null;
@@ -41,21 +35,6 @@ public class SnackBarUtils {
 
         // If we reach here then we didn't find a CoL or a suitable content view so we'll fallback
         return fallback;
-    }
-
-    static void forceAnimation(BaseTransientBottomBar bottomBar) {
-        try {
-            Field mAccessibilityManagerField = BaseTransientBottomBar.class.getDeclaredField("mAccessibilityManager");
-            mAccessibilityManagerField.setAccessible(true);
-            AccessibilityManager accessibilityManager = (AccessibilityManager) mAccessibilityManagerField.get(bottomBar);
-            Field mIsEnabledField = AccessibilityManager.class.getDeclaredField("mIsEnabled");
-            mIsEnabledField.setAccessible(true);
-            mIsEnabledField.setBoolean(accessibilityManager, false);
-            mAccessibilityManagerField.set(bottomBar, accessibilityManager);
-        }
-        catch (Exception e) {
-            Log.d("Snackbar", "Reflection error: " + e.toString());
-        }
     }
 
     static class SnackbarAnimationCallback implements ContentViewCallback {

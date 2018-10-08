@@ -43,6 +43,13 @@ public abstract class TournamentDao extends EntityDao<TournamentEntity> {
             " WHERE :id = tournament_id")
     public abstract Maybe<Tournament> get(String id);
 
+    @Query("DELETE FROM events " +
+            " WHERE event_game_id IN (" +
+            " SELECT game_id FROM games  " +
+            " WHERE game_tournament = :tournamentId" +
+            ")")
+    public abstract void deleteTournamentEvents(String tournamentId);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void insert(List<TournamentEntity> tournaments);
 

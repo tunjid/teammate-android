@@ -15,7 +15,6 @@ import com.mainstreetcode.teammate.R;
 import static android.support.design.widget.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION;
 import static android.support.design.widget.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT;
 import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.findSuitableParent;
-import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.forceAnimation;
 
 public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
 
@@ -50,8 +49,6 @@ public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
         final ChoiceBar choiceBar = new ChoiceBar(parent, content, viewCallback);
 
         choiceBar.setDuration(duration);
-        forceAnimation(choiceBar);
-
         return choiceBar;
     }
 

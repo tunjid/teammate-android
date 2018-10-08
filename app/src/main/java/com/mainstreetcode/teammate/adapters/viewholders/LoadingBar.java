@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 
 import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.findSuitableParent;
-import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.forceAnimation;
 
 public class LoadingBar extends BaseTransientBottomBar<LoadingBar> {
 
@@ -40,8 +39,6 @@ public class LoadingBar extends BaseTransientBottomBar<LoadingBar> {
         final LoadingBar loadingBar = new LoadingBar(parent, content, viewCallback);
 
         loadingBar.setDuration(duration);
-        forceAnimation(loadingBar);
-
         return loadingBar;
     }
 }
