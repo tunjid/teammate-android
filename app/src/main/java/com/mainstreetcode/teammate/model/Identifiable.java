@@ -36,7 +36,17 @@ public interface Identifiable {
     }
 
     static Identifiable fromString(String string) {
-        return () -> string;
+        //noinspection EqualsWhichDoesntCheckParameterClass
+        return new Identifiable() {
+            @Override
+            public boolean equals(Object obj) { return string.equals(obj); }
+
+            @Override
+            public int hashCode() { return string.hashCode(); }
+
+            @Override
+            public String getId() { return string; }
+        };
     }
 
     static <T extends Identifiable> Flowable<DiffUtil.DiffResult> diff(Flowable<List<T>> sourceFlowable,
