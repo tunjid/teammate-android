@@ -4,6 +4,7 @@ import android.arch.core.util.Function;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.google.android.flexbox.AlignItems;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -56,7 +57,7 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(itemView.getContext());
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-        layoutManager.setAlignItems(2);
+        layoutManager.setAlignItems(AlignItems.CENTER);
 
         RecyclerView recyclerView = itemView.findViewById(R.id.inner_list);
         recyclerView.setLayoutManager(layoutManager);
