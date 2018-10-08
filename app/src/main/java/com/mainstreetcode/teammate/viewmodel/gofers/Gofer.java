@@ -56,7 +56,7 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
     }
 
     public Flowable<Object> watchForChange() {
-        return changeEmitter().filter(changed -> changed).cast(Object.class);
+        return changeEmitter().filter(changed -> changed).cast(Object.class).observeOn(mainThread());
     }
 
     public final Single<DiffUtil.DiffResult> save() {

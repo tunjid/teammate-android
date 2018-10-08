@@ -51,7 +51,6 @@ public final class GameFragment extends MainActivityFragment
         implements UserAdapter.AdapterListener {
 
     private static final String ARG_GAME = "game";
-    private static final String ARG_COMPETITOR = "competitor";
 
     private Game game;
     private List<Identifiable> items;

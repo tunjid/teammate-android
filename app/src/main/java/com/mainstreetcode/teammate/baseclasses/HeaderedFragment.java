@@ -29,9 +29,7 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
 import static android.support.v4.view.ViewCompat.setTransitionName;
@@ -150,14 +148,16 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     private void getData(boolean refresh) {
         checkIfChanged();
 
-        int delay = refresh ? 100 : 2500;
         Flowable<DiffUtil.DiffResult> diffFlowable = gofer().get().doOnComplete(() -> {
             if (refresh) scrollManager.notifyDataSetChanged();
         });
 
         if (cantGetModel()) return;
-        disposables.add(Completable.timer(delay, TimeUnit.MILLISECONDS).andThen(diffFlowable)
-                .subscribe(this::onModelUpdated, defaultErrorHandler, this::checkIfChanged));
+
+        Runnable get = () -> disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler, this::checkIfChanged));
+
+        if (refresh) get.run();
+        else appBarLayout.postDelayed(() -> { if (getView() != null) get.run(); }, 800);
     }
 
     private void checkIfChanged() {

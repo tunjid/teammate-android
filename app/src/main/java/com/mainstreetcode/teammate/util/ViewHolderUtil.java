@@ -84,7 +84,7 @@ public class ViewHolderUtil {
 
                     public void onBitmapFailed(Drawable errorDrawable) { emitter.onError(new TeammateException("failed")); }
 
-                    public void onPrepareLoad(Drawable placeHolderDrawable) { emitter.onError(new TeammateException("failed")); }
+                    public void onPrepareLoad(Drawable placeHolderDrawable) { }
                 }));
     }
 
