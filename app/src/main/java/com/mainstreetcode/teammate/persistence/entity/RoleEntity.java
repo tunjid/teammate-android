@@ -50,6 +50,7 @@ public class RoleEntity implements Parcelable {
     protected RoleEntity(Parcel in) {
         id = in.readString();
         imageUrl = in.readString();
+        nickname = in.readString();
         position = Config.positionFromCode(in.readString());
         team = (Team) in.readValue(Team.class.getClassLoader());
         user = (User) in.readValue(User.class.getClassLoader());

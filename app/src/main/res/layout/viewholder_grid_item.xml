@@ -14,15 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/item_subtitle"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/thumbnail"
             android:layout_width="0dp"

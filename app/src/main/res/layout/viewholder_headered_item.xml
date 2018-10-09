@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     app:layout_collapseMode="parallax"
     app:layout_collapseParallaxMultiplier="0.8">
 
@@ -12,6 +11,7 @@
         android:id="@+id/image"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/black_50"
         android:contentDescription="@string/team_logo"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -25,16 +25,8 @@
         android:layout_height="0dp"
         android:contentDescription="@string/team_logo"
         android:src="@drawable/bg_image_placeholder"
+        android:tint="@color/black_50"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/image"
-        app:layout_constraintLeft_toLeftOf="@+id/image"
-        app:layout_constraintRight_toRightOf="@+id/image"
-        app:layout_constraintTop_toTopOf="@+id/image" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/black_50"
         app:layout_constraintBottom_toBottomOf="@+id/image"
         app:layout_constraintLeft_toLeftOf="@+id/image"
         app:layout_constraintRight_toRightOf="@+id/image"
