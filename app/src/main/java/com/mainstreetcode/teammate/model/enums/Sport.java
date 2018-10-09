@@ -79,6 +79,7 @@ public class Sport extends MetaData {
 
     public void update(Sport updated) {
         super.update(updated);
+        if (this == updated) return;
         this.emoji = updated.emoji;
         if (!updated.tournamentTypes.isEmpty()) {
             tournamentTypes.clear();

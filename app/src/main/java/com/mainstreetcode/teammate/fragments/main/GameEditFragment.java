@@ -110,7 +110,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public boolean[] insetState() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return gofer.canEdit();}
+    public boolean showsFab() {return gofer.canEdit() && !isBottomSheetShowing();}
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}
