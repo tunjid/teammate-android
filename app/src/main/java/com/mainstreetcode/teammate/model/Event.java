@@ -200,7 +200,6 @@ public class Event extends EventEntity
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
-            serialized.addProperty(GAME, src.gameId);
             serialized.addProperty(NAME_KEY, src.name.toString());
             serialized.addProperty(NOTES_KEY, src.notes.toString());
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName.toString());
@@ -208,6 +207,7 @@ public class Event extends EventEntity
             serialized.addProperty(TEAM_KEY, src.team.getId());
             serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
             serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
+            if (!TextUtils.isEmpty(src.getGameId())) serialized.addProperty(GAME, src.gameId);
 
             String visibilityCode = src.visibility != null ? src.visibility.getCode() : "";
             if (!TextUtils.isEmpty(visibilityCode))
