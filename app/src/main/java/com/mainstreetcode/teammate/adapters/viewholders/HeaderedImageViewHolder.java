@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.HeaderedModel;
+import com.mainstreetcode.teammate.util.UrlDiff;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -23,22 +24,15 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
 
     private ImageView fullRes;
     private ImageView thumbnail;
-    private HeaderedModel model;
+
+    private UrlDiff diff;
 
     public HeaderedImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
         super(itemView, listener);
         fullRes = itemView.findViewById(R.id.image_full_res);
         thumbnail = itemView.findViewById(R.id.image);
         thumbnail.setOnClickListener(this);
-    }
-
-    public void bind(HeaderedModel model) {
-        this.model = model;
-        RequestCreator creator = getCreator();
-        if (creator == null) return;
-
-        creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(thumbnail);
-        fullRes.postDelayed(new DeferredImageLoader(), FULL_RES_LOAD_DELAY);
+        diff = new UrlDiff(this::getImage);
     }
 
     @Override
@@ -46,22 +40,40 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
 
     public ImageView getThumbnail() {return thumbnail;}
 
+    public void bind(HeaderedModel model) {
+        CharSequence url = model.getHeaderItem().getValue();
+        if (TextUtils.isEmpty(url)) return;
+
+        diff.push(url.toString());
+    }
+
+    public void unBind() { diff.stop(); }
+
+    private void getImage(String url) {
+        RequestCreator creator = getCreator(url);
+        if (creator == null) return;
+
+        creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(thumbnail);
+        fullRes.postDelayed(new DeferredImageLoader(url), FULL_RES_LOAD_DELAY);
+    }
+
     @Nullable
-    private RequestCreator getCreator() {
-        if (model == null) return null;
-        String pathOrUrl = model.getHeaderItem().getValue().toString();
+    private RequestCreator getCreator(String url) {
+        if (TextUtils.isEmpty(url)) return null;
 
-        if (TextUtils.isEmpty(pathOrUrl)) return null;
-
-        File file = new File(pathOrUrl);
+        File file = new File(url);
         Picasso picasso = Picasso.with(itemView.getContext());
-        return file.exists() ? picasso.load(file) : picasso.load(pathOrUrl);
+        return file.exists() ? picasso.load(file) : picasso.load(url);
     }
 
     private final class DeferredImageLoader implements Runnable, Callback {
+        private final String url;
+
+        private DeferredImageLoader(String url) {this.url = url;}
+
         @Override
         public void run() {
-            RequestCreator delayed = getCreator();
+            RequestCreator delayed = getCreator(url);
             if (delayed != null) delayed.fit().centerCrop().into(fullRes, this);
         }
 
@@ -69,6 +81,6 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
         public void onSuccess() {fullRes.setVisibility(View.VISIBLE);}
 
         @Override
-        public void onError() {}
+        public void onError() {diff.restart();}
     }
 }
