@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
@@ -30,7 +31,7 @@ public class Sport extends MetaData {
         return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
     }
 
-    public boolean supportsTournaments() { return !tournamentStyles.isEmpty(); }
+    public boolean supportsCompetitions() { return !tournamentStyles.isEmpty(); }
 
     public boolean supportsTournamentType(TournamentType type) {
         return tournamentTypes.contains(type.code);
@@ -38,6 +39,10 @@ public class Sport extends MetaData {
 
     public boolean supportsTournamentStyle(TournamentStyle style) {
         return tournamentStyles.contains(style.code);
+    }
+
+    public boolean betweenUsers() {
+        return User.COMPETITOR_TYPE.equals(refType());
     }
 
     public String refType() {
