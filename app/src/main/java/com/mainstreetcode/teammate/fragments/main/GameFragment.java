@@ -332,27 +332,17 @@ public final class GameFragment extends MainActivityFragment
 
     private void checkCompetitor() {
         if (hasChoiceBar) return;
-        if (!roleViewModel.privilegedInGame(game)) return;
-
-        Competitor competitor;
-        if (game.getHome().hasNotResponded()) competitor = game.getHome();
-        else if (game.getAway().hasNotResponded()) competitor = game.getAway();
-        else competitor = null;
-
-        if (competitor == null || competitor.isEmpty() || competitor.isAccepted()) return;
-
-        User currentUser = userViewModel.getCurrentUser();
-        if (game.betweenUsers() && !currentUser.equals(competitor.getEntity())) return;
-
-        hasChoiceBar = true;
-        showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))
-                .setPositiveText(getText(R.string.accept))
-                .setNegativeText(getText(R.string.decline))
-                .setPositiveClickListener(v -> respond(true, competitor))
-                .setNegativeClickListener(v -> respond(false, competitor))
-                .addCallback(new BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
-                    public void onDismissed(ChoiceBar shown, int event) { hasChoiceBar = false; }
-                }));
+        disposables.add(roleViewModel.hasPendingCompetitor(game).subscribe(competitor -> {
+            hasChoiceBar = true;
+            showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))
+                    .setPositiveText(getText(R.string.accept))
+                    .setNegativeText(getText(R.string.decline))
+                    .setPositiveClickListener(v -> respond(true, competitor))
+                    .setNegativeClickListener(v -> respond(false, competitor))
+                    .addCallback(new BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
+                        public void onDismissed(ChoiceBar shown, int event) { hasChoiceBar = false; }
+                    }));
+        }, ErrorHandler.EMPTY));
     }
 
     private void bindReferee() {

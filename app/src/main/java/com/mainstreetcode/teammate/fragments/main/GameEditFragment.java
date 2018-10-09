@@ -160,8 +160,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
 
-        if (game.isEmpty()) disposables.add(gofer.save()
-                .subscribe(ignored -> showFragment(GameFragment.newInstance(game)), defaultErrorHandler));
+        if (game.isEmpty()) createGame();
         else new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.game_manual_score_request)
                 .setMessage(R.string.game_end_prompt)
@@ -172,6 +171,11 @@ public class GameEditFragment extends HeaderedFragment<Game>
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void createGame() {
+        toggleProgress(true);
+        disposables.add(gofer.save().subscribe(ignored -> showFragment(GameFragment.newInstance(game)), defaultErrorHandler));
     }
 
     private void updateCompetitor(Competitive item) {
