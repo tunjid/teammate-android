@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -54,9 +55,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.deleteFunction = deleteFunction;
         this.guestRepository = GuestRepository.getInstance();
 
-        items.addAll(model.asItems());
-        items.add(model.getTeam());
-
+        items.addAll(model.asIdentifiables().subList(0, 3));
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
@@ -81,12 +80,23 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return fragment.getString(R.string.no_permission);
     }
 
+    private Flowable<List<Identifiable>> initialItems() {
+        List<Identifiable> list = new ArrayList<>(model.asItems());
+        list.add(model.getTeam());
+        return Flowable.just(list).delay(200, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    Flowable<DiffUtil.DiffResult> emptyFlowable() {
+        return Identifiable.diff(initialItems(), this::getItems, this::preserveItems);
+    }
+
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingLocation) return Flowable.empty();
         Flowable<List<Identifiable>> eventFlowable = getFunction.apply(model).map(Event::asIdentifiables);
         Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
-        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(eventFlowable, guestsFlowable));
+        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(initialItems(), eventFlowable, guestsFlowable));
         return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
     }
 

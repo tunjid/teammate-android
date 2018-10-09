@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.arch.core.util.Function;
 import android.view.View;
 
-import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.Supplier;
@@ -17,25 +16,19 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getActivity;
 public class ClickInputViewHolder extends InputViewHolder
         implements View.OnClickListener {
 
-    private final View clickView;
     private final Runnable clickAction;
 
     public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction) {
-        super(itemView, enabler);
-        clickView = itemView.findViewById(R.id.click_view);
-        editText.removeTextChangedListener(this);
-        clickView.setVisibility(View.VISIBLE);
-        clickView.setOnClickListener(this);
-        this.clickAction = clickAction;
+        this(itemView, enabler, clickAction, null);
     }
 
     public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Function<CharSequence, CharSequence> errorChecker) {
         super(itemView, enabler, errorChecker);
-        clickView = itemView.findViewById(R.id.click_view);
-        editText.removeTextChangedListener(this);
-        clickView.setVisibility(View.VISIBLE);
-        clickView.setOnClickListener(this);
         this.clickAction = clickAction;
+        editText.setFocusable(false);
+        editText.setClickable(true);
+        editText.setOnClickListener(this);
+        editText.removeTextChangedListener(this);
     }
 
     @Override
@@ -45,7 +38,7 @@ public class ClickInputViewHolder extends InputViewHolder
 
     @Override
     public void onClick(View view) {
-       if(isEnabled()) clickAction.run();
+        if (isEnabled()) clickAction.run();
     }
 
     void onDialogDismissed() {

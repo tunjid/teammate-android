@@ -114,6 +114,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     @Override
     public void onDestroyView() {
+        viewHolder.unBind();
         viewHolder = null;
         appBarLayout = null;
         super.onDestroyView();

@@ -170,7 +170,6 @@ public final class GameFragment extends MainActivityFragment
         super.onResume();
         fetchGame();
         fetchStats(true);
-        checkCompetitor();
     }
 
     @Override
@@ -341,6 +340,9 @@ public final class GameFragment extends MainActivityFragment
         else competitor = null;
 
         if (competitor == null || competitor.isEmpty() || competitor.isAccepted()) return;
+
+        User currentUser = userViewModel.getCurrentUser();
+        if (game.betweenUsers() && !currentUser.equals(competitor.getEntity())) return;
 
         hasChoiceBar = true;
         showChoices(choiceBar -> choiceBar.setText(getString(R.string.game_accept))

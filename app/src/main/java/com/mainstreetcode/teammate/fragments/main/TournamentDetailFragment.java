@@ -32,6 +32,7 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
@@ -180,6 +181,13 @@ public class TournamentDetailFragment extends MainActivityFragment {
     }
 
     private void checkCompetitor() {
+        if (competitor.isEmpty() || competitor.isAccepted()) return;
+        if (restoredFromBackStack()) // Don't prompt for the same competitor multiple times.
+            disposables.add(competitorViewModel.updateCompetitor(competitor).subscribe(this::promptForCompetitor, ErrorHandler.EMPTY));
+        else promptForCompetitor();
+    }
+
+    private void promptForCompetitor() {
         if (competitor.isEmpty() || competitor.isAccepted()) return;
         showChoices(choiceBar -> choiceBar.setText(getString(R.string.tournament_accept))
                 .setPositiveText(getText(R.string.accept))

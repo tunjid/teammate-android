@@ -33,7 +33,6 @@ public class DateViewHolder extends ClickInputViewHolder
 
     public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
         super(itemView, enabler, () -> {});
-        itemView.findViewById(R.id.click_view).setOnClickListener(this);
         setButtonRunnable(R.drawable.ic_access_time_white_24dp, this::showTime);
     }
 
@@ -46,9 +45,7 @@ public class DateViewHolder extends ClickInputViewHolder
     }
 
     @Override
-    public void onClick(View view) {
-        showDate();
-    }
+    public void onClick(View view) { if(isEnabled())  showDate(); }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {

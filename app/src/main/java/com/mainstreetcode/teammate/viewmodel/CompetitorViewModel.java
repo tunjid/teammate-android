@@ -12,8 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * View model for User and Auth
@@ -31,6 +34,11 @@ public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor
 
     @Override
     public List<Identifiable> getModelList(Class<User> key) { return declined; }
+
+    public Completable updateCompetitor(Competitor competitor) {
+        if (competitor.isEmpty()) return Completable.complete();
+        return repository.get(competitor).ignoreElements().observeOn(mainThread());
+    }
 
     public Single<DiffUtil.DiffResult> respond(final Competitor competitor, boolean accept) {
         if (accept) competitor.accept();

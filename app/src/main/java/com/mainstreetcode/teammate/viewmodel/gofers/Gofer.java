@@ -64,10 +64,12 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
     }
 
     public final Flowable<DiffUtil.DiffResult> get() {
-        return model.isEmpty() ? Flowable.empty() : fetch().doOnError(onError);
+        return model.isEmpty() ? emptyFlowable() : fetch().doOnError(onError);
     }
 
     public final List<Identifiable> getItems() { return items; }
+
+    Flowable<DiffUtil.DiffResult> emptyFlowable() { return Flowable.empty(); }
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -6,15 +6,11 @@ import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.mainstreetcode.teammate.util.ModelUtils.preserveAscending;
-import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
 
 public class Sport extends MetaData {
 
@@ -84,10 +80,14 @@ public class Sport extends MetaData {
     public void update(Sport updated) {
         super.update(updated);
         this.emoji = updated.emoji;
-        preserveAscending(transform(tournamentTypes, Identifiable::fromString, Identifiable::getId),
-                transform(updated.tournamentTypes, Identifiable::fromString, Identifiable::getId));
-        preserveAscending(transform(tournamentStyles, Identifiable::fromString, Identifiable::getId),
-                transform(updated.tournamentStyles, Identifiable::fromString, Identifiable::getId));
+        if (!updated.tournamentTypes.isEmpty()) {
+            tournamentTypes.clear();
+            tournamentTypes.addAll(updated.tournamentTypes);
+        }
+        if (!updated.tournamentStyles.isEmpty()) {
+            tournamentStyles.clear();
+            tournamentStyles.addAll(updated.tournamentStyles);
+        }
     }
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Sport> {
