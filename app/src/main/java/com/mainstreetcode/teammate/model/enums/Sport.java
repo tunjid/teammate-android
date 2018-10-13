@@ -6,12 +6,16 @@ import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mainstreetcode.teammate.util.ModelUtils.replaceList;
 
 public class Sport extends MetaData {
 
@@ -83,17 +87,23 @@ public class Sport extends MetaData {
     }
 
     public void update(Sport updated) {
-        super.update(updated);
-        if (this == updated) return;
-        this.emoji = updated.emoji;
-        if (!updated.tournamentTypes.isEmpty()) {
-            tournamentTypes.clear();
-            tournamentTypes.addAll(updated.tournamentTypes);
-        }
-        if (!updated.tournamentStyles.isEmpty()) {
-            tournamentStyles.clear();
-            tournamentStyles.addAll(updated.tournamentStyles);
-        }
+        Sport source = updated;
+        if (source.stats.isEmpty() || source.tournamentTypes.isEmpty() || source.tournamentStyles.isEmpty())
+            source = Config.sportFromCode(source.code);
+
+        if (this == source) return;
+
+        super.update(source);
+        this.emoji = source.emoji;
+        replaceList(this.stats, source.stats);
+        replaceStringList(this.tournamentTypes, source.tournamentTypes);
+        replaceStringList(this.tournamentStyles, source.tournamentStyles);
+    }
+
+    private void replaceStringList(List<String> sourceList, List<String> updatedList) {
+        List<Identifiable> source = TransformingSequentialList.transform(sourceList, Identifiable::fromString, Identifiable::getId);
+        List<Identifiable> updated = TransformingSequentialList.transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        replaceList(source, updated);
     }
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Sport> {
