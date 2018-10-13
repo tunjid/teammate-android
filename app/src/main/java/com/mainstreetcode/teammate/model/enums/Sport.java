@@ -9,13 +9,13 @@ import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ModelUtils;
-import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.replaceList;
+import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
 
 public class Sport extends MetaData {
 
@@ -101,8 +101,8 @@ public class Sport extends MetaData {
     }
 
     private void replaceStringList(List<String> sourceList, List<String> updatedList) {
-        List<Identifiable> source = TransformingSequentialList.transform(sourceList, Identifiable::fromString, Identifiable::getId);
-        List<Identifiable> updated = TransformingSequentialList.transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
+        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
         replaceList(source, updated);
     }
 
