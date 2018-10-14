@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.RemoteImage;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
@@ -30,6 +31,7 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
         subtitle = itemView.findViewById(R.id.item_subtitle);
         thumbnail = itemView.findViewById(R.id.thumbnail);
 
+        ViewHolderUtil.updateForegroundDrawable(itemView);
         if (isThumbnail()) thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 

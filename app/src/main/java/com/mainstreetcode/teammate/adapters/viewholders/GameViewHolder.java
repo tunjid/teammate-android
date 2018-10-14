@@ -10,6 +10,7 @@ import com.mainstreetcode.teammate.adapters.GameAdapter;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.util.AppBarListener;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
 
@@ -47,6 +48,7 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
 
         animationPadding = itemView.getResources().getDimensionPixelSize(R.dimen.quarter_margin);
         itemView.setOnClickListener(view -> adapterListener.onGameClicked(model));
+        ViewHolderUtil.updateForegroundDrawable(itemView);
     }
 
     public void bind(Game model) {
