@@ -1,6 +1,10 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,6 +37,7 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
         thumbnail = itemView.findViewById(R.id.image);
         thumbnail.setOnClickListener(this);
         diff = new UrlDiff(this::getImage);
+        animateHeader();
     }
 
     @Override
@@ -64,6 +69,21 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
         File file = new File(url);
         Picasso picasso = Picasso.with(itemView.getContext());
         return file.exists() ? picasso.load(file) : picasso.load(url);
+    }
+
+    private void animateHeader() {
+        final int endColor = ContextCompat.getColor(itemView.getContext(), R.color.black_50);
+        final int startColor = Color.TRANSPARENT;
+
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), startColor, endColor);
+        animator.setDuration(2000);
+        animator.addUpdateListener(animation -> {
+            Integer color = (Integer) animation.getAnimatedValue();
+            if (color == null) return;
+            thumbnail.setColorFilter(color);
+            fullRes.setColorFilter(color);
+        });
+        animator.start();
     }
 
     private final class DeferredImageLoader implements Runnable, Callback {
