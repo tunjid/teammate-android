@@ -215,7 +215,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void postChat(Chat chat) {
-        chatViewModel.post(chat).subscribe(() -> {
+        disposables.add(chatViewModel.post(chat).subscribe(() -> {
             chatViewModel.updateLastSeen(team);
             int index = items.indexOf(chat);
 
@@ -229,7 +229,7 @@ public class ChatFragment extends MainActivityFragment
                     int index = items.indexOf(chat);
                     if (index != -1) scrollManager.notifyItemChanged(index);
                 })
-                .build());
+                .build()));
     }
 
     private void notifyAndScrollToLast(boolean scrollToLast) {
