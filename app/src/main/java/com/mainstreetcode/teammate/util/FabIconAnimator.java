@@ -16,6 +16,8 @@ import android.view.View;
 
 import com.mainstreetcode.teammate.R;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class FabIconAnimator {
 
     private static final String ROTATION_Y_PROPERTY = "rotationY";
@@ -59,7 +61,16 @@ public class FabIconAnimator {
     }
 
     public void setOnClickListener(@Nullable View.OnClickListener clickListener) {
-        button.setOnClickListener(clickListener);
+        if (clickListener == null) {
+            button.setOnClickListener(null);
+            return;
+        }
+        AtomicBoolean flag = new AtomicBoolean(true);
+        button.setOnClickListener(view -> {
+            if (!flag.getAndSet(false)) return;
+            clickListener.onClick(view);
+            button.postDelayed(() -> flag.set(true), 2000);
+        });
     }
 
     private boolean isExtended() {

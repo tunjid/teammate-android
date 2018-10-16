@@ -7,6 +7,8 @@
     android:layout_marginLeft="@dimen/half_margin"
     android:layout_marginRight="@dimen/half_margin"
     android:layout_marginTop="@dimen/half_margin"
+    android:clickable="true"
+    android:focusable="true"
     app:cardCornerRadius="@dimen/half_margin">
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

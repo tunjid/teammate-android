@@ -8,6 +8,8 @@
     android:layout_marginLeft="@dimen/half_margin"
     android:layout_marginRight="@dimen/half_margin"
     android:layout_marginTop="@dimen/half_margin"
+    android:clickable="true"
+    android:focusable="true"
     app:cardCornerRadius="@dimen/quarter_margin">
 
     <android.support.constraint.ConstraintLayout

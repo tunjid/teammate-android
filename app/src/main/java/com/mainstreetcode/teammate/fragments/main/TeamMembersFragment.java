@@ -115,7 +115,7 @@ public class TeamMembersFragment extends MainActivityFragment
         editItem.setVisible(visible);
         deleteItem.setVisible(visible);
         blockedItem.setVisible(visible);
-        tournamentItem.setVisible(team.getSport().supportsTournaments());
+        tournamentItem.setVisible(team.getSport().supportsCompetitions());
     }
 
     @Override

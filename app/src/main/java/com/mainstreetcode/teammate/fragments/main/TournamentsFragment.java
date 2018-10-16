@@ -132,7 +132,7 @@ public final class TournamentsFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return team.getSport().supportsTournaments() && localRoleViewModel.hasPrivilegedRole();
+        return team.getSport().supportsCompetitions() && localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -182,7 +182,7 @@ public final class TournamentsFragment extends MainActivityFragment
 
     private void onTournamentsUpdated(DiffUtil.DiffResult result) {
         toggleProgress(false);
-        boolean supportsTournaments = team.getSport().supportsTournaments();
+        boolean supportsTournaments = team.getSport().supportsCompetitions();
         scrollManager.onDiff(result);
         scrollManager.updateForEmptyList(R.drawable.ic_trophy_white_24dp, supportsTournaments
                 ? R.string.no_tournaments : R.string.no_tournament_support);

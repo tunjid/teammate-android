@@ -126,7 +126,7 @@ public class RoleEntity implements Parcelable {
         dest.writeString(position.getCode());
         dest.writeValue(team);
         dest.writeValue(user);
-        dest.writeValue(created.getTime());
+        dest.writeLong(created.getTime());
     }
 
     public static final Creator<RoleEntity> CREATOR = new Creator<RoleEntity>() {

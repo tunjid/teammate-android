@@ -6,11 +6,16 @@ import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Config;
+import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mainstreetcode.teammate.util.ModelUtils.replaceList;
+import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
 
 public class Sport extends MetaData {
 
@@ -30,7 +35,7 @@ public class Sport extends MetaData {
         return new Sport("", App.getInstance().getString(R.string.any_sport), THONK);
     }
 
-    public boolean supportsTournaments() { return !tournamentStyles.isEmpty(); }
+    public boolean supportsCompetitions() { return !tournamentStyles.isEmpty(); }
 
     public boolean supportsTournamentType(TournamentType type) {
         return tournamentTypes.contains(type.code);
@@ -38,6 +43,10 @@ public class Sport extends MetaData {
 
     public boolean supportsTournamentStyle(TournamentStyle style) {
         return tournamentStyles.contains(style.code);
+    }
+
+    public boolean betweenUsers() {
+        return User.COMPETITOR_TYPE.equals(refType());
     }
 
     public String refType() {
@@ -78,17 +87,23 @@ public class Sport extends MetaData {
     }
 
     public void update(Sport updated) {
-        super.update(updated);
-        if (this == updated) return;
-        this.emoji = updated.emoji;
-        if (!updated.tournamentTypes.isEmpty()) {
-            tournamentTypes.clear();
-            tournamentTypes.addAll(updated.tournamentTypes);
-        }
-        if (!updated.tournamentStyles.isEmpty()) {
-            tournamentStyles.clear();
-            tournamentStyles.addAll(updated.tournamentStyles);
-        }
+        Sport source = updated;
+        if (source.stats.isEmpty() || source.tournamentTypes.isEmpty() || source.tournamentStyles.isEmpty())
+            source = Config.sportFromCode(source.code);
+
+        if (this == source) return;
+
+        super.update(source);
+        this.emoji = source.emoji;
+        replaceList(this.stats, source.stats);
+        replaceStringList(this.tournamentTypes, source.tournamentTypes);
+        replaceStringList(this.tournamentStyles, source.tournamentStyles);
+    }
+
+    private void replaceStringList(List<String> sourceList, List<String> updatedList) {
+        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
+        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        replaceList(source, updated);
     }
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Sport> {

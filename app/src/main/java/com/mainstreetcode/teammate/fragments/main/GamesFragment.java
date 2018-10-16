@@ -27,6 +27,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
@@ -135,7 +136,10 @@ public final class GamesFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return team.getSport().supportsTournaments() && localRoleViewModel.hasPrivilegedRole();
+        Sport sport = team.getSport();
+        boolean supportsTournaments = sport.supportsCompetitions();
+        if (sport.betweenUsers()) return supportsTournaments;
+        return supportsTournaments && localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -190,7 +194,7 @@ public final class GamesFragment extends MainActivityFragment
 
     private void onGamesUpdated(DiffUtil.DiffResult result) {
         toggleProgress(false);
-        boolean supportsTournaments = team.getSport().supportsTournaments();
+        boolean supportsTournaments = team.getSport().supportsCompetitions();
         scrollManager.onDiff(result);
         scrollManager.updateForEmptyList(R.drawable.ic_score_white_24dp, supportsTournaments
                 ? R.string.no_games : R.string.no_game_support);

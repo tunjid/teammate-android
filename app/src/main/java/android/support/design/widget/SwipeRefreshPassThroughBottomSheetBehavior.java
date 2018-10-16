@@ -15,7 +15,7 @@ public class SwipeRefreshPassThroughBottomSheetBehavior extends BottomSheetBehav
     @Override
     View findScrollingChild(View view) {
         View result = super.findScrollingChild(view);
-        if (result == null || !(result instanceof SwipeRefreshLayout)) return result;
+        if (!(result instanceof SwipeRefreshLayout)) return result;
 
         result.post(() -> result.setEnabled(false));
         return ((SwipeRefreshLayout) result).getChildAt(0);

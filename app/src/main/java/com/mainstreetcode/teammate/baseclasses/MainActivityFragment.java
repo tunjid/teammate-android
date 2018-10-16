@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.mainstreetcode.teammate.activities.MainActivity;
-import com.mainstreetcode.teammate.fragments.main.TeamEditFragment;
+import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammate.activities.MainActivity}
@@ -147,6 +148,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         setFabExtended(dy < 0);
     }
 
+    @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
+    }
+
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
@@ -159,8 +166,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
 
     protected void showCompetitor(Competitor competitor) {
         Competitive entity = competitor.getEntity();
-        if (entity instanceof Team) showFragment(TeamEditFragment.newEditInstance((Team) entity));
-        else if (entity instanceof User) showFragment(UserEditFragment.newInstance((User) entity));
+        BaseFragment fragment = entity instanceof Team
+                ? JoinRequestFragment.joinInstance((Team) entity, userViewModel.getCurrentUser())
+                : entity instanceof User
+                ? UserEditFragment.newInstance((User) entity)
+                : null;
+        if (fragment != null) showFragment(fragment);
     }
 
     protected void watchForRoleChanges(Team team, Runnable onChanged) {
