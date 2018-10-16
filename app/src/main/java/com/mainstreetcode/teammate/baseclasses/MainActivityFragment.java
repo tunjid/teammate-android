@@ -148,6 +148,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         setFabExtended(dy < 0);
     }
 
+    @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
+    }
+
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
