@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.HeaderedModel;
-import com.mainstreetcode.teammate.util.UrlDiff;
+import com.mainstreetcode.teammate.util.DiffWatcher;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -29,14 +29,14 @@ public class HeaderedImageViewHolder extends BaseViewHolder<ImageWorkerFragment.
     private ImageView fullRes;
     private ImageView thumbnail;
 
-    private UrlDiff diff;
+    private DiffWatcher<String> diff;
 
     public HeaderedImageViewHolder(View itemView, ImageWorkerFragment.ImagePickerListener listener) {
         super(itemView, listener);
         fullRes = itemView.findViewById(R.id.image_full_res);
         thumbnail = itemView.findViewById(R.id.image);
         thumbnail.setOnClickListener(this);
-        diff = new UrlDiff(this::getImage);
+        diff = new DiffWatcher<>(this::getImage);
         animateHeader();
     }
 
