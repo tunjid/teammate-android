@@ -33,12 +33,13 @@ import com.mainstreetcode.teammate.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.util.ViewUtil;
 
 import java.util.Arrays;
 
 import io.reactivex.Single;
 
-public class ViewHolderUtil {
+public class ViewHolderUtil extends ViewUtil {
 
     public static final int USER = 284;
     public static final int TEAM = 285;
@@ -70,10 +71,6 @@ public class ViewHolderUtil {
 
     public static String getTransitionName(Object item, @IdRes int id) {
         return item.hashCode() + "-" + id;
-    }
-
-    public static ViewGroup.MarginLayoutParams getLayoutParams(View view) {
-        return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
     }
 
     @Nullable
