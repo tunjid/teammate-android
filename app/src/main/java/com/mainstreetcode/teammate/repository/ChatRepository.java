@@ -2,7 +2,7 @@ package com.mainstreetcode.teammate.repository;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Pair;
 
 import com.google.gson.Gson;

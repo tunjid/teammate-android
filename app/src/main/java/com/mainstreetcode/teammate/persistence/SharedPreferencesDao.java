@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.persistence;
 
-import android.arch.persistence.room.Dao;
+import androidx.room.Dao;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;

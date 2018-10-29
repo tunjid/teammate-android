@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -12,13 +12,13 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Team;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 /**
  * Viewholder for a {@link Team}
  */
-public abstract class AdViewHolder<T extends Ad> extends BaseViewHolder<BaseRecyclerViewAdapter.AdapterListener> {
+public abstract class AdViewHolder<T extends Ad> extends InteractiveViewHolder<InteractiveAdapter.AdapterListener> {
 
     T ad;
 
@@ -26,7 +26,7 @@ public abstract class AdViewHolder<T extends Ad> extends BaseViewHolder<BaseRecy
     TextView subtitle;
     ImageView thumbnail;
 
-    AdViewHolder(View itemView, BaseRecyclerViewAdapter.AdapterListener adapterListener) {
+    AdViewHolder(View itemView, InteractiveAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
         title = itemView.findViewById(R.id.item_title);
         subtitle = itemView.findViewById(R.id.item_subtitle);

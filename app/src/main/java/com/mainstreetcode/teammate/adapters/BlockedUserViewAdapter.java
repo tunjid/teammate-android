@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -9,17 +9,15 @@ import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
-
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link BlockedUser}
  */
 
-public class BlockedUserViewAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, BaseRecyclerViewAdapter.AdapterListener> {
+public class BlockedUserViewAdapter extends InteractiveAdapter<BaseItemViewHolder, InteractiveAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 

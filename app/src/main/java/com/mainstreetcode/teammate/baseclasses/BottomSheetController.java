@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.baseclasses;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.MenuRes;
+import androidx.annotation.MenuRes;
 
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 

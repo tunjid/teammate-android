@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.view.ViewCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,9 +36,9 @@ import java.util.List;
 public class SplashFragment extends RegistrationActivityFragment
         implements View.OnClickListener {
 
-    public static final String TRANSITION_BACKGROUND = "transition-background";
-    public static final String TRANSITION_TITLE = "transition-title";
-    public static final String TRANSITION_SUBTITLE = "transition-subtitle";
+    static final String TRANSITION_BACKGROUND = "transition-background";
+    static final String TRANSITION_TITLE = "transition-title";
+    static final String TRANSITION_SUBTITLE = "transition-subtitle";
 
     private final static List<String> FACEBOOK_PERMISSIONS = Arrays.asList("email", "public_profile");
 
@@ -58,10 +60,10 @@ public class SplashFragment extends RegistrationActivityFragment
 
         Context context = rootView.getContext();
 
-        login.setText(new SpanBuilder(context, getString(R.string.login_have_account))
+        login.setText(SpanBuilder.of(getString(R.string.login_have_account))
                 .appendNewLine()
-                .appendCharsequence(new SpanBuilder(context, getString(R.string.login_sign_in))
-                        .color(R.color.white)
+                .append(SpanBuilder.of(getString(R.string.login_sign_in))
+                        .color(context, R.color.white)
                         .underline()
                         .build())
                 .build());
@@ -137,8 +139,8 @@ public class SplashFragment extends RegistrationActivityFragment
         faceBookResultCallback.onActivityResult(requestCode, resultCode, data);
     }
 
-    CallbackManager faceBookResultCallback = CallbackManager.Factory.create();
-    FacebookCallback<LoginResult> facebookCallback = new FacebookCallback<LoginResult>() {
+    private CallbackManager faceBookResultCallback = CallbackManager.Factory.create();
+    private FacebookCallback<LoginResult> facebookCallback = new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(LoginResult loginResult) {
             toggleProgress(true);

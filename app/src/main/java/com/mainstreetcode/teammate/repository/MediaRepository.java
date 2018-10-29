@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.model.Media;

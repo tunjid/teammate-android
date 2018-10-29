@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -10,20 +10,19 @@ import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.AWAY;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Tournament}
  */
 
-public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, GameEditAdapter.AdapterListener> {
+public class GameEditAdapter extends InteractiveAdapter<InteractiveViewHolder, GameEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 
@@ -34,7 +33,7 @@ public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Gam
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditGame);
@@ -49,7 +48,7 @@ public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Gam
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
         Object item = items.get(i);
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
         else if (item instanceof Competitor)
@@ -68,7 +67,7 @@ public class GameEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Gam
                 : AWAY;
     }
 
-    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface AdapterListener extends InteractiveAdapter.AdapterListener {
         boolean canEditGame();
 
         void onAwayClicked(Competitor away);

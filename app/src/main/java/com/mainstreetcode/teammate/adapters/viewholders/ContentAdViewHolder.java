@@ -1,20 +1,20 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 
 import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.NativeContentAd;
 import com.google.android.gms.ads.formats.NativeContentAdView;
 import com.mainstreetcode.teammate.model.ContentAd;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 public class ContentAdViewHolder extends AdViewHolder<ContentAd> {
 
     private NativeContentAdView adView;
 
-    public ContentAdViewHolder(View itemView, BaseRecyclerViewAdapter.AdapterListener adapterListener) {
+    public ContentAdViewHolder(View itemView, InteractiveAdapter.AdapterListener adapterListener) {
         super(itemView, adapterListener);
         adView = (NativeContentAdView) itemView;
 

@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.arch.core.util.Function;
-import android.support.v7.widget.RecyclerView;
+import androidx.arch.core.util.Function;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.google.android.flexbox.AlignItems;

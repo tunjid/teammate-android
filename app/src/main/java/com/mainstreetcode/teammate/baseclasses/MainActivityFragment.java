@@ -2,11 +2,11 @@ package com.mainstreetcode.teammate.baseclasses;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment;

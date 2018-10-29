@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.persistence;
 
-import android.arch.persistence.room.Dao;
-import android.support.annotation.NonNull;
+import androidx.room.Dao;
+import androidx.annotation.NonNull;
 
 import com.mainstreetcode.teammate.model.Device;
 

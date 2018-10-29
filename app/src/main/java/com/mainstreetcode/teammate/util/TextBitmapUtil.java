@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.util;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 import android.view.View;
 import android.widget.TextView;
 

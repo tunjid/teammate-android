@@ -2,9 +2,9 @@ package com.mainstreetcode.teammate.viewmodel;
 
 
 import android.annotation.SuppressLint;
-import android.arch.core.util.Function;
-import android.support.v4.util.Pair;
-import android.support.v7.util.DiffUtil;
+import androidx.arch.core.util.Function;
+import androidx.core.util.Pair;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;

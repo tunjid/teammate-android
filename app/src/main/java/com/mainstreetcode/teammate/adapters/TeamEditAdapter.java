@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.arch.core.util.Function;
-import android.support.annotation.NonNull;
+import androidx.arch.core.util.Function;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -16,19 +16,18 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Team}
  */
 
-public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
+public class TeamEditAdapter extends InteractiveAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
     private final List<Identifiable> items;
 

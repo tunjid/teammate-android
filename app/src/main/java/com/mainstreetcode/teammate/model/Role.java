@@ -1,9 +1,7 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -13,7 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
@@ -25,6 +22,9 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.room.Ignore;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 
@@ -125,8 +125,8 @@ public class Role extends RoleEntity
 
     public CharSequence getTitle() {
         CharSequence title = user.getFirstName();
-        if (!TextUtils.isEmpty(nickname)) return new SpanBuilder(App.getInstance(), title)
-                .appendNewLine().appendCharsequence("\"" + nickname + "\"")
+        if (!TextUtils.isEmpty(nickname)) return SpanBuilder.of(title)
+                .appendNewLine().append("\"" + nickname + "\"")
                 .build();
 
         return title;

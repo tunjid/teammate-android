@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -18,21 +18,20 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Tournament}
  */
 
-public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TournamentEditAdapter.AdapterListener> {
+public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHolder, TournamentEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 
@@ -43,7 +42,7 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
             case Item.NUMBER:
@@ -66,7 +65,7 @@ public class TournamentEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolde
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
         Object item = items.get(i);
 
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);

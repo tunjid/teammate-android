@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -14,8 +14,8 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,12 @@ import java.util.List;
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Event}
  */
 
-public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventSearchRequestAdapter.EventSearchAdapterListener> {
+public class EventSearchRequestAdapter extends InteractiveAdapter<InteractiveViewHolder, EventSearchRequestAdapter.EventSearchAdapterListener> {
 
     private final EventSearchRequest request;
     private final List<Sport> sports;
@@ -45,7 +44,7 @@ public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.LOCATION:
                 return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE, adapterListener::onLocationClicked)
@@ -63,7 +62,7 @@ public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
         Item item = request.asItems().get(position);
         ((BaseItemViewHolder) viewHolder).bind(item);
     }
@@ -83,7 +82,7 @@ public class EventSearchRequestAdapter extends BaseRecyclerViewAdapter<BaseViewH
         return request.asItems().get(position).getItemType();
     }
 
-    public interface EventSearchAdapterListener extends BaseRecyclerViewAdapter.AdapterListener{
+    public interface EventSearchAdapterListener extends InteractiveAdapter.AdapterListener{
         void onLocationClicked();
     }
 }

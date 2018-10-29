@@ -6,11 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
-import android.support.text.emoji.EmojiCompat;
-import android.support.text.emoji.FontRequestEmojiCompatConfig;
-import android.support.v4.provider.FontRequest;
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDexApplication;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.core.provider.FontRequest;
 
 import com.mainstreetcode.teammate.repository.ConfigRepository;
 import com.mainstreetcode.teammate.repository.RoleRepository;

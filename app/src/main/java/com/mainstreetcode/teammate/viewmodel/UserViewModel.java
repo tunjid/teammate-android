@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 import com.facebook.login.LoginResult;
 import com.mainstreetcode.teammate.model.Message;

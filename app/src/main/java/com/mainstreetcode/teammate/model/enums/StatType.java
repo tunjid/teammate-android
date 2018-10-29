@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.model.enums;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
@@ -16,7 +15,7 @@ public class StatType extends MetaData {
     private String sportCode;
     private StatAttributes attributes = new StatAttributes();
 
-    StatType(String code, String name, String emoji, String sportCode) {
+    private StatType(String code, String name, String emoji, String sportCode) {
         super(code, name);
         this.emoji = emoji;
         this.sportCode = sportCode;
@@ -29,10 +28,7 @@ public class StatType extends MetaData {
     public CharSequence getEmoji() { return ModelUtils.processString(emoji); }
 
     public CharSequence getEmojiAndName() {
-        return new SpanBuilder(App.getInstance(), getEmoji())
-                .appendCharsequence("   ")
-                .appendCharsequence(name)
-                .build();
+        return SpanBuilder.of(getEmoji()).append("   ").append(name).build();
     }
 
     public StatAttributes getAttributes() {

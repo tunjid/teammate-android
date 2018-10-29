@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -15,8 +15,8 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -24,13 +24,12 @@ import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Tournament}
  */
 
-public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, StatEditAdapter.AdapterListener> {
+public class StatEditAdapter extends InteractiveAdapter<InteractiveViewHolder, StatEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 
@@ -41,7 +40,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
             case Item.NUMBER:
@@ -58,7 +57,7 @@ public class StatEditAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, Sta
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
         Object item = items.get(i);
 
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);

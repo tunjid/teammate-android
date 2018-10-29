@@ -7,10 +7,10 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 
-public class StatViewHolder extends BaseViewHolder<ViewHolderUtil.SimpleAdapterListener<Stat>> {
+public class StatViewHolder extends InteractiveViewHolder<ViewHolderUtil.SimpleAdapterListener<Stat>> {
 
     protected Stat model;
 

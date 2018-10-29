@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.app.Activity;
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 import android.view.View;
 
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;

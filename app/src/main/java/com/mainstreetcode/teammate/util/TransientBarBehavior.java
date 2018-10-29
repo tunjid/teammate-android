@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.util;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.view.ViewCompat;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
@@ -15,7 +17,7 @@ import java.util.List;
 /**
  * Animates a {@link View} when a {@link Snackbar} appears.
  * <p>
- * Mostly identical to {@link android.support.design.widget.FloatingActionButton.Behavior}
+ * Mostly identical to {@link FloatingActionButton.Behavior}
  * <p>
  * Created by tj.dahunsi on 4/15/17.
  */

@@ -1,10 +1,10 @@
 package com.mainstreetcode.teammate.model;
 
 import android.annotation.SuppressLint;
-import android.arch.persistence.room.Ignore;
+import androidx.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.android.gms.location.places.Place;

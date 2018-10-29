@@ -4,12 +4,12 @@ package com.mainstreetcode.teammate.baseclasses;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
@@ -32,7 +32,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 
-import static android.support.v4.view.ViewCompat.setTransitionName;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 import static io.reactivex.Completable.timer;

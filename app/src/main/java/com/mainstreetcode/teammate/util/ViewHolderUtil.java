@@ -2,7 +2,7 @@ package com.mainstreetcode.teammate.util;
 
 
 import android.app.Activity;
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.ColorStateList;
@@ -14,25 +14,25 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
-import android.support.design.card.MaterialCardView;
-import android.support.design.ripple.RippleUtils;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
+import com.google.android.material.card.MaterialCardView;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.ripple.RippleUtils;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.Arrays;
 
@@ -147,7 +147,7 @@ public class ViewHolderUtil {
         return new ShapeDrawable(shape);
     }
 
-    public interface SimpleAdapterListener<T> extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface SimpleAdapterListener<T> extends InteractiveAdapter.AdapterListener {
         void onItemClicked(T item);
     }
 }

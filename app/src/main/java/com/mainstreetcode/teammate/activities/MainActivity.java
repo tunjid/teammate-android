@@ -1,18 +1,18 @@
 package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
-import android.arch.core.util.Function;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.arch.core.util.Function;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.MenuRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.IdRes;
+import androidx.annotation.MenuRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.view.MenuItem;
@@ -59,14 +59,14 @@ import com.mainstreetcode.teammate.util.nav.ViewHolder;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
-import com.tunjid.androidbootstrap.core.view.ViewHider;
+import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import io.reactivex.disposables.CompositeDisposable;
 
-import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
-import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
 import static android.view.View.GONE;
-import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
+import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 
 public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {

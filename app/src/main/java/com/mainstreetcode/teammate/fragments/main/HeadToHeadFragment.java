@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -184,8 +186,8 @@ public class HeadToHeadFragment extends MainActivityFragment
     }
 
     private CharSequence getText(@StringRes int stringRes, int count) {
-        return new SpanBuilder(requireContext(), String.valueOf(count)).resize(1.4F).bold()
-                .appendCharsequence(new SpanBuilder(requireContext(), getString(stringRes))
+        return SpanBuilder.of(String.valueOf(count)).resize(1.4F).bold()
+                .append(SpanBuilder.of(getString(stringRes))
                         .prependNewLine()
                         .build()).build();
     }

@@ -4,12 +4,13 @@ import android.view.View;
 
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+
 
 /**
  * Viewholder for {@link Item items}
  */
-public class BaseItemViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseViewHolder<T> {
+public class BaseItemViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends InteractiveViewHolder<T> {
     Item item;
 
     public BaseItemViewHolder(View itemView) {

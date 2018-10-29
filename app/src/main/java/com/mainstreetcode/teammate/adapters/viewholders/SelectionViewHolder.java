@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.arch.core.util.Function;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
+import androidx.arch.core.util.Function;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 
 import com.mainstreetcode.teammate.util.Supplier;

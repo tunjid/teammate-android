@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.util;
 
-import android.support.design.widget.AppBarLayout;
+import com.google.android.material.appbar.AppBarLayout;
 import android.view.View;
 import android.view.ViewTreeObserver;
 

@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import static com.mainstreetcode.teammate.model.Item.COMPETITOR;
  * Adapter for {@link Team}
  */
 
-public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHolder, CompetitorAdapter.AdapterListener> {
+public class CompetitorAdapter extends InteractiveAdapter<CompetitorViewHolder, CompetitorAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 
@@ -32,7 +32,7 @@ public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHol
     @NonNull
     @Override
     public CompetitorViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        return new CompetitorViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener);
+        return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class CompetitorAdapter extends BaseRecyclerViewAdapter<CompetitorViewHol
         return COMPETITOR;
     }
 
-    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface AdapterListener extends InteractiveAdapter.AdapterListener {
         void onCompetitorClicked(Competitor competitor);
     }
 }

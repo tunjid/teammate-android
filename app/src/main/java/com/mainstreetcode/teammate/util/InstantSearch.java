@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.util;
 
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
