@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,7 +31,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
-import com.mainstreetcode.teammate.util.FabIconAnimator;
+import com.mainstreetcode.teammate.util.FabInteractor;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
@@ -80,7 +82,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private LoadingBar loadingBar;
     private Toolbar toolbar;
 
-    private FabIconAnimator fabIconAnimator;
+    private FabInteractor fabInteractor;
     @Nullable private ViewHider fabHider;
     @Nullable private ViewHider toolbarHider;
 
@@ -121,7 +123,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
 
-        ConstraintLayout extendedFabContainer = findViewById(R.id.extend_fab_container);
+        MaterialButton fab = findViewById(R.id.fab);
         keyboardPadding = findViewById(R.id.keyboard_padding);
         coordinatorLayout = findViewById(R.id.coordinator);
         constraintLayout = findViewById(R.id.content_view);
@@ -131,8 +133,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
 
-        fabHider = ViewHider.of(extendedFabContainer).setDirection(BOTTOM).build();
-        fabIconAnimator = new FabIconAnimator(extendedFabContainer);
+        fabHider = ViewHider.of(fab).setDirection(BOTTOM).build();
+        fabInteractor = new FabInteractor(fab);
 
         //noinspection AndroidLintClickableViewAccessibility
         keyboardPadding.setOnTouchListener((view, event) -> {
@@ -190,12 +192,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
-        if (fabIconAnimator != null) fabIconAnimator.update(icon, title);
+        if (fabInteractor != null) fabInteractor.update(icon, title);
     }
 
     @Override
     public void setFabExtended(boolean expanded) {
-        if (fabIconAnimator != null) fabIconAnimator.setExtended(expanded);
+        if (fabInteractor != null) fabInteractor.setExtended(expanded);
     }
 
     @Override
@@ -244,7 +246,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabClickListener(@Nullable View.OnClickListener clickListener) {
-        fabIconAnimator.setOnClickListener(clickListener);
+        fabInteractor.setOnClickListener(clickListener);
     }
 
     public void onDialogDismissed() {

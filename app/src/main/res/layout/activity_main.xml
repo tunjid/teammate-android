@@ -1,7 +1,7 @@
-<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/content_view"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.mainstreetcode.teammate.activities.MainActivity">
@@ -28,12 +28,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <include
-            layout="@layout/fab_extended"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fab"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
+            app:cornerRadius="@dimen/triple_and_half_margin"
             app:layout_behavior="com.mainstreetcode.teammate.util.TransientBarBehavior" />
 
         <androidx.appcompat.widget.Toolbar
