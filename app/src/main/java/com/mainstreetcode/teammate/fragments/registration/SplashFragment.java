@@ -25,6 +25,7 @@ import com.mainstreetcode.teammate.activities.RegistrationActivity;
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.Arrays;
 import java.util.List;
@@ -85,7 +86,7 @@ public class SplashFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return false;}

@@ -24,6 +24,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -101,7 +102,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {

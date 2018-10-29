@@ -19,6 +19,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Media;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 
 public class MediaDetailFragment extends MainActivityFragment
@@ -121,7 +122,7 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean[] insetState() {return NONE;}
+    public InsetFlags insetFlags() {return NONE;}
 
     @Override
     public boolean showsFab() {return false;}

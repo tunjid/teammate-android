@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 public class GuestViewFragment extends HeaderedFragment<Guest> {
 
@@ -96,7 +97,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return false;}

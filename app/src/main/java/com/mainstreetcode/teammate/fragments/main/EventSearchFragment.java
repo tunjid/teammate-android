@@ -28,6 +28,7 @@ import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.List;
 
@@ -133,7 +134,7 @@ public class EventSearchFragment extends MainActivityFragment {
     public boolean showsFab() { return locationViewModel.hasPermission(this); }
 
     @Override
-    public boolean[] insetState() {return NONE;}
+    public InsetFlags insetFlags() {return NONE;}
 
     @Override
     public void togglePersistentUi() {

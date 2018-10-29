@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.BlockedUserGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
 
@@ -89,7 +90,7 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return gofer.hasPrivilegedRole();}

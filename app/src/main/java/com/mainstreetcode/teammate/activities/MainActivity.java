@@ -271,7 +271,7 @@ public class MainActivity extends TeammatesBaseActivity
         BaseFragment toShow = args.getFragment();
         TeammatesBaseFragment current = getCurrentFragment();
 
-        int topPadding = current != null && current.insetState()[TOP_INSET] ? TeammatesBaseActivity.topInset : 0;
+        int topPadding = current != null && current.insetFlags().hasTopInset() ? TeammatesBaseActivity.topInset : 0;
         topPadding += getResources().getDimensionPixelSize(R.dimen.single_margin);
         bottomSheetContainer.setPadding(0, topPadding, 0, 0);
 

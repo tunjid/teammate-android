@@ -35,6 +35,7 @@ import com.mainstreetcode.teammate.util.FabInteractor;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +62,6 @@ import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
-
-    protected static final int TOP_INSET = 1;
-    private static final int LEFT_INSET = 0;
-    private static final int RIGHT_INSET = 2;
 
     public static int topInset;
     private int leftInset;
@@ -317,11 +314,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     private void adjustSystemInsets(Fragment fragment) {
         if (!(fragment instanceof TeammatesBaseFragment)) return;
-        boolean[] insetState = ((TeammatesBaseFragment) fragment).insetState();
+        InsetFlags insetFlags = ((TeammatesBaseFragment) fragment).insetFlags();
 
-        getLayoutParams(toolbar).topMargin = insetState[TOP_INSET] ? topInset : 0;
-        topInsetView.setVisibility(insetState[TOP_INSET] ? GONE : VISIBLE);
-        constraintLayout.setPadding(insetState[LEFT_INSET] ? leftInset : 0, 0, insetState[RIGHT_INSET] ? rightInset : 0, 0);
+        getLayoutParams(toolbar).topMargin = insetFlags.hasTopInset() ? 0 : topInset;
+        topInsetView.setVisibility(insetFlags.hasTopInset() ? VISIBLE : GONE);
+        constraintLayout.setPadding(insetFlags.hasLeftInset() ? leftInset : 0, 0, insetFlags.hasRightInset() ? rightInset : 0, 0);
     }
 
     private void hideSystemUI() {

@@ -26,6 +26,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 /**
  * Edits a Team member
@@ -107,7 +108,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return gofer.canEdit() && !isBottomSheetShowing();}
