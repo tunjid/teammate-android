@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
-            app:cornerRadius="@dimen/triple_and_half_margin"
+            android:elevation="@dimen/half_margin"
             app:layout_behavior="com.mainstreetcode.teammate.util.TransientBarBehavior" />
 
         <androidx.appcompat.widget.Toolbar
