@@ -7,6 +7,8 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.RoleRepository;
 
+import java.util.Arrays;
+
 import io.reactivex.Flowable;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -30,7 +32,7 @@ public class LocalRoleViewModel extends ViewModel {
     }
 
     public Flowable<Object> watchRoleChanges(User user, Team team) {
-        return repository.getRoleInTeam(user.getId(), team.getId())
+        return matchInUserRoles(user, team)
                 .map(this::checkChanged)
                 .filter(flag -> flag)
                 .observeOn(mainThread())
@@ -41,5 +43,16 @@ public class LocalRoleViewModel extends ViewModel {
         boolean changed = !role.getPosition().equals(foundRole.getPosition());
         role.update(foundRole);
         return changed;
+    }
+
+    private Flowable<Role> matchInUserRoles(User user, Team team) {
+        Flowable<Role> inMemory = Flowable.fromIterable(RoleViewModel.roles)
+                .filter(role -> role instanceof Role)
+                .cast(Role.class)
+                .filter(role -> user.equals(role.getUser()) && team.equals(role.getTeam()));
+
+        Flowable<Role> fromIo = repository.getRoleInTeam(user.getId(), team.getId());
+
+        return Flowable.concatDelayError(Arrays.asList(inMemory, fromIo));
     }
 }
