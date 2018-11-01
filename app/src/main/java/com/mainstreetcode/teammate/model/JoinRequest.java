@@ -88,7 +88,8 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        RemoteImage image = userApproved ? team : user;
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, image::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
