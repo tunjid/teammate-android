@@ -44,7 +44,6 @@ import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Supplier;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.util.nav.BottomNav;
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
 import com.mainstreetcode.teammate.util.nav.NavItem;
@@ -68,7 +67,10 @@ import io.reactivex.disposables.CompositeDisposable;
 import static android.view.View.GONE;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.loadBitmapFromView;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
+import static com.tunjid.androidbootstrap.view.util.ViewUtil.getLayoutParams;
 
 public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
@@ -76,10 +78,10 @@ public class MainActivity extends TeammatesBaseActivity
     public static final String FEED_DEEP_LINK = "feed-deep-link";
     public static final String BOTTOM_TOOLBAR_STATE = "BOTTOM_TOOLBAR_STATE";
 
-    @Nullable
-    private ViewHider bottombarHider;
-    @Nullable
-    private ToolbarState bottomToolbarState;
+    private int bottomNavHeight;
+
+    @Nullable private ToolbarState bottomToolbarState;
+    @Nullable private ViewHider bottombarHider;
     private BottomNav bottomNav;
 
     private BottomSheetBehavior bottomSheetBehavior;
@@ -166,9 +168,9 @@ public class MainActivity extends TeammatesBaseActivity
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
 
-        View bottomBar = findViewById(R.id.bottom_navigation);
+        View bottomNav = findViewById(R.id.bottom_navigation);
         ImageView bottomBarSnapshot = findViewById(R.id.bottom_nav_snapshot);
-        ViewHolderUtil.listenForLayout(bottomBar, () -> ViewHolderUtil.getLayoutParams(bottomBarSnapshot).height = bottomBar.getHeight());
+        listenForLayout(bottomNav, () -> getLayoutParams(bottomBarSnapshot).height = bottomNavHeight = bottomNav.getHeight());
 
         bottombarHider = ViewHider.of(bottomBarSnapshot).setDuration(HIDER_DURATION)
                 .setDirection(BOTTOM)
@@ -176,14 +178,14 @@ public class MainActivity extends TeammatesBaseActivity
                     TeammatesBaseFragment view = getCurrentFragment();
                     if (view == null || view.showsBottomNav()) return;
 
-                    bottomBarSnapshot.setImageBitmap(ViewHolderUtil.loadBitmapFromView(bottomBar));
-                    bottomBar.setVisibility(GONE);
+                    bottomBarSnapshot.setImageBitmap(loadBitmapFromView(bottomNav));
+                    bottomNav.setVisibility(GONE);
                 })
                 .addEndRunnable(() -> {
                     TeammatesBaseFragment view = getCurrentFragment();
                     if (view == null || !view.showsBottomNav()) return;
 
-                    bottomBar.setVisibility(View.VISIBLE);
+                    bottomNav.setVisibility(View.VISIBLE);
                     initTransition();
                 })
                 .build();
@@ -233,6 +235,12 @@ public class MainActivity extends TeammatesBaseActivity
     public void setAltToolbarMenu(@MenuRes int menu) {
         altToolbar.getMenu().clear();
         altToolbar.inflateMenu(menu);
+    }
+
+    @Override protected int adjustKeyboardPadding(int suggestion) {
+        int padding = super.adjustKeyboardPadding(suggestion);
+        if (padding != bottomInset) padding -= bottomNavHeight;
+        return padding;
     }
 
     @Override

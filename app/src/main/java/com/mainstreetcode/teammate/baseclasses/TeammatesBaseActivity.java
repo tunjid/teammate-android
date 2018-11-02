@@ -68,7 +68,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public static int topInset;
     private int leftInset;
     private int rightInset;
-    private int bottomInset;
+    public int bottomInset;
 
     private boolean insetsApplied;
 
@@ -261,6 +261,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return parent == null || parent.getId() != R.id.main_fragment_container;
     }
 
+    protected int adjustKeyboardPadding(int suggestion) {
+        return suggestion - bottomInset;
+    }
+
     protected void clearTransientBars() {
         for (BaseTransientBottomBar bar : transientBottomBars)
             if (bar instanceof ChoiceBar) ((ChoiceBar) bar).dismissAsTimeout();
@@ -306,11 +310,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     private void setKeyboardPadding(int padding) {
         initTransition();
-        Fragment fragment = getCurrentFragment();
-
-        padding -= bottomInset;
-        if (fragment instanceof MainActivityFragment && padding != bottomInset)
-            padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
+        padding = adjustKeyboardPadding(padding);
         padding = Math.max(padding, 0);
         coordinatorLayout.setPadding(0, 0, 0, padding);
         fragmentContainer.setPadding(0, 0, 0, padding);
