@@ -96,10 +96,10 @@ public class ViewHolderUtil extends ViewUtil {
         if (!observer.isAlive()) return;
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override public void onGlobalLayout() {
-                onLayout.run();
                 if (observer.isAlive()) observer.removeOnGlobalLayoutListener(this);
                 ViewTreeObserver current = view.getViewTreeObserver();
                 if (current.isAlive()) current.removeOnGlobalLayoutListener(this);
+                onLayout.run();
             }
         });
     }
