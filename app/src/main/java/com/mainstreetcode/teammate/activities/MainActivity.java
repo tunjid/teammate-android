@@ -1,24 +1,16 @@
 package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
-import androidx.arch.core.util.Function;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.IdRes;
-import androidx.annotation.MenuRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
@@ -52,6 +44,7 @@ import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Supplier;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.util.nav.BottomNav;
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
 import com.mainstreetcode.teammate.util.nav.NavItem;
@@ -61,11 +54,20 @@ import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.MenuRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.arch.core.util.Function;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static android.view.View.GONE;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
-import static android.view.View.GONE;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 
 public class MainActivity extends TeammatesBaseActivity
@@ -165,14 +167,22 @@ public class MainActivity extends TeammatesBaseActivity
         super.setContentView(layoutResID);
 
         View bottomBar = findViewById(R.id.bottom_navigation);
-        bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
+        ImageView bottomBarSnapshot = findViewById(R.id.bottom_nav_snapshot);
+        ViewHolderUtil.listenForLayout(bottomBar, () -> ViewHolderUtil.getLayoutParams(bottomBarSnapshot).height = bottomBar.getHeight());
+
+        bottombarHider = ViewHider.of(bottomBarSnapshot).setDuration(HIDER_DURATION)
+                .setDirection(BOTTOM)
                 .addStartRunnable(() -> {
                     TeammatesBaseFragment view = getCurrentFragment();
-                    if (view != null && !view.showsBottomNav()) bottomBar.setVisibility(GONE);
+                    if (view == null || view.showsBottomNav()) return;
+
+                    bottomBarSnapshot.setImageBitmap(ViewHolderUtil.loadBitmapFromView(bottomBar));
+                    bottomBar.setVisibility(GONE);
                 })
                 .addEndRunnable(() -> {
                     TeammatesBaseFragment view = getCurrentFragment();
                     if (view == null || !view.showsBottomNav()) return;
+
                     bottomBar.setVisibility(View.VISIBLE);
                     initTransition();
                 })

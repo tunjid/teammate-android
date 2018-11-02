@@ -3,31 +3,13 @@ package com.mainstreetcode.teammate.baseclasses;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
-import androidx.transition.AutoTransition;
-import androidx.transition.Transition;
-import androidx.transition.TransitionManager;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
@@ -40,11 +22,26 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.AutoTransition;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
+
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
-import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
-import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
-import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -52,6 +49,9 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
+import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
+import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
+import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
@@ -63,6 +63,8 @@ import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
+    protected static final int HIDER_DURATION = 400;
+
     public static int topInset;
     private int leftInset;
     private int rightInset;
@@ -71,11 +73,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private boolean insetsApplied;
 
     private View bottomInsetView;
-    private View keyboardPadding;
     private View topInsetView;
 
     private CoordinatorLayout coordinatorLayout;
     private ConstraintLayout constraintLayout;
+    private FrameLayout fragmentContainer;
     private LoadingBar loadingBar;
     private Toolbar toolbar;
 
@@ -121,23 +123,24 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         super.setContentView(layoutResID);
 
         MaterialButton fab = findViewById(R.id.fab);
-        keyboardPadding = findViewById(R.id.keyboard_padding);
+        fragmentContainer = findViewById(R.id.main_fragment_container);
         coordinatorLayout = findViewById(R.id.coordinator);
         constraintLayout = findViewById(R.id.content_view);
         bottomInsetView = findViewById(R.id.bottom_inset);
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
 
-        if (toolbar != null) toolbarHider = ViewHider.of(toolbar).setDirection(TOP).build();
+        if (toolbar != null)
+            toolbarHider = ViewHider.of(toolbar).setDuration(HIDER_DURATION).setDirection(TOP).build();
 
-        fabHider = ViewHider.of(fab).setDirection(BOTTOM).build();
+        fabHider = ViewHider.of(fab).setDuration(HIDER_DURATION).setDirection(BOTTOM).build();
         fabInteractor = new FabInteractor(fab);
 
         //noinspection AndroidLintClickableViewAccessibility
-        keyboardPadding.setOnTouchListener((view, event) -> {
-            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
-            return true;
-        });
+//        keyboardPadding.setOnTouchListener((view, event) -> {
+//            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
+//            return true;
+//        });
 
         setSupportActionBar(toolbar);
         getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
@@ -174,7 +177,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    @SuppressLint("Range")
+    @SuppressLint({"Range", "WrongConstant"})
     public void toggleProgress(boolean show) {
         if (show && loadingBar != null && loadingBar.isShown()) return;
         if (show) (loadingBar = LoadingBar.make(coordinatorLayout, LENGTH_INDEFINITE)).show();
@@ -308,8 +311,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         padding -= bottomInset;
         if (fragment instanceof MainActivityFragment && padding != bottomInset)
             padding -= getResources().getDimensionPixelSize(R.dimen.action_bar_height);
-
-        getLayoutParams(keyboardPadding).height = padding;
+        padding = Math.max(padding, 0);
+        coordinatorLayout.setPadding(0, 0, 0, padding);
+        fragmentContainer.setPadding(0, 0, 0, padding);
     }
 
     private void adjustSystemInsets(Fragment fragment) {

@@ -2,11 +2,14 @@ package com.mainstreetcode.teammate.util;
 
 
 import android.app.Activity;
+
 import androidx.arch.core.util.Function;
+
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -14,18 +17,23 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.card.MaterialCardView;
+
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.google.android.material.ripple.RippleUtils;
 import com.mainstreetcode.teammate.App;
@@ -81,6 +89,26 @@ public class ViewHolderUtil extends ViewUtil {
             context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
+    }
+
+    public static void listenForLayout(View view, Runnable onLayout) {
+        ViewTreeObserver observer = view.getViewTreeObserver();
+        if (!observer.isAlive()) return;
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override public void onGlobalLayout() {
+                onLayout.run();
+                if (observer.isAlive()) observer.removeOnGlobalLayoutListener(this);
+                ViewTreeObserver current = view.getViewTreeObserver();
+                if (current.isAlive()) current.removeOnGlobalLayoutListener(this);
+            }
+        });
+    }
+
+    public static Bitmap loadBitmapFromView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
     }
 
     public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {
