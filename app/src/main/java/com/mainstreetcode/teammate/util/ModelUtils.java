@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.util;
 
-import android.support.annotation.Nullable;
-import android.support.text.emoji.EmojiCompat;
+import androidx.annotation.Nullable;
+import androidx.emoji.text.EmojiCompat;
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;

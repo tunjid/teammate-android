@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -10,17 +10,15 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
-
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Guest}
  */
 
-public class GuestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class GuestAdapter extends InteractiveAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
     private final List<Identifiable> items;
 

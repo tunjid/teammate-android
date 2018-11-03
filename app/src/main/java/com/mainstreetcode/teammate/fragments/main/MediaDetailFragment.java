@@ -2,9 +2,9 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +19,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Media;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 
 public class MediaDetailFragment extends MainActivityFragment
@@ -121,7 +122,7 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean[] insetState() {return NONE;}
+    public InsetFlags insetFlags() {return NONE;}
 
     @Override
     public boolean showsFab() {return false;}

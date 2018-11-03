@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -17,8 +17,8 @@ import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +27,12 @@ import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.TRUE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Event}
  */
 
-public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, StatAggregateRequestAdapter.AdapterListener> {
+public class StatAggregateRequestAdapter extends InteractiveAdapter<InteractiveViewHolder, StatAggregateRequestAdapter.AdapterListener> {
 
     private final StatAggregate.Request request;
     private final List<Sport> sports;
@@ -48,7 +47,7 @@ public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseVie
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.SPORT:
                 return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, ALL_INPUT_VALID);
@@ -67,7 +66,7 @@ public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseVie
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
         Identifiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
             ((BaseItemViewHolder) viewHolder).bind((Item) identifiable);
@@ -88,7 +87,7 @@ public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseVie
         return identifiable instanceof Item ? ((Item) identifiable).getItemType() : identifiable instanceof User ? USER : TEAM;
     }
 
-    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface AdapterListener extends InteractiveAdapter.AdapterListener {
         void onUserPicked(User user);
 
         void onTeamPicked(Team team);

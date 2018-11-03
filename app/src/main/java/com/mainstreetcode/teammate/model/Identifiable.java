@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.model;
 
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.notifications.FeedItem;
 
@@ -17,7 +17,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 
-import static android.support.v7.util.DiffUtil.calculateDiff;
+import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 import static com.mainstreetcode.teammate.model.Identifiable.Util.getPoints;
 import static com.mainstreetcode.teammate.model.Identifiable.Util.isComparable;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;

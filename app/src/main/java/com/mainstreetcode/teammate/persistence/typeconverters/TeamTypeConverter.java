@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.persistence.typeconverters;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.persistence.AppDatabase;

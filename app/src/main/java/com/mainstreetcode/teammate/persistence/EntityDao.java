@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.persistence;
 
-import android.arch.persistence.room.Delete;
+import androidx.room.Delete;
 
 import java.util.List;
 

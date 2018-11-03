@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
@@ -17,7 +17,7 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +41,9 @@ import static io.reactivex.schedulers.Schedulers.io;
 
 public class ImageWorkerFragment extends MainActivityFragment {
 
-    public static final int CROP_CHOOSER = 1;
-    public static final int MULTIPLE_MEDIA_CHOOSER = 2;
-    public static final int MEDIA_DOWNLOAD_CHOOSER = 3;
+    private static final int CROP_CHOOSER = 1;
+    private static final int MULTIPLE_MEDIA_CHOOSER = 2;
+    private static final int MEDIA_DOWNLOAD_CHOOSER = 3;
 
     private static final String TAG = "ImageWorkerFragment";
     private static final String IMAGE_SELECTION = "image/*";
@@ -174,14 +174,14 @@ public class ImageWorkerFragment extends MainActivityFragment {
         }
     }
 
-    boolean isCropListener() {
+    private boolean isCropListener() {
         Fragment target = getParentFragment();
-        return target != null && target instanceof CropListener;
+        return target instanceof CropListener;
     }
 
-    boolean isMediaListener() {
+    private boolean isMediaListener() {
         Fragment target = getParentFragment();
-        return target != null && target instanceof MediaListener;
+        return target instanceof MediaListener;
     }
 
     private static String makeTag(BaseFragment host) {
@@ -249,7 +249,7 @@ public class ImageWorkerFragment extends MainActivityFragment {
         void startedDownLoad(boolean started);
     }
 
-    public interface ImagePickerListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface ImagePickerListener extends InteractiveAdapter.AdapterListener {
         void onImageClick();
     }
 

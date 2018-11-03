@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.User;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.CHAT;
  * Adapter for {@link Chat}
  */
 
-public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
+public class TeamChatAdapter extends InteractiveAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
     private final List<Identifiable> items;
     private final User signedInUser;
 
@@ -80,7 +80,7 @@ public class TeamChatAdapter extends BaseRecyclerViewAdapter<TeamChatViewHolder,
         return items.get(position) instanceof Chat ? CHAT : CONTENT_AD;
     }
 
-    public interface ChatAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface ChatAdapterListener extends InteractiveAdapter.AdapterListener {
         void onChatClicked(Chat chat);
     }
 

@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,12 +12,12 @@ import com.mainstreetcode.teammate.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 /**
  * Viewholder for a {@link Team}
  */
-public class TeamChatViewHolder extends BaseViewHolder<TeamChatAdapter.ChatAdapterListener> {
+public class TeamChatViewHolder extends InteractiveViewHolder<TeamChatAdapter.ChatAdapterListener> {
 
     private Chat item;
     private View space;

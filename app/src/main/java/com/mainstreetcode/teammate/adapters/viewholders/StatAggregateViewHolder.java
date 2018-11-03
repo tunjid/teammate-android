@@ -5,16 +5,16 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.StatAggregate;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
-public class StatAggregateViewHolder extends BaseViewHolder<BaseRecyclerViewAdapter.AdapterListener>{
+public class StatAggregateViewHolder extends InteractiveViewHolder<InteractiveAdapter.AdapterListener>{
 
     private TextView count;
     private TextView statType;
 
     public StatAggregateViewHolder(View itemView) {
-        super(itemView, new BaseRecyclerViewAdapter.AdapterListener() {});
+        super(itemView, new InteractiveAdapter.AdapterListener() {});
         count = itemView.findViewById(R.id.item_position);
         statType = itemView.findViewById(R.id.item_title);
     }

@@ -11,7 +11,7 @@ import com.mainstreetcode.teammate.adapters.StandingsAdapter;
 import com.mainstreetcode.teammate.model.Row;
 import com.mainstreetcode.teammate.util.SyncedScrollView;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import static android.view.Gravity.CENTER;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
-public class StandingRowViewHolder extends BaseViewHolder<StandingsAdapter.AdapterListener> {
+public class StandingRowViewHolder extends InteractiveViewHolder<StandingsAdapter.AdapterListener> {
 
     private Row row;
 

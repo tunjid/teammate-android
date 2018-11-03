@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.arch.core.util.Function;
-import android.support.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;

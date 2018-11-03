@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -17,10 +17,10 @@
         app:layout_constraintRight_toLeftOf="@+id/button"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <View
         android:id="@+id/click_view"
@@ -47,11 +47,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_location_on_white_24dp" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/inner_list"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
         app:layout_constraintTop_toBottomOf="@+id/input_layout" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -14,19 +14,18 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Role}
  */
 
-public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
+public class JoinRequestAdapter extends InteractiveAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 

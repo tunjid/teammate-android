@@ -80,10 +80,7 @@ public class Sport extends MetaData {
     }
 
     public CharSequence appendEmoji(CharSequence text) {
-        return new SpanBuilder(App.getInstance(), getEmoji())
-                .appendCharsequence("   ")
-                .appendCharsequence(text)
-                .build();
+        return SpanBuilder.of(getEmoji()).append("   ").append(text).build();
     }
 
     public void update(Sport updated) {

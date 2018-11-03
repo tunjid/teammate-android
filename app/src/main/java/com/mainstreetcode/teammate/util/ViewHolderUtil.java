@@ -2,11 +2,14 @@ package com.mainstreetcode.teammate.util;
 
 
 import android.app.Activity;
-import android.arch.core.util.Function;
+
+import androidx.arch.core.util.Function;
+
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -14,31 +17,37 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
-import android.support.design.card.MaterialCardView;
-import android.support.design.ripple.RippleUtils;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
+
+import com.google.android.material.card.MaterialCardView;
+
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
+import com.google.android.material.ripple.RippleUtils;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.util.ViewUtil;
 
 import java.util.Arrays;
 
 import io.reactivex.Single;
 
-public class ViewHolderUtil {
+public class ViewHolderUtil extends ViewUtil {
 
     public static final int USER = 284;
     public static final int TEAM = 285;
@@ -72,10 +81,6 @@ public class ViewHolderUtil {
         return item.hashCode() + "-" + id;
     }
 
-    public static ViewGroup.MarginLayoutParams getLayoutParams(View view) {
-        return (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-    }
-
     @Nullable
     public static Activity getActivity(RecyclerView.ViewHolder viewHolder) {
         Context context = viewHolder.itemView.getContext();
@@ -84,6 +89,26 @@ public class ViewHolderUtil {
             context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
+    }
+
+    public static void listenForLayout(View view, Runnable onLayout) {
+        ViewTreeObserver observer = view.getViewTreeObserver();
+        if (!observer.isAlive()) return;
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override public void onGlobalLayout() {
+                if (observer.isAlive()) observer.removeOnGlobalLayoutListener(this);
+                ViewTreeObserver current = view.getViewTreeObserver();
+                if (current.isAlive()) current.removeOnGlobalLayoutListener(this);
+                onLayout.run();
+            }
+        });
+    }
+
+    public static Bitmap loadBitmapFromView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
     }
 
     public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {
@@ -147,7 +172,7 @@ public class ViewHolderUtil {
         return new ShapeDrawable(shape);
     }
 
-    public interface SimpleAdapterListener<T> extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface SimpleAdapterListener<T> extends InteractiveAdapter.AdapterListener {
         void onItemClicked(T item);
     }
 }

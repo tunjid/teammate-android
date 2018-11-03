@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.util;
 
-import android.arch.core.util.Function;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.AbstractSequentialList;
 import java.util.Iterator;

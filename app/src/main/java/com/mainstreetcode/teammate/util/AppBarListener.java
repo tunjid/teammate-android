@@ -1,13 +1,12 @@
 package com.mainstreetcode.teammate.util;
 
-import android.support.design.widget.AppBarLayout;
 import android.view.View;
-import android.view.ViewTreeObserver;
+
+import com.google.android.material.appbar.AppBarLayout;
 
 public class AppBarListener implements
         View.OnAttachStateChangeListener,
-        AppBarLayout.OnOffsetChangedListener,
-        ViewTreeObserver.OnGlobalLayoutListener {
+        AppBarLayout.OnOffsetChangedListener {
 
     private int lastOffset;
     private int appBarHeight;
@@ -17,9 +16,9 @@ public class AppBarListener implements
     private AppBarListener(AppBarLayout appBarLayout, ModelUtils.Consumer<OffsetProps> offsetDiffListener) {
         this.appBarLayout = appBarLayout;
         this.offsetDiffListener = offsetDiffListener;
-        appBarLayout.addOnAttachStateChangeListener(this);
-        appBarLayout.getViewTreeObserver().addOnGlobalLayoutListener(this);
         appBarLayout.addOnOffsetChangedListener(this);
+        appBarLayout.addOnAttachStateChangeListener(this);
+        ViewHolderUtil.listenForLayout(appBarLayout, () -> this.appBarHeight = appBarLayout.getHeight());
     }
 
     public static Builder with() { return new Builder(); }
@@ -39,12 +38,6 @@ public class AppBarListener implements
         lastOffset = newOffset;
     }
 
-    @Override
-    public void onGlobalLayout() {
-        this.appBarHeight = appBarLayout.getHeight();
-        appBarLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-    }
-
     public static class OffsetProps {
         private final int dy;
         private final int offset;
@@ -57,6 +50,7 @@ public class AppBarListener implements
         }
 
         public boolean appBarUnmeasured() { return appBarHeight == 0; }
+
         public int getDy() { return dy; }
 
         public int getOffset() { return -offset; }

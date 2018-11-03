@@ -2,11 +2,11 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.arch.core.util.Function;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
+import androidx.arch.core.util.Function;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +20,16 @@ import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
-import static android.support.v4.view.ViewCompat.setTransitionName;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.github.florent37.picassopalette.PicassoPalette.Profile.MUTED_DARK;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 
-public abstract class MediaViewHolder<T extends View> extends BaseViewHolder<MediaAdapter.MediaAdapterListener>
+public abstract class MediaViewHolder<T extends View> extends InteractiveViewHolder<MediaAdapter.MediaAdapterListener>
         implements Callback {
 
     private static final String UNITY_ASPECT_RATIO = "1";

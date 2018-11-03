@@ -1,9 +1,11 @@
-package android.support.design.widget;
+package com.google.android.material.bottomsheet;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 @SuppressWarnings("unused")
 public class SwipeRefreshPassThroughBottomSheetBehavior extends BottomSheetBehavior {
@@ -14,7 +16,7 @@ public class SwipeRefreshPassThroughBottomSheetBehavior extends BottomSheetBehav
 
     @Override
     View findScrollingChild(View view) {
-        View result = super.findScrollingChild(view);
+        @SuppressLint("VisibleForTests") View result = super.findScrollingChild(view);
         if (!(result instanceof SwipeRefreshLayout)) return result;
 
         result.post(() -> result.setEnabled(false));

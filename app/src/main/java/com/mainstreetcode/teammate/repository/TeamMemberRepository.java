@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.repository;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;

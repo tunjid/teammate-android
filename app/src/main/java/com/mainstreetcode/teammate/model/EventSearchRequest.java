@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.persistence.room.Ignore;
+import androidx.room.Ignore;
 import android.location.Address;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;

@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +15,17 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link User}
  */
 
-public class UserEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, UserEditAdapter.AdapterListener> {
+public class UserEditAdapter extends InteractiveAdapter<BaseItemViewHolder, UserEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
 

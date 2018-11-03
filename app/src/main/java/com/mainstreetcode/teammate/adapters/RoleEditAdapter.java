@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.arch.core.util.Function;
-import android.support.annotation.NonNull;
+import androidx.arch.core.util.Function;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -14,17 +14,15 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
-
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Role}
  */
 
-public class RoleEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, RoleEditAdapter.RoleEditAdapterListener> {
+public class RoleEditAdapter extends InteractiveAdapter<BaseItemViewHolder, RoleEditAdapter.RoleEditAdapterListener> {
 
     private final List<Identifiable> items;
 

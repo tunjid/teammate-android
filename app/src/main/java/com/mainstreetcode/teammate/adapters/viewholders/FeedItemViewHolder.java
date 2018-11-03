@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.support.v4.view.ViewCompat;
+import androidx.core.view.ViewCompat;
 import android.view.View;
 
 import com.mainstreetcode.teammate.R;
@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 
-import static android.support.v4.view.ViewCompat.setTransitionName;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 /**

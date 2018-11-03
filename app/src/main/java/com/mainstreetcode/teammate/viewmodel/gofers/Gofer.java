@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.ListableModel;

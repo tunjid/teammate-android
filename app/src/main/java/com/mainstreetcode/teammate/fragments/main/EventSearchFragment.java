@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +28,7 @@ import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.List;
 
@@ -133,7 +134,7 @@ public class EventSearchFragment extends MainActivityFragment {
     public boolean showsFab() { return locationViewModel.hasPermission(this); }
 
     @Override
-    public boolean[] insetState() {return NONE;}
+    public InsetFlags insetFlags() {return NONE;}
 
     @Override
     public void togglePersistentUi() {

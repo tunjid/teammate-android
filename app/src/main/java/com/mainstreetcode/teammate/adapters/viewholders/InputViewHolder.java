@@ -1,11 +1,11 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 import android.content.res.ColorStateList;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;

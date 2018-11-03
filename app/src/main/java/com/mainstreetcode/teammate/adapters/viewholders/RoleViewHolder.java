@@ -6,7 +6,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.model.Role;
 
-import static android.support.v4.view.ViewCompat.setTransitionName;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 public class RoleViewHolder extends ModelCardViewHolder<Role, TeamMemberAdapter.UserAdapterListener>

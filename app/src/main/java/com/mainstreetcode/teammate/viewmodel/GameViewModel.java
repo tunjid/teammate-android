@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.arch.core.util.Function;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
+import androidx.arch.core.util.Function;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Game;
