@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -8,10 +7,11 @@ import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.model.Item.COMPETITOR;
 

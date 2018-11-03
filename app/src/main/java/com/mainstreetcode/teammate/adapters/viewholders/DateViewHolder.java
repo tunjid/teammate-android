@@ -10,9 +10,10 @@ import android.widget.TimePicker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ModelUtils;
-import com.mainstreetcode.teammate.util.Supplier;
 
 import java.util.Calendar;
+
+import androidx.arch.core.util.Function;
 
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -31,7 +32,7 @@ public class DateViewHolder extends ClickInputViewHolder
 
     private Calendar calendar = getInstance();
 
-    public DateViewHolder(View itemView, Supplier<Boolean> enabler) {
+    public DateViewHolder(View itemView, Function<Item, Boolean> enabler) {
         super(itemView, enabler, () -> {});
         setButtonRunnable(R.drawable.ic_access_time_white_24dp, this::showTime);
     }

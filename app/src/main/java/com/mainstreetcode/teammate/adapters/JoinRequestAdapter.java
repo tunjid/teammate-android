@@ -39,16 +39,27 @@ public class JoinRequestAdapter extends InteractiveAdapter<BaseItemViewHolder, J
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, FALSE, ALL_INPUT_VALID);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.choose_sport,
+                        Config.getSports(),
+                        Sport::getName,
+                        Sport::getCode,
+                        FALSE,
+                        ALL_INPUT_VALID);
             case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.choose_role,
+                        Config.getPositions(),
+                        Position::getName,
+                        Position::getCode,
+                        item -> adapterListener.canEditRole());
             case Item.ABOUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, ALL_INPUT_VALID);
             case Item.DESCRIPTION:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, ALL_INPUT_VALID);
             case Item.INPUT:
             default:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), item -> adapterListener.canEditFields());
         }
     }
 

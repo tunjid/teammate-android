@@ -1,15 +1,15 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChipViewHolder;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class StatTypeAdapter extends InteractiveAdapter<ChipViewHolder, StatTypeAdapter.AdapterListener> {
 

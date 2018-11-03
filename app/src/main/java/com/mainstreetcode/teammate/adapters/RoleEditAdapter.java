@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.adapters;
 
 import androidx.arch.core.util.Function;
 import androidx.annotation.NonNull;
+
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -37,13 +38,22 @@ public class RoleEditAdapter extends InteractiveAdapter<BaseItemViewHolder, Role
         switch (viewType) {
             case Item.INPUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE)
-                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
+                        .setButtonRunnable(
+                                R.drawable.ic_picture_white_24dp,
+                                adapterListener::onImageClick,
+                                (Function<Item, Boolean>) this::showsChangePicture);
             case Item.ABOUT:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.ALL_INPUT_VALID);
             case Item.NICKNAME:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canChangeRoleFields, Item.ALL_INPUT_VALID);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        item -> adapterListener.canChangeRoleFields(),
+                        Item.ALL_INPUT_VALID);
             case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canChangeRolePosition);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.choose_role, Config.getPositions(),
+                        Position::getName,
+                        Position::getCode,
+                        item -> adapterListener.canChangeRolePosition());
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }

@@ -1,12 +1,12 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.app.Activity;
-import androidx.arch.core.util.Function;
 import android.view.View;
 
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.model.Item;
-import com.mainstreetcode.teammate.util.Supplier;
+
+import androidx.arch.core.util.Function;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getActivity;
 
@@ -18,11 +18,11 @@ public class ClickInputViewHolder extends InputViewHolder
 
     private final Runnable clickAction;
 
-    public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction) {
+    public ClickInputViewHolder(View itemView, Function<Item, Boolean> enabler, Runnable clickAction) {
         this(itemView, enabler, clickAction, null);
     }
 
-    public ClickInputViewHolder(View itemView, Supplier<Boolean> enabler, Runnable clickAction, Function<CharSequence, CharSequence> errorChecker) {
+    public ClickInputViewHolder(View itemView, Function<Item, Boolean> enabler, Runnable clickAction, Function<Item, CharSequence> errorChecker) {
         super(itemView, enabler, errorChecker);
         this.clickAction = clickAction;
         editText.setFocusable(false);

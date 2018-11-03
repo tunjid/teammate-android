@@ -1,8 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.arch.core.util.Function;
 import android.content.res.Resources;
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -23,6 +21,9 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
@@ -46,17 +47,44 @@ public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHol
         switch (viewType) {
             case Item.INPUT:
             case Item.NUMBER:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditBeforeCreation)
-                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditAfterCreation, ALL_INPUT_VALID);
+
+                return new InputViewHolder(
+                        getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        (Function<Item, Boolean>) this::canEdit,
+                        (Function<Item, CharSequence>) this::textChecker)
+                        .setButtonRunnable(
+                                R.drawable.ic_picture_white_24dp,
+                                adapterListener::onImageClick,
+                                (Function<Item, Boolean>) this::showsChangePicture);
             case Item.TOURNAMENT_TYPE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_type, Config.getTournamentTypes(adapterListener.getSport()::supportsTournamentType), TournamentType::getName, TournamentType::getCode, adapterListener::canEditBeforeCreation, ALL_INPUT_VALID);
+                return new SelectionViewHolder<>(getItemView(
+                        R.layout.viewholder_simple_input, viewGroup),
+                        R.string.tournament_type,
+                        Config.getTournamentTypes(adapterListener.getSport()::supportsTournamentType),
+                        TournamentType::getName,
+                        TournamentType::getCode,
+                        (Function<Item, Boolean>) this::canEdit,
+                        ALL_INPUT_VALID);
             case Item.TOURNAMENT_STYLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_style, Config.getTournamentStyles(adapterListener.getSport()::supportsTournamentStyle), TournamentStyle::getName, TournamentStyle::getCode, adapterListener::canEditBeforeCreation, ALL_INPUT_VALID);
+                return new SelectionViewHolder<>(
+                        getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.tournament_style,
+                        Config.getTournamentStyles(adapterListener.getSport()::supportsTournamentStyle),
+                        TournamentStyle::getName,
+                        TournamentStyle::getCode,
+                        (Function<Item, Boolean>) this::canEdit,
+                        ALL_INPUT_VALID);
             case Item.INFO:
                 Resources resources = viewGroup.getResources();
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_single_final, Arrays.asList(true, false), flag -> resources.getString(flag ? R.string.yes : R.string.no), String::valueOf, adapterListener::canEditBeforeCreation, ALL_INPUT_VALID);
+                return new SelectionViewHolder<>(
+                        getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.tournament_single_final,
+                        Arrays.asList(true, false),
+                        flag -> resources.getString(flag ? R.string.yes : R.string.no),
+                        String::valueOf,
+                        (Function<Item, Boolean>) this::canEdit,
+                        ALL_INPUT_VALID);
             case TOURNAMENT:
                 return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), viewHolder -> {});
             default:
@@ -69,7 +97,8 @@ public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHol
         Object item = items.get(i);
 
         if (item instanceof Item) ((BaseItemViewHolder) viewHolder).bind((Item) item);
-        else if (item instanceof Competitor) ((CompetitorViewHolder) viewHolder).bind((Competitor) item);
+        else if (item instanceof Competitor)
+            ((CompetitorViewHolder) viewHolder).bind((Competitor) item);
     }
 
     @Override
@@ -87,6 +116,35 @@ public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHol
 
     private boolean showsChangePicture(Item item) {
         return item.getStringRes() == R.string.tournament_name && adapterListener.canEditAfterCreation();
+    }
+
+    private boolean canEdit(Item item) {
+        switch (item.getItemType()) {
+            default:
+            case Item.ABOUT:
+                return Item.FALSE.apply(item);
+            case Item.INFO:
+            case Item.NUMBER:
+            case Item.TOURNAMENT_TYPE:
+            case Item.TOURNAMENT_STYLE:
+                return adapterListener.canEditBeforeCreation();
+            case Item.DESCRIPTION:
+                return adapterListener.canEditAfterCreation();
+        }
+    }
+
+    private CharSequence textChecker(Item item) {
+        switch (item.getItemType()) {
+            default:
+            case Item.INPUT:
+            case Item.NUMBER:
+                return Item.NON_EMPTY.apply(item);
+            case Item.INFO:
+            case Item.DESCRIPTION:
+            case Item.TOURNAMENT_TYPE:
+            case Item.TOURNAMENT_STYLE:
+                return Item.ALL_INPUT_VALID.apply(item);
+        }
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {

@@ -36,7 +36,7 @@ public class GameEditAdapter extends InteractiveAdapter<InteractiveViewHolder, G
     public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditGame);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), item -> adapterListener.canEditGame());
             case Item.NUMBER:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case AWAY:

@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -11,11 +10,12 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.EVENT;

@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -21,6 +20,9 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Event  }
@@ -44,18 +46,22 @@ public class EventEditAdapter extends InteractiveAdapter<InteractiveViewHolder, 
     public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.TEXT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.ALL_INPUT_VALID);
             case Item.NUMBER:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.ALL_INPUT_VALID);
-            case Item.DATE:
-                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent);
             case Item.LOCATION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditEvent, Item.ALL_INPUT_VALID)
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        item -> adapterListener.canEditEvent(),
+                        (Function<Item, CharSequence>) this::textChecker)
                         .setButtonRunnable(R.drawable.ic_location_on_white_24dp, this::onLocationClicked);
             case Item.VISIBILITY:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.event_visibility_selection, Config.getVisibilities(), Visibility::getName, Visibility::getCode, adapterListener::canEditEvent);
+                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.event_visibility_selection,
+                        Config.getVisibilities(),
+                        Visibility::getName,
+                        Visibility::getCode,
+                        item -> adapterListener.canEditEvent());
+            case Item.DATE:
+                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), item -> adapterListener.canEditEvent());
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_event_guest, viewGroup), adapterListener);
             case TEAM:
@@ -96,6 +102,19 @@ public class EventEditAdapter extends InteractiveAdapter<InteractiveViewHolder, 
 
     private void onLocationClicked() {
         if (adapterListener.canEditEvent()) adapterListener.onLocationClicked();
+    }
+
+    private CharSequence textChecker(Item item) {
+        switch (item.getItemType()) {
+            default:
+            case Item.INPUT:
+            case Item.DATE:
+                return Item.NON_EMPTY.apply(item);
+            case Item.TEXT:
+            case Item.NUMBER:
+            case Item.LOCATION:
+                return Item.ALL_INPUT_VALID.apply(item);
+        }
     }
 
     public interface EventEditAdapterListener extends

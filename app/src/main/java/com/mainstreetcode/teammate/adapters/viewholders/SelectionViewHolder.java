@@ -1,15 +1,15 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import androidx.arch.core.util.Function;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 
-import com.mainstreetcode.teammate.util.Supplier;
+import com.mainstreetcode.teammate.model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.arch.core.util.Function;
 import io.reactivex.Flowable;
 
 
@@ -25,7 +25,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
                                @StringRes int titleRes,  List<T> items,
                                Function<T, CharSequence> displayFunction,
                                Function<T, String> valueFunction,
-                               Supplier<Boolean> enabler) {
+                               Function<Item, Boolean> enabler) {
         super(itemView, enabler, () -> {});
         this.titleRes = titleRes;
         this.items = items;
@@ -37,8 +37,8 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
                                @StringRes int titleRes,  List<T> items,
                                Function<T, CharSequence> displayFunction,
                                Function<T, String> valueFunction,
-                               Supplier<Boolean> enabler,
-                               Function<CharSequence, CharSequence> errorChecker) {
+                               Function<Item,Boolean> enabler,
+                               Function<Item, CharSequence> errorChecker) {
         super(itemView, enabler, () -> {}, errorChecker);
         this.titleRes = titleRes;
         this.items = items;
@@ -59,7 +59,7 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
 
         AlertDialog dialog = new AlertDialog.Builder(itemView.getContext())
                 .setTitle(titleRes)
-                .setItems(sequences.toArray(new CharSequence[sequences.size()]), (dialogInterface, position) -> onItemSelected(sequences, position, items.get(position)))
+                .setItems(sequences.toArray(new CharSequence[0]), (dialogInterface, position) -> onItemSelected(sequences, position, items.get(position)))
                 .create();
 
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());

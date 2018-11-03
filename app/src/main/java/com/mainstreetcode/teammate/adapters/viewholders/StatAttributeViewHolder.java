@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import androidx.arch.core.util.Function;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.google.android.flexbox.AlignItems;
@@ -15,9 +13,11 @@ import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.StatTypes;
-import com.mainstreetcode.teammate.util.Supplier;
 
 import java.util.List;
+
+import androidx.arch.core.util.Function;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
 
@@ -28,8 +28,8 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
     public StatAttributeViewHolder(View itemView,
                                    int titleRes,
                                    Stat stat,
-                                   Supplier<Boolean> enabler,
-                                   Function<CharSequence, CharSequence> errorChecker) {
+                                   Function<Item, Boolean> enabler,
+                                   Function<Item, CharSequence> errorChecker) {
 
         super(itemView, titleRes, stat.getSport().getStats(), StatType::getEmojiAndName, StatType::getCode, enabler, errorChecker);
 
@@ -37,18 +37,18 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
         adapter = new StatTypeAdapter(new StatTypeAdapter.AdapterListener() {
             @Override
             public List<StatAttribute> getAttributes() {
-                return enabler.get() ? statType.getAttributes() : stat.getAttributes();
+                return isEnabled() ? statType.getAttributes() : stat.getAttributes();
             }
 
             @Override
-            public boolean isEnabled() { return enabler.get(); }
+            public boolean isEnabled() { return StatAttributeViewHolder.this.isEnabled(); }
 
             @Override
             public boolean isSelected(StatAttribute attribute) { return stat.contains(attribute); }
 
             @Override
             public void onAttributeTapped(StatAttribute attribute) {
-                if (!enabler.get()) return;
+                if (!isEnabled()) return;
                 stat.compoundAttribute(attribute);
                 adapter.notifyDataSetChanged();
             }

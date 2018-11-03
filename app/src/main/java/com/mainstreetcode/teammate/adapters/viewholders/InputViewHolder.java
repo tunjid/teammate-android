@@ -1,11 +1,6 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import androidx.arch.core.util.Function;
 import android.content.res.ColorStateList;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -13,11 +8,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ModelUtils;
-import com.mainstreetcode.teammate.util.Supplier;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.core.content.ContextCompat;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -32,12 +32,14 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     EditText editText;
     private final ImageButton button;
     private final TextInputLayout inputLayout;
-    private final Supplier<Boolean> enabler;
-    private final Function<CharSequence, CharSequence> errorChecker;
+    private final Function<Item, Boolean> enabler;
+    private final Function<Item, CharSequence> errorChecker;
 
     @Nullable private Function<Item, Boolean> visibilitySupplier;
 
-    public InputViewHolder(View itemView, Supplier<Boolean> enabler, @Nullable Function<CharSequence, CharSequence> errorChecker) {
+    public InputViewHolder(View itemView,
+                           Function<Item, Boolean> enabler,
+                           @Nullable Function<Item, CharSequence> errorChecker) {
         super(itemView);
         this.enabler = enabler;
         this.errorChecker = errorChecker == null ? this::emptyTextChecker : errorChecker;
@@ -49,15 +51,16 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         editText.addTextChangedListener(this);
     }
 
-    public InputViewHolder(View itemView, Supplier<Boolean> enabler) {
+    public InputViewHolder(View itemView, Function<Item, Boolean> enabler) {
         this(itemView, enabler, null);
     }
 
     public InputViewHolder setButtonRunnable(@DrawableRes int icon, Runnable clickRunnable) {
-        return setButtonRunnable(input -> true, icon, clickRunnable);
+        return setButtonRunnable(icon, clickRunnable, input -> true);
     }
 
-    public InputViewHolder setButtonRunnable(Function<Item, Boolean> visibilitySupplier, @DrawableRes int icon, Runnable clickRunnable) {
+    public InputViewHolder setButtonRunnable(@DrawableRes int icon, Runnable clickRunnable,
+                                             Function<Item, Boolean> visibilitySupplier) {
         this.visibilitySupplier = visibilitySupplier;
         button.setImageResource(icon);
         button.setOnClickListener(clicked -> clickRunnable.run());
@@ -93,7 +96,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     private void checkForErrors() {
-        CharSequence errorMessage = errorChecker.apply(editText.getText());
+        CharSequence errorMessage = errorChecker.apply(item);
         if (TextUtils.isEmpty(errorMessage)) editText.setError(null);
         else editText.setError(errorMessage);
     }
@@ -106,12 +109,11 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         button.setVisibility(visibility);
     }
 
-    private CharSequence emptyTextChecker(CharSequence input) {
-        return TextUtils.isEmpty(input) ? editText.getContext().getString(R.string.team_invalid_empty_field) : "";
+    private CharSequence emptyTextChecker(Item input) {
+        return TextUtils.isEmpty(input.getValue()) ? editText.getContext().getString(R.string.team_invalid_empty_field) : "";
     }
 
     protected boolean isEnabled() {
-        try {return enabler.get();}
-        catch (Exception e) {return false;}
+        return item == null ? false : enabler.apply(item);
     }
 }

@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.arch.core.util.Function;
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -20,8 +18,10 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
+
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
-import static com.mainstreetcode.teammate.model.Item.FALSE;
 
 /**
  * Adapter for {@link Team}
@@ -42,22 +42,36 @@ public class TeamEditAdapter extends InteractiveAdapter<BaseItemViewHolder, Team
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
             case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, ViewHolderUtil.allowsSpecialCharacters);
             case Item.INPUT:
             case Item.NUMBER:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields)
-                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
             case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, ALL_INPUT_VALID);
+                return new InputViewHolder(
+                        getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        (Function<Item, Boolean>) this::canEdit,
+                        (Function<Item, CharSequence>) this::textChecker
+                ).setButtonRunnable(
+                        R.drawable.ic_picture_white_24dp,
+                        adapterListener::onImageClick,
+                        (Function<Item, Boolean>) this::showsChangePicture);
             case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::canEditFields, ALL_INPUT_VALID);
+                return new SelectionViewHolder<>(
+                        getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        R.string.choose_sport,
+                        Config.getSports(),
+                        Sport::getName,
+                        Sport::getCode,
+                        this::canEdit,
+                        ALL_INPUT_VALID);
             case Item.CITY:
             case Item.STATE:
-                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked);
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        this::canEdit,
+                        adapterListener::onAddressClicked);
             case Item.ZIP:
-                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked, ALL_INPUT_VALID);
+                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup),
+                        this::canEdit,
+                        adapterListener::onAddressClicked, ALL_INPUT_VALID);
             default:
                 return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
@@ -82,6 +96,36 @@ public class TeamEditAdapter extends InteractiveAdapter<BaseItemViewHolder, Team
 
     private boolean showsChangePicture(Item item) {
         return item.getStringRes() == R.string.team_name && adapterListener.canEditFields();
+    }
+
+    private boolean canEdit(Item item) {
+        switch (item.getItemType()) {
+            default:
+            case Item.ABOUT:
+                return Item.FALSE.apply(item);
+            case Item.ZIP:
+            case Item.CITY:
+            case Item.INFO:
+            case Item.STATE:
+            case Item.INPUT:
+            case Item.SPORT:
+            case Item.NUMBER:
+            case Item.DESCRIPTION:
+                return adapterListener.canEditFields();
+        }
+    }
+
+    private CharSequence textChecker(Item item) {
+        switch (item.getItemType()) {
+            default:
+            case Item.INPUT:
+            case Item.NUMBER:
+                return Item.NON_EMPTY.apply(item);
+            case Item.INFO:
+                return ViewHolderUtil.allowsSpecialCharacters.apply(item.getValue());
+            case Item.DESCRIPTION:
+                return Item.ALL_INPUT_VALID.apply(item);
+        }
     }
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {

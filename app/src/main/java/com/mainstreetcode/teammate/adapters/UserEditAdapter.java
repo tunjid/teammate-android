@@ -1,8 +1,11 @@
 package com.mainstreetcode.teammate.adapters;
 
 import androidx.arch.core.util.Function;
+
 import android.content.Context;
+
 import androidx.annotation.NonNull;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,14 +43,18 @@ public class UserEditAdapter extends InteractiveAdapter<BaseItemViewHolder, User
         Context context = viewGroup.getContext();
         View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_simple_input, viewGroup, false);
 
+        Function<Item, Boolean> enabler = input -> adapterListener.canEdit();
         switch (viewType) {
             case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit)
-                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), enabler)
+                        .setButtonRunnable(
+                                R.drawable.ic_picture_white_24dp,
+                                adapterListener::onImageClick,
+                                (Function<Item, Boolean>) this::showsChangePicture);
             case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, ViewHolderUtil.allowsSpecialCharacters);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), enabler, ViewHolderUtil.allowsSpecialCharacters);
             case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEdit, ALL_INPUT_VALID);
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), enabler, ALL_INPUT_VALID);
             default:
                 return new BaseItemViewHolder(itemView);
         }
