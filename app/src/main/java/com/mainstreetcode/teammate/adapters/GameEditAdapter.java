@@ -1,28 +1,30 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
-
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.AWAY;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Tournament}
  */
 
-public class GameEditAdapter extends InteractiveAdapter<InteractiveViewHolder, GameEditAdapter.AdapterListener> {
+public class GameEditAdapter extends BaseAdapter<BaseViewHolder, GameEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
     private final TextInputStyle.InputChooser chooser;
@@ -35,18 +37,19 @@ public class GameEditAdapter extends InteractiveAdapter<InteractiveViewHolder, G
 
     @NonNull
     @Override
-    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case AWAY:
-                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked)
-                        .hideSubtitle().withTitle(R.string.pick_away_competitor);
             default:
+            case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
+            case AWAY:
+            return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked)
+                        .hideSubtitle().withTitle(R.string.pick_away_competitor);
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
         Object item = items.get(i);
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));
         else if (item instanceof Competitor)
@@ -61,7 +64,7 @@ public class GameEditAdapter extends InteractiveAdapter<InteractiveViewHolder, G
     @Override
     public int getItemViewType(int position) {
         Object object = items.get(position);
-        return object instanceof Item ? Item.INPUT : AWAY;
+        return object instanceof Item ? ITEM : AWAY;
     }
 
     public interface AdapterListener extends InteractiveAdapter.AdapterListener {

@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.RemoteImage;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
@@ -17,7 +18,7 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE;
 
 
-public class ModelCardViewHolder<H extends RemoteImage, T extends InteractiveAdapter.AdapterListener> extends InteractiveViewHolder<T> {
+public class ModelCardViewHolder<H extends RemoteImage, T extends InteractiveAdapter.AdapterListener> extends BaseViewHolder<T> {
 
     protected H model;
 

@@ -3,9 +3,9 @@ package com.mainstreetcode.teammate.adapters;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
@@ -15,11 +15,13 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
+
 /**
  * Adapter for {@link BlockedUser}
  */
 
-public class BlockedUserViewAdapter extends InteractiveAdapter<BaseItemViewHolder, InteractiveAdapter.AdapterListener> {
+public class BlockedUserViewAdapter extends BaseAdapter<InputViewHolder, InteractiveAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
     private final Chooser chooser;
@@ -32,12 +34,12 @@ public class BlockedUserViewAdapter extends InteractiveAdapter<BaseItemViewHolde
 
     @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InputViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
+    public void onBindViewHolder(@NonNull InputViewHolder baseItemViewHolder, int i) {
         Identifiable item = items.get(i);
         if ((item instanceof Item)) baseItemViewHolder.bind(chooser.get((Item) item));
     }
@@ -49,7 +51,7 @@ public class BlockedUserViewAdapter extends InteractiveAdapter<BaseItemViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        return Item.INPUT;
+        return ITEM;
     }
 
     private static class Chooser extends TextInputStyle.InputChooser {

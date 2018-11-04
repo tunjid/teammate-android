@@ -10,18 +10,22 @@ import android.widget.ImageButton;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseItemViewHolder<T>
+public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseViewHolder<T>
         implements
         TextWatcher {
+
+    @Nullable TextInputStyle textInputStyle;
 
     private final EditText editText;
     private final ImageButton button;
@@ -32,6 +36,12 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         inputLayout = itemView.findViewById(R.id.input_layout);
         button = itemView.findViewById(R.id.button);
         editText = inputLayout.getEditText();
+    }
+
+    @Override protected void clear() {
+        if (textInputStyle != null) textInputStyle.setViewHolder(null);
+        textInputStyle = null;
+        super.clear();
     }
 
     public void bind(TextInputStyle textInputStyle) {
@@ -47,8 +57,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         editText.setText(ModelUtils.processString(item.getValue()));
         editText.setInputType(item.getInputType());
 
-        editText.setFocusable(!isSelector);
         editText.setClickable(isSelector);
+        editText.setFocusable(!isSelector);
+        editText.setFocusableInTouchMode(!isSelector);
         editText.setOnClickListener(textInputStyle.textClickListener());
         button.setOnClickListener(textInputStyle.buttonClickListener());
 
@@ -67,7 +78,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     @Override
     public void afterTextChanged(Editable editable) {
-        if (textInputStyle.isSelector()) return;
+        if (textInputStyle == null || textInputStyle.isSelector()) return;
         textInputStyle.getItem().setValue(editable.toString());
         checkForErrors();
     }
@@ -78,12 +89,14 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     private void checkForErrors() {
+        if (textInputStyle == null) return;
         CharSequence errorMessage = textInputStyle.errorText();
         if (TextUtils.isEmpty(errorMessage)) editText.setError(null);
         else editText.setError(errorMessage);
     }
 
     private void setClickableState() {
+        if (textInputStyle == null) return;
         int colorInt = ContextCompat.getColor(itemView.getContext(), textInputStyle.isEnabled() ? R.color.black : R.color.disabled_text);
         editText.setTextColor(ColorStateList.valueOf(colorInt));
 

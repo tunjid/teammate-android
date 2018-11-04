@@ -7,19 +7,22 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
-public class EventSearchRequestAdapter extends InteractiveAdapter<InteractiveViewHolder, EventSearchRequestAdapter.EventSearchAdapterListener> {
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
+
+public class EventSearchRequestAdapter extends BaseAdapter<BaseViewHolder, EventSearchRequestAdapter.EventSearchAdapterListener> {
 
     private final EventSearchRequest request;
     private final TextInputStyle.InputChooser chooser;
@@ -34,13 +37,13 @@ public class EventSearchRequestAdapter extends InteractiveAdapter<InteractiveVie
 
     @NonNull
     @Override
-    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
         Item item = request.asItems().get(position);
         ((InputViewHolder) viewHolder).bind(chooser.get(item));
     }
@@ -57,7 +60,7 @@ public class EventSearchRequestAdapter extends InteractiveAdapter<InteractiveVie
 
     @Override
     public int getItemViewType(int position) {
-        return Item.INPUT;
+        return ITEM;
     }
 
     public interface EventSearchAdapterListener extends InteractiveAdapter.AdapterListener{

@@ -49,6 +49,7 @@ import io.reactivex.Single;
 
 public class ViewHolderUtil extends ViewUtil {
 
+    public static final int ITEM = 283;
     public static final int USER = 284;
     public static final int TEAM = 285;
     public static final int CHAT = 286;
@@ -58,14 +59,15 @@ public class ViewHolderUtil extends ViewUtil {
     public static final int AWAY = 290;
     public static final int STAT = 291;
     public static final int EVENT = 292;
-    public static final int FEED_ITEM = 293;
-    public static final int TOURNAMENT = 294;
-    public static final int CONTENT_AD = 295;
-    public static final int INSTALL_AD = 296;
-    public static final int MEDIA_IMAGE = 297;
-    public static final int MEDIA_VIDEO = 298;
-    public static final int JOIN_REQUEST = 299;
-    public static final int BLOCKED_USER = 300;
+    public static final int GUEST = 292;
+    public static final int FEED_ITEM = 294;
+    public static final int TOURNAMENT = 295;
+    public static final int CONTENT_AD = 296;
+    public static final int INSTALL_AD = 297;
+    public static final int MEDIA_IMAGE = 298;
+    public static final int MEDIA_VIDEO = 299;
+    public static final int JOIN_REQUEST = 300;
+    public static final int BLOCKED_USER = 301;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
     private static final int DEFAULT_STROKE_VALUE = -1;

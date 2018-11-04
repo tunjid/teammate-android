@@ -7,19 +7,19 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.util.AppBarListener;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE;
 
 
-public class GameViewHolder extends InteractiveViewHolder<GameAdapter.AdapterListener> {
+public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> {
 
     private static final float ONE_F = 1F;
 

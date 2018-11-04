@@ -5,11 +5,12 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.StatAttributeViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
@@ -17,14 +18,13 @@ import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.StatType;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
 
@@ -32,7 +32,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
  * Adapter for {@link com.mainstreetcode.teammate.model.Tournament}
  */
 
-public class StatEditAdapter extends InteractiveAdapter<InteractiveViewHolder, StatEditAdapter.AdapterListener> {
+public class StatEditAdapter extends BaseAdapter<BaseViewHolder, StatEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
     private final TextInputStyle.InputChooser chooser;
@@ -45,10 +45,10 @@ public class StatEditAdapter extends InteractiveAdapter<InteractiveViewHolder, S
 
     @NonNull
     @Override
-    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case Item.INPUT:
-            case Item.NUMBER:
+            default:
+            case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case Item.STAT_TYPE:
                 return new StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup),
@@ -57,13 +57,11 @@ public class StatEditAdapter extends InteractiveAdapter<InteractiveViewHolder, S
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
             case TEAM:
                 return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), team -> adapterListener.onTeamClicked());
-            default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
         Object item = items.get(i);
 
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));
@@ -81,7 +79,7 @@ public class StatEditAdapter extends InteractiveAdapter<InteractiveViewHolder, S
         Object object = items.get(position);
         return object instanceof Item ? ((Item) object).getItemType() == Item.STAT_TYPE
                 ? Item.STAT_TYPE
-                : Item.INPUT
+                : ITEM
                 : object instanceof User
                 ? USER : TEAM;
     }

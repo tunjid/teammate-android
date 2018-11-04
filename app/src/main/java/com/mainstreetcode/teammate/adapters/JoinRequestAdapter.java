@@ -3,10 +3,10 @@ package com.mainstreetcode.teammate.adapters;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -14,7 +14,6 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -22,12 +21,13 @@ import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 /**
  * Adapter for {@link Role}
  */
 
-public class JoinRequestAdapter extends InteractiveAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
+public class JoinRequestAdapter extends BaseAdapter<InputViewHolder, JoinRequestAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
     private final TextInputStyle.InputChooser chooser;
@@ -40,12 +40,12 @@ public class JoinRequestAdapter extends InteractiveAdapter<BaseItemViewHolder, J
 
     @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InputViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
+    public void onBindViewHolder(@NonNull InputViewHolder baseItemViewHolder, int i) {
         Identifiable item = items.get(i);
         if (item instanceof Item) baseItemViewHolder.bind(chooser.get((Item) item));
     }
@@ -57,7 +57,7 @@ public class JoinRequestAdapter extends InteractiveAdapter<BaseItemViewHolder, J
 
     @Override
     public int getItemViewType(int position) {
-        return Item.INPUT;
+        return ITEM;
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {

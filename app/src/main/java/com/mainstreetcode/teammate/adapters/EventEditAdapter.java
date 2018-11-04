@@ -5,11 +5,12 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.GuestViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Guest;
@@ -17,21 +18,20 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Visibility;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.GUEST;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
+
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Event  }
  */
 
-public class EventEditAdapter extends InteractiveAdapter<InteractiveViewHolder, EventEditAdapter.EventEditAdapterListener> {
-
-    private static final int GUEST = 18;
-    private static final int TEAM = 19;
+public class EventEditAdapter extends BaseAdapter<BaseViewHolder, EventEditAdapter.EventEditAdapterListener> {
 
     private final List<Identifiable> identifiables;
     private final TextInputStyle.InputChooser chooser = new Chooser(adapterListener);
@@ -44,21 +44,20 @@ public class EventEditAdapter extends InteractiveAdapter<InteractiveViewHolder, 
 
     @NonNull
     @Override
-    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case Item.INPUT:
+            default:
+            case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_event_guest, viewGroup), adapterListener);
             case TEAM:
                 return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), item -> adapterListener.selectTeam());
-            default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
         Object item = identifiables.get(i);
 
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));
@@ -80,7 +79,7 @@ public class EventEditAdapter extends InteractiveAdapter<InteractiveViewHolder, 
     public int getItemViewType(int position) {
         Object thing = identifiables.get(position);
         return thing instanceof Item
-                ? Item.INPUT
+                ? ITEM
                 : thing instanceof Team
                 ? TEAM
                 : GUEST;

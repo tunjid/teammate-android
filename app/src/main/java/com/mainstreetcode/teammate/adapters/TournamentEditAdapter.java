@@ -9,6 +9,8 @@ import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
@@ -17,8 +19,6 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +26,14 @@ import java.util.List;
 import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
 
 /**
  * Adapter for {@link com.mainstreetcode.teammate.model.Tournament}
  */
 
-public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHolder, TournamentEditAdapter.AdapterListener> {
+public class TournamentEditAdapter extends BaseAdapter<BaseViewHolder, TournamentEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
     private final TextInputStyle.InputChooser chooser;
@@ -45,10 +46,10 @@ public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHol
 
     @NonNull
     @Override
-    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
             default:
-            case Item.INPUT:
+            case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case TOURNAMENT:
                 return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), viewHolder -> {});
@@ -56,7 +57,7 @@ public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHol
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
         Object item = items.get(i);
 
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));
@@ -72,7 +73,7 @@ public class TournamentEditAdapter extends InteractiveAdapter<InteractiveViewHol
     @Override
     public int getItemViewType(int position) {
         Object thing = items.get(position);
-        return thing instanceof Item ? Item.INPUT : TOURNAMENT;
+        return thing instanceof Item ? ITEM : TOURNAMENT;
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {

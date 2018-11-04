@@ -3,24 +3,25 @@ package com.mainstreetcode.teammate.adapters;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
+
 /**
  * Adapter for {@link Guest}
  */
 
-public class GuestAdapter extends InteractiveAdapter<BaseItemViewHolder, ImageWorkerFragment.ImagePickerListener> {
+public class GuestAdapter extends BaseAdapter<InputViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
     private final List<Identifiable> items;
     private final Chooser chooser;
@@ -33,12 +34,12 @@ public class GuestAdapter extends InteractiveAdapter<BaseItemViewHolder, ImageWo
 
     @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InputViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
         Identifiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
@@ -50,7 +51,7 @@ public class GuestAdapter extends InteractiveAdapter<BaseItemViewHolder, ImageWo
 
     @Override
     public int getItemViewType(int position) {
-        return Item.INPUT;
+        return ITEM;
     }
 
     @Override

@@ -12,12 +12,10 @@ import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.StatTypes;
-import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
-import io.reactivex.Flowable;
 
 public class StatAttributeViewHolder extends InputViewHolder {
 

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.SparseArray;
 import android.view.View;
-import android.widget.EditText;
 
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.model.Item;

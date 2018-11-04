@@ -5,11 +5,12 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -19,7 +20,6 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
 
@@ -34,7 +35,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
  * Adapter for {@link Event}
  */
 
-public class StatAggregateRequestAdapter extends InteractiveAdapter<InteractiveViewHolder, StatAggregateRequestAdapter.AdapterListener> {
+public class StatAggregateRequestAdapter extends BaseAdapter<BaseViewHolder, StatAggregateRequestAdapter.AdapterListener> {
 
     private final StatAggregate.Request request;
     private final TextInputStyle.InputChooser chooser;
@@ -48,10 +49,10 @@ public class StatAggregateRequestAdapter extends InteractiveAdapter<InteractiveV
 
     @NonNull
     @Override
-    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case Item.DATE:
-            case Item.SPORT:
+            default:
+            case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onUserPicked)
@@ -59,17 +60,15 @@ public class StatAggregateRequestAdapter extends InteractiveAdapter<InteractiveV
             case TEAM:
                 return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onTeamPicked)
                         .withTitle(R.string.pick_team);
-            default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
         Identifiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
-            ((BaseItemViewHolder) viewHolder).bind(chooser.get((Item) identifiable));
+            ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));
         else if (identifiable instanceof User)
             ((UserViewHolder) viewHolder).bind((User) identifiable);
         else if (identifiable instanceof Team)
@@ -84,7 +83,7 @@ public class StatAggregateRequestAdapter extends InteractiveAdapter<InteractiveV
     @Override
     public int getItemViewType(int position) {
         Identifiable identifiable = request.getItems().get(position);
-        return identifiable instanceof Item ? Item.INPUT : identifiable instanceof User ? USER : TEAM;
+        return identifiable instanceof Item ? ITEM : identifiable instanceof User ? USER : TEAM;
     }
 
     public interface AdapterListener extends InteractiveAdapter.AdapterListener {
