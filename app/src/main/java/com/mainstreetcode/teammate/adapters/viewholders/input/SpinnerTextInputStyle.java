@@ -37,7 +37,7 @@ public class SpinnerTextInputStyle<T> extends TextInputStyle {
                                  Function<T, String> valueFunction,
                                  Function<Item, Boolean> enabler,
                                  Function<Item, CharSequence> errorChecker) {
-        super(() -> {}, () -> {}, enabler, errorChecker, Item.NO_ICON);
+        super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, errorChecker, Item.NO_ICON);
         this.titleRes = titleRes;
         this.items = items;
         this.displayFunction = displayFunction;
@@ -66,8 +66,7 @@ public class SpinnerTextInputStyle<T> extends TextInputStyle {
 
     private void onItemSelected(List<CharSequence> sequences, int position, T type) {
         item.setValue(valueFunction.apply(type));
-        if (editText == null) return;
-        editText.setText(sequences.get(position).toString());
-        editText.setError(null);
+        if (viewHolder == null) return;
+        viewHolder.updateText(sequences.get(position));
     }
 }

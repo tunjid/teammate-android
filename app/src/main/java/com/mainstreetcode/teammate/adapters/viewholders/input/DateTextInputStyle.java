@@ -77,6 +77,6 @@ public class DateTextInputStyle extends TextInputStyle
     private void updateTime() {
         String updatedDate = ModelUtils.prettyPrinter.format(calendar.getTime());
         item.setValue(updatedDate);
-        if (editText != null) editText.setText(updatedDate);
+        if (viewHolder != null) viewHolder.updateText(updatedDate);
     }
 }

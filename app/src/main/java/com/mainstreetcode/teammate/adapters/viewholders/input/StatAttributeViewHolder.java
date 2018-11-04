@@ -12,10 +12,12 @@ import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.StatTypes;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Flowable;
 
 public class StatAttributeViewHolder extends InputViewHolder {
 
@@ -57,17 +59,25 @@ public class StatAttributeViewHolder extends InputViewHolder {
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void bind(TextInputStyle textInputStyle) {
+    @Override public void bind(TextInputStyle textInputStyle) {
         super.bind(textInputStyle);
         statType.update(statTypes.fromCodeOrFirst(textInputStyle.getItem().getRawValue()));
         adapter.notifyDataSetChanged();
     }
 
-//    @Override
-//    protected void onItemSelected(List<CharSequence> sequences, int position, StatType type) {
-//        super.onItemSelected(sequences, position, type);
-//        statType.update(type);
-//        adapter.notifyDataSetChanged();
-//    }
+    @Override void updateText(CharSequence text) {
+        super.updateText(text);
+        if (textInputStyle == null) return;
+        String value = textInputStyle.getItem().getRawValue();
+        StatType current = null;
+
+        for (StatType type : statTypes)
+            if (type.getCode().equals(value)) {
+                current = type;
+                break;
+            }
+        if (current == null) return;
+        statType.update(current);
+        adapter.notifyDataSetChanged();
+    }
 }

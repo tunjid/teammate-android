@@ -18,7 +18,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getActivity;
 public class TextInputStyle {
 
     Item item;
-    EditText editText;
+    InputViewHolder viewHolder;
 
     @Nullable private Runnable textRunnable;
     @Nullable private Runnable buttonRunnable;
@@ -65,8 +65,8 @@ public class TextInputStyle {
 
     void onButtonClicked(View view) { if (buttonRunnable != null) buttonRunnable.run(); }
 
-    void setEditText(EditText editText) {
-        this.editText = editText;
+    void setViewHolder(InputViewHolder viewHolder) {
+        this.viewHolder = viewHolder;
     }
 
     void onDialogDismissed(Context context) {

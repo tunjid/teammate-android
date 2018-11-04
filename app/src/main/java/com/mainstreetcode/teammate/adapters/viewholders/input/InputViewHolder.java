@@ -36,7 +36,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     public void bind(TextInputStyle textInputStyle) {
         this.textInputStyle = textInputStyle;
-        textInputStyle.setEditText(editText);
+        textInputStyle.setViewHolder(this);
 
         Item item = textInputStyle.getItem();
         boolean isSelector = textInputStyle.isSelector();
@@ -69,6 +69,11 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     public void afterTextChanged(Editable editable) {
         if (textInputStyle.isSelector()) return;
         textInputStyle.getItem().setValue(editable.toString());
+        checkForErrors();
+    }
+
+    void updateText(CharSequence text) {
+        editText.setText(text);
         checkForErrors();
     }
 
