@@ -1,13 +1,14 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.DateViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
@@ -22,9 +23,10 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.provider.Contacts.PresenceColumns.AWAY;
+import androidx.annotation.NonNull;
+
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
-import static com.mainstreetcode.teammate.model.Item.TRUE;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.AWAY;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.HOME;
 
 /**
@@ -34,26 +36,21 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.HOME;
 public class HeadToHeadRequestAdapter extends InteractiveAdapter<InteractiveViewHolder, HeadToHeadRequestAdapter.AdapterListener> {
 
     private final HeadToHead.Request request;
-    private final List<Sport> sports;
+    private final Chooser chooser;
 
     public HeadToHeadRequestAdapter(HeadToHead.Request request,
                                     AdapterListener listener) {
         super(listener);
         this.request = request;
-        sports = new ArrayList<>(Config.getSports());
-        sports.add(0, Sport.empty());
+        chooser = new Chooser();
     }
 
     @NonNull
     @Override
     public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case Item.TOURNAMENT_TYPE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.tournament_type, Config.getTournamentTypes(type -> true), TournamentType::getName, TournamentType::getCode, TRUE, ALL_INPUT_VALID);
-            case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, ALL_INPUT_VALID);
-            case Item.DATE:
-                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
+            case Item.INPUT:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case HOME:
                 return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onHomeClicked)
                         .hideSubtitle().withTitle(R.string.pick_home_competitor);
@@ -70,7 +67,7 @@ public class HeadToHeadRequestAdapter extends InteractiveAdapter<InteractiveView
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
         Identifiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
-            ((BaseItemViewHolder) viewHolder).bind((Item) identifiable);
+            ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));
         else if (identifiable instanceof Competitor)
             ((CompetitorViewHolder) viewHolder).bind((Competitor) identifiable);
     }
@@ -83,12 +80,47 @@ public class HeadToHeadRequestAdapter extends InteractiveAdapter<InteractiveView
     @Override
     public int getItemViewType(int position) {
         Identifiable identifiable = request.getItems().get(position);
-        return identifiable instanceof Item ? ((Item) identifiable).getItemType() : position == 2 ? HOME : AWAY;
+        return identifiable instanceof Item ? Item.INPUT : position == 2 ? HOME : AWAY;
     }
 
     public interface AdapterListener extends InteractiveAdapter.AdapterListener {
         void onHomeClicked(Competitor home);
 
         void onAwayClicked(Competitor away);
+    }
+
+    private static class Chooser extends TextInputStyle.InputChooser {
+
+        private final List<Sport> sports;
+
+        Chooser() {
+            sports = new ArrayList<>(Config.getSports());
+            sports.add(0, Sport.empty());
+        }
+
+        @Override public TextInputStyle apply(Item item) {
+            int itemType = item.getItemType();
+            switch (itemType) {
+                default:
+                case Item.SPORT:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.choose_sport,
+                            sports,
+                            Sport::getName,
+                            Sport::getCode,
+                            Item.TRUE,
+                            ALL_INPUT_VALID);
+                case Item.DATE:
+                    return new DateTextInputStyle(Item.TRUE);
+                case Item.TOURNAMENT_TYPE:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.tournament_type,
+                            Config.getTournamentTypes(type -> true),
+                            TournamentType::getName,
+                            TournamentType::getCode,
+                            Item.TRUE,
+                            ALL_INPUT_VALID);
+            }
+        }
     }
 }

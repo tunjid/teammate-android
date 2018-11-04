@@ -82,8 +82,7 @@ public class ViewHolderUtil extends ViewUtil {
     }
 
     @Nullable
-    public static Activity getActivity(RecyclerView.ViewHolder viewHolder) {
-        Context context = viewHolder.itemView.getContext();
+    public static Activity getActivity(Context context) {
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) return (Activity) context;
             context = ((ContextWrapper) context).getBaseContext();

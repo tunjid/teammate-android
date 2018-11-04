@@ -2,11 +2,15 @@ package com.mainstreetcode.teammate.baseclasses;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment;
@@ -116,6 +120,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         if (activity == null) return;
 
         if (shouldGoBack) activity.onBackPressed();
+    }
+
+    protected RecyclerView.RecycledViewPool inputRecycledViewPool() {
+        return ((MainActivity) requireActivity()).getInputRecycledPool();
     }
 
     protected boolean isBottomSheetShowing() {

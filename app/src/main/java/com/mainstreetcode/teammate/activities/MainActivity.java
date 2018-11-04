@@ -37,6 +37,7 @@ import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -62,6 +63,7 @@ import androidx.arch.core.util.Function;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static android.view.View.GONE;
@@ -84,6 +86,7 @@ public class MainActivity extends TeammatesBaseActivity
     @Nullable private ViewHider bottombarHider;
     private BottomNav bottomNav;
 
+    private RecyclerView.RecycledViewPool inputRecycledPool;
     private BottomSheetBehavior bottomSheetBehavior;
     private ViewGroup bottomSheetContainer;
     private Toolbar bottomSheetToolbar;
@@ -119,6 +122,8 @@ public class MainActivity extends TeammatesBaseActivity
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
 
         userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        inputRecycledPool = new RecyclerView.RecycledViewPool();
+        inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10);
 
         if (!userViewModel.isSignedIn()) {
             startRegistrationActivity(this);
@@ -314,6 +319,10 @@ public class MainActivity extends TeammatesBaseActivity
     private boolean onAltMenuItemSelected(MenuItem item) {
         Fragment current = getCurrentFragment();
         return current != null && current.onOptionsItemSelected(item);
+    }
+
+    public RecyclerView.RecycledViewPool getInputRecycledPool() {
+        return inputRecycledPool;
     }
 
     private void showNavOverflow() {

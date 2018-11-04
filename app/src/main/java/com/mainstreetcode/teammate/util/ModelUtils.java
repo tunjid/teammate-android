@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammate.util;
 
 import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
 import androidx.emoji.text.EmojiCompat;
 import android.text.TextUtils;
 
+import com.google.android.gms.common.util.BiConsumer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -76,8 +78,12 @@ public class ModelUtils {
     }
 
     public static <K, V> V get(K key, Map<K, V> map, Supplier<V> instantiator) {
-        V value = map.get(key);
-        if (value == null) map.put(key, value = instantiator.get());
+        return get(key, map::get, map::put, instantiator);
+    }
+
+    public static <K, V> V get(K key, Function<K, V> getter, BiConsumer<K, V> setter, Supplier<V> instantiator) {
+        V value = getter.apply(key);
+        if (value == null) setter.accept(key, value = instantiator.get());
 
         return value;
     }

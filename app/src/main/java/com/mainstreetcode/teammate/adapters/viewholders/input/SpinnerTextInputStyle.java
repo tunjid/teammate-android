@@ -1,5 +1,6 @@
-package com.mainstreetcode.teammate.adapters.viewholders;
+package com.mainstreetcode.teammate.adapters.viewholders.input;
 
+import android.content.Context;
 import android.view.View;
 
 import com.mainstreetcode.teammate.model.Item;
@@ -13,41 +14,37 @@ import androidx.arch.core.util.Function;
 import io.reactivex.Flowable;
 
 
-public class SelectionViewHolder<T> extends ClickInputViewHolder
-        implements View.OnClickListener {
+public class SpinnerTextInputStyle<T> extends TextInputStyle {
 
     private final int titleRes;
     private final List<T> items;
     private final Function<T, CharSequence> displayFunction;
     private final Function<T, String> valueFunction;
 
-    public SelectionViewHolder(View itemView,
-                               @StringRes int titleRes,  List<T> items,
-                               Function<T, CharSequence> displayFunction,
-                               Function<T, String> valueFunction,
-                               Function<Item, Boolean> enabler) {
-        super(itemView, enabler, () -> {});
+    public SpinnerTextInputStyle(@StringRes int titleRes, List<T> items,
+                                 Function<T, CharSequence> displayFunction,
+                                 Function<T, String> valueFunction,
+                                 Function<Item, Boolean> enabler) {
+        super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, Item.NON_EMPTY, Item.NO_ICON);
         this.titleRes = titleRes;
         this.items = items;
         this.displayFunction = displayFunction;
         this.valueFunction = valueFunction;
     }
 
-    public SelectionViewHolder(View itemView,
-                               @StringRes int titleRes,  List<T> items,
-                               Function<T, CharSequence> displayFunction,
-                               Function<T, String> valueFunction,
-                               Function<Item,Boolean> enabler,
-                               Function<Item, CharSequence> errorChecker) {
-        super(itemView, enabler, () -> {}, errorChecker);
+    public SpinnerTextInputStyle(@StringRes int titleRes, List<T> items,
+                                 Function<T, CharSequence> displayFunction,
+                                 Function<T, String> valueFunction,
+                                 Function<Item, Boolean> enabler,
+                                 Function<Item, CharSequence> errorChecker) {
+        super(() -> {}, () -> {}, enabler, errorChecker, Item.NO_ICON);
         this.titleRes = titleRes;
         this.items = items;
         this.displayFunction = displayFunction;
         this.valueFunction = valueFunction;
     }
 
-    @Override
-    public void onClick(View view) {
+    @Override void onTextClicked(View view) {
         if (!isEnabled()) return;
 
         List<CharSequence> sequences = new ArrayList<>();
@@ -57,17 +54,19 @@ public class SelectionViewHolder<T> extends ClickInputViewHolder
                 .collectInto(sequences, List::add)
                 .subscribe();
 
-        AlertDialog dialog = new AlertDialog.Builder(itemView.getContext())
+        Context context = view.getContext();
+        AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle(titleRes)
                 .setItems(sequences.toArray(new CharSequence[0]), (dialogInterface, position) -> onItemSelected(sequences, position, items.get(position)))
                 .create();
 
-        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed());
+        dialog.setOnDismissListener(dialogInterface -> onDialogDismissed(context));
         dialog.show();
     }
 
-    protected void onItemSelected(List<CharSequence> sequences, int position, T type) {
+    private void onItemSelected(List<CharSequence> sequences, int position, T type) {
         item.setValue(valueFunction.apply(type));
+        if (editText == null) return;
         editText.setText(sequences.get(position).toString());
         editText.setError(null);
     }

@@ -50,6 +50,11 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final int TOURNAMENT_STYLE = 20;
     public static final int COMPETITOR = 21;
 
+    public static final Runnable NO_CLICK = null;
+    public static final Runnable EMPTY_CLICK = () -> {};
+
+    public static final Function<Item, Integer> NO_ICON = item -> 0;
+
     public static final Function<Item, Boolean> TRUE = item -> true;
     public static final Function<Item, Boolean> FALSE = item -> false;
 

@@ -1,18 +1,11 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.arch.core.util.Function;
-
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
@@ -22,7 +15,7 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
-import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
+import androidx.annotation.NonNull;
 
 /**
  * Adapter for {@link User}
@@ -31,39 +24,24 @@ import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 public class UserEditAdapter extends InteractiveAdapter<BaseItemViewHolder, UserEditAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
+    private final TextInputStyle.InputChooser chooser;
 
     public UserEditAdapter(List<Identifiable> items, UserEditAdapter.AdapterListener listener) {
         super(listener);
         this.items = items;
+        chooser = new Chooser(adapterListener);
     }
 
     @NonNull
     @Override
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        Context context = viewGroup.getContext();
-        View itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_simple_input, viewGroup, false);
-
-        Function<Item, Boolean> enabler = input -> adapterListener.canEdit();
-        switch (viewType) {
-            case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), enabler)
-                        .setButtonRunnable(
-                                R.drawable.ic_picture_white_24dp,
-                                adapterListener::onImageClick,
-                                (Function<Item, Boolean>) this::showsChangePicture);
-            case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), enabler, ViewHolderUtil.allowsSpecialCharacters);
-            case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), enabler, ALL_INPUT_VALID);
-            default:
-                return new BaseItemViewHolder(itemView);
-        }
+        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
         Identifiable item = items.get(i);
-        if (item instanceof Item) viewHolder.bind((Item) item);
+        if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 
     @Override
@@ -73,8 +51,7 @@ public class UserEditAdapter extends InteractiveAdapter<BaseItemViewHolder, User
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
-        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
+        return Item.INPUT;
     }
 
     @Override
@@ -82,11 +59,52 @@ public class UserEditAdapter extends InteractiveAdapter<BaseItemViewHolder, User
         return items.get(position).hashCode();
     }
 
-    private boolean showsChangePicture(Item item) {
-        return adapterListener.canEdit() && item.getStringRes() == R.string.first_name;
-    }
-
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
         boolean canEdit();
+    }
+
+    private static class Chooser extends TextInputStyle.InputChooser {
+
+        private AdapterListener adapterListener;
+
+        Chooser(AdapterListener adapterListener) {
+            this.adapterListener = adapterListener;
+        }
+
+        @Override public int iconGetter(Item item) {
+            switch (item.getItemType()) {
+                default:
+                    return 0;
+                case Item.INPUT:
+                    return adapterListener.canEdit() ? R.drawable.ic_picture_white_24dp : 0;
+            }
+        }
+
+        @Override public CharSequence textChecker(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.INPUT:
+                    return Item.NON_EMPTY.apply(item);
+                case Item.INFO:
+                    return ViewHolderUtil.allowsSpecialCharacters.apply(item.getValue());
+                case Item.ABOUT:
+                    return Item.ALL_INPUT_VALID.apply(item);
+            }
+        }
+
+        @Override public TextInputStyle apply(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.INFO:
+                case Item.INPUT:
+                case Item.ABOUT:
+                    return new TextInputStyle(
+                            Item.NO_CLICK,
+                            adapterListener::onImageClick,
+                            input -> adapterListener.canEdit(),
+                            this::textChecker,
+                            this::iconGetter);
+            }
+        }
     }
 }

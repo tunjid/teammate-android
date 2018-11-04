@@ -4,11 +4,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +27,12 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.List;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentTransaction;
+
 import static android.app.Activity.RESULT_OK;
 import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
@@ -39,7 +40,7 @@ import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSION
 
 public class EventSearchFragment extends MainActivityFragment {
 
-    public static final int MAP_ZOOM = 10;
+    private static final int MAP_ZOOM = 10;
 
     private boolean leaveMap;
 
@@ -64,6 +65,7 @@ public class EventSearchFragment extends MainActivityFragment {
         scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
                 .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest(), this::startPlacePicker))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 

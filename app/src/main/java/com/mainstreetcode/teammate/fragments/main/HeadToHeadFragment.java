@@ -78,6 +78,7 @@ public class HeadToHeadFragment extends MainActivityFragment
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
                 .withAdapter(new HeadToHeadRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 

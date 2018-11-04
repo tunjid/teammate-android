@@ -1,14 +1,12 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.arch.core.util.Function;
-import androidx.annotation.NonNull;
-
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.BaseItemViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -19,6 +17,8 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 /**
  * Adapter for {@link Role}
  */
@@ -26,43 +26,24 @@ import java.util.List;
 public class RoleEditAdapter extends InteractiveAdapter<BaseItemViewHolder, RoleEditAdapter.RoleEditAdapterListener> {
 
     private final List<Identifiable> items;
+    private final TextInputStyle.InputChooser chooser;
 
     public RoleEditAdapter(List<Identifiable> items, RoleEditAdapter.RoleEditAdapterListener listener) {
         super(listener);
         this.items = items;
+        chooser = new Chooser(adapterListener);
     }
 
     @NonNull
     @Override
     public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        switch (viewType) {
-            case Item.INPUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE)
-                        .setButtonRunnable(
-                                R.drawable.ic_picture_white_24dp,
-                                adapterListener::onImageClick,
-                                (Function<Item, Boolean>) this::showsChangePicture);
-            case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, Item.ALL_INPUT_VALID);
-            case Item.NICKNAME:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup),
-                        item -> adapterListener.canChangeRoleFields(),
-                        Item.ALL_INPUT_VALID);
-            case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup),
-                        R.string.choose_role, Config.getPositions(),
-                        Position::getName,
-                        Position::getCode,
-                        item -> adapterListener.canChangeRolePosition());
-            default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
-        }
+        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
         Identifiable item = items.get(i);
-        if (item instanceof Item) baseItemViewHolder.bind((Item) item);
+        if (item instanceof Item) baseItemViewHolder.bind(chooser.get((Item) item));
     }
 
     @Override
@@ -72,17 +53,81 @@ public class RoleEditAdapter extends InteractiveAdapter<BaseItemViewHolder, Role
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
-        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
-    }
-
-    private boolean showsChangePicture(Item item) {
-        return item.getStringRes() == R.string.first_name && adapterListener.canChangeRoleFields();
+        return Item.INPUT;
     }
 
     public interface RoleEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
         boolean canChangeRolePosition();
 
         boolean canChangeRoleFields();
+    }
+
+    private static class Chooser extends TextInputStyle.InputChooser {
+
+        private final RoleEditAdapterListener adapterListener;
+
+        private Chooser(RoleEditAdapterListener adapterListener) {this.adapterListener = adapterListener;}
+
+        private boolean showsChangePicture(Item item) {
+            return item.getStringRes() == R.string.first_name && adapterListener.canChangeRoleFields();
+        }
+
+        @Override public boolean enabler(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.INPUT:
+                case Item.ABOUT:
+                    return false;
+                case Item.NICKNAME:
+                    return adapterListener.canChangeRoleFields();
+            }
+        }
+
+        @Override public  int iconGetter(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.INPUT:
+                case Item.ABOUT:
+                case Item.NICKNAME:
+                    return 0;
+                case Item.ROLE:
+                    return showsChangePicture(item) ? R.drawable.ic_picture_white_24dp : 0;
+            }
+        }
+
+        @Override public  CharSequence textChecker(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.INPUT:
+                    return Item.NON_EMPTY.apply(item);
+                case Item.ABOUT:
+                case Item.NICKNAME:
+                    return Item.ALL_INPUT_VALID.apply(item);
+            }
+        }
+
+        @Override public  TextInputStyle apply(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.INPUT:
+                case Item.ABOUT:
+                case Item.NICKNAME:
+                    return new TextInputStyle(
+                            Item.NO_CLICK,
+                            item.getStringRes() == R.string.first_name
+                                    ? adapterListener::onImageClick
+                                    : Item.NO_CLICK,
+                            this::enabler,
+                            this::textChecker,
+                            this::iconGetter);
+                case Item.ROLE:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.choose_role,
+                            Config.getPositions(),
+                            Position::getName,
+                            Position::getCode,
+                            current -> adapterListener.canChangeRolePosition());
+            }
+        }
     }
 }

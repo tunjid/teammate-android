@@ -1,4 +1,4 @@
-package com.mainstreetcode.teammate.adapters.viewholders;
+package com.mainstreetcode.teammate.adapters.viewholders.input;
 
 import android.view.View;
 
@@ -11,13 +11,14 @@ import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
  * Viewholder for {@link Item items}
  */
 public class BaseItemViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends InteractiveViewHolder<T> {
-    Item item;
+
+    TextInputStyle textInputStyle;
 
     public BaseItemViewHolder(View itemView) {
         super(itemView);
     }
 
-    public void bind(Item item) {
-        this.item = item;
+    public void bind(TextInputStyle textInputStyle) {
+        this.textInputStyle = textInputStyle;
     }
 }

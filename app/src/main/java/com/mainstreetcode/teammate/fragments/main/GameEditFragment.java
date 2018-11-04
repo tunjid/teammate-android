@@ -1,12 +1,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +22,13 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
+
 /**
  * Edits a Team member
  */
@@ -38,7 +39,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
         TeamAdapter.AdapterListener,
         GameEditAdapter.AdapterListener {
 
-    public static final String ARG_GAME = "stat";
+    private static final String ARG_GAME = "game";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Game game;
@@ -78,6 +79,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new GameEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
