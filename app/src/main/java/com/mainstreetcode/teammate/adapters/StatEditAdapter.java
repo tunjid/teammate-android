@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.model.enums.StatAttribute;
+import com.mainstreetcode.teammate.model.enums.StatType;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
@@ -120,9 +120,9 @@ public class StatEditAdapter extends InteractiveAdapter<InteractiveViewHolder, S
                     Stat stat = adapterListener.getStat();
                     return new SpinnerTextInputStyle<>(
                             R.string.choose_stat,
-                            stat.getAttributes(),
-                            StatAttribute::getName,
-                            StatAttribute::getCode,
+                            stat.getSport().getStats(),
+                            StatType::getEmojiAndName,
+                            StatType::getCode,
                             ignored -> adapterListener.canChangeStat(),
                             ALL_INPUT_VALID);
             }

@@ -24,7 +24,6 @@ public class StatAttributeViewHolder extends InputViewHolder {
     private final StatTypes statTypes;
 
     public StatAttributeViewHolder(View itemView, Stat stat) {
-
         super(itemView);
 
         statTypes = stat.getSport().getStats();
