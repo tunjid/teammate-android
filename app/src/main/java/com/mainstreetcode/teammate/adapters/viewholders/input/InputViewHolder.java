@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters.viewholders.input;
 
-import android.content.res.ColorStateList;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -16,7 +15,6 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -39,6 +37,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     @Override protected void clear() {
+        editText.removeTextChangedListener(this);
         if (textInputStyle != null) textInputStyle.setViewHolder(null);
         textInputStyle = null;
         super.clear();
@@ -63,8 +62,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         editText.setOnClickListener(textInputStyle.textClickListener());
         button.setOnClickListener(textInputStyle.buttonClickListener());
 
-        if (isSelector) editText.removeTextChangedListener(this);
-        else editText.addTextChangedListener(this);
+        editText.removeTextChangedListener(this);
+        if (!isSelector) editText.addTextChangedListener(this);
 
         checkForErrors();
         setClickableState();
@@ -97,8 +96,6 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     private void setClickableState() {
         if (textInputStyle == null) return;
-        int colorInt = ContextCompat.getColor(itemView.getContext(), textInputStyle.isEnabled() ? R.color.black : R.color.disabled_text);
-        editText.setTextColor(ColorStateList.valueOf(colorInt));
 
         int icon = textInputStyle.getIcon();
         int visibility = icon == 0 ? GONE : VISIBLE;
