@@ -86,7 +86,7 @@ public class TextInputStyle {
         public TextInputStyle get(Item item) {
             return ModelUtils.get(
                     item.getStringRes(),
-                    behaviors::get, behaviors::append,
+                    behaviors::get, behaviors::put,
                     () -> apply(item)).with(item);
         }
 
