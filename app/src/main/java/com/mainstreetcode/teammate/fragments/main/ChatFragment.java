@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -252,6 +254,8 @@ public class ChatFragment extends MainActivityFragment
         if (recyclerView == null) return false;
 
         LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+        if (layoutManager == null) return false;
+
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
         return Math.abs(items.size() - lastVisibleItemPosition) < 4;
