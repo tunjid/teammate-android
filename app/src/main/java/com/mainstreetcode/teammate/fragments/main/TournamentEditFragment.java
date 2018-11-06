@@ -2,13 +2,6 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
@@ -27,6 +21,14 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * Edits a Team member
  */
@@ -35,10 +37,10 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
         implements
         TournamentEditAdapter.AdapterListener {
 
-    public static final String ARG_TOURNAMENT = "tournament";
-
+    static final String ARG_TOURNAMENT = "tournament";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
+    private boolean showingPrompt;
     private Tournament tournament;
     private TournamentGofer gofer;
 
@@ -194,7 +196,13 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public Sport getSport() { return tournament.getSport(); }
 
     private void promptForCompetitors() {
+        if (showingPrompt) return;
+
+        showingPrompt = true;
         showSnackbar(snackbar -> snackbar.setText(getString(R.string.add_tournament_competitors_prompt))
+                .addCallback(new Snackbar.Callback() {
+                    public void onDismissed(Snackbar bar, int event) { showingPrompt = false; }
+                })
                 .setAction(R.string.okay, view -> showFragment(CompetitorsFragment.newInstance(tournament))));
     }
 
