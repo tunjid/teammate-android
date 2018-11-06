@@ -42,6 +42,7 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -80,7 +81,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private FrameLayout fragmentContainer;
     private LoadingBar loadingBar;
     private Toolbar toolbar;
-    private View fabPad;
+    private View padding;
 
     private ViewHider fabHider;
     private ViewHider toolbarHider;
@@ -130,16 +131,16 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         bottomInsetView = findViewById(R.id.bottom_inset);
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
-        fabPad = findViewById(R.id.coordinator_padding);
+        padding = findViewById(R.id.padding);
         toolbarHider = ViewHider.of(toolbar).setDuration(HIDER_DURATION).setDirection(TOP).build();
         fabHider = ViewHider.of(fab).setDuration(HIDER_DURATION).setDirection(BOTTOM).build();
         fabInteractor = new FabInteractor(fab);
 
         //noinspection AndroidLintClickableViewAccessibility
-//        fabPad.setOnTouchListener((view, event) -> {
-//            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
-//            return true;
-//        });
+        padding.setOnTouchListener((view, event) -> {
+            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
+            return true;
+        });
 
         setSupportActionBar(toolbar);
         getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
@@ -312,9 +313,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         padding = adjustKeyboardPadding(padding);
         padding = Math.max(padding, 0);
 
-//        getLayoutParams(fabPad).height = padding;
-        fabPad.setPadding(0, 0, 0, padding);
         fragmentContainer.setPadding(0, 0, 0, padding);
+        getLayoutParams(this.padding).height = padding == 0 ? 1 : padding; // 0 breaks animations
     }
 
     private void adjustSystemInsets(Fragment fragment) {
