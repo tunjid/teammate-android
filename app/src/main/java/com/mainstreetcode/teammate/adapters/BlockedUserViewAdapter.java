@@ -6,6 +6,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
@@ -38,10 +39,16 @@ public class BlockedUserViewAdapter extends BaseAdapter<InputViewHolder, Interac
         return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
+    @SuppressWarnings("unchecked")
+    @Override protected <S extends AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        return (S) adapterListener;
+    }
+
     @Override
-    public void onBindViewHolder(@NonNull InputViewHolder baseItemViewHolder, int i) {
+    public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Identifiable item = items.get(i);
-        if ((item instanceof Item)) baseItemViewHolder.bind(chooser.get((Item) item));
+        if ((item instanceof Item)) viewHolder.bind(chooser.get((Item) item));
     }
 
     @Override

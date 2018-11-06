@@ -16,4 +16,8 @@ public class BaseViewHolder<T extends InteractiveAdapter.AdapterListener> extend
     }
 
     protected void clear() { adapterListener = null; }
+
+    void updateAdapterListener(T adapterListener) {
+        this.adapterListener = adapterListener;
+    }
 }

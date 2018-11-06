@@ -41,9 +41,15 @@ public class EventSearchRequestAdapter extends BaseAdapter<BaseViewHolder, Event
         return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
+    @SuppressWarnings("unchecked")
+    @Override protected <S extends AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        return (S) adapterListener;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
         Item item = request.asItems().get(position);
         ((InputViewHolder) viewHolder).bind(chooser.get(item));
     }
@@ -63,11 +69,11 @@ public class EventSearchRequestAdapter extends BaseAdapter<BaseViewHolder, Event
         return ITEM;
     }
 
-    public interface EventSearchAdapterListener extends InteractiveAdapter.AdapterListener{
+    public interface EventSearchAdapterListener extends InteractiveAdapter.AdapterListener {
         void onLocationClicked();
     }
 
-    private static class Chooser extends TextInputStyle.InputChooser{
+    private static class Chooser extends TextInputStyle.InputChooser {
 
         private final List<Sport> sports;
         private final EventSearchAdapterListener adapterListener;

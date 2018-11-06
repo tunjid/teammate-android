@@ -35,6 +35,7 @@ public class EventEditAdapter extends BaseAdapter<BaseViewHolder, EventEditAdapt
 
     private final List<Identifiable> identifiables;
     private final TextInputStyle.InputChooser chooser = new Chooser(adapterListener);
+    private final TeamAdapter.AdapterListener teamListener = item -> adapterListener.selectTeam();
 
     public EventEditAdapter(List<Identifiable> identifiables, EventEditAdapterListener listener) {
         super(listener);
@@ -52,12 +53,19 @@ public class EventEditAdapter extends BaseAdapter<BaseViewHolder, EventEditAdapt
             case GUEST:
                 return new GuestViewHolder(getItemView(R.layout.viewholder_event_guest, viewGroup), adapterListener);
             case TEAM:
-                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), item -> adapterListener.selectTeam());
+                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), teamListener);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override protected <S extends AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        if (viewHolder instanceof TeamViewHolder) return (S) teamListener;
+        return (S) adapterListener;
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Object item = identifiables.get(i);
 
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));

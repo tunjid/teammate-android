@@ -18,12 +18,14 @@ import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.StatType;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
+import static com.mainstreetcode.teammate.model.Item.STAT_TYPE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
@@ -36,6 +38,8 @@ public class StatEditAdapter extends BaseAdapter<BaseViewHolder, StatEditAdapter
 
     private final List<Identifiable> items;
     private final TextInputStyle.InputChooser chooser;
+    private final UserAdapter.AdapterListener userListener = user -> adapterListener.onUserClicked();
+    private final TeamAdapter.AdapterListener teamListener = team -> adapterListener.onTeamClicked();
 
     public StatEditAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
@@ -50,18 +54,28 @@ public class StatEditAdapter extends BaseAdapter<BaseViewHolder, StatEditAdapter
             default:
             case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
-            case Item.STAT_TYPE:
+            case STAT_TYPE:
                 return new StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup),
                         adapterListener.getStat());
             case USER:
-                return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), user -> adapterListener.onUserClicked());
+                return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), userListener);
             case TEAM:
-                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), team -> adapterListener.onTeamClicked());
+                return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), teamListener);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        if (viewHolder.getItemViewType() == USER) return (S) userListener;
+        if (viewHolder.getItemViewType() == TEAM) return (S) teamListener;
+
+        return (S) adapterListener;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Object item = items.get(i);
 
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));
@@ -77,8 +91,8 @@ public class StatEditAdapter extends BaseAdapter<BaseViewHolder, StatEditAdapter
     @Override
     public int getItemViewType(int position) {
         Object object = items.get(position);
-        return object instanceof Item ? ((Item) object).getItemType() == Item.STAT_TYPE
-                ? Item.STAT_TYPE
+        return object instanceof Item ? ((Item) object).getItemType() == STAT_TYPE
+                ? STAT_TYPE
                 : ITEM
                 : object instanceof User
                 ? USER : TEAM;
@@ -114,7 +128,7 @@ public class StatEditAdapter extends BaseAdapter<BaseViewHolder, StatEditAdapter
                             Item.TRUE,
                             Item.NON_EMPTY,
                             Item.NO_ICON);
-                case Item.STAT_TYPE:
+                case STAT_TYPE:
                     Stat stat = adapterListener.getStat();
                     return new SpinnerTextInputStyle<>(
                             R.string.choose_stat,

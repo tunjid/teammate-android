@@ -65,7 +65,18 @@ public class StatAggregateRequestAdapter extends BaseAdapter<BaseViewHolder, Sta
 
     @Override
     @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        if (viewHolder.getItemViewType() == USER)
+            return (S) ((UserAdapter.AdapterListener) adapterListener::onUserPicked);
+        if (viewHolder.getItemViewType() == TEAM)
+            return (S) ((TeamAdapter.AdapterListener) adapterListener::onTeamPicked);
+        return (S) adapterListener;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
         Identifiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
             ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));

@@ -62,9 +62,19 @@ public class HeadToHeadRequestAdapter extends BaseAdapter<BaseViewHolder, HeadTo
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        if (viewHolder.getItemViewType() == HOME)
+            return (S) ((CompetitorAdapter.AdapterListener) adapterListener::onHomeClicked);
+        if (viewHolder.getItemViewType() == AWAY)
+            return (S) ((CompetitorAdapter.AdapterListener) adapterListener::onAwayClicked);
+        return (S) adapterListener;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
         Identifiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
             ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));

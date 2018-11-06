@@ -19,6 +19,7 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +38,7 @@ public class TournamentEditAdapter extends BaseAdapter<BaseViewHolder, Tournamen
 
     private final List<Identifiable> items;
     private final TextInputStyle.InputChooser chooser;
+    private final CompetitorAdapter.AdapterListener listener = viewHolder -> {};
 
     public TournamentEditAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
@@ -52,12 +54,19 @@ public class TournamentEditAdapter extends BaseAdapter<BaseViewHolder, Tournamen
             case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case TOURNAMENT:
-                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), viewHolder -> {});
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), listener);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        return (S) listener;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Object item = items.get(i);
 
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));

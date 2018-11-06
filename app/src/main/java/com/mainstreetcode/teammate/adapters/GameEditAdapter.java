@@ -43,13 +43,22 @@ public class GameEditAdapter extends BaseAdapter<BaseViewHolder, GameEditAdapter
             case ITEM:
                 return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case AWAY:
-            return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked)
+                return new CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener::onAwayClicked)
                         .hideSubtitle().withTitle(R.string.pick_away_competitor);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        if (viewHolder instanceof CompetitorViewHolder)
+            return (S) ((CompetitorAdapter.AdapterListener) adapterListener::onAwayClicked);
+        return (S) adapterListener;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Object item = items.get(i);
         if (item instanceof Item) ((InputViewHolder) viewHolder).bind(chooser.get((Item) item));
         else if (item instanceof Competitor)
@@ -77,7 +86,7 @@ public class GameEditAdapter extends BaseAdapter<BaseViewHolder, GameEditAdapter
 
         private AdapterListener adapterListener;
 
-        Chooser (AdapterListener adapterListener) {
+        Chooser(AdapterListener adapterListener) {
             this.adapterListener = adapterListener;
         }
 

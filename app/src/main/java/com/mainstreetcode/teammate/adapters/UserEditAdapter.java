@@ -6,11 +6,13 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -40,7 +42,14 @@ public class UserEditAdapter extends BaseAdapter<InputViewHolder, UserEditAdapte
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        return (S) adapterListener;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Identifiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
