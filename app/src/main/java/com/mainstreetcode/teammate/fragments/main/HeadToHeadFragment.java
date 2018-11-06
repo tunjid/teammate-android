@@ -159,7 +159,6 @@ public class HeadToHeadFragment extends MainActivityFragment
         if (isHome) request.updateHome(item);
         else request.updateAway(item);
         searchScrollManager.notifyDataSetChanged();
-        searchScrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 

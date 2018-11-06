@@ -184,7 +184,6 @@ public class GameEditFragment extends HeaderedFragment<Game>
     private void updateCompetitor(Competitive item) {
         game.getAway().updateEntity(item);
         scrollManager.notifyDataSetChanged();
-        scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 

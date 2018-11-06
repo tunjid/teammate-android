@@ -138,7 +138,6 @@ public class StatAggregateFragment extends MainActivityFragment
         else return;
 
         searchScrollManager.notifyDataSetChanged();
-        searchScrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 
