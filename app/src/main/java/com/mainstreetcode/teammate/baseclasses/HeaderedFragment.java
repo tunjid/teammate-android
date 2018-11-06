@@ -4,14 +4,9 @@ package com.mainstreetcode.teammate.baseclasses;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.appbar.AppBarLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.HeaderedImageViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
@@ -30,6 +25,11 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 
 import static androidx.core.view.ViewCompat.setTransitionName;
@@ -83,9 +83,8 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
         AppBarListener.with()
                 .appBarLayout(appBarLayout)
-                .offsetDiffListener(offsetProps -> updateFabForScrollState(offsetProps.getDy()))
+                .offsetDiffListener(this::onAppBarOffset)
                 .create();
-
     }
 
     @Override
@@ -163,6 +162,10 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
 
     private void checkIfChanged() {
         disposables.add(gofer().watchForChange().subscribe(value -> onPrepComplete(), ErrorHandler.EMPTY));
+    }
+
+    private void onAppBarOffset(AppBarListener.OffsetProps offsetProps) {
+        if (!offsetProps.appBarUnmeasured()) updateFabForScrollState(offsetProps.getDy());
     }
 
     protected void blockUser(User user, Team team) {
