@@ -49,10 +49,11 @@
         android:id="@+id/coordinator"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_snapshot"
+        app:layout_constraintBottom_toTopOf="@+id/coordinator_padding"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fab"
@@ -63,7 +64,6 @@
             android:layout_margin="@dimen/single_margin"
             android:elevation="@dimen/half_margin"
             app:layout_behavior="com.mainstreetcode.teammate.util.TransientBarBehavior" />
-
 
         <FrameLayout
             android:id="@+id/bottom_sheet"
@@ -96,6 +96,14 @@
         </FrameLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <View
+        android:id="@+id/coordinator_padding"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_snapshot"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <ImageView
         android:id="@+id/bottom_nav_snapshot"
         android:layout_width="0dp"
@@ -104,6 +112,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bottom_inset"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
 
     <LinearLayout
         android:id="@+id/bottom_navigation"

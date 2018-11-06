@@ -80,6 +80,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private FrameLayout fragmentContainer;
     private LoadingBar loadingBar;
     private Toolbar toolbar;
+    private View fabPad;
 
     private ViewHider fabHider;
     private ViewHider toolbarHider;
@@ -129,13 +130,13 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         bottomInsetView = findViewById(R.id.bottom_inset);
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
-
+        fabPad = findViewById(R.id.coordinator_padding);
         toolbarHider = ViewHider.of(toolbar).setDuration(HIDER_DURATION).setDirection(TOP).build();
         fabHider = ViewHider.of(fab).setDuration(HIDER_DURATION).setDirection(BOTTOM).build();
         fabInteractor = new FabInteractor(fab);
 
         //noinspection AndroidLintClickableViewAccessibility
-//        keyboardPadding.setOnTouchListener((view, event) -> {
+//        fabPad.setOnTouchListener((view, event) -> {
 //            if (event.getAction() == ACTION_UP) setKeyboardPadding(bottomInset);
 //            return true;
 //        });
@@ -310,7 +311,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         initTransition();
         padding = adjustKeyboardPadding(padding);
         padding = Math.max(padding, 0);
-        coordinatorLayout.setPadding(0, 0, 0, padding);
+
+//        getLayoutParams(fabPad).height = padding;
+        fabPad.setPadding(0, 0, 0, padding);
         fragmentContainer.setPadding(0, 0, 0, padding);
     }
 
