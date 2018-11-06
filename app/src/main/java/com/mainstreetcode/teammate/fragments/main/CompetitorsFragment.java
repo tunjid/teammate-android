@@ -179,7 +179,6 @@ public final class CompetitorsFragment extends MainActivityFragment
 
         entities.add(item);
         scrollManager.notifyDataSetChanged();
-        scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 
