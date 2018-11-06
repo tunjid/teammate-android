@@ -81,9 +81,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private LoadingBar loadingBar;
     private Toolbar toolbar;
 
+    private ViewHider fabHider;
+    private ViewHider toolbarHider;
     private FabInteractor fabInteractor;
-    @Nullable private ViewHider fabHider;
-    @Nullable private ViewHider toolbarHider;
 
     private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
 
@@ -130,9 +130,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         topInsetView = findViewById(R.id.top_inset);
         toolbar = findViewById(R.id.toolbar);
 
-        if (toolbar != null)
-            toolbarHider = ViewHider.of(toolbar).setDuration(HIDER_DURATION).setDirection(TOP).build();
-
+        toolbarHider = ViewHider.of(toolbar).setDuration(HIDER_DURATION).setDirection(TOP).build();
         fabHider = ViewHider.of(fab).setDuration(HIDER_DURATION).setDirection(BOTTOM).build();
         fabInteractor = new FabInteractor(fab);
 
