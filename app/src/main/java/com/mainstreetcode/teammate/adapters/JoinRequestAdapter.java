@@ -54,7 +54,7 @@ public class JoinRequestAdapter extends BaseAdapter<InputViewHolder, JoinRequest
 
     @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
-        super.bindViewHolder(viewHolder, i);
+        super.onBindViewHolder(viewHolder, i);
         Identifiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
