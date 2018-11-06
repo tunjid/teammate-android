@@ -5,15 +5,21 @@
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/action_bar_height">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chat"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/quarter_margin"
         app:layout_constraintBottom_toTopOf="@+id/footer_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <View
         android:id="@+id/footer_background"
@@ -37,15 +43,15 @@
         android:id="@+id/input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/half_margin"
         android:layout_marginLeft="@dimen/single_margin"
+        android:layout_marginBottom="@dimen/half_margin"
         android:background="@drawable/bg_chat_box"
         android:gravity="left"
         android:hint="@string/message_hint"
-        android:paddingBottom="@dimen/half_margin"
         android:paddingLeft="@dimen/single_margin"
-        android:paddingRight="@dimen/single_margin"
         android:paddingTop="@dimen/half_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:paddingBottom="@dimen/half_margin"
         android:textColor="@color/dark_grey"
         android:textColorHighlight="@color/dark_grey"
         android:textSize="@dimen/small_text"

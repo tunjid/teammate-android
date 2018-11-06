@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.List;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.disposables.Disposable;
 
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
@@ -86,6 +87,7 @@ public class ChatFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
+        SwipeRefreshLayout refresh = rootView.findViewById(R.id.refresh_layout);
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
 
@@ -94,6 +96,7 @@ public class ChatFragment extends MainActivityFragment
                 .onLayoutManager(layoutManager -> ((LinearLayoutManager) layoutManager).setStackFromEnd(true))
                 .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
                 .withEndlessScrollCallback(() -> fetchChatsBefore(false))
+                .withRefreshLayout(refresh, () -> refresh.setRefreshing(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addStateListener(this::onScrollStateChanged)
                 .addScrollListener(this::onScroll)
@@ -183,9 +186,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void fetchChatsBefore(boolean fetchLatest) {
-        if (fetchLatest) scrollManager.setRefreshing();
-        else toggleProgress(true);
-
+        scrollManager.setRefreshing();
         disposables.add(chatViewModel.getMany(team, fetchLatest).subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
