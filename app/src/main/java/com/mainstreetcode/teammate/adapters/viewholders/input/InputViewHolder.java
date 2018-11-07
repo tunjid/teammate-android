@@ -23,7 +23,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         implements
         TextWatcher {
 
-    @Nullable TextInputStyle textInputStyle;
+    @Nullable
+    TextInputStyle textInputStyle;
 
     private final EditText editText;
     private final ImageButton button;
@@ -37,9 +38,13 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     }
 
     @Override protected void clear() {
+        button.setOnClickListener(null);
+        editText.setOnClickListener(null);
         editText.removeTextChangedListener(this);
+
         if (textInputStyle != null) textInputStyle.setViewHolder(null);
         textInputStyle = null;
+
         super.clear();
     }
 
