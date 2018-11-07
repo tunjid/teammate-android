@@ -51,8 +51,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
         implements
         EventEditAdapter.EventEditAdapterListener {
 
-    public static final String ARG_GAME = "game";
-    public static final String ARG_EVENT = "event";
+    static final String ARG_EVENT = "event";
+    private static final String ARG_GAME = "game";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Event event;

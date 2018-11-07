@@ -51,6 +51,8 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     abstract Flowable<DiffUtil.DiffResult> fetch();
 
+    public void clear() { }
+
     public final Completable remove() {
         return delete().doOnError(onError).observeOn(mainThread());
     }
