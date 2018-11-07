@@ -53,7 +53,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     static final String ARG_EVENT = "event";
     private static final String ARG_GAME = "game";
-    private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Event event;
     private EventGofer gofer;
@@ -199,9 +198,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public boolean showsFab() {return gofer.hasPrivilegedRole();}
-
-    @Override
-    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
     protected Event getHeaderedModel() {return event;}
