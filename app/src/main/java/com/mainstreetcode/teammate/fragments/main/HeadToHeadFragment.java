@@ -92,11 +92,12 @@ public class HeadToHeadFragment extends MainActivityFragment
 
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchMatchUps);
         expandingToolbar.setTitleIcon(false);
-        expandingToolbar.changeVisibility(false);
         expandingToolbar.setTitle(R.string.game_head_to_head_params);
 
         scrollManager.notifyDataSetChanged();
+
         updateHeadToHead(0, 0, 0);
+        if (!restoredFromBackStack()) expandingToolbar.changeVisibility(false);
 
         return root;
     }
