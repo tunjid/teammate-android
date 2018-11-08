@@ -131,7 +131,7 @@ public final class CompetitorsFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return !competitors.isEmpty();
+        return !isBottomSheetShowing() && !competitors.isEmpty();
     }
 
     @Override
