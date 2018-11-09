@@ -250,7 +250,9 @@ public class Event extends EventEntity
 
             if (team == null) team = Team.empty();
 
-            return new Event(id, gameId, imageUrl, name, notes, locationName, ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility, spots);
+            return new Event(id, gameId, imageUrl,
+                    ModelUtils.processString(name), ModelUtils.processString(notes), ModelUtils.processString(locationName),
+                    ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility, spots);
         }
     }
 }

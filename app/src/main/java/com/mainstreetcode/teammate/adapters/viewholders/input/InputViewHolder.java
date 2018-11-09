@@ -58,7 +58,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         inputLayout.setEnabled(textInputStyle.isEnabled());
         inputLayout.setHint(itemView.getContext().getString(item.getStringRes()));
 
-        editText.setText(ModelUtils.processString(item.getValue()));
+        editText.setText(item.getValue());
         editText.setInputType(item.getInputType());
 
         editText.setClickable(isSelector);
