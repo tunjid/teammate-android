@@ -48,16 +48,16 @@ public class TextInputStyle {
 
     boolean isSelector() { return textRunnable != null; }
 
-    boolean isEnabled() { return enabler.apply(item);}
+    boolean isEditable() { return enabler.apply(item);}
 
     int getIcon() { return iconVisibilityFunction.apply(item);}
 
     CharSequence errorText() { return errorChecker.apply(item);}
 
-    View.OnClickListener buttonClickListener() { return isEnabled() ? this::onButtonClicked : null; }
+    View.OnClickListener buttonClickListener() { return isEditable() ? this::onButtonClicked : null; }
 
     View.OnClickListener textClickListener() {
-        return isEnabled() ? this::onTextClicked : null;
+        return isEditable() ? this::onTextClicked : null;
     }
 
     void onTextClicked(View view) { if (textRunnable != null) textRunnable.run();}

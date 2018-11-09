@@ -45,7 +45,7 @@ public class SpinnerTextInputStyle<T> extends TextInputStyle {
     }
 
     @Override void onTextClicked(View view) {
-        if (!isEnabled()) return;
+        if (!isEditable()) return;
 
         List<CharSequence> sequences = new ArrayList<>();
 

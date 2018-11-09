@@ -61,14 +61,14 @@ public class DateTextInputStyle extends TextInputStyle
     }
 
     private void showDate(Context context) {
-        if (!isEnabled()) return;
+        if (!isEditable()) return;
         AlertDialog dialog = new DatePickerDialog(context, this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE));
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed(context));
         dialog.show();
     }
 
     private void showTime(Context context) {
-        if (!isEnabled()) return;
+        if (!isEditable()) return;
         AlertDialog dialog = new TimePickerDialog(context, this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true);
         dialog.setOnDismissListener(dialogInterface -> onDialogDismissed(context));
         dialog.show();

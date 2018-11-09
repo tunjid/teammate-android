@@ -34,7 +34,7 @@ public class StatAttributeViewHolder extends InputViewHolder {
             }
 
             @Override
-            public boolean isEnabled() { return textInputStyle != null && textInputStyle.isEnabled(); }
+            public boolean isEnabled() { return textInputStyle != null && textInputStyle.isEditable(); }
 
             @Override
             public boolean isSelected(StatAttribute attribute) { return stat.contains(attribute); }
