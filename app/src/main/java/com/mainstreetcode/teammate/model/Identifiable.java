@@ -1,11 +1,15 @@
 package com.mainstreetcode.teammate.model;
 
 
+import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
-
 import com.mainstreetcode.teammate.notifications.FeedItem;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.BiFunction;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,15 +17,10 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.reactivex.Flowable;
-import io.reactivex.Single;
-import io.reactivex.functions.BiFunction;
-
 import static androidx.recyclerview.widget.DiffUtil.calculateDiff;
 import static com.mainstreetcode.teammate.model.Identifiable.Util.getPoints;
 import static com.mainstreetcode.teammate.model.Identifiable.Util.isComparable;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-import static io.reactivex.schedulers.Schedulers.computation;
 
 public interface Identifiable {
 
@@ -118,6 +117,14 @@ public interface Identifiable {
     Comparator<Identifiable> DESCENDING_COMPARATOR = (modelA, modelB) -> -COMPARATOR.compare(modelA, modelB);
 
     class Util {
+
+        static final HandlerThread diffThread;
+
+        static {
+            diffThread = new HandlerThread("Diffing");
+            diffThread.start();
+        }
+
         static int getPoints(Identifiable identifiable) {
             if (identifiable instanceof FeedItem)
                 identifiable = ((FeedItem) identifiable).getModel();
@@ -147,8 +154,9 @@ public interface Identifiable {
 
             AtomicReference<List<T>> sourceUpdater = new AtomicReference<>();
 
-            return sourceFlowable.concatMapDelayError(fetchedItems -> Flowable.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
-                            .subscribeOn(computation())
+            return sourceFlowable.concatMapDelayError(fetchedItems ->
+                    Flowable.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
+                            .subscribeOn(AndroidSchedulers.from(diffThread.getLooper()))
                             .observeOn(mainThread())
                             .doOnNext(diffResult -> updateListOnUIThread(sourceSupplier, sourceUpdater))
             );
@@ -160,15 +168,18 @@ public interface Identifiable {
 
             AtomicReference<List<T>> sourceUpdater = new AtomicReference<>();
 
-            return sourceSingle.flatMap(fetchedItems -> Single.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
-                            .subscribeOn(computation())
+            return sourceSingle.flatMap(fetchedItems ->
+                    Single.fromCallable(() -> getDiffResult(sourceSupplier, accumulator, sourceUpdater, fetchedItems))
+                            .subscribeOn(AndroidSchedulers.from(diffThread.getLooper()))
                             .observeOn(mainThread())
                             .doOnSuccess(diffResult -> updateListOnUIThread(sourceSupplier, sourceUpdater))
             );
         }
 
         @NonNull
-        private static <T extends Identifiable> DiffUtil.DiffResult getDiffResult(Callable<List<T>> sourceSupplier, BiFunction<List<T>, List<T>, List<T>> accumulator, AtomicReference<List<T>> sourceUpdater, List<T> fetchedItems) throws Exception {
+        private static <T extends Identifiable> DiffUtil.DiffResult getDiffResult(Callable<List<T>> sourceSupplier,
+                                                                                  BiFunction<List<T>, List<T>, List<T>> accumulator,
+                                                                                  AtomicReference<List<T>> sourceUpdater, List<T> fetchedItems) throws Exception {
             List<T> stale = sourceSupplier.call();
             List<T> updated = accumulator.apply(new ArrayList<>(stale), fetchedItems);
 

@@ -29,8 +29,13 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class EventGofer extends TeamHostingGofer<Event> {
+
+    private static final int SPLIT = 3;
 
     private boolean isSettingLocation;
     private final Function<Guest, Single<Guest>> rsvpFunction;
@@ -55,7 +60,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.deleteFunction = deleteFunction;
         this.guestRepository = GuestRepository.getInstance();
 
-        items.addAll(model.asIdentifiables().subList(0, 3));
+        items.addAll(model.asIdentifiables().subList(0, SPLIT));
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
@@ -83,7 +88,9 @@ public class EventGofer extends TeamHostingGofer<Event> {
     private Flowable<List<Identifiable>> initialItems() {
         List<Identifiable> list = new ArrayList<>(model.asItems());
         list.add(model.getTeam());
-        return Flowable.just(list).delay(200, TimeUnit.MILLISECONDS);
+
+        return Flowable.fromIterable(list).buffer(SPLIT).concatMap(buffer ->
+                Flowable.just(buffer).delay(400, TimeUnit.MILLISECONDS));
     }
 
     @Override
@@ -115,7 +122,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     public Single<Integer> getRSVPStatus() {
-        return Flowable.fromIterable(items)
+        return Single.defer(() -> Flowable.fromIterable(new ArrayList<>(items))
                 .filter(identifiable -> identifiable instanceof Guest)
                 .cast(Guest.class)
                 .filter(Guest::isAttending)
@@ -123,7 +130,8 @@ public class EventGofer extends TeamHostingGofer<Event> {
                 .filter(getSignedInUser()::equals)
                 .collect(ArrayList::new, List::add)
                 .map(List::isEmpty)
-                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp);
+                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp)
+        ).subscribeOn(Schedulers.io()).observeOn(mainThread());
     }
 
     Completable delete() {
