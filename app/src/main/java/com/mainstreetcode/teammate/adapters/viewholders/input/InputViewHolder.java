@@ -110,8 +110,8 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     private void checkForErrors() {
         if (textInputStyle == null) return;
         CharSequence errorMessage = textInputStyle.errorText();
-        if (TextUtils.isEmpty(errorMessage)) editText.setError(null);
-        else editText.setError(errorMessage);
+        if (TextUtils.isEmpty(errorMessage)) inputLayout.setError(null);
+        else inputLayout.setError(errorMessage);
     }
 
     private void setClickableState() {
