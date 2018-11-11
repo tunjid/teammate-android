@@ -134,7 +134,6 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     private void scaleHint(boolean grow) {
         float scale = grow ? 1F : 0.8F;
-
         float translationX = grow ? 0 : -((hint.getWidth() - (0.8F * hint.getWidth())) * 0.5F);
         float translationY = grow ? 0 : -((itemView.getHeight() - hint.getHeight()) * (text.getLineCount() > 1 ? 0.58F : 0.5F));
 
