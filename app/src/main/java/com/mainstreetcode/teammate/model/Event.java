@@ -76,10 +76,10 @@ public class Event extends EventEntity
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
                 Item.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, () -> String.valueOf(spots), this::setSpots, this),
                 Item.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-                Item.text(holder.get(4), 4, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this),
-                Item.text(holder.get(5), 5, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
-                Item.text(holder.get(6), 6, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this)
-        );
+                Item.text(holder.get(4), 4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
+                Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this),
+                Item.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
+                );
     }
 
     @Override

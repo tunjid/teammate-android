@@ -176,6 +176,4 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public interface ValueChangeCallBack {
         void onValueChanged(String value);
     }
-
-
 }

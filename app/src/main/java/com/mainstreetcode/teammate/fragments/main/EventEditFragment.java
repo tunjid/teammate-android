@@ -109,6 +109,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
                 .withRecycledViewPool(inputRecycledViewPool())
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
+                .setHasFixedSize()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();

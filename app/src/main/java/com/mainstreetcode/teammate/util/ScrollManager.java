@@ -31,10 +31,14 @@ public class ScrollManager {
 
     private static final String TAG = "ScrollManager";
 
-    @Nullable private EndlessScroller scroller;
-    @Nullable private EmptyViewHolder viewHolder;
-    @Nullable private ItemTouchHelper touchHelper;
-    @Nullable private SwipeRefreshLayout refreshLayout;
+    @Nullable
+    private EndlessScroller scroller;
+    @Nullable
+    private EmptyViewHolder viewHolder;
+    @Nullable
+    private ItemTouchHelper touchHelper;
+    @Nullable
+    private SwipeRefreshLayout refreshLayout;
 
     private RecyclerView recyclerView;
     private Adapter adapter;
@@ -45,7 +49,8 @@ public class ScrollManager {
                           @Nullable SwipeDragOptions options,
                           @Nullable RecyclerView.RecycledViewPool recycledViewPool,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
-                          List<OnScrollListener> listeners) {
+                          List<OnScrollListener> listeners,
+                          boolean hasFixedSize) {
 
         this.scroller = scroller;
         this.viewHolder = viewHolder;
@@ -57,6 +62,7 @@ public class ScrollManager {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+        if (hasFixedSize) recyclerView.setHasFixedSize(true);
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
         if (recycledViewPool != null) recyclerView.setRecycledViewPool(recycledViewPool);
         if (options != null) touchHelper = fromSwipeDragOptions(this, options);
@@ -113,6 +119,7 @@ public class ScrollManager {
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void notifyItemMoved(int from, int to) {
         if (adapter != null) adapter.notifyItemMoved(from, to);
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
@@ -145,13 +152,13 @@ public class ScrollManager {
         adapter = null;
     }
 
+    @SuppressWarnings("unused")
     public int getFirstVisiblePosition() {
         LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             LinearLayoutManager castedManager = (LinearLayoutManager) layoutManager;
             return castedManager.findFirstVisibleItemPosition();
-        }
-        else if (layoutManager instanceof StaggeredGridLayoutManager) {
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             StaggeredGridLayoutManager castedManager = (StaggeredGridLayoutManager) layoutManager;
 
             int[] positions = new int[castedManager.getSpanCount()];
@@ -181,6 +188,7 @@ public class ScrollManager {
 
         int spanCount;
         int layoutManagerType;
+        boolean hasFixedSize;
 
         Runnable scrollCallback;
         SwipeRefreshLayout refreshLayout;
@@ -198,6 +206,11 @@ public class ScrollManager {
         List<BiConsumer<Integer, Integer>> displacementConsumers = new ArrayList<>();
 
         private Builder() {}
+
+        public Builder setHasFixedSize() {
+            this.hasFixedSize = true;
+            return this;
+        }
 
         public Builder withAdapter(@NonNull Adapter adapter) {
             this.adapter = adapter;
@@ -357,8 +370,8 @@ public class ScrollManager {
             displacementConsumers.clear();
 
             return new ScrollManager(
-                    scroller, emptyViewholder, refreshLayout, swipeDragOptions,
-                    recycledViewPool, recyclerView, adapter, layoutManager, scrollListeners);
+                    scroller, emptyViewholder, refreshLayout, swipeDragOptions, recycledViewPool,
+                    recyclerView, adapter, layoutManager, scrollListeners, hasFixedSize);
         }
     }
 

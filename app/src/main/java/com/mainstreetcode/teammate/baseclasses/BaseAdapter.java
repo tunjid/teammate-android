@@ -33,6 +33,11 @@ public abstract class BaseAdapter<VH extends BaseViewHolder, T extends Interacti
         super.onViewRecycled(holder);
     }
 
+    @Override public void onViewDetachedFromWindow(@NonNull VH holder) {
+        holder.onDetached();
+        super.onViewDetachedFromWindow(holder);
+    }
+
     @Override public boolean onFailedToRecycleView(@NonNull VH holder) {
         holder.clear();
         return super.onFailedToRecycleView(holder);

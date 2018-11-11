@@ -7,10 +7,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.util.ErrorHandler;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 import java.util.Objects;
 
@@ -18,18 +22,21 @@ import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseViewHolder<T>
         implements
         TextWatcher {
 
+    private int lastIcon = -1;
     private int lastLineCount = 1;
 
     private final TextView hint;
     private final EditText text;
     private final ImageButton button;
 
-    @Nullable TextInputStyle textInputStyle;
+    @Nullable
+    TextInputStyle textInputStyle;
 
     public InputViewHolder(View itemView) {
         super(itemView);
@@ -48,6 +55,11 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         textInputStyle = null;
 
         super.clear();
+    }
+
+    @Override protected void onDetached() {
+        button.setVisibility(GONE);
+        super.onDetached();
     }
 
     public void bind(TextInputStyle inputStyle) {
@@ -117,7 +129,10 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     private void checkForErrors() {
         if (textInputStyle == null) return;
+
         CharSequence errorMessage = textInputStyle.errorText();
+        if (Objects.equals(errorMessage, text.getError())) return;
+
         if (isEmpty(errorMessage)) text.setError(null);
         else text.setError(errorMessage);
     }
@@ -125,11 +140,19 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     private void setClickableState() {
         if (textInputStyle == null) return;
 
-        int icon = textInputStyle.getIcon();
-        int visibility = icon == 0 ? GONE : VISIBLE;
+        int newIcon = textInputStyle.getIcon();
+        if (lastIcon == newIcon) return;
 
-        button.setVisibility(visibility);
-        if (icon != 0) button.setImageResource(icon);
+        int oldVisibility = button.getVisibility();
+        int newVisibility = newIcon == 0 ? GONE : VISIBLE;
+
+        if (oldVisibility != newVisibility) button.setVisibility(newVisibility);
+        if (newIcon != 0) disposables.add(Single.fromCallable(() -> ContextCompat.getDrawable(text.getContext(), newIcon))
+            .subscribeOn(Schedulers.io())
+            .observeOn(mainThread())
+            .subscribe(button::setImageDrawable, ErrorHandler.EMPTY));
+
+        lastIcon = newIcon;
     }
 
     private void scaleHint(boolean grow) {
