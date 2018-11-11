@@ -1,13 +1,12 @@
 package com.mainstreetcode.teammate.adapters.viewholders.input;
 
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
-import com.google.android.material.textfield.TextInputLayout;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
@@ -15,31 +14,35 @@ import com.mainstreetcode.teammate.model.Item;
 
 import java.util.Objects;
 
+import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
 
 public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> extends BaseViewHolder<T>
         implements
         TextWatcher {
 
-    @Nullable
-    TextInputStyle textInputStyle;
+    private int lastLineCount = 1;
 
-    private final EditText editText;
+    private final TextView hint;
+    private final EditText text;
     private final ImageButton button;
-    private final TextInputLayout inputLayout;
+
+    @Nullable TextInputStyle textInputStyle;
 
     public InputViewHolder(View itemView) {
         super(itemView);
-        inputLayout = itemView.findViewById(R.id.input_layout);
+        hint = itemView.findViewById(R.id.hint);
+        text = itemView.findViewById(R.id.input);
         button = itemView.findViewById(R.id.button);
-        editText = inputLayout.getEditText();
+        text.setOnFocusChangeListener((v, hasFocus) -> scaleHint(!hasFocus && isEmpty(text.getText())));
     }
 
     @Override protected void clear() {
         button.setOnClickListener(null);
-        editText.setOnClickListener(null);
-        editText.removeTextChangedListener(this);
+        text.setOnClickListener(null);
+        text.removeTextChangedListener(this);
 
         if (textInputStyle != null) textInputStyle.setViewHolder(null);
         textInputStyle = null;
@@ -54,39 +57,40 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         Item item = inputStyle.getItem();
 
         int newInputType = item.getInputType();
-        int oldInputType = editText.getInputType();
+        int oldInputType = text.getInputType();
 
         boolean isEditable = inputStyle.isEditable();
         boolean isSelector = inputStyle.isSelector();
 
-        boolean isEnabled = editText.isEnabled();
-        boolean isClickable = editText.isClickable();
-        boolean isFocusable = editText.isFocusable();
-        boolean isFocusableInTouchMode = editText.isFocusableInTouchMode();
+        boolean isEnabled = text.isEnabled();
+        boolean isClickable = text.isClickable();
+        boolean isFocusable = text.isFocusable();
+        boolean isFocusableInTouchMode = text.isFocusableInTouchMode();
 
         CharSequence newValue = item.getValue().toString();
-        CharSequence oldValue = editText.getText().toString();
+        CharSequence oldValue = text.getText().toString();
 
-        CharSequence oldHint = inputLayout.getHint();
+        CharSequence oldHint = hint.getText();
         CharSequence newHint = itemView.getContext().getString(item.getStringRes());
 
-        if (isEnabled != isEditable) inputLayout.setEnabled(isEditable);
-        if (isClickable != isSelector) editText.setClickable(isSelector);
-        if (isFocusable == isSelector) editText.setFocusable(!isSelector);
-        if (isFocusableInTouchMode == isSelector) editText.setFocusableInTouchMode(!isSelector);
+        if (isEnabled != isEditable) text.setEnabled(isEditable);
+        if (isClickable != isSelector) text.setClickable(isSelector);
+        if (isFocusable == isSelector) text.setFocusable(!isSelector);
+        if (isFocusableInTouchMode == isSelector) text.setFocusableInTouchMode(!isSelector);
 
-        if (!Objects.equals(oldValue, newValue)) editText.setText(newValue);
-        if (!Objects.equals(oldHint, newHint)) inputLayout.setHint(newHint);
-        if (oldInputType != newInputType) editText.setInputType(newInputType);
+        if (!Objects.equals(oldHint, newHint)) hint.setText(newHint);
+        if (!Objects.equals(oldValue, newValue)) text.setText(newValue);
+        if (oldInputType != newInputType) text.setInputType(newInputType);
 
-        editText.setOnClickListener(inputStyle.textClickListener());
+        text.setOnClickListener(inputStyle.textClickListener());
         button.setOnClickListener(inputStyle.buttonClickListener());
 
-        editText.removeTextChangedListener(this);
-        if (!isSelector) editText.addTextChangedListener(this);
+        text.removeTextChangedListener(this);
+        if (!isSelector) text.addTextChangedListener(this);
 
         checkForErrors();
         setClickableState();
+        listenForLayout(hint, () -> scaleHint(isEmpty(text.getText())));
     }
 
     @Override
@@ -97,21 +101,25 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     @Override
     public void afterTextChanged(Editable editable) {
+        int currentLineCount = text.getLineCount();
+        if (lastLineCount != currentLineCount) listenForLayout(hint, () -> scaleHint(false));
+        lastLineCount = currentLineCount;
+
         if (textInputStyle == null || textInputStyle.isSelector()) return;
         textInputStyle.getItem().setValue(editable.toString());
         checkForErrors();
     }
 
     void updateText(CharSequence text) {
-        editText.setText(text);
+        this.text.setText(text);
         checkForErrors();
     }
 
     private void checkForErrors() {
         if (textInputStyle == null) return;
         CharSequence errorMessage = textInputStyle.errorText();
-        if (TextUtils.isEmpty(errorMessage)) inputLayout.setError(null);
-        else inputLayout.setError(errorMessage);
+        if (isEmpty(errorMessage)) text.setError(null);
+        else text.setError(errorMessage);
     }
 
     private void setClickableState() {
@@ -122,5 +130,19 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
         button.setVisibility(visibility);
         if (icon != 0) button.setImageResource(icon);
+    }
+
+    private void scaleHint(boolean grow) {
+        float scale = grow ? 1F : 0.8F;
+
+        float translationX = grow ? 0 : -((hint.getWidth() - (0.8F * hint.getWidth())) * 0.5F);
+        float translationY = grow ? 0 : -((itemView.getHeight() - hint.getHeight()) * (text.getLineCount() > 1 ? 0.55F : 0.5F));
+
+        hint.animate()
+                .scaleX(scale)
+                .scaleY(scale)
+                .translationX(translationX)
+                .translationY(translationY)
+                .setDuration(200).start();
     }
 }
