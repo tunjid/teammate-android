@@ -24,10 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/quarter_margin"
         android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/input"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-
         tools:text="Hint" />
 
     <ImageButton
