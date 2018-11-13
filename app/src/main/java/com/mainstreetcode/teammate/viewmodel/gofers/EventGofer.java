@@ -1,10 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
-import androidx.arch.core.util.Function;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DiffUtil;
 
 import com.google.android.gms.location.places.Place;
 import com.mainstreetcode.teammate.R;
@@ -23,8 +19,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -34,8 +33,6 @@ import io.reactivex.schedulers.Schedulers;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class EventGofer extends TeamHostingGofer<Event> {
-
-    private static final int SPLIT = 3;
 
     private boolean isSettingLocation;
     private final Function<Guest, Single<Guest>> rsvpFunction;
@@ -60,7 +57,9 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.deleteFunction = deleteFunction;
         this.guestRepository = GuestRepository.getInstance();
 
-        items.addAll(model.asIdentifiables().subList(0, SPLIT));
+        items.addAll(model.asIdentifiables());
+        items.add(model.getTeam());
+
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
@@ -85,25 +84,12 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return fragment.getString(R.string.no_permission);
     }
 
-    private Flowable<List<Identifiable>> initialItems() {
-        List<Identifiable> list = new ArrayList<>(model.asItems());
-        list.add(model.getTeam());
-
-        return Flowable.fromIterable(list).buffer(SPLIT).concatMap(buffer ->
-                Flowable.just(buffer).delay(400, TimeUnit.MILLISECONDS));
-    }
-
-    @Override
-    Flowable<DiffUtil.DiffResult> emptyFlowable() {
-        return Identifiable.diff(initialItems(), this::getItems, this::preserveItems);
-    }
-
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingLocation) return Flowable.empty();
         Flowable<List<Identifiable>> eventFlowable = getFunction.apply(model).map(Event::asIdentifiables);
         Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
-        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(initialItems(), eventFlowable, guestsFlowable));
+        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(eventFlowable, guestsFlowable));
         return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
     }
 

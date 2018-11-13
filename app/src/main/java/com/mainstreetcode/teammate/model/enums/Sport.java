@@ -6,7 +6,6 @@ import com.google.gson.JsonSerializationContext;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.replaceList;
-import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
+import static com.mainstreetcode.teammate.util.ModelUtils.replaceStringList;
 
 public class Sport extends MetaData {
 
@@ -95,12 +94,6 @@ public class Sport extends MetaData {
         replaceList(this.stats, source.stats);
         replaceStringList(this.tournamentTypes, source.tournamentTypes);
         replaceStringList(this.tournamentStyles, source.tournamentStyles);
-    }
-
-    private void replaceStringList(List<String> sourceList, List<String> updatedList) {
-        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
-        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
-        replaceList(source, updated);
     }
 
     public static class GsonAdapter extends MetaData.GsonAdapter<Sport> {

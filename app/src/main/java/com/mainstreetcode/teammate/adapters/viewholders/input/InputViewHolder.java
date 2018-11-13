@@ -6,17 +6,19 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 
 import java.util.Objects;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
@@ -28,11 +30,14 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         implements
         TextWatcher {
 
+    private static final float HINT_SHRINK_SCALE = 0.8F;
+    private static final float HALF = 0.5F;
+
     private int lastIcon = -1;
     private int lastLineCount = 1;
 
-    private final TextView hint;
-    private final EditText text;
+    protected final TextView hint;
+    protected final EditText text;
     private final ImageButton button;
 
     @Nullable
@@ -60,6 +65,15 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     @Override protected void onDetached() {
         button.setVisibility(GONE);
         super.onDetached();
+    }
+
+    protected float getHintLateralTranslation() {
+        int width = hint.getWidth();
+        return -((width - (HINT_SHRINK_SCALE * width)) * HALF);
+    }
+
+    protected float getHintLongitudinalTranslation() {
+        return -((itemView.getHeight() - hint.getHeight()) * HALF);
     }
 
     public void bind(TextInputStyle inputStyle) {
@@ -125,6 +139,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     void updateText(CharSequence text) {
         this.text.setText(text);
         checkForErrors();
+        listenForLayout(hint, () -> scaleHint(isEmpty(text)));
     }
 
     private void checkForErrors() {
@@ -147,18 +162,19 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         int newVisibility = newIcon == 0 ? GONE : VISIBLE;
 
         if (oldVisibility != newVisibility) button.setVisibility(newVisibility);
-        if (newIcon != 0) disposables.add(Single.fromCallable(() -> ContextCompat.getDrawable(text.getContext(), newIcon))
-            .subscribeOn(Schedulers.io())
-            .observeOn(mainThread())
-            .subscribe(button::setImageDrawable, ErrorHandler.EMPTY));
+        if (newIcon != 0)
+            disposables.add(Single.fromCallable(() -> ContextCompat.getDrawable(text.getContext(), newIcon))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(mainThread())
+                    .subscribe(button::setImageDrawable, ErrorHandler.EMPTY));
 
         lastIcon = newIcon;
     }
 
     private void scaleHint(boolean grow) {
-        float scale = grow ? 1F : 0.8F;
-        float translationX = grow ? 0 : -((hint.getWidth() - (0.8F * hint.getWidth())) * 0.5F);
-        float translationY = grow ? 0 : -((itemView.getHeight() - hint.getHeight()) * (text.getLineCount() > 1 ? 0.58F : 0.5F));
+        float scale = grow ? 1F : HINT_SHRINK_SCALE;
+        float translationX = grow ? 0 : getHintLateralTranslation();
+        float translationY = grow ? 0 : getHintLongitudinalTranslation();
 
         hint.animate()
                 .scaleX(scale)

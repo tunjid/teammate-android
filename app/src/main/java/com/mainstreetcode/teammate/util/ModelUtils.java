@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
+
 /**
  * Static methods for models
  */
@@ -122,6 +124,12 @@ public class ModelUtils {
 
     public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
         return new ArrayList<>(subTypeList);
+    }
+
+    public static void replaceStringList(List<String> sourceList, List<String> updatedList) {
+        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
+        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        replaceList(source, updated);
     }
 
     public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {

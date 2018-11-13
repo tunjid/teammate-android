@@ -23,6 +23,8 @@ public class StatAttributeViewHolder extends InputViewHolder {
     private final StatType statType = StatType.empty();
     private final StatTypes statTypes;
 
+    private RecyclerView recyclerView;
+
     public StatAttributeViewHolder(View itemView, Stat stat) {
         super(itemView);
 
@@ -52,7 +54,7 @@ public class StatAttributeViewHolder extends InputViewHolder {
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         layoutManager.setAlignItems(AlignItems.CENTER);
 
-        RecyclerView recyclerView = itemView.findViewById(R.id.inner_list);
+        recyclerView = itemView.findViewById(R.id.inner_list);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }
@@ -77,5 +79,13 @@ public class StatAttributeViewHolder extends InputViewHolder {
         if (current == null) return;
         statType.update(current);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override protected float getHintLateralTranslation() {
+        return super.getHintLateralTranslation();
+    }
+
+    @Override protected float getHintLongitudinalTranslation() {
+        return -((itemView.getHeight() - hint.getHeight() - recyclerView.getHeight()) * 0.5F);
     }
 }
