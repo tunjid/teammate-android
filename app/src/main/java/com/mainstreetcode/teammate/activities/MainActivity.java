@@ -82,8 +82,10 @@ public class MainActivity extends TeammatesBaseActivity
 
     private int bottomNavHeight;
 
-    @Nullable private ToolbarState bottomToolbarState;
-    @Nullable private ViewHider bottombarHider;
+    @Nullable
+    private ToolbarState bottomToolbarState;
+    @Nullable
+    private ViewHider bottomBarHider;
     private BottomNav bottomNav;
 
     private RecyclerView.RecycledViewPool inputRecycledPool;
@@ -177,7 +179,7 @@ public class MainActivity extends TeammatesBaseActivity
         ImageView bottomBarSnapshot = findViewById(R.id.bottom_nav_snapshot);
         listenForLayout(bottomNav, () -> getLayoutParams(bottomBarSnapshot).height = bottomNavHeight = bottomNav.getHeight());
 
-        bottombarHider = ViewHider.of(bottomBarSnapshot).setDuration(HIDER_DURATION)
+        bottomBarHider = ViewHider.of(bottomBarSnapshot).setDuration(HIDER_DURATION)
                 .setDirection(BOTTOM)
                 .addStartRunnable(() -> {
                     TeammatesBaseFragment view = getCurrentFragment();
@@ -270,9 +272,9 @@ public class MainActivity extends TeammatesBaseActivity
 
     @Override
     public void toggleBottombar(boolean show) {
-        if (bottombarHider == null) return;
-        if (show) bottombarHider.show();
-        else bottombarHider.hide();
+        if (bottomBarHider == null) return;
+        if (show) bottomBarHider.show();
+        else bottomBarHider.hide();
     }
 
     @Override
@@ -291,13 +293,10 @@ public class MainActivity extends TeammatesBaseActivity
 
         clearTransientBars();
 
-        BaseFragment toShow = args.getFragment();
-        TeammatesBaseFragment current = getCurrentFragment();
-
-        int topPadding = current != null && current.insetFlags().hasTopInset() ? TeammatesBaseActivity.topInset : 0;
-        topPadding += getResources().getDimensionPixelSize(R.dimen.single_margin);
+        int topPadding = TeammatesBaseActivity.topInset + getResources().getDimensionPixelSize(R.dimen.single_margin);
         bottomSheetContainer.setPadding(0, topPadding, 0, 0);
 
+        BaseFragment toShow = args.getFragment();
         toShow.setEnterTransition(getBottomSheetTransition());
         toShow.setExitTransition(getBottomSheetTransition());
 
