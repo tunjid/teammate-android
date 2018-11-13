@@ -18,13 +18,14 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import java.util.Objects;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static androidx.core.content.ContextCompat.getColor;
+import static androidx.core.content.ContextCompat.getDrawable;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -32,6 +33,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         implements
         TextWatcher {
 
+    private static final int HINT_ANIMATION_DURATION = 200;
     private static final float HINT_SHRINK_SCALE = 0.8F;
     private static final float HALF = 0.5F;
 
@@ -168,7 +170,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
         if (oldVisibility != newVisibility) button.setVisibility(newVisibility);
         if (newIcon != 0)
-            disposables.add(Single.fromCallable(() -> ContextCompat.getDrawable(text.getContext(), newIcon))
+            disposables.add(Single.fromCallable(() -> getDrawable(text.getContext(), newIcon))
                     .subscribeOn(Schedulers.io())
                     .observeOn(mainThread())
                     .subscribe(button::setImageDrawable, ErrorHandler.EMPTY));
@@ -186,15 +188,16 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
                 .scaleY(scale)
                 .translationX(translationX)
                 .translationY(translationY)
-                .setDuration(200)
+                .setDuration(HINT_ANIMATION_DURATION)
                 .start();
     }
 
     private void tintHint(boolean hasFocus) {
-        int src = hint.getCurrentTextColor();
-        int dest = ContextCompat.getColor(hint.getContext(), hasFocus ? R.color.colorAccent : R.color.dark_grey);
-        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), src, dest);
-        animator.setDuration(200);
+        int start = hint.getCurrentTextColor();
+        int end = getColor(hint.getContext(), hasFocus ? R.color.colorAccent : R.color.dark_grey);
+
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), start, end);
+        animator.setDuration(HINT_ANIMATION_DURATION);
         animator.addUpdateListener(animation -> hint.setTextColor((int) animation.getAnimatedValue()));
         animator.start();
     }
