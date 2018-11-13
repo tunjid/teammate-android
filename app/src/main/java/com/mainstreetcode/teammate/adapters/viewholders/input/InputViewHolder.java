@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders.input;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -48,7 +50,10 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         hint = itemView.findViewById(R.id.hint);
         text = itemView.findViewById(R.id.input);
         button = itemView.findViewById(R.id.button);
-        text.setOnFocusChangeListener((v, hasFocus) -> scaleHint(!hasFocus && isEmpty(text.getText())));
+        text.setOnFocusChangeListener((v, hasFocus) -> {
+            tintHint(hasFocus);
+            scaleHint(!hasFocus && isEmpty(text.getText()));
+        });
     }
 
     @Override protected void clear() {
@@ -181,6 +186,16 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
                 .scaleY(scale)
                 .translationX(translationX)
                 .translationY(translationY)
-                .setDuration(200).start();
+                .setDuration(200)
+                .start();
+    }
+
+    private void tintHint(boolean hasFocus) {
+        int src = hint.getCurrentTextColor();
+        int dest = ContextCompat.getColor(hint.getContext(), hasFocus ? R.color.colorAccent : R.color.dark_grey);
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), src, dest);
+        animator.setDuration(200);
+        animator.addUpdateListener(animation -> hint.setTextColor((int) animation.getAnimatedValue()));
+        animator.start();
     }
 }
