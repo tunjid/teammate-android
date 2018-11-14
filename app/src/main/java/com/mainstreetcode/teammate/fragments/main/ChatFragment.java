@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -32,9 +34,10 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.List;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.disposables.Disposable;
 
-import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
+import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.text.TextUtils.isEmpty;
 
 public class ChatFragment extends MainActivityFragment
@@ -84,6 +87,7 @@ public class ChatFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
+        SwipeRefreshLayout refresh = rootView.findViewById(R.id.refresh_layout);
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
 
@@ -92,6 +96,7 @@ public class ChatFragment extends MainActivityFragment
                 .onLayoutManager(layoutManager -> ((LinearLayoutManager) layoutManager).setStackFromEnd(true))
                 .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
                 .withEndlessScrollCallback(() -> fetchChatsBefore(false))
+                .withRefreshLayout(refresh, () -> refresh.setRefreshing(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addStateListener(this::onScrollStateChanged)
                 .addScrollListener(this::onScroll)
@@ -181,9 +186,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void fetchChatsBefore(boolean fetchLatest) {
-        if (fetchLatest) scrollManager.setRefreshing();
-        else toggleProgress(true);
-
+        scrollManager.setRefreshing();
         disposables.add(chatViewModel.getMany(team, fetchLatest).subscribe(ChatFragment.this::onChatsUpdated, defaultErrorHandler));
     }
 
@@ -215,7 +218,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void postChat(Chat chat) {
-        chatViewModel.post(chat).subscribe(() -> {
+        disposables.add(chatViewModel.post(chat).subscribe(() -> {
             chatViewModel.updateLastSeen(team);
             int index = items.indexOf(chat);
 
@@ -229,7 +232,7 @@ public class ChatFragment extends MainActivityFragment
                     int index = items.indexOf(chat);
                     if (index != -1) scrollManager.notifyItemChanged(index);
                 })
-                .build());
+                .build()));
     }
 
     private void notifyAndScrollToLast(boolean scrollToLast) {
@@ -252,6 +255,8 @@ public class ChatFragment extends MainActivityFragment
         if (recyclerView == null) return false;
 
         LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+        if (layoutManager == null) return false;
+
         int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
         return Math.abs(items.size() - lastVisibleItemPosition) < 4;

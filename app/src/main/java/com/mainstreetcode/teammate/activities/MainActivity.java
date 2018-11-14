@@ -1,24 +1,16 @@
 package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
-import android.arch.core.util.Function;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.MenuRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
@@ -45,6 +37,7 @@ import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -59,14 +52,27 @@ import com.mainstreetcode.teammate.util.nav.ViewHolder;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
-import com.tunjid.androidbootstrap.core.view.ViewHider;
+import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.MenuRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.arch.core.util.Function;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
-import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 import static android.view.View.GONE;
-import static com.tunjid.androidbootstrap.core.view.ViewHider.BOTTOM;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.loadBitmapFromView;
+import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
+import static com.tunjid.androidbootstrap.view.util.ViewUtil.getLayoutParams;
 
 public class MainActivity extends TeammatesBaseActivity
         implements BottomSheetController {
@@ -74,12 +80,15 @@ public class MainActivity extends TeammatesBaseActivity
     public static final String FEED_DEEP_LINK = "feed-deep-link";
     public static final String BOTTOM_TOOLBAR_STATE = "BOTTOM_TOOLBAR_STATE";
 
-    @Nullable
-    private ViewHider bottombarHider;
+    private int bottomNavHeight;
+
     @Nullable
     private ToolbarState bottomToolbarState;
+    @Nullable
+    private ViewHider bottomBarHider;
     private BottomNav bottomNav;
 
+    private RecyclerView.RecycledViewPool inputRecycledPool;
     private BottomSheetBehavior bottomSheetBehavior;
     private ViewGroup bottomSheetContainer;
     private Toolbar bottomSheetToolbar;
@@ -115,6 +124,8 @@ public class MainActivity extends TeammatesBaseActivity
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
 
         userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        inputRecycledPool = new RecyclerView.RecycledViewPool();
+        inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10);
 
         if (!userViewModel.isSignedIn()) {
             startRegistrationActivity(this);
@@ -164,16 +175,24 @@ public class MainActivity extends TeammatesBaseActivity
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
 
-        View bottomBar = findViewById(R.id.bottom_navigation);
-        bottombarHider = ViewHider.of(bottomBar).setDirection(BOTTOM)
+        View bottomNav = findViewById(R.id.bottom_navigation);
+        ImageView bottomBarSnapshot = findViewById(R.id.bottom_nav_snapshot);
+        listenForLayout(bottomNav, () -> getLayoutParams(bottomBarSnapshot).height = bottomNavHeight = bottomNav.getHeight());
+
+        bottomBarHider = ViewHider.of(bottomBarSnapshot).setDuration(HIDER_DURATION)
+                .setDirection(BOTTOM)
                 .addStartRunnable(() -> {
                     TeammatesBaseFragment view = getCurrentFragment();
-                    if (view != null && !view.showsBottomNav()) bottomBar.setVisibility(GONE);
+                    if (view == null || view.showsBottomNav()) return;
+
+                    bottomBarSnapshot.setImageBitmap(loadBitmapFromView(bottomNav));
+                    bottomNav.setVisibility(GONE);
                 })
                 .addEndRunnable(() -> {
                     TeammatesBaseFragment view = getCurrentFragment();
                     if (view == null || !view.showsBottomNav()) return;
-                    bottomBar.setVisibility(View.VISIBLE);
+
+                    bottomNav.setVisibility(View.VISIBLE);
                     initTransition();
                 })
                 .build();
@@ -225,6 +244,12 @@ public class MainActivity extends TeammatesBaseActivity
         altToolbar.inflateMenu(menu);
     }
 
+    @Override protected int adjustKeyboardPadding(int suggestion) {
+        int padding = super.adjustKeyboardPadding(suggestion);
+        if (padding != bottomInset) padding -= bottomNavHeight;
+        return padding;
+    }
+
     @Override
     public void setAltToolbarTitle(CharSequence title) {
         altToolbar.setTitle(title);
@@ -247,9 +272,9 @@ public class MainActivity extends TeammatesBaseActivity
 
     @Override
     public void toggleBottombar(boolean show) {
-        if (bottombarHider == null) return;
-        if (show) bottombarHider.show();
-        else bottombarHider.hide();
+        if (bottomBarHider == null) return;
+        if (show) bottomBarHider.show();
+        else bottomBarHider.hide();
     }
 
     @Override
@@ -268,13 +293,10 @@ public class MainActivity extends TeammatesBaseActivity
 
         clearTransientBars();
 
-        BaseFragment toShow = args.getFragment();
-        TeammatesBaseFragment current = getCurrentFragment();
-
-        int topPadding = current != null && current.insetState()[TOP_INSET] ? TeammatesBaseActivity.topInset : 0;
-        topPadding += getResources().getDimensionPixelSize(R.dimen.single_margin);
+        int topPadding = TeammatesBaseActivity.topInset + getResources().getDimensionPixelSize(R.dimen.single_margin);
         bottomSheetContainer.setPadding(0, topPadding, 0, 0);
 
+        BaseFragment toShow = args.getFragment();
         toShow.setEnterTransition(getBottomSheetTransition());
         toShow.setExitTransition(getBottomSheetTransition());
 
@@ -296,6 +318,10 @@ public class MainActivity extends TeammatesBaseActivity
     private boolean onAltMenuItemSelected(MenuItem item) {
         Fragment current = getCurrentFragment();
         return current != null && current.onOptionsItemSelected(item);
+    }
+
+    public RecyclerView.RecycledViewPool getInputRecycledPool() {
+        return inputRecycledPool;
     }
 
     private void showNavOverflow() {

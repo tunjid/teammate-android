@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.arch.core.util.Function;
-import android.support.v7.util.DiffUtil;
+import androidx.arch.core.util.Function;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;

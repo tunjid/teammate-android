@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.card.MaterialCardView android:id="@+id/item_container"
+<com.google.android.material.card.MaterialCardView android:id="@+id/item_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,14 +9,16 @@
     android:layout_marginLeft="@dimen/single_margin"
     android:layout_marginRight="@dimen/single_margin"
     android:layout_marginTop="@dimen/half_margin"
+    android:clickable="true"
+    android:focusable="true"
     app:cardCornerRadius="@dimen/quarter_margin">
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -59,7 +61,7 @@
             app:layout_constraintTop_toTopOf="@+id/location"
             app:srcCompat="@drawable/ic_location_on_white_24dp" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/item_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -79,7 +81,7 @@
             app:layout_constraintVertical_chainStyle="spread"
             tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/item_subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -99,7 +101,7 @@
             app:layout_constraintTop_toBottomOf="@+id/item_title"
             tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/location"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -119,5 +121,5 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_subtitle"
             tools:text="Hi I'm some very interesting text. I'm interesting because I say I am, which is quite nice" />
-    </android.support.constraint.ConstraintLayout>
-</android.support.design.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

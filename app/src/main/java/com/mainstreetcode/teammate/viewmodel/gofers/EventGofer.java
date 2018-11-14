@@ -1,10 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
-import android.arch.core.util.Function;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.util.DiffUtil;
 
 import com.google.android.gms.location.places.Place;
 import com.mainstreetcode.teammate.R;
@@ -23,12 +19,18 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class EventGofer extends TeamHostingGofer<Event> {
 
@@ -55,7 +57,9 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.deleteFunction = deleteFunction;
         this.guestRepository = GuestRepository.getInstance();
 
-        items.addAll(model.asIdentifiables().subList(0, 3));
+        items.addAll(model.asIdentifiables());
+        items.add(model.getTeam());
+
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
     }
 
@@ -80,23 +84,12 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return fragment.getString(R.string.no_permission);
     }
 
-    private Flowable<List<Identifiable>> initialItems() {
-        List<Identifiable> list = new ArrayList<>(model.asItems());
-        list.add(model.getTeam());
-        return Flowable.just(list).delay(200, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    Flowable<DiffUtil.DiffResult> emptyFlowable() {
-        return Identifiable.diff(initialItems(), this::getItems, this::preserveItems);
-    }
-
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingLocation) return Flowable.empty();
         Flowable<List<Identifiable>> eventFlowable = getFunction.apply(model).map(Event::asIdentifiables);
         Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
-        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(initialItems(), eventFlowable, guestsFlowable));
+        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(eventFlowable, guestsFlowable));
         return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
     }
 
@@ -115,7 +108,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     public Single<Integer> getRSVPStatus() {
-        return Flowable.fromIterable(items)
+        return Single.defer(() -> Flowable.fromIterable(new ArrayList<>(items))
                 .filter(identifiable -> identifiable instanceof Guest)
                 .cast(Guest.class)
                 .filter(Guest::isAttending)
@@ -123,7 +116,8 @@ public class EventGofer extends TeamHostingGofer<Event> {
                 .filter(getSignedInUser()::equals)
                 .collect(ArrayList::new, List::add)
                 .map(List::isEmpty)
-                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp);
+                .map(notAttending -> notAttending ? R.drawable.ic_event_available_white_24dp : R.drawable.ic_event_busy_white_24dp)
+        ).subscribeOn(Schedulers.io()).observeOn(mainThread());
     }
 
     Completable delete() {

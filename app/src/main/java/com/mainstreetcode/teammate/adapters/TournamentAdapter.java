@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -13,8 +13,8 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
  * Adapter for {@link Event}
  */
 
-public class TournamentAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, TournamentAdapter.TournamentAdapterListener> {
+public class TournamentAdapter extends InteractiveAdapter<InteractiveViewHolder, TournamentAdapter.TournamentAdapterListener> {
 
     private final List<Identifiable> items;
 
@@ -38,17 +38,17 @@ public class TournamentAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, T
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
-                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
+                ? new ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
-                ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : new TournamentViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
+                ? new InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
+                : new TournamentViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
         Identifiable item = items.get(position);
         if (item instanceof Tournament) ((TournamentViewHolder) viewHolder).bind((Tournament) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
@@ -70,7 +70,7 @@ public class TournamentAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, T
         return item instanceof Tournament ? TOURNAMENT : ((Ad) item).getType();
     }
 
-    public interface TournamentAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface TournamentAdapterListener extends InteractiveAdapter.AdapterListener {
         void onTournamentClicked(Tournament item);
     }
 

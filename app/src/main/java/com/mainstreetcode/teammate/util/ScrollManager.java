@@ -1,41 +1,44 @@
 package com.mainstreetcode.teammate.util;
 
 
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.Adapter;
-import android.support.v7.widget.RecyclerView.LayoutManager;
-import android.support.v7.widget.RecyclerView.OnScrollListener;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
-
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
+import androidx.recyclerview.widget.RecyclerView.LayoutManager;
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.functions.BiConsumer;
 import io.reactivex.functions.Function;
 
-import static android.support.v7.widget.helper.ItemTouchHelper.Callback.makeMovementFlags;
+import static androidx.recyclerview.widget.ItemTouchHelper.Callback.makeMovementFlags;
 
 public class ScrollManager {
 
     private static final String TAG = "ScrollManager";
 
-    @Nullable private EndlessScroller scroller;
-    @Nullable private EmptyViewHolder viewHolder;
-    @Nullable private ItemTouchHelper touchHelper;
-    @Nullable private SwipeRefreshLayout refreshLayout;
+    @Nullable
+    private EndlessScroller scroller;
+    @Nullable
+    private EmptyViewHolder viewHolder;
+    @Nullable
+    private ItemTouchHelper touchHelper;
+    @Nullable
+    private SwipeRefreshLayout refreshLayout;
 
     private RecyclerView recyclerView;
     private Adapter adapter;
@@ -44,8 +47,10 @@ public class ScrollManager {
                           @Nullable EmptyViewHolder viewHolder,
                           @Nullable SwipeRefreshLayout refreshLayout,
                           @Nullable SwipeDragOptions options,
+                          @Nullable RecyclerView.RecycledViewPool recycledViewPool,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
-                          List<OnScrollListener> listeners) {
+                          List<OnScrollListener> listeners,
+                          boolean hasFixedSize) {
 
         this.scroller = scroller;
         this.viewHolder = viewHolder;
@@ -57,7 +62,9 @@ public class ScrollManager {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+        if (hasFixedSize) recyclerView.setHasFixedSize(true);
         if (scroller != null) recyclerView.addOnScrollListener(scroller);
+        if (recycledViewPool != null) recyclerView.setRecycledViewPool(recycledViewPool);
         if (options != null) touchHelper = fromSwipeDragOptions(this, options);
         if (touchHelper != null) touchHelper.attachToRecyclerView(recyclerView);
         for (OnScrollListener listener : listeners) recyclerView.addOnScrollListener(listener);
@@ -112,6 +119,7 @@ public class ScrollManager {
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void notifyItemMoved(int from, int to) {
         if (adapter != null) adapter.notifyItemMoved(from, to);
         if (viewHolder != null && adapter != null) viewHolder.toggle(adapter.getItemCount() == 0);
@@ -144,13 +152,13 @@ public class ScrollManager {
         adapter = null;
     }
 
+    @SuppressWarnings("unused")
     public int getFirstVisiblePosition() {
         LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {
             LinearLayoutManager castedManager = (LinearLayoutManager) layoutManager;
             return castedManager.findFirstVisibleItemPosition();
-        }
-        else if (layoutManager instanceof StaggeredGridLayoutManager) {
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
             StaggeredGridLayoutManager castedManager = (StaggeredGridLayoutManager) layoutManager;
 
             int[] positions = new int[castedManager.getSpanCount()];
@@ -180,6 +188,7 @@ public class ScrollManager {
 
         int spanCount;
         int layoutManagerType;
+        boolean hasFixedSize;
 
         Runnable scrollCallback;
         SwipeRefreshLayout refreshLayout;
@@ -190,12 +199,18 @@ public class ScrollManager {
         LayoutManager layoutManager;
 
         SwipeDragOptions swipeDragOptions;
+        RecyclerView.RecycledViewPool recycledViewPool;
         ModelUtils.Consumer<LayoutManager> layoutManagerConsumer;
         ModelUtils.Consumer<IndexOutOfBoundsException> handler;
         List<ModelUtils.Consumer<Integer>> stateConsumers = new ArrayList<>();
         List<BiConsumer<Integer, Integer>> displacementConsumers = new ArrayList<>();
 
         private Builder() {}
+
+        public Builder setHasFixedSize() {
+            this.hasFixedSize = true;
+            return this;
+        }
 
         public Builder withAdapter(@NonNull Adapter adapter) {
             this.adapter = adapter;
@@ -221,6 +236,11 @@ public class ScrollManager {
         public Builder withStaggeredGridLayoutManager(int spanCount) {
             layoutManagerType = STAGGERED_GRID_LAYOUT_MANAGER;
             this.spanCount = spanCount;
+            return this;
+        }
+
+        public Builder withRecycledViewPool(RecyclerView.RecycledViewPool recycledViewPool) {
+            this.recycledViewPool = recycledViewPool;
             return this;
         }
 
@@ -300,6 +320,8 @@ public class ScrollManager {
             if (handler == null)
                 throw new IllegalArgumentException("InconsistencyHandler must be provided");
 
+            if (layoutManager instanceof LinearLayoutManager)
+                ((LinearLayoutManager) layoutManager).setRecycleChildrenOnDetach(true);
             if (layoutManagerConsumer != null) layoutManagerConsumer.accept(layoutManager);
 
             EndlessScroller scroller = scrollCallback == null ? null : new EndlessScroller(layoutManager) {
@@ -347,7 +369,9 @@ public class ScrollManager {
             stateConsumers.clear();
             displacementConsumers.clear();
 
-            return new ScrollManager(scroller, emptyViewholder, refreshLayout, swipeDragOptions, recyclerView, adapter, layoutManager, scrollListeners);
+            return new ScrollManager(
+                    scroller, emptyViewholder, refreshLayout, swipeDragOptions, recycledViewPool,
+                    recyclerView, adapter, layoutManager, scrollListeners, hasFixedSize);
         }
     }
 
@@ -426,7 +450,7 @@ public class ScrollManager {
 
     public static class SwipeDragOptionsBuilder {
         private ModelUtils.Consumer<RecyclerView.ViewHolder> swipeDragEndConsumerConsumer = viewHolder -> {};
-        private BiConsumer<RecyclerView.ViewHolder, Integer> swipeDragStartConsumerConsumer  = (viewHolder, state) -> {};
+        private BiConsumer<RecyclerView.ViewHolder, Integer> swipeDragStartConsumerConsumer = (viewHolder, state) -> {};
         private Supplier<Boolean> itemViewSwipeSupplier = () -> false;
         private Supplier<Boolean> longPressDragEnabledSupplier = () -> false;
         private Function<RecyclerView.ViewHolder, Integer> movementFlagsSupplier = viewHolder -> defaultMovements();
@@ -463,7 +487,7 @@ public class ScrollManager {
         }
 
         public ScrollManager.SwipeDragOptions build() {
-            return new ScrollManager.SwipeDragOptions(swipeDragEndConsumerConsumer, swipeDragStartConsumerConsumer,itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
+            return new ScrollManager.SwipeDragOptions(swipeDragEndConsumerConsumer, swipeDragStartConsumerConsumer, itemViewSwipeSupplier, longPressDragEnabledSupplier, movementFlagsSupplier, listSupplier);
         }
     }
 

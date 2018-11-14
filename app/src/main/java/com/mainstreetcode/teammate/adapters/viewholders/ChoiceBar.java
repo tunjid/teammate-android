@@ -1,19 +1,20 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.BaseTransientBottomBar;
-import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.mainstreetcode.teammate.R;
 
-import static android.support.design.widget.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION;
-import static android.support.design.widget.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT;
+import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
+
+import static com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT;
 import static com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.findSuitableParent;
 
 public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
@@ -28,7 +29,7 @@ public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
      * @param content  The content view for this transient bottom bar.
      * @param callback The content view callback for this transient bottom bar.
      */
-    private ChoiceBar(ViewGroup parent, View content, android.support.design.snackbar.ContentViewCallback callback) {
+    private ChoiceBar(ViewGroup parent, View content, com.google.android.material.snackbar.ContentViewCallback callback) {
         super(parent, content, callback);
 
         positiveButton = content.findViewById(R.id.positive_button);
@@ -45,7 +46,7 @@ public class ChoiceBar extends BaseTransientBottomBar<ChoiceBar> {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         final View content = inflater.inflate(R.layout.snackbar_choice, parent, false);
-        final android.support.design.snackbar.ContentViewCallback viewCallback = new SnackBarUtils.SnackbarAnimationCallback(content);
+        final com.google.android.material.snackbar.ContentViewCallback viewCallback = new SnackBarUtils.SnackbarAnimationCallback(content);
         final ChoiceBar choiceBar = new ChoiceBar(parent, content, viewCallback);
 
         choiceBar.setDuration(duration);

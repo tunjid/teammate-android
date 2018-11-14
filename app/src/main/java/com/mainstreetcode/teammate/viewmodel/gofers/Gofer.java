@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.ListableModel;
@@ -51,6 +51,8 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
 
     abstract Flowable<DiffUtil.DiffResult> fetch();
 
+    public void clear() { }
+
     public final Completable remove() {
         return delete().doOnError(onError).observeOn(mainThread());
     }
@@ -64,12 +66,10 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
     }
 
     public final Flowable<DiffUtil.DiffResult> get() {
-        return model.isEmpty() ? emptyFlowable() : fetch().doOnError(onError);
+        return model.isEmpty() ? Flowable.empty() : fetch().doOnError(onError);
     }
 
     public final List<Identifiable> getItems() { return items; }
-
-    Flowable<DiffUtil.DiffResult> emptyFlowable() { return Flowable.empty(); }
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.support.v4.util.Pair;
-import android.support.v7.util.DiffUtil;
+import androidx.core.util.Pair;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.MediaTransferIntentService;

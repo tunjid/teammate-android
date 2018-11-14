@@ -1,14 +1,16 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.DateViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -17,60 +19,67 @@ import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
-import static com.mainstreetcode.teammate.model.Item.TRUE;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
 
 /**
  * Adapter for {@link Event}
  */
 
-public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, StatAggregateRequestAdapter.AdapterListener> {
+public class StatAggregateRequestAdapter extends BaseAdapter<BaseViewHolder, StatAggregateRequestAdapter.AdapterListener> {
 
     private final StatAggregate.Request request;
-    private final List<Sport> sports;
+    private final TextInputStyle.InputChooser chooser;
 
     public StatAggregateRequestAdapter(StatAggregate.Request request,
                                        AdapterListener listener) {
         super(listener);
         this.request = request;
-        sports = new ArrayList<>(Config.getSports());
-        sports.add(0, Sport.empty());
+        chooser = new Chooser();
     }
 
     @NonNull
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         switch (viewType) {
-            case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, sports, Sport::getName, Sport::getCode, TRUE, ALL_INPUT_VALID);
-            case Item.DATE:
-                return new DateViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), TRUE);
+            default:
+            case ITEM:
+                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
             case USER:
                 return new UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onUserPicked)
                         .withTitle(R.string.pick_user);
             case TEAM:
                 return new TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener::onTeamPicked)
                         .withTitle(R.string.pick_team);
-            default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        if (viewHolder.getItemViewType() == USER)
+            return (S) ((UserAdapter.AdapterListener) adapterListener::onUserPicked);
+        if (viewHolder.getItemViewType() == TEAM)
+            return (S) ((TeamAdapter.AdapterListener) adapterListener::onTeamPicked);
+        return (S) adapterListener;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
         Identifiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
-            ((BaseItemViewHolder) viewHolder).bind((Item) identifiable);
+            ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));
         else if (identifiable instanceof User)
             ((UserViewHolder) viewHolder).bind((User) identifiable);
         else if (identifiable instanceof Team)
@@ -85,12 +94,39 @@ public class StatAggregateRequestAdapter extends BaseRecyclerViewAdapter<BaseVie
     @Override
     public int getItemViewType(int position) {
         Identifiable identifiable = request.getItems().get(position);
-        return identifiable instanceof Item ? ((Item) identifiable).getItemType() : identifiable instanceof User ? USER : TEAM;
+        return identifiable instanceof Item ? ITEM : identifiable instanceof User ? USER : TEAM;
     }
 
-    public interface AdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface AdapterListener extends InteractiveAdapter.AdapterListener {
         void onUserPicked(User user);
 
         void onTeamPicked(Team team);
+    }
+
+    private static class Chooser extends TextInputStyle.InputChooser {
+
+        private final List<Sport> sports;
+
+        private Chooser() {
+            sports = new ArrayList<>(Config.getSports());
+            sports.add(0, Sport.empty());
+        }
+
+        @Override public TextInputStyle apply(Item item) {
+            int itemType = item.getItemType();
+            switch (itemType) {
+                default:
+                case Item.SPORT:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.choose_sport,
+                            sports,
+                            Sport::getName,
+                            Sport::getCode,
+                            Item.TRUE,
+                            ALL_INPUT_VALID);
+                case Item.DATE:
+                    return new DateTextInputStyle(Item.TRUE);
+            }
+        }
     }
 }

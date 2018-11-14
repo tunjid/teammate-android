@@ -5,14 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,6 +30,16 @@ import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -49,9 +51,8 @@ public class EventEditFragment extends HeaderedFragment<Event>
         implements
         EventEditAdapter.EventEditAdapterListener {
 
-    public static final String ARG_GAME = "game";
-    public static final String ARG_EVENT = "event";
-    private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
+    static final String ARG_EVENT = "event";
+    private static final String ARG_GAME = "game";
 
     private Event event;
     private EventGofer gofer;
@@ -105,8 +106,10 @@ public class EventEditFragment extends HeaderedFragment<Event>
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new EventEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
+                .setHasFixedSize()
                 .build();
 
         scrollManager.getRecyclerView().requestFocus();
@@ -192,13 +195,10 @@ public class EventEditFragment extends HeaderedFragment<Event>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return gofer.hasPrivilegedRole();}
-
-    @Override
-    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
     protected Event getHeaderedModel() {return event;}

@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +9,13 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.SettingsItem;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
 
-public class SettingsAdapter extends BaseRecyclerViewAdapter<SettingsAdapter.SettingsViewHolder, SettingsAdapter.SettingsAdapterListener> {
+public class SettingsAdapter extends InteractiveAdapter<SettingsAdapter.SettingsViewHolder, SettingsAdapter.SettingsAdapterListener> {
 
     private final List<SettingsItem> items;
 
@@ -42,11 +42,11 @@ public class SettingsAdapter extends BaseRecyclerViewAdapter<SettingsAdapter.Set
         return items.size();
     }
 
-    public interface SettingsAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface SettingsAdapterListener extends InteractiveAdapter.AdapterListener {
         void onSettingsItemClicked(SettingsItem item);
     }
 
-    static class SettingsViewHolder extends BaseViewHolder<SettingsAdapterListener>
+    static class SettingsViewHolder extends InteractiveViewHolder<SettingsAdapterListener>
             implements View.OnClickListener {
 
         private SettingsItem item;

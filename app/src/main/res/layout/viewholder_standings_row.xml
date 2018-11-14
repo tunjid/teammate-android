@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout android:id="@+id/item_container"
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/item_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,7 +10,7 @@
     android:layout_marginRight="@dimen/single_margin"
     android:layout_marginTop="@dimen/half_margin">
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -83,4 +83,4 @@
             android:paddingBottom="@dimen/quarter_margin"
             android:paddingTop="@dimen/quarter_margin" />
     </com.mainstreetcode.teammate.util.SyncedScrollView>
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

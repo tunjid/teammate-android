@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +78,7 @@ public class HeadToHeadFragment extends MainActivityFragment
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
                 .withAdapter(new HeadToHeadRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
@@ -89,11 +92,12 @@ public class HeadToHeadFragment extends MainActivityFragment
 
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchMatchUps);
         expandingToolbar.setTitleIcon(false);
-        expandingToolbar.changeVisibility(false);
         expandingToolbar.setTitle(R.string.game_head_to_head_params);
 
         scrollManager.notifyDataSetChanged();
+
         updateHeadToHead(0, 0, 0);
+        if (!restoredFromBackStack()) expandingToolbar.changeVisibility(false);
 
         return root;
     }
@@ -156,7 +160,6 @@ public class HeadToHeadFragment extends MainActivityFragment
         if (isHome) request.updateHome(item);
         else request.updateAway(item);
         searchScrollManager.notifyDataSetChanged();
-        searchScrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 
@@ -184,8 +187,8 @@ public class HeadToHeadFragment extends MainActivityFragment
     }
 
     private CharSequence getText(@StringRes int stringRes, int count) {
-        return new SpanBuilder(requireContext(), String.valueOf(count)).resize(1.4F).bold()
-                .appendCharsequence(new SpanBuilder(requireContext(), getString(stringRes))
+        return SpanBuilder.of(String.valueOf(count)).resize(1.4F).bold()
+                .append(SpanBuilder.of(getString(stringRes))
                         .prependNewLine()
                         .build()).build();
     }

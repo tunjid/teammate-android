@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.persistence.room.Ignore;
+import androidx.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -48,11 +48,11 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     public static JoinRequest join(Team team, User user) {
-        return new JoinRequest(false, true, "", Position.empty(), copyTeam(team), user, new Date());
+        return new JoinRequest(false, true, "", Config.positionFromCode(""), copyTeam(team), user, new Date());
     }
 
     public static JoinRequest invite(Team team) {
-        return new JoinRequest(true, false, "", Position.empty(), copyTeam(team), User.empty(), new Date());
+        return new JoinRequest(true, false, "", Config.positionFromCode(""), copyTeam(team), User.empty(), new Date());
     }
 
     public JoinRequest(boolean teamApproved, boolean userApproved, String id, Position position, Team team, User user, Date created) {
@@ -88,7 +88,8 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        RemoteImage image = userApproved ? team : user;
+        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, image::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override

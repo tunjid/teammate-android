@@ -2,9 +2,9 @@ package com.mainstreetcode.teammate.util.nav;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.StringRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.StringRes;
 
 public class NavItem implements Parcelable{
     @IdRes final int idRes;

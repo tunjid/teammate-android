@@ -7,7 +7,7 @@ import com.mainstreetcode.teammate.adapters.BlockedUserAdapter;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.User;
 
-import static android.support.v4.view.ViewCompat.setTransitionName;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 public class BlockedUserViewHolder extends ModelCardViewHolder<BlockedUser, BlockedUserAdapter.UserAdapterListener>

@@ -5,18 +5,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.PublishSubject;
 
-public class UrlDiff {
+public class DiffWatcher<T> {
 
-    private final AtomicReference<PublishSubject<String>> ref = new AtomicReference<>();
-    private final ModelUtils.Consumer<String> consumer;
+    private final AtomicReference<PublishSubject<T>> ref = new AtomicReference<>();
+    private final ModelUtils.Consumer<T> consumer;
     private final CompositeDisposable disposable = new CompositeDisposable();
 
-    public UrlDiff(ModelUtils.Consumer<String> consumer) {
+    public DiffWatcher(ModelUtils.Consumer<T> consumer) {
         this.consumer = consumer;
         watch();
     }
 
-    public void push(String url) { ref.get().onNext(url); }
+    public void push(T item) { ref.get().onNext(item); }
 
     public void stop() { disposable.clear(); }
 

@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -12,11 +11,12 @@ import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.BLOCKED_USER;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
@@ -26,7 +26,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
  * Adapter for {@link Team}
  */
 
-public class BlockedUserAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, BlockedUserAdapter.UserAdapterListener> {
+public class BlockedUserAdapter extends InteractiveAdapter<InteractiveViewHolder, BlockedUserAdapter.UserAdapterListener> {
 
     private final List<Identifiable> teamModels;
 
@@ -38,17 +38,17 @@ public class BlockedUserAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, 
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
-                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
+                ? new ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
-                ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : new BlockedUserViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener);
+                ? new InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
+                : new BlockedUserViewHolder(getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
         Identifiable item = teamModels.get(position);
 
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
@@ -72,7 +72,7 @@ public class BlockedUserAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, 
         return BLOCKED_USER;
     }
 
-    public interface UserAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface UserAdapterListener extends InteractiveAdapter.AdapterListener {
         void onBlockedUserClicked(BlockedUser blockedUser);
     }
 }

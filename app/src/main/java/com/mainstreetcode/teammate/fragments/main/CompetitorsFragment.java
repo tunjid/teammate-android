@@ -1,11 +1,11 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
-import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIPE;
+import static androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG;
+import static androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE;
 
 public final class CompetitorsFragment extends MainActivityFragment
         implements
@@ -131,7 +131,7 @@ public final class CompetitorsFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return !competitors.isEmpty();
+        return !isBottomSheetShowing() && !competitors.isEmpty();
     }
 
     @Override
@@ -179,7 +179,6 @@ public final class CompetitorsFragment extends MainActivityFragment
 
         entities.add(item);
         scrollManager.notifyDataSetChanged();
-        scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 

@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 public class GuestViewFragment extends HeaderedFragment<Guest> {
 
@@ -60,6 +61,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
                 .withAdapter(new GuestAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
@@ -96,7 +98,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return false;}

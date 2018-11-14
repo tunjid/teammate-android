@@ -8,7 +8,7 @@ import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.User;
 
-import static android.support.v4.view.ViewCompat.setTransitionName;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
 public class JoinRequestViewHolder extends ModelCardViewHolder<JoinRequest, TeamMemberAdapter.UserAdapterListener>

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 
 /**
  * ViewModel for roles in a team
@@ -51,24 +53,29 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
         return roles;
     }
 
-    public boolean privilegedInGame(Game game) {
-        Competitive home = game.getHome().getEntity();
-        Competitive away = game.getAway().getEntity();
+    public Maybe<Competitor> hasPendingCompetitor(Game game) {
+        Competitor competitor;
+        if (game.getHome().hasNotResponded()) competitor = game.getHome();
+        else if (game.getAway().hasNotResponded()) competitor = game.getAway();
+        else competitor = null;
+
+        if (competitor == null || competitor.isEmpty() || competitor.isAccepted())
+            return Maybe.empty();
 
         for (Identifiable identifiable : roles) {
             if (!(identifiable instanceof Role)) continue;
             Role role = (Role) identifiable;
-            if (!game.betweenUsers() && !role.isPrivilegedRole()) continue;
-            if (matches(role, home)) return true;
-            if (matches(role, away)) return true;
+            Competitive entity = competitor.getEntity();
+            if (matches(role, entity)) return Maybe.just(competitor);
         }
-        return false;
+        return Maybe.empty();
     }
 
     private boolean matches(Role role, Competitive entity) {
         if (entity instanceof User) return role.getUser().equals(entity);
-        else if (entity instanceof Team) return role.getTeam().equals(entity);
-        return false;
+        else if (!(entity instanceof Team)) return false;
+        Team team = (Team) entity;
+        return role.getTeam().equals(team) && role.isPrivilegedRole();
     }
 
 }

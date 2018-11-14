@@ -1,15 +1,19 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.core.util.Function;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.InputType;
+import android.text.TextUtils;
 
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.util.Supplier;
 
 import java.lang.annotation.Retention;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.arch.core.util.Function;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -46,14 +50,19 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public static final int TOURNAMENT_STYLE = 20;
     public static final int COMPETITOR = 21;
 
-    public static final Supplier<Boolean> TRUE = () -> true;
-    public static final Supplier<Boolean> FALSE = () -> false;
+    public static final Runnable NO_CLICK = null;
+    public static final Runnable EMPTY_CLICK = () -> {};
 
-    public static final Function<CharSequence, CharSequence> ALL_INPUT_VALID = sequence -> "";
+    public static final Function<Item, Integer> NO_ICON = item -> 0;
+
+    public static final Function<Item, Boolean> TRUE = item -> true;
+    public static final Function<Item, Boolean> FALSE = item -> false;
+
+    public static final Function<Item, CharSequence> ALL_INPUT_VALID = input -> "";
+    public static final Function<Item, CharSequence> NON_EMPTY = input -> TextUtils.isEmpty(input.getValue()) ? App.getInstance().getString(R.string.team_invalid_empty_field) : "";
 
     @SuppressWarnings("unused")
     public static <T> void ignore(T ignored) {}
-
 
     private final int sortPosition;
     private final int inputType;
@@ -98,6 +107,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
         return new Item<>(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static Supplier<CharSequence> nullToEmpty(@Nullable CharSequence source) {
         CharSequence finalSource = source == null ? "" : source;
         return () -> finalSource;
@@ -134,7 +144,7 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     @Override
     public boolean areContentsTheSame(Identifiable other) {
         if (other instanceof Item) return value.equals(((Item) other).value);
-        return value.equals(other.getId());
+        return id.equals(other.getId());
     }
 
     @Override
@@ -166,6 +176,4 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public interface ValueChangeCallBack {
         void onValueChanged(String value);
     }
-
-
 }

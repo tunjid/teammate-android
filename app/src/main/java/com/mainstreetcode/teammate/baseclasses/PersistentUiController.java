@@ -1,11 +1,11 @@
 package com.mainstreetcode.teammate.baseclasses;
 
 
-import android.support.annotation.DrawableRes;
-import android.support.annotation.MenuRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.MenuRes;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;

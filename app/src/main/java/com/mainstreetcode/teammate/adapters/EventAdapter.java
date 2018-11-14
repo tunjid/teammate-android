@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -11,11 +10,12 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Identifiable;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.EVENT;
@@ -25,7 +25,7 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
  * Adapter for {@link com.mainstreetcode.teammate.model.Event}
  */
 
-public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventAdapter.EventAdapterListener> {
+public class EventAdapter extends InteractiveAdapter<InteractiveViewHolder, EventAdapter.EventAdapterListener> {
 
     private final List<Identifiable> items;
 
@@ -37,17 +37,17 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
 
     @NonNull
     @Override
-    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public InteractiveViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         return viewType == CONTENT_AD
-                ? new ContentAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
+                ? new ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
                 : viewType == INSTALL_AD
-                ? new InstallAdViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                : new EventViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_event, viewGroup), adapterListener);
+                ? new InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
+                : new EventViewHolder(getItemView(R.layout.viewholder_event, viewGroup), adapterListener);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
         Identifiable item = items.get(position);
         if (item instanceof Event) ((EventViewHolder) viewHolder).bind((Event) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
@@ -69,7 +69,7 @@ public class EventAdapter extends BaseRecyclerViewAdapter<BaseViewHolder, EventA
         return item instanceof Event ? EVENT : ((Ad) item).getType();
     }
 
-    public interface EventAdapterListener extends BaseRecyclerViewAdapter.AdapterListener {
+    public interface EventAdapterListener extends InteractiveAdapter.AdapterListener {
         void onEventClicked(Event item);
     }
 

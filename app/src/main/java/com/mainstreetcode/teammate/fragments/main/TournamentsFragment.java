@@ -1,12 +1,12 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -132,7 +132,7 @@ public final class TournamentsFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return team.getSport().supportsTournaments() && localRoleViewModel.hasPrivilegedRole();
+        return team.getSport().supportsCompetitions() && localRoleViewModel.hasPrivilegedRole();
     }
 
     @Override
@@ -182,7 +182,7 @@ public final class TournamentsFragment extends MainActivityFragment
 
     private void onTournamentsUpdated(DiffUtil.DiffResult result) {
         toggleProgress(false);
-        boolean supportsTournaments = team.getSport().supportsTournaments();
+        boolean supportsTournaments = team.getSport().supportsCompetitions();
         scrollManager.onDiff(result);
         scrollManager.updateForEmptyList(R.drawable.ic_trophy_white_24dp, supportsTournaments
                 ? R.string.no_tournaments : R.string.no_tournament_support);

@@ -2,9 +2,7 @@ package com.mainstreetcode.teammate.model;
 
 
 import android.annotation.SuppressLint;
-import android.arch.core.util.Function;
 import android.os.Parcel;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonArray;
@@ -32,6 +30,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Predicate;
 
@@ -39,6 +39,7 @@ import io.reactivex.functions.Predicate;
 public class Config implements Model<Config> {
 
     private static final String EMPTY_STRING = "";
+    private static Config cached = Config.empty();
 
     public static Config empty() {return new Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);}
 
@@ -90,7 +91,6 @@ public class Config implements Model<Config> {
     public static List<String> getPrivileged() {
         return getList(config -> config.privileged);
     }
-
 
     public static List<Position> getPositions() {
         return getList(config -> config.positions);
@@ -149,7 +149,8 @@ public class Config implements Model<Config> {
     }
 
     private static Config getCurrentConfig() {
-        return ConfigRepository.getInstance().getCurrent();
+        if (cached.isEmpty()) cached.update(ConfigRepository.getInstance().getCurrent());
+        return cached;
     }
 
     private static <T> List<T> getList(Function<Config, List<T>> function) {
@@ -176,10 +177,17 @@ public class Config implements Model<Config> {
         this.defaultTeamLogo = updated.defaultTeamLogo;
         this.defaultEventLogo = updated.defaultEventLogo;
         this.defaultUserAvatar = updated.defaultUserAvatar;
-        sports.addAll(updated.sports);
-        positions.addAll(updated.positions);
-        visibilities.addAll(updated.visibilities);
-        staticVariants.addAll(updated.staticVariants);
+        ModelUtils.replaceStringList(privileged, updated.privileged);
+
+        ModelUtils.replaceList(sports, updated.sports);
+        ModelUtils.replaceList(positions, updated.positions);
+        ModelUtils.replaceList(statTypes, updated.statTypes);
+        ModelUtils.replaceList(visibilities, updated.visibilities);
+        ModelUtils.replaceList(blockReasons, updated.blockReasons);
+        ModelUtils.replaceList(staticVariants, updated.staticVariants);
+        ModelUtils.replaceList(staticVariants, updated.staticVariants);
+        ModelUtils.replaceList(tournamentTypes, updated.tournamentTypes);
+        ModelUtils.replaceList(tournamentStyles, updated.tournamentStyles);
     }
 
     @Override

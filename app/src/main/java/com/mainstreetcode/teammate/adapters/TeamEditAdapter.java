@@ -1,14 +1,13 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.arch.core.util.Function;
-import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.ClickInputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -16,58 +15,46 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
 
 import java.util.List;
 
-import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
-import static com.mainstreetcode.teammate.model.Item.FALSE;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
+import androidx.annotation.NonNull;
+
+import static com.mainstreetcode.teammate.model.Item.ZIP;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 /**
  * Adapter for {@link Team}
  */
 
-public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
+public class TeamEditAdapter extends BaseAdapter<InputViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
     private final List<Identifiable> items;
+    private final TextInputStyle.InputChooser chooser;
 
     public TeamEditAdapter(List<Identifiable> items, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
         // setHasStableIds(true); DO NOT PUT THIS BACK
         this.items = items;
+        chooser = new Chooser(adapterListener);
     }
 
     @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        switch (viewType) {
-            case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), FALSE);
-            case Item.INFO:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, ViewHolderUtil.allowsSpecialCharacters);
-            case Item.INPUT:
-            case Item.NUMBER:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields)
-                        .setButtonRunnable((Function<Item, Boolean>) this::showsChangePicture, R.drawable.ic_picture_white_24dp, adapterListener::onImageClick);
-            case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, ALL_INPUT_VALID);
-            case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, adapterListener::canEditFields, ALL_INPUT_VALID);
-            case Item.CITY:
-            case Item.STATE:
-                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked);
-            case Item.ZIP:
-                return new ClickInputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields, adapterListener::onAddressClicked, ALL_INPUT_VALID);
-            default:
-                return new BaseItemViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
-        }
+    public InputViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override protected <S extends AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        return (S) adapterListener;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseItemViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Identifiable item = items.get(i);
-        if (item instanceof Item) viewHolder.bind((Item) item);
+        if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 
     @Override
@@ -77,12 +64,7 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
-        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
-    }
-
-    private boolean showsChangePicture(Item item) {
-        return item.getStringRes() == R.string.team_name && adapterListener.canEditFields();
+        return ITEM;
     }
 
     public interface TeamEditAdapterListener extends ImageWorkerFragment.ImagePickerListener {
@@ -90,5 +72,84 @@ public class TeamEditAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder,
         void onAddressClicked();
 
         boolean canEditFields();
+    }
+
+    private static class Chooser extends TextInputStyle.InputChooser {
+
+        private TeamEditAdapterListener adapterListener;
+
+        Chooser(TeamEditAdapterListener adapterListener) {
+            this.adapterListener = adapterListener;
+        }
+
+        @Override public int iconGetter(Item item) {
+            return item.getStringRes() == R.string.team_name && adapterListener.canEditFields()
+                    ? R.drawable.ic_picture_white_24dp : 0;
+        }
+
+        @Override public boolean enabler(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.ABOUT:
+                    return Item.FALSE.apply(item);
+                case Item.ZIP:
+                case Item.CITY:
+                case Item.INFO:
+                case Item.STATE:
+                case Item.INPUT:
+                case Item.SPORT:
+                case Item.NUMBER:
+                case Item.DESCRIPTION:
+                    return adapterListener.canEditFields();
+            }
+        }
+
+        @Override public CharSequence textChecker(Item item) {
+            switch (item.getItemType()) {
+                default:
+                case Item.CITY:
+                case Item.STATE:
+                case Item.INPUT:
+                case Item.NUMBER:
+                    return Item.NON_EMPTY.apply(item);
+                case Item.INFO:
+                    return ViewHolderUtil.allowsSpecialCharacters.apply(item.getValue());
+                case Item.ZIP:
+                case Item.DESCRIPTION:
+                    return Item.ALL_INPUT_VALID.apply(item);
+            }
+        }
+
+        @Override public TextInputStyle apply(Item item) {
+            int itemType = item.getItemType();
+            switch (itemType) {
+                default:
+                case Item.ZIP:
+                case Item.CITY:
+                case Item.INFO:
+                case Item.STATE:
+                case Item.ABOUT:
+                case Item.INPUT:
+                case Item.NUMBER:
+                case Item.DESCRIPTION:
+                    return new TextInputStyle(
+                            itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP
+                                    ? adapterListener::onAddressClicked
+                                    : Item.NO_CLICK,
+                            itemType == Item.INPUT
+                                    ? adapterListener::onImageClick
+                                    : adapterListener::onAddressClicked,
+                            this::enabler,
+                            this::textChecker,
+                            this::iconGetter);
+                case Item.SPORT:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.choose_sport,
+                            Config.getSports(),
+                            Sport::getName,
+                            Sport::getCode,
+                            this::enabler);
+            }
+        }
     }
 }

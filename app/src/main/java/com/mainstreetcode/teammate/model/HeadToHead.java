@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.persistence.room.Ignore;
+import androidx.room.Ignore;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;

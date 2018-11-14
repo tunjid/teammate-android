@@ -1,10 +1,10 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.persistence.room.Ignore;
+import androidx.room.Ignore;
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -231,7 +231,9 @@ public class Team extends TeamEntity
             int minAge = (int) ModelUtils.asFloat(MIN_AGE_KEY, teamJson);
             int maxAge = (int) ModelUtils.asFloat(MAX_AGE_KEY, teamJson);
 
-            return new Team(id, imageUrl, screenName, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge);
+            return new Team(id, imageUrl, screenName, city, state, zip,
+                    ModelUtils.processString(name), ModelUtils.processString(description),
+                    created, location, sport, storageUsed, maxStorage, minAge, maxAge);
         }
 
         @Override

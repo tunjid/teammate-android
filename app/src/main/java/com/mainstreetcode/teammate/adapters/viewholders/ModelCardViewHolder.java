@@ -1,22 +1,24 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.RemoteImage;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE;
 
 
-public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerViewAdapter.AdapterListener> extends BaseViewHolder<T> {
+public class ModelCardViewHolder<H extends RemoteImage, T extends InteractiveAdapter.AdapterListener> extends BaseViewHolder<T> {
 
     protected H model;
 
@@ -30,6 +32,7 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends BaseRecyclerVi
         subtitle = itemView.findViewById(R.id.item_subtitle);
         thumbnail = itemView.findViewById(R.id.thumbnail);
 
+        ViewHolderUtil.updateForegroundDrawable(itemView);
         if (isThumbnail()) thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 

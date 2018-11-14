@@ -1,12 +1,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +20,14 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
 
 /**
  * Edits a Team member
@@ -37,7 +39,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
         TeamAdapter.AdapterListener,
         GameEditAdapter.AdapterListener {
 
-    public static final String ARG_GAME = "stat";
+    private static final String ARG_GAME = "game";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Game game;
@@ -77,6 +79,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new GameEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
@@ -107,7 +110,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return gofer.canEdit() && !isBottomSheetShowing();}
@@ -160,8 +163,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public void onClick(View view) {
         if (view.getId() != R.id.fab) return;
 
-        if (game.isEmpty()) disposables.add(gofer.save()
-                .subscribe(ignored -> showFragment(GameFragment.newInstance(game)), defaultErrorHandler));
+        if (game.isEmpty()) createGame();
         else new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.game_manual_score_request)
                 .setMessage(R.string.game_end_prompt)
@@ -174,10 +176,14 @@ public class GameEditFragment extends HeaderedFragment<Game>
                 .show();
     }
 
+    private void createGame() {
+        toggleProgress(true);
+        disposables.add(gofer.save().subscribe(ignored -> showFragment(GameFragment.newInstance(game)), defaultErrorHandler));
+    }
+
     private void updateCompetitor(Competitive item) {
         game.getAway().updateEntity(item);
         scrollManager.notifyDataSetChanged();
-        scrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 

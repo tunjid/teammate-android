@@ -1,14 +1,14 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.support.annotation.NonNull;
-import android.support.design.chip.Chip;
+import androidx.annotation.NonNull;
+import com.google.android.material.chip.Chip;
 import android.view.View;
 
 import com.mainstreetcode.teammate.adapters.StatTypeAdapter;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseViewHolder;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
-public class ChipViewHolder extends BaseViewHolder<StatTypeAdapter.AdapterListener> {
+public class ChipViewHolder extends InteractiveViewHolder<StatTypeAdapter.AdapterListener> {
     private Chip chip;
     private StatAttribute attribute;
 

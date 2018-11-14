@@ -1,11 +1,14 @@
 package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+
+import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
@@ -49,8 +52,10 @@ public class RegistrationActivity extends TeammatesBaseActivity {
         String domain1 = getString(R.string.domain_1);
         String domain2 = getString(R.string.domain_2);
 
+        String path = data.getPath();
+        if (path == null) return false;
         boolean domainMatches = domain1.equals(data.getHost()) || domain2.equals(data.getHost());
-        return domainMatches && data.getPath().contains("forgotPassword");
+        return domainMatches && path.contains("forgotPassword");
     }
 
     public static void startMainActivity(@Nullable Activity activity) {

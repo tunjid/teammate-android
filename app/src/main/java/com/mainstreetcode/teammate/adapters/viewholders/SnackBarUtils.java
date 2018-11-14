@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
 
-import android.support.design.snackbar.ContentViewCallback;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
+import com.google.android.material.snackbar.ContentViewCallback;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;

@@ -2,14 +2,19 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+
+import com.google.android.material.tabs.TabLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AlertDialog;
+
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -36,8 +41,8 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
-import static android.support.design.widget.TabLayout.MODE_FIXED;
-import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
+import static com.google.android.material.tabs.TabLayout.MODE_FIXED;
+import static com.google.android.material.tabs.TabLayout.MODE_SCROLLABLE;
 
 public class TournamentDetailFragment extends MainActivityFragment {
 
@@ -50,6 +55,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private EmptyViewHolder viewHolder;
+    private RecyclerView.RecycledViewPool gamesRecycledViewPool;
 
     public static TournamentDetailFragment newInstance(Tournament tournament) {
         TournamentDetailFragment fragment = new TournamentDetailFragment();
@@ -82,6 +88,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         Bundle args = getArguments();
         tournament = args.getParcelable(ARG_TOURNAMENT);
         competitor = args.getParcelable(ARG_COMPETITOR);
+        gamesRecycledViewPool = new RecyclerView.RecycledViewPool();
 
         if (competitor == null) competitor = Competitor.empty();
     }
@@ -160,6 +167,10 @@ public class TournamentDetailFragment extends MainActivityFragment {
         tabLayout = null;
         viewHolder = null;
         super.onDestroyView();
+    }
+
+    public RecyclerView.RecycledViewPool getGamesRecycledViewPool() {
+        return gamesRecycledViewPool;
     }
 
     @Override

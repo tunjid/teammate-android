@@ -2,9 +2,9 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.transition.Fade;
-import android.support.transition.TransitionManager;
-import android.support.v4.view.ViewCompat;
+import androidx.transition.Fade;
+import androidx.transition.TransitionManager;
+import androidx.core.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;

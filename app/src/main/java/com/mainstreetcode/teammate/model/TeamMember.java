@@ -2,7 +2,7 @@ package com.mainstreetcode.teammate.model;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

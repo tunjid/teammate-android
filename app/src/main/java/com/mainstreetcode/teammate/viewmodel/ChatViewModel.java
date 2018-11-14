@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.arch.core.util.Function;
+import androidx.arch.core.util.Function;
 
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;

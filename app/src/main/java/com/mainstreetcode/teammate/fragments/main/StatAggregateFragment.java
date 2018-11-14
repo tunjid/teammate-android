@@ -1,8 +1,8 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +62,7 @@ public class StatAggregateFragment extends MainActivityFragment
         searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
                 .withAdapter(new StatAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
@@ -75,10 +76,11 @@ public class StatAggregateFragment extends MainActivityFragment
 
         expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), this::fetchAggregates);
         expandingToolbar.setTitleIcon(false);
-        expandingToolbar.changeVisibility(false);
         expandingToolbar.setTitle(R.string.stat_aggregate_get);
 
         scrollManager.notifyDataSetChanged();
+
+        if (!restoredFromBackStack()) expandingToolbar.changeVisibility(false);
 
         return root;
     }
@@ -137,7 +139,6 @@ public class StatAggregateFragment extends MainActivityFragment
         else return;
 
         searchScrollManager.notifyDataSetChanged();
-        searchScrollManager.getRecyclerView().postDelayed(this::hideBottomSheet, 200);
         hideKeyboard();
     }
 

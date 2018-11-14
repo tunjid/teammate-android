@@ -1,9 +1,9 @@
 package com.mainstreetcode.teammate.model;
 
-import android.arch.persistence.room.Ignore;
+import androidx.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
@@ -16,6 +16,7 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.util.IdCache;
+import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -191,7 +192,8 @@ public class User extends UserEntity implements
             String lastName = asString(LAST_NAME_KEY, userObject);
             String about = asString(ABOUT_KEY, userObject);
 
-            return new User(id, imageUrl, screenName, primaryEmail, firstName, lastName, about);
+            return new User(id, imageUrl, screenName, primaryEmail,
+                    ModelUtils.processString(firstName), ModelUtils.processString(lastName), ModelUtils.processString(about));
         }
 
         @Override

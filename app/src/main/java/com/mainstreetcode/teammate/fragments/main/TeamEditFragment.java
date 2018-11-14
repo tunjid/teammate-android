@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +24,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -78,6 +79,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
                 .withAdapter(new TeamEditAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
@@ -101,7 +103,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public boolean[] insetState() {return VERTICAL;}
+    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {

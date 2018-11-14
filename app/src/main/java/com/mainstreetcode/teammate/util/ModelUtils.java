@@ -1,9 +1,11 @@
 package com.mainstreetcode.teammate.util;
 
-import android.support.annotation.Nullable;
-import android.support.text.emoji.EmojiCompat;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.emoji.text.EmojiCompat;
 import android.text.TextUtils;
 
+import com.google.android.gms.common.util.BiConsumer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -24,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+
+import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
 
 /**
  * Static methods for models
@@ -76,8 +80,12 @@ public class ModelUtils {
     }
 
     public static <K, V> V get(K key, Map<K, V> map, Supplier<V> instantiator) {
-        V value = map.get(key);
-        if (value == null) map.put(key, value = instantiator.get());
+        return get(key, map::get, map::put, instantiator);
+    }
+
+    public static <K, V> V get(K key, Function<K, V> getter, BiConsumer<K, V> setter, Supplier<V> instantiator) {
+        V value = getter.apply(key);
+        if (value == null) setter.accept(key, value = instantiator.get());
 
         return value;
     }
@@ -116,6 +124,12 @@ public class ModelUtils {
 
     public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
         return new ArrayList<>(subTypeList);
+    }
+
+    public static void replaceStringList(List<String> sourceList, List<String> updatedList) {
+        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
+        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        replaceList(source, updated);
     }
 
     public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {

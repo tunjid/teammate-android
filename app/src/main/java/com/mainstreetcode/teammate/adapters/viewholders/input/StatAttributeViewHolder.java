@@ -1,7 +1,5 @@
-package com.mainstreetcode.teammate.adapters.viewholders;
+package com.mainstreetcode.teammate.adapters.viewholders.input;
 
-import android.arch.core.util.Function;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.google.android.flexbox.AlignItems;
@@ -10,45 +8,42 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatTypeAdapter;
-import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.StatTypes;
-import com.mainstreetcode.teammate.util.Supplier;
 
 import java.util.List;
 
-public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
+import androidx.recyclerview.widget.RecyclerView;
+
+public class StatAttributeViewHolder extends InputViewHolder {
 
     private final StatTypeAdapter adapter;
     private final StatType statType = StatType.empty();
     private final StatTypes statTypes;
 
-    public StatAttributeViewHolder(View itemView,
-                                   int titleRes,
-                                   Stat stat,
-                                   Supplier<Boolean> enabler,
-                                   Function<CharSequence, CharSequence> errorChecker) {
+    private RecyclerView recyclerView;
 
-        super(itemView, titleRes, stat.getSport().getStats(), StatType::getEmojiAndName, StatType::getCode, enabler, errorChecker);
+    public StatAttributeViewHolder(View itemView, Stat stat) {
+        super(itemView);
 
         statTypes = stat.getSport().getStats();
         adapter = new StatTypeAdapter(new StatTypeAdapter.AdapterListener() {
             @Override
             public List<StatAttribute> getAttributes() {
-                return enabler.get() ? statType.getAttributes() : stat.getAttributes();
+                return isEnabled() ? statType.getAttributes() : stat.getAttributes();
             }
 
             @Override
-            public boolean isEnabled() { return enabler.get(); }
+            public boolean isEnabled() { return textInputStyle != null && textInputStyle.isEditable(); }
 
             @Override
             public boolean isSelected(StatAttribute attribute) { return stat.contains(attribute); }
 
             @Override
             public void onAttributeTapped(StatAttribute attribute) {
-                if (!enabler.get()) return;
+                if (!isEnabled()) return;
                 stat.compoundAttribute(attribute);
                 adapter.notifyDataSetChanged();
             }
@@ -59,22 +54,38 @@ public class StatAttributeViewHolder extends SelectionViewHolder<StatType> {
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         layoutManager.setAlignItems(AlignItems.CENTER);
 
-        RecyclerView recyclerView = itemView.findViewById(R.id.inner_list);
+        recyclerView = itemView.findViewById(R.id.inner_list);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void bind(Item item) {
-        super.bind(item);
-        statType.update(statTypes.fromCodeOrFirst(item.getRawValue()));
+    @Override public void bind(TextInputStyle textInputStyle) {
+        super.bind(textInputStyle);
+        statType.update(statTypes.fromCodeOrFirst(textInputStyle.getItem().getRawValue()));
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    protected void onItemSelected(List<CharSequence> sequences, int position, StatType type) {
-        super.onItemSelected(sequences, position, type);
-        statType.update(type);
+    @Override void updateText(CharSequence text) {
+        super.updateText(text);
+        if (textInputStyle == null) return;
+        String value = textInputStyle.getItem().getRawValue();
+        StatType current = null;
+
+        for (StatType type : statTypes)
+            if (type.getCode().equals(value)) {
+                current = type;
+                break;
+            }
+        if (current == null) return;
+        statType.update(current);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override protected float getHintLateralTranslation() {
+        return super.getHintLateralTranslation();
+    }
+
+    @Override protected float getHintLongitudinalTranslation() {
+        return -((itemView.getHeight() - hint.getHeight() - recyclerView.getHeight()) * 0.5F);
     }
 }

@@ -4,12 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.MenuRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
 import android.transition.ChangeTransform;
@@ -19,6 +13,7 @@ import android.transition.TransitionSet;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.model.Config;
@@ -27,7 +22,13 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.MenuRes;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentTransaction;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 
@@ -37,9 +38,8 @@ import io.reactivex.functions.Consumer;
 
 public class TeammatesBaseFragment extends BaseFragment implements View.OnClickListener {
 
-    protected static final boolean[] DEFAULT = {true, false, true, false};
-    protected static final boolean[] VERTICAL = {true, true, true, false};
-    protected static final boolean[] NONE = {false, true, false, false};
+    protected static final InsetFlags VERTICAL = InsetFlags.create(true, false, true, true);
+    protected static final InsetFlags NONE = InsetFlags.NONE;
     protected static final int PLACE_PICKER_REQUEST = 1;
 
     protected static final Validator VALIDATOR = new Validator();
@@ -76,15 +76,12 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         super.onDestroyView();
     }
 
-    @Override
-    public void onClick(View v) {}
+    public InsetFlags insetFlags() {
+        return InsetFlags.VERTICAL;
+    }
 
     public int[] staticViews() {
         return new int[]{};
-    }
-
-    public boolean[] insetState() {
-        return DEFAULT;
     }
 
     public boolean showsFab() {return false;}
@@ -92,6 +89,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     public boolean showsToolBar() {return true;}
 
     public boolean showsBottomNav() {return true;}
+
+    @Override
+    public void onClick(View v) {}
 
     protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
 
@@ -107,6 +107,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void updateFabIcon() {getPersistentUiController().setFabIcon(getFabIconResource(), getFabStringResource());}
 
+    @SuppressWarnings("WeakerAccess")
     protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
     protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
@@ -193,6 +194,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         return getFragmentManager().beginTransaction();
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected PersistentUiController getPersistentUiController() {
         Activity activity = getActivity();
         return activity == null ? DUMMY : ((PersistentUiController) activity);

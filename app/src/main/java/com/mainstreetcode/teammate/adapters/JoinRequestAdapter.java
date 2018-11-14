@@ -1,12 +1,13 @@
 package com.mainstreetcode.teammate.adapters;
 
-import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.viewholders.BaseItemViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.InputViewHolder;
-import com.mainstreetcode.teammate.adapters.viewholders.SelectionViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle;
+import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
+import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Identifiable;
@@ -14,49 +15,48 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseRecyclerViewAdapter;
+import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 import static com.mainstreetcode.teammate.model.Item.ALL_INPUT_VALID;
 import static com.mainstreetcode.teammate.model.Item.FALSE;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getItemView;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 /**
  * Adapter for {@link Role}
  */
 
-public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHolder, JoinRequestAdapter.AdapterListener> {
+public class JoinRequestAdapter extends BaseAdapter<InputViewHolder, JoinRequestAdapter.AdapterListener> {
 
     private final List<Identifiable> items;
+    private final TextInputStyle.InputChooser chooser;
 
     public JoinRequestAdapter(List<Identifiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
+        chooser = new Chooser(adapterListener);
     }
 
     @NonNull
     @Override
-    public BaseItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        switch (viewType) {
-            case Item.SPORT:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_sport, Config.getSports(), Sport::getName, Sport::getCode, FALSE, ALL_INPUT_VALID);
-            case Item.ROLE:
-                return new SelectionViewHolder<>(getItemView(R.layout.viewholder_simple_input, viewGroup), R.string.choose_role, Config.getPositions(), Position::getName, Position::getCode, adapterListener::canEditRole);
-            case Item.ABOUT:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, ALL_INPUT_VALID);
-            case Item.DESCRIPTION:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), Item.FALSE, ALL_INPUT_VALID);
-            case Item.INPUT:
-            default:
-                return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup), adapterListener::canEditFields);
-        }
+    public InputViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        return new InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseItemViewHolder baseItemViewHolder, int i) {
+    @SuppressWarnings("unchecked")
+    protected <S extends InteractiveAdapter.AdapterListener> S updateListener(BaseViewHolder<S> viewHolder) {
+        return (S) adapterListener;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
+        super.onBindViewHolder(viewHolder, i);
         Identifiable item = items.get(i);
-        if (item instanceof Item) baseItemViewHolder.bind((Item) item);
+        if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 
     @Override
@@ -66,13 +66,50 @@ public class JoinRequestAdapter extends BaseRecyclerViewAdapter<BaseItemViewHold
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
-        return item instanceof Item ? ((Item) item).getItemType() : Item.INPUT;
+        return ITEM;
     }
 
     public interface AdapterListener extends ImageWorkerFragment.ImagePickerListener {
         boolean canEditFields();
 
         boolean canEditRole();
+    }
+
+    private static class Chooser extends TextInputStyle.InputChooser {
+
+        private final AdapterListener adapterListener;
+
+        private Chooser(AdapterListener adapterListener) {this.adapterListener = adapterListener;}
+
+        @Override public TextInputStyle apply(Item item) {
+            int itemType = item.getItemType();
+            switch (itemType) {
+                default:
+                    return new TextInputStyle(
+                            Item.NO_CLICK,
+                            Item.NO_CLICK,
+                            itemType == Item.INPUT
+                                    ? ignored -> adapterListener.canEditFields()
+                                    : Item.FALSE,
+                            Item.ALL_INPUT_VALID,
+                            Item.NO_ICON);
+                case Item.SPORT:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.choose_sport,
+                            Config.getSports(),
+                            Sport::getName,
+                            Sport::getCode,
+                            FALSE,
+                            ALL_INPUT_VALID);
+                case Item.ROLE:
+                    return new SpinnerTextInputStyle<>(
+                            R.string.choose_role,
+                            Config.getPositions(),
+                            Position::getName,
+                            Position::getCode,
+                            ignored -> adapterListener.canEditRole(),
+                            ALL_INPUT_VALID);
+            }
+        }
     }
 }

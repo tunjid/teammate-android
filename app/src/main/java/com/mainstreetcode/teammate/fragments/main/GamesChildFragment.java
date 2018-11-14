@@ -1,9 +1,13 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,21 +75,28 @@ public final class GamesChildFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_games_child, container, false);
-
-        Runnable refreshAction = () -> disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(GamesChildFragment.this::onGamesUpdated, defaultErrorHandler));
+        Fragment fragment = getParentFragment();
+        RecyclerView.RecycledViewPool recycledViewPool = fragment instanceof TournamentDetailFragment
+                ? ((TournamentDetailFragment) fragment).getGamesRecycledViewPool()
+                : new RecyclerView.RecycledViewPool();
 
         scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::onRefresh)
                 .withEndlessScrollCallback(() -> fetchTournaments(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new GameAdapter(items, this))
+                .withRecycledViewPool(recycledViewPool)
                 .withLinearLayoutManager()
                 .build();
 
         scrollManager.setViewHolderColor(R.color.dark_grey);
 
         return rootView;
+    }
+
+    private boolean onRefresh() {
+        return disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(GamesChildFragment.this::onGamesUpdated, defaultErrorHandler));
     }
 
     @Override
@@ -115,11 +126,11 @@ public final class GamesChildFragment extends MainActivityFragment
         showFragment(GameFragment.newInstance(game));
     }
 
-    void fetchTournaments(boolean fetchLatest) {
+    private void fetchTournaments(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 
-        disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(this::onGamesUpdated, defaultErrorHandler));
+        onRefresh();
     }
 
     private void onGamesUpdated(DiffUtil.DiffResult result) {
