@@ -76,10 +76,6 @@ public class RoleEditAdapter extends BaseAdapter<InputViewHolder, RoleEditAdapte
 
         private Chooser(RoleEditAdapterListener adapterListener) {this.adapterListener = adapterListener;}
 
-        private boolean showsChangePicture(Item item) {
-            return item.getStringRes() == R.string.first_name && adapterListener.canChangeRoleFields();
-        }
-
         @Override public boolean enabler(Item item) {
             switch (item.getItemType()) {
                 default:
@@ -94,12 +90,13 @@ public class RoleEditAdapter extends BaseAdapter<InputViewHolder, RoleEditAdapte
         @Override public int iconGetter(Item item) {
             switch (item.getItemType()) {
                 default:
-                case Item.INPUT:
+                case Item.ROLE:
                 case Item.ABOUT:
                 case Item.NICKNAME:
                     return 0;
-                case Item.ROLE:
-                    return showsChangePicture(item) ? R.drawable.ic_picture_white_24dp : 0;
+                case Item.INPUT:
+                    return item.getStringRes() == R.string.first_name && adapterListener.canChangeRolePosition()
+                            ? R.drawable.ic_picture_white_24dp : 0;
             }
         }
 
@@ -122,9 +119,7 @@ public class RoleEditAdapter extends BaseAdapter<InputViewHolder, RoleEditAdapte
                 case Item.NICKNAME:
                     return new TextInputStyle(
                             Item.NO_CLICK,
-                            item.getStringRes() == R.string.first_name
-                                    ? adapterListener::onImageClick
-                                    : Item.NO_CLICK,
+                            adapterListener::onImageClick,
                             this::enabler,
                             this::textChecker,
                             this::iconGetter);

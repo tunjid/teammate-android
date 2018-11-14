@@ -19,8 +19,10 @@ public class TextInputStyle {
     Item item;
     InputViewHolder viewHolder;
 
-    @Nullable private Runnable textRunnable;
-    @Nullable private Runnable buttonRunnable;
+    @Nullable
+    private Runnable textRunnable;
+    @Nullable
+    private Runnable buttonRunnable;
 
     private Function<Item, Boolean> enabler;
     private Function<Item, CharSequence> errorChecker;
@@ -54,11 +56,9 @@ public class TextInputStyle {
 
     CharSequence errorText() { return errorChecker.apply(item);}
 
-    View.OnClickListener buttonClickListener() { return isEditable() ? this::onButtonClicked : null; }
+    View.OnClickListener buttonClickListener() { return getIcon() != 0 ? this::onButtonClicked : null; }
 
-    View.OnClickListener textClickListener() {
-        return isEditable() ? this::onTextClicked : null;
-    }
+    View.OnClickListener textClickListener() { return isEditable() ? this::onTextClicked : null; }
 
     void onTextClicked(View view) { if (textRunnable != null) textRunnable.run();}
 
