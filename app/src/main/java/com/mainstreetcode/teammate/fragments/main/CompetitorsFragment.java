@@ -87,7 +87,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
                 .withAdapter(new DragDropAdapter<>(new CompetitorAdapter(competitorIdentifiables, competitor -> {}), CompetitorViewHolder::getDragHandle, this::onDragStarted))
                 .withInconsistencyHandler(this::onInconsistencyDetected)

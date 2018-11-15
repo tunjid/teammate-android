@@ -82,7 +82,7 @@ public class HeadToHeadFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
                 .withAdapter(new GameAdapter(matchUps, game -> showFragment(GameFragment.newInstance(game))))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchMatchUps)

@@ -80,11 +80,11 @@ public class TeamMembersFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(teamMemberViewModel.refresh(team).subscribe(TeamMembersFragment.this::onTeamUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withAdapter(new TeamMemberAdapter(teamModels, this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))

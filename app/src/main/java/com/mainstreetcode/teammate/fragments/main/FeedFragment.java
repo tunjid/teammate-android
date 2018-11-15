@@ -52,8 +52,6 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 public final class FeedFragment extends MainActivityFragment
         implements FeedAdapter.FeedItemAdapterListener {
 
-    private static final int[] EXCLUDED_VIEWS = {R.id.feed_list};
-
     private int onBoardingIndex;
     private boolean isOnBoarding;
     private AtomicBoolean bottomBarState;
@@ -75,11 +73,11 @@ public final class FeedFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.feed_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
@@ -120,9 +118,6 @@ public final class FeedFragment extends MainActivityFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public int[] staticViews() {return EXCLUDED_VIEWS;}
 
     @Override
     @SuppressWarnings("unchecked")

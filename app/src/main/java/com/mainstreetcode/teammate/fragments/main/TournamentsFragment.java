@@ -75,11 +75,11 @@ public final class TournamentsFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(tournamentViewModel.refresh(team).subscribe(TournamentsFragment.this::onTournamentsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchTournaments(false))

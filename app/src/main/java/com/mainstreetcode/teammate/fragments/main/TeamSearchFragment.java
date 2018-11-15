@@ -37,7 +37,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         SearchView.OnQueryTextListener,
         TeamAdapter.AdapterListener {
 
-    private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
+    private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
     public static final String ARG_SPORT = "sport-code";
 
     private View createTeam;
@@ -87,7 +87,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         searchView = rootView.findViewById(R.id.searchView);
         createTeam = rootView.findViewById(R.id.create_team);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamSearchAdapter(teams, this))
                 .withGridLayoutManager(2)

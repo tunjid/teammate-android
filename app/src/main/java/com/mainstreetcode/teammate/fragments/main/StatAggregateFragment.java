@@ -66,7 +66,7 @@ public class StatAggregateFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchAggregates)
                 .withInconsistencyHandler(this::onInconsistencyDetected)

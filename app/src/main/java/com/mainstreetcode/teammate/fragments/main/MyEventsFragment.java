@@ -60,11 +60,11 @@ public final class MyEventsFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_events, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(myEventsViewModel.refresh(Event.class).subscribe(MyEventsFragment.this::onEventsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchEvents(false))

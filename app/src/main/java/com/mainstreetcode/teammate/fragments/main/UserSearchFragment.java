@@ -32,7 +32,7 @@ public final class UserSearchFragment extends MainActivityFragment
         SearchView.OnQueryTextListener,
         UserAdapter.AdapterListener {
 
-    private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
+    private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
 
     private SearchView searchView;
     private InstantSearch<String, User> instantSearch;
@@ -59,7 +59,7 @@ public final class UserSearchFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_user_search, container, false);
         searchView = rootView.findViewById(R.id.searchView);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new UserAdapter(items, this))
                 .withGridLayoutManager(2)

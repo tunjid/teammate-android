@@ -69,11 +69,11 @@ public final class BlockedUsersFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_events, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(blockedUserViewModel.refresh(team).subscribe(BlockedUsersFragment.this::onBlockedUsersUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchBlockedUsers(false))
