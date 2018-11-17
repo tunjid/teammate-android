@@ -1,12 +1,14 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DiffUtil;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -83,6 +85,7 @@ public final class EventsFragment extends MainActivityFragment
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchEvents(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
                 .withLinearLayoutManager()
@@ -173,7 +176,7 @@ public final class EventsFragment extends MainActivityFragment
         return superResult;
     }
 
-    void fetchEvents(boolean fetchLatest) {
+    private void fetchEvents(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 

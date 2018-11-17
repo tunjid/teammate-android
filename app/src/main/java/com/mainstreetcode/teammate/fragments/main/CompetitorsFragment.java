@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,6 +129,12 @@ public final class CompetitorsFragment extends MainActivityFragment
         updateFabIcon();
         setFabClickListener(this);
         setToolbarTitle(getString(R.string.add_tournament_competitors));
+    }
+
+    @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
     }
 
     @Override

@@ -81,6 +81,7 @@ public final class FeedFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build();

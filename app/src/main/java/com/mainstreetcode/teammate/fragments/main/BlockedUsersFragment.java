@@ -77,8 +77,9 @@ public final class BlockedUsersFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchBlockedUsers(false))
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withAdapter(new BlockedUserAdapter(items, this))
+                .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withGridLayoutManager(2)
                 .build();
 
@@ -136,7 +137,7 @@ public final class BlockedUsersFragment extends MainActivityFragment
         return superResult;
     }
 
-    void fetchBlockedUsers(boolean fetchLatest) {
+   private void fetchBlockedUsers(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 

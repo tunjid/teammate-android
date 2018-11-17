@@ -124,6 +124,12 @@ public class HeadToHeadFragment extends MainActivityFragment
     }
 
     @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
+    }
+
+    @Override
     public void onUserClicked(User item) { updateCompetitor(item); }
 
     @Override

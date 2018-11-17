@@ -106,6 +106,12 @@ public class StatAggregateFragment extends MainActivityFragment
     }
 
     @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
+    }
+
+    @Override
     public void onUserPicked(User item) {
         pick(UserSearchFragment.newInstance());
     }

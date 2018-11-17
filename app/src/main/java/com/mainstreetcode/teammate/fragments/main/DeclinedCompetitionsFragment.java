@@ -62,6 +62,7 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchCompetitions(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(getAdapter())
                 .withLinearLayoutManager()

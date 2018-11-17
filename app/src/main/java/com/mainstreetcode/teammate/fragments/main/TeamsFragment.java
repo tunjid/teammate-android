@@ -66,6 +66,7 @@ public final class TeamsFragment extends MainActivityFragment
                 .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
                 .withStaggeredGridLayoutManager(2)
