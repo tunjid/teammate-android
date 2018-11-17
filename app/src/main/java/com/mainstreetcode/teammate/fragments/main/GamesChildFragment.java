@@ -80,7 +80,7 @@ public final class GamesChildFragment extends MainActivityFragment
                 ? ((TournamentDetailFragment) fragment).getGamesRecycledViewPool()
                 : new RecyclerView.RecycledViewPool();
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::onRefresh)
                 .withEndlessScrollCallback(() -> fetchTournaments(false))

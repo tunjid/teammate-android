@@ -30,7 +30,7 @@ public final class TeamsFragment extends MainActivityFragment
         implements
         TeamAdapter.AdapterListener {
 
-    private static final int[] EXCLUDED_VIEWS = {R.id.team_list};
+    private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
 
     private List<Identifiable> roles;
 
@@ -58,14 +58,15 @@ public final class TeamsFragment extends MainActivityFragment
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_teams, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(roleViewModel.refresh(Role.class).subscribe(TeamsFragment.this::onTeamsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamAdapter(roles, this))
                 .withStaggeredGridLayoutManager(2)

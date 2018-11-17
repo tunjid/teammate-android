@@ -82,12 +82,7 @@ public class UserEditAdapter extends BaseAdapter<InputViewHolder, UserEditAdapte
         }
 
         @Override public int iconGetter(Item item) {
-            switch (item.getItemType()) {
-                default:
-                    return 0;
-                case Item.INPUT:
-                    return adapterListener.canEdit() ? R.drawable.ic_picture_white_24dp : 0;
-            }
+            return adapterListener.canEdit() && item.getStringRes() == R.string.first_name ? R.drawable.ic_picture_white_24dp : 0;
         }
 
         @Override public CharSequence textChecker(Item item) {

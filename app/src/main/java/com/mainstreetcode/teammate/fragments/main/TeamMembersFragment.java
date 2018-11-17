@@ -4,14 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +25,15 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.List;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
@@ -80,14 +81,15 @@ public class TeamMembersFragment extends MainActivityFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_team_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false);
 
         Runnable refreshAction = () -> disposables.add(teamMemberViewModel.refresh(team).subscribe(TeamMembersFragment.this::onTeamUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_detail))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withAdapter(new TeamMemberAdapter(teamModels, this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withStaggeredGridLayoutManager(2)
                 .build();
@@ -227,7 +229,7 @@ public class TeamMembersFragment extends MainActivityFragment
         return super.provideFragmentTransaction(fragmentTo);
     }
 
-    void fetchTeamMembers(boolean fetchLatest) {
+    private void fetchTeamMembers(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 

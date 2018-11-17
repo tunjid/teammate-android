@@ -70,7 +70,7 @@ public final class StandingsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> fetchStandings(true);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView.findViewById(R.id.empty_container), R.drawable.ic_table_24dp, R.string.tournament_no_standings))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScrollCallback(() -> fetchStandings(false))
