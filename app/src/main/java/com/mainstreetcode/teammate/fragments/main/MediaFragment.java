@@ -146,8 +146,8 @@ public class MediaFragment extends MainActivityFragment
                 TeamPickerFragment.change(getActivity(), R.id.request_media_team_pick);
                 return true;
             case R.id.action_delete:
-                mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
-                        .subscribe(this::onMediaDeleted, defaultErrorHandler);
+                disposables.add(mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
+                        .subscribe(this::onMediaDeleted, defaultErrorHandler));
                 return true;
             case R.id.action_download:
                 if (ImageWorkerFragment.requestDownload(this, team))
