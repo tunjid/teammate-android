@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.baseclasses;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -100,16 +99,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         spacer = view.findViewById(R.id.spacer_toolbar);
         if (spacer == null || ((View) view.getParent()).getId() != R.id.bottom_sheet_view) return;
 
-//        int radius = getResources().getDimensionPixelSize(R.dimen.single_and_half_margin);
-//
-//        spacer.setOutlineProvider(new ViewOutlineProvider() {
-//            @Override public void getOutline(View view, Outline outline) {
-//                outline.setRoundRect(1, 1, view.getWidth() - 1, view.getHeight() + radius, radius);
-//            }
-//        });
         spacer.setBackgroundResource(R.drawable.bg_round_top_toolbar);
         spacer.setClipToOutline(true);
     }
@@ -183,14 +176,12 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         spacer.setSelected(scrollManager.getRecyclerView().canScrollVertically(-1));
     }
 
-    @SuppressLint("CheckResult")
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
         teamViewModel.updateDefaultTeam(Team.empty());
-        userViewModel.signOut().subscribe(
+        disposables.add(userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),
                 throwable -> MainActivity.startRegistrationActivity(getActivity())
-        );
+        ));
     }
 
     protected void showCompetitor(Competitor competitor) {
