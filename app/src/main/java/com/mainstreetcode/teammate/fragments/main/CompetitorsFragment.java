@@ -1,11 +1,13 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +89,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.team_list))
+        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
                 .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
                 .withAdapter(new DragDropAdapter<>(new CompetitorAdapter(competitorIdentifiables, competitor -> {}), CompetitorViewHolder::getDragHandle, this::onDragStarted))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -127,6 +129,12 @@ public final class CompetitorsFragment extends MainActivityFragment
         updateFabIcon();
         setFabClickListener(this);
         setToolbarTitle(getString(R.string.add_tournament_competitors));
+    }
+
+    @Override
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
     }
 
     @Override

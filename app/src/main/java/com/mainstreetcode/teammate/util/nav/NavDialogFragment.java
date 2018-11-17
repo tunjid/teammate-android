@@ -19,7 +19,7 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 
 public class NavDialogFragment extends BottomSheetDialogFragment {
 
-    TeamViewModel teamViewModel;
+    private TeamViewModel teamViewModel;
 
     public static NavDialogFragment newInstance() {
         NavDialogFragment fragment = new NavDialogFragment();

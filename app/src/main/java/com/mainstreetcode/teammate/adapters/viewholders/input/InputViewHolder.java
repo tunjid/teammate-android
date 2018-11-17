@@ -37,7 +37,6 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
     private static final float HINT_SHRINK_SCALE = 0.8F;
     private static final float HALF = 0.5F;
 
-    private int lastIcon = -1;
     private int lastLineCount = 1;
 
     protected final TextView hint;
@@ -163,7 +162,6 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         if (textInputStyle == null) return;
 
         int newIcon = textInputStyle.getIcon();
-        if (lastIcon == newIcon) return;
 
         int oldVisibility = button.getVisibility();
         int newVisibility = newIcon == 0 ? GONE : VISIBLE;
@@ -174,8 +172,6 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
                     .subscribeOn(Schedulers.io())
                     .observeOn(mainThread())
                     .subscribe(button::setImageDrawable, ErrorHandler.EMPTY));
-
-        lastIcon = newIcon;
     }
 
     private void scaleHint(boolean grow) {

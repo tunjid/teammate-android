@@ -1,17 +1,11 @@
 package com.mainstreetcode.teammate.baseclasses;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
@@ -40,11 +34,20 @@ import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * Class for Fragments in {@link com.mainstreetcode.teammate.activities.MainActivity}
  */
 
 public class MainActivityFragment extends TeammatesBaseFragment {
+
+    @Nullable
+    private View spacer;
 
     protected ScrollManager scrollManager;
     protected FeedViewModel feedViewModel;
@@ -94,6 +97,16 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         defaultErrorHandler.addAction(() -> {if (scrollManager != null) scrollManager.reset();});
     }
 
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        spacer = view.findViewById(R.id.spacer_toolbar);
+        if (spacer == null || ((View) view.getParent()).getId() != R.id.bottom_sheet_view) return;
+
+        spacer.setBackgroundResource(R.drawable.bg_round_top_toolbar);
+        spacer.setClipToOutline(true);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -103,7 +116,9 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
         if (scrollManager != null) scrollManager.clear();
+        spacer = null;
     }
 
     @Override
@@ -156,20 +171,17 @@ public class MainActivityFragment extends TeammatesBaseFragment {
         setFabExtended(dy < 0);
     }
 
-    @Override
-    protected void onKeyBoardChanged(boolean appeared) {
-        super.onKeyBoardChanged(appeared);
-        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
+    protected void updateTopSpacerElevation() {
+        if (spacer == null || scrollManager == null) return;
+        spacer.setSelected(scrollManager.getRecyclerView().canScrollVertically(-1));
     }
 
-    @SuppressLint("CheckResult")
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected void signOut() {
         teamViewModel.updateDefaultTeam(Team.empty());
-        userViewModel.signOut().subscribe(
+        disposables.add(userViewModel.signOut().subscribe(
                 success -> MainActivity.startRegistrationActivity(getActivity()),
                 throwable -> MainActivity.startRegistrationActivity(getActivity())
-        );
+        ));
     }
 
     protected void showCompetitor(Competitor competitor) {
