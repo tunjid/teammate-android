@@ -5,6 +5,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="bottom_nav_selected">@color/colorPrimary</item>
+        <item name="bottom_nav_unselected">@color/dark_grey</item>
         <item name ="android:windowBackground">@color/colorPrimary</item>
     </style>
 
@@ -13,6 +15,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="bottom_nav_selected">@color/colorPrimary</item>
+        <item name="bottom_nav_unselected">@color/dark_grey</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name ="android:windowBackground">@color/colorPrimary</item>
     </style>

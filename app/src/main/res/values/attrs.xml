@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="bottom_nav_selected" format="reference" />
+    <attr name="bottom_nav_unselected" format="reference" />
+</resources>

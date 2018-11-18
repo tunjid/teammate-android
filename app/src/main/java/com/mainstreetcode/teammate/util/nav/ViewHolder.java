@@ -3,6 +3,8 @@ package com.mainstreetcode.teammate.util.nav;
 import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -62,8 +65,8 @@ public class ViewHolder {
         return detector.onTouchEvent(event);
     }
 
-    void tint(@ColorRes int colorRes) {
-        int color = ContextCompat.getColor(itemView.getContext(), colorRes);
+    void tint(@AttrRes int colorAttr) {
+        int color = ViewHolderUtil.resolveThemeColor(itemView.getContext(), colorAttr);
         title.setTextColor(color);
         icon.setBorderColor(color);
         if (hasCustomImage) return;
@@ -83,7 +86,7 @@ public class ViewHolder {
         itemView.setId(navItem.idRes);
         title.setText(navItem.titleRes);
         icon.setImageResource(navItem.drawableRes);
-        tint(R.color.dark_grey);
+        tint(R.attr.bottom_nav_unselected);
         return this;
     }
 
