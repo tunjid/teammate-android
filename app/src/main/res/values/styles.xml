@@ -8,6 +8,14 @@
         <item name ="android:windowBackground">@color/colorPrimary</item>
     </style>
 
+    <style name="DarkAppTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name ="android:windowBackground">@color/colorPrimary</item>
+    </style>
+
     <!--<style name="TextLabel" parent="ThemeOverlay.AppCompat.Light">-->
         <!--&lt;!&ndash; Hint color and label color in FALSE state &ndash;&gt;-->
 
