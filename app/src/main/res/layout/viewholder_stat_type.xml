@@ -25,7 +25,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/quarter_margin"
-        android:textColor="@color/dark_grey"
         android:textSize="@dimen/small_text"
         app:layout_constraintBottom_toBottomOf="@+id/input"
         app:layout_constraintLeft_toLeftOf="@+id/input"
