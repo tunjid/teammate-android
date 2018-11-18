@@ -12,7 +12,7 @@
             android:id="@+id/member_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="?colorPrimary"
             android:gravity="center_vertical"
             android:padding="@dimen/single_margin"
             android:text="@string/member_information"
