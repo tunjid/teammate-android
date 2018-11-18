@@ -1,5 +1,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders.input;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.text.Editable;
@@ -120,8 +122,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         text.removeTextChangedListener(this);
         if (!isSelector) text.addTextChangedListener(this);
 
+        updateButton();
         checkForErrors();
-        setClickableState();
+        setTintAlpha(text.hasFocus());
         listenForLayout(hint, () -> scaleHint(isEmpty(text.getText())));
     }
 
@@ -158,7 +161,7 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         else text.setError(errorMessage);
     }
 
-    private void setClickableState() {
+    private void updateButton() {
         if (textInputStyle == null) return;
 
         int newIcon = textInputStyle.getIcon();
@@ -195,6 +198,13 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
         ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), start, end);
         animator.setDuration(HINT_ANIMATION_DURATION);
         animator.addUpdateListener(animation -> hint.setTextColor((int) animation.getAnimatedValue()));
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) { setTintAlpha(hasFocus); }
+        });
         animator.start();
+    }
+
+    private void setTintAlpha(boolean hasFocus) {
+        hint.setAlpha(textInputStyle != null && !textInputStyle.isEditable() && !hasFocus ? 0.38F : 1F);
     }
 }

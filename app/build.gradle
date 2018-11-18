@@ -8,12 +8,11 @@ android {
         applicationId "com.mainstreetcode.teammate"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 29
-        versionName "3.0.8"
+        versionCode 30
+        versionName "3.0.8a"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true  //add this line
-
 
         javaCompileOptions {
             annotationProcessorOptions {
