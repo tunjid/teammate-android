@@ -3,4 +3,5 @@
     <attr name="bottom_nav_selected" format="reference" />
     <attr name="bottom_nav_unselected" format="reference" />
     <attr name="icon_tint" format="reference" />
+    <attr name="alt_icon_tint" format="reference" />
 </resources>
