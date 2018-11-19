@@ -59,7 +59,6 @@
             android:paddingLeft="@dimen/single_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/half_margin"
-            android:textColor="@color/dark_grey"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0"

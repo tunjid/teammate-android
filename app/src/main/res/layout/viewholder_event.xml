@@ -90,7 +90,6 @@
             android:paddingLeft="@dimen/half_margin"
             android:paddingRight="@dimen/half_margin"
             android:text="@string/empty_string"
-            android:textColor="@color/dark_grey"
             app:autoSizeMinTextSize="@dimen/small_text"
             app:autoSizeTextType="uniform"
             app:layout_constrainedWidth="true"

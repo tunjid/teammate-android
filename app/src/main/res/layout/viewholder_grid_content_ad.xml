@@ -58,7 +58,6 @@
                 android:paddingLeft="@dimen/single_margin"
                 android:paddingRight="@dimen/single_margin"
                 android:paddingTop="@dimen/quarter_margin"
-                android:textColor="@color/dark_grey"
                 android:textSize="@dimen/tiny_text"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintLeft_toLeftOf="parent"
