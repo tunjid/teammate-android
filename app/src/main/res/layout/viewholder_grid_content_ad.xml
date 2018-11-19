@@ -29,7 +29,7 @@
                 android:id="@+id/thumbnail"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/dark_grey"
+                android:background="?icon_tint"
                 android:contentDescription="@string/team_logo"
                 app:layout_constraintDimensionRatio="H,1:1"
                 app:layout_constraintLeft_toLeftOf="parent"

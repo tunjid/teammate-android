@@ -7,19 +7,34 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="bottom_nav_selected">@color/colorPrimary</item>
         <item name="bottom_nav_unselected">@color/dark_grey</item>
+        <item name="icon_tint">@color/dark_grey</item>
         <item name="android:textColor">@color/dark_grey</item>
         <item name ="android:windowBackground">@color/colorPrimary</item>
     </style>
 
-    <style name="AppToolbarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+    <style name="AppDarkTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="bottom_nav_selected">@color/colorPrimary</item>
         <item name="bottom_nav_unselected">@color/dark_grey</item>
+        <item name="icon_tint">@color/dark_grey</item>
         <item name="android:textColor">@color/white</item>
         <item name ="android:windowBackground">@color/colorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/roboto</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.AppDarkTheme.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/roboto</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <!--<style name="TextLabel" parent="ThemeOverlay.AppCompat.Light">-->

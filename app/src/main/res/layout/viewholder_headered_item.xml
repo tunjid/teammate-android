@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:layout_collapseMode="parallax"
-    android:background="@color/dark_grey"
+    android:background="?icon_tint"
     app:layout_collapseParallaxMultiplier="0.8">
 
     <ImageView

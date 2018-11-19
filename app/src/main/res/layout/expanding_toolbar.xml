@@ -23,7 +23,7 @@
             android:layout_height="@dimen/single_and_half_margin"
             android:layout_marginLeft="@dimen/single_margin"
             android:layout_marginRight="@dimen/single_margin"
-            android:tint="@color/dark_grey"
+            android:tint="?icon_tint"
             app:layout_constraintBottom_toBottomOf="@+id/search_title"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/search_title"
