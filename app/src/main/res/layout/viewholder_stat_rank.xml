@@ -60,7 +60,6 @@
         android:maxLines="1"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
-        android:textColor="@color/dark_grey"
         app:autoSizeMinTextSize="@dimen/tiny_text"
         app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
         app:layout_constraintLeft_toRightOf="@+id/inset"

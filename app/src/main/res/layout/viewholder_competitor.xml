@@ -76,7 +76,6 @@
             android:maxLines="1"
             android:paddingLeft="@dimen/quarter_margin"
             android:paddingRight="@dimen/quarter_margin"
-            android:textColor="@color/dark_grey"
             app:layout_constrainedWidth="true"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintTop_toTopOf="@+id/item_title"
