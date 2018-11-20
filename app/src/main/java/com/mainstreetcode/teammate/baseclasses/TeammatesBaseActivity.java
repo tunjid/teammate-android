@@ -214,7 +214,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void showSnackBar(CharSequence message) {
-        toggleProgress(false);
         Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_LONG);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
@@ -225,7 +224,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     @SuppressWarnings("unchecked")
     public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {
-        toggleProgress(false);
         Snackbar snackbar = Snackbar.make(coordinatorLayout, "", LENGTH_INDEFINITE).addCallback(callback);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android

@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 import io.reactivex.exceptions.CompositeException;
 import okhttp3.ResponseBody;
@@ -41,7 +42,7 @@ public class Message {
         this.errorCode = UNKNOWN_ERROR_CODE;
     }
 
-    Message(String message, String errorCode) {
+    private Message(String message, String errorCode) {
         this.message = message;
         this.errorCode = errorCode;
     }
@@ -95,6 +96,19 @@ public class Message {
             Logger.log("ApiMessage", "Unable to read API error message", e);
         }
         return new Message(App.getInstance().getString(R.string.error_default));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Message other = (Message) o;
+        return Objects.equals(message, other.message) &&
+                Objects.equals(errorCode, other.errorCode);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(message, errorCode);
     }
 
     public static class GsonAdapter implements com.google.gson.JsonDeserializer<Message> {
