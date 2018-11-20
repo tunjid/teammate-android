@@ -10,8 +10,8 @@
         <item name="alt_icon_tint">@color/white</item>
         <item name="alt_background">@color/white</item>
         <item name="editTextColor">@color/dark_grey</item>
-        <item name="inputTextColor">@color/dark_grey</item>
-        <item name="buttonTextColor">@color/white</item>
+        <item name="input_text_color">@color/dark_grey</item>
+        <item name="button_text_color">@color/white</item>
         <item name="chat_background_color">@color/light_grey</item>
         <item name="chat_alt_background_color">@color/white</item>
         <item name="android:textColor">@color/dark_grey</item>
@@ -30,7 +30,7 @@
         <item name="alt_background">@color/white</item>
         <item name="android:textColor">@color/white</item>
         <item name="editTextColor">@color/dark_grey</item>
-        <item name="inputTextColor">@color/dark_grey</item>
+        <item name="input_text_color">@color/dark_grey</item>
         <item name ="android:windowBackground">@color/colorPrimary</item>
     </style>
 
