@@ -5,7 +5,7 @@
     android:insetRight="4px">
     <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <solid android:color="@color/colorPrimary" />
+        <solid android:color="?colorPrimary" />
 
         <corners
             android:topLeftRadius="@dimen/single_and_half_margin"
