@@ -6,6 +6,7 @@
     <attr name="alt_icon_tint" format="reference" />
     <attr name="alt_background" format="reference" />
     <attr name="input_text_color" format="reference" />
+    <attr name="button_text_color" format="reference" />
     <attr name="chat_background_color" format="reference" />
     <attr name="chat_alt_background_color" format="reference" />
 </resources>

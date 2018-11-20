@@ -35,7 +35,7 @@
         android:layout_marginTop="@dimen/single_margin"
         android:gravity="center"
         android:text="@string/add_competitor"
-        android:textColor="@color/white"
+        android:textColor="?button_text_color"
         app:cornerRadius="@dimen/single_margin"
         app:icon="@drawable/ic_add_white_24dp"
         app:layout_constraintLeft_toLeftOf="parent"

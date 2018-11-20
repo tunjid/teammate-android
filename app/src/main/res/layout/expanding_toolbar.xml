@@ -62,7 +62,7 @@
             android:background="@drawable/bg_chat_box"
             android:backgroundTint="?colorAccent"
             android:text="@string/event_public_start_search"
-            android:textColor="@color/white"
+            android:textColor="?button_text_color"
             android:visibility="gone"
             app:cornerRadius="@dimen/single_margin"
             app:layout_constraintRight_toRightOf="parent"
