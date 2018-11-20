@@ -23,6 +23,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/white</item>
         <item name="icon_tint">@color/dark_grey</item>
         <item name="alt_icon_tint">@color/white</item>
         <item name="alt_background">@color/white</item>
