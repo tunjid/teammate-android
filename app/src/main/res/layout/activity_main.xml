@@ -91,7 +91,7 @@
                 android:layout_gravity="top|center_horizontal"
                 android:layout_marginTop="@dimen/half_margin"
                 android:background="@drawable/bg_chat_box"
-                android:backgroundTint="@color/white" />
+                android:backgroundTint="?alt_background" />
         </FrameLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -117,7 +117,7 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="?alt_background"
         android:elevation="@dimen/half_margin"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/bottom_inset"

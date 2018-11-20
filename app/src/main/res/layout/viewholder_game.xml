@@ -68,7 +68,7 @@
             android:layout_height="@dimen/sixteenth_margin"
             android:layout_marginLeft="@dimen/single_margin"
             android:layout_marginRight="@dimen/single_margin"
-            android:background="@color/white"
+            android:background="?alt_background"
             app:layout_constraintBottom_toBottomOf="@+id/score"
             app:layout_constraintLeft_toLeftOf="@+id/score"
             app:layout_constraintRight_toRightOf="@+id/score"

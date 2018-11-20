@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/triple_and_half_margin"
-    android:background="@color/white">
+    android:background="?alt_background">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"

@@ -15,7 +15,7 @@
         android:contentDescription="@string/image_description"
         android:maxHeight="@dimen/double_and_half_margin"
         android:maxWidth="@dimen/double_and_half_margin"
-        app:civ_border_color="@color/white"
+        app:civ_border_color="?alt_background"
         app:civ_border_width="@dimen/sixteenth_margin"
         app:layout_constraintBottom_toBottomOf="@+id/content"
         app:layout_constraintHorizontal_chainStyle="packed"
