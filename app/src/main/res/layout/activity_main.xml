@@ -91,7 +91,7 @@
                 android:layout_gravity="top|center_horizontal"
                 android:layout_marginTop="@dimen/half_margin"
                 android:background="@drawable/bg_chat_box"
-                android:backgroundTint="?alt_background" />
+                android:backgroundTint="?alt_icon_tint" />
         </FrameLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
