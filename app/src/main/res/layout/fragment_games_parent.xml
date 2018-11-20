@@ -49,7 +49,6 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/single_margin"
         android:textStyle="bold"
-        android:textColor="@color/black"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/item_container"
         app:layout_constraintLeft_toLeftOf="parent"
