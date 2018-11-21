@@ -11,10 +11,10 @@
 
     <TextView
         android:id="@+id/text"
-        style="@style/TextAppearance.AppDarkTheme.Subtitle1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:lineSpacingMultiplier="1.25"
+        android:textSize="@dimen/regular_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:text="Accept?" />
