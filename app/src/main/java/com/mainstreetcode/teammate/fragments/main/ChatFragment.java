@@ -97,6 +97,7 @@ public class ChatFragment extends MainActivityFragment
                 .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
                 .withEndlessScrollCallback(() -> fetchChatsBefore(false))
                 .withRefreshLayout(refresh, () -> refresh.setRefreshing(false))
+                .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .addStateListener(this::onScrollStateChanged)
                 .addScrollListener(this::onScroll)
