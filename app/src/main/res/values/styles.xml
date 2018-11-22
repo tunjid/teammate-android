@@ -27,6 +27,7 @@
         <item name="alt_icon_tint">@color/white</item>
         <item name="alt_background">@color/white</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 
     <style name="TextAppearance.AppTheme.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle2">
