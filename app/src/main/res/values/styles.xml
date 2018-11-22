@@ -2,24 +2,33 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="headline_font">@font/roboto</item>
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
         <item name="bottom_nav_selected">@color/colorPrimary</item>
         <item name="bottom_nav_unselected">@color/dark_grey</item>
+
         <item name="icon_tint">@color/dark_grey</item>
         <item name="alt_icon_tint">@color/white</item>
         <item name="alt_background">@color/white</item>
+
         <item name="alt_text_color">@color/white</item>
         <item name="editTextColor">@color/dark_grey</item>
         <item name="input_text_color">@color/dark_grey</item>
         <item name="button_text_color">@color/white</item>
-        <item name="card_stroke_width">@dimen/card_stroke_width</item>
+
         <item name="card_stroke_color">@color/light_grey</item>
+        <item name="card_stroke_width">@dimen/card_stroke_width</item>
+        <item name="card_large_corner_radius">@dimen/half_margin</item>
+        <item name="card_small_corner_radius">@dimen/quarter_margin</item>
+
         <item name="chat_background_color">@color/light_grey</item>
         <item name="chat_alt_background_color">@color/white</item>
         <item name="chat_background_stroke_color">@color/light_grey</item>
         <item name="chat_alt_background_stroke_color">@color/white</item>
+
         <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 

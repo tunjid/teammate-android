@@ -10,7 +10,7 @@
     android:layout_marginBottom="@dimen/half_margin"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="@dimen/quarter_margin"
+    app:cardCornerRadius="?card_small_corner_radius"
     app:strokeColor="?card_stroke_color"
     app:strokeWidth="?card_stroke_width">
 

@@ -8,7 +8,7 @@
     android:layout_marginTop="@dimen/half_margin"
     android:layout_marginRight="@dimen/half_margin"
     android:layout_marginBottom="@dimen/half_margin"
-    app:cardCornerRadius="@dimen/half_margin"
+    app:cardCornerRadius="?card_large_corner_radius"
     app:strokeColor="?card_stroke_color"
     app:strokeWidth="?card_stroke_width">
 
