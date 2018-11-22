@@ -14,7 +14,8 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:strokeColor="?card_stroke_color" />
     </FrameLayout>
 
     <TextView
@@ -82,8 +83,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_marginLeft="@dimen/single_margin"
-        android:layout_marginRight="@dimen/single_margin"
         android:layout_marginTop="@dimen/single_and_half_margin"
+        android:layout_marginRight="@dimen/single_margin"
         android:elevation="@dimen/double_margin"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

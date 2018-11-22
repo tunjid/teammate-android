@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView android:id="@+id/card_view_wrapper"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view_wrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
     android:layout_marginLeft="@dimen/single_margin"
-    android:layout_marginRight="@dimen/single_margin"
     android:layout_marginTop="@dimen/single_and_half_margin"
-    app:layout_constraintTop_toTopOf="parent">
+    android:layout_marginRight="@dimen/single_margin"
+    app:layout_constraintTop_toTopOf="parent"
+    app:strokeColor="?card_stroke_color">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/half_margin"
-        android:paddingTop="@dimen/half_margin">
+        android:paddingTop="@dimen/half_margin"
+        android:paddingBottom="@dimen/half_margin">
 
         <ImageView
             android:id="@+id/search_icon"
@@ -34,10 +35,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:drawablePadding="@dimen/single_margin"
-            android:paddingBottom="@dimen/half_margin"
             android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/half_margin"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingBottom="@dimen/half_margin"
             android:textSize="@dimen/small_text"
             app:layout_constraintLeft_toRightOf="@+id/search_icon"
             app:layout_constraintRight_toRightOf="parent"

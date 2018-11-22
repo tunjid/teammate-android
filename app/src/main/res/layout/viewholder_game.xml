@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/half_margin"
     android:layout_marginLeft="@dimen/half_margin"
-    android:layout_marginRight="@dimen/half_margin"
     android:layout_marginTop="@dimen/half_margin"
+    android:layout_marginRight="@dimen/half_margin"
+    android:layout_marginBottom="@dimen/half_margin"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="@dimen/quarter_margin">
+    app:cardCornerRadius="@dimen/quarter_margin"
+    app:strokeColor="?card_stroke_color">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -44,6 +45,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/score"
+            style="@style/TextAppearance.AppDarkTheme.Subtitle1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_chat_box"
@@ -51,11 +53,10 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:paddingBottom="@dimen/quarter_margin"
             android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/quarter_margin"
-            style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingBottom="@dimen/quarter_margin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

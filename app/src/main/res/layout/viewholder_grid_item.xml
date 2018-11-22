@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/half_margin"
     android:layout_marginLeft="@dimen/half_margin"
-    android:layout_marginRight="@dimen/half_margin"
     android:layout_marginTop="@dimen/half_margin"
+    android:layout_marginRight="@dimen/half_margin"
+    android:layout_marginBottom="@dimen/half_margin"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="@dimen/half_margin">
+    app:cardCornerRadius="@dimen/half_margin"
+    app:strokeColor="?card_stroke_color">
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,14 +28,14 @@
 
         <TextView
             android:id="@+id/item_title"
+            style="@style/TextAppearance.AppTheme.Subtitle1"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:gravity="center"
             android:lineSpacingMultiplier="1.2"
             android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/half_margin"
-            style="@style/TextAppearance.AppTheme.Subtitle1"
+            android:paddingRight="@dimen/single_margin"
             app:layout_constrainedWidth="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -42,14 +43,14 @@
 
         <TextView
             android:id="@+id/item_subtitle"
+            style="@style/TextAppearance.AppTheme.Subtitle2"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:gravity="center"
-            android:paddingBottom="@dimen/half_margin"
             android:paddingLeft="@dimen/single_margin"
-            android:paddingRight="@dimen/single_margin"
             android:paddingTop="@dimen/quarter_margin"
-            style="@style/TextAppearance.AppTheme.Subtitle2"
+            android:paddingRight="@dimen/single_margin"
+            android:paddingBottom="@dimen/half_margin"
             app:layout_constrainedWidth="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
