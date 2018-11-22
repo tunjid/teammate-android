@@ -58,6 +58,7 @@
             android:paddingTop="@dimen/quarter_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingBottom="@dimen/quarter_margin"
+            android:textColor="?button_text_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

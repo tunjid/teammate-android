@@ -13,6 +13,7 @@
     <attr name="alt_empty_view_holder_tint" format="reference" />
 
     <attr name="alt_text_color" format="reference" />
+    <attr name="light_text_color" format="reference" />
     <attr name="input_text_color" format="reference" />
     <attr name="button_text_color" format="reference" />
 

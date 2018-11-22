@@ -16,9 +16,9 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:tabIndicatorColor="@color/white"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/light_grey" />
+        app:tabIndicatorColor="?alt_text_color"
+        app:tabSelectedTextColor="?alt_text_color"
+        app:tabTextColor="?light_text_color" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
