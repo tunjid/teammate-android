@@ -53,8 +53,8 @@ public class EmptyViewHolder {
         icon.setImageDrawable(getIcon(iconRes));
     }
 
-    public void setColor(@EmptyTint @AttrRes int color) {
-        this.color = ViewHolderUtil.resolveThemeColor(icon.getContext(), color);
+    public void setColor(@EmptyTint @AttrRes int attrRes) {
+        this.color = ViewHolderUtil.resolveThemeColor(icon.getContext(), attrRes);
         text.setTextColor(color);
         icon.setImageDrawable(getDrawable(icon.getDrawable()));
     }
