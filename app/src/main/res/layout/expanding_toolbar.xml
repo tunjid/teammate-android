@@ -10,7 +10,8 @@
     android:layout_marginTop="@dimen/single_and_half_margin"
     android:layout_marginRight="@dimen/single_margin"
     app:layout_constraintTop_toTopOf="parent"
-    app:strokeColor="?card_stroke_color">
+    app:strokeColor="?card_stroke_color"
+    app:strokeWidth="?card_stroke_width">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

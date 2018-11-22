@@ -15,7 +15,8 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:strokeColor="?card_stroke_color" />
+            app:strokeColor="?card_stroke_color"
+            app:strokeWidth="?card_stroke_width" />
     </FrameLayout>
 
     <TextView

@@ -14,6 +14,7 @@
         <item name="editTextColor">@color/dark_grey</item>
         <item name="input_text_color">@color/dark_grey</item>
         <item name="button_text_color">@color/white</item>
+        <item name="card_stroke_width">@dimen/card_stroke_width</item>
         <item name="card_stroke_color">@color/light_grey</item>
         <item name="chat_background_color">@color/light_grey</item>
         <item name="chat_alt_background_color">@color/white</item>

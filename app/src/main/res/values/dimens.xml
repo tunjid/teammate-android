@@ -2,4 +2,5 @@
 <resources>
     <dimen name="action_bar_height">56dp</dimen>
     <dimen name="three_quarter_margin">12dp</dimen>
+    <dimen name="card_stroke_width">0dp</dimen>
 </resources>
