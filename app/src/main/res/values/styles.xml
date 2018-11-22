@@ -20,7 +20,7 @@
         <item name="chat_alt_background_color">@color/white</item>
         <item name="chat_background_stroke_color">@color/light_grey</item>
         <item name="chat_alt_background_stroke_color">@color/white</item>
-        <item name ="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
     <style name="AppToolBarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
@@ -32,6 +32,7 @@
         <item name="icon_tint">@color/dark_grey</item>
         <item name="alt_icon_tint">@color/white</item>
         <item name="alt_background">@color/white</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
     </style>
