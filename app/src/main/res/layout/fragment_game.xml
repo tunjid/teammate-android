@@ -80,7 +80,7 @@
 
                 <TextView
                     android:id="@+id/ended"
-                    style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -93,7 +93,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/home"
-                    style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -107,7 +107,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/away"
-                    style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -122,7 +122,7 @@
 
                 <TextView
                     android:id="@+id/date"
-                    style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/half_margin"

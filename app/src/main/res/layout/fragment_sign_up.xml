@@ -119,7 +119,7 @@
 
         <CheckBox
             android:id="@+id/terms"
-            style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+            style="@style/TextAppearance.AppDarkTheme.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/single_margin"

@@ -45,7 +45,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/score"
-            style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+            style="@style/TextAppearance.AppDarkTheme.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_chat_box"

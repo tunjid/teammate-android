@@ -31,7 +31,7 @@
 
     <TextView
         android:id="@+id/content"
-        style="@style/TextAppearance.AppTheme.Subtitle1"
+        style="@style/TextAppearance.AppTheme.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_chat_box"
@@ -51,7 +51,7 @@
         android:id="@+id/details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/TextAppearance.AppDarkTheme.Subtitle1"
+        style="@style/TextAppearance.AppDarkTheme.Body1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/content" />

@@ -39,7 +39,7 @@
 
         <TextView
             android:id="@+id/item_title"
-            style="@style/TextAppearance.AppTheme.Subtitle1"
+            style="@style/TextAppearance.AppTheme.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -59,7 +59,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/item_subtitle"
-            style="@style/TextAppearance.AppTheme.Subtitle2"
+            style="@style/TextAppearance.AppTheme.Body2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
