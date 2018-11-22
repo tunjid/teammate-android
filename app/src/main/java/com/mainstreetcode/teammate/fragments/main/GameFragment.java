@@ -118,7 +118,7 @@ public final class GameFragment extends MainActivityFragment
         AppBarListener.with().appBarLayout(rootView.findViewById(R.id.app_bar))
                 .offsetDiffListener(gameViewHolder::animate).create();
 
-        scrollManager.setViewHolderColor(R.color.dark_grey);
+        scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint);
 
         refereeChip.setCloseIconResource(R.drawable.ic_close_24dp);
         refereeChip.setOnCloseIconClickListener(v -> onRemoveRefereeClicked());

@@ -14,6 +14,9 @@
         <item name="alt_icon_tint">@color/white</item>
         <item name="alt_background">@color/white</item>
 
+        <item name="empty_view_holder_tint">@color/white</item>
+        <item name="alt_empty_view_holder_tint">@color/dark_grey</item>
+
         <item name="alt_text_color">@color/white</item>
         <item name="editTextColor">@color/dark_grey</item>
         <item name="input_text_color">@color/dark_grey</item>
