@@ -17,6 +17,7 @@
     <attr name="input_text_color" format="reference" />
     <attr name="button_text_color" format="reference" />
 
+    <attr name="card_elevation" format="reference" />
     <attr name="card_stroke_width" format="reference" />
     <attr name="card_stroke_color" format="reference" />
     <attr name="card_small_corner_radius" format="reference" />

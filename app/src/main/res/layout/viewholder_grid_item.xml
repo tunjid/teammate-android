@@ -10,6 +10,7 @@
     android:clickable="true"
     android:focusable="true"
     app:cardCornerRadius="?card_large_corner_radius"
+    app:cardElevation="?card_elevation"
     app:strokeColor="?card_stroke_color"
     app:strokeWidth="?card_stroke_width">
 
