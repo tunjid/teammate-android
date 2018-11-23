@@ -2,12 +2,10 @@ package com.mainstreetcode.teammate.util;
 
 
 import android.app.Activity;
-
-import androidx.arch.core.util.Function;
-
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -17,24 +15,13 @@ import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.Nullable;
-
-import com.google.android.material.card.MaterialCardView;
-
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.ripple.RippleUtils;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
@@ -45,6 +32,15 @@ import com.tunjid.androidbootstrap.view.util.ViewUtil;
 
 import java.util.Arrays;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import io.reactivex.Single;
 
 public class ViewHolderUtil extends ViewUtil {
@@ -74,6 +70,14 @@ public class ViewHolderUtil extends ViewUtil {
 
     public static Function<CharSequence, CharSequence> allowsSpecialCharacters =
             input -> ModelUtils.hasNoSpecialChars(input) ? "" : App.getInstance().getResources().getString(R.string.no_special_characters);
+
+    @ColorInt
+    public static int resolveThemeColor(Context context, @AttrRes int colorAttr) {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = context.getTheme();
+        theme.resolveAttribute(colorAttr, typedValue, true);
+        return typedValue.data;
+    }
 
     public static View getItemView(@LayoutRes int res, ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);

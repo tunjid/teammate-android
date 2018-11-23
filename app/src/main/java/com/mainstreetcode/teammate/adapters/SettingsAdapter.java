@@ -1,7 +1,13 @@
 package com.mainstreetcode.teammate.adapters;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +15,7 @@ import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.SettingsItem;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
 
@@ -61,7 +68,18 @@ public class SettingsAdapter extends InteractiveAdapter<SettingsAdapter.Settings
         void bind(SettingsItem item) {
             this.item = item;
             itemName.setText(item.getStringRes());
-            itemName.setCompoundDrawablesWithIntrinsicBounds(item.getDrawableRes(), 0, 0, 0);
+            itemName.setCompoundDrawablesRelativeWithIntrinsicBounds(getIcon(), null, null, null);
+        }
+
+        @Nullable
+        Drawable getIcon() {
+            Drawable src = ContextCompat.getDrawable(itemView.getContext(), item.getDrawableRes());
+            if (src == null) return null;
+
+            Drawable wrapped = DrawableCompat.wrap(src);
+            DrawableCompat.setTint(wrapped, ViewHolderUtil.resolveThemeColor(itemView.getContext(), R.attr.alt_icon_tint));
+
+            return wrapped;
         }
 
         @Override

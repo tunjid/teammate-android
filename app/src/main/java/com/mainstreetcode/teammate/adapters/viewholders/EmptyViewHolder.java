@@ -3,29 +3,41 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 public class EmptyViewHolder {
 
     private final TextView text;
     private final ImageView icon;
 
-    @ColorRes private int color = R.color.white;
+    @ColorInt
+    private int color;
+
+    @IntDef({R.attr.empty_view_holder_tint, R.attr.alt_empty_view_holder_tint})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EmptyTint {}
 
     public EmptyViewHolder(View itemView, @DrawableRes int iconRes, @StringRes int stringRes) {
         text = itemView.findViewById(R.id.item_title);
         icon = itemView.findViewById(R.id.icon);
+        color = ViewHolderUtil.resolveThemeColor(itemView.getContext(), R.attr.empty_view_holder_tint);
 
         update(iconRes, stringRes);
     }
@@ -41,9 +53,9 @@ public class EmptyViewHolder {
         icon.setImageDrawable(getIcon(iconRes));
     }
 
-    public void setColor(@ColorRes int color) {
-        this.color = color;
-        text.setTextColor(getColor());
+    public void setColor(@EmptyTint @AttrRes int attrRes) {
+        this.color = ViewHolderUtil.resolveThemeColor(icon.getContext(), attrRes);
+        text.setTextColor(color);
         icon.setImageDrawable(getDrawable(icon.getDrawable()));
     }
 
@@ -62,12 +74,8 @@ public class EmptyViewHolder {
         if (color != R.color.white) mutated = original.mutate();
 
         Drawable wrapped = DrawableCompat.wrap(mutated);
-        DrawableCompat.setTint(wrapped, getColor());
+        DrawableCompat.setTint(wrapped, color);
 
         return wrapped;
-    }
-
-    private int getColor() {
-        return ContextCompat.getColor(text.getContext(), color);
     }
 }

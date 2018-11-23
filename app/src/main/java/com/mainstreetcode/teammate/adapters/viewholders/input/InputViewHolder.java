@@ -16,6 +16,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 
 import java.util.Objects;
 
@@ -26,7 +27,6 @@ import io.reactivex.schedulers.Schedulers;
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static androidx.core.content.ContextCompat.getColor;
 import static androidx.core.content.ContextCompat.getDrawable;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
@@ -193,7 +193,9 @@ public class InputViewHolder<T extends ImageWorkerFragment.ImagePickerListener> 
 
     private void tintHint(boolean hasFocus) {
         int start = hint.getCurrentTextColor();
-        int end = getColor(hint.getContext(), hasFocus ? R.color.colorAccent : R.color.dark_grey);
+        int end = ViewHolderUtil.resolveThemeColor(hint.getContext(), hasFocus
+                ? R.attr.colorAccent
+                : R.attr.input_text_color);
 
         ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), start, end);
         animator.setDuration(HINT_ANIMATION_DURATION);

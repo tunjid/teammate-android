@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="headline_font" format="reference" />
+
+    <attr name="bottom_nav_selected" format="reference" />
+    <attr name="bottom_nav_unselected" format="reference" />
+
+    <attr name="icon_tint" format="reference" />
+    <attr name="alt_icon_tint" format="reference" />
+    <attr name="alt_background" format="reference" />
+
+    <attr name="empty_view_holder_tint" format="reference" />
+    <attr name="alt_empty_view_holder_tint" format="reference" />
+
+    <attr name="alt_text_color" format="reference" />
+    <attr name="light_text_color" format="reference" />
+    <attr name="input_text_color" format="reference" />
+    <attr name="button_text_color" format="reference" />
+
+    <attr name="card_elevation" format="reference" />
+    <attr name="card_stroke_width" format="reference" />
+    <attr name="card_stroke_color" format="reference" />
+    <attr name="card_small_corner_radius" format="reference" />
+    <attr name="card_large_corner_radius" format="reference" />
+
+    <attr name="chat_background_color" format="reference" />
+    <attr name="chat_alt_background_color" format="reference" />
+    <attr name="chat_background_stroke_color" format="reference" />
+    <attr name="chat_alt_background_stroke_color" format="reference" />
+
+    <attr name="toolbar_default_elevation" format="reference" />
+    <attr name="toolbar_displaced_elevation" format="reference" />
+</resources>

@@ -1,10 +1,10 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/inner_coordinator"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/inner_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="?alt_background">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -15,7 +15,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/colorPrimary"
+            app:contentScrim="?colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,18 +49,17 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/score"
+                    style="@style/TextAppearance.AppDarkTheme.Headline4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/quadruple_margin"
                     android:ellipsize="end"
                     android:gravity="center"
                     android:maxLines="1"
-                    android:paddingBottom="@dimen/single_margin"
                     android:paddingLeft="@dimen/single_margin"
-                    android:paddingRight="@dimen/single_margin"
                     android:paddingTop="@dimen/single_and_half_margin"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/large_text"
+                    android:paddingRight="@dimen/single_margin"
+                    android:paddingBottom="@dimen/single_margin"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -72,7 +71,7 @@
                     android:layout_height="@dimen/eigth_margin"
                     android:layout_marginLeft="@dimen/single_margin"
                     android:layout_marginRight="@dimen/single_margin"
-                    android:background="@color/white"
+                    android:background="?alt_background"
                     app:layout_constraintBottom_toBottomOf="@+id/score"
                     app:layout_constraintLeft_toLeftOf="@+id/score"
                     app:layout_constraintRight_toRightOf="@+id/score"
@@ -81,27 +80,26 @@
 
                 <TextView
                     android:id="@+id/ended"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="@dimen/sixteenth_margin"
                     android:text="@string/game_ended"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/small_text"
+
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/score" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/home"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingTop="@dimen/half_margin"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/small_text"
                     app:layout_constraintBottom_toBottomOf="@+id/ended"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@+id/score"
@@ -109,14 +107,13 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/away"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingTop="@dimen/half_margin"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/small_text"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintBottom_toBottomOf="@+id/ended"
                     app:layout_constraintLeft_toRightOf="@+id/score"
@@ -125,11 +122,10 @@
 
                 <TextView
                     android:id="@+id/date"
+                    style="@style/TextAppearance.AppDarkTheme.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/half_margin"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/small_text"
                     app:layout_constraintLeft_toRightOf="@id/home_thumbnail"
                     app:layout_constraintRight_toLeftOf="@id/away_thumbnail"
                     app:layout_constraintTop_toTopOf="@id/home_thumbnail"
@@ -141,8 +137,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/half_margin"
-                    android:layout_marginRight="@dimen/half_margin"
                     android:layout_marginTop="@dimen/quarter_margin"
+                    android:layout_marginRight="@dimen/half_margin"
                     android:text="@string/empty_string"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"

@@ -6,16 +6,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingLeft="@dimen/single_margin"
-    android:paddingRight="@dimen/single_margin"
-    android:paddingTop="@dimen/single_margin">
+    android:paddingTop="@dimen/single_margin"
+    android:paddingRight="@dimen/single_margin">
 
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:lineSpacingMultiplier="1.25"
-        android:textColor="@color/white"
-        android:textSize="@dimen/small_text"
+        android:textSize="@dimen/regular_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:text="Accept?" />

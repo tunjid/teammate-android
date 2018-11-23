@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
+        <item>@font/pathway_gothic_one</item>
         <item>@font/raleway_medium</item>
         <item>@font/roboto</item>
         <item>@font/work_sans_medium</item>

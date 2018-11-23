@@ -1,30 +1,101 @@
 <resources>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+        <item name="headline_font">@font/roboto</item>
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name ="android:windowBackground">@color/colorPrimary</item>
+
+        <item name="bottom_nav_selected">@color/colorPrimary</item>
+        <item name="bottom_nav_unselected">@color/dark_grey</item>
+
+        <item name="icon_tint">@color/dark_grey</item>
+        <item name="alt_icon_tint">@color/white</item>
+        <item name="alt_background">@color/white</item>
+
+        <item name="empty_view_holder_tint">@color/white</item>
+        <item name="alt_empty_view_holder_tint">@color/dark_grey</item>
+
+        <item name="alt_text_color">@color/white</item>
+        <item name="light_text_color">@color/light_grey</item>
+        <item name="editTextColor">@color/dark_grey</item>
+        <item name="input_text_color">@color/dark_grey</item>
+        <item name="button_text_color">@color/white</item>
+
+        <item name="card_elevation">@dimen/eigth_margin</item>
+        <item name="card_stroke_color">@color/light_grey</item>
+        <item name="card_stroke_width">@dimen/no_margin</item>
+        <item name="card_large_corner_radius">@dimen/half_margin</item>
+        <item name="card_small_corner_radius">@dimen/quarter_margin</item>
+
+        <item name="chat_background_color">@color/light_grey</item>
+        <item name="chat_alt_background_color">@color/white</item>
+        <item name="chat_background_stroke_color">@color/light_grey</item>
+        <item name="chat_alt_background_stroke_color">@color/white</item>
+
+        <item name="toolbar_default_elevation">@dimen/no_margin</item>
+        <item name="toolbar_displaced_elevation">@dimen/half_margin</item>
+
+        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
-    <!--<style name="TextLabel" parent="ThemeOverlay.AppCompat.Light">-->
-        <!--&lt;!&ndash; Hint color and label color in FALSE state &ndash;&gt;-->
+    <style name="AppToolBarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <item name="fontFamily">?headline_font</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="icon_tint">@color/dark_grey</item>
+        <item name="alt_icon_tint">@color/white</item>
+        <item name="alt_background">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
 
-        <!--<item name="android:textColorHint">@color/colorPrimary</item>-->
-        <!--&lt;!&ndash; Label color in TRUE state and bar color FALSE and TRUE State &ndash;&gt;-->
-        <!--<item name="colorAccent">@color/colorAccent</item>-->
-        <!--<item name="colorControlNormal">@color/colorPrimary</item>-->
-    <!--</style>-->
+    <style name="TextAppearance.AppTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?input_text_color</item>
+    </style>
 
-    <!--<style name="ThemeOverlay.AccentSecondary" parent="ThemeOverlay.AppCompat">-->
-        <!--<item name="colorAccent">@color/black</item>-->
-        <!--<item name="colorControlNormal">@color/black</item>-->
-    <!--</style>-->
+    <style name="TextAppearance.AppTheme.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?input_text_color</item>
+    </style>
 
-    <!--<style name="DarkEditText" parent="Theme.AppCompat.Light.DarkActionBar">-->
-    <!--<item name="colorControlNormal">@color/dark_grey</item>-->
-    <!--<item name="colorControlActivated">@color/accent</item>-->
-    <!--<item name="colorControlHighlight">@color/accent</item>-->
-    <!--</style>-->
+    <style name="TextAppearance.AppDarkTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?alt_text_color</item>
+    </style>
+
+    <style name="TextAppearance.AppDarkTheme.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?alt_text_color</item>
+    </style>
+
+    <style name="TextAppearance.AppDarkTheme.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">?headline_font</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?alt_text_color</item>
+    </style>
+
+    <style name="TextAppearance.AppDarkTheme.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">?headline_font</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?alt_text_color</item>
+    </style>
+
+    <style name="TextAppearance.AppDarkTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="fontFamily">?headline_font</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?alt_text_color</item>
+    </style>
 </resources>
