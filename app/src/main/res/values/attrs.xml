@@ -27,4 +27,7 @@
     <attr name="chat_alt_background_color" format="reference" />
     <attr name="chat_background_stroke_color" format="reference" />
     <attr name="chat_alt_background_stroke_color" format="reference" />
+
+    <attr name="toolbar_default_elevation" format="reference" />
+    <attr name="toolbar_displaced_elevation" format="reference" />
 </resources>

@@ -5,7 +5,7 @@
         <objectAnimator
             android:duration="200"
             android:propertyName="translationZ"
-            android:valueTo="@dimen/half_margin"
+            android:valueTo="?toolbar_displaced_elevation"
             android:valueType="floatType" />
     </item>
 
@@ -13,7 +13,7 @@
         <objectAnimator
             android:duration="200"
             android:propertyName="translationZ"
-            android:valueTo="0dp"
+            android:valueTo="?toolbar_default_elevation"
             android:valueType="floatType" />
     </item>
 

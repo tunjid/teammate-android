@@ -34,6 +34,9 @@
         <item name="chat_background_stroke_color">@color/light_grey</item>
         <item name="chat_alt_background_stroke_color">@color/white</item>
 
+        <item name="toolbar_default_elevation">@dimen/no_margin</item>
+        <item name="toolbar_displaced_elevation">@dimen/half_margin</item>
+
         <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
