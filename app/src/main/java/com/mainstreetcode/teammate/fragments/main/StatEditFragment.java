@@ -3,12 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +22,13 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
+
 /**
  * Edits a Team member
  */
@@ -35,9 +36,9 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags;
 public class StatEditFragment extends HeaderedFragment<Stat>
         implements
         UserAdapter.AdapterListener,
-        StatEditAdapter.AdapterListener{
+        StatEditAdapter.AdapterListener {
 
-    public static final String ARG_STAT = "stat";
+    private static final String ARG_STAT = "stat";
     private static final int[] EXCLUDED_VIEWS = {R.id.model_list};
 
     private Stat stat;
@@ -139,7 +140,7 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return gofer.canEdit();}
+    public boolean showsFab() { return !isBottomSheetShowing() && gofer.canEdit(); }
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}

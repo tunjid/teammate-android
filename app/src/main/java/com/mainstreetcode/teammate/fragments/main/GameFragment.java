@@ -205,7 +205,7 @@ public final class GameFragment extends MainActivityFragment
 
     @Override
     public boolean showsFab() {
-        return editableStatus.get() && !game.isEnded();
+        return !isBottomSheetShowing() && editableStatus.get() && !game.isEnded();
     }
 
     @Override
