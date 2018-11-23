@@ -1,6 +1,6 @@
-<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/inner_coordinator"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/inner_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/triple_and_half_margin"
@@ -44,6 +44,7 @@
 
     <TextView
         android:id="@+id/winner"
+        style="@style/TextAppearance.AppTheme.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/single_margin"
@@ -54,6 +55,7 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <include
+        android:id="@+id/item_container"
         layout="@layout/viewholder_list_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
