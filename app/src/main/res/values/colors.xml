@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#009754</color>
-    <color name="colorPrimaryDark">#009754</color>
-    <color name="colorPrimaryDarker">#00713f</color>
-    <color name="colorAccent">#52D6FF</color>
+    <color name="teammate_green">#009754</color>
+    <color name="teammate_blue">#52D6FF</color>
     <color name="ad_yellow">#FFB507</color>
     <color name="black_50">#80000000</color>
     <color name="black_75">#C0000000</color>
