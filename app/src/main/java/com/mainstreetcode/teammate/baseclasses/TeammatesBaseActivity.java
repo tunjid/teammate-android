@@ -64,7 +64,7 @@ import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
-    protected static final int HIDER_DURATION = 400;
+    protected static final int HIDER_DURATION = 300;
 
     public static int topInset;
     private int leftInset;
