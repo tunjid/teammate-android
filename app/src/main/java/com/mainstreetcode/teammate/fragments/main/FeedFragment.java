@@ -84,6 +84,7 @@ public final class FeedFragment extends MainActivityFragment
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
+                .withLines()
                 .build();
 
         bottomBarState.set(true);

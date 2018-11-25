@@ -90,6 +90,7 @@ public final class TournamentsFragment extends MainActivityFragment
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TournamentAdapter(items, this))
                 .withLinearLayoutManager()
+                .withLines()
                 .build();
 
         return rootView;

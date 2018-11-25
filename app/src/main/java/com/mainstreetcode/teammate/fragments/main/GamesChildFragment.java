@@ -88,6 +88,7 @@ public final class GamesChildFragment extends MainActivityFragment
                 .withAdapter(new GameAdapter(items, this))
                 .withRecycledViewPool(recycledViewPool)
                 .withLinearLayoutManager()
+                .withLines()
                 .build();
 
         scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint);

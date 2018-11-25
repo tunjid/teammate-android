@@ -89,6 +89,7 @@ public final class EventsFragment extends MainActivityFragment
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
                 .withLinearLayoutManager()
+                .withLines()
                 .build();
 
         return rootView;

@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -50,7 +51,8 @@ public class ScrollManager {
                           @Nullable RecyclerView.RecycledViewPool recycledViewPool,
                           RecyclerView recyclerView, Adapter adapter, LayoutManager layoutManager,
                           List<OnScrollListener> listeners,
-                          boolean hasFixedSize) {
+                          boolean hasFixedSize,
+                          boolean hasLines) {
 
         this.scroller = scroller;
         this.viewHolder = viewHolder;
@@ -68,6 +70,8 @@ public class ScrollManager {
         if (options != null) touchHelper = fromSwipeDragOptions(this, options);
         if (touchHelper != null) touchHelper.attachToRecyclerView(recyclerView);
         for (OnScrollListener listener : listeners) recyclerView.addOnScrollListener(listener);
+        if (hasLines && layoutManager instanceof LinearLayoutManager)
+            recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), ((LinearLayoutManager) layoutManager).getOrientation()));
     }
 
     public static Builder withRecyclerView(RecyclerView recyclerView) {
@@ -158,7 +162,8 @@ public class ScrollManager {
         if (layoutManager instanceof LinearLayoutManager) {
             LinearLayoutManager castedManager = (LinearLayoutManager) layoutManager;
             return castedManager.findFirstVisibleItemPosition();
-        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+        }
+        else if (layoutManager instanceof StaggeredGridLayoutManager) {
             StaggeredGridLayoutManager castedManager = (StaggeredGridLayoutManager) layoutManager;
 
             int[] positions = new int[castedManager.getSpanCount()];
@@ -189,6 +194,7 @@ public class ScrollManager {
         int spanCount;
         int layoutManagerType;
         boolean hasFixedSize;
+        boolean hasLines;
 
         Runnable scrollCallback;
         SwipeRefreshLayout refreshLayout;
@@ -209,6 +215,11 @@ public class ScrollManager {
 
         public Builder setHasFixedSize() {
             this.hasFixedSize = true;
+            return this;
+        }
+
+        public Builder withLines() {
+            this.hasLines = true;
             return this;
         }
 
@@ -371,7 +382,7 @@ public class ScrollManager {
 
             return new ScrollManager(
                     scroller, emptyViewholder, refreshLayout, swipeDragOptions, recycledViewPool,
-                    recyclerView, adapter, layoutManager, scrollListeners, hasFixedSize);
+                    recyclerView, adapter, layoutManager, scrollListeners, hasFixedSize, hasLines);
         }
     }
 
