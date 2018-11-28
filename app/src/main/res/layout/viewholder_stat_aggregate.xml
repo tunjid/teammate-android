@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView android:id="@+id/item_container"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/half_margin"
     android:layout_marginLeft="@dimen/half_margin"
-    android:layout_marginRight="@dimen/half_margin"
     android:layout_marginTop="@dimen/half_margin"
-    app:cardCornerRadius="@dimen/quarter_margin">
+    android:layout_marginRight="@dimen/half_margin"
+    android:layout_marginBottom="@dimen/half_margin"
+    app:cardCornerRadius="?card_small_corner_radius"
+    app:cardElevation="?card_elevation"
+    app:strokeColor="?card_stroke_color"
+    app:strokeWidth="?card_stroke_width">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/half_margin"
-        android:paddingTop="@dimen/half_margin">
+        android:paddingTop="@dimen/half_margin"
+        android:paddingBottom="@dimen/half_margin">
 
         <TextView
             android:id="@+id/item_title"
@@ -26,7 +29,6 @@
             android:maxLines="2"
             android:paddingLeft="@dimen/single_margin"
             android:paddingRight="@dimen/single_margin"
-            android:textColor="@color/dark_grey"
             android:textSize="@dimen/regular_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -38,9 +40,8 @@
             android:layout_width="@dimen/double_margin"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="@dimen/quarter_margin"
             android:paddingTop="@dimen/half_margin"
-            android:textColor="@color/dark_grey"
+            android:paddingBottom="@dimen/quarter_margin"
             android:textSize="@dimen/regular_text"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"

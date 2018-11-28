@@ -198,7 +198,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
-    public boolean showsFab() {return gofer.hasPrivilegedRole();}
+    public boolean showsFab() { return !isBottomSheetShowing() && gofer.hasPrivilegedRole(); }
 
     @Override
     protected Event getHeaderedModel() {return event;}

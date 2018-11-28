@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView android:id="@+id/item_name"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_name"
+    style="@style/TextAppearance.AppDarkTheme.Headline6"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:paddingBottom="@dimen/single_margin"
-    android:paddingLeft="@dimen/single_margin"
-    android:paddingRight="@dimen/single_margin"
-    android:paddingTop="@dimen/single_margin"
-    android:textColor="@color/white"
     android:drawablePadding="@dimen/single_margin"
-    android:textSize="@dimen/regular_text" />
+    android:paddingLeft="@dimen/single_margin"
+    android:paddingTop="@dimen/single_margin"
+    android:paddingRight="@dimen/single_margin"
+    android:paddingBottom="@dimen/single_margin"
+    tools:text="Text" />

@@ -35,7 +35,7 @@ public class BottomNav {
 
     public void highlight(@IdRes int highlighted) {
         for (ViewHolder viewHolder : viewHolders)
-            viewHolder.tint(viewHolder.itemView.getId() == highlighted ? R.color.colorPrimary : R.color.dark_grey);
+            viewHolder.tint(viewHolder.itemView.getId() == highlighted ? R.attr.bottom_nav_selected : R.attr.bottom_nav_unselected);
     }
 
     @Nullable

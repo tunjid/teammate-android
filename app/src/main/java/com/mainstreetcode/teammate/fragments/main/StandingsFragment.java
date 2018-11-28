@@ -79,7 +79,7 @@ public final class StandingsFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager.setViewHolderColor(R.color.dark_grey);
+        scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint);
 
         viewHolder = new StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), this);
         viewHolder.thumbnail.setVisibility(View.GONE);
@@ -116,7 +116,7 @@ public final class StandingsFragment extends MainActivityFragment
         showCompetitor(competitor);
     }
 
-    void fetchStandings(boolean isRefreshing) {
+    private void fetchStandings(boolean isRefreshing) {
         if (isRefreshing) scrollManager.setRefreshing();
         else toggleProgress(true);
 

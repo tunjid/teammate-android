@@ -2,14 +2,18 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DiffUtil;
+
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -118,7 +122,7 @@ public final class GameFragment extends MainActivityFragment
         AppBarListener.with().appBarLayout(rootView.findViewById(R.id.app_bar))
                 .offsetDiffListener(gameViewHolder::animate).create();
 
-        scrollManager.setViewHolderColor(R.color.dark_grey);
+        scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint);
 
         refereeChip.setCloseIconResource(R.drawable.ic_close_24dp);
         refereeChip.setOnCloseIconClickListener(v -> onRemoveRefereeClicked());
@@ -188,16 +192,20 @@ public final class GameFragment extends MainActivityFragment
     }
 
     @Override
-    @StringRes
+    protected void onKeyBoardChanged(boolean appeared) {
+        super.onKeyBoardChanged(appeared);
+        if (!appeared && isBottomSheetShowing()) hideBottomSheet();
+    }
+
+    @Override @StringRes
     protected int getFabStringResource() { return R.string.stat_add; }
 
-    @Override
-    @DrawableRes
+    @Override @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     @Override
     public boolean showsFab() {
-        return editableStatus.get() && !game.isEnded();
+        return !isBottomSheetShowing() && editableStatus.get() && !game.isEnded();
     }
 
     @Override

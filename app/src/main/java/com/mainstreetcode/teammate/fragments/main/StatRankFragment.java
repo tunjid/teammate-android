@@ -77,7 +77,7 @@ public final class StatRankFragment extends MainActivityFragment {
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager.setViewHolderColor(R.color.dark_grey);
+        scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint);
 
         StatType[] statTypes = tournament.getSport().getStats().toArray(new StatType[]{});
         ArrayAdapter<StatType> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, statTypes);
@@ -107,7 +107,7 @@ public final class StatRankFragment extends MainActivityFragment {
     @Override
     public boolean showsFab() { return false; }
 
-    void fetchStandings() {
+    private void fetchStandings() {
         toggleProgress(true);
         disposables.add(tournamentViewModel.getStatRank(tournament, type).subscribe(this::onTournamentsUpdated, defaultErrorHandler));
     }

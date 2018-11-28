@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.ColorRes;
+import androidx.annotation.AttrRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -84,7 +84,7 @@ public class ScrollManager {
         if (viewHolder != null) viewHolder.update(iconRes, stringRes);
     }
 
-    public void setViewHolderColor(@ColorRes int color) {
+    public void setViewHolderColor(@EmptyViewHolder.EmptyTint @AttrRes int color) {
         if (viewHolder == null || adapter == null) return;
         viewHolder.setColor(color);
         viewHolder.toggle(adapter.getItemCount() == 0);

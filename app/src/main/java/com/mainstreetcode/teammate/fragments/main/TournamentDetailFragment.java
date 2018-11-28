@@ -2,19 +2,6 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AlertDialog;
-
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -25,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentRoundAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
@@ -41,12 +29,21 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import static com.google.android.material.tabs.TabLayout.MODE_FIXED;
 import static com.google.android.material.tabs.TabLayout.MODE_SCROLLABLE;
 
 public class TournamentDetailFragment extends MainActivityFragment {
 
-    public static final String ARG_TOURNAMENT = "tournament";
+    private static final String ARG_TOURNAMENT = "tournament";
     private static final String ARG_COMPETITOR = "competitor";
 
     private Tournament tournament;
@@ -69,7 +66,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public TournamentDetailFragment pending(Competitor competitor) {
+    TournamentDetailFragment pending(Competitor competitor) {
         getArguments().putParcelable(ARG_COMPETITOR, competitor);
         return this;
     }
@@ -169,7 +166,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         super.onDestroyView();
     }
 
-    public RecyclerView.RecycledViewPool getGamesRecycledViewPool() {
+    RecyclerView.RecycledViewPool getGamesRecycledViewPool() {
         return gamesRecycledViewPool;
     }
 
@@ -244,7 +241,7 @@ public class TournamentDetailFragment extends MainActivityFragment {
         tabLayout.setTabMode(tournament.getNumRounds() > 4 ? MODE_SCROLLABLE : MODE_FIXED);
         tabLayout.setVisibility(hasCompetitors ? View.VISIBLE : View.GONE);
         tabLayout.setupWithViewPager(viewPager);
-        viewHolder.setColor(R.color.dark_grey);
+        viewHolder.setColor(R.attr.alt_empty_view_holder_tint);
         viewHolder.toggle(!hasCompetitors);
 
         Competitor winner = tournament.getWinner();
