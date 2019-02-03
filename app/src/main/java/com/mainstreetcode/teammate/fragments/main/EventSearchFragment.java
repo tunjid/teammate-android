@@ -8,12 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter;
@@ -25,6 +26,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.DrawableRes;
@@ -170,8 +172,8 @@ public class EventSearchFragment extends MainActivityFragment {
         if (requestCode != PLACE_PICKER_REQUEST) return;
         if (resultCode != RESULT_OK) return;
 
-        Place place = PlacePicker.getPlace(requireContext(), data);
-        if (place != null) onLocationFound(place.getLatLng(), true);
+        try {onLocationFound(Autocomplete.getPlaceFromIntent(data).getLatLng(), true);}
+        catch (Exception e) {Logger.log(getStableTag(), "Unable to retrieve place", e);}
     }
 
     @Override
@@ -200,7 +202,9 @@ public class EventSearchFragment extends MainActivityFragment {
     }
 
     private void startPlacePicker() {
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        Autocomplete.IntentBuilder builder = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+                Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
         try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }

@@ -12,6 +12,7 @@ import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.core.provider.FontRequest;
 
+import com.google.android.libraries.places.api.Places;
 import com.mainstreetcode.teammate.repository.ConfigRepository;
 import com.mainstreetcode.teammate.repository.RoleRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
@@ -52,6 +53,7 @@ public class App extends MultiDexApplication {
         initializeEmoji();
         registerReceiver(mediaDownloadListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         //MobileAds.initialize(this, getString(R.string.admob_app_id));
+        Places.initialize(getApplicationContext(), getString(R.string.google_api_key));
     }
 
     @SuppressLint("CheckResult")

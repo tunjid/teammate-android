@@ -13,9 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.EventEditAdapter;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
@@ -31,6 +32,8 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import java.util.Arrays;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -174,7 +177,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
         if (failed && isFromPlacePicker) gofer.setSettingLocation(false);
         if (failed || !isFromPlacePicker) return;
 
-        Place place = PlacePicker.getPlace(requireContext(), data);
+        Place place = Autocomplete.getPlaceFromIntent(data);
         disposables.add(gofer.setPlace(place).subscribe(this::onModelUpdated, emptyErrorHandler));
     }
 
@@ -278,7 +281,9 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     public void onLocationClicked() {
         gofer.setSettingLocation(true);
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+        Autocomplete.IntentBuilder builder = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+                Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS));
 
         try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
