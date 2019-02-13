@@ -81,7 +81,17 @@ public final class CompetitorsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
         scrollManager = ScrollManager.<CompetitorViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(new CompetitorAdapter(competitorIdentifiables, competitor -> {}))
+                .withAdapter(new CompetitorAdapter(competitorIdentifiables, competitor -> {}) {
+                    @Override
+                    public long getItemId(int position) { return entities.get(position).hashCode(); }
+
+                    @NonNull @Override
+                    public CompetitorViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+                        CompetitorViewHolder holder = super.onCreateViewHolder(viewGroup, viewType);
+                        holder.getDragHandle().setVisibility(View.VISIBLE);
+                        return holder;
+                    }
+                })
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(ScrollManager.<CompetitorViewHolder>swipeDragOptionsBuilder()

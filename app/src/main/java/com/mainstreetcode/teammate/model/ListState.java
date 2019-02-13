@@ -10,7 +10,7 @@ public class ListState {
     @DrawableRes
     public final int imageRes;
 
-    private ListState(int textRes, int imageRes) {
+    private ListState(int imageRes, int textRes) {
         this.textRes = textRes;
         this.imageRes = imageRes;
     }
