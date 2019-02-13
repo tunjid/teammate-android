@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.User;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 

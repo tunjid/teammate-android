@@ -1,24 +1,25 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StandingsAdapter;
-import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.util.SyncedScrollManager;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
+import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.mainstreetcode.teammate.util.SyncedScrollManager;
 import com.mainstreetcode.teammate.util.SyncedScrollView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Lists {@link Event tournaments}
@@ -70,10 +71,10 @@ public final class StandingsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> fetchStandings(true);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView.findViewById(R.id.empty_container), R.drawable.ic_table_24dp, R.string.tournament_no_standings))
+        scrollManager = ScrollManager.<StandingRowViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView.findViewById(R.id.empty_container), R.drawable.ic_table_24dp, R.string.tournament_no_standings))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchStandings(false))
+                .withEndlessScroll(() -> fetchStandings(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new StandingsAdapter(standings.getTable(), this))
                 .withLinearLayoutManager()

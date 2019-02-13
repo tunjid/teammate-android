@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.JoinRequestAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
@@ -41,12 +42,12 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         implements
         JoinRequestAdapter.AdapterListener {
 
-    public static final String ARG_JOIN_REQUEST = "join-request";
+    static final String ARG_JOIN_REQUEST = "join-request";
 
     private JoinRequest request;
     private JoinRequestGofer gofer;
 
-    public static JoinRequestFragment inviteInstance(Team team) {
+    static JoinRequestFragment inviteInstance(Team team) {
         JoinRequestFragment fragment = newInstance(JoinRequest.invite(team));
         fragment.setEnterExitTransitions();
 
@@ -60,7 +61,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         return fragment;
     }
 
-    public static JoinRequestFragment viewInstance(JoinRequest request) {
+    static JoinRequestFragment viewInstance(JoinRequest request) {
         JoinRequestFragment fragment = newInstance(request);
         fragment.setEnterExitTransitions();
 
@@ -98,7 +99,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<InputViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new JoinRequestAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))

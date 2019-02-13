@@ -2,9 +2,6 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,12 +12,17 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.adapters.SettingsAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.SettingsItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 public final class SettingsFragment extends MainActivityFragment
         implements SettingsAdapter.SettingsAdapterListener {
@@ -48,7 +50,7 @@ public final class SettingsFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.settings_list))
+        scrollManager = ScrollManager.<SettingsViewHolder>with(rootView.findViewById(R.id.settings_list))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new SettingsAdapter(items, this))
                 .withLinearLayoutManager()

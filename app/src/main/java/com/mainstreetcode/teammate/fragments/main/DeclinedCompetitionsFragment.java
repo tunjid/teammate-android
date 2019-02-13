@@ -57,10 +57,10 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(competitorViewModel.refresh(User.class).subscribe(DeclinedCompetitionsFragment.this::onCompetitorsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
+        scrollManager = ScrollManager.<CompetitorViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchCompetitions(false))
+                .withEndlessScroll(() -> fetchCompetitions(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)

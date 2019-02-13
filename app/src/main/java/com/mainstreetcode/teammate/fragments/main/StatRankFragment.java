@@ -20,6 +20,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -70,8 +71,8 @@ public final class StatRankFragment extends MainActivityFragment {
         View root = inflater.inflate(R.layout.fragment_stat_rank, container, false);
         Spinner spinner = root.findViewById(R.id.spinner);
 
-        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_medal_24dp, R.string.no_stat_ranks))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(root.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(root, R.drawable.ic_medal_24dp, R.string.no_stat_ranks))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new StatRankAdapter(statRanks, statRank -> showFragment(UserEditFragment.newInstance(statRank.getUser()))))
                 .withLinearLayoutManager()

@@ -35,6 +35,7 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.AppBarListener;
@@ -43,6 +44,7 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -109,11 +111,11 @@ public final class GameFragment extends MainActivityFragment
         gameViewHolder = new GameViewHolder(appBar, ignored -> {});
         gameViewHolder.bind(game);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.model_list))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
                 .withAdapter(new StatAdapter(items, stat -> showFragment(StatEditFragment.newInstance(stat))))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
-                .withEndlessScrollCallback(() -> fetchStats(false))
+                .withEndlessScroll(() -> fetchStats(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
@@ -242,12 +244,12 @@ public final class GameFragment extends MainActivityFragment
                 .subscribe(ignored -> togglePersistentUi(), defaultErrorHandler));
 
         if (game.competitorsDeclined())
-            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined);
+            scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined));
 
         else if (game.competitorsNotAccepted())
-            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance);
+            scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance));
 
-        else scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_stats);
+        else scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_stats));
     }
 
     private void onRemoveRefereeClicked() {

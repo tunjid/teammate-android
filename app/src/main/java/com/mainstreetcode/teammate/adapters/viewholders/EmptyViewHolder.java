@@ -8,7 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
+import com.tunjid.androidbootstrap.recyclerview.ListPlaceholder;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,7 +24,7 @@ import androidx.annotation.StringRes;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
-public class EmptyViewHolder {
+public class EmptyViewHolder implements ListPlaceholder<ListState> {
 
     private final TextView text;
     private final ImageView icon;
@@ -48,15 +50,20 @@ public class EmptyViewHolder {
         text.setVisibility(visibility);
     }
 
-    public void update(@DrawableRes int iconRes, @StringRes int stringRes) {
-        text.setText(stringRes);
-        icon.setImageDrawable(getIcon(iconRes));
+    @Override
+    public void bind(ListState data) {
+        update(data.imageRes, data.textRes);
     }
 
     public void setColor(@EmptyTint @AttrRes int attrRes) {
         this.color = ViewHolderUtil.resolveThemeColor(icon.getContext(), attrRes);
         text.setTextColor(color);
         icon.setImageDrawable(getDrawable(icon.getDrawable()));
+    }
+
+    private void update(@DrawableRes int iconRes, @StringRes int stringRes) {
+        text.setText(stringRes);
+        icon.setImageDrawable(getIcon(iconRes));
     }
 
     @Nullable
@@ -78,4 +85,5 @@ public class EmptyViewHolder {
 
         return wrapped;
     }
+
 }

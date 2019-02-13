@@ -19,6 +19,7 @@ import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -62,8 +63,8 @@ public final class TeamsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(roleViewModel.refresh(Role.class).subscribe(TeamsFragment.this::onTeamsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())

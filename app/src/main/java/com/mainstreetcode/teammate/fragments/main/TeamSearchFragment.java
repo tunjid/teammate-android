@@ -1,10 +1,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +17,15 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
 import io.reactivex.Flowable;
 
 /**
@@ -38,7 +39,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         TeamAdapter.AdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
-    public static final String ARG_SPORT = "sport-code";
+    private static final String ARG_SPORT = "sport-code";
 
     private View createTeam;
     private SearchView searchView;
@@ -87,7 +88,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         searchView = rootView.findViewById(R.id.searchView);
         createTeam = rootView.findViewById(R.id.create_team);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamSearchAdapter(teams, this))
                 .withGridLayoutManager(2)

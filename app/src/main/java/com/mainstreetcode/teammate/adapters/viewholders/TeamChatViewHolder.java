@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 /**
  * Viewholder for a {@link Team}

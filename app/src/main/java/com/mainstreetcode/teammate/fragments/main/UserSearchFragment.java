@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public final class UserSearchFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_user_search, container, false);
         searchView = rootView.findViewById(R.id.searchView);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new UserAdapter(items, this))
                 .withGridLayoutManager(2)

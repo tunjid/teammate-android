@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.adapters.HeadToHeadRequestAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
@@ -30,6 +31,7 @@ import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -75,15 +77,15 @@ public class HeadToHeadFragment extends MainActivityFragment
         draws = root.findViewById(R.id.draws);
         losses = root.findViewById(R.id.losses);
 
-        searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
+        searchScrollManager = ScrollManager.<BaseViewHolder>with(root.findViewById(R.id.search_options))
                 .withAdapter(new HeadToHeadRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(root.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
                 .withAdapter(new GameAdapter(matchUps, game -> showFragment(GameFragment.newInstance(game))))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchMatchUps)
                 .withInconsistencyHandler(this::onInconsistencyDetected)

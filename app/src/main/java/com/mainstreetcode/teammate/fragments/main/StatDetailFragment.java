@@ -19,7 +19,7 @@ import static com.google.android.material.tabs.TabLayout.MODE_FIXED;
 
 public class StatDetailFragment extends MainActivityFragment {
 
-    public static final String ARG_TOURNAMENT = "role";
+    private static final String ARG_TOURNAMENT = "tournament";
 
     private Tournament tournament;
 

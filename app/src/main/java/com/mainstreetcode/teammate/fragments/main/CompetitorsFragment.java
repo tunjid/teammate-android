@@ -1,20 +1,13 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter;
-import com.mainstreetcode.teammate.adapters.DragDropAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
@@ -32,28 +25,25 @@ import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG;
-import static androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 public final class CompetitorsFragment extends MainActivityFragment
         implements
         UserAdapter.AdapterListener,
         TeamAdapter.AdapterListener {
 
-    private static final int SWIPE_DELAY = 200;
-    private static final int NO_SWIPE_OR_DRAG = 0;
     private static final String ARG_TOURNAMENT = "tournament";
 
-    private boolean canMove = true;
     private Tournament tournament;
     private List<Competitive> entities;
     private List<Competitor> competitors;
     private List<Identifiable> competitorIdentifiables;
-    private AtomicReference<SwipeDragData<Integer>> dragRef = new AtomicReference<>();
-    private AtomicReference<SwipeDragData<Integer>> swipeRef = new AtomicReference<>();
 
     public static CompetitorsFragment newInstance(Tournament tournament) {
         CompetitorsFragment fragment = new CompetitorsFragment();
@@ -89,18 +79,18 @@ public final class CompetitorsFragment extends MainActivityFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(new DragDropAdapter<>(new CompetitorAdapter(competitorIdentifiables, competitor -> {}), CompetitorViewHolder::getDragHandle, this::onDragStarted))
+        scrollManager = ScrollManager.<CompetitorViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
+                .withAdapter(new CompetitorAdapter(competitorIdentifiables, competitor -> {}))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
-                .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder()
-                        .setMovementFlagsSupplier(viewHolder -> getMovementFlags())
-                        .setSwipeDragStartConsumerConsumer(this::onSwipeStarted)
-                        .setSwipeDragEndConsumer(this::onSwipeDragEnded)
+                .withSwipeDragOptions(ScrollManager.<CompetitorViewHolder>swipeDragOptionsBuilder()
+                        .setMovementFlagsFunction(viewHolder -> ScrollManager.SWIPE_DRAG_ALL_DIRECTIONS)
+                        .setSwipeConsumer((holder, position) -> removeCompetitor(holder))
+                        .setDragHandleFunction(CompetitorViewHolder::getDragHandle)
                         .setLongPressDragEnabledSupplier(() -> false)
                         .setItemViewSwipeSupplier(() -> true)
-                        .setListSupplier(() -> competitors)
+                        .setDragConsumer(this::moveCompetitor)
                         .build())
                 .build();
 
@@ -194,57 +184,35 @@ public final class CompetitorsFragment extends MainActivityFragment
         disposables.add(tournamentViewModel.addCompetitors(tournament, competitors).subscribe(added -> requireActivity().onBackPressed(), defaultErrorHandler));
     }
 
-    private void onDragStarted(RecyclerView.ViewHolder viewHolder) {
-        dragRef.set(new SwipeDragData<>(viewHolder.getItemId(), viewHolder.getAdapterPosition(), ACTION_STATE_DRAG, 0));
-        scrollManager.startDrag(viewHolder);
+    private void moveCompetitor(CompetitorViewHolder start, CompetitorViewHolder end) {
+        int from = start.getAdapterPosition();
+        int to = end.getAdapterPosition();
+
+        swap(from, to);
+        scrollManager.notifyItemMoved(from, to);
+        scrollManager.notifyItemChanged(from);
+        scrollManager.notifyItemChanged(to);
     }
 
-    private void onSwipeStarted(RecyclerView.ViewHolder viewHolder, int state) {
-        if (state != ACTION_STATE_SWIPE) return;
-        swipeRef.set(new SwipeDragData<>(viewHolder.getItemId(), viewHolder.getAdapterPosition(), ACTION_STATE_SWIPE, competitors.size()));
+    private void removeCompetitor(CompetitorViewHolder viewHolder) {
+        int position = viewHolder.getAdapterPosition();
+        Pair<Integer, Integer> minMax = remove(position);
+
+        scrollManager.notifyItemRemoved(position);
+        // Only necessary to rebind views lower so they have the right position
+        scrollManager.notifyItemRangeChanged(minMax.first, minMax.second);
     }
 
-    private void onSwipeDragEnded(RecyclerView.ViewHolder viewHolder) {
-        long id = viewHolder.getItemId();
-        SwipeDragData<Integer> dragData = dragRef.get();
-        SwipeDragData<Integer> swipeData = swipeRef.get();
-
-        if (dragData != null && id == dragData.id) completeDrag(viewHolder, dragData);
-        else if (swipeData != null && id == swipeData.id) completeSwipe(swipeData);
+    private void swap(int from, int to) {
+        if (from < to)
+            for (int i = from; i < to; i++) Collections.swap(competitorIdentifiables, i, i + 1);
+        else for (int i = from; i > to; i--) Collections.swap(competitorIdentifiables, i, i - 1);
     }
 
-    private void completeDrag(RecyclerView.ViewHolder viewHolder, SwipeDragData<Integer> dragData) {
-        int from = dragData.position;
-        int to = viewHolder.getAdapterPosition();
-        scrollManager.notifyItemRangeChanged(Math.min(from, to), 1 + Math.abs(from - to));
-        dragRef.set(null);
-    }
+    private Pair<Integer, Integer> remove(int position) {
+        competitorIdentifiables.remove(position);
 
-    private void completeSwipe(SwipeDragData<Integer> swipeData) {
-        if (competitors.size() == swipeData.meta) return;
-        swipeRef.set(null);
-        canMove = false;
-        scrollManager.getRecyclerView().postDelayed(() -> {
-            canMove = true;
-            scrollManager.notifyDataSetChanged();
-        }, SWIPE_DELAY);
-    }
-
-    private int getMovementFlags() {
-        return canMove ? ScrollManager.defaultMovements() : NO_SWIPE_OR_DRAG;
-    }
-
-    static class SwipeDragData<T> {
-        long id;
-        int position;
-        int dragSwipeType;
-        T meta;
-
-        SwipeDragData(long id, int position, int dragSwipeType, T meta) {
-            this.id = id;
-            this.position = position;
-            this.dragSwipeType = dragSwipeType;
-            this.meta = meta;
-        }
+        int lastIndex = competitorIdentifiables.size() - 1;
+        return new Pair<>(Math.min(position, lastIndex), lastIndex);
     }
 }
