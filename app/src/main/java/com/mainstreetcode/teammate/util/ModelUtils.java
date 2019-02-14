@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.functions.collections.Lists;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 

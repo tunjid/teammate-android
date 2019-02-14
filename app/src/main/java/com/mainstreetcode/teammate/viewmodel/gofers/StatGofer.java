@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.DiffUtil;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.Supplier;
 import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;

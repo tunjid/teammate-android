@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.util.Supplier;
+import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.annotation.Retention;
