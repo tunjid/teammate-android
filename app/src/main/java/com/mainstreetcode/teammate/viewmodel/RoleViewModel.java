@@ -5,7 +5,7 @@ import android.annotation.SuppressLint;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -26,7 +26,7 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
 
     private final RoleRepository roleRepository;
 
-    static final List<Identifiable> roles = new ArrayList<>();
+    static final List<Differentiable> roles = new ArrayList<>();
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -49,7 +49,7 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
     }
 
     @Override
-    public List<Identifiable> getModelList(Class<Role> roleClass) {
+    public List<Differentiable> getModelList(Class<Role> roleClass) {
         return roles;
     }
 
@@ -62,7 +62,7 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
         if (competitor == null || competitor.isEmpty() || competitor.isAccepted())
             return Maybe.empty();
 
-        for (Identifiable identifiable : roles) {
+        for (Differentiable identifiable : roles) {
             if (!(identifiable instanceof Role)) continue;
             Role role = (Role) identifiable;
             Competitive entity = competitor.getEntity();

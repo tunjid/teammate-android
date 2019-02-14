@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
@@ -36,12 +36,12 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.USER;
 
 public class StatEditAdapter extends BaseAdapter<BaseViewHolder, StatEditAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final TextInputStyle.InputChooser chooser;
     private final UserAdapter.AdapterListener userListener = user -> adapterListener.onUserClicked();
     private final TeamAdapter.AdapterListener teamListener = team -> adapterListener.onTeamClicked();
 
-    public StatEditAdapter(List<Identifiable> items, AdapterListener listener) {
+    public StatEditAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         chooser = new Chooser(adapterListener);

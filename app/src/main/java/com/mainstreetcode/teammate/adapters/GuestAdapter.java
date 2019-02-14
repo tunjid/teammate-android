@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 
 import java.util.List;
@@ -24,10 +24,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 public class GuestAdapter extends BaseAdapter<InputViewHolder, ImageWorkerFragment.ImagePickerListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final Chooser chooser;
 
-    public GuestAdapter(List<Identifiable> items, ImageWorkerFragment.ImagePickerListener listener) {
+    public GuestAdapter(List<Differentiable> items, ImageWorkerFragment.ImagePickerListener listener) {
         super(listener);
         this.items = items;
         this.chooser = new Chooser();
@@ -47,7 +47,7 @@ public class GuestAdapter extends BaseAdapter<InputViewHolder, ImageWorkerFragme
     @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
         super.onBindViewHolder(viewHolder, i);
-        Identifiable item = items.get(i);
+        Differentiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 

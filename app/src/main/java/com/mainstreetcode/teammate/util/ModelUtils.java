@@ -11,7 +11,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -122,30 +123,30 @@ public class ModelUtils {
         catch (ParseException e) { return new Date(); }
     }
 
-    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
+    public static List<Differentiable> asDifferentiables(List<? extends Differentiable> subTypeList) {
         return new ArrayList<>(subTypeList);
     }
 
     public static void replaceStringList(List<String> sourceList, List<String> updatedList) {
-        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
-        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        List<Differentiable> source = transform(sourceList, s -> Differentiable.fromCharSequence(() -> s), Differentiable::getId);
+        List<Differentiable> updated = transform(updatedList, s -> Differentiable.fromCharSequence(() -> s), Differentiable::getId);
         replaceList(source, updated);
     }
 
-    public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> void preserveAscending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, Identifiable.COMPARATOR);
+        Collections.sort(source, FunctionalDiff.COMPARATOR);
     }
 
-    public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, Identifiable.DESCENDING_COMPARATOR);
+        Collections.sort(source, FunctionalDiff.DESCENDING_COMPARATOR);
     }
 
-    public static <T extends Identifiable> List<T> replaceList(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> List<T> replaceList(List<T> source, List<T> additions) {
         source.clear();
         source.addAll(additions);
-        Collections.sort(source, Identifiable.COMPARATOR);
+        Collections.sort(source, FunctionalDiff.COMPARATOR);
         return source;
     }
 
@@ -167,7 +168,7 @@ public class ModelUtils {
         return null;
     }
 
-    private static <T extends Identifiable> void concatenateList(List<T> source, List<T> additions) {
+    private static <T extends Differentiable> void concatenateList(List<T> source, List<T> additions) {
         Set<T> set = new HashSet<>(additions);
         set.addAll(source);
         source.clear();

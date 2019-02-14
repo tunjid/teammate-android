@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 
 public class TeamAdapter extends InteractiveAdapter<InteractiveViewHolder, TeamAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public TeamAdapter(List<Identifiable> items, AdapterListener listener) {
+    public TeamAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -49,7 +49,7 @@ public class TeamAdapter extends InteractiveAdapter<InteractiveViewHolder, TeamA
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof Team) ((TeamViewHolder) viewHolder).bind((Team) item);
         else if (item instanceof Role) ((TeamViewHolder) viewHolder).bind(((Role) item).getTeam());
@@ -67,7 +67,7 @@ public class TeamAdapter extends InteractiveAdapter<InteractiveViewHolder, TeamA
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof Team ? TEAM : item instanceof Role ? TEAM : ((Ad) item).getType();
     }
 

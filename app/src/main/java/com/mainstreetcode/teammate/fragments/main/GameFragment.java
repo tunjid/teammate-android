@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.User;
@@ -59,7 +59,7 @@ public final class GameFragment extends MainActivityFragment
     private static final String ARG_GAME = "game";
 
     private Game game;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     private boolean hasChoiceBar;
     private GameGofer gofer;

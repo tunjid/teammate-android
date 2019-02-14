@@ -8,7 +8,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StatAggregateViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class StatAggregateAdapter extends InteractiveAdapter<InteractiveViewHolder, InteractiveAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public StatAggregateAdapter(List<Identifiable> items) {
+    public StatAggregateAdapter(List<Differentiable> items) {
         this.items = items;
         setHasStableIds(true);
     }
@@ -48,7 +48,7 @@ public class StatAggregateAdapter extends InteractiveAdapter<InteractiveViewHold
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof StatAggregate.Aggregate) ((StatAggregateViewHolder) viewHolder).bind((StatAggregate.Aggregate) item);
     }
@@ -65,7 +65,7 @@ public class StatAggregateAdapter extends InteractiveAdapter<InteractiveViewHold
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof StatAggregate.Aggregate ? GAME : ((Ad) item).getType();
     }
 }

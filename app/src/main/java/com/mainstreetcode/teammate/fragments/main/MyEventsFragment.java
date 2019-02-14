@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.MyEventsViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -36,7 +36,7 @@ public final class MyEventsFragment extends MainActivityFragment
         implements
         EventAdapter.EventAdapterListener {
 
-    private List<Identifiable> items;
+    private List<Differentiable> items;
     private MyEventsViewModel myEventsViewModel;
 
     public static MyEventsFragment newInstance() {

@@ -1,12 +1,7 @@
 package com.mainstreetcode.teammate.persistence.entity;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.model.Config;
@@ -15,6 +10,12 @@ import com.mainstreetcode.teammate.model.enums.Visibility;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.util.Date;
+
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 import static com.mainstreetcode.teammate.util.ModelUtils.parse;

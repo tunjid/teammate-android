@@ -25,7 +25,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -47,7 +47,7 @@ public class MediaFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
     private AtomicBoolean bottomBarState;
 
     public static MediaFragment newInstance(Team team) {

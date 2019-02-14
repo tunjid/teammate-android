@@ -13,7 +13,7 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
@@ -39,7 +39,7 @@ public final class GamesChildFragment extends MainActivityFragment
 
     private int round;
     private Tournament tournament;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static GamesChildFragment newInstance(Tournament tournament, int round) {
         GamesChildFragment fragment = new GamesChildFragment();

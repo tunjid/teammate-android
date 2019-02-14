@@ -14,8 +14,8 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
 import com.mainstreetcode.teammate.util.FabInteractor;
-import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
+import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
@@ -223,7 +223,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     @SuppressWarnings("unchecked")
-    public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {
+    public void showSnackBar(Consumer<Snackbar> consumer) {
         Snackbar snackbar = Snackbar.make(coordinatorLayout, "", LENGTH_INDEFINITE).addCallback(callback);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
@@ -235,7 +235,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     @SuppressWarnings("unchecked")
-    public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {
+    public void showChoices(Consumer<ChoiceBar> consumer) {
         ChoiceBar bar = ChoiceBar.make(coordinatorLayout, LENGTH_INDEFINITE).addCallback(callback);
         consumer.accept(bar);
         transientBottomBars.add(bar);

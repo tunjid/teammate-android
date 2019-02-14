@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.ListableModel;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -27,7 +27,7 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
     protected final T model;
     private final Consumer<Throwable> onError;
 
-    final List<Identifiable> items;
+    final List<Differentiable> items;
 
     Gofer(T model, Consumer<Throwable> onError) {
         this.model = model;
@@ -69,13 +69,13 @@ public abstract class Gofer<T extends Model<T> & ListableModel<T>> {
         return model.isEmpty() ? Flowable.empty() : fetch().doOnError(onError);
     }
 
-    public final List<Identifiable> getItems() { return items; }
+    public final List<Differentiable> getItems() { return items; }
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     void startPrep() { watchForChange().subscribe(ignored -> {}, ErrorHandler.EMPTY); }
 
-    List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
+    List<Differentiable> preserveItems(List<Differentiable> old, List<Differentiable> fetched) {
         ModelUtils.preserveAscending(old, fetched);
         return old;
     }

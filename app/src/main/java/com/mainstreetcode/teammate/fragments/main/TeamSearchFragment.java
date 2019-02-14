@@ -10,7 +10,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -46,7 +46,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     private TeamSearchRequest request;
     private InstantSearch<TeamSearchRequest, Team> instantSearch;
 
-    private final List<Identifiable> teams = new ArrayList<>();
+    private final List<Differentiable> teams = new ArrayList<>();
 
     public static TeamSearchFragment newInstance() {
         TeamSearchFragment fragment = new TeamSearchFragment();
@@ -171,7 +171,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         scrollManager.notifyDataSetChanged();
     }
 
-    private boolean IsEligibleTeam(Identifiable team) {
+    private boolean IsEligibleTeam(Differentiable team) {
         return TextUtils.isEmpty(request.getSport()) || (!(team instanceof Team)
                 || ((Team) team).getSport().getCode().equals(request.getSport()));
     }

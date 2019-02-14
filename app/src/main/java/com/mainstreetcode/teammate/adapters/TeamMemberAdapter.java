@@ -10,7 +10,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.JoinRequestViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.RoleViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
@@ -33,9 +33,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ROLE;
 
 public class TeamMemberAdapter extends InteractiveAdapter<InteractiveViewHolder, TeamMemberAdapter.UserAdapterListener> {
 
-    private final List<Identifiable> teamModels;
+    private final List<Differentiable> teamModels;
 
-    public TeamMemberAdapter(List<Identifiable> teamModels, UserAdapterListener listener) {
+    public TeamMemberAdapter(List<Differentiable> teamModels, UserAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
         this.teamModels = teamModels;
@@ -56,7 +56,7 @@ public class TeamMemberAdapter extends InteractiveAdapter<InteractiveViewHolder,
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = teamModels.get(position);
+        Differentiable item = teamModels.get(position);
 
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         if (!(item instanceof TeamMember)) return;
@@ -80,7 +80,7 @@ public class TeamMemberAdapter extends InteractiveAdapter<InteractiveViewHolder,
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = teamModels.get(position);
+        Differentiable item = teamModels.get(position);
         if (item instanceof Ad) return ((Ad) item).getType();
         if (!(item instanceof TeamMember)) return JOIN_REQUEST;
 

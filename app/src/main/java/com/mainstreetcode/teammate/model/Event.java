@@ -25,6 +25,7 @@ import com.mainstreetcode.teammate.persistence.entity.EventEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.TextBitmapUtil;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public class Event extends EventEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Event)) return id.equals(other.getId());
         Event casted = (Event) other;
         return name.equals(casted.name)
@@ -102,7 +103,7 @@ public class Event extends EventEntity
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

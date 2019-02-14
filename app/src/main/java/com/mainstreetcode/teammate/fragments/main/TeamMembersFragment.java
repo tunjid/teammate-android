@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -49,7 +49,7 @@ public class TeamMembersFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> teamModels;
+    private List<Differentiable> teamModels;
 
     public static TeamMembersFragment newInstance(Team team) {
         TeamMembersFragment fragment = new TeamMembersFragment();

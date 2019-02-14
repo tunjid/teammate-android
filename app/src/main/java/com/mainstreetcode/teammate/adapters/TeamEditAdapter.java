@@ -10,7 +10,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -29,10 +29,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 public class TeamEditAdapter extends BaseAdapter<InputViewHolder, TeamEditAdapter.TeamEditAdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final TextInputStyle.InputChooser chooser;
 
-    public TeamEditAdapter(List<Identifiable> items, TeamEditAdapter.TeamEditAdapterListener listener) {
+    public TeamEditAdapter(List<Differentiable> items, TeamEditAdapter.TeamEditAdapterListener listener) {
         super(listener);
         // setHasStableIds(true); DO NOT PUT THIS BACK
         this.items = items;
@@ -53,7 +53,7 @@ public class TeamEditAdapter extends BaseAdapter<InputViewHolder, TeamEditAdapte
     @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
         super.onBindViewHolder(viewHolder, i);
-        Identifiable item = items.get(i);
+        Differentiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 

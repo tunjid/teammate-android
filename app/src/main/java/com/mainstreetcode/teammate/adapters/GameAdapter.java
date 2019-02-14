@@ -10,7 +10,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class GameAdapter extends InteractiveAdapter<InteractiveViewHolder, GameAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public GameAdapter(List<Identifiable> items, AdapterListener listener) {
+    public GameAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -49,7 +49,7 @@ public class GameAdapter extends InteractiveAdapter<InteractiveViewHolder, GameA
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof Game) ((GameViewHolder) viewHolder).bind((Game) item);
     }
@@ -66,7 +66,7 @@ public class GameAdapter extends InteractiveAdapter<InteractiveViewHolder, GameA
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof Game ? GAME : ((Ad) item).getType();
     }
 

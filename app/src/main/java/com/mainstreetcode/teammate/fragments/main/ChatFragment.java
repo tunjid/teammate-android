@@ -28,7 +28,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -52,7 +52,7 @@ public class ChatFragment extends MainActivityFragment
     private boolean wasScrolling;
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
     private Disposable chatDisposable;
 
     public static ChatFragment newInstance(Team team) {

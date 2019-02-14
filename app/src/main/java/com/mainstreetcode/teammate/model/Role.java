@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -75,7 +76,7 @@ public class Role extends RoleEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Role)) return id.equals(other.getId());
         Role casted = (Role) other;
         return position.equals(casted.position)
@@ -84,7 +85,7 @@ public class Role extends RoleEntity
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

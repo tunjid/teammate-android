@@ -10,7 +10,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.enums.Position;
@@ -31,10 +31,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 public class JoinRequestAdapter extends BaseAdapter<InputViewHolder, JoinRequestAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final TextInputStyle.InputChooser chooser;
 
-    public JoinRequestAdapter(List<Identifiable> items, AdapterListener listener) {
+    public JoinRequestAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         chooser = new Chooser(adapterListener);
@@ -55,7 +55,7 @@ public class JoinRequestAdapter extends BaseAdapter<InputViewHolder, JoinRequest
     @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
         super.onBindViewHolder(viewHolder, i);
-        Identifiable item = items.get(i);
+        Differentiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 

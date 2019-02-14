@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.adapters.StatRankAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -34,7 +34,7 @@ public final class StatRankFragment extends MainActivityFragment {
 
     private StatType type;
     private Tournament tournament;
-    private List<Identifiable> statRanks;
+    private List<Differentiable> statRanks;
 
     public static StatRankFragment newInstance(Tournament team) {
         StatRankFragment fragment = new StatRankFragment();

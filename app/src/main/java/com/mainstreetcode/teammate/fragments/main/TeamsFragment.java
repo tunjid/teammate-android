@@ -15,7 +15,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -33,7 +33,7 @@ public final class TeamsFragment extends MainActivityFragment
 
     private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
 
-    private List<Identifiable> roles;
+    private List<Differentiable> roles;
 
     public static TeamsFragment newInstance() {
         TeamsFragment fragment = new TeamsFragment();

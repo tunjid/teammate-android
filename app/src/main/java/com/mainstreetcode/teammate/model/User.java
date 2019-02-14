@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -68,7 +69,7 @@ public class User extends UserEntity implements
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof User)) return id.equals(other.getId());
         User casted = (User) other;
         return firstName.equals(casted.getFirstName()) && lastName.equals(casted.getLastName())
@@ -91,7 +92,7 @@ public class User extends UserEntity implements
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

@@ -7,7 +7,8 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -77,13 +78,13 @@ public class StatGofer extends Gofer<Stat> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Stat::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(Stat::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Stat::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Single<List<Differentiable>> source = upsertFunction.apply(model).map(Stat::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     public Single<DiffUtil.DiffResult> chooseUser(User otherUser) {
@@ -115,19 +116,19 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Identifiable> Single<DiffUtil.DiffResult> swap(Identifiable item,
+    private <T extends Differentiable> Single<DiffUtil.DiffResult> swap(Differentiable item,
                                                                       Supplier<T> swapDestination,
                                                                       BiConsumer<T, T> onSwapComplete) {
 
         AtomicReference<T> cache = new AtomicReference<>();
-        Single<List<Identifiable>> swapSource = Single.just(Collections.singletonList(item));
-        return Identifiable.diff(swapSource, this::getItems, (sourceCopy, fetched) -> {
+        Single<List<Differentiable>> swapSource = Single.just(Collections.singletonList(item));
+        return FunctionalDiff.of(swapSource, getItems(), (sourceCopy, fetched) -> {
             T toSwap = (T) fetched.get(0);
             sourceCopy.remove(swapDestination.get());
             sourceCopy.add(toSwap);
             cache.set(toSwap);
 
-            Collections.sort(sourceCopy, Identifiable.COMPARATOR);
+            Collections.sort(sourceCopy, FunctionalDiff.COMPARATOR);
             return sourceCopy;
         }).doOnSuccess(ignored -> onSwapComplete.accept(swapDestination.get(), cache.get()));
     }

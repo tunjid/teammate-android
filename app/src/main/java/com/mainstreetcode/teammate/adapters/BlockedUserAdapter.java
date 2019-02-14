@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.BlockedUser;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class BlockedUserAdapter extends InteractiveAdapter<InteractiveViewHolder, BlockedUserAdapter.UserAdapterListener> {
 
-    private final List<Identifiable> teamModels;
+    private final List<Differentiable> teamModels;
 
-    public BlockedUserAdapter(List<Identifiable> items, UserAdapterListener listener) {
+    public BlockedUserAdapter(List<Differentiable> items, UserAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
         this.teamModels = items;
@@ -49,7 +49,7 @@ public class BlockedUserAdapter extends InteractiveAdapter<InteractiveViewHolder
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = teamModels.get(position);
+        Differentiable item = teamModels.get(position);
 
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof BlockedUser) ((BlockedUserViewHolder) viewHolder).bind((BlockedUser) item);
@@ -67,7 +67,7 @@ public class BlockedUserAdapter extends InteractiveAdapter<InteractiveViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = teamModels.get(position);
+        Differentiable item = teamModels.get(position);
         if (item instanceof Ad) return ((Ad) item).getType();
         return BLOCKED_USER;
     }

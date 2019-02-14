@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.repository.EventRepository;
@@ -19,7 +19,7 @@ import io.reactivex.Flowable;
 
 public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
 
-    private final List<Identifiable> attending = new ArrayList<>();
+    private final List<Differentiable> attending = new ArrayList<>();
     private final EventRepository repository;
 
     public MyEventsViewModel() {
@@ -30,7 +30,7 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
     Class<Event> valueClass() { return Event.class; }
 
     @Override
-    public List<Identifiable> getModelList(Class<Event> key) { return attending; }
+    public List<Differentiable> getModelList(Class<Event> key) { return attending; }
 
     @Override
     void onModelAlert(Alert alert) {
@@ -54,10 +54,10 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
     private void removeDeletedTeamEvents(Team matcher) {
         if (matcher == null) return;
 
-        Iterator<Identifiable> iterator = getModelList(Event.class).iterator();
+        Iterator<Differentiable> iterator = getModelList(Event.class).iterator();
 
         while (iterator.hasNext()) {
-            Identifiable identifiable = iterator.next();
+            Differentiable identifiable = iterator.next();
             if (!(identifiable instanceof Event)) continue;
             if (((Event) identifiable).getTeam().equals(matcher)) iterator.remove();
         }

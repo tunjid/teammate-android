@@ -3,7 +3,8 @@ package com.mainstreetcode.teammate.viewmodel;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.CompetitorRepository;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
@@ -25,7 +26,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor> {
 
     private final CompetitorRepository repository;
-    private final List<Identifiable> declined = new ArrayList<>();
+    private final List<Differentiable> declined = new ArrayList<>();
 
     public CompetitorViewModel() { repository = CompetitorRepository.getInstance(); }
 
@@ -33,7 +34,7 @@ public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor
     Class<Competitor> valueClass() { return Competitor.class; }
 
     @Override
-    public List<Identifiable> getModelList(Class<User> key) { return declined; }
+    public List<Differentiable> getModelList(Class<User> key) { return declined; }
 
     public Completable updateCompetitor(Competitor competitor) {
         if (competitor.isEmpty()) return Completable.complete();
@@ -43,8 +44,8 @@ public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor
     public Single<DiffUtil.DiffResult> respond(final Competitor competitor, boolean accept) {
         if (accept) competitor.accept();
         else competitor.decline();
-        Single<List<Identifiable>> single = repository.createOrUpdate(competitor).map(Collections::singletonList);
-        return Identifiable.diff(single, () -> declined, (sourceCopy, fetched) -> {
+        Single<List<Differentiable>> single = repository.createOrUpdate(competitor).map(Collections::singletonList);
+        return FunctionalDiff.of(single, declined, (sourceCopy, fetched) -> {
             if (accept) sourceCopy.removeAll(fetched);
             else sourceCopy.addAll(fetched);
 

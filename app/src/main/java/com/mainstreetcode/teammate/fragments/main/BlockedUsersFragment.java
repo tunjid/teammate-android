@@ -19,7 +19,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.BlockedUserViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.BlockedUser;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -40,7 +40,7 @@ public final class BlockedUsersFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static BlockedUsersFragment newInstance(Team team) {
         BlockedUsersFragment fragment = new BlockedUsersFragment();

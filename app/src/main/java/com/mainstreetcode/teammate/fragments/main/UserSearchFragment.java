@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
@@ -38,7 +38,7 @@ public final class UserSearchFragment extends MainActivityFragment
     private SearchView searchView;
     private InstantSearch<String, User> instantSearch;
 
-    private final List<Identifiable> items = new ArrayList<>();
+    private final List<Differentiable> items = new ArrayList<>();
 
     public static UserSearchFragment newInstance() {
         UserSearchFragment fragment = new UserSearchFragment();

@@ -23,7 +23,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -46,7 +46,7 @@ public final class TournamentsFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static TournamentsFragment newInstance(Team team) {
         TournamentsFragment fragment = new TournamentsFragment();

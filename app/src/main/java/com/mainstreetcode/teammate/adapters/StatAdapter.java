@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StatViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.STAT;
 
 public class StatAdapter extends InteractiveAdapter<InteractiveViewHolder, ViewHolderUtil.SimpleAdapterListener<Stat>> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public StatAdapter(List<Identifiable> items, ViewHolderUtil.SimpleAdapterListener<Stat> listener) {
+    public StatAdapter(List<Differentiable> items, ViewHolderUtil.SimpleAdapterListener<Stat> listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -49,7 +49,7 @@ public class StatAdapter extends InteractiveAdapter<InteractiveViewHolder, ViewH
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof Stat) ((StatViewHolder) viewHolder).bind((Stat) item);
     }
@@ -66,7 +66,7 @@ public class StatAdapter extends InteractiveAdapter<InteractiveViewHolder, ViewH
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof Stat ? STAT : ((Ad) item).getType();
     }
 }

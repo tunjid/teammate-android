@@ -2,12 +2,13 @@ package com.mainstreetcode.teammate.model;
 
 
 import com.mainstreetcode.teammate.util.ObjectId;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 
 import androidx.annotation.Nullable;
 
-public abstract class Ad<T> implements Identifiable {
+public abstract class Ad<T> implements Differentiable {
 
     private T nativeAd;
     private final String id = new ObjectId().toHexString();

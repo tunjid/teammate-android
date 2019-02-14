@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
@@ -27,9 +27,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class EventAdapter extends InteractiveAdapter<InteractiveViewHolder, EventAdapter.EventAdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public EventAdapter(List<Identifiable> items, EventAdapterListener listener) {
+    public EventAdapter(List<Differentiable> items, EventAdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -48,7 +48,7 @@ public class EventAdapter extends InteractiveAdapter<InteractiveViewHolder, Even
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Event) ((EventViewHolder) viewHolder).bind((Event) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
     }
@@ -65,7 +65,7 @@ public class EventAdapter extends InteractiveAdapter<InteractiveViewHolder, Even
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof Event ? EVENT : ((Ad) item).getType();
     }
 

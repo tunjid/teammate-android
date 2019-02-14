@@ -23,6 +23,7 @@ import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.persistence.entity.UserEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.ObjectId;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -96,14 +97,14 @@ public class Media implements
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Media)) return id.equals(other.getId());
         Media casted = (Media) other;
         return thumbnail.equals(casted.thumbnail) && url.equals(casted.getUrl());
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

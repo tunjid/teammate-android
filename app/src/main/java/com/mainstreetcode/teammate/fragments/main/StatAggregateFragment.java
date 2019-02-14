@@ -17,7 +17,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -38,7 +38,7 @@ public class StatAggregateFragment extends MainActivityFragment
     private ExpandingToolbar expandingToolbar;
     private ScrollManager searchScrollManager;
 
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static StatAggregateFragment newInstance() {
         StatAggregateFragment fragment = new StatAggregateFragment();

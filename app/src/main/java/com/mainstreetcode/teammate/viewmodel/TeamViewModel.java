@@ -2,7 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
@@ -27,7 +27,7 @@ import io.reactivex.processors.PublishProcessor;
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     private static final Team defaultTeam = Team.empty();
-    static final List<Identifiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
+    static final List<Differentiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepository repository;
     private final PublishProcessor<Team> teamChangeProcessor;
@@ -44,7 +44,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     Class<Team> valueClass() { return Team.class; }
 
     @Override
-    public List<Identifiable> getModelList(Class<Team> key) {
+    public List<Differentiable> getModelList(Class<Team> key) {
         return teams;
     }
 

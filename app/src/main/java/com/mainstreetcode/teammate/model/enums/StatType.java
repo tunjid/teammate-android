@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.model.enums;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
@@ -53,7 +53,7 @@ public class StatType extends MetaData {
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         boolean result = super.areContentsTheSame(other);
         if (!(other instanceof StatType)) return result;
         return result && sportCode.equals(((StatType) other).sportCode);

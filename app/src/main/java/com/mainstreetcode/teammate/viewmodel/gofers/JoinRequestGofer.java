@@ -8,7 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -138,15 +139,15 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(JoinRequest::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(JoinRequest::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (items, updated) -> filteredItems(model));
     }
 
     @Override
     Single<DiffUtil.DiffResult> upsert() {
         Single<JoinRequest> single = model.isEmpty() ? joinTeam() : approveRequest();
-        Single<List<Identifiable>> source = single.map(JoinRequest::asIdentifiables).doOnSuccess(ignored -> updateState());
-        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
+        Single<List<Differentiable>> source = single.map(JoinRequest::asDifferentiables).doOnSuccess(ignored -> updateState());
+        return FunctionalDiff.of(source, getItems(), (items, updated) -> filteredItems(model));
     }
 
     @Override
@@ -194,10 +195,10 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
                 .blockingGet();
     }
 
-    private List<Identifiable> filteredItems(JoinRequest request) {
+    private List<Differentiable> filteredItems(JoinRequest request) {
         return Flowable.fromIterable(request.asItems())
                 .filter(this::filter)
-                .collect(ArrayList<Identifiable>::new, List::add)
+                .collect(ArrayList<Differentiable>::new, List::add)
                 .blockingGet();
     }
 }

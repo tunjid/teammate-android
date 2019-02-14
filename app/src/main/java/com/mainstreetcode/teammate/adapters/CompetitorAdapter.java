@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
@@ -21,9 +21,9 @@ import static com.mainstreetcode.teammate.model.Item.COMPETITOR;
 
 public class CompetitorAdapter extends InteractiveAdapter<CompetitorViewHolder, CompetitorAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public CompetitorAdapter(List<Identifiable> items, AdapterListener listener) {
+    public CompetitorAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -38,7 +38,7 @@ public class CompetitorAdapter extends InteractiveAdapter<CompetitorViewHolder, 
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull CompetitorViewHolder viewHolder, int position) {
-        Identifiable identifiable = items.get(position);
+        Differentiable identifiable = items.get(position);
         if (identifiable instanceof Competitor) viewHolder.bind((Competitor) identifiable);
     }
 

@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
@@ -43,7 +43,7 @@ public final class CompetitorsFragment extends MainActivityFragment
     private Tournament tournament;
     private List<Competitive> entities;
     private List<Competitor> competitors;
-    private List<Identifiable> competitorIdentifiables;
+    private List<Differentiable> competitorDifferentiables;
 
     public static CompetitorsFragment newInstance(Tournament tournament) {
         CompetitorsFragment fragment = new CompetitorsFragment();
@@ -73,7 +73,7 @@ public final class CompetitorsFragment extends MainActivityFragment
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         entities = new ArrayList<>();
         competitors = new TransformingSequentialList<>(entities, Competitor::empty, Competitor::getEntity);
-        competitorIdentifiables = new TransformingSequentialList<>(competitors, identity -> identity, i -> (Competitor) i);
+        competitorDifferentiables = new TransformingSequentialList<>(competitors, identity -> identity, i -> (Competitor) i);
     }
 
     @Override
@@ -81,7 +81,7 @@ public final class CompetitorsFragment extends MainActivityFragment
         View rootView = inflater.inflate(R.layout.fragment_competitors, container, false);
         scrollManager = ScrollManager.<CompetitorViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(new CompetitorAdapter(competitorIdentifiables, competitor -> {}) {
+                .withAdapter(new CompetitorAdapter(competitorDifferentiables, competitor -> {}) {
                     @Override
                     public long getItemId(int position) { return entities.get(position).hashCode(); }
 
@@ -215,14 +215,14 @@ public final class CompetitorsFragment extends MainActivityFragment
 
     private void swap(int from, int to) {
         if (from < to)
-            for (int i = from; i < to; i++) Collections.swap(competitorIdentifiables, i, i + 1);
-        else for (int i = from; i > to; i--) Collections.swap(competitorIdentifiables, i, i - 1);
+            for (int i = from; i < to; i++) Collections.swap(competitorDifferentiables, i, i + 1);
+        else for (int i = from; i > to; i--) Collections.swap(competitorDifferentiables, i, i - 1);
     }
 
     private Pair<Integer, Integer> remove(int position) {
-        competitorIdentifiables.remove(position);
+        competitorDifferentiables.remove(position);
 
-        int lastIndex = competitorIdentifiables.size() - 1;
+        int lastIndex = competitorDifferentiables.size() - 1;
         return new Pair<>(Math.min(position, lastIndex), lastIndex);
     }
 }

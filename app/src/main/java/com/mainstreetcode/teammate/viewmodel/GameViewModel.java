@@ -1,14 +1,11 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
-import androidx.arch.core.util.Function;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -22,6 +19,7 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
@@ -39,8 +40,8 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
-    private final Map<Tournament, Map<Integer, List<Identifiable>>> gameRoundMap = new HashMap<>();
-    private final List<Identifiable> headToHeadMatchUps = new ArrayList<>();
+    private final Map<Tournament, Map<Integer, List<Differentiable>>> gameRoundMap = new HashMap<>();
+    private final List<Differentiable> headToHeadMatchUps = new ArrayList<>();
 
     private final GameRoundRepository gameRoundRepository = GameRoundRepository.getInstance();
     private final GameRepository gameRepository = GameRepository.getInstance();
@@ -62,7 +63,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     @Override
-    void onErrorMessage(Message message, Team key, Identifiable invalid) {
+    void onErrorMessage(Message message, Team key, Differentiable invalid) {
         super.onErrorMessage(message, key, invalid);
         if (message.isInvalidObject()) headToHeadMatchUps.remove(invalid);
         if (invalid instanceof Game) ((Game) invalid).setEnded(false);
@@ -75,19 +76,19 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     @SuppressLint("UseSparseArrays")
-    public List<Identifiable> getGamesForRound(Tournament tournament, int round) {
-        Map<Integer, List<Identifiable>> roundMap = ModelUtils.get(tournament, gameRoundMap, HashMap::new);
+    public List<Differentiable> getGamesForRound(Tournament tournament, int round) {
+        Map<Integer, List<Differentiable>> roundMap = ModelUtils.get(tournament, gameRoundMap, HashMap::new);
         return ModelUtils.get(round, roundMap, ArrayList::new);
     }
 
-    public List<Identifiable> getHeadToHeadMatchUps() {
+    public List<Differentiable> getHeadToHeadMatchUps() {
         return headToHeadMatchUps;
     }
 
     public Flowable<DiffUtil.DiffResult> fetchGamesInRound(Tournament tournament, int round) {
         Flowable<List<Game>> flowable = gameRoundRepository.modelsBefore(tournament, round);
-        Function<List<Game>, List<Identifiable>> listMapper = ArrayList<Identifiable>::new;
-        return Identifiable.diff(flowable.map(listMapper::apply), () -> getGamesForRound(tournament, round), this::preserveList);
+        Function<List<Game>, List<Differentiable>> listMapper = ArrayList<Differentiable>::new;
+        return FunctionalDiff.of(flowable.map(listMapper::apply), getGamesForRound(tournament, round), this::preserveList);
     }
 
     public Single<HeadToHead.Summary> headToHead(HeadToHead.Request request) {
@@ -95,11 +96,11 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     }
 
     public Single<DiffUtil.DiffResult> getMatchUps(HeadToHead.Request request) {
-        Single<List<Identifiable>> sourceSingle = api.matchUps(request).map(games -> {
-            Collections.sort(games, Identifiable.COMPARATOR);
+        Single<List<Differentiable>> sourceSingle = api.matchUps(request).map(games -> {
+            Collections.sort(games, FunctionalDiff.COMPARATOR);
             return new ArrayList<>(games);
         });
-        return Identifiable.diff(sourceSingle, () -> headToHeadMatchUps, ModelUtils::replaceList).observeOn(mainThread());
+        return FunctionalDiff.of(sourceSingle, headToHeadMatchUps, ModelUtils::replaceList).observeOn(mainThread());
     }
 
     public Flowable<Game> getGame(Game game) {
@@ -139,13 +140,13 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private void onTournamentDeleted(Alert.TournamentDeletion alert) {
         Tournament tournament = alert.getModel();
 
-        Map<?, List<Identifiable>> tournamentMap = ModelUtils.get(tournament, gameRoundMap, Collections::emptyMap);
-        Function<Map<?, List<Identifiable>>, Flowable<Identifiable>> mapListFunction = listMap ->
+        Map<?, List<Differentiable>> tournamentMap = ModelUtils.get(tournament, gameRoundMap, Collections::emptyMap);
+        Function<Map<?, List<Differentiable>>, Flowable<Differentiable>> mapListFunction = listMap ->
                 Flowable.fromIterable(listMap.values())
                         .flatMap(Flowable::fromIterable);
 
-        Flowable<Identifiable> teamMapped = mapListFunction.apply(modelListMap);
-        Flowable<Identifiable> tournamentMapped = mapListFunction.apply(tournamentMap);
+        Flowable<Differentiable> teamMapped = mapListFunction.apply(modelListMap);
+        Flowable<Differentiable> tournamentMapped = mapListFunction.apply(tournamentMap);
         Flowable.concat(teamMapped, tournamentMapped)
                 .distinct()
                 .filter(item -> item instanceof Game)

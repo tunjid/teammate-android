@@ -17,7 +17,7 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -49,7 +49,7 @@ public final class GamesFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static GamesFragment newInstance(Team team) {
         GamesFragment fragment = new GamesFragment();

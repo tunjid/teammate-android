@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -34,7 +34,7 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
         implements
         CompetitorAdapter.AdapterListener {
 
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static DeclinedCompetitionsFragment newInstance() {
         DeclinedCompetitionsFragment fragment = new DeclinedCompetitionsFragment();

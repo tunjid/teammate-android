@@ -5,8 +5,10 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.functions.BiFunction;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -27,7 +29,6 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.functions.BiFunction;
 
 public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
@@ -38,7 +39,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
     private final TeamMemberRepository<JoinRequest> memberRepository = TeamMemberRepository.getInstance();
 
-    private final List<Identifiable> feedItems = new ArrayList<>();
+    private final List<Differentiable> feedItems = new ArrayList<>();
 
     public FeedViewModel() {}
 
@@ -48,7 +49,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     @Override
-    public List<Identifiable> getModelList(Class<FeedItem> key) {
+    public List<Differentiable> getModelList(Class<FeedItem> key) {
         return feedItems;
     }
 
@@ -64,7 +65,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     @Override
-    Pair<Model, Class> notificationCancelMap(Identifiable identifiable) {
+    Pair<Model, Class> notificationCancelMap(Differentiable identifiable) {
         if (!(identifiable instanceof FeedItem)) return new Pair<>(null, null);
         FeedItem feedItem = (FeedItem) identifiable;
         return new Pair<>(feedItem.getModel(), feedItem.getItemClass());
@@ -76,13 +77,13 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(final FeedItem<Event> feedItem, boolean attending) {
-        Flowable<List<Identifiable>> sourceFlowable = guestRepository.createOrUpdate(Guest.forEvent(feedItem.getModel(), attending))
+        Flowable<List<Differentiable>> sourceFlowable = guestRepository.createOrUpdate(Guest.forEvent(feedItem.getModel(), attending))
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(this::toIdentifiable);
+                .toFlowable().map(this::toDifferentiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(false)).firstOrError();
+        return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(false)).firstOrError();
     }
 
     public Single<DiffUtil.DiffResult> processCompetitor(final FeedItem<Competitor> feedItem, boolean accepted) {
@@ -90,13 +91,13 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
         if (accepted) model.accept();
         else model.decline();
 
-        Flowable<List<Identifiable>> sourceFlowable = competitorRepository.createOrUpdate(model)
+        Flowable<List<Differentiable>> sourceFlowable = competitorRepository.createOrUpdate(model)
                 .map(mapped -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .toFlowable().map(this::toIdentifiable);
+                .toFlowable().map(this::toDifferentiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(false)).firstOrError();
+        return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(false)).firstOrError();
     }
 
     public Single<DiffUtil.DiffResult> processJoinRequest(FeedItem<JoinRequest> feedItem, boolean approved) {
@@ -113,16 +114,16 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
                 ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
                 : joinRequestRepository.delete(request);
 
-        Single<List<Identifiable>> sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem.class, feedItem)
+        Single<List<Differentiable>> sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem.class, feedItem)
                 .map(model -> feedItem)
                 .cast(FeedItem.class)
                 .map(Collections::singletonList)
-                .map(this::toIdentifiable);
+                .map(this::toDifferentiable);
 
-        return Identifiable.diff(sourceFlowable, () -> feedItems, onFeedItemProcessed(leaveUnchanged));
+        return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(leaveUnchanged));
     }
 
-    private BiFunction<List<Identifiable>, List<Identifiable>, List<Identifiable>> onFeedItemProcessed(boolean leaveUnchanged) {
+    private BiFunction<List<Differentiable>, List<Differentiable>, List<Differentiable>> onFeedItemProcessed(boolean leaveUnchanged) {
         if (leaveUnchanged) return (feedItems, ignored) -> feedItems;
 
         return (feedItems, processed) -> {
@@ -132,9 +133,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     }
 
     private void removedProcessedRequest(JoinRequest request) {
-        Iterator<Identifiable> iterator = feedItems.iterator();
+        Iterator<Differentiable> iterator = feedItems.iterator();
         while (iterator.hasNext()) {
-            Identifiable identifiable = iterator.next();
+            Differentiable identifiable = iterator.next();
             if (!(identifiable instanceof FeedItem)) continue;
 
             Model model = ((FeedItem) identifiable).getModel();

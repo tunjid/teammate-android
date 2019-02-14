@@ -9,7 +9,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.FeedItemViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
@@ -27,9 +27,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class FeedAdapter extends InteractiveAdapter<InteractiveViewHolder, FeedAdapter.FeedItemAdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public FeedAdapter(List<Identifiable> items, FeedItemAdapterListener listener) {
+    public FeedAdapter(List<Differentiable> items, FeedItemAdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -48,7 +48,7 @@ public class FeedAdapter extends InteractiveAdapter<InteractiveViewHolder, FeedA
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof FeedItem) ((FeedItemViewHolder) viewHolder).bind((FeedItem) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
     }
@@ -65,7 +65,7 @@ public class FeedAdapter extends InteractiveAdapter<InteractiveViewHolder, FeedA
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof FeedItem ? FEED_ITEM : ((Ad) item).getType();
     }
 

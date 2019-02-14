@@ -7,8 +7,9 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 
@@ -77,8 +78,8 @@ public class GameGofer extends Gofer<Game> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Game::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(Game::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     public Completable delete() {
@@ -92,15 +93,15 @@ public class GameGofer extends Gofer<Game> {
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Game::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Single<List<Differentiable>> source = upsertFunction.apply(model).map(Game::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     @Override
-    List<Identifiable> preserveItems(List<Identifiable> old, List<Identifiable> fetched) {
-        List<Identifiable> result = super.preserveItems(old, fetched);
-        Iterator<Identifiable> iterator = result.iterator();
-        Function<Identifiable, Boolean> filter = item -> item instanceof Competitor && ((Competitor) item).isEmpty();
+    List<Differentiable> preserveItems(List<Differentiable> old, List<Differentiable> fetched) {
+        List<Differentiable> result = super.preserveItems(old, fetched);
+        Iterator<Differentiable> iterator = result.iterator();
+        Function<Differentiable, Boolean> filter = item -> item instanceof Competitor && ((Competitor) item).isEmpty();
 
         int currentSize = result.size();
         while (iterator.hasNext()) if (filter.apply(iterator.next())) iterator.remove();

@@ -23,7 +23,7 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.HeadToHead;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -50,7 +50,7 @@ public class HeadToHeadFragment extends MainActivityFragment
     private TextView draws;
     private TextView losses;
 
-    private List<Identifiable> matchUps;
+    private List<Differentiable> matchUps;
 
     public static HeadToHeadFragment newInstance() {
         HeadToHeadFragment fragment = new HeadToHeadFragment();

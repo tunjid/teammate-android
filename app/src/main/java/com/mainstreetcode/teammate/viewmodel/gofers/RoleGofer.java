@@ -6,7 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.UserRepository;
@@ -52,13 +53,13 @@ public class RoleGofer extends TeamHostingGofer<Role> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Role::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(Role::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = updateFunction.apply(model).map(Role::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
+        Single<List<Differentiable>> source = updateFunction.apply(model).map(Role::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (itemsCopy, updated) -> updated);
     }
 
     public Completable delete() {

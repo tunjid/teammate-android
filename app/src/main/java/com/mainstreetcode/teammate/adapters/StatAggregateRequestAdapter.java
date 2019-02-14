@@ -13,7 +13,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
@@ -77,7 +77,7 @@ public class StatAggregateRequestAdapter extends BaseAdapter<BaseViewHolder, Sta
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
-        Identifiable identifiable = request.getItems().get(position);
+        Differentiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
             ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));
         else if (identifiable instanceof User)
@@ -93,7 +93,7 @@ public class StatAggregateRequestAdapter extends BaseAdapter<BaseViewHolder, Sta
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable identifiable = request.getItems().get(position);
+        Differentiable identifiable = request.getItems().get(position);
         return identifiable instanceof Item ? ITEM : identifiable instanceof User ? USER : TEAM;
     }
 

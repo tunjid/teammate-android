@@ -3,8 +3,9 @@ package com.mainstreetcode.teammate.viewmodel;
 import androidx.arch.core.util.Function;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.mainstreetcode.teammate.model.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
@@ -36,8 +37,8 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
-    private final Map<Game, List<Identifiable>> modelListMap = new HashMap<>();
-    private final List<Identifiable> aggregates = new ArrayList<>();
+    private final Map<Game, List<Differentiable>> modelListMap = new HashMap<>();
+    private final List<Differentiable> aggregates = new ArrayList<>();
 
     private final StatRepository repository;
 
@@ -60,8 +61,8 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         return repository.modelsBefore(key, getQueryDate(fetchLatest, key, Stat::getCreated));
     }
 
-    public List<Identifiable> getModelList(Game game) {
-        List<Identifiable> modelList = modelListMap.get(game);
+    public List<Differentiable> getModelList(Game game) {
+        List<Differentiable> modelList = modelListMap.get(game);
         if (!modelListMap.containsKey(game)) modelListMap.put(game, modelList = new ArrayList<>());
 
         return modelList;
@@ -73,7 +74,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
         pushModelAlert(Alert.gameDeletion(key));
     }
 
-    public List<Identifiable> getStatAggregates() {
+    public List<Differentiable> getStatAggregates() {
         return aggregates;
     }
 
@@ -93,10 +94,10 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     }
 
     public Single<DiffUtil.DiffResult> aggregate(StatAggregate.Request request) {
-        Single<List<Identifiable>> sourceSingle = api.statsAggregate(request)
+        Single<List<Differentiable>> sourceSingle = api.statsAggregate(request)
                 .map(StatAggregate.Result::getAggregates)
-                .map(ArrayList<Identifiable>::new);
-        return Identifiable.diff(sourceSingle, () -> aggregates, ModelUtils::replaceList).observeOn(mainThread());
+                .map(ArrayList<Differentiable>::new);
+        return FunctionalDiff.of(sourceSingle, aggregates, ModelUtils::replaceList).observeOn(mainThread());
     }
 
     private boolean isPrivilegedOrIsReferee(boolean isPrivileged, User current, Game game) {

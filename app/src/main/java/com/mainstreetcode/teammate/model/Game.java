@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.GameEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -82,7 +83,7 @@ public class Game extends GameEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Game)) return id.equals(other.getId());
         Game casted = (Game) other;
         return score.equals(casted.score)
@@ -96,7 +97,7 @@ public class Game extends GameEntity
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 
