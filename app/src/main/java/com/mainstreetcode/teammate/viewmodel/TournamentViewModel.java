@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Standings;

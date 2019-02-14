@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;

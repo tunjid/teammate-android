@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
-import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.Notifier;

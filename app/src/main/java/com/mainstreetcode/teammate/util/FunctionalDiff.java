@@ -1,8 +1,18 @@
-package com.mainstreetcode.teammate.model;
+package com.mainstreetcode.teammate.util;
 
 
 import android.os.HandlerThread;
 
+import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.model.Guest;
+import com.mainstreetcode.teammate.model.Item;
+import com.mainstreetcode.teammate.model.JoinRequest;
+import com.mainstreetcode.teammate.model.Media;
+import com.mainstreetcode.teammate.model.Role;
+import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.model.TeamMember;
+import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.tunjid.androidbootstrap.functions.BiFunction;
 import com.tunjid.androidbootstrap.functions.collections.Lists;

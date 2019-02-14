@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.Competitive;
-import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
 import com.mainstreetcode.teammate.model.Message;
