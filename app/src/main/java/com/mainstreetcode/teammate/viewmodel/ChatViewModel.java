@@ -17,7 +17,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.socket.engineio.client.EngineIOException;
 
-import static com.mainstreetcode.teammate.util.ModelUtils.findFirst;
+import static com.tunjid.androidbootstrap.functions.collections.Lists.findFirst;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 

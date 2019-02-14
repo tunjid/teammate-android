@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.BiFunction;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
-import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -44,12 +44,12 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
     private int index;
 
     private final Function<JoinRequest, Flowable<JoinRequest>> getFunction;
-    private final ModelUtils.BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
+    private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
     public JoinRequestGofer(JoinRequest model,
                             Consumer<Throwable> onError,
                             Function<JoinRequest, Flowable<JoinRequest>> getFunction,
-                            ModelUtils.BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+                            BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
         super(model, onError);
         this.getFunction = getFunction;
         this.joinCompleter = joinCompleter;

@@ -22,7 +22,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
-import static com.mainstreetcode.teammate.util.ModelUtils.findLast;
+import static com.tunjid.androidbootstrap.functions.collections.Lists.findLast;
 
 public abstract class MappedViewModel<K, V extends Differentiable> extends BaseViewModel {
 

@@ -1,8 +1,5 @@
 package com.mainstreetcode.teammate.util;
 
-import androidx.annotation.Nullable;
-import androidx.arch.core.util.Function;
-import androidx.emoji.text.EmojiCompat;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.util.BiConsumer;
@@ -12,6 +9,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mainstreetcode.teammate.model.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.collections.Lists;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.text.ParseException;
@@ -21,12 +19,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.emoji.text.EmojiCompat;
 
 import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
 
@@ -144,28 +145,9 @@ public class ModelUtils {
     }
 
     public static <T extends Differentiable> List<T> replaceList(List<T> source, List<T> additions) {
-        source.clear();
-        source.addAll(additions);
+        Lists.replace(source, additions);
         Collections.sort(source, FunctionalDiff.COMPARATOR);
         return source;
-    }
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findFirst(List<?> list, Class<T> typeClass) {
-        for (Object item : list) if (typeClass.isAssignableFrom(item.getClass())) return (T) item;
-        return null;
-    }
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findLast(List<?> list, Class<T> typeClass) {
-        ListIterator<?> li = list.listIterator(list.size());
-        while (li.hasPrevious()) {
-            Object item = li.previous();
-            if (typeClass.isAssignableFrom(item.getClass())) return ((T) item);
-        }
-        return null;
     }
 
     private static <T extends Differentiable> void concatenateList(List<T> source, List<T> additions) {
@@ -206,12 +188,4 @@ public class ModelUtils {
         return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(source) : source;
     }
 
-    @FunctionalInterface
-    public interface Consumer<T> {
-        void accept(T t);
-    }
-
-    public interface BiFunction<R, S, T> {
-        T apply(R r, S s);
-    }
 }
