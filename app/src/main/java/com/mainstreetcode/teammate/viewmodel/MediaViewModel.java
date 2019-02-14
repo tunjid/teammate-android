@@ -1,14 +1,12 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import androidx.core.util.Pair;
-import androidx.recyclerview.widget.DiffUtil;
-
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.MediaTransferIntentService;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.repository.MediaRepository;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import androidx.core.util.Pair;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -51,15 +51,15 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {
         AtomicBoolean partialDelete = new AtomicBoolean();
-        List<Identifiable> source = getModelList(team);
+        List<Differentiable> source = getModelList(team);
         List<Media> toDelete = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
 
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();
 
-        Flowable<List<Identifiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete) : repository.ownerDelete(toDelete))
-                .toFlowable().map(this::toIdentifiable);
+        Flowable<List<Differentiable>> sourceFlowable = (isAdmin ? repository.privilegedDelete(team, toDelete) : repository.ownerDelete(toDelete))
+                .toFlowable().map(this::toDifferentiable);
 
-        return Identifiable.diff(sourceFlowable, () -> source, (sourceCopy, deleted) -> {
+        return FunctionalDiff.of(sourceFlowable, source, (sourceCopy, deleted) -> {
             partialDelete.set(deleted.size() != toDelete.size());
             sourceCopy.removeAll(deleted);
             return sourceCopy;
@@ -70,7 +70,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     }
 
     public boolean downloadMedia(Team team) {
-        List<Identifiable> source = getModelList(team);
+        List<Differentiable> source = getModelList(team);
         List<Media> toDownload = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
         if (source == null || toDownload == null || toDownload.isEmpty()) return false;
 

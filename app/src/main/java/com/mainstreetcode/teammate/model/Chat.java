@@ -22,6 +22,7 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.ObjectId;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -94,14 +95,14 @@ public class Chat implements
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Chat)) return id.equals(other.getId());
         Chat casted = (Chat) other;
         return content.equals(casted.content) && user.areContentsTheSame(casted.getUser());
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

@@ -14,11 +14,11 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.HeadToHead;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,7 @@ public class HeadToHeadRequestAdapter extends BaseAdapter<BaseViewHolder, HeadTo
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
-        Identifiable identifiable = request.getItems().get(position);
+        Differentiable identifiable = request.getItems().get(position);
         if (identifiable instanceof Item)
             ((InputViewHolder) viewHolder).bind(chooser.get((Item) identifiable));
         else if (identifiable instanceof Competitor)
@@ -89,7 +89,7 @@ public class HeadToHeadRequestAdapter extends BaseAdapter<BaseViewHolder, HeadTo
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable identifiable = request.getItems().get(position);
+        Differentiable identifiable = request.getItems().get(position);
         return identifiable instanceof Item ? ITEM : position == 2 ? HOME : AWAY;
     }
 

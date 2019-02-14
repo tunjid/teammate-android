@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Map;
  * Event events
  */
 
-public class Row implements Identifiable {
+public class Row implements Differentiable {
 
     private final String id;
     private final Competitor competitor;

@@ -33,6 +33,7 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,10 +47,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivityFragment extends TeammatesBaseFragment {
 
-    @Nullable
-    private View spacer;
-
-    protected ScrollManager scrollManager;
     protected FeedViewModel feedViewModel;
     protected RoleViewModel roleViewModel;
     protected UserViewModel userViewModel;
@@ -66,6 +63,10 @@ public class MainActivityFragment extends TeammatesBaseFragment {
     protected CompetitorViewModel competitorViewModel;
     protected TournamentViewModel tournamentViewModel;
     protected BlockedUserViewModel blockedUserViewModel;
+
+    @Nullable
+    private View spacer;
+    protected ScrollManager<? extends InteractiveViewHolder> scrollManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

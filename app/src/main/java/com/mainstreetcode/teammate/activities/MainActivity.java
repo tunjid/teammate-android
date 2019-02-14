@@ -44,7 +44,6 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.Supplier;
 import com.mainstreetcode.teammate.util.nav.BottomNav;
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
 import com.mainstreetcode.teammate.util.nav.NavItem;
@@ -52,6 +51,7 @@ import com.mainstreetcode.teammate.util.nav.ViewHolder;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import androidx.annotation.IdRes;

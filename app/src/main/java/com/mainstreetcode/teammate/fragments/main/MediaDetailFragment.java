@@ -2,9 +2,6 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,11 +18,15 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Media;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+
 
 public class MediaDetailFragment extends MainActivityFragment
         implements MediaAdapter.MediaAdapterListener {
 
-    public static final String ARG_MEDIA = "media";
+    static final String ARG_MEDIA = "media";
 
     private Media media;
     private MediaViewHolder mediaViewHolder;
@@ -67,7 +68,7 @@ public class MediaDetailFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler);
+        disposables.add(mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler));
     }
 
     @Override
@@ -86,7 +87,7 @@ public class MediaDetailFragment extends MainActivityFragment
         new AlertDialog.Builder(activity)
                 .setTitle(R.string.flag_media)
                 .setMessage(R.string.flag_media_message)
-                .setPositiveButton(R.string.yes, (dialog, which) -> mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler))
+                .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler)))
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .show();
 

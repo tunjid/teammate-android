@@ -9,7 +9,9 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.util.Logger;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -90,14 +92,14 @@ public class TeamMember<S extends Model<S> & TeamHost & UserHost> implements
     public String getId() { return wrappedModel.getId(); }
 
     @Override
-    public int compareTo(@NonNull TeamMember o) { return Identifiable.COMPARATOR.compare(wrappedModel, o); }
+    public int compareTo(@NonNull TeamMember o) { return FunctionalDiff.COMPARATOR.compare(wrappedModel, o); }
 
     @Override
     @SuppressWarnings("unchecked")
     public void update(TeamMember updated) {}
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof TeamMember)) return getId().equals(other.getId());
         TeamMember casted = (TeamMember) other;
         return getWrappedModel().areContentsTheSame(casted.getWrappedModel());

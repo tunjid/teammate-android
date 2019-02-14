@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -24,10 +24,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.CHAT;
  */
 
 public class TeamChatAdapter extends InteractiveAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener> {
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final User signedInUser;
 
-    public TeamChatAdapter(List<Identifiable> items, User signedInUser,
+    public TeamChatAdapter(List<Differentiable> items, User signedInUser,
                            TeamChatAdapter.ChatAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
@@ -84,7 +84,7 @@ public class TeamChatAdapter extends InteractiveAdapter<TeamChatViewHolder, Team
         void onChatClicked(Chat chat);
     }
 
-    private Chat forceCast(Identifiable identifiable) {
+    private Chat forceCast(Differentiable identifiable) {
         return (Chat) identifiable;
     }
 }

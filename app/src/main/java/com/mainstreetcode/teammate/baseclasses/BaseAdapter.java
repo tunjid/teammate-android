@@ -1,6 +1,6 @@
 package com.mainstreetcode.teammate.baseclasses;
 
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 

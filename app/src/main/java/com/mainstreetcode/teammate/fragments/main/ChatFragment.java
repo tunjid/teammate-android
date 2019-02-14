@@ -24,10 +24,11 @@ import android.widget.TextView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
+import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -51,7 +52,7 @@ public class ChatFragment extends MainActivityFragment
     private boolean wasScrolling;
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
     private Disposable chatDisposable;
 
     public static ChatFragment newInstance(Team team) {
@@ -91,11 +92,11 @@ public class ChatFragment extends MainActivityFragment
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.chat))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
+        scrollManager = ScrollManager.<TeamChatViewHolder>with(rootView.findViewById(R.id.chat))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
                 .onLayoutManager(layoutManager -> ((LinearLayoutManager) layoutManager).setStackFromEnd(true))
                 .withAdapter(new TeamChatAdapter(items, userViewModel.getCurrentUser(), this))
-                .withEndlessScrollCallback(() -> fetchChatsBefore(false))
+                .withEndlessScroll(() -> fetchChatsBefore(false))
                 .withRefreshLayout(refresh, () -> refresh.setRefreshing(false))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)

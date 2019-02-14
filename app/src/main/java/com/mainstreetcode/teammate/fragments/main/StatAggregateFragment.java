@@ -13,16 +13,18 @@ import com.mainstreetcode.teammate.adapters.StatAggregateRequestAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class StatAggregateFragment extends MainActivityFragment
     private ExpandingToolbar expandingToolbar;
     private ScrollManager searchScrollManager;
 
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static StatAggregateFragment newInstance() {
         StatAggregateFragment fragment = new StatAggregateFragment();
@@ -59,15 +61,15 @@ public class StatAggregateFragment extends MainActivityFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_stat_aggregate, container, false);
 
-        searchScrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
+        searchScrollManager = ScrollManager.<BaseViewHolder>with(root.findViewById(R.id.search_options))
                 .withAdapter(new StatAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
 
-        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(root.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout), this::fetchAggregates)
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new StatAggregateAdapter(items))

@@ -9,9 +9,9 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -26,10 +26,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 public class GameEditAdapter extends BaseAdapter<BaseViewHolder, GameEditAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final TextInputStyle.InputChooser chooser;
 
-    public GameEditAdapter(List<Identifiable> items, AdapterListener listener) {
+    public GameEditAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         this.chooser = new Chooser(adapterListener);

@@ -14,8 +14,9 @@ import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
@@ -33,7 +34,7 @@ import java.util.Map;
  * Notifications from a user's feed
  */
 
-public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<FeedItem> {
+public class FeedItem<T extends Model<T>> implements Differentiable, Comparable<FeedItem> {
 
     static final String JOIN_REQUEST = "join-request";
     static final String EVENT = "event";
@@ -95,7 +96,7 @@ public class FeedItem<T extends Model<T>> implements Identifiable, Comparable<Fe
 
     @Override
     public int compareTo(@NonNull FeedItem o) {
-        return Identifiable.COMPARATOR.compare(model, o.getModel());
+        return FunctionalDiff.COMPARATOR.compare(model, o.getModel());
     }
 
     @Override

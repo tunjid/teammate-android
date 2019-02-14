@@ -1,8 +1,5 @@
 package com.mainstreetcode.teammate.util;
 
-import androidx.annotation.Nullable;
-import androidx.arch.core.util.Function;
-import androidx.emoji.text.EmojiCompat;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.util.BiConsumer;
@@ -11,7 +8,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.functions.Supplier;
+import com.tunjid.androidbootstrap.functions.collections.Lists;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,14 +19,17 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.emoji.text.EmojiCompat;
+
+import static com.tunjid.androidbootstrap.functions.collections.Lists.transform;
 
 /**
  * Static methods for models
@@ -122,52 +124,33 @@ public class ModelUtils {
         catch (ParseException e) { return new Date(); }
     }
 
-    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
+    public static List<Differentiable> asDifferentiables(List<? extends Differentiable> subTypeList) {
         return new ArrayList<>(subTypeList);
     }
 
     public static void replaceStringList(List<String> sourceList, List<String> updatedList) {
-        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
-        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        List<Differentiable> source = transform(sourceList, s -> Differentiable.fromCharSequence(() -> s), Differentiable::getId);
+        List<Differentiable> updated = transform(updatedList, s -> Differentiable.fromCharSequence(() -> s), Differentiable::getId);
         replaceList(source, updated);
     }
 
-    public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> void preserveAscending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, Identifiable.COMPARATOR);
+        Collections.sort(source, FunctionalDiff.COMPARATOR);
     }
 
-    public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, Identifiable.DESCENDING_COMPARATOR);
+        Collections.sort(source, FunctionalDiff.DESCENDING_COMPARATOR);
     }
 
-    public static <T extends Identifiable> List<T> replaceList(List<T> source, List<T> additions) {
-        source.clear();
-        source.addAll(additions);
-        Collections.sort(source, Identifiable.COMPARATOR);
+    public static <T extends Differentiable> List<T> replaceList(List<T> source, List<T> additions) {
+        Lists.replace(source, additions);
+        Collections.sort(source, FunctionalDiff.COMPARATOR);
         return source;
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findFirst(List<?> list, Class<T> typeClass) {
-        for (Object item : list) if (typeClass.isAssignableFrom(item.getClass())) return (T) item;
-        return null;
-    }
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findLast(List<?> list, Class<T> typeClass) {
-        ListIterator<?> li = list.listIterator(list.size());
-        while (li.hasPrevious()) {
-            Object item = li.previous();
-            if (typeClass.isAssignableFrom(item.getClass())) return ((T) item);
-        }
-        return null;
-    }
-
-    private static <T extends Identifiable> void concatenateList(List<T> source, List<T> additions) {
+    private static <T extends Differentiable> void concatenateList(List<T> source, List<T> additions) {
         Set<T> set = new HashSet<>(additions);
         set.addAll(source);
         source.clear();
@@ -205,12 +188,4 @@ public class ModelUtils {
         return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(source) : source;
     }
 
-    @FunctionalInterface
-    public interface Consumer<T> {
-        void accept(T t);
-    }
-
-    public interface BiFunction<R, S, T> {
-        T apply(R r, S s);
-    }
 }

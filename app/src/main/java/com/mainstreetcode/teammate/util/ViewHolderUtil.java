@@ -27,7 +27,7 @@ import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.util.ViewUtil;
 
 import java.util.Arrays;

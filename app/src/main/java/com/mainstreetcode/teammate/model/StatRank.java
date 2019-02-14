@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 
@@ -20,7 +21,7 @@ public class StatRank
         UserHost,
         TeamHost,
         RemoteImage,
-        Identifiable,
+        Differentiable,
         Comparable<StatRank> {
 
 
@@ -55,7 +56,7 @@ public class StatRank
     public String getId() { return user.getId() + "-" + team.getId(); }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof StatRank)) return getId().equals(other.getId());
         StatRank casted = (StatRank) other;
         return user.areContentsTheSame(casted.getUser())
@@ -63,7 +64,7 @@ public class StatRank
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

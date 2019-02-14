@@ -3,7 +3,7 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.BlockedUser;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
@@ -54,13 +54,13 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     @Override
-    void afterPullToRefreshDiff(List<Identifiable> source) {
+    void afterPullToRefreshDiff(List<Differentiable> source) {
         super.afterPullToRefreshDiff(source);
         filterJoinedMembers(source);
     }
 
     @Override
-    void afterPreserveListDiff(List<Identifiable> source) {
+    void afterPreserveListDiff(List<Differentiable> source) {
         super.afterPreserveListDiff(source);
         filterJoinedMembers(source);
     }
@@ -105,9 +105,9 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         });
     }
 
-    private void onRequestProcessed(JoinRequest request, boolean approved, Team team, Identifiable processedMember) {
+    private void onRequestProcessed(JoinRequest request, boolean approved, Team team, Differentiable processedMember) {
         pushModelAlert(Alert.requestProcessed(request));
-        List<Identifiable> list = getModelList(team);
+        List<Differentiable> list = getModelList(team);
         list.remove(TeamMember.fromModel(request));
         if (approved) list.add(processedMember);
     }
@@ -123,10 +123,10 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     private void removeBlockedUser(BlockedUser blockedUser) {
-        Iterator<Identifiable> iterator = getModelList(blockedUser.getTeam()).iterator();
+        Iterator<Differentiable> iterator = getModelList(blockedUser.getTeam()).iterator();
 
         while (iterator.hasNext()) {
-            Identifiable identifiable = iterator.next();
+            Differentiable identifiable = iterator.next();
             if (!(identifiable instanceof TeamMember)) continue;
 
             TeamMember member = ((TeamMember) identifiable);
@@ -134,12 +134,12 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
         }
     }
 
-    private void filterJoinedMembers(List<Identifiable> source) {
+    private void filterJoinedMembers(List<Differentiable> source) {
         Set<String> userIds = new HashSet<>();
-        ListIterator<Identifiable> iterator = source.listIterator(source.size());
+        ListIterator<Differentiable> iterator = source.listIterator(source.size());
 
         while (iterator.hasPrevious()) {
-            Identifiable item = iterator.previous();
+            Differentiable item = iterator.previous();
             if (!(item instanceof TeamMember)) continue;
 
             TeamMember member = ((TeamMember) item);

@@ -9,12 +9,12 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.StatRankViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.StatRank;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
 
 public class StatRankAdapter extends InteractiveAdapter<InteractiveViewHolder, ViewHolderUtil.SimpleAdapterListener<StatRank>> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public StatRankAdapter(List<Identifiable> items, ViewHolderUtil.SimpleAdapterListener<StatRank> listener) {
+    public StatRankAdapter(List<Differentiable> items, ViewHolderUtil.SimpleAdapterListener<StatRank> listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -49,7 +49,7 @@ public class StatRankAdapter extends InteractiveAdapter<InteractiveViewHolder, V
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
         else if (item instanceof StatRank) ((StatRankViewHolder) viewHolder).bind((StatRank) item);
     }
@@ -66,7 +66,7 @@ public class StatRankAdapter extends InteractiveAdapter<InteractiveViewHolder, V
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof StatRank ? GAME : ((Ad) item).getType();
     }
 }

@@ -22,6 +22,8 @@ import okio.Buffer;
 import okio.BufferedSource;
 import retrofit2.HttpException;
 
+import static com.tunjid.androidbootstrap.functions.collections.Lists.findFirst;
+
 /**
  * Messages from the {@link com.mainstreetcode.teammate.rest.TeammateApi}
  */
@@ -64,7 +66,7 @@ public class Message {
         }
         else if (throwable instanceof CompositeException) {
             CompositeException compositeException = (CompositeException) throwable;
-            HttpException httpException = ModelUtils.findFirst(compositeException.getExceptions(), HttpException.class);
+            HttpException httpException = findFirst(compositeException.getExceptions(), HttpException.class);
             if (httpException != null) return new Message(httpException);
         }
         return null;

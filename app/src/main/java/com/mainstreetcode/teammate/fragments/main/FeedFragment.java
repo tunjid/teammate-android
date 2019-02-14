@@ -25,12 +25,14 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
+import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -77,8 +79,8 @@ public final class FeedFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
@@ -233,9 +235,9 @@ public final class FeedFragment extends MainActivityFragment
         boolean isOnATeam = teamViewModel.isOnATeam();
         scrollManager.onDiff(diffResult);
         feedViewModel.clearNotifications(FeedItem.class);
-        scrollManager.updateForEmptyList(
+        scrollManager.updateForEmptyList(ListState.of(
                 isOnATeam ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
-                isOnATeam ? R.string.no_feed : R.string.no_team_feed);
+                isOnATeam ? R.string.no_feed : R.string.no_team_feed));
     }
 
     private void setToolbarTitle(User user) {

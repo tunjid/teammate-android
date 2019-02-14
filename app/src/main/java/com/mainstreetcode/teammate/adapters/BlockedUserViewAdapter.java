@@ -8,9 +8,9 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.model.BlockedUser;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -24,10 +24,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 public class BlockedUserViewAdapter extends BaseAdapter<InputViewHolder, InteractiveAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final Chooser chooser;
 
-    public BlockedUserViewAdapter(List<Identifiable> items) {
+    public BlockedUserViewAdapter(List<Differentiable> items) {
         super(new AdapterListener() {});
         this.items = items;
         chooser = new Chooser();
@@ -47,7 +47,7 @@ public class BlockedUserViewAdapter extends BaseAdapter<InputViewHolder, Interac
     @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
         super.onBindViewHolder(viewHolder, i);
-        Identifiable item = items.get(i);
+        Differentiable item = items.get(i);
         if ((item instanceof Item)) viewHolder.bind(chooser.get((Item) item));
     }
 

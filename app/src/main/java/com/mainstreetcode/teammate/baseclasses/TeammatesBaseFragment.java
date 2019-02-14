@@ -19,9 +19,9 @@ import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import androidx.annotation.DrawableRes;
@@ -30,7 +30,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.FragmentTransaction;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 
 /**
  * Base Fragment for this app
@@ -45,7 +44,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected static final Validator VALIDATOR = new Validator();
 
     protected CompositeDisposable disposables = new CompositeDisposable();
-    protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
+    protected io.reactivex.functions.Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
     protected ErrorHandler defaultErrorHandler;
     private Message lastMessage;
 
@@ -119,9 +118,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
-    protected void showSnackbar(ModelUtils.Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}
+    protected void showSnackbar(Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}
 
-    protected void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {getPersistentUiController().showChoices(consumer);}
+    protected void showChoices(Consumer<ChoiceBar> consumer) {getPersistentUiController().showChoices(consumer);}
 
     protected void setFabClickListener(@Nullable View.OnClickListener clickListener) {getPersistentUiController().setFabClickListener(clickListener);}
 
@@ -239,10 +238,10 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         public void showSnackBar(CharSequence message) {}
 
         @Override
-        public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {}
+        public void showSnackBar(Consumer<Snackbar> consumer) {}
 
         @Override
-        public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {}
+        public void showChoices(Consumer<ChoiceBar> consumer) {}
 
         @Override
         public void setToolbarTitle(CharSequence title) {}

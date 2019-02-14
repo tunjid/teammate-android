@@ -4,10 +4,12 @@ package com.mainstreetcode.teammate.model;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
+
 /**
  * Base interface for model interactions
  */
-public interface Model<T> extends RemoteImage, Identifiable, Parcelable, Comparable<T> {
+public interface Model<T> extends RemoteImage, Differentiable, Parcelable, Comparable<T> {
     /**
      * Update the current model with values in the model provided, while keeping values in
      * data structures like {@link java.util.List lists}

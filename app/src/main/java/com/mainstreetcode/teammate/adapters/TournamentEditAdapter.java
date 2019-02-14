@@ -14,12 +14,12 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,11 +36,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
 
 public class TournamentEditAdapter extends BaseAdapter<BaseViewHolder, TournamentEditAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final TextInputStyle.InputChooser chooser;
     private final CompetitorAdapter.AdapterListener listener = viewHolder -> {};
 
-    public TournamentEditAdapter(List<Identifiable> items, AdapterListener listener) {
+    public TournamentEditAdapter(List<Differentiable> items, AdapterListener listener) {
         super(listener);
         this.items = items;
         chooser = new Chooser(adapterListener);

@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.mainstreetcode.teammate.adapters.StatTypeAdapter;
 import com.mainstreetcode.teammate.model.enums.StatAttribute;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 public class ChipViewHolder extends InteractiveViewHolder<StatTypeAdapter.AdapterListener> {
     private Chip chip;

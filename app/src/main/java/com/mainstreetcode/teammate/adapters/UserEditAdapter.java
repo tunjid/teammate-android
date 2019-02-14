@@ -8,11 +8,11 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle;
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 
@@ -26,10 +26,10 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM;
 
 public class UserEditAdapter extends BaseAdapter<InputViewHolder, UserEditAdapter.AdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
     private final TextInputStyle.InputChooser chooser;
 
-    public UserEditAdapter(List<Identifiable> items, UserEditAdapter.AdapterListener listener) {
+    public UserEditAdapter(List<Differentiable> items, UserEditAdapter.AdapterListener listener) {
         super(listener);
         this.items = items;
         chooser = new Chooser(adapterListener);
@@ -50,7 +50,7 @@ public class UserEditAdapter extends BaseAdapter<InputViewHolder, UserEditAdapte
     @Override
     public void onBindViewHolder(@NonNull InputViewHolder viewHolder, int i) {
         super.onBindViewHolder(viewHolder, i);
-        Identifiable item = items.get(i);
+        Differentiable item = items.get(i);
         if (item instanceof Item) viewHolder.bind(chooser.get((Item) item));
     }
 

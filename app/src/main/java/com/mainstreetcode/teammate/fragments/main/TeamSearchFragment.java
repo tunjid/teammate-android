@@ -1,10 +1,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,17 +10,22 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
 import io.reactivex.Flowable;
 
 /**
@@ -38,14 +39,14 @@ public final class TeamSearchFragment extends MainActivityFragment
         TeamAdapter.AdapterListener {
 
     private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
-    public static final String ARG_SPORT = "sport-code";
+    private static final String ARG_SPORT = "sport-code";
 
     private View createTeam;
     private SearchView searchView;
     private TeamSearchRequest request;
     private InstantSearch<TeamSearchRequest, Team> instantSearch;
 
-    private final List<Identifiable> teams = new ArrayList<>();
+    private final List<Differentiable> teams = new ArrayList<>();
 
     public static TeamSearchFragment newInstance() {
         TeamSearchFragment fragment = new TeamSearchFragment();
@@ -87,7 +88,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         searchView = rootView.findViewById(R.id.searchView);
         createTeam = rootView.findViewById(R.id.create_team);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new TeamSearchAdapter(teams, this))
                 .withGridLayoutManager(2)
@@ -170,7 +171,7 @@ public final class TeamSearchFragment extends MainActivityFragment
         scrollManager.notifyDataSetChanged();
     }
 
-    private boolean IsEligibleTeam(Identifiable team) {
+    private boolean IsEligibleTeam(Differentiable team) {
         return TextUtils.isEmpty(request.getSport()) || (!(team instanceof Team)
                 || ((Team) team).getSport().getCode().equals(request.getSport()));
     }
