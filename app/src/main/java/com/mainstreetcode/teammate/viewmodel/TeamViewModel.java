@@ -2,16 +2,16 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
-import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
+import com.tunjid.androidbootstrap.functions.collections.Lists;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import io.reactivex.processors.PublishProcessor;
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     private static final Team defaultTeam = Team.empty();
-    static final List<Differentiable> teams = new TransformingSequentialList<>(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
+    static final List<Differentiable> teams = Lists.transform(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepository repository;
     private final PublishProcessor<Team> teamChangeProcessor;

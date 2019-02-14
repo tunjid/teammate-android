@@ -16,13 +16,13 @@ import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.mainstreetcode.teammate.util.TransformingSequentialList;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.functions.collections.Lists;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,8 +72,8 @@ public final class CompetitorsFragment extends MainActivityFragment
         setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         entities = new ArrayList<>();
-        competitors = new TransformingSequentialList<>(entities, Competitor::empty, Competitor::getEntity);
-        competitorDifferentiables = new TransformingSequentialList<>(competitors, identity -> identity, i -> (Competitor) i);
+        competitors = Lists.transform(entities, Competitor::empty, Competitor::getEntity);
+        competitorDifferentiables = Lists.transform(competitors, identity -> identity, i -> (Competitor) i);
     }
 
     @Override

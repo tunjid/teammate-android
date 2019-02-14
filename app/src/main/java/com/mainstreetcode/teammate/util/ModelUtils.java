@@ -29,7 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.arch.core.util.Function;
 import androidx.emoji.text.EmojiCompat;
 
-import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
+import static com.tunjid.androidbootstrap.functions.collections.Lists.transform;
 
 /**
  * Static methods for models
