@@ -3,16 +3,12 @@ package com.mainstreetcode.teammate.util;
 
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.model.ListState;
-import com.tunjid.androidbootstrap.functions.BiConsumer;
-import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.recyclerview.EndlessScroller;
-import com.tunjid.androidbootstrap.recyclerview.ListPlaceholder;
 import com.tunjid.androidbootstrap.recyclerview.SwipeDragOptions;
 
 import java.util.List;
 
 import androidx.annotation.AttrRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
@@ -21,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class ScrollManager<VH extends RecyclerView.ViewHolder>
-        extends com.tunjid.androidbootstrap.recyclerview.ScrollManager<ListState, VH> {
+        extends com.tunjid.androidbootstrap.recyclerview.ScrollManager<VH, ListState> {
 
     private final EmptyViewHolder viewHolder;
 
@@ -56,7 +52,11 @@ public class ScrollManager<VH extends RecyclerView.ViewHolder>
     }
 
     public static class Builder<VH extends RecyclerView.ViewHolder>
-            extends com.tunjid.androidbootstrap.recyclerview.AbstractScrollManagerBuilder<ScrollManager<VH>, ListState, VH> {
+            extends com.tunjid.androidbootstrap.recyclerview.AbstractScrollManagerBuilder<
+            ScrollManager.Builder<VH>,
+            ScrollManager<VH>,
+            VH,
+            ListState> {
 
         @Override
         public ScrollManager<VH> build() {
@@ -73,102 +73,12 @@ public class ScrollManager<VH extends RecyclerView.ViewHolder>
         public Builder<VH> withEndlessScroll(Runnable runnable) {
             this.endlessScrollVisibleThreshold = 5;
             this.endlessScrollConsumer = __ -> runnable.run();
-            return this;
+            return thisInstance;
         }
 
         Builder<VH> setRecyclerView(RecyclerView recyclerView) {
             this.recyclerView = recyclerView;
-            return this;
-        }
-
-        @Override
-        public Builder<VH> setHasFixedSize() {
-            super.setHasFixedSize();
-            return this;
-        }
-
-        @Override
-        public Builder<VH> onLayoutManager(Consumer<LayoutManager> layoutManagerConsumer) {
-            super.onLayoutManager(layoutManagerConsumer);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withLinearLayoutManager() {
-            super.withLinearLayoutManager();
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withGridLayoutManager(int spanCount) {
-            super.withGridLayoutManager(spanCount);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withStaggeredGridLayoutManager(int spanCount) {
-            super.withStaggeredGridLayoutManager(spanCount);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withRecycledViewPool(RecyclerView.RecycledViewPool recycledViewPool) {
-            super.withRecycledViewPool(recycledViewPool);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withInconsistencyHandler(Consumer<IndexOutOfBoundsException> handler) {
-            super.withInconsistencyHandler(handler);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withEndlessScrollCallback(int threshold, @NonNull Consumer<Integer> endlessScrollConsumer) {
-            super.withEndlessScrollCallback(threshold, endlessScrollConsumer);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> addStateListener(@NonNull Consumer<Integer> stateListener) {
-            super.addStateListener(stateListener);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> addScrollListener(@NonNull BiConsumer<Integer, Integer> scrollListener) {
-            super.addScrollListener(scrollListener);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> addDecoration(@NonNull RecyclerView.ItemDecoration decoration) {
-            super.addDecoration(decoration);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withRefreshLayout(@NonNull SwipeRefreshLayout refreshLayout, Runnable refreshAction) {
-            super.withRefreshLayout(refreshLayout, refreshAction);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withAdapter(@NonNull Adapter<VH> adapter) {
-            super.withAdapter(adapter);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withPlaceholder(@NonNull ListPlaceholder<ListState> placeholder) {
-            super.withPlaceholder(placeholder);
-            return this;
-        }
-
-        @Override
-        public Builder<VH> withSwipeDragOptions(@NonNull SwipeDragOptions<VH> swipeDragOptions) {
-            super.withSwipeDragOptions(swipeDragOptions);
-            return this;
+            return thisInstance;
         }
     }
 }
