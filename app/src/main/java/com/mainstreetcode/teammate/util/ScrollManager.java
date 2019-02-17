@@ -3,7 +3,9 @@ package com.mainstreetcode.teammate.util;
 
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.model.ListState;
+import com.tunjid.androidbootstrap.recyclerview.AbstractListManagerBuilder;
 import com.tunjid.androidbootstrap.recyclerview.EndlessScroller;
+import com.tunjid.androidbootstrap.recyclerview.ListManager;
 import com.tunjid.androidbootstrap.recyclerview.SwipeDragOptions;
 
 import java.util.List;
@@ -16,8 +18,7 @@ import androidx.recyclerview.widget.RecyclerView.LayoutManager;
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-public class ScrollManager<VH extends RecyclerView.ViewHolder>
-        extends com.tunjid.androidbootstrap.recyclerview.ScrollManager<VH, ListState> {
+public class ScrollManager<VH extends RecyclerView.ViewHolder> extends ListManager<VH, ListState> {
 
     private final EmptyViewHolder viewHolder;
 
@@ -52,8 +53,8 @@ public class ScrollManager<VH extends RecyclerView.ViewHolder>
     }
 
     public static class Builder<VH extends RecyclerView.ViewHolder>
-            extends com.tunjid.androidbootstrap.recyclerview.AbstractScrollManagerBuilder<
-            ScrollManager.Builder<VH>,
+            extends AbstractListManagerBuilder<
+            Builder<VH>,
             ScrollManager<VH>,
             VH,
             ListState> {
