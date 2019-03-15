@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +59,6 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         role = getArguments().getParcelable(ARG_ROLE);
         gofer = teamMemberViewModel.gofer(role);
     }
@@ -94,9 +92,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_user_edit, menu);
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_user_edit; }
 
     @Override
     @StringRes

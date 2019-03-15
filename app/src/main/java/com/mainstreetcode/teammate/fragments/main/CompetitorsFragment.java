@@ -69,7 +69,6 @@ public final class CompetitorsFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         entities = new ArrayList<>();
         competitors = Lists.transform(entities, Competitor::empty, Competitor::getEntity);

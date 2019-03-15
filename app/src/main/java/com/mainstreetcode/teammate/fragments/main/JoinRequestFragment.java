@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +88,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         request = getArguments().getParcelable(ARG_JOIN_REQUEST);
         gofer = teamMemberViewModel.gofer(request);
     }
@@ -110,16 +108,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
         scrollManager.getRecyclerView().requestFocus();
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_user_edit, menu);
     }
 
     @Override
@@ -156,6 +144,11 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected int getToolbarMenu() {
+        return R.menu.fragment_user_edit;
+    }
 
     @Override
     public CharSequence getToolbarTitle() { return gofer.getToolbarTitle(this); }

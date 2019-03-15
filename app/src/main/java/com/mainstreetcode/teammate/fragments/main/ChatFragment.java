@@ -1,19 +1,10 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,18 +19,23 @@ import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Chat;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.disposables.Disposable;
 
-import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.text.TextUtils.isEmpty;
+import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
 
 public class ChatFragment extends MainActivityFragment
         implements
@@ -79,7 +75,6 @@ public class ChatFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         items = chatViewModel.getModelList(team);
     }
@@ -129,11 +124,6 @@ public class ChatFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_chat, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
@@ -148,6 +138,9 @@ public class ChatFragment extends MainActivityFragment
         super.onDestroyView();
         chatViewModel.updateLastSeen(team);
     }
+
+    @Override
+    protected int getToolbarMenu() { return R.menu.fragment_chat; }
 
     @Override
     public boolean showsFab() {

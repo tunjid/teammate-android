@@ -46,4 +46,55 @@ public interface PersistentUiController {
     void showChoices(Consumer<ChoiceBar> consumer);
 
     void setFabClickListener(@Nullable View.OnClickListener clickListener);
+
+    PersistentUiController DUMMY = new PersistentUiController() {
+
+        @Override
+        public void update(UiState state) {}
+
+        @Override
+        public void toggleToolbar(boolean show) {}
+
+        @Override
+        public void toggleAltToolbar(boolean show) {}
+
+        @Override
+        public void toggleBottombar(boolean show) {}
+
+        @Override
+        public void toggleFab(boolean show) {}
+
+        @Override
+        public void toggleProgress(boolean show) {}
+
+        @Override
+        public void toggleSystemUI(boolean show) {}
+
+        @Override
+        public void setFabIcon(int icon, int textRes) {}
+
+        @Override
+        public void setFabExtended(boolean expanded) {}
+
+        @Override
+        public void showSnackBar(CharSequence message) {}
+
+        @Override
+        public void showSnackBar(Consumer<Snackbar> consumer) {}
+
+        @Override
+        public void showChoices(Consumer<ChoiceBar> consumer) {}
+
+        @Override
+        public void setToolbarTitle(CharSequence title) {}
+
+        @Override
+        public void setAltToolbarTitle(CharSequence title) {}
+
+        @Override
+        public void setAltToolbarMenu(int menu) {}
+
+        @Override
+        public void setFabClickListener(View.OnClickListener clickListener) {}
+    };
 }

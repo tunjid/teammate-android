@@ -3,8 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +53,6 @@ public class MediaDetailFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         media = getArguments().getParcelable(ARG_MEDIA);
         systemUiStatus = new AtomicBoolean();
     }
@@ -73,12 +70,6 @@ public class MediaDetailFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         disposables.add(mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_media_detail, menu);
     }
 
     @Override
@@ -119,6 +110,9 @@ public class MediaDetailFragment extends MainActivityFragment
         mediaViewHolder = null;
         super.onDestroyView();
     }
+
+    @Override
+    protected int getToolbarMenu() { return R.menu.fragment_media_detail; }
 
     @Override
     public InsetFlags insetFlags() { return NONE; }

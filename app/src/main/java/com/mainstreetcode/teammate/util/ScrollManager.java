@@ -27,7 +27,7 @@ public class ScrollManager<VH extends RecyclerView.ViewHolder> extends ListManag
                             @Nullable SwipeRefreshLayout refreshLayout,
                             @Nullable SwipeDragOptions<VH> options,
                             @Nullable RecyclerView.RecycledViewPool recycledViewPool,
-                            RecyclerView recyclerView, Adapter<VH> adapter,
+                            RecyclerView recyclerView, Adapter<? extends VH> adapter,
                             LayoutManager layoutManager,
                             List<RecyclerView.ItemDecoration> decorations,
                             List<OnScrollListener> listeners,

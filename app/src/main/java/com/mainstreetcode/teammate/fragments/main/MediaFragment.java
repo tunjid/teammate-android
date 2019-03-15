@@ -3,16 +3,7 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.util.Pair;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,15 +16,23 @@ import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.util.Pair;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
@@ -75,7 +74,6 @@ public class MediaFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         items = mediaViewModel.getModelList(team);
         bottomBarState = new AtomicBoolean();
@@ -144,11 +142,6 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_media, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
@@ -185,6 +178,10 @@ public class MediaFragment extends MainActivityFragment
 
     @Override
     public boolean showsBottomNav() { return bottomBarState.get(); }
+
+    @Override protected int getToolbarMenu() {
+        return R.menu.fragment_media;
+    }
 
     @Override
     public void onClick(View v) {

@@ -47,7 +47,6 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         blockedUser = getArguments().getParcelable(ARG_BLOCKED_USER);
         gofer = blockedUserViewModel.gofer(blockedUser);
     }

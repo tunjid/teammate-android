@@ -96,9 +96,7 @@ public final class BlockedUsersFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_events, menu);
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_events; }
 
     @Override
     public boolean showsFab() {

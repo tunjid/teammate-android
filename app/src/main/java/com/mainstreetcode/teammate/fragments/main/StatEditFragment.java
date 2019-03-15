@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,6 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         stat = getArguments().getParcelable(ARG_STAT);
         gofer = statViewModel.gofer(stat);
     }
@@ -93,11 +91,6 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.action_delete).setVisible(gofer.canEdit() && !stat.getGame().isEnded() && !stat.isEmpty());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_stat_edit, menu);
     }
 
     @Override
@@ -128,6 +121,9 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected int getToolbarMenu() { return R.menu.fragment_stat_edit; }
 
     @Override protected CharSequence getToolbarTitle() {
         return getString(stat.isEmpty() ? R.string.stat_add : R.string.stat_edit);

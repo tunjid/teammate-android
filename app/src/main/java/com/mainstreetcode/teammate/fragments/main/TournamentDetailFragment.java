@@ -6,7 +6,6 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +80,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         Bundle args = getArguments();
         tournament = args.getParcelable(ARG_TOURNAMENT);
         competitor = args.getParcelable(ARG_COMPETITOR);
@@ -112,11 +110,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
         boolean hasPrivilegedRole = localRoleViewModel.hasPrivilegedRole();
         menu.findItem(R.id.action_edit).setVisible(hasPrivilegedRole);
         menu.findItem(R.id.action_delete).setVisible(hasPrivilegedRole);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_tournament_detail, menu);
     }
 
     @Override
@@ -169,6 +162,9 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_group_add_white_24dp; }
+
+    @Override
+    protected int getToolbarMenu() { return R.menu.fragment_tournament_detail; }
 
     @Override
     public boolean showsFab() {

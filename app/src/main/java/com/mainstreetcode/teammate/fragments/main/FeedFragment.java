@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +66,6 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         bottomBarState = new AtomicBoolean(true);
     }
 
@@ -107,11 +104,6 @@ public final class FeedFragment extends MainActivityFragment
     public void togglePersistentUi() {
         super.togglePersistentUi();
         onBoard();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_feed, menu);
     }
 
     @Override
@@ -169,6 +161,10 @@ public final class FeedFragment extends MainActivityFragment
             togglePersistentUi();
             showFragment(MediaDetailFragment.newInstance((Media) model));
         }
+    }
+
+    @Override protected int getToolbarMenu() {
+        return R.menu.fragment_feed;
     }
 
     @Override

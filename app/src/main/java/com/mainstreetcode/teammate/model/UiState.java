@@ -87,39 +87,39 @@ public final class UiState {
                      Consumer<CharSequence> altToolbarTitleConsumer,
                      Consumer<View.OnClickListener> fabClickListenerConsumer
     ) {
-        if (Objects.equals(fabIcon, newState.fabIcon)) fabIconConsumer.accept(newState.fabIcon);
-        if (Objects.equals(fabText, newState.fabText)) fabTextConsumer.accept(newState.fabText);
+        if (!Objects.equals(fabIcon, newState.fabIcon)) fabIconConsumer.accept(newState.fabIcon);
+        if (!Objects.equals(fabText, newState.fabText)) fabTextConsumer.accept(newState.fabText);
 
-        if (Objects.equals(toolBarMenu, newState.toolBarMenu))
+        if (!Objects.equals(toolBarMenu, newState.toolBarMenu))
             toolBarMenuConsumer.accept(newState.toolBarMenu);
 
-        if (Objects.equals(altToolBarMenu, newState.altToolBarMenu))
+        if (!Objects.equals(altToolBarMenu, newState.altToolBarMenu))
             altToolBarMenuConsumer.accept(newState.altToolBarMenu);
 
-        if (Objects.equals(showsFab, newState.showsFab)) showsFabConsumer.accept(newState.showsFab);
+        if (!Objects.equals(showsFab, newState.showsFab)) showsFabConsumer.accept(newState.showsFab);
 
-        if (Objects.equals(showsToolbar, newState.showsToolbar))
+        if (!Objects.equals(showsToolbar, newState.showsToolbar))
             showsToolbarConsumer.accept(newState.showsToolbar);
 
-        if (Objects.equals(showsAltToolbar, newState.showsAltToolbar))
+        if (!Objects.equals(showsAltToolbar, newState.showsAltToolbar))
             showsAltToolbarConsumer.accept(newState.showsAltToolbar);
 
-        if (Objects.equals(showsBottomNav, newState.showsBottomNav))
+        if (!Objects.equals(showsBottomNav, newState.showsBottomNav))
             showsBottomNavConsumer.accept(newState.showsBottomNav);
 
-        if (Objects.equals(showsSystemUI, newState.showsSystemUI))
+        if (!Objects.equals(showsSystemUI, newState.showsSystemUI))
             showsSystemUIConsumer.accept(newState.showsSystemUI);
 
-        if (Objects.equals(insetFlags, newState.insetFlags))
+        if (!Objects.equals(insetFlags, newState.insetFlags))
             insetFlagsConsumer.accept(newState.insetFlags);
 
-        if (Objects.equals(toolbarTitle, newState.toolbarTitle))
+        if (!Objects.equals(toolbarTitle, newState.toolbarTitle))
             toolbarTitleConsumer.accept(newState.toolbarTitle);
 
-        if (Objects.equals(altToolbarTitle, newState.altToolbarTitle))
+        if (!Objects.equals(altToolbarTitle, newState.altToolbarTitle))
             altToolbarTitleConsumer.accept(newState.altToolbarTitle);
 
-        if (Objects.equals(fabClickListener, newState.fabClickListener))
+        if (!Objects.equals(fabClickListener, newState.fabClickListener))
             fabClickListenerConsumer.accept(newState.fabClickListener);
     }
 }

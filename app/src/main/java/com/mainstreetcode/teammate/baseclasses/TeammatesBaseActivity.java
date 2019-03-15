@@ -16,19 +16,22 @@ import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
 import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.util.FabInteractor;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -145,7 +148,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             return true;
         });
 
-        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(item -> {
+            BaseFragment fragment = getCurrentFragment();
+            boolean selected = fragment != null && fragment.onOptionsItemSelected(item);
+            return selected || onOptionsItemSelected(item);
+        });
+
         getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -155,8 +163,47 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    public void invalidateOptionsMenu() {
+        super.invalidateOptionsMenu();
+        TeammatesBaseFragment fragment = getCurrentFragment();
+        if (fragment != null) fragment.onPrepareOptionsMenu(toolbar.getMenu());
+    }
+
+    @Override
     public TeammatesBaseFragment getCurrentFragment() {
         return (TeammatesBaseFragment) super.getCurrentFragment();
+    }
+
+    @Override
+    public void update(UiState state) {
+        AtomicInteger icon = new AtomicInteger();
+        AtomicInteger text = new AtomicInteger();
+        uiState.diff(state,
+                icon::set,
+                text::set,
+                this::setToolBarMenu,
+                this::setAltToolbarMenu,
+                this::toggleFab,
+                this::toggleToolbar,
+                this::toggleAltToolbar,
+                this::toggleBottombar,
+                this::toggleSystemUI,
+                insetFlag -> {},
+                this::setToolbarTitle,
+                this::setAltToolbarTitle,
+                this::setFabClickListener
+        );
+
+        int iconRes = icon.get();
+        int textRes = text.get();
+
+        if (iconRes != 0
+                && textRes != 0
+                && !Objects.equals(uiState.fabIcon, iconRes)
+                && !Objects.equals(uiState.fabText, textRes))
+            setFabIcon(iconRes, textRes);
+
+        uiState = state;
     }
 
     @Override
@@ -205,8 +252,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setToolbarTitle(CharSequence title) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setTitle(title);
+        toolbar.setTitle(title);
     }
 
     @Override
@@ -248,6 +294,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void setFabClickListener(@Nullable View.OnClickListener clickListener) {
         fabInteractor.setOnClickListener(clickListener);
+    }
+
+    protected void setToolBarMenu(@MenuRes int menu) {
+        toolbar.getMenu().clear();
+        if (menu != 0) toolbar.inflateMenu(menu);
     }
 
     public void onDialogDismissed() {

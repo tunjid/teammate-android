@@ -1,12 +1,8 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +16,10 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 
 public class GuestViewFragment extends HeaderedFragment<Guest> {
 
@@ -47,7 +47,6 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         guest = getArguments().getParcelable(ARG_GUEST);
         gofer = eventViewModel.gofer(guest);
     }
@@ -79,11 +78,6 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_guest_view, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_block) {
             blockUser(guest.getUser(), guest.getEvent().getTeam());
@@ -91,6 +85,9 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected int getToolbarMenu() { return R.menu.fragment_guest_view; }
 
     @Override
     protected CharSequence getToolbarTitle() {

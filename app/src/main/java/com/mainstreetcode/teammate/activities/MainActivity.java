@@ -41,7 +41,6 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -54,9 +53,6 @@ import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
-
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.MenuRes;
@@ -253,32 +249,6 @@ public class MainActivity extends TeammatesBaseActivity
         int padding = super.adjustKeyboardPadding(suggestion);
         if (padding != bottomInset) padding -= bottomNavHeight;
         return padding;
-    }
-
-    @Override
-    public void update(UiState state) {
-        AtomicInteger icon = new AtomicInteger();
-        AtomicInteger text = new AtomicInteger();
-        uiState.diff(state,
-                icon::set,
-                text::set,
-                menu -> {},
-                this::setAltToolbarMenu,
-                this::toggleFab,
-                this::toggleToolbar,
-                this::toggleAltToolbar,
-                this::toggleBottombar,
-                this::toggleSystemUI,
-                insetFlag -> {},
-                this::setToolbarTitle,
-                this::setAltToolbarTitle,
-                this::setFabClickListener
-        );
-
-        if (!Objects.equals(uiState.fabIcon, icon.get()) && !Objects.equals(uiState.fabText, text.get()))
-            setFabIcon(icon.get(), text.get());
-
-        uiState = state;
     }
 
     @Override

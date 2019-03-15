@@ -84,7 +84,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     public int[] staticViews() { return new int[]{}; }
 
     @StringRes
-    protected int getFabStringResource() { return R.string.add_competitor; }
+    protected int getFabStringResource() { return R.string.empty_string; }
 
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
@@ -179,7 +179,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected void onKeyBoardChanged(boolean appeared) {}
 
     public void togglePersistentUi() {
-        getPersistentUiController().update(fromFragment(this));
+        getPersistentUiController().update(fromThis());
     }
 
     @SuppressLint("CommitTransaction")
@@ -191,7 +191,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     @SuppressWarnings("WeakerAccess")
     protected PersistentUiController getPersistentUiController() {
         Activity activity = getActivity();
-        return activity == null ? DUMMY : ((PersistentUiController) activity);
+        return activity == null ? PersistentUiController.DUMMY : ((PersistentUiController) activity);
     }
 
     protected void hideKeyboard() {
@@ -202,72 +202,22 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
 
-    private static UiState fromFragment(TeammatesBaseFragment fragment) {
+    private UiState fromThis() {
         return new UiState(
-                fragment.getFabIconResource(),
-                fragment.getFabStringResource(),
-                fragment.getToolbarMenu(),
-                fragment.getAltToolbarMenu(),
-                fragment.showsFab(),
-                fragment.showsToolBar(),
-                fragment.showsAltToolBar(),
-                fragment.showsBottomNav(),
-                fragment.showsSystemUI(),
-                fragment.insetFlags(),
-                fragment.getToolbarTitle(),
-                fragment.getAltToolbarTitle(),
-                fragment
+                this.getFabIconResource(),
+                this.getFabStringResource(),
+                this.getToolbarMenu(),
+                this.getAltToolbarMenu(),
+                this.showsFab(),
+                this.showsToolBar(),
+                this.showsAltToolBar(),
+                this.showsBottomNav(),
+                this.showsSystemUI(),
+                this.insetFlags(),
+                this.getToolbarTitle(),
+                this.getAltToolbarTitle(),
+                this
         );
     }
 
-    private static final PersistentUiController DUMMY = new PersistentUiController() {
-
-        @Override
-        public void update(UiState state) { }
-
-        @Override
-        public void toggleToolbar(boolean show) {}
-
-        @Override
-        public void toggleAltToolbar(boolean show) {}
-
-        @Override
-        public void toggleBottombar(boolean show) {}
-
-        @Override
-        public void toggleFab(boolean show) {}
-
-        @Override
-        public void toggleProgress(boolean show) {}
-
-        @Override
-        public void toggleSystemUI(boolean show) {}
-
-        @Override
-        public void setFabIcon(int icon, int textRes) {}
-
-        @Override
-        public void setFabExtended(boolean expanded) {}
-
-        @Override
-        public void showSnackBar(CharSequence message) {}
-
-        @Override
-        public void showSnackBar(Consumer<Snackbar> consumer) {}
-
-        @Override
-        public void showChoices(Consumer<ChoiceBar> consumer) {}
-
-        @Override
-        public void setToolbarTitle(CharSequence title) {}
-
-        @Override
-        public void setAltToolbarTitle(CharSequence title) {}
-
-        @Override
-        public void setAltToolbarMenu(int menu) {}
-
-        @Override
-        public void setFabClickListener(View.OnClickListener clickListener) {}
-    };
 }
