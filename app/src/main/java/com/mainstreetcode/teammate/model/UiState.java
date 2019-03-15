@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 public final class UiState {
@@ -28,7 +29,7 @@ public final class UiState {
     private final InsetFlags insetFlags;
     private final CharSequence toolbarTitle;
     private final CharSequence altToolbarTitle;
-    private final View.OnClickListener fabClickListener;
+   @Nullable private final View.OnClickListener fabClickListener;
 
     public static UiState freshState() {
         return new UiState(
@@ -54,12 +55,13 @@ public final class UiState {
                    int altToolBarMenu,
                    boolean showsFab,
                    boolean showsToolbar,
-                   boolean showsAltToolbar, boolean showsBottomNav,
+                   boolean showsAltToolbar,
+                   boolean showsBottomNav,
                    boolean showsSystemUI,
                    InsetFlags insetFlags,
                    CharSequence toolbarTitle,
                    CharSequence altToolbarTitle,
-                   View.OnClickListener fabClickListener) {
+                   @Nullable View.OnClickListener fabClickListener) {
         this.fabIcon = fabIcon;
         this.fabText = fabText;
         this.toolBarMenu = toolBarMenu;
@@ -123,7 +125,6 @@ public final class UiState {
         if (!Objects.equals(altToolbarTitle, newState.altToolbarTitle))
             altToolbarTitleConsumer.accept(newState.altToolbarTitle);
 
-        if (!Objects.equals(fabClickListener, newState.fabClickListener))
-            fabClickListenerConsumer.accept(newState.fabClickListener);
+        fabClickListenerConsumer.accept(newState.fabClickListener);
     }
 }

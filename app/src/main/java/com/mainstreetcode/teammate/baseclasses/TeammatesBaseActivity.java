@@ -229,7 +229,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
-        if (icon != 0 && title != 0 && fabInteractor != null) fabInteractor.update(icon, title);
+        runOnUiThread(() -> {
+            if (icon != 0 && title != 0 && fabInteractor != null) fabInteractor.update(icon, title);
+        });
     }
 
     @Override

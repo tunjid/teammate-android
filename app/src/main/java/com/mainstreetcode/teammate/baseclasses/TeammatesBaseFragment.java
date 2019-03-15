@@ -214,7 +214,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
                 this.insetFlags(),
                 this.getToolbarTitle(),
                 this.getAltToolbarTitle(),
-                this
+                getView() == null ? null : this
         );
     }
 
