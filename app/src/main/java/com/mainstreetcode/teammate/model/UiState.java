@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.model;
 
 import android.view.View;
 
+import com.tunjid.androidbootstrap.functions.BiConsumer;
 import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
@@ -13,19 +14,21 @@ import androidx.annotation.StringRes;
 
 public final class UiState {
 
-    @DrawableRes public final int fabIcon;
-    @StringRes public final int fabText;
-    @MenuRes public final int toolBarMenu;
-    @MenuRes public final int altToolBarMenu;
+    @DrawableRes private final int fabIcon;
+    @StringRes private final int fabText;
+    @MenuRes private final int toolBarMenu;
+    @MenuRes private final int altToolBarMenu;
+
     public final boolean showsFab;
-    public final boolean showsToolbar;
-    public final boolean showsAltToolbar;
-    public final boolean showsBottomNav;
-    public final boolean showsSystemUI;
-    public final InsetFlags insetFlags;
-    public final CharSequence toolbarTitle;
-    public final CharSequence altToolbarTitle;
-    public final View.OnClickListener fabClickListener;
+    private final boolean showsToolbar;
+    private final boolean showsAltToolbar;
+    private final boolean showsBottomNav;
+    private final boolean showsSystemUI;
+
+    private final InsetFlags insetFlags;
+    private final CharSequence toolbarTitle;
+    private final CharSequence altToolbarTitle;
+    private final View.OnClickListener fabClickListener;
 
     public static UiState freshState() {
         return new UiState(
@@ -73,8 +76,7 @@ public final class UiState {
     }
 
     public void diff(UiState newState,
-                     Consumer<Integer> fabIconConsumer,
-                     Consumer<Integer> fabTextConsumer,
+                     BiConsumer<Integer, Integer> fabStateConsumer,
                      Consumer<Integer> toolBarMenuConsumer,
                      Consumer<Integer> altToolBarMenuConsumer,
                      Consumer<Boolean> showsFabConsumer,
@@ -87,8 +89,9 @@ public final class UiState {
                      Consumer<CharSequence> altToolbarTitleConsumer,
                      Consumer<View.OnClickListener> fabClickListenerConsumer
     ) {
-        if (!Objects.equals(fabIcon, newState.fabIcon)) fabIconConsumer.accept(newState.fabIcon);
-        if (!Objects.equals(fabText, newState.fabText)) fabTextConsumer.accept(newState.fabText);
+        if (!Objects.equals(fabIcon, newState.fabIcon)
+                || !Objects.equals(fabText, newState.fabText))
+            fabStateConsumer.accept(newState.fabIcon, newState.fabText);
 
         if (!Objects.equals(toolBarMenu, newState.toolBarMenu))
             toolBarMenuConsumer.accept(newState.toolBarMenu);
@@ -96,7 +99,8 @@ public final class UiState {
         if (!Objects.equals(altToolBarMenu, newState.altToolBarMenu))
             altToolBarMenuConsumer.accept(newState.altToolBarMenu);
 
-        if (!Objects.equals(showsFab, newState.showsFab)) showsFabConsumer.accept(newState.showsFab);
+        if (!Objects.equals(showsFab, newState.showsFab))
+            showsFabConsumer.accept(newState.showsFab);
 
         if (!Objects.equals(showsToolbar, newState.showsToolbar))
             showsToolbarConsumer.accept(newState.showsToolbar);

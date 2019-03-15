@@ -180,7 +180,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     private void onRoleUpdated(DiffUtil.DiffResult result) {
         viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
-        toggleFab(showsFab());
+        togglePersistentUi();
         toggleProgress(false);
         requireActivity().invalidateOptionsMenu();
         showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));

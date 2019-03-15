@@ -119,8 +119,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     @SuppressWarnings("WeakerAccess")
     protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
-    protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
-
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
     protected void showSnackbar(Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}

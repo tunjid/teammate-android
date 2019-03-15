@@ -83,18 +83,15 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.team_search_create; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_search_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() { return getString(R.string.my_teams); }
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}

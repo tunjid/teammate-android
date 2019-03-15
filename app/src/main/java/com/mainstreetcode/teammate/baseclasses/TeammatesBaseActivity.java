@@ -23,8 +23,6 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
@@ -160,6 +158,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             showSystemUI();
             setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
+        update(uiState);
     }
 
     @Override
@@ -176,11 +175,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void update(UiState state) {
-        AtomicInteger icon = new AtomicInteger();
-        AtomicInteger text = new AtomicInteger();
         uiState.diff(state,
-                icon::set,
-                text::set,
+                this::setFabIcon,
                 this::setToolBarMenu,
                 this::setAltToolbarMenu,
                 this::toggleFab,
@@ -193,15 +189,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 this::setAltToolbarTitle,
                 this::setFabClickListener
         );
-
-        int iconRes = icon.get();
-        int textRes = text.get();
-
-        if (iconRes != 0
-                && textRes != 0
-                && !Objects.equals(uiState.fabIcon, iconRes)
-                && !Objects.equals(uiState.fabText, textRes))
-            setFabIcon(iconRes, textRes);
 
         uiState = state;
     }
@@ -242,7 +229,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
-        if (fabInteractor != null) fabInteractor.update(icon, title);
+        if (icon != 0 && title != 0 && fabInteractor != null) fabInteractor.update(icon, title);
     }
 
     @Override
