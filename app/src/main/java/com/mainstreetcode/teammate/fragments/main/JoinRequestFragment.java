@@ -150,14 +150,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return gofer.getFabTitle(); }
 
@@ -166,13 +158,13 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public CharSequence getToolbarTitle() { return gofer.getToolbarTitle(this); }
 
     @Override
-    @SuppressWarnings("SimplifiableIfStatement")
-    public boolean showsFab() {
-        return gofer.showsFab();
-    }
+    public InsetFlags insetFlags() { return VERTICAL; }
+
+    @Override
+    public boolean showsFab() { return gofer.showsFab(); }
 
     @Override
     public void onImageClick() {}
@@ -238,9 +230,8 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     private void onJoinRequestSent(DiffUtil.DiffResult result) {
         scrollManager.onDiff(result);
         hideBottomSheet();
-        toggleFab(false);
         toggleProgress(false);
-        setToolbarTitle(gofer.getToolbarTitle(this));
+        togglePersistentUi();
         showSnackbar(getString(request.isTeamApproved()
                 ? R.string.user_invite_sent
                 : R.string.team_submitted_join_request));

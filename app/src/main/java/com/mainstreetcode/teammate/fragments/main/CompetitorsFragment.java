@@ -124,14 +124,6 @@ public final class CompetitorsFragment extends MainActivityFragment
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.add_tournament_competitors));
-    }
-
-    @Override
     protected void onKeyBoardChanged(boolean appeared) {
         super.onKeyBoardChanged(appeared);
         if (!appeared && isBottomSheetShowing()) hideBottomSheet();
@@ -140,6 +132,11 @@ public final class CompetitorsFragment extends MainActivityFragment
     @Override
     public boolean showsFab() {
         return !isBottomSheetShowing() && !competitors.isEmpty();
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.add_tournament_competitors);
     }
 
     @Override

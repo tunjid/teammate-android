@@ -122,20 +122,16 @@ public class StatEditFragment extends HeaderedFragment<Stat>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(stat.isEmpty() ? R.string.stat_add : R.string.stat_edit));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return stat.isEmpty() ? R.string.stat_create : R.string.stat_update; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override protected CharSequence getToolbarTitle() {
+        return getString(stat.isEmpty() ? R.string.stat_add : R.string.stat_edit);
+    }
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}

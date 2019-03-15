@@ -152,20 +152,17 @@ public class TeamMembersFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getTargetFragment() != null ? "" : getString(R.string.team_name_prefix, team.getName()));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.invite_user; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_group_add_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getTargetFragment() != null ? "" : getString(R.string.team_name_prefix, team.getName());
+    }
 
     @Override
     public boolean showsFab() {

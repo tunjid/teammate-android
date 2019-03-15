@@ -119,20 +119,17 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return tournament.isEmpty() ? R.string.tournament_create : R.string.tournament_update; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}

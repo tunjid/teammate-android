@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment;
 import com.mainstreetcode.teammate.fragments.registration.SplashFragment;
+import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 
 public class RegistrationActivity extends TeammatesBaseActivity {
@@ -63,6 +64,11 @@ public class RegistrationActivity extends TeammatesBaseActivity {
         Intent main = new Intent(activity, MainActivity.class);
         activity.startActivity(main);
         activity.finish();
+    }
+
+    @Override
+    public void update(UiState state) {
+
     }
 
     @Override

@@ -62,11 +62,10 @@ public class StatDetailFragment extends MainActivityFragment {
     }
 
     @Override
-    public void togglePersistentUi() {
-        setToolbarTitle(getString(R.string.tournament_stats));
-        super.togglePersistentUi();
-    }
+    public boolean showsFab() { return false; }
 
     @Override
-    public boolean showsFab() { return false; }
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.tournament_stats);
+    }
 }

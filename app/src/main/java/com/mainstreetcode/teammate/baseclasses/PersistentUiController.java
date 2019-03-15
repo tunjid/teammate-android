@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
+import com.mainstreetcode.teammate.model.UiState;
 import com.tunjid.androidbootstrap.functions.Consumer;
 
 import androidx.annotation.DrawableRes;
@@ -13,6 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 public interface PersistentUiController {
+
+    void update(UiState state);
+
     void toggleToolbar(boolean show);
 
     void toggleAltToolbar(boolean show);

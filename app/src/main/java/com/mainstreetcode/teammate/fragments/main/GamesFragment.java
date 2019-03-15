@@ -123,20 +123,14 @@ public final class GamesFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.games));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
-    protected int getFabStringResource() { return R.string.game_add; }
+    public int getFabStringResource() { return R.string.game_add; }
 
     @Override
     @DrawableRes
-    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+    public int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+
+    @Override public CharSequence getToolbarTitle() { return getString(R.string.games); }
 
     @Override
     public boolean showsFab() {

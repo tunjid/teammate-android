@@ -32,16 +32,10 @@ public class BlankBottomSheetFragment extends MainActivityFragment {
     protected void toggleSystemUI(boolean show) {}
 
     @Override
-    protected void toggleToolbar(boolean show) {}
-
-    @Override
     protected void toggleAltToolbar(boolean show) {}
 
     @Override
     protected void toggleBottombar(boolean show) {}
-
-    @Override
-    protected void toggleFab(boolean show) {}
 
     @Override
     protected void toggleProgress(boolean show) {}

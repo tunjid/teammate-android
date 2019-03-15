@@ -151,14 +151,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setToolbarTitle(getString(R.string.tournament_fixtures));
-        requireActivity().invalidateOptionsMenu();
-        super.togglePersistentUi();
-    }
-
-    @Override
     public void onDestroyView() {
         viewPager = null;
         tabLayout = null;
@@ -181,6 +173,11 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @Override
     public boolean showsFab() {
         return localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors();
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.tournament_fixtures);
     }
 
     @Override

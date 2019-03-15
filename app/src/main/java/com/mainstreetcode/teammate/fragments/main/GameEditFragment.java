@@ -95,14 +95,6 @@ public class GameEditFragment extends HeaderedFragment<Game>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(game.isEmpty() ? R.string.game_add : R.string.game_edit));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return game.isEmpty() ? R.string.game_create : R.string.game_update; }
 
@@ -111,10 +103,15 @@ public class GameEditFragment extends HeaderedFragment<Game>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() { return VERTICAL; }
 
     @Override
-    public boolean showsFab() {return gofer.canEdit() && !isBottomSheetShowing();}
+    protected CharSequence getToolbarTitle() {
+        return getString(game.isEmpty() ? R.string.game_add : R.string.game_edit);
+    }
+
+    @Override
+    public boolean showsFab() { return gofer.canEdit() && !isBottomSheetShowing(); }
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}

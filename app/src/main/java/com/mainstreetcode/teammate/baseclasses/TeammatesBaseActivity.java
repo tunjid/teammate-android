@@ -13,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
+import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.util.FabInteractor;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
 import com.tunjid.androidbootstrap.functions.Consumer;
@@ -86,6 +87,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ViewHider fabHider;
     private ViewHider toolbarHider;
     private FabInteractor fabInteractor;
+
+    protected UiState uiState = UiState.freshState();
 
     private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
 

@@ -84,8 +84,6 @@ public final class TeamsFragment extends MainActivityFragment
 
     @Override
     public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
         if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
         super.togglePersistentUi();
     }

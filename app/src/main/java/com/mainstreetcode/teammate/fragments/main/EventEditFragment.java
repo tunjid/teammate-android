@@ -180,14 +180,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return event.isEmpty() ? R.string.event_create : R.string.event_update; }
 
@@ -197,6 +189,11 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
 
     @Override
     public boolean showsFab() { return !isBottomSheetShowing() && gofer.hasPrivilegedRole(); }

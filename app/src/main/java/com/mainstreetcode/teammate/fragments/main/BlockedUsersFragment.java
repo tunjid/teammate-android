@@ -101,15 +101,13 @@ public final class BlockedUsersFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.blocked_users_title, team.getName()));
+    public boolean showsFab() {
+        return false;
     }
 
     @Override
-    public boolean showsFab() {
-        return false;
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.blocked_users_title, team.getName());
     }
 
     @Override

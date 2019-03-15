@@ -120,20 +120,17 @@ public final class TournamentsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.tournaments));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.tournament_add; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.tournaments);
+    }
 
     @Override
     public boolean showsFab() {

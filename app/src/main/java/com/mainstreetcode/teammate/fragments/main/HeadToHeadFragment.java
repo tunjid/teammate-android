@@ -119,13 +119,6 @@ public class HeadToHeadFragment extends MainActivityFragment
     public boolean showsFab() { return false; }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-    }
-
-    @Override
     protected void onKeyBoardChanged(boolean appeared) {
         super.onKeyBoardChanged(appeared);
         if (!appeared && isBottomSheetShowing()) hideBottomSheet();

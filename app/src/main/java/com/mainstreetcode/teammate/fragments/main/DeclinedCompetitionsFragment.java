@@ -75,12 +75,15 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchCompetitions(true);
-        setToolbarTitle(getString(R.string.competitors_declined));
     }
 
     @Override
     public boolean showsFab() { return false; }
 
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.competitors_declined);
+    }
 
     @Override
     public void onCompetitorClicked(Competitor competitor) {

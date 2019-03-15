@@ -140,13 +140,6 @@ public class EventSearchFragment extends MainActivityFragment {
     public InsetFlags insetFlags() {return NONE;}
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.event_my_location; }
 

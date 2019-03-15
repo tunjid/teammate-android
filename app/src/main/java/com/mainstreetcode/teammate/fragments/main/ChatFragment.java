@@ -150,14 +150,13 @@ public class ChatFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setToolbarTitle(getString(R.string.team_chat_title, team.getName()));
+    public boolean showsFab() {
+        return false;
     }
 
     @Override
-    public boolean showsFab() {
-        return false;
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.team_chat_title, team.getName());
     }
 
     @Override

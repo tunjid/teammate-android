@@ -88,12 +88,16 @@ public final class MyEventsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
-        setToolbarTitle(getString(R.string.attending_events));
     }
 
     @Override
     public boolean showsFab() {
         return false;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.attending_events);
     }
 
     @Override

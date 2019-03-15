@@ -3,12 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.FeedAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
@@ -28,7 +23,6 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -41,6 +35,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Single;
 
 import static com.google.android.material.snackbar.Snackbar.Callback.DISMISS_EVENT_MANUAL;
@@ -95,7 +94,6 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(userViewModel.getCurrentUser());
     }
 
     @Override
@@ -109,7 +107,6 @@ public final class FeedFragment extends MainActivityFragment
     public void togglePersistentUi() {
         super.togglePersistentUi();
         onBoard();
-        setToolbarTitle(userViewModel.getCurrentUser());
     }
 
     @Override
@@ -169,16 +166,21 @@ public final class FeedFragment extends MainActivityFragment
         }
         else if (model instanceof Media) {
             bottomBarState.set(false);
-            toggleBottombar(false);
+            togglePersistentUi();
             showFragment(MediaDetailFragment.newInstance((Media) model));
         }
     }
 
     @Override
-    public boolean showsFab() {return false;}
+    public boolean showsFab() { return false; }
 
     @Override
-    public boolean showsBottomNav() {return bottomBarState.get();}
+    public boolean showsBottomNav() { return bottomBarState.get(); }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.home_greeting, getTimeOfDay(), userViewModel.getCurrentUser().getFirstName());
+    }
 
     @Override
     @Nullable
@@ -238,10 +240,6 @@ public final class FeedFragment extends MainActivityFragment
         scrollManager.updateForEmptyList(ListState.of(
                 isOnATeam ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
                 isOnATeam ? R.string.no_feed : R.string.no_team_feed));
-    }
-
-    private void setToolbarTitle(User user) {
-        setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName()));
     }
 
     private void onBoard() {

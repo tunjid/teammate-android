@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -80,49 +81,51 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         return InsetFlags.VERTICAL;
     }
 
-    public int[] staticViews() {
-        return new int[]{};
-    }
+    public int[] staticViews() { return new int[]{}; }
 
-    public boolean showsFab() {return false;}
+    @StringRes
+    protected int getFabStringResource() { return R.string.add_competitor; }
 
-    public boolean showsToolBar() {return true;}
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
-    public boolean showsBottomNav() {return true;}
+    @MenuRes
+    protected int getToolbarMenu() { return 0; }
+
+    @MenuRes
+    protected int getAltToolbarMenu() { return 0; }
+
+    public boolean showsFab() { return false; }
+
+    public boolean showsToolBar() { return true; }
+
+    public boolean showsAltToolBar() { return false; }
+
+    public boolean showsBottomNav() { return true; }
+
+    protected boolean showsSystemUI() { return true; }
+
+    protected CharSequence getToolbarTitle() { return ""; }
+
+    protected CharSequence getAltToolbarTitle() { return ""; }
 
     @Override
     public void onClick(View v) {}
 
     protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
 
-    protected void toggleToolbar(boolean show) {getPersistentUiController().toggleToolbar(show);}
-
-    protected void toggleAltToolbar(boolean show) {getPersistentUiController().toggleAltToolbar(show);}
-
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
-
-    protected void toggleSystemUI(boolean show) {getPersistentUiController().toggleSystemUI(show);}
-
-    protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
-
-    protected void updateFabIcon() {getPersistentUiController().setFabIcon(getFabIconResource(), getFabStringResource());}
 
     @SuppressWarnings("WeakerAccess")
     protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
     protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
 
-    protected void setAltToolbarTitle(CharSequence title) {getPersistentUiController().setAltToolbarTitle(title);}
-
-    protected void setAltToolbarMenu(@MenuRes int menu) {getPersistentUiController().setAltToolbarMenu(menu);}
-
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
     protected void showSnackbar(Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}
 
     protected void showChoices(Consumer<ChoiceBar> consumer) {getPersistentUiController().showChoices(consumer);}
-
-    protected void setFabClickListener(@Nullable View.OnClickListener clickListener) {getPersistentUiController().setFabClickListener(clickListener);}
 
     @Nullable
     @Override
@@ -132,12 +135,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
     }
-
-    @StringRes
-    protected int getFabStringResource() { return R.string.add_competitor; }
-
-    @DrawableRes
-    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -182,11 +179,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected void onKeyBoardChanged(boolean appeared) {}
 
     public void togglePersistentUi() {
-        toggleFab(showsFab());
-        toggleSystemUI(true);
-        toggleToolbar(showsToolBar());
-        toggleBottombar(showsBottomNav());
-        setFabClickListener(this);
+        getPersistentUiController().update(fromFragment(this));
     }
 
     @SuppressLint("CommitTransaction")
@@ -209,7 +202,29 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
 
+    private static UiState fromFragment(TeammatesBaseFragment fragment) {
+        return new UiState(
+                fragment.getFabIconResource(),
+                fragment.getFabStringResource(),
+                fragment.getToolbarMenu(),
+                fragment.getAltToolbarMenu(),
+                fragment.showsFab(),
+                fragment.showsToolBar(),
+                fragment.showsAltToolBar(),
+                fragment.showsBottomNav(),
+                fragment.showsSystemUI(),
+                fragment.insetFlags(),
+                fragment.getToolbarTitle(),
+                fragment.getAltToolbarTitle(),
+                fragment
+        );
+    }
+
     private static final PersistentUiController DUMMY = new PersistentUiController() {
+
+        @Override
+        public void update(UiState state) { }
+
         @Override
         public void toggleToolbar(boolean show) {}
 

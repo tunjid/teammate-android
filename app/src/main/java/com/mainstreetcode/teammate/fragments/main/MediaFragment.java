@@ -49,6 +49,7 @@ public class MediaFragment extends MainActivityFragment
     private Team team;
     private List<Differentiable> items;
     private AtomicBoolean bottomBarState;
+    private AtomicBoolean altToolBarState;
 
     public static MediaFragment newInstance(Team team) {
         MediaFragment fragment = new MediaFragment();
@@ -78,6 +79,7 @@ public class MediaFragment extends MainActivityFragment
         team = getArguments().getParcelable(ARG_TEAM);
         items = mediaViewModel.getModelList(team);
         bottomBarState = new AtomicBoolean();
+        altToolBarState = new AtomicBoolean();
 
         ImageWorkerFragment.attach(this);
     }
@@ -112,21 +114,27 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setAltToolbarMenu(R.menu.fragment_media_context);
-        setToolbarTitle(getString(R.string.media_title, team.getName()));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.media_add; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+
+    @Override
+    protected int getAltToolbarMenu() {
+        return R.menu.fragment_media_context;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.media_title, team.getName());
+    }
+
+    @Override
+    protected CharSequence getAltToolbarTitle() {
+        return getString(R.string.multi_select, mediaViewModel.getNumSelected(team));
+    }
 
     private void fetchMedia(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
@@ -168,10 +176,15 @@ public class MediaFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean showsFab() {return true;}
+    public boolean showsFab() { return true; }
 
     @Override
-    public boolean showsBottomNav() {return bottomBarState.get();}
+    public boolean showsAltToolBar() {
+        return altToolBarState.get();
+    }
+
+    @Override
+    public boolean showsBottomNav() { return bottomBarState.get(); }
 
     @Override
     public void onClick(View v) {
@@ -207,7 +220,7 @@ public class MediaFragment extends MainActivityFragment
         if (mediaViewModel.hasSelections(team)) longClickMedia(item);
         else {
             bottomBarState.set(false);
-            toggleBottombar(false);
+            togglePersistentUi();
             showFragment(MediaDetailFragment.newInstance(item));
         }
     }
@@ -253,8 +266,8 @@ public class MediaFragment extends MainActivityFragment
     }
 
     private void toggleContextMenu(boolean show) {
-        setAltToolbarTitle(getString(R.string.multi_select, mediaViewModel.getNumSelected(team)));
-        toggleAltToolbar(show);
+        altToolBarState.set(show);
+        togglePersistentUi();
     }
 
     private void longClickMedia(Media media) {

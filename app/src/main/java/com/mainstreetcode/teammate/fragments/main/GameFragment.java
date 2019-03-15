@@ -185,15 +185,6 @@ public final class GameFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.game_stats));
-        requireActivity().invalidateOptionsMenu();
-        super.togglePersistentUi();
-    }
-
-    @Override
     protected void onKeyBoardChanged(boolean appeared) {
         super.onKeyBoardChanged(appeared);
         if (!appeared && isBottomSheetShowing()) hideBottomSheet();
@@ -204,6 +195,11 @@ public final class GameFragment extends MainActivityFragment
 
     @Override @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.game_stats);
+    }
 
     @Override
     public boolean showsFab() {

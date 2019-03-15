@@ -118,14 +118,6 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.events_title, team.getName()));
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.event_add; }
 
@@ -136,6 +128,11 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public boolean showsFab() {
         return localRoleViewModel.hasPrivilegedRole();
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.events_title, team.getName());
     }
 
     @Override

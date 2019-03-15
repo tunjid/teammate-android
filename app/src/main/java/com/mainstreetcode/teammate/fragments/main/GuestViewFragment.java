@@ -93,9 +93,8 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public void togglePersistentUi() {
-        setToolbarTitle(getString(R.string.event_guest));
-        super.togglePersistentUi();
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.event_guest);
     }
 
     @Override
