@@ -33,8 +33,8 @@ public class ViewHolder {
     ViewHolder(View view, Runnable swipeRunnable) {
         this.swipeRunnable = swipeRunnable;
         itemView = view;
-        title = view.findViewById(R.id.title);
-        icon = view.findViewById(R.id.icon);
+        title = view.findViewById(R.id.item_title);
+        icon = view.findViewById(R.id.thumbnail);
         icon.setDisableCircularTransformation(true);
         callback = new ImageCallback(this);
 
