@@ -55,7 +55,6 @@ import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import androidx.annotation.IdRes;
-import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -239,21 +238,14 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    public void setAltToolbarMenu(@MenuRes int menu) {
-        if (menu == 0) return;
-        altToolbar.getMenu().clear();
-        altToolbar.inflateMenu(menu);
+    public void updateAltToolbar(int menu, CharSequence title) {
+        updateToolBar(altToolbar, menu, title);
     }
 
     @Override protected int adjustKeyboardPadding(int suggestion) {
         int padding = super.adjustKeyboardPadding(suggestion);
         if (padding != bottomInset) padding -= bottomNavHeight;
         return padding;
-    }
-
-    @Override
-    public void setAltToolbarTitle(CharSequence title) {
-        altToolbar.setTitle(title);
     }
 
     @Override

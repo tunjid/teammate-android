@@ -31,15 +31,13 @@ public interface PersistentUiController {
 
     void setFabIcon(@DrawableRes int icon, @StringRes int textRes);
 
+    void updateMainToolBar(@MenuRes int menu, CharSequence title);
+
+    void updateAltToolbar(@MenuRes int menu, CharSequence title);
+
     void setFabExtended(boolean expanded);
 
     void showSnackBar(CharSequence message);
-
-    void setToolbarTitle(CharSequence title);
-
-    void setAltToolbarTitle(CharSequence title);
-
-    void setAltToolbarMenu(@MenuRes int menu);
 
     void showSnackBar(Consumer<Snackbar> consumer);
 
@@ -77,6 +75,12 @@ public interface PersistentUiController {
         public void setFabExtended(boolean expanded) {}
 
         @Override
+        public void updateMainToolBar(int menu, CharSequence title) {}
+
+        @Override
+        public void updateAltToolbar(int menu, CharSequence title) {}
+
+        @Override
         public void showSnackBar(CharSequence message) {}
 
         @Override
@@ -84,15 +88,6 @@ public interface PersistentUiController {
 
         @Override
         public void showChoices(Consumer<ChoiceBar> consumer) {}
-
-        @Override
-        public void setToolbarTitle(CharSequence title) {}
-
-        @Override
-        public void setAltToolbarTitle(CharSequence title) {}
-
-        @Override
-        public void setAltToolbarMenu(int menu) {}
 
         @Override
         public void setFabClickListener(View.OnClickListener clickListener) {}

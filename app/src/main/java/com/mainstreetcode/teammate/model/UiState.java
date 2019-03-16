@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.tunjid.androidbootstrap.functions.BiConsumer;
 import com.tunjid.androidbootstrap.functions.Consumer;
+import com.tunjid.androidbootstrap.functions.Function;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.Objects;
@@ -29,7 +30,7 @@ public final class UiState {
     private final InsetFlags insetFlags;
     private final CharSequence toolbarTitle;
     private final CharSequence altToolbarTitle;
-   @Nullable private final View.OnClickListener fabClickListener;
+    @Nullable private final View.OnClickListener fabClickListener;
 
     public static UiState freshState() {
         return new UiState(
@@ -78,28 +79,21 @@ public final class UiState {
     }
 
     public void diff(UiState newState,
-                     BiConsumer<Integer, Integer> fabStateConsumer,
-                     Consumer<Integer> toolBarMenuConsumer,
-                     Consumer<Integer> altToolBarMenuConsumer,
                      Consumer<Boolean> showsFabConsumer,
                      Consumer<Boolean> showsToolbarConsumer,
                      Consumer<Boolean> showsAltToolbarConsumer,
                      Consumer<Boolean> showsBottomNavConsumer,
                      Consumer<Boolean> showsSystemUIConsumer,
                      Consumer<InsetFlags> insetFlagsConsumer,
-                     Consumer<CharSequence> toolbarTitleConsumer,
-                     Consumer<CharSequence> altToolbarTitleConsumer,
+                     BiConsumer<Integer, Integer> fabStateConsumer,
+                     BiConsumer<Integer, CharSequence> toolbarStateConsumer,
+                     BiConsumer<Integer, CharSequence> altToolbarStateConsumer,
                      Consumer<View.OnClickListener> fabClickListenerConsumer
     ) {
-        if (!Objects.equals(fabIcon, newState.fabIcon)
-                || !Objects.equals(fabText, newState.fabText))
-            fabStateConsumer.accept(newState.fabIcon, newState.fabText);
 
-        if (!Objects.equals(toolBarMenu, newState.toolBarMenu))
-            toolBarMenuConsumer.accept(newState.toolBarMenu);
-
-        if (!Objects.equals(altToolBarMenu, newState.altToolBarMenu))
-            altToolBarMenuConsumer.accept(newState.altToolBarMenu);
+        either(newState, state -> state.fabIcon, state -> state.fabText, fabStateConsumer);
+        either(newState, state -> state.toolBarMenu, state -> state.toolbarTitle, toolbarStateConsumer);
+        either(newState, state -> state.altToolBarMenu, state -> state.altToolbarTitle, altToolbarStateConsumer);
 
         if (!Objects.equals(showsFab, newState.showsFab))
             showsFabConsumer.accept(newState.showsFab);
@@ -119,12 +113,19 @@ public final class UiState {
         if (!Objects.equals(insetFlags, newState.insetFlags))
             insetFlagsConsumer.accept(newState.insetFlags);
 
-        if (!Objects.equals(toolbarTitle, newState.toolbarTitle))
-            toolbarTitleConsumer.accept(newState.toolbarTitle);
-
-        if (!Objects.equals(altToolbarTitle, newState.altToolbarTitle))
-            altToolbarTitleConsumer.accept(newState.altToolbarTitle);
-
         fabClickListenerConsumer.accept(newState.fabClickListener);
+    }
+
+    private <S, T> void either(UiState that,
+                               Function<UiState, S> first,
+                               Function<UiState, T> second,
+                               BiConsumer<S, T> biConsumer) {
+        S thisFirst = first.apply(this);
+        S thatFirst = first.apply(that);
+        T thisSecond = second.apply(this);
+        T thatSecond = second.apply(that);
+
+        if (!Objects.equals(thisFirst, thatFirst) || !Objects.equals(thisSecond, thatSecond))
+            biConsumer.accept(thatFirst, thatSecond);
     }
 }

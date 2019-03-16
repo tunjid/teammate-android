@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 
 import com.google.android.material.button.MaterialButton;
@@ -26,7 +27,6 @@ import java.util.List;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
-import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -176,22 +176,28 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void update(UiState state) {
         uiState.diff(state,
-                this::setFabIcon,
-                this::setToolBarMenu,
-                this::setAltToolbarMenu,
                 this::toggleFab,
                 this::toggleToolbar,
                 this::toggleAltToolbar,
                 this::toggleBottombar,
                 this::toggleSystemUI,
                 insetFlag -> {},
-                this::setToolbarTitle,
-                this::setAltToolbarTitle,
+                this::setFabIcon,
+                this::updateMainToolBar,
+                this::updateAltToolbar,
                 this::setFabClickListener
         );
 
         uiState = state;
     }
+
+    @Override
+    public void updateMainToolBar(int menu, CharSequence title) {
+        updateToolBar(toolbar, menu, title);
+    }
+
+    @Override
+    public void updateAltToolbar(int menu, CharSequence title) { }
 
     @Override
     public void toggleToolbar(boolean show) {
@@ -240,17 +246,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
-    public void setToolbarTitle(CharSequence title) {
-        toolbar.setTitle(title);
-    }
-
-    @Override
-    public void setAltToolbarTitle(CharSequence title) {}
-
-    @Override
-    public void setAltToolbarMenu(int menu) {}
-
-    @Override
     public void showSnackBar(CharSequence message) {
         Snackbar snackbar = Snackbar.make(coordinatorLayout, message, LENGTH_LONG);
 
@@ -285,11 +280,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         fabInteractor.setOnClickListener(clickListener);
     }
 
-    protected void setToolBarMenu(@MenuRes int menu) {
-        toolbar.getMenu().clear();
-        if (menu != 0) toolbar.inflateMenu(menu);
-    }
-
     public void onDialogDismissed() {
         TeammatesBaseFragment fragment = getCurrentFragment();
         boolean showFab = fragment != null && fragment.showsFab();
@@ -304,6 +294,15 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     protected int adjustKeyboardPadding(int suggestion) {
         return suggestion - bottomInset;
+    }
+
+    protected void updateToolBar(Toolbar toolbar, int menu, CharSequence title) {
+        toolbar.animate().alpha(0).setDuration(200).withEndAction(() -> {
+            toolbar.setTitle(title);
+            toolbar.getMenu().clear();
+            if (menu != 0) toolbar.inflateMenu(menu);
+            toolbar.animate().setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).start();
+        }).start();
     }
 
     protected void clearTransientBars() {
