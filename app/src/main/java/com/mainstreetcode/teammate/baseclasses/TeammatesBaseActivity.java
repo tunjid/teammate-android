@@ -5,10 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -32,7 +29,6 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -58,6 +54,7 @@ import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOOLBAR_ANIM_DELAY;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
@@ -169,8 +166,10 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     public void invalidateOptionsMenu() {
         super.invalidateOptionsMenu();
-        TeammatesBaseFragment fragment = getCurrentFragment();
-        if (fragment != null) fragment.onPrepareOptionsMenu(toolbar.getMenu());
+        toolbar.postDelayed(() -> {
+            TeammatesBaseFragment fragment = getCurrentFragment();
+            if (fragment != null) fragment.onPrepareOptionsMenu(toolbar.getMenu());
+        }, TOOLBAR_ANIM_DELAY);
     }
 
     @Override
@@ -180,7 +179,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void update(UiState state) {
-        runOnUiThread(() -> uiState = uiState.diff(state,
+        uiState = uiState.diff(state,
                 this::toggleFab,
                 this::toggleToolbar,
                 this::toggleAltToolbar,
@@ -191,7 +190,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 this::updateMainToolBar,
                 this::updateAltToolbar,
                 this::setFabClickListener
-        ));
+        );
     }
 
     @Override

@@ -26,7 +26,7 @@ import io.reactivex.processors.PublishProcessor;
 
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
-    private static final Team defaultTeam = Team.empty();
+    private final Team defaultTeam = Team.empty();
     static final List<Differentiable> teams = Lists.transform(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepository repository;

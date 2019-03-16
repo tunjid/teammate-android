@@ -70,6 +70,7 @@ public class ViewHolderUtil extends ViewUtil {
     public static final int BLOCKED_USER = 301;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
+    public static final int TOOLBAR_ANIM_DELAY = 200;
     private static final int DEFAULT_STROKE_VALUE = -1;
 
     public static Function<CharSequence, CharSequence> allowsSpecialCharacters =
@@ -110,7 +111,7 @@ public class ViewHolderUtil extends ViewUtil {
     public static void updateToolBar(Toolbar toolbar, int menu, CharSequence title) {
         int childCount = toolbar.getChildCount();
 
-        if (toolbar.getId() == R.id.alt_toolbar || childCount < 2) {
+        if (toolbar.getId() == R.id.alt_toolbar || childCount <= 2) {
             toolbar.setTitle(title);
             replaceMenu(toolbar, menu);
         }
@@ -118,10 +119,10 @@ public class ViewHolderUtil extends ViewUtil {
             View child = toolbar.getChildAt(i);
             if (child instanceof ImageView) continue;
 
-            child.animate().alpha(0).setDuration(200).withEndAction(() -> {
+            child.animate().alpha(0).setDuration(TOOLBAR_ANIM_DELAY).withEndAction(() -> {
                 if (child instanceof TextView) toolbar.setTitle(title);
                 else if (child instanceof ActionMenuView) replaceMenu(toolbar, menu);
-                child.animate().setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).start();
+                child.animate().setDuration(TOOLBAR_ANIM_DELAY).setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).start();
             }).start();
         }
     }
