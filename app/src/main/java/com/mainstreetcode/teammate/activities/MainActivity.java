@@ -50,7 +50,6 @@ import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.util.nav.BottomNav;
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
 import com.mainstreetcode.teammate.util.nav.NavItem;
-import com.mainstreetcode.teammate.util.nav.ViewHolder;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
@@ -165,7 +164,7 @@ public class MainActivity extends TeammatesBaseActivity
                         NavItem.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
                         NavItem.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
                         NavItem.create(R.id.action_media, R.string.media, R.drawable.ic_video_library_black_24dp),
-                        NavItem.create(R.id.action_team, R.string.my_teams, R.drawable.ic_group_black_24dp))
+                        NavItem.create(R.id.action_tournaments, R.string.tourneys, R.drawable.ic_trophy_white_24dp))
                 .createBottomNav();
 
         if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
@@ -213,14 +212,11 @@ public class MainActivity extends TeammatesBaseActivity
         super.onResume();
         TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
 
-        disposables.add(teamViewModel.getTeamChangeFlowable().subscribe(team -> {
-            ViewHolder viewHolder = bottomNav.getViewHolder(R.id.action_team);
-            if (viewHolder != null) viewHolder.setImageUrl(team.getImageUrl());
-            disposables.add(ViewHolderUtil.fetchRoundedDrawable(this,
-                    team.getImageUrl(),
-                    getResources().getDimensionPixelSize(R.dimen.double_margin))
-                    .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
-        }, ErrorHandler.EMPTY));
+        disposables.add(teamViewModel.getTeamChangeFlowable()
+                .flatMapSingle(team -> ViewHolderUtil.fetchRoundedDrawable(this,
+                        team.getImageUrl(),
+                        getResources().getDimensionPixelSize(R.dimen.double_margin)))
+                .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
     }
 
     @Override

@@ -112,8 +112,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     @Override
     public void onClick(View v) {}
 
-    protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
-
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
 
     @SuppressWarnings("WeakerAccess")
@@ -199,6 +197,8 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         InputMethodManager imm = (InputMethodManager) root.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
+
+    private void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
 
     private UiState fromThis() {
         return new UiState(

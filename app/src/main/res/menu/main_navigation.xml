@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_tournaments"
+        android:id="@+id/action_team"
         android:enabled="true"
         android:icon="@drawable/ic_trophy_white_24dp"
-        android:title="@string/tournaments"
+        android:title="@string/my_teams"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_games"

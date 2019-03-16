@@ -94,15 +94,13 @@ public final class TeamsFragment extends MainActivityFragment
     protected CharSequence getToolbarTitle() { return getString(R.string.my_teams); }
 
     @Override
-    public int[] staticViews() {return EXCLUDED_VIEWS;}
+    public int[] staticViews() { return EXCLUDED_VIEWS; }
 
     @Override
-    public boolean showsBottomNav() {return true;}
+    public boolean showsBottomNav() { return true; }
 
     @Override
-    public boolean showsFab() {
-        return !isTeamPicker();
-    }
+    public boolean showsFab() { return !isTeamPicker() || roles.isEmpty(); }
 
     @Override
     @SuppressWarnings("ConstantConditions")
@@ -130,9 +128,8 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
-        boolean isEmpty = roles.isEmpty();
-        if (isTeamPicker()) toggleFab(isEmpty);
         scrollManager.onDiff(result);
+        togglePersistentUi();
     }
 
     private boolean isTeamPicker() {
@@ -166,6 +163,8 @@ public final class TeamsFragment extends MainActivityFragment
                 return R.string.no_team_chat;
             case R.id.request_media_team_pick:
                 return R.string.no_team_media;
+            case R.id.request_tournament_team_pick:
+                return R.string.no_team_tournament;
             default:
                 return R.string.no_team;
         }
