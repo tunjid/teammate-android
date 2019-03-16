@@ -4,11 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.core.view.ViewCompat;
 import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
@@ -31,6 +26,11 @@ import com.tunjid.androidbootstrap.core.text.SpanBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.view.ViewCompat;
 import io.reactivex.Completable;
 
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
@@ -90,20 +90,16 @@ public class SignUpFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.sign_up));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.submit; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override protected CharSequence getToolbarTitle() {
+        return getString(R.string.sign_up);
+    }
 
     @Override
     public void onDestroyView() {

@@ -89,19 +89,17 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return team.isEmpty() ? R.string.team_create : R.string.team_update; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}
@@ -140,8 +138,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     protected void onPrepComplete() {
         scrollManager.notifyDataSetChanged();
-        toggleFab(showsFab());
-        setToolbarTitle(gofer.getToolbarTitle(this));
+        togglePersistentUi();
         super.onPrepComplete();
     }
 

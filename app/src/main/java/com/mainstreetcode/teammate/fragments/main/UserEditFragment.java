@@ -76,20 +76,17 @@ public class UserEditFragment extends HeaderedFragment<User>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(canEdit() ? R.string.user_edit : R.string.user_info));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.user_update; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(canEdit() ? R.string.user_edit : R.string.user_info);
+    }
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}

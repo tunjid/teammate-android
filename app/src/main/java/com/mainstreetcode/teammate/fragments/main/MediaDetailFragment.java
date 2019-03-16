@@ -3,8 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +16,8 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Media;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -30,6 +30,7 @@ public class MediaDetailFragment extends MainActivityFragment
 
     private Media media;
     private MediaViewHolder mediaViewHolder;
+    private AtomicBoolean systemUiStatus;
 
     public static MediaDetailFragment newInstance(Media media) {
         MediaDetailFragment fragment = new MediaDetailFragment();
@@ -52,8 +53,8 @@ public class MediaDetailFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         media = getArguments().getParcelable(ARG_MEDIA);
+        systemUiStatus = new AtomicBoolean();
     }
 
     @Nullable
@@ -69,12 +70,6 @@ public class MediaDetailFragment extends MainActivityFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         disposables.add(mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_media_detail, menu);
     }
 
     @Override
@@ -105,12 +100,6 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setToolbarTitle("");
-    }
-
-    @Override
     public void onPause() {
         if (mediaViewHolder != null) mediaViewHolder.unBind();
         super.onPause();
@@ -123,16 +112,22 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public InsetFlags insetFlags() {return NONE;}
+    protected int getToolbarMenu() { return R.menu.fragment_media_detail; }
 
     @Override
-    public boolean showsFab() {return false;}
+    public InsetFlags insetFlags() { return NONE; }
 
     @Override
-    public boolean showsBottomNav() {return false;}
+    public boolean showsFab() { return false; }
 
     @Override
-    public boolean showsToolBar() {return true;}
+    public boolean showsBottomNav() { return false; }
+
+    @Override
+    public boolean showsToolBar() { return true; }
+
+    @Override
+    protected boolean showsSystemUI() { return systemUiStatus.get(); }
 
     @Override
     public void onMediaClicked(Media item) {
@@ -141,7 +136,8 @@ public class MediaDetailFragment extends MainActivityFragment
 
         int visibility = activity.getWindow().getDecorView().getSystemUiVisibility();
         boolean status = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-        toggleSystemUI(status);
+        systemUiStatus.set(status);
+        togglePersistentUi();
     }
 
     @Override

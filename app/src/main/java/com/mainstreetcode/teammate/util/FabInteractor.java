@@ -50,7 +50,7 @@ public class FabInteractor extends FabExtensionAnimator {
         private final CharSequence charSequence;
         private final Drawable drawable;
 
-        public State(MaterialButton button, @DrawableRes int icon, @StringRes int text) {
+        State(MaterialButton button, @DrawableRes int icon, @StringRes int text) {
             this.icon = icon;
             this.text = text;
             this.charSequence = button.getResources().getText(text);

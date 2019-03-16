@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +59,6 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         role = getArguments().getParcelable(ARG_ROLE);
         gofer = teamMemberViewModel.gofer(role);
     }
@@ -94,17 +92,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_user_edit, menu);
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.role_edit));
-        super.togglePersistentUi();
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_user_edit; }
 
     @Override
     @StringRes
@@ -113,6 +101,11 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.role_edit);
+    }
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}
@@ -187,7 +180,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     private void onRoleUpdated(DiffUtil.DiffResult result) {
         viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
-        toggleFab(showsFab());
+        togglePersistentUi();
         toggleProgress(false);
         requireActivity().invalidateOptionsMenu();
         showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));

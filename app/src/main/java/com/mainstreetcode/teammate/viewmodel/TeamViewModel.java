@@ -7,7 +7,9 @@ import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.repository.TeamRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.util.InstantSearch;
+import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 import com.tunjid.androidbootstrap.functions.collections.Lists;
@@ -15,6 +17,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
@@ -26,7 +29,7 @@ import io.reactivex.processors.PublishProcessor;
 
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
-    private static final Team defaultTeam = Team.empty();
+    private final Team defaultTeam = Team.empty();
     static final List<Differentiable> teams = Lists.transform(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepository repository;
@@ -62,7 +65,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Flowable<Team> getTeamChangeFlowable() {
-        return Flowable.just(defaultTeam).concatWith(teamChangeProcessor);
+        return Flowable.fromCallable(() -> defaultTeam).concatWith(teamChangeProcessor);
     }
 
     private Flowable<Team> getTeam(Team team) {
@@ -75,6 +78,13 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Single<Team> deleteTeam(Team team) {
         return repository.delete(team).doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)));
+    }
+
+    public Single<DiffUtil.DiffResult> nonDefaultTeams(List<Team> sink) {
+        return FunctionalDiff.of(Flowable.fromIterable(teams)
+                        .filter(item -> item instanceof Team && !item.equals(defaultTeam))
+                        .cast(Team.class)
+                        .toList(), sink, ModelUtils::replaceList);
     }
 
     public void updateDefaultTeam(Team newDefault) {

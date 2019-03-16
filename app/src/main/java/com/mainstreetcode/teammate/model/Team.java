@@ -63,7 +63,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
+        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "Detroit️", "", "", "My Team", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
     @Override

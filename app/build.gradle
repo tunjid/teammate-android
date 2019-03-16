@@ -90,7 +90,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
 
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
 
     implementation 'com.google.android:flexbox:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
@@ -106,11 +106,11 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 
-    implementation 'com.tunjid.android-bootstrap:recyclerview:5.0.0-alpha1'
-    implementation 'com.tunjid.android-bootstrap:functions:1.0.3-alpha1'
-    implementation 'com.tunjid.android-bootstrap:material:5.0.0-alpha1'
-    implementation 'com.tunjid.android-bootstrap:core:5.0.0-alpha1'
-    implementation 'com.tunjid.android-bootstrap:view:5.0.0-alpha1'
+    implementation 'com.tunjid.android-bootstrap:recyclerview:5.0.0-beta1'
+    implementation 'com.tunjid.android-bootstrap:functions:1.0.3-beta1'
+    implementation 'com.tunjid.android-bootstrap:material:5.0.0-beta1'
+    implementation 'com.tunjid.android-bootstrap:core:5.0.0-beta1'
+    implementation 'com.tunjid.android-bootstrap:view:5.0.0-beta1'
 
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.github.florent37:picassopalette:2.0.0'

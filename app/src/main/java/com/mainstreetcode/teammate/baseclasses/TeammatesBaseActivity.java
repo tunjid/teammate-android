@@ -13,8 +13,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
+import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.util.FabInteractor;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
@@ -27,7 +29,6 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -53,7 +54,9 @@ import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOOLBAR_ANIM_DELAY;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
@@ -80,12 +83,15 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ConstraintLayout constraintLayout;
     private FrameLayout fragmentContainer;
     private LoadingBar loadingBar;
-    private Toolbar toolbar;
     private View padding;
+
+    protected Toolbar toolbar;
 
     private ViewHider fabHider;
     private ViewHider toolbarHider;
     private FabInteractor fabInteractor;
+
+    protected UiState uiState = UiState.freshState();
 
     private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
 
@@ -142,19 +148,58 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             return true;
         });
 
-        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(item -> {
+            BaseFragment fragment = getCurrentFragment();
+            boolean selected = fragment != null && fragment.onOptionsItemSelected(item);
+            return selected || onOptionsItemSelected(item);
+        });
+
         getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             showSystemUI();
             setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
+        update(uiState);
+    }
+
+    @Override
+    public void invalidateOptionsMenu() {
+        super.invalidateOptionsMenu();
+        toolbar.postDelayed(() -> {
+            TeammatesBaseFragment fragment = getCurrentFragment();
+            if (fragment != null) fragment.onPrepareOptionsMenu(toolbar.getMenu());
+        }, TOOLBAR_ANIM_DELAY);
     }
 
     @Override
     public TeammatesBaseFragment getCurrentFragment() {
         return (TeammatesBaseFragment) super.getCurrentFragment();
     }
+
+    @Override
+    public void update(UiState state) {
+        uiState = uiState.diff(state,
+                this::toggleFab,
+                this::toggleToolbar,
+                this::toggleAltToolbar,
+                this::toggleBottombar,
+                this::toggleSystemUI,
+                insetFlag -> {},
+                this::setFabIcon,
+                this::updateMainToolBar,
+                this::updateAltToolbar,
+                this::setFabClickListener
+        );
+    }
+
+    @Override
+    public void updateMainToolBar(int menu, CharSequence title) {
+        updateToolBar(toolbar, menu, title);
+    }
+
+    @Override
+    public void updateAltToolbar(int menu, CharSequence title) { }
 
     @Override
     public void toggleToolbar(boolean show) {
@@ -192,25 +237,15 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
-        if (fabInteractor != null) fabInteractor.update(icon, title);
+        runOnUiThread(() -> {
+            if (icon != 0 && title != 0 && fabInteractor != null) fabInteractor.update(icon, title);
+        });
     }
 
     @Override
     public void setFabExtended(boolean expanded) {
         if (fabInteractor != null) fabInteractor.setExtended(expanded);
     }
-
-    @Override
-    public void setToolbarTitle(CharSequence title) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setTitle(title);
-    }
-
-    @Override
-    public void setAltToolbarTitle(CharSequence title) {}
-
-    @Override
-    public void setAltToolbarMenu(int menu) {}
 
     @Override
     public void showSnackBar(CharSequence message) {
@@ -277,6 +312,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TeammatesBaseFragment view = getCurrentFragment();
         if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
         transition.excludeTarget(RecyclerView.class, true);
+        transition.excludeTarget(toolbar, true);
 
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }

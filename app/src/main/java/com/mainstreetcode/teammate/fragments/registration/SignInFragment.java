@@ -68,20 +68,16 @@ public final class SignInFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.sign_in));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.submit; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override protected CharSequence getToolbarTitle() {
+        return getString(R.string.sign_in);
+    }
 
     @Override
     public void onDestroyView() {

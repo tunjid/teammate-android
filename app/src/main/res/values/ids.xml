@@ -5,6 +5,7 @@
     <item name="action_messages" type="id"/>
     <item name="action_media" type="id"/>
     <item name="action_team" type="id"/>
+    <item name="action_tournaments" type="id"/>
     <item name="viewholder_date" type="id"/>
     <item name="viewholder_team" type="id"/>
     <item name="viewholder_user" type="id"/>

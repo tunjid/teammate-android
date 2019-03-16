@@ -60,7 +60,6 @@ public final class StatRankFragment extends MainActivityFragment {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         statRanks = tournamentViewModel.getStatRanks(tournament);
         type = tournament.getSport().statTypeFromCode("");

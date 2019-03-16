@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import com.mainstreetcode.teammate.adapters.TeamMemberAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
@@ -24,6 +22,7 @@ import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 
@@ -73,7 +72,6 @@ public class TeamMembersFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         team = getArguments().getParcelable(ARG_TEAM);
         teamModels = teamMemberViewModel.getModelList(team);
@@ -122,11 +120,6 @@ public class TeamMembersFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_team_detail, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit:
@@ -152,20 +145,22 @@ public class TeamMembersFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getTargetFragment() != null ? "" : getString(R.string.team_name_prefix, team.getName()));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.invite_user; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_group_add_white_24dp; }
+
+    @Override
+    protected int getToolbarMenu() {
+        return R.menu.fragment_team_detail;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getTargetFragment() != null ? "" : getString(R.string.team_name_prefix, team.getName());
+    }
 
     @Override
     public boolean showsFab() {

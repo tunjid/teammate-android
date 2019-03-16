@@ -45,7 +45,7 @@ public class FunctionalDiff {
         return sourceFlowable.concatMapDelayError(list -> Flowable.fromCallable(() -> Diff.calculate(original, list, accumulator))
                 .subscribeOn(AndroidSchedulers.from(diffThread.getLooper()))
                 .observeOn(mainThread())
-                .doOnNext(diff -> Lists.replace(original, diff.cumulative))
+                .doOnNext(diff -> Lists.replace(original, diff.items))
                 .map(diff -> diff.result));
     }
 
@@ -56,7 +56,7 @@ public class FunctionalDiff {
         return sourceSingle.flatMap(list -> Single.fromCallable(() -> Diff.calculate(original, list, accumulator))
                 .subscribeOn(AndroidSchedulers.from(diffThread.getLooper()))
                 .observeOn(mainThread())
-                .doOnSuccess(diff -> Lists.replace(original, diff.cumulative))
+                .doOnSuccess(diff -> Lists.replace(original, diff.items))
                 .map(diff -> diff.result));
     }
 
@@ -75,7 +75,7 @@ public class FunctionalDiff {
         return Integer.compare(a, b);
     };
 
-   public static final Comparator<Differentiable> DESCENDING_COMPARATOR = (modelA, modelB) -> -COMPARATOR.compare(modelA, modelB);
+   static final Comparator<Differentiable> DESCENDING_COMPARATOR = (modelA, modelB) -> -COMPARATOR.compare(modelA, modelB);
 
     private static int getPoints(Differentiable identifiable) {
         if (identifiable instanceof FeedItem)

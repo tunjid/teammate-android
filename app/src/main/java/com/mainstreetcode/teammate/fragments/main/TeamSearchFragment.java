@@ -77,7 +77,6 @@ public final class TeamSearchFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         request = TeamSearchRequest.from(getArguments().getString(ARG_SPORT));
         instantSearch = teamViewModel.instantSearch();
     }

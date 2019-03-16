@@ -83,14 +83,6 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.team_search_create; }
 
@@ -99,15 +91,16 @@ public final class TeamsFragment extends MainActivityFragment
     protected int getFabIconResource() { return R.drawable.ic_search_white_24dp; }
 
     @Override
-    public int[] staticViews() {return EXCLUDED_VIEWS;}
+    protected CharSequence getToolbarTitle() { return getString(R.string.my_teams); }
 
     @Override
-    public boolean showsBottomNav() {return true;}
+    public int[] staticViews() { return EXCLUDED_VIEWS; }
 
     @Override
-    public boolean showsFab() {
-        return !isTeamPicker();
-    }
+    public boolean showsBottomNav() { return true; }
+
+    @Override
+    public boolean showsFab() { return !isTeamPicker() || roles.isEmpty(); }
 
     @Override
     @SuppressWarnings("ConstantConditions")
@@ -135,9 +128,8 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
-        boolean isEmpty = roles.isEmpty();
-        if (isTeamPicker()) toggleFab(isEmpty);
         scrollManager.onDiff(result);
+        togglePersistentUi();
     }
 
     private boolean isTeamPicker() {
@@ -171,6 +163,8 @@ public final class TeamsFragment extends MainActivityFragment
                 return R.string.no_team_chat;
             case R.id.request_media_team_pick:
                 return R.string.no_team_media;
+            case R.id.request_tournament_team_pick:
+                return R.string.no_team_tournament;
             default:
                 return R.string.no_team;
         }

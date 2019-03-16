@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         Bundle arguments = getArguments();
         tournament = arguments.getParcelable(ARG_TOURNAMENT);
         gofer = tournamentViewModel.gofer(tournament);
@@ -98,11 +96,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_tournament_edit, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_rounds:
@@ -119,20 +112,22 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return tournament.isEmpty() ? R.string.tournament_create : R.string.tournament_update; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected int getToolbarMenu() {
+        return R.menu.fragment_tournament_edit;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
 
     @Override
     public InsetFlags insetFlags() {return VERTICAL;}

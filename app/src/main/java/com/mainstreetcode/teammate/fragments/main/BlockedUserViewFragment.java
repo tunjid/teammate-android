@@ -47,7 +47,6 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         blockedUser = getArguments().getParcelable(ARG_BLOCKED_USER);
         gofer = blockedUserViewModel.gofer(blockedUser);
     }
@@ -78,21 +77,10 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     protected int getFabIconResource() { return R.drawable.ic_unlock_white; }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.blocked_user));
-        super.togglePersistentUi();
-    }
-
-    @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab)
             disposables.add(gofer.delete().subscribe(this::onUserUnblocked, defaultErrorHandler));
     }
-
-    @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
 
     @Override
     public boolean showsFab() {return gofer.hasPrivilegedRole();}
@@ -100,6 +88,14 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     @Override
     public void onImageClick() {
         showSnackbar(getString(R.string.no_permission));
+    }
+
+    @Override
+    public InsetFlags insetFlags() {return VERTICAL;}
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.blocked_user);
     }
 
     @Override

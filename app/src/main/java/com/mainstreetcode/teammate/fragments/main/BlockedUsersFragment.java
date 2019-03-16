@@ -96,20 +96,16 @@ public final class BlockedUsersFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_events, menu);
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.blocked_users_title, team.getName()));
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_events; }
 
     @Override
     public boolean showsFab() {
         return false;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.blocked_users_title, team.getName());
     }
 
     @Override

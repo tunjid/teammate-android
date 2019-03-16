@@ -59,7 +59,6 @@ public final class StandingsFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         tournament = getArguments().getParcelable(ARG_TOURNAMENT);
         standings = tournamentViewModel.getStandings(tournament);
     }

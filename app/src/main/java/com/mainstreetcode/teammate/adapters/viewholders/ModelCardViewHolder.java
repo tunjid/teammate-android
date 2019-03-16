@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import androidx.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,7 +12,8 @@ import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+
+import androidx.annotation.StringRes;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE;
 

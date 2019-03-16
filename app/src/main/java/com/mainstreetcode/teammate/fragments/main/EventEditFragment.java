@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +87,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         Bundle args = getArguments();
         Game game = args.getParcelable(ARG_GAME);
         event = game != null ? game.getEvent() : args.getParcelable(ARG_EVENT);
@@ -126,11 +124,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
         if (canEditEvent() || event.isPublic()) menu.findItem(R.id.action_delete).setVisible(true);
 
         disposables.add(gofer.getRSVPStatus().subscribe(item::setIcon, emptyErrorHandler));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_event_edit, menu);
     }
 
     @Override
@@ -180,14 +173,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return event.isEmpty() ? R.string.event_create : R.string.event_update; }
 
@@ -196,7 +181,15 @@ public class EventEditFragment extends HeaderedFragment<Event>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
+    protected int getToolbarMenu() { return R.menu.fragment_event_edit; }
+
+    @Override
     public InsetFlags insetFlags() {return VERTICAL;}
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
 
     @Override
     public boolean showsFab() { return !isBottomSheetShowing() && gofer.hasPrivilegedRole(); }

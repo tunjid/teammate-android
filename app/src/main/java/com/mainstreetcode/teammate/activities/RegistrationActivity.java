@@ -1,20 +1,18 @@
 package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
-
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity;
 import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment;
 import com.mainstreetcode.teammate.fragments.registration.SplashFragment;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 
 public class RegistrationActivity extends TeammatesBaseActivity {
 

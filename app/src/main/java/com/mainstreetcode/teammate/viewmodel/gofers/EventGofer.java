@@ -72,10 +72,10 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return isSettingLocation;
     }
 
-    public String getToolbarTitle(Fragment fragment) {
+    public CharSequence getToolbarTitle(Fragment fragment) {
         return model.isEmpty()
                 ? fragment.getString(R.string.create_event)
-                : fragment.getString(R.string.edit_event, model.getName());
+                : model.getName();
     }
 
     @Nullable

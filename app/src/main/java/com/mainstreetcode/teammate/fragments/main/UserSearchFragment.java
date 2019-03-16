@@ -51,7 +51,6 @@ public final class UserSearchFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         instantSearch = userViewModel.instantSearch();
     }
 
