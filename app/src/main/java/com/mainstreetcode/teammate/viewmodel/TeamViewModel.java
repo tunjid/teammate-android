@@ -62,7 +62,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Flowable<Team> getTeamChangeFlowable() {
-        return Flowable.just(defaultTeam).concatWith(teamChangeProcessor);
+        return Flowable.fromCallable(() -> defaultTeam).concatWith(teamChangeProcessor);
     }
 
     private Flowable<Team> getTeam(Team team) {

@@ -38,7 +38,7 @@ public final class UiState {
                 0,
                 0,
                 0,
-                false,
+                true,
                 false,
                 false,
                 false,
@@ -78,7 +78,7 @@ public final class UiState {
         this.fabClickListener = fabClickListener;
     }
 
-    public void diff(UiState newState,
+    public UiState diff(UiState newState,
                      Consumer<Boolean> showsFabConsumer,
                      Consumer<Boolean> showsToolbarConsumer,
                      Consumer<Boolean> showsAltToolbarConsumer,
@@ -114,6 +114,8 @@ public final class UiState {
             insetFlagsConsumer.accept(newState.insetFlags);
 
         fabClickListenerConsumer.accept(newState.fabClickListener);
+
+        return newState;
     }
 
     private <S, T> void either(UiState that,

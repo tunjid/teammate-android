@@ -3,12 +3,6 @@ package com.mainstreetcode.teammate.util.nav;
 import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-
-import androidx.annotation.AttrRes;
-import androidx.annotation.ColorRes;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.view.GestureDetectorCompat;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +13,9 @@ import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import androidx.annotation.AttrRes;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.GestureDetectorCompat;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewHolder {

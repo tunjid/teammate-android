@@ -19,7 +19,9 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.ripple.RippleUtils;
@@ -37,6 +39,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.arch.core.util.Function;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
@@ -96,24 +100,35 @@ public class ViewHolderUtil extends ViewUtil {
         return null;
     }
 
-    public static void listenForLayout(View view, Runnable onLayout) {
-        ViewTreeObserver observer = view.getViewTreeObserver();
-        if (!observer.isAlive()) return;
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override public void onGlobalLayout() {
-                if (observer.isAlive()) observer.removeOnGlobalLayoutListener(this);
-                ViewTreeObserver current = view.getViewTreeObserver();
-                if (current.isAlive()) current.removeOnGlobalLayoutListener(this);
-                onLayout.run();
-            }
-        });
-    }
-
     public static Bitmap loadBitmapFromView(View view) {
         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         view.draw(canvas);
         return bitmap;
+    }
+
+    public static void updateToolBar(Toolbar toolbar, int menu, CharSequence title) {
+        int childCount = toolbar.getChildCount();
+
+        if (toolbar.getId() == R.id.alt_toolbar || childCount < 2) {
+            toolbar.setTitle(title);
+            replaceMenu(toolbar, menu);
+        }
+        else for (int i = 0; i < childCount; i++) {
+            View child = toolbar.getChildAt(i);
+            if (child instanceof ImageView) continue;
+
+            child.animate().alpha(0).setDuration(200).withEndAction(() -> {
+                if (child instanceof TextView) toolbar.setTitle(title);
+                else if (child instanceof ActionMenuView) replaceMenu(toolbar, menu);
+                child.animate().setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).start();
+            }).start();
+        }
+    }
+
+    private static void replaceMenu(Toolbar toolbar, int menu) {
+        toolbar.getMenu().clear();
+        if (menu != 0) toolbar.inflateMenu(menu);
     }
 
     public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {

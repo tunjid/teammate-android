@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -30,6 +32,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -56,6 +59,7 @@ import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
@@ -82,8 +86,9 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ConstraintLayout constraintLayout;
     private FrameLayout fragmentContainer;
     private LoadingBar loadingBar;
-    private Toolbar toolbar;
     private View padding;
+
+    protected Toolbar toolbar;
 
     private ViewHider fabHider;
     private ViewHider toolbarHider;
@@ -175,7 +180,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void update(UiState state) {
-        uiState.diff(state,
+        runOnUiThread(() -> uiState = uiState.diff(state,
                 this::toggleFab,
                 this::toggleToolbar,
                 this::toggleAltToolbar,
@@ -186,9 +191,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 this::updateMainToolBar,
                 this::updateAltToolbar,
                 this::setFabClickListener
-        );
-
-        uiState = state;
+        ));
     }
 
     @Override
@@ -296,15 +299,6 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         return suggestion - bottomInset;
     }
 
-    protected void updateToolBar(Toolbar toolbar, int menu, CharSequence title) {
-        toolbar.animate().alpha(0).setDuration(200).withEndAction(() -> {
-            toolbar.setTitle(title);
-            toolbar.getMenu().clear();
-            if (menu != 0) toolbar.inflateMenu(menu);
-            toolbar.animate().setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).start();
-        }).start();
-    }
-
     protected void clearTransientBars() {
         for (BaseTransientBottomBar bar : transientBottomBars)
             if (bar instanceof ChoiceBar) ((ChoiceBar) bar).dismissAsTimeout();
@@ -319,6 +313,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TeammatesBaseFragment view = getCurrentFragment();
         if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
         transition.excludeTarget(RecyclerView.class, true);
+        transition.excludeTarget(toolbar, true);
 
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }

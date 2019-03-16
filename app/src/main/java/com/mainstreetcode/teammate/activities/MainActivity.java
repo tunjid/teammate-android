@@ -2,6 +2,8 @@ package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -44,6 +46,7 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.util.nav.BottomNav;
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
 import com.mainstreetcode.teammate.util.nav.NavItem;
@@ -70,6 +73,7 @@ import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.loadBitmapFromView;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.util.ViewUtil.getLayoutParams;
 
@@ -140,6 +144,7 @@ public class MainActivity extends TeammatesBaseActivity
         bottomSheetContainer = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
+        toolbar.setNavigationOnClickListener(view -> showNavOverflow());
         altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -211,6 +216,10 @@ public class MainActivity extends TeammatesBaseActivity
         disposables.add(teamViewModel.getTeamChangeFlowable().subscribe(team -> {
             ViewHolder viewHolder = bottomNav.getViewHolder(R.id.action_team);
             if (viewHolder != null) viewHolder.setImageUrl(team.getImageUrl());
+            disposables.add(ViewHolderUtil.fetchRoundedDrawable(this,
+                    team.getImageUrl(),
+                    getResources().getDimensionPixelSize(R.dimen.double_margin))
+                    .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
         }, ErrorHandler.EMPTY));
     }
 
@@ -319,6 +328,16 @@ public class MainActivity extends TeammatesBaseActivity
 
     private void showNavOverflow() {
         NavDialogFragment.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    private void updateToolbarIcon(Drawable drawable) {
+        Drawable current = toolbar.getNavigationIcon();
+        TransitionDrawable updated = new TransitionDrawable(current == null
+                ? new Drawable[]{drawable}
+                : new Drawable[]{current.getCurrent(), drawable});
+
+        toolbar.setNavigationIcon(updated);
+        if (current != null) updated.startTransition(HIDER_DURATION);
     }
 
     private boolean onNavItemSelected(@IdRes int id) {
