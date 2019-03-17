@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -42,6 +43,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.arch.core.util.Function;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -133,19 +135,27 @@ public class ViewHolderUtil extends ViewUtil {
     }
 
     public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {
-        return Single.create(emitter -> Picasso.with(context).load(url).resize(size, size).centerCrop()
-                .into(new Target() {
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmap);
-                        imageDrawable.setCircular(true);
-                        imageDrawable.setCornerRadius(size);
-                        emitter.onSuccess(imageDrawable);
-                    }
+        return fetchRoundedDrawable(context, url, size, 0);
+    }
 
-                    public void onBitmapFailed(Drawable errorDrawable) { emitter.onError(new TeammateException("failed")); }
+    public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size, int placeholder) {
+        return Single.<Bitmap>create(emitter -> Picasso.get().load(url).resize(size, size).centerCrop()
+                .into(new Target() {
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) { emitter.onSuccess(bitmap); }
+
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) { emitter.onError(e); }
 
                     public void onPrepareLoad(Drawable placeHolderDrawable) { }
-                }));
+                }))
+                .onErrorResumeNext(throwable -> placeholder != 0
+                        ? Single.fromCallable(() -> getBitmapFromVectorDrawable(context, placeholder))
+                        : Single.error(throwable))
+                .map(bitmap -> {
+                    RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmap);
+                    imageDrawable.setCircular(true);
+                    imageDrawable.setCornerRadius(size);
+                    return imageDrawable;
+                });
     }
 
     public static void updateForegroundDrawable(View itemView) {
@@ -191,6 +201,21 @@ public class ViewHolderUtil extends ViewUtil {
         Arrays.fill(radii, radius);
         RoundRectShape shape = new RoundRectShape(radii, null, null);
         return new ShapeDrawable(shape);
+    }
+
+    @Nullable
+    private static Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+        if (drawable == null) return null;
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.setTint(Color.WHITE);
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     public interface SimpleAdapterListener<T> extends InteractiveAdapter.AdapterListener {

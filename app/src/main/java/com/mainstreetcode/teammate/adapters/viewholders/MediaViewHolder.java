@@ -101,7 +101,7 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
         boolean isFullScreen = adapterListener.isFullScreen();
         if (TextUtils.isEmpty(url)) return;
 
-        RequestCreator creator = Picasso.with(itemView.getContext()).load(url);
+        RequestCreator creator = Picasso.get().load(url);
 
         if (!isFullScreen) creator.placeholder(R.drawable.bg_image_placeholder);
 
@@ -152,5 +152,5 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
     public void onSuccess() {}
 
     @Override
-    public void onError() {}
+    public void onError(Exception e) {}
 }

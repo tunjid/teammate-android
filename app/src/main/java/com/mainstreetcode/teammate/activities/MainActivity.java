@@ -143,18 +143,17 @@ public class MainActivity extends TeammatesBaseActivity
         bottomSheetContainer = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
+        toolbar.setNavigationContentDescription(R.string.expand_nav);
+        toolbar.setNavigationIcon(R.drawable.ic_supervisor_white_24dp);
         toolbar.setNavigationOnClickListener(view -> showNavOverflow());
         altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState != STATE_HIDDEN) return;
-                restoreHiddenViewState();
+            @Override public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == STATE_HIDDEN) restoreHiddenViewState();
             }
 
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
+            @Override public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
 
         bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation))
@@ -215,7 +214,7 @@ public class MainActivity extends TeammatesBaseActivity
         disposables.add(teamViewModel.getTeamChangeFlowable()
                 .flatMapSingle(team -> ViewHolderUtil.fetchRoundedDrawable(this,
                         team.getImageUrl(),
-                        getResources().getDimensionPixelSize(R.dimen.double_margin)))
+                        getResources().getDimensionPixelSize(R.dimen.double_margin),R.drawable.ic_supervisor_white_24dp))
                 .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
     }
 
@@ -225,7 +224,7 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState);
         super.onSaveInstanceState(outState);
     }

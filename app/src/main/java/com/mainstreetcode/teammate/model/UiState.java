@@ -1,5 +1,8 @@
 package com.mainstreetcode.teammate.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.tunjid.androidbootstrap.functions.BiConsumer;
@@ -14,7 +17,7 @@ import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
-public final class UiState {
+public final class UiState implements Parcelable {
 
     @DrawableRes private final int fabIcon;
     @StringRes private final int fabText;
@@ -38,11 +41,11 @@ public final class UiState {
                 0,
                 0,
                 0,
+                false,
                 true,
                 false,
-                false,
-                false,
-                false,
+                true,
+                true,
                 InsetFlags.ALL,
                 "",
                 "",
@@ -78,47 +81,44 @@ public final class UiState {
         this.fabClickListener = fabClickListener;
     }
 
-    public UiState diff(UiState newState,
-                     Consumer<Boolean> showsFabConsumer,
-                     Consumer<Boolean> showsToolbarConsumer,
-                     Consumer<Boolean> showsAltToolbarConsumer,
-                     Consumer<Boolean> showsBottomNavConsumer,
-                     Consumer<Boolean> showsSystemUIConsumer,
-                     Consumer<InsetFlags> insetFlagsConsumer,
-                     BiConsumer<Integer, Integer> fabStateConsumer,
-                     BiConsumer<Integer, CharSequence> toolbarStateConsumer,
-                     BiConsumer<Integer, CharSequence> altToolbarStateConsumer,
-                     Consumer<View.OnClickListener> fabClickListenerConsumer
+    public UiState diff(boolean force, UiState newState,
+                        Consumer<Boolean> showsFabConsumer,
+                        Consumer<Boolean> showsToolbarConsumer,
+                        Consumer<Boolean> showsAltToolbarConsumer,
+                        Consumer<Boolean> showsBottomNavConsumer,
+                        Consumer<Boolean> showsSystemUIConsumer,
+                        Consumer<InsetFlags> insetFlagsConsumer,
+                        BiConsumer<Integer, Integer> fabStateConsumer,
+                        BiConsumer<Integer, CharSequence> toolbarStateConsumer,
+                        BiConsumer<Integer, CharSequence> altToolbarStateConsumer,
+                        Consumer<View.OnClickListener> fabClickListenerConsumer
     ) {
+        only(force, newState, state -> state.showsFab, showsFabConsumer);
+        only(force, newState, state -> state.showsToolbar, showsToolbarConsumer);
+        only(force, newState, state -> state.showsAltToolbar, showsAltToolbarConsumer);
+        only(force, newState, state -> state.showsBottomNav, showsBottomNavConsumer);
+        only(force, newState, state -> state.showsSystemUI, showsSystemUIConsumer);
+        only(force, newState, state -> state.insetFlags, insetFlagsConsumer);
 
-        either(newState, state -> state.fabIcon, state -> state.fabText, fabStateConsumer);
-        either(newState, state -> state.toolBarMenu, state -> state.toolbarTitle, toolbarStateConsumer);
-        either(newState, state -> state.altToolBarMenu, state -> state.altToolbarTitle, altToolbarStateConsumer);
-
-        if (!Objects.equals(showsFab, newState.showsFab))
-            showsFabConsumer.accept(newState.showsFab);
-
-        if (!Objects.equals(showsToolbar, newState.showsToolbar))
-            showsToolbarConsumer.accept(newState.showsToolbar);
-
-        if (!Objects.equals(showsAltToolbar, newState.showsAltToolbar))
-            showsAltToolbarConsumer.accept(newState.showsAltToolbar);
-
-        if (!Objects.equals(showsBottomNav, newState.showsBottomNav))
-            showsBottomNavConsumer.accept(newState.showsBottomNav);
-
-        if (!Objects.equals(showsSystemUI, newState.showsSystemUI))
-            showsSystemUIConsumer.accept(newState.showsSystemUI);
-
-        if (!Objects.equals(insetFlags, newState.insetFlags))
-            insetFlagsConsumer.accept(newState.insetFlags);
+        either(force, newState, state -> state.fabIcon, state -> state.fabText, fabStateConsumer);
+        either(force, newState, state -> state.toolBarMenu, state -> state.toolbarTitle, toolbarStateConsumer);
+        either(force, newState, state -> state.altToolBarMenu, state -> state.altToolbarTitle, altToolbarStateConsumer);
 
         fabClickListenerConsumer.accept(newState.fabClickListener);
 
         return newState;
     }
 
-    private <S, T> void either(UiState that,
+    private <T> void only(boolean force, UiState that, Function<UiState, T> first, Consumer<T> consumer) {
+        T thisFirst = first.apply(this);
+        T thatFirst = first.apply(that);
+
+        if (force || !Objects.equals(thisFirst, thatFirst)) consumer.accept(thatFirst);
+
+    }
+
+    private <S, T> void either(boolean force,
+                               UiState that,
                                Function<UiState, S> first,
                                Function<UiState, T> second,
                                BiConsumer<S, T> biConsumer) {
@@ -127,7 +127,67 @@ public final class UiState {
         T thisSecond = second.apply(this);
         T thatSecond = second.apply(that);
 
-        if (!Objects.equals(thisFirst, thatFirst) || !Objects.equals(thisSecond, thatSecond))
+        if (force || !Objects.equals(thisFirst, thatFirst) || !Objects.equals(thisSecond, thatSecond))
             biConsumer.accept(thatFirst, thatSecond);
     }
+
+    private UiState(Parcel in) {
+        fabIcon = in.readInt();
+        fabText = in.readInt();
+        toolBarMenu = in.readInt();
+        altToolBarMenu = in.readInt();
+        showsFab = in.readByte() != 0x00;
+        showsToolbar = in.readByte() != 0x00;
+        showsAltToolbar = in.readByte() != 0x00;
+        showsBottomNav = in.readByte() != 0x00;
+        showsSystemUI = in.readByte() != 0x00;
+
+        boolean hasLeftInset = in.readByte() != 0x00;
+        boolean hasTopInset = in.readByte() != 0x00;
+        boolean hasRightInset = in.readByte() != 0x00;
+        boolean hasBottomInset = in.readByte() != 0x00;
+        insetFlags = InsetFlags.create(hasLeftInset, hasTopInset, hasRightInset, hasBottomInset);
+
+        toolbarTitle = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+        altToolbarTitle = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+
+        fabClickListener = null;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(fabIcon);
+        dest.writeInt(fabText);
+        dest.writeInt(toolBarMenu);
+        dest.writeInt(altToolBarMenu);
+        dest.writeByte((byte) (showsFab ? 0x01 : 0x00));
+        dest.writeByte((byte) (showsToolbar ? 0x01 : 0x00));
+        dest.writeByte((byte) (showsAltToolbar ? 0x01 : 0x00));
+        dest.writeByte((byte) (showsBottomNav ? 0x01 : 0x00));
+        dest.writeByte((byte) (showsSystemUI ? 0x01 : 0x00));
+        dest.writeByte((byte) (insetFlags.hasLeftInset() ? 0x01 : 0x00));
+        dest.writeByte((byte) (insetFlags.hasTopInset() ? 0x01 : 0x00));
+        dest.writeByte((byte) (insetFlags.hasRightInset() ? 0x01 : 0x00));
+        dest.writeByte((byte) (insetFlags.hasBottomInset() ? 0x01 : 0x00));
+
+        TextUtils.writeToParcel(toolbarTitle, dest, 0);
+        TextUtils.writeToParcel(altToolbarTitle, dest, 0);
+    }
+
+    public static final Parcelable.Creator<UiState> CREATOR = new Parcelable.Creator<UiState>() {
+        @Override
+        public UiState createFromParcel(Parcel in) {
+            return new UiState(in);
+        }
+
+        @Override
+        public UiState[] newArray(int size) {
+            return new UiState[size];
+        }
+    };
 }

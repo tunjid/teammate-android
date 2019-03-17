@@ -67,7 +67,7 @@ public class HeaderedImageViewHolder extends InteractiveViewHolder<ImageWorkerFr
         if (TextUtils.isEmpty(url)) return null;
 
         File file = new File(url);
-        Picasso picasso = Picasso.with(itemView.getContext());
+        Picasso picasso = Picasso.get();
         return file.exists() ? picasso.load(file) : picasso.load(url);
     }
 
@@ -101,6 +101,6 @@ public class HeaderedImageViewHolder extends InteractiveViewHolder<ImageWorkerFr
         public void onSuccess() {fullRes.setVisibility(View.VISIBLE);}
 
         @Override
-        public void onError() {diff.restart();}
+        public void onError(Exception e) {diff.restart();}
     }
 }
