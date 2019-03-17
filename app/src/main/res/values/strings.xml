@@ -398,7 +398,7 @@
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team!</string>
     <string name="no_rsvp">You aren\'t attending any events.</string>
-    <string name="no_team_feed">Welcome! Use the tabs to join your team, or browse nearby events.</string>
+    <string name="no_team_feed">Welcome! Use the button below to find or create your team, or the bottom nav to explore categories like public events.</string>
     <string name="no_team_event">Your teams\' events. Join a team or browse nearby public events.</string>
     <string name="no_team_chat">Your teams\' chats. Join a team to start chatting</string>
     <string name="no_team_media">Your teams\' moments. Join a team and relive them all.</string>

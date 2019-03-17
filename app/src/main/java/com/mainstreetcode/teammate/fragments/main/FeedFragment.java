@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -33,8 +32,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DiffUtil;
@@ -89,11 +90,6 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         scrollManager.setRefreshing();
@@ -107,8 +103,12 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab:
+                showFragment(TeamSearchFragment.newInstance());
+                break;
+        }
     }
 
     @Override
@@ -164,7 +164,15 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean showsFab() { return false; }
+    @StringRes
+    protected int getFabStringResource() { return R.string.team_search_create; }
+
+    @Override
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_search_white_24dp; }
+
+    @Override
+    public boolean showsFab() { return !teamViewModel.isOnATeam(); }
 
     @Override
     public boolean showsBottomNav() { return bottomBarState.get(); }
@@ -225,6 +233,7 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
+        togglePersistentUi();
         toggleProgress(false);
         boolean isOnATeam = teamViewModel.isOnATeam();
         scrollManager.onDiff(diffResult);

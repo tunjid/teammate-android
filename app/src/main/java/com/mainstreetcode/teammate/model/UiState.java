@@ -41,7 +41,7 @@ public final class UiState implements Parcelable {
                 0,
                 0,
                 0,
-                false,
+                true,
                 true,
                 false,
                 true,
