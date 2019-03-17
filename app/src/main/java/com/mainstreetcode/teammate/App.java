@@ -1,16 +1,12 @@
 package com.mainstreetcode.teammate;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import androidx.annotation.Nullable;
-import androidx.multidex.MultiDexApplication;
-import androidx.emoji.text.EmojiCompat;
-import androidx.emoji.text.FontRequestEmojiCompatConfig;
-import androidx.core.provider.FontRequest;
 
 import com.mainstreetcode.teammate.repository.ConfigRepository;
 import com.mainstreetcode.teammate.repository.RoleRepository;
@@ -18,11 +14,16 @@ import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Logger;
 
+import androidx.annotation.Nullable;
+import androidx.core.provider.FontRequest;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+
 /**
  * Application Singleton
  */
 
-public class App extends MultiDexApplication {
+public class App extends Application {
 
     private static final String PROVIDER_AUTHORITY = "com.google.android.gms.fonts";
     private static final String PROVIDER_PACKAGE = "com.google.android.gms";
