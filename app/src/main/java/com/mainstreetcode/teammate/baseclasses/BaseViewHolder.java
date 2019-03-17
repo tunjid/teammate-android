@@ -2,8 +2,8 @@ package com.mainstreetcode.teammate.baseclasses;
 
 import android.view.View;
 
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class BaseViewHolder<T extends InteractiveAdapter.AdapterListener> extends InteractiveViewHolder<T> {

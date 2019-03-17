@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,11 +9,13 @@ import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import static android.text.TextUtils.isEmpty;
 
 /**
  * Viewholder for a {@link Team}
@@ -42,12 +43,7 @@ public abstract class AdViewHolder<T extends Ad> extends InteractiveViewHolder<I
         setImageAspectRatio(ad);
         ViewHolderUtil.listenForLayout(thumbnail, () -> {
             String imageUrl = getImageUrl();
-
-            if (!TextUtils.isEmpty(imageUrl)) Picasso.with(itemView.getContext())
-                    .load(imageUrl)
-                    .fit()
-                    .centerCrop()
-                    .into(thumbnail);
+            if (!isEmpty(imageUrl)) Picasso.get().load(imageUrl).fit().centerCrop().into(thumbnail);
         });
     }
 

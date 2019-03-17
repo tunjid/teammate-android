@@ -71,11 +71,11 @@ public class GameViewHolder extends BaseViewHolder<GameAdapter.AdapterListener> 
         String awayUrl = away.getImageUrl();
 
         if (TextUtils.isEmpty(homeUrl)) homeThumbnail.setImageResource(R.color.dark_grey);
-        else Picasso.with(itemView.getContext()).load(homeUrl)
+        else Picasso.get().load(homeUrl)
                 .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(homeThumbnail);
 
         if (TextUtils.isEmpty(awayUrl)) awayThumbnail.setImageResource(R.color.dark_grey);
-        else Picasso.with(itemView.getContext()).load(awayUrl).
+        else Picasso.get().load(awayUrl).
                 resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(awayThumbnail);
     }
 

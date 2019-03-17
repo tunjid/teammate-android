@@ -12,7 +12,7 @@ import com.mainstreetcode.teammate.adapters.TeamChatAdapter;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 /**
  * Viewholder for a {@link Team}
@@ -48,13 +48,8 @@ public class TeamChatViewHolder extends InteractiveViewHolder<TeamChatAdapter.Ch
         details.setVisibility(showDetails || item.isEmpty() || chatFailed ? View.VISIBLE : View.GONE);
         content.setBackgroundResource(isSignedInUser ? R.drawable.bg_chat_box : R.drawable.bg_chat_box_alt);
 
-        if (!isSignedInUser && !TextUtils.isEmpty(item.getImageUrl())) {
-            Picasso.with(context)
-                    .load(item.getImageUrl())
-                    .fit()
-                    .centerCrop()
-                    .into(image);
-        }
+        if (!isSignedInUser && !TextUtils.isEmpty(item.getImageUrl()))
+            Picasso.get().load(item.getImageUrl()).fit().centerCrop().into(image);
 
         if (chatFailed) details.setText(R.string.chat_failed);
         else if (item.isEmpty()) details.setText(R.string.chat_sending);

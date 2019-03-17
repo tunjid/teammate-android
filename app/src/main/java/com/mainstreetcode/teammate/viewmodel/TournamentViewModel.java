@@ -3,7 +3,8 @@ package com.mainstreetcode.teammate.viewmodel;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Team;
@@ -37,7 +38,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     private final TeammateApi api;
     private final TournamentRepository repository;
     private final Map<Tournament, Standings> standingsMap = new HashMap<>();
-    private final Map<Tournament, List<Identifiable>> ranksMap = new HashMap<>();
+    private final Map<Tournament, List<Differentiable>> ranksMap = new HashMap<>();
 
     public TournamentViewModel() {
         api = TeammateService.getApiInstance();
@@ -62,7 +63,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     @Override
-    void onErrorMessage(Message message, Team key, Identifiable invalid) {
+    void onErrorMessage(Message message, Team key, Differentiable invalid) {
         super.onErrorMessage(message, key, invalid);
         boolean shouldRemove = message.isInvalidObject() && invalid instanceof Tournament;
         if (shouldRemove) removeTournament((Tournament) invalid);
@@ -72,7 +73,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
         return ModelUtils.get(tournament, standingsMap, () -> Standings.forTournament(tournament));
     }
 
-    public List<Identifiable> getStatRanks(Tournament tournament) {
+    public List<Differentiable> getStatRanks(Tournament tournament) {
         return ModelUtils.get(tournament, ranksMap, ArrayList::new);
     }
 
@@ -92,8 +93,8 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     public Single<DiffUtil.DiffResult> getStatRank(Tournament tournament, StatType type) {
-        Single<List<Identifiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(ArrayList<Identifiable>::new);
-        return Identifiable.diff(sourceSingle, () -> getStatRanks(tournament), ModelUtils::replaceList).observeOn(mainThread());
+        Single<List<Differentiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(ArrayList<Differentiable>::new);
+        return FunctionalDiff.of(sourceSingle, getStatRanks(tournament), ModelUtils::replaceList).observeOn(mainThread());
     }
 
     private Flowable<Tournament> getTournament(Tournament tournament) {
@@ -105,7 +106,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     private void removeTournament(Tournament tournament) {
-        for (List<Identifiable> list : modelListMap.values()) list.remove(tournament);
+        for (List<Differentiable> list : modelListMap.values()) list.remove(tournament);
         pushModelAlert(Alert.tournamentDeletion(tournament));
     }
 }

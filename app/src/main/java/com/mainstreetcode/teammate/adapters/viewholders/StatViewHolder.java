@@ -7,7 +7,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 
 public class StatViewHolder extends InteractiveViewHolder<ViewHolderUtil.SimpleAdapterListener<Stat>> {

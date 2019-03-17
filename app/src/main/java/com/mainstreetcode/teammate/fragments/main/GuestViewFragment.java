@@ -1,24 +1,25 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GuestAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 
 public class GuestViewFragment extends HeaderedFragment<Guest> {
 
@@ -46,7 +47,6 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         guest = getArguments().getParcelable(ARG_GUEST);
         gofer = eventViewModel.gofer(guest);
     }
@@ -56,7 +56,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<InputViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new GuestAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
@@ -78,11 +78,6 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_guest_view, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_block) {
             blockUser(guest.getUser(), guest.getEvent().getTeam());
@@ -92,13 +87,15 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public void togglePersistentUi() {
-        setToolbarTitle(getString(R.string.event_guest));
-        super.togglePersistentUi();
+    protected int getToolbarMenu() { return R.menu.fragment_guest_view; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.event_guest);
     }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {return false;}

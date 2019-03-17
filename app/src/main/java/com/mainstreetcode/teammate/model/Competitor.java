@@ -16,6 +16,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -99,7 +100,7 @@ public class Competitor extends CompetitorEntity
     public String getId() { return id; }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Competitor)) return id.equals(other.getId());
         Competitor casted = (Competitor) other;
         return entity.getClass().equals(casted.entity.getClass())

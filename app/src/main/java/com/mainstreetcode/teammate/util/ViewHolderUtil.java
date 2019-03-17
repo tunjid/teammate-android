@@ -8,6 +8,8 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -19,7 +21,9 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.ripple.RippleUtils;
@@ -27,7 +31,7 @@ import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.util.ViewUtil;
 
 import java.util.Arrays;
@@ -37,11 +41,19 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.arch.core.util.Function;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.palette.graphics.Palette;
 import io.reactivex.Single;
+
+import static io.reactivex.Single.error;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class ViewHolderUtil extends ViewUtil {
 
@@ -66,6 +78,7 @@ public class ViewHolderUtil extends ViewUtil {
     public static final int BLOCKED_USER = 301;
     public static final int THUMBNAIL_SIZE = 250;
     public static final int FULL_RES_LOAD_DELAY = 200;
+    public static final int TOOLBAR_ANIM_DELAY = 200;
     private static final int DEFAULT_STROKE_VALUE = -1;
 
     public static Function<CharSequence, CharSequence> allowsSpecialCharacters =
@@ -96,19 +109,6 @@ public class ViewHolderUtil extends ViewUtil {
         return null;
     }
 
-    public static void listenForLayout(View view, Runnable onLayout) {
-        ViewTreeObserver observer = view.getViewTreeObserver();
-        if (!observer.isAlive()) return;
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override public void onGlobalLayout() {
-                if (observer.isAlive()) observer.removeOnGlobalLayoutListener(this);
-                ViewTreeObserver current = view.getViewTreeObserver();
-                if (current.isAlive()) current.removeOnGlobalLayoutListener(this);
-                onLayout.run();
-            }
-        });
-    }
-
     public static Bitmap loadBitmapFromView(View view) {
         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -116,20 +116,62 @@ public class ViewHolderUtil extends ViewUtil {
         return bitmap;
     }
 
-    public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {
-        return Single.create(emitter -> Picasso.with(context).load(url).resize(size, size).centerCrop()
-                .into(new Target() {
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmap);
-                        imageDrawable.setCircular(true);
-                        imageDrawable.setCornerRadius(size);
-                        emitter.onSuccess(imageDrawable);
-                    }
+    public static void updateToolBar(Toolbar toolbar, int menu, CharSequence title) {
+        int childCount = toolbar.getChildCount();
 
-                    public void onBitmapFailed(Drawable errorDrawable) { emitter.onError(new TeammateException("failed")); }
+        if (toolbar.getId() == R.id.alt_toolbar || childCount <= 2) {
+            toolbar.setTitle(title);
+            replaceMenu(toolbar, menu);
+        }
+        else for (int i = 0; i < childCount; i++) {
+            View child = toolbar.getChildAt(i);
+            if (child instanceof ImageView) continue;
+
+            child.animate().alpha(0).setDuration(TOOLBAR_ANIM_DELAY).withEndAction(() -> {
+                if (child instanceof TextView) toolbar.setTitle(title);
+                else if (child instanceof ActionMenuView) replaceMenu(toolbar, menu);
+                child.animate().setDuration(TOOLBAR_ANIM_DELAY).setInterpolator(new AccelerateDecelerateInterpolator()).alpha(1).start();
+            }).start();
+        }
+    }
+
+    private static void replaceMenu(Toolbar toolbar, int menu) {
+        toolbar.getMenu().clear();
+        if (menu != 0) toolbar.inflateMenu(menu);
+    }
+
+    public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {
+        return fetchRoundedDrawable(context, url, size, 0);
+    }
+
+    public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size, int placeholder) {
+        return Single.<Bitmap>create(emitter -> Picasso.get().load(url).resize(size, size).centerCrop()
+                .into(new Target() {
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) { emitter.onSuccess(bitmap); }
+
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) { emitter.onError(e); }
 
                     public void onPrepareLoad(Drawable placeHolderDrawable) { }
-                }));
+                }))
+                .onErrorResumeNext(throwable -> placeholder != 0
+                        ? Single.fromCallable(() -> getBitmapFromVectorDrawable(context, placeholder))
+                        : error(throwable))
+                .map(bitmap -> {
+                    RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmap);
+                    imageDrawable.setCircular(true);
+                    imageDrawable.setCornerRadius(size);
+                    return imageDrawable;
+                });
+    }
+
+    public static Single<Palette> extractPalette(ImageView imageView) {
+        Drawable drawable = imageView.getDrawable();
+
+        if (drawable == null) return error(new TeammateException("No drawable in ImageView"));
+        if (!(drawable instanceof BitmapDrawable)) return error(new TeammateException("Not a BitmapDrawable"));
+
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        return Single.fromCallable(() -> Palette.from(bitmap).generate()).subscribeOn(io()).observeOn(mainThread());
     }
 
     public static void updateForegroundDrawable(View itemView) {
@@ -175,6 +217,21 @@ public class ViewHolderUtil extends ViewUtil {
         Arrays.fill(radii, radius);
         RoundRectShape shape = new RoundRectShape(radii, null, null);
         return new ShapeDrawable(shape);
+    }
+
+    @Nullable
+    private static Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+        if (drawable == null) return null;
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.setTint(Color.WHITE);
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     public interface SimpleAdapterListener<T> extends InteractiveAdapter.AdapterListener {

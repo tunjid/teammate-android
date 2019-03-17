@@ -9,6 +9,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.GameEditAdapter;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Competitive;
@@ -75,7 +76,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<BaseViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new GameEditAdapter(gofer.getItems(), this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -94,14 +95,6 @@ public class GameEditFragment extends HeaderedFragment<Game>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(game.isEmpty() ? R.string.game_add : R.string.game_edit));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return game.isEmpty() ? R.string.game_create : R.string.game_update; }
 
@@ -110,10 +103,15 @@ public class GameEditFragment extends HeaderedFragment<Game>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() { return NO_TOP; }
 
     @Override
-    public boolean showsFab() {return gofer.canEdit() && !isBottomSheetShowing();}
+    protected CharSequence getToolbarTitle() {
+        return getString(game.isEmpty() ? R.string.game_add : R.string.game_edit);
+    }
+
+    @Override
+    public boolean showsFab() { return gofer.canEdit() && !isBottomSheetShowing(); }
 
     @Override
     public int[] staticViews() {return EXCLUDED_VIEWS;}

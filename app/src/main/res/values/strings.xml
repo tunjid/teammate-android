@@ -45,7 +45,7 @@
     <string name="events">Events</string>
     <string name="chats">Chats</string>
     <string name="media">Gallery</string>
-    <string name="my_teams">Teams</string>
+    <string name="my_teams">My Teams</string>
     <string name="expand_nav">Expand bottom nav</string>
 
     <string name="team">Team</string>
@@ -203,6 +203,7 @@
     <string name="event_not_attending">Not Going</string>
 
     <!--TournamentDetailFragment-->
+    <string name="tourneys">Tourneys</string>
     <string name="tournaments">Tournaments</string>
     <string name="editing_competitors">Editing</string>
     <string name="add_tournament_competitors_prompt">Add Competitors?</string>
@@ -397,10 +398,11 @@
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team!</string>
     <string name="no_rsvp">You aren\'t attending any events.</string>
-    <string name="no_team_feed">Welcome! Use the tabs to join your team, or browse nearby events.</string>
+    <string name="no_team_feed">Welcome! Use the button below to find or create your team, or the bottom nav to explore categories like public events.</string>
     <string name="no_team_event">Your teams\' events. Join a team or browse nearby public events.</string>
     <string name="no_team_chat">Your teams\' chats. Join a team to start chatting</string>
     <string name="no_team_media">Your teams\' moments. Join a team and relive them all.</string>
+    <string name="no_team_tournament">Your teams\' tournaments. Come one, come all</string>
 
     <!--Facebook-->
     <string name="facebook_app_id">2000415723539146</string>

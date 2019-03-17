@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import android.view.View;
 
 import com.mainstreetcode.teammate.model.InstallAd;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 public class InstallAdViewHolder extends AdViewHolder<InstallAd> {
 

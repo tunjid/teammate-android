@@ -13,7 +13,7 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -183,10 +183,10 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     }
 
     private void onGameDeleted(Game game) {
-        for (List<Identifiable> list : modelListMap.values()) {
-            Iterator<Identifiable> iterator = list.iterator();
+        for (List<Differentiable> list : modelListMap.values()) {
+            Iterator<Differentiable> iterator = list.iterator();
             while (iterator.hasNext()) {
-                Identifiable next = iterator.next();
+                Differentiable next = iterator.next();
                 if (!(next instanceof Event)) return;
                 if (game.getId().equals(((Event) next).getGameId())) iterator.remove();
             }

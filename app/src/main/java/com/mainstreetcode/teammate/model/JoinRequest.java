@@ -18,6 +18,7 @@ import com.mainstreetcode.teammate.model.enums.Position;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -93,14 +94,14 @@ public class JoinRequest extends JoinRequestEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof JoinRequest)) return id.equals(other.getId());
         JoinRequest casted = (JoinRequest) other;
         return position.equals(casted.position) && user.areContentsTheSame(casted.getUser());
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

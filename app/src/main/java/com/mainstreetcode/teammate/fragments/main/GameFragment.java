@@ -2,27 +2,16 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-
-import com.google.android.material.chip.Chip;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
-
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.StatAdapter;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
@@ -34,7 +23,7 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.AppBarListener;
@@ -43,9 +32,18 @@ import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
 
 /**
  * Lists {@link Event games}
@@ -57,7 +55,7 @@ public final class GameFragment extends MainActivityFragment
     private static final String ARG_GAME = "game";
 
     private Game game;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     private boolean hasChoiceBar;
     private GameGofer gofer;
@@ -91,7 +89,6 @@ public final class GameFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         Bundle arguments = getArguments();
         game = arguments.getParcelable(ARG_GAME);
@@ -109,11 +106,11 @@ public final class GameFragment extends MainActivityFragment
         gameViewHolder = new GameViewHolder(appBar, ignored -> {});
         gameViewHolder.bind(game);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.model_list))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
                 .withAdapter(new StatAdapter(items, stat -> showFragment(StatEditFragment.newInstance(stat))))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
-                .withEndlessScrollCallback(() -> fetchStats(false))
+                .withEndlessScroll(() -> fetchStats(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
@@ -141,11 +138,6 @@ public final class GameFragment extends MainActivityFragment
         menu.findItem(R.id.action_delete_game).setVisible(gofer.canDelete(userViewModel.getCurrentUser()));
         menu.findItem(R.id.action_end_game).setVisible(showsFab());
         menu.findItem(R.id.action_event).setVisible(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_game, menu);
     }
 
     @Override
@@ -183,15 +175,6 @@ public final class GameFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.game_stats));
-        requireActivity().invalidateOptionsMenu();
-        super.togglePersistentUi();
-    }
-
-    @Override
     protected void onKeyBoardChanged(boolean appeared) {
         super.onKeyBoardChanged(appeared);
         if (!appeared && isBottomSheetShowing()) hideBottomSheet();
@@ -202,6 +185,14 @@ public final class GameFragment extends MainActivityFragment
 
     @Override @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+
+    @Override
+    protected int getToolbarMenu() { return R.menu.fragment_game; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.game_stats);
+    }
 
     @Override
     public boolean showsFab() {
@@ -242,12 +233,13 @@ public final class GameFragment extends MainActivityFragment
                 .subscribe(ignored -> togglePersistentUi(), defaultErrorHandler));
 
         if (game.competitorsDeclined())
-            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined);
+            scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined));
 
         else if (game.competitorsNotAccepted())
-            scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance);
+            scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance));
 
-        else scrollManager.updateForEmptyList(R.drawable.ic_stat_white_24dp, R.string.no_stats);
+        else
+            scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_stats));
     }
 
     private void onRemoveRefereeClicked() {

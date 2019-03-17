@@ -10,11 +10,11 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT;
 
 public class TournamentAdapter extends InteractiveAdapter<InteractiveViewHolder, TournamentAdapter.TournamentAdapterListener> {
 
-    private final List<Identifiable> items;
+    private final List<Differentiable> items;
 
-    public TournamentAdapter(List<Identifiable> items, TournamentAdapterListener listener) {
+    public TournamentAdapter(List<Differentiable> items, TournamentAdapterListener listener) {
         super(listener);
         this.items = items;
         setHasStableIds(true);
@@ -49,7 +49,7 @@ public class TournamentAdapter extends InteractiveAdapter<InteractiveViewHolder,
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         if (item instanceof Tournament) ((TournamentViewHolder) viewHolder).bind((Tournament) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
     }
@@ -66,7 +66,7 @@ public class TournamentAdapter extends InteractiveAdapter<InteractiveViewHolder,
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable item = items.get(position);
+        Differentiable item = items.get(position);
         return item instanceof Tournament ? TOURNAMENT : ((Ad) item).getType();
     }
 

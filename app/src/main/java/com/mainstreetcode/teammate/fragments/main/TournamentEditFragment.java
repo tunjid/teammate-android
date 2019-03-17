@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TournamentEditAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Tournament;
@@ -65,7 +65,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         Bundle arguments = getArguments();
         tournament = arguments.getParcelable(ARG_TOURNAMENT);
         gofer = tournamentViewModel.gofer(tournament);
@@ -76,7 +75,7 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<BaseViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new TournamentEditAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
@@ -97,11 +96,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_tournament_edit, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_rounds:
@@ -118,14 +112,6 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return tournament.isEmpty() ? R.string.tournament_create : R.string.tournament_update; }
 
@@ -134,7 +120,17 @@ public class TournamentEditFragment extends HeaderedFragment<Tournament>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    protected int getToolbarMenu() {
+        return R.menu.fragment_tournament_edit;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
+
+    @Override
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {return gofer.canEditAfterCreation();}

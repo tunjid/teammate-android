@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -71,15 +72,15 @@ public class TournamentGofer extends TeamHostingGofer<Tournament> {
 
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> eventFlowable = getFunction.apply(model).map(Tournament::asIdentifiables);
-        Flowable<List<Identifiable>> competitorsFlowable = competitorsFunction.apply(model).map(ModelUtils::asIdentifiables);
-        Flowable<List<Identifiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, competitorsFlowable);
-        return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
+        Flowable<List<Differentiable>> eventFlowable = getFunction.apply(model).map(Tournament::asDifferentiables);
+        Flowable<List<Differentiable>> competitorsFlowable = competitorsFunction.apply(model).map(ModelUtils::asDifferentiables);
+        Flowable<List<Differentiable>> sourceFlowable = Flowable.mergeDelayError(eventFlowable, competitorsFlowable);
+        return FunctionalDiff.of(sourceFlowable, getItems(), this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = updateFunction.apply(model).map(Tournament::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Single<List<Differentiable>> source = updateFunction.apply(model).map(Tournament::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     Completable delete() {

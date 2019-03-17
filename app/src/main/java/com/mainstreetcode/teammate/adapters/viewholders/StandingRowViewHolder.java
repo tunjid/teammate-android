@@ -11,7 +11,7 @@ import com.mainstreetcode.teammate.adapters.StandingsAdapter;
 import com.mainstreetcode.teammate.model.Row;
 import com.mainstreetcode.teammate.util.SyncedScrollView;
 import com.squareup.picasso.Picasso;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class StandingRowViewHolder extends InteractiveViewHolder<StandingsAdapte
 
         String imageUrl = model.getImageUrl();
         if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey);
-        else Picasso.with(itemView.getContext()).load(imageUrl).fit().centerCrop().into(thumbnail);
+        else Picasso.get().load(imageUrl).fit().centerCrop().into(thumbnail);
     }
 
     public void bindColumns(List<String> columns) {

@@ -17,6 +17,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -78,14 +79,14 @@ public class Guest extends GuestEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Guest)) return id.equals(other.getId());
         Guest casted = (Guest) other;
         return attending == casted.attending;
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

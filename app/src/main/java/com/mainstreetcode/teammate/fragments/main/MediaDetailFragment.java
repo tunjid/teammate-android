@@ -2,12 +2,7 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +16,21 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Media;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+
 
 public class MediaDetailFragment extends MainActivityFragment
         implements MediaAdapter.MediaAdapterListener {
 
-    public static final String ARG_MEDIA = "media";
+    static final String ARG_MEDIA = "media";
 
     private Media media;
     private MediaViewHolder mediaViewHolder;
+    private AtomicBoolean systemUiStatus;
 
     public static MediaDetailFragment newInstance(Media media) {
         MediaDetailFragment fragment = new MediaDetailFragment();
@@ -51,8 +53,8 @@ public class MediaDetailFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         media = getArguments().getParcelable(ARG_MEDIA);
+        systemUiStatus = new AtomicBoolean();
     }
 
     @Nullable
@@ -67,13 +69,7 @@ public class MediaDetailFragment extends MainActivityFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_media_detail, menu);
+        disposables.add(mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler));
     }
 
     @Override
@@ -86,7 +82,7 @@ public class MediaDetailFragment extends MainActivityFragment
         new AlertDialog.Builder(activity)
                 .setTitle(R.string.flag_media)
                 .setMessage(R.string.flag_media_message)
-                .setPositiveButton(R.string.yes, (dialog, which) -> mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler))
+                .setPositiveButton(R.string.yes, (dialog, which) -> disposables.add(mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler)))
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .show();
 
@@ -97,16 +93,7 @@ public class MediaDetailFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         View root = getView();
-        if (root == null) return;
-
-        boolean isImage = media.isImage();
-        bindViewHolder(root, media, isImage);
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setToolbarTitle("");
+        if (root != null) bindViewHolder(root, media, media.isImage());
     }
 
     @Override
@@ -122,16 +109,29 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public InsetFlags insetFlags() {return NONE;}
+    protected int getToolbarMenu() { return R.menu.fragment_media_detail; }
 
     @Override
-    public boolean showsFab() {return false;}
+    protected int getNavBarColor() {
+        return mediaViewHolder == null
+                ? super.getNavBarColor()
+                : mediaViewHolder.getBackgroundColor();
+    }
 
     @Override
-    public boolean showsBottomNav() {return false;}
+    public InsetFlags insetFlags() { return NONE; }
 
     @Override
-    public boolean showsToolBar() {return true;}
+    public boolean showsFab() { return false; }
+
+    @Override
+    public boolean showsBottomNav() { return false; }
+
+    @Override
+    public boolean showsToolBar() { return true; }
+
+    @Override
+    protected boolean showsSystemUI() { return systemUiStatus.get(); }
 
     @Override
     public void onMediaClicked(Media item) {
@@ -140,23 +140,21 @@ public class MediaDetailFragment extends MainActivityFragment
 
         int visibility = activity.getWindow().getDecorView().getSystemUiVisibility();
         boolean status = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-        toggleSystemUI(status);
+        systemUiStatus.set(status);
+        togglePersistentUi();
     }
 
     @Override
-    public boolean onMediaLongClicked(Media media) {
-        return false;
-    }
+    public boolean onMediaLongClicked(Media media) { return false; }
 
     @Override
-    public boolean isSelected(Media media) {
-        return false;
-    }
+    public boolean isSelected(Media media) { return false; }
 
     @Override
-    public boolean isFullScreen() {
-        return true;
-    }
+    public boolean isFullScreen() { return true; }
+
+    @Override
+    public void onFillLoaded() { togglePersistentUi(); }
 
     private void checkMediaFlagged(Media media) {
         if (!media.isFlagged()) return;
@@ -166,10 +164,10 @@ public class MediaDetailFragment extends MainActivityFragment
         if (activity != null) activity.onBackPressed();
     }
 
-    private void bindViewHolder(View rootView, Media media, boolean isImage) {
+    private void bindViewHolder(View root, Media media, boolean isImage) {
         mediaViewHolder = isImage
-                ? new ImageMediaViewHolder(rootView, this)
-                : new VideoMediaViewHolder(rootView, this);
+                ? new ImageMediaViewHolder(root, this)
+                : new VideoMediaViewHolder(root, this);
 
         mediaViewHolder.fullBind(media);
         onMediaClicked(media);

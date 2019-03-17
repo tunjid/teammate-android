@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters.viewholders;
 
-import androidx.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,8 +11,9 @@ import com.mainstreetcode.teammate.model.RemoteImage;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
+
+import androidx.annotation.StringRes;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE;
 
@@ -67,7 +67,7 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends InteractiveAda
     }
 
     void load(String imageUrl, ImageView destination) {
-        RequestCreator creator = Picasso.with(itemView.getContext()).load(imageUrl);
+        RequestCreator creator = Picasso.get().load(imageUrl);
 
         if (!isThumbnail()) creator.fit().centerCrop();
         else creator.placeholder(R.drawable.bg_image_placeholder)

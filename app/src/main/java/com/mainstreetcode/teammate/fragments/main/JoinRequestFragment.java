@@ -3,13 +3,13 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.JoinRequestAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Team;
@@ -41,12 +41,12 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         implements
         JoinRequestAdapter.AdapterListener {
 
-    public static final String ARG_JOIN_REQUEST = "join-request";
+    static final String ARG_JOIN_REQUEST = "join-request";
 
     private JoinRequest request;
     private JoinRequestGofer gofer;
 
-    public static JoinRequestFragment inviteInstance(Team team) {
+    static JoinRequestFragment inviteInstance(Team team) {
         JoinRequestFragment fragment = newInstance(JoinRequest.invite(team));
         fragment.setEnterExitTransitions();
 
@@ -60,7 +60,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
         return fragment;
     }
 
-    public static JoinRequestFragment viewInstance(JoinRequest request) {
+    static JoinRequestFragment viewInstance(JoinRequest request) {
         JoinRequestFragment fragment = newInstance(request);
         fragment.setEnterExitTransitions();
 
@@ -88,7 +88,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         request = getArguments().getParcelable(ARG_JOIN_REQUEST);
         gofer = teamMemberViewModel.gofer(request);
     }
@@ -98,7 +97,7 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<InputViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new JoinRequestAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
@@ -109,16 +108,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
 
         scrollManager.getRecyclerView().requestFocus();
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_user_edit, menu);
     }
 
     @Override
@@ -149,14 +138,6 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(gofer.getToolbarTitle(this));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return gofer.getFabTitle(); }
 
@@ -165,13 +146,18 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    protected int getToolbarMenu() {
+        return R.menu.fragment_user_edit;
+    }
 
     @Override
-    @SuppressWarnings("SimplifiableIfStatement")
-    public boolean showsFab() {
-        return gofer.showsFab();
-    }
+    public CharSequence getToolbarTitle() { return gofer.getToolbarTitle(this); }
+
+    @Override
+    public InsetFlags insetFlags() { return NO_TOP; }
+
+    @Override
+    public boolean showsFab() { return gofer.showsFab(); }
 
     @Override
     public void onImageClick() {}
@@ -237,9 +223,8 @@ public class JoinRequestFragment extends HeaderedFragment<JoinRequest>
     private void onJoinRequestSent(DiffUtil.DiffResult result) {
         scrollManager.onDiff(result);
         hideBottomSheet();
-        toggleFab(false);
         toggleProgress(false);
-        setToolbarTitle(gofer.getToolbarTitle(this));
+        togglePersistentUi();
         showSnackbar(getString(request.isTeamApproved()
                 ? R.string.user_invite_sent
                 : R.string.team_submitted_join_request));

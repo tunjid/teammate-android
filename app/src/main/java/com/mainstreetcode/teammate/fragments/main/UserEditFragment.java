@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.UserEditAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -60,7 +61,7 @@ public class UserEditFragment extends HeaderedFragment<User>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<InputViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new UserEditAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
@@ -75,14 +76,6 @@ public class UserEditFragment extends HeaderedFragment<User>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(canEdit() ? R.string.user_edit : R.string.user_info));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.user_update; }
 
@@ -91,7 +84,12 @@ public class UserEditFragment extends HeaderedFragment<User>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    protected CharSequence getToolbarTitle() {
+        return getString(canEdit() ? R.string.user_edit : R.string.user_info);
+    }
+
+    @Override
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {return canEdit();}

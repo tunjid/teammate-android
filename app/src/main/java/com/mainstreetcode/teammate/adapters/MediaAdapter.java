@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -11,13 +10,14 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Media;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
@@ -30,9 +30,9 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.MEDIA_VIDEO;
 
 public class MediaAdapter extends InteractiveAdapter<InteractiveViewHolder, MediaAdapter.MediaAdapterListener> {
 
-    private final List<Identifiable> mediaList;
+    private final List<Differentiable> mediaList;
 
-    public MediaAdapter(List<Identifiable> mediaList, MediaAdapterListener listener) {
+    public MediaAdapter(List<Differentiable> mediaList, MediaAdapterListener listener) {
         super(listener);
         this.mediaList = mediaList;
         setHasStableIds(true);
@@ -53,7 +53,7 @@ public class MediaAdapter extends InteractiveAdapter<InteractiveViewHolder, Medi
     @Override
     @SuppressWarnings("unchecked")
     public void onBindViewHolder(@NonNull InteractiveViewHolder viewHolder, int position) {
-        Identifiable item = mediaList.get(position);
+        Differentiable item = mediaList.get(position);
         if (item instanceof Media) ((MediaViewHolder) viewHolder).bind((Media) item);
         else if (item instanceof Ad) ((AdViewHolder) viewHolder).bind((Ad) item);
     }
@@ -65,7 +65,7 @@ public class MediaAdapter extends InteractiveAdapter<InteractiveViewHolder, Medi
 
     @Override
     public int getItemViewType(int position) {
-        Identifiable identifiable = mediaList.get(position);
+        Differentiable identifiable = mediaList.get(position);
         return identifiable instanceof Media ? (((Media) identifiable).isImage() ? MEDIA_IMAGE : MEDIA_VIDEO) : ((Ad) identifiable).getType();
     }
 
@@ -75,6 +75,9 @@ public class MediaAdapter extends InteractiveAdapter<InteractiveViewHolder, Medi
     }
 
     public interface MediaAdapterListener extends InteractiveAdapter.AdapterListener {
+
+        default void onFillLoaded() {}
+
         void onMediaClicked(Media item);
 
         boolean onMediaLongClicked(Media media);

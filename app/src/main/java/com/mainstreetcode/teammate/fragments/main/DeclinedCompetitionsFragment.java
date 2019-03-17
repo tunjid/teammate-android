@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -34,7 +34,7 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
         implements
         CompetitorAdapter.AdapterListener {
 
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static DeclinedCompetitionsFragment newInstance() {
         DeclinedCompetitionsFragment fragment = new DeclinedCompetitionsFragment();
@@ -57,10 +57,10 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(competitorViewModel.refresh(User.class).subscribe(DeclinedCompetitionsFragment.this::onCompetitorsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
+        scrollManager = ScrollManager.<CompetitorViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchCompetitions(false))
+                .withEndlessScroll(() -> fetchCompetitions(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -75,12 +75,15 @@ public final class DeclinedCompetitionsFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         fetchCompetitions(true);
-        setToolbarTitle(getString(R.string.competitors_declined));
     }
 
     @Override
     public boolean showsFab() { return false; }
 
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.competitors_declined);
+    }
 
     @Override
     public void onCompetitorClicked(Competitor competitor) {

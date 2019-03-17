@@ -6,8 +6,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.List;
@@ -42,8 +43,8 @@ public class GuestGofer extends TeamHostingGofer<Guest> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Guest::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(Guest::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {

@@ -21,6 +21,7 @@ import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.persistence.entity.StatEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class Stat extends StatEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Stat)) return id.equals(other.getId());
         Stat casted = (Stat) other;
         return statType.areContentsTheSame(casted.statType) && user.areContentsTheSame(casted.user)
@@ -86,7 +87,7 @@ public class Stat extends StatEntity
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

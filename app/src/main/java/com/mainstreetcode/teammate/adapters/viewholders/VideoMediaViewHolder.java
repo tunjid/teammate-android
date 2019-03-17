@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.devbrackets.android.exomedia.ui.widget.VideoControls;
+import com.devbrackets.android.exomedia.ui.widget.VideoControlsCore;
 import com.devbrackets.android.exomedia.ui.widget.VideoView;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.MediaAdapter;
@@ -105,9 +106,9 @@ public class VideoMediaViewHolder extends MediaViewHolder<VideoView> {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent event) {
             if (fullResView == null) return true;
-            VideoControls videoControls = fullResView.getVideoControls();
+            VideoControlsCore videoControls = fullResView.getVideoControlsCore();
 
-            if (videoControls != null && videoControls.isVisible()) videoControls.hide();
+            if (videoControls != null && videoControls.isVisible()) videoControls.hide(false);
             else fullResView.showControls();
 
             adapterListener.onMediaClicked(media);

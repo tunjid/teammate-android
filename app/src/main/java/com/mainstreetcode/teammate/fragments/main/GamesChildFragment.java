@@ -1,13 +1,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,11 +13,18 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Lists {@link Event tournaments}
@@ -39,7 +39,7 @@ public final class GamesChildFragment extends MainActivityFragment
 
     private int round;
     private Tournament tournament;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static GamesChildFragment newInstance(Tournament tournament, int round) {
         GamesChildFragment fragment = new GamesChildFragment();
@@ -80,10 +80,10 @@ public final class GamesChildFragment extends MainActivityFragment
                 ? ((TournamentDetailFragment) fragment).getGamesRecycledViewPool()
                 : new RecyclerView.RecycledViewPool();
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::onRefresh)
-                .withEndlessScrollCallback(() -> fetchTournaments(false))
+                .withEndlessScroll(() -> fetchTournaments(false))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new GameAdapter(items, this))
                 .withRecycledViewPool(recycledViewPool)
@@ -95,8 +95,8 @@ public final class GamesChildFragment extends MainActivityFragment
         return rootView;
     }
 
-    private boolean onRefresh() {
-        return disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(GamesChildFragment.this::onGamesUpdated, defaultErrorHandler));
+    private void onRefresh() {
+        disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(GamesChildFragment.this::onGamesUpdated, defaultErrorHandler));
     }
 
     @Override

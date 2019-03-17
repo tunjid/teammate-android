@@ -18,7 +18,6 @@ public class TeamViewHolder extends ModelCardViewHolder<Team, TeamAdapter.Adapte
 
     public void bind(Team model) {
         super.bind(model);
-        if (model.isEmpty()) return;
 
         setTitle(model.getSportAndName());
         setSubTitle(model.getCity());

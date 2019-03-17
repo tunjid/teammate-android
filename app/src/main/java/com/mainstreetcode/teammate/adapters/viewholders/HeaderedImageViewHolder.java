@@ -16,7 +16,7 @@ import com.mainstreetcode.teammate.util.DiffWatcher;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.io.File;
 
@@ -67,7 +67,7 @@ public class HeaderedImageViewHolder extends InteractiveViewHolder<ImageWorkerFr
         if (TextUtils.isEmpty(url)) return null;
 
         File file = new File(url);
-        Picasso picasso = Picasso.with(itemView.getContext());
+        Picasso picasso = Picasso.get();
         return file.exists() ? picasso.load(file) : picasso.load(url);
     }
 
@@ -101,6 +101,6 @@ public class HeaderedImageViewHolder extends InteractiveViewHolder<ImageWorkerFr
         public void onSuccess() {fullRes.setVisibility(View.VISIBLE);}
 
         @Override
-        public void onError() {diff.restart();}
+        public void onError(Exception e) {diff.restart();}
     }
 }

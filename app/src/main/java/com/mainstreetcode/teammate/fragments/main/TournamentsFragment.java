@@ -1,17 +1,7 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DiffUtil;
-
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +13,22 @@ import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
@@ -44,7 +43,7 @@ public final class TournamentsFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static TournamentsFragment newInstance(Team team) {
         TournamentsFragment fragment = new TournamentsFragment();
@@ -70,7 +69,6 @@ public final class TournamentsFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         items = tournamentViewModel.getModelList(team);
     }
@@ -81,10 +79,10 @@ public final class TournamentsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(tournamentViewModel.refresh(team).subscribe(TournamentsFragment.this::onTournamentsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchTournaments(false))
+                .withEndlessScroll(() -> fetchTournaments(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -103,11 +101,6 @@ public final class TournamentsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_tournaments, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
@@ -118,12 +111,7 @@ public final class TournamentsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.tournaments));
-        super.togglePersistentUi();
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_tournaments; }
 
     @Override
     @StringRes
@@ -132,6 +120,11 @@ public final class TournamentsFragment extends MainActivityFragment
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.tournaments);
+    }
 
     @Override
     public boolean showsFab() {
@@ -187,7 +180,7 @@ public final class TournamentsFragment extends MainActivityFragment
         toggleProgress(false);
         boolean supportsTournaments = team.getSport().supportsCompetitions();
         scrollManager.onDiff(result);
-        scrollManager.updateForEmptyList(R.drawable.ic_trophy_white_24dp, supportsTournaments
-                ? R.string.no_tournaments : R.string.no_tournament_support);
+        scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_trophy_white_24dp, supportsTournaments
+                ? R.string.no_tournaments : R.string.no_tournament_support));
     }
 }

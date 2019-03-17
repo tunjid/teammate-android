@@ -19,7 +19,7 @@ import static com.google.android.material.tabs.TabLayout.MODE_FIXED;
 
 public class StatDetailFragment extends MainActivityFragment {
 
-    public static final String ARG_TOURNAMENT = "role";
+    private static final String ARG_TOURNAMENT = "tournament";
 
     private Tournament tournament;
 
@@ -62,11 +62,10 @@ public class StatDetailFragment extends MainActivityFragment {
     }
 
     @Override
-    public void togglePersistentUi() {
-        setToolbarTitle(getString(R.string.tournament_stats));
-        super.togglePersistentUi();
-    }
+    public boolean showsFab() { return false; }
 
     @Override
-    public boolean showsFab() { return false; }
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.tournament_stats);
+    }
 }

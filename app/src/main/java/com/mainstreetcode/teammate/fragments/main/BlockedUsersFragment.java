@@ -1,10 +1,12 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DiffUtil;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,10 +19,11 @@ import com.mainstreetcode.teammate.adapters.viewholders.BlockedUserViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.BlockedUser;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -37,7 +40,7 @@ public final class BlockedUsersFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static BlockedUsersFragment newInstance(Team team) {
         BlockedUsersFragment fragment = new BlockedUsersFragment();
@@ -73,10 +76,10 @@ public final class BlockedUsersFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(blockedUserViewModel.refresh(team).subscribe(BlockedUsersFragment.this::onBlockedUsersUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchBlockedUsers(false))
+                .withEndlessScroll(() -> fetchBlockedUsers(false))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withAdapter(new BlockedUserAdapter(items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -93,20 +96,16 @@ public final class BlockedUsersFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_events, menu);
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.blocked_users_title, team.getName()));
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_events; }
 
     @Override
     public boolean showsFab() {
         return false;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.blocked_users_title, team.getName());
     }
 
     @Override
@@ -137,7 +136,7 @@ public final class BlockedUsersFragment extends MainActivityFragment
         return superResult;
     }
 
-   private void fetchBlockedUsers(boolean fetchLatest) {
+    private void fetchBlockedUsers(boolean fetchLatest) {
         if (fetchLatest) scrollManager.setRefreshing();
         else toggleProgress(true);
 

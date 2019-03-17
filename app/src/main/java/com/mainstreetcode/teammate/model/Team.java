@@ -21,6 +21,7 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public class Team extends TeamEntity
     }
 
     public static Team empty() {
-        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "", "", "", "", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
+        return new Team(NEW_TEAM, Config.getDefaultTeamLogo(), "", "Detroit️", "", "", "My Team", "", new Date(), null, Sport.empty(), 0, 0, 0, 0);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class Team extends TeamEntity
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Team)) return id.equals(other.getId());
         Team casted = (Team) other;
         boolean same = name.equals(casted.name) && city.equals(casted.getCity())
@@ -103,7 +104,7 @@ public class Team extends TeamEntity
     public String getImageUrl() { return TextUtils.isEmpty(imageUrl) ? Config.getDefaultTeamLogo() : imageUrl; }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

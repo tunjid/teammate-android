@@ -1,7 +1,7 @@
 package com.mainstreetcode.teammate.viewmodel;
 
 
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamHost;
@@ -16,9 +16,9 @@ import java.util.Map;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
 
-public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> extends MappedViewModel<Team, V> {
+public abstract class TeamMappedViewModel<V extends Differentiable & TeamHost> extends MappedViewModel<Team, V> {
 
-    final Map<Team, List<Identifiable>> modelListMap = new HashMap<>();
+    final Map<Team, List<Differentiable>> modelListMap = new HashMap<>();
 
     @Override
     void onModelAlert(Alert alert) {
@@ -29,12 +29,12 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
         modelListMap.remove(deleted);
     }
 
-    public List<Identifiable> getModelList(Team team) {
+    public List<Differentiable> getModelList(Team team) {
         return ModelUtils.get(team, modelListMap, ArrayList::new);
     }
 
     @Override
-    void onErrorMessage(Message message, Team key, Identifiable invalid) {
+    void onErrorMessage(Message message, Team key, Differentiable invalid) {
         super.onErrorMessage(message, key, invalid);
         if (message.isIllegalTeamMember()) pushModelAlert(Alert.teamDeletion(key));
     }
@@ -49,7 +49,7 @@ public abstract class TeamMappedViewModel<V extends Identifiable & TeamHost> ext
         pushModelAlert(Alert.teamDeletion(key));
     }
 
-    Flowable<Identifiable> getAllModels() {
+    Flowable<Differentiable> getAllModels() {
         return Flowable.fromIterable(modelListMap.values()).flatMap(Flowable::fromIterable);
     }
 }

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.util;
 import android.view.View;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.tunjid.androidbootstrap.functions.Consumer;
 
 public class AppBarListener implements
         View.OnAttachStateChangeListener,
@@ -11,9 +12,9 @@ public class AppBarListener implements
     private int lastOffset;
     private int appBarHeight;
     private final AppBarLayout appBarLayout;
-    private final ModelUtils.Consumer<OffsetProps> offsetDiffListener;
+    private final Consumer<OffsetProps> offsetDiffListener;
 
-    private AppBarListener(AppBarLayout appBarLayout, ModelUtils.Consumer<OffsetProps> offsetDiffListener) {
+    private AppBarListener(AppBarLayout appBarLayout, Consumer<OffsetProps> offsetDiffListener) {
         this.appBarLayout = appBarLayout;
         this.offsetDiffListener = offsetDiffListener;
         appBarLayout.addOnOffsetChangedListener(this);
@@ -60,14 +61,14 @@ public class AppBarListener implements
 
     public static class Builder {
         private AppBarLayout appBarLayout;
-        private ModelUtils.Consumer<OffsetProps> offsetDiffListener;
+        private Consumer<OffsetProps> offsetDiffListener;
 
         public Builder appBarLayout(AppBarLayout appBarLayout) {
             this.appBarLayout = appBarLayout;
             return this;
         }
 
-        public Builder offsetDiffListener(ModelUtils.Consumer<OffsetProps> offsetDiffListener) {
+        public Builder offsetDiffListener(Consumer<OffsetProps> offsetDiffListener) {
             this.offsetDiffListener = offsetDiffListener;
             return this;
         }

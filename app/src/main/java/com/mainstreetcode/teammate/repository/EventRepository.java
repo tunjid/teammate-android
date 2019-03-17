@@ -13,7 +13,7 @@ import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.EventDao;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
-import com.mainstreetcode.teammate.util.TransformingSequentialList;
+import com.tunjid.androidbootstrap.functions.collections.Lists;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,7 +99,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
         Date localDate = date == null ? getFutureDate() : date;
 
         Maybe<List<Event>> local = AppDatabase.getInstance().guestDao().getRsvpList(current.getId(), localDate)
-                .map(guests -> (List<Event>) new ArrayList<>(new TransformingSequentialList<>(guests, Guest::getEvent)))
+                .map(guests -> (List<Event>) new ArrayList<>(Lists.transform(guests, Guest::getEvent)))
                 .subscribeOn(io());
 
         Maybe<List<Event>> remote = api.eventsAttending(date, DEF_QUERY_LIMIT).map(getSaveManyFunction()).toMaybe();

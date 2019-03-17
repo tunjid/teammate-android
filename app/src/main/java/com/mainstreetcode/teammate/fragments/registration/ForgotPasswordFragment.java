@@ -57,20 +57,17 @@ public final class ForgotPasswordFragment extends RegistrationActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.sign_in_forgot_password));
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.submit; }
 
     @Override
     @DrawableRes
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.sign_in_forgot_password);
+    }
 
     @Override
     public void onDestroyView() {

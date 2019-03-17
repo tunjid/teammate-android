@@ -1,17 +1,7 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DiffUtil;
-
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +13,20 @@ import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
@@ -43,7 +41,7 @@ public final class EventsFragment extends MainActivityFragment
     private static final String ARG_TEAM = "team";
 
     private Team team;
-    private List<Identifiable> items;
+    private List<Differentiable> items;
 
     public static EventsFragment newInstance(Team team) {
         EventsFragment fragment = new EventsFragment();
@@ -69,7 +67,6 @@ public final class EventsFragment extends MainActivityFragment
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         team = getArguments().getParcelable(ARG_TEAM);
         items = eventViewModel.getModelList(team);
     }
@@ -80,10 +77,10 @@ public final class EventsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(eventViewModel.refresh(team).subscribe(EventsFragment.this::onEventsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchEvents(false))
+                .withEndlessScroll(() -> fetchEvents(false))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -102,11 +99,6 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_events, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_pick_team:
@@ -117,12 +109,7 @@ public final class EventsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.events_title, team.getName()));
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_events; }
 
     @Override
     @StringRes
@@ -135,6 +122,11 @@ public final class EventsFragment extends MainActivityFragment
     @Override
     public boolean showsFab() {
         return localRoleViewModel.hasPrivilegedRole();
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.events_title, team.getName());
     }
 
     @Override

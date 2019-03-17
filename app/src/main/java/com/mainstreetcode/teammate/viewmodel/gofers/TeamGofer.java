@@ -7,7 +7,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 
 import java.util.List;
@@ -60,20 +61,20 @@ public class TeamGofer extends TeamHostingGofer<Team> {
 
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingAddress) return Flowable.empty();
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Team::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated);
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(Team::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (itemsCopy, updated) -> updated);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Team::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
+        Single<List<Differentiable>> source = upsertFunction.apply(model).map(Team::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (itemsCopy, updated) -> updated).doOnSuccess(ignored -> state = EDITING);
     }
 
     public Single<DiffUtil.DiffResult> setAddress(Address address) {
         isSettingAddress = true;
         model.setAddress(address);
-        Single<List<Identifiable>> source = Single.just(model.<List<Identifiable>>asIdentifiables());
-        return Identifiable.diff(source, this::getItems, (itemsCopy, updated) -> updated).doFinally(() -> isSettingAddress = false);
+        Single<List<Differentiable>> source = Single.just(model.asDifferentiables());
+        return FunctionalDiff.of(source, getItems(), (itemsCopy, updated) -> updated).doFinally(() -> isSettingAddress = false);
     }
 
     @Nullable

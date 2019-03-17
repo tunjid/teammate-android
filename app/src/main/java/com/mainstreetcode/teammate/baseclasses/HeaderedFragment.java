@@ -121,7 +121,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
     }
 
     protected void onPrepComplete() {
-        toggleFab(showsFab());
+        togglePersistentUi();
     }
 
     protected boolean canExpandAppBar() {return true;}
@@ -139,7 +139,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         if (appBarLayout != null) appBarLayout.setExpanded(false);
         if (showsFab()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
                 .observeOn(mainThread())
-                .subscribe(() -> toggleFab(showsFab()), ErrorHandler.EMPTY));
+                .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY));
     }
 
     protected final void fetch() { getData(false); }

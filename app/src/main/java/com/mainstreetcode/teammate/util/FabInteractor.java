@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import com.google.android.material.button.MaterialButton;
-import com.tunjid.androidbootstrap.view.animator.FabExtensionAnimator;
+import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,7 +50,7 @@ public class FabInteractor extends FabExtensionAnimator {
         private final CharSequence charSequence;
         private final Drawable drawable;
 
-        public State(MaterialButton button, @DrawableRes int icon, @StringRes int text) {
+        State(MaterialButton button, @DrawableRes int icon, @StringRes int text) {
             this.icon = icon;
             this.text = text;
             this.charSequence = button.getResources().getText(text);

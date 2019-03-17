@@ -12,10 +12,11 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.MyEventsViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public final class MyEventsFragment extends MainActivityFragment
         implements
         EventAdapter.EventAdapterListener {
 
-    private List<Identifiable> items;
+    private List<Differentiable> items;
     private MyEventsViewModel myEventsViewModel;
 
     public static MyEventsFragment newInstance() {
@@ -65,10 +66,10 @@ public final class MyEventsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(myEventsViewModel.refresh(Event.class).subscribe(MyEventsFragment.this::onEventsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
-                .withEndlessScrollCallback(() -> fetchEvents(false))
+                .withEndlessScroll(() -> fetchEvents(false))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(new EventAdapter(items, this))
@@ -87,12 +88,16 @@ public final class MyEventsFragment extends MainActivityFragment
     @Override
     public void togglePersistentUi() {
         super.togglePersistentUi();
-        setToolbarTitle(getString(R.string.attending_events));
     }
 
     @Override
     public boolean showsFab() {
         return false;
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.attending_events);
     }
 
     @Override

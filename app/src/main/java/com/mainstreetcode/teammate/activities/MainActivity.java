@@ -2,6 +2,8 @@ package com.mainstreetcode.teammate.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -44,18 +46,17 @@ import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.Supplier;
+import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.mainstreetcode.teammate.util.nav.BottomNav;
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment;
 import com.mainstreetcode.teammate.util.nav.NavItem;
-import com.mainstreetcode.teammate.util.nav.ViewHolder;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
 import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.functions.Supplier;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import androidx.annotation.IdRes;
-import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -71,6 +72,7 @@ import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.listenForLayout;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.loadBitmapFromView;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.util.ViewUtil.getLayoutParams;
 
@@ -141,17 +143,17 @@ public class MainActivity extends TeammatesBaseActivity
         bottomSheetContainer = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
+        toolbar.setNavigationContentDescription(R.string.expand_nav);
+        toolbar.setNavigationIcon(R.drawable.ic_supervisor_white_24dp);
+        toolbar.setNavigationOnClickListener(view -> showNavOverflow());
         altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState != STATE_HIDDEN) return;
-                restoreHiddenViewState();
+            @Override public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == STATE_HIDDEN) restoreHiddenViewState();
             }
 
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
+            @Override public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
 
         bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation))
@@ -161,7 +163,7 @@ public class MainActivity extends TeammatesBaseActivity
                         NavItem.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
                         NavItem.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
                         NavItem.create(R.id.action_media, R.string.media, R.drawable.ic_video_library_black_24dp),
-                        NavItem.create(R.id.action_team, R.string.my_teams, R.drawable.ic_group_black_24dp))
+                        NavItem.create(R.id.action_tournaments, R.string.tourneys, R.drawable.ic_trophy_white_24dp))
                 .createBottomNav();
 
         if (savedState != null) bottomToolbarState = savedState.getParcelable(BOTTOM_TOOLBAR_STATE);
@@ -209,10 +211,11 @@ public class MainActivity extends TeammatesBaseActivity
         super.onResume();
         TeamViewModel teamViewModel = ViewModelProviders.of(this).get(TeamViewModel.class);
 
-        disposables.add(teamViewModel.getTeamChangeFlowable().subscribe(team -> {
-            ViewHolder viewHolder = bottomNav.getViewHolder(R.id.action_team);
-            if (viewHolder != null) viewHolder.setImageUrl(team.getImageUrl());
-        }, ErrorHandler.EMPTY));
+        disposables.add(teamViewModel.getTeamChangeFlowable()
+                .flatMapSingle(team -> ViewHolderUtil.fetchRoundedDrawable(this,
+                        team.getImageUrl(),
+                        getResources().getDimensionPixelSize(R.dimen.double_margin),R.drawable.ic_supervisor_white_24dp))
+                .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
     }
 
     @Override
@@ -221,7 +224,7 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState);
         super.onSaveInstanceState(outState);
     }
@@ -239,20 +242,14 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    public void setAltToolbarMenu(@MenuRes int menu) {
-        altToolbar.getMenu().clear();
-        altToolbar.inflateMenu(menu);
+    public void updateAltToolbar(int menu, CharSequence title) {
+        updateToolBar(altToolbar, menu, title);
     }
 
     @Override protected int adjustKeyboardPadding(int suggestion) {
         int padding = super.adjustKeyboardPadding(suggestion);
         if (padding != bottomInset) padding -= bottomNavHeight;
         return padding;
-    }
-
-    @Override
-    public void setAltToolbarTitle(CharSequence title) {
-        altToolbar.setTitle(title);
     }
 
     @Override
@@ -326,6 +323,16 @@ public class MainActivity extends TeammatesBaseActivity
 
     private void showNavOverflow() {
         NavDialogFragment.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    private void updateToolbarIcon(Drawable drawable) {
+        Drawable current = toolbar.getNavigationIcon();
+        TransitionDrawable updated = new TransitionDrawable(current == null
+                ? new Drawable[]{drawable}
+                : new Drawable[]{current.getCurrent(), drawable});
+
+        toolbar.setNavigationIcon(updated);
+        if (current != null) updated.startTransition(HIDER_DURATION);
     }
 
     private boolean onNavItemSelected(@IdRes int id) {

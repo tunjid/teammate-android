@@ -1,21 +1,36 @@
 package com.mainstreetcode.teammate.util.nav;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.navigation.NavigationView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.navigation.NavigationView;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.adapters.RemoteImageAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.RemoteImageViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
+import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
+import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import io.reactivex.disposables.Disposable;
+
+import static android.widget.LinearLayout.HORIZONTAL;
 
 public class NavDialogFragment extends BottomSheetDialogFragment {
 
@@ -36,7 +51,6 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
         teamViewModel = ViewModelProviders.of(requireActivity()).get(TeamViewModel.class);
     }
 
-    @Nullable
     @Override
     @SuppressWarnings("ConstantConditions")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,9 +59,26 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
         TeamViewHolder teamViewHolder = new TeamViewHolder(itemView, item -> switchTeam());
         NavigationView navigationView = root.findViewById(R.id.bottom_nav_view);
 
+        List<Team> list = new ArrayList<>();
+
+        Disposable disposable = teamViewModel.nonDefaultTeams(list)
+                .subscribe(ScrollManager.<RemoteImageViewHolder<Team>>with(root.findViewById(R.id.horizontal_list))
+                        .withAdapter(new RemoteImageAdapter<>(list, team -> {
+                            dismiss();
+                            teamViewModel.updateDefaultTeam(team);
+                            ((BaseActivity) requireActivity()).showFragment(TeamMembersFragment.newInstance(team));
+                        }))
+                        .withCustomLayoutManager(new LinearLayoutManager(root.getContext(), HORIZONTAL, false))
+                        .build()::onDiff, ErrorHandler.EMPTY);
+
         itemView.setElevation(0);
         teamViewHolder.bind(teamViewModel.getDefaultTeam());
         navigationView.setNavigationItemSelectedListener(this::onOptionsItemSelected);
+        root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override public void onViewAttachedToWindow(View v) {}
+
+            @Override public void onViewDetachedFromWindow(View v) { disposable.dispose(); }
+        });
         return root;
     }
 

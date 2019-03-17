@@ -3,12 +3,6 @@ package com.mainstreetcode.teammate.util.nav;
 import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-
-import androidx.annotation.AttrRes;
-import androidx.annotation.ColorRes;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.view.GestureDetectorCompat;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +13,9 @@ import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import androidx.annotation.AttrRes;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.GestureDetectorCompat;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewHolder {
@@ -36,8 +33,8 @@ public class ViewHolder {
     ViewHolder(View view, Runnable swipeRunnable) {
         this.swipeRunnable = swipeRunnable;
         itemView = view;
-        title = view.findViewById(R.id.title);
-        icon = view.findViewById(R.id.icon);
+        title = view.findViewById(R.id.item_title);
+        icon = view.findViewById(R.id.thumbnail);
         icon.setDisableCircularTransformation(true);
         callback = new ImageCallback(this);
 
@@ -115,14 +112,13 @@ public class ViewHolder {
 
             currentImage = imageUrl;
             viewHolder.hasCustomImage = true;
-            Picasso.with(viewHolder.itemView.getContext())
-                    .load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this);
+            Picasso.get().load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this);
         }
 
         @Override
         public void onSuccess() { viewHolder.onCustomImageLoaded(loaded = true); }
 
         @Override
-        public void onError() { viewHolder.onCustomImageLoaded(loaded = false); }
+        public void onError(Exception e) { viewHolder.onCustomImageLoaded(loaded = false); }
     }
 }

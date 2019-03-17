@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class StatAggregate {
         private Team team;
         private Sport sport;
 
-        private final List<Identifiable> items;
+        private final List<Differentiable> items;
 
         private Request(User user, Team team, Sport sport) {
             this.user = user;
@@ -52,9 +53,9 @@ public class StatAggregate {
         public void setSport(String sport) { this.sport = Config.sportFromCode(sport); }
 
 
-        public List<Identifiable> getItems() { return items; }
+        public List<Differentiable> getItems() { return items; }
 
-        private List<Identifiable> buildItems() {
+        private List<Differentiable> buildItems() {
             return Arrays.asList(
                     Item.text(holder.get(0), 0, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
                             .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
@@ -118,7 +119,7 @@ public class StatAggregate {
         }
     }
 
-    public static class Aggregate implements Identifiable {
+    public static class Aggregate implements Differentiable {
         int count;
         StatType type;
 

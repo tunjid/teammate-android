@@ -17,6 +17,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.Logger;
@@ -41,9 +42,9 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     private Team team;
     private TeamGofer gofer;
 
-    public static TeamEditFragment newCreateInstance() {return newInstance(Team.empty());}
+    static TeamEditFragment newCreateInstance() {return newInstance(Team.empty());}
 
-    public static TeamEditFragment newEditInstance(Team team) {return newInstance(team);}
+    static TeamEditFragment newEditInstance(Team team) {return newInstance(team);}
 
     private static TeamEditFragment newInstance(Team team) {
         TeamEditFragment fragment = new TeamEditFragment();
@@ -74,7 +75,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<InputViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new TeamEditAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
@@ -88,13 +89,6 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return team.isEmpty() ? R.string.team_create : R.string.team_update; }
 
@@ -103,7 +97,12 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    protected CharSequence getToolbarTitle() {
+        return gofer.getToolbarTitle(this);
+    }
+
+    @Override
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {
@@ -139,8 +138,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
 
     protected void onPrepComplete() {
         scrollManager.notifyDataSetChanged();
-        toggleFab(showsFab());
-        setToolbarTitle(gofer.getToolbarTitle(this));
+        togglePersistentUi();
         super.onPrepComplete();
     }
 

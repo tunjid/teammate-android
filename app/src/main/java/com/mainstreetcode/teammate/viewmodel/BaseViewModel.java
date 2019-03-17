@@ -2,7 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
@@ -20,7 +20,7 @@ abstract class BaseViewModel extends ViewModel {
 
     private static final PublishProcessor<Alert> eventSource = PublishProcessor.create();
 
-    private LinkedList<Identifiable> ads = new LinkedList<>();
+    private LinkedList<Differentiable> ads = new LinkedList<>();
     private CompositeDisposable disposable = new CompositeDisposable();
 
     BaseViewModel() {
@@ -42,7 +42,7 @@ abstract class BaseViewModel extends ViewModel {
         super.onCleared();
     }
 
-    final List<Identifiable> preserveList(List<Identifiable> source, List<Identifiable> additions) {
+    final List<Differentiable> preserveList(List<Differentiable> source, List<Differentiable> additions) {
         if (sortsAscending()) ModelUtils.preserveAscending(source, additions);
         else ModelUtils.preserveDescending(source, additions);
 
@@ -51,9 +51,9 @@ abstract class BaseViewModel extends ViewModel {
         return source;
     }
 
-    void afterPreserveListDiff(List<Identifiable> source) {}
+    void afterPreserveListDiff(List<Differentiable> source) {}
 
-    private void distributeAds(List<Identifiable> source) {
+    private void distributeAds(List<Differentiable> source) {
         //filterAds(source);
         if (source.isEmpty() || ads.isEmpty()) return;
 
@@ -95,8 +95,8 @@ abstract class BaseViewModel extends ViewModel {
 //        adLoader.loadAds(new AdRequest.Builder().build(), 2);
     }
     //        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
-    //        Iterator<Identifiable> iterator = source.iterator();
-//    private void filterAds(List<Identifiable> source) {
+    //        Iterator<Differentiable> iterator = source.iterator();
+//    private void filterAds(List<Differentiable> source) {
 
 //    }
 

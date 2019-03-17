@@ -1,21 +1,15 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.RoleEditAdapter;
+import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.util.ScrollManager;
@@ -23,6 +17,13 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DiffUtil;
 
 /**
  * Edits a Team member
@@ -32,7 +33,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
         implements
         RoleEditAdapter.RoleEditAdapterListener {
 
-    public static final String ARG_ROLE = "role";
+    static final String ARG_ROLE = "role";
 
     private Role role;
     private RoleGofer gofer;
@@ -58,7 +59,6 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         role = getArguments().getParcelable(ARG_ROLE);
         gofer = teamMemberViewModel.gofer(role);
     }
@@ -68,7 +68,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_headered, container, false);
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.<InputViewHolder>with(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(new RoleEditAdapter(gofer.getItems(), this))
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
@@ -92,17 +92,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_user_edit, menu);
-    }
-
-    @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        setToolbarTitle(getString(R.string.role_edit));
-        super.togglePersistentUi();
-    }
+    protected int getToolbarMenu() { return R.menu.fragment_user_edit; }
 
     @Override
     @StringRes
@@ -113,7 +103,12 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.role_edit);
+    }
+
+    @Override
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {return gofer.canChangeRoleFields();}
@@ -185,7 +180,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     private void onRoleUpdated(DiffUtil.DiffResult result) {
         viewHolder.bind(getHeaderedModel());
         scrollManager.onDiff(result);
-        toggleFab(showsFab());
+        togglePersistentUi();
         toggleProgress(false);
         requireActivity().invalidateOptionsMenu();
         showSnackbar(getString(R.string.updated_user, role.getUser().getFirstName()));

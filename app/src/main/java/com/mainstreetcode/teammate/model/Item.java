@@ -5,7 +5,8 @@ import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.util.Supplier;
+import com.tunjid.androidbootstrap.functions.Supplier;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.annotation.Retention;
 
@@ -20,7 +21,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 /**
  * Item for listing properties of a {@link Model}
  */
-public class Item<T> implements Identifiable, Comparable<Item> {
+public class Item<T> implements Differentiable, Comparable<Item> {
 
     @Retention(SOURCE)
     @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY})
@@ -142,13 +143,13 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public int compareTo(@NonNull Item o) { return Integer.compare(sortPosition, o.sortPosition); }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (other instanceof Item) return value.equals(((Item) other).value);
         return id.equals(other.getId());
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

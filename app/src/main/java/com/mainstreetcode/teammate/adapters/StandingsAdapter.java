@@ -8,7 +8,7 @@ import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Row;
 import com.mainstreetcode.teammate.util.SyncedScrollView;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveAdapter;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 
 import java.util.List;
 

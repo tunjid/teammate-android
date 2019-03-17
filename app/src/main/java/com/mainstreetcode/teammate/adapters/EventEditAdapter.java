@@ -14,7 +14,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.enums.Visibility;
@@ -33,11 +33,11 @@ import static com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM;
 
 public class EventEditAdapter extends BaseAdapter<BaseViewHolder, EventEditAdapter.EventEditAdapterListener> {
 
-    private final List<Identifiable> identifiables;
+    private final List<Differentiable> identifiables;
     private final TextInputStyle.InputChooser chooser = new Chooser(adapterListener);
     private final TeamAdapter.AdapterListener teamListener = item -> adapterListener.selectTeam();
 
-    public EventEditAdapter(List<Identifiable> identifiables, EventEditAdapterListener listener) {
+    public EventEditAdapter(List<Differentiable> identifiables, EventEditAdapterListener listener) {
         super(listener);
         setHasStableIds(true);
         this.identifiables = identifiables;

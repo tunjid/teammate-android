@@ -13,9 +13,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar;
+import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.util.FabInteractor;
-import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity;
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.animator.ViewHider;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
@@ -27,7 +29,6 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -50,10 +51,13 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
+import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOOLBAR_ANIM_DELAY;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
@@ -64,7 +68,13 @@ import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
+    private static final int DEFAULT_SYSTEM_UI_FLAGS = SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
+
     protected static final int HIDER_DURATION = 300;
+    private static final String UI_STATE = "APP_UI_STATE";
 
     public static int topInset;
     private int leftInset;
@@ -80,12 +90,15 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ConstraintLayout constraintLayout;
     private FrameLayout fragmentContainer;
     private LoadingBar loadingBar;
-    private Toolbar toolbar;
     private View padding;
+
+    protected Toolbar toolbar;
 
     private ViewHider fabHider;
     private ViewHider toolbarHider;
     private FabInteractor fabInteractor;
+
+    protected UiState uiState;
 
     private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
 
@@ -111,6 +124,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+
+        uiState = savedInstanceState == null ? UiState.freshState() : savedInstanceState.getParcelable(UI_STATE);
     }
 
     @Override
@@ -142,7 +157,12 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             return true;
         });
 
-        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(item -> {
+            BaseFragment fragment = getCurrentFragment();
+            boolean selected = fragment != null && fragment.onOptionsItemSelected(item);
+            return selected || onOptionsItemSelected(item);
+        });
+
         getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -152,9 +172,43 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        updateUI(true, uiState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(UI_STATE, uiState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void invalidateOptionsMenu() {
+        super.invalidateOptionsMenu();
+        toolbar.postDelayed(() -> {
+            TeammatesBaseFragment fragment = getCurrentFragment();
+            if (fragment != null) fragment.onPrepareOptionsMenu(toolbar.getMenu());
+        }, TOOLBAR_ANIM_DELAY);
+    }
+
+    @Override
     public TeammatesBaseFragment getCurrentFragment() {
         return (TeammatesBaseFragment) super.getCurrentFragment();
     }
+
+    @Override
+    public void update(UiState state) {
+        updateUI(false, state);
+    }
+
+    @Override
+    public void updateMainToolBar(int menu, CharSequence title) {
+        updateToolBar(toolbar, menu, title);
+    }
+
+    @Override
+    public void updateAltToolbar(int menu, CharSequence title) { }
 
     @Override
     public void toggleToolbar(boolean show) {
@@ -192,25 +246,20 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void setFabIcon(@DrawableRes int icon, @StringRes int title) {
-        if (fabInteractor != null) fabInteractor.update(icon, title);
+        runOnUiThread(() -> {
+            if (icon != 0 && title != 0 && fabInteractor != null) fabInteractor.update(icon, title);
+        });
+    }
+
+    @Override
+    public void setNavBarColor(int color) {
+        getWindow().setNavigationBarColor(color);
     }
 
     @Override
     public void setFabExtended(boolean expanded) {
         if (fabInteractor != null) fabInteractor.setExtended(expanded);
     }
-
-    @Override
-    public void setToolbarTitle(CharSequence title) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setTitle(title);
-    }
-
-    @Override
-    public void setAltToolbarTitle(CharSequence title) {}
-
-    @Override
-    public void setAltToolbarMenu(int menu) {}
 
     @Override
     public void showSnackBar(CharSequence message) {
@@ -223,7 +272,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     @SuppressWarnings("unchecked")
-    public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {
+    public void showSnackBar(Consumer<Snackbar> consumer) {
         Snackbar snackbar = Snackbar.make(coordinatorLayout, "", LENGTH_INDEFINITE).addCallback(callback);
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
@@ -235,7 +284,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     @SuppressWarnings("unchecked")
-    public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {
+    public void showChoices(Consumer<ChoiceBar> consumer) {
         ChoiceBar bar = ChoiceBar.make(coordinatorLayout, LENGTH_INDEFINITE).addCallback(callback);
         consumer.accept(bar);
         transientBottomBars.add(bar);
@@ -277,8 +326,26 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TeammatesBaseFragment view = getCurrentFragment();
         if (view != null) for (int id : view.staticViews()) transition.excludeTarget(id, true);
         transition.excludeTarget(RecyclerView.class, true);
+        transition.excludeTarget(toolbar, true);
 
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
+    }
+
+    private void updateUI(boolean force, UiState state) {
+        uiState = uiState.diff(force,
+                state,
+                this::toggleFab,
+                this::toggleToolbar,
+                this::toggleAltToolbar,
+                this::toggleBottombar,
+                this::toggleSystemUI,
+                this::setNavBarColor,
+                insetFlag -> {},
+                this::setFabIcon,
+                this::updateMainToolBar,
+                this::updateAltToolbar,
+                this::setFabClickListener
+        );
     }
 
     private WindowInsetsCompat consumeSystemInsets(WindowInsetsCompat insets) {
@@ -325,16 +392,14 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     private void hideSystemUI() {
-        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-        visibility = visibility | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_FULLSCREEN;
+        int visibility = DEFAULT_SYSTEM_UI_FLAGS | SYSTEM_UI_FLAG_FULLSCREEN;
         if (isInLandscape()) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 
         getDecorView().setSystemUiVisibility(visibility);
     }
 
     private void showSystemUI() {
-        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-        getDecorView().setSystemUiVisibility(visibility);
+        getDecorView().setSystemUiVisibility(DEFAULT_SYSTEM_UI_FLAGS);
     }
 
     private boolean isInLandscape() {

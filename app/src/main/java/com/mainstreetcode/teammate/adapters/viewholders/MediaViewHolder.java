@@ -2,17 +2,13 @@ package com.mainstreetcode.teammate.adapters.viewholders;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import androidx.arch.core.util.Function;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.github.florent37.picassopalette.PicassoPalette;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.MediaAdapter;
 import com.mainstreetcode.teammate.model.Media;
@@ -20,11 +16,18 @@ import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.tunjid.androidbootstrap.view.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.functions.Consumer;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
-import static androidx.core.view.ViewCompat.setTransitionName;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.github.florent37.picassopalette.PicassoPalette.Profile.MUTED_DARK;
+import static androidx.core.view.ViewCompat.setTransitionName;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName;
 
@@ -42,12 +45,14 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
     public Media media;
 
     T fullResView;
+    private int fill;
     private View border;
     private ConstraintLayout container;
     public ImageView thumbnailView;
 
     MediaViewHolder(View itemView, @NonNull MediaAdapter.MediaAdapterListener adapterListener) {
         super(itemView, adapterListener);
+        fill = Color.BLACK;
         border = itemView.findViewById(R.id.border);
         container = itemView.findViewById(R.id.container);
         fullResView = itemView.findViewById(getFullViewId());
@@ -92,6 +97,9 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
 
     public void unBind() {}
 
+    @ColorInt
+    public int getBackgroundColor() { return fill; }
+
     public boolean performLongClick() {
         highlightViewHolder(adapterListener::onMediaLongClicked);
         return true;
@@ -101,7 +109,7 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
         boolean isFullScreen = adapterListener.isFullScreen();
         if (TextUtils.isEmpty(url)) return;
 
-        RequestCreator creator = Picasso.with(itemView.getContext()).load(url);
+        RequestCreator creator = Picasso.get().load(url);
 
         if (!isFullScreen) creator.placeholder(R.drawable.bg_image_placeholder);
 
@@ -110,9 +118,7 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
 
         Callback callBack = isFullScreen && fitToSize
                 ? this
-                : isFullScreen
-                ? PicassoPalette.with(url, destination).use(MUTED_DARK).intoBackground(itemView)
-                : PicassoPalette.with(url, destination).use(MUTED_DARK).intoBackground(thumbnailView);
+                : new PaletteCallBack(destination, color -> onFillExtracted(color, isFullScreen ? itemView : thumbnailView));
 
         creator.into(destination, callBack);
     }
@@ -143,6 +149,11 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
         set.start();
     }
 
+    private void onFillExtracted(@ColorInt int colorFill, View destination) {
+        destination.setBackgroundColor(fill = colorFill);
+        adapterListener.onFillLoaded();
+    }
+
     @NonNull
     private ObjectAnimator animateProperty(String property, float start, float end) {
         return ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION);
@@ -152,5 +163,25 @@ public abstract class MediaViewHolder<T extends View> extends InteractiveViewHol
     public void onSuccess() {}
 
     @Override
-    public void onError() {}
+    public void onError(Exception e) {}
+
+    private static class PaletteCallBack implements Callback {
+
+        private final ImageView destination;
+        private final Consumer<Integer> integerConsumer;
+
+        PaletteCallBack(ImageView destination, Consumer<Integer> integerConsumer) {
+            this.destination = destination;
+            this.integerConsumer = integerConsumer;
+        }
+
+        @Override @SuppressLint("CheckResult")
+        public void onSuccess() {
+            //noinspection ResultOfMethodCallIgnored
+            ViewHolderUtil.extractPalette(destination).map(palette -> palette.getDarkMutedColor(Color.BLACK))
+                    .subscribe(integerConsumer::accept, Throwable::printStackTrace);
+        }
+
+        @Override public void onError(Exception e) { }
+    }
 }

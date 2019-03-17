@@ -8,12 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.BiFunction;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.repository.TeamMemberRepository;
-import com.mainstreetcode.teammate.util.ModelUtils;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -43,12 +44,12 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
     private int index;
 
     private final Function<JoinRequest, Flowable<JoinRequest>> getFunction;
-    private final ModelUtils.BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
+    private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
     public JoinRequestGofer(JoinRequest model,
                             Consumer<Throwable> onError,
                             Function<JoinRequest, Flowable<JoinRequest>> getFunction,
-                            ModelUtils.BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+                            BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
         super(model, onError);
         this.getFunction = getFunction;
         this.joinCompleter = joinCompleter;
@@ -138,15 +139,15 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(JoinRequest::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(JoinRequest::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (items, updated) -> filteredItems(model));
     }
 
     @Override
     Single<DiffUtil.DiffResult> upsert() {
         Single<JoinRequest> single = model.isEmpty() ? joinTeam() : approveRequest();
-        Single<List<Identifiable>> source = single.map(JoinRequest::asIdentifiables).doOnSuccess(ignored -> updateState());
-        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
+        Single<List<Differentiable>> source = single.map(JoinRequest::asDifferentiables).doOnSuccess(ignored -> updateState());
+        return FunctionalDiff.of(source, getItems(), (items, updated) -> filteredItems(model));
     }
 
     @Override
@@ -194,10 +195,10 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
                 .blockingGet();
     }
 
-    private List<Identifiable> filteredItems(JoinRequest request) {
+    private List<Differentiable> filteredItems(JoinRequest request) {
         return Flowable.fromIterable(request.asItems())
                 .filter(this::filter)
-                .collect(ArrayList<Identifiable>::new, List::add)
+                .collect(ArrayList<Differentiable>::new, List::add)
                 .blockingGet();
     }
 }
