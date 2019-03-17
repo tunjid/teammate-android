@@ -68,6 +68,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
 
     protected static final int HIDER_DURATION = 300;
+    private static final String UI_STATE = "APP_UI_STATE";
 
     public static int topInset;
     private int leftInset;
@@ -91,7 +92,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     private ViewHider toolbarHider;
     private FabInteractor fabInteractor;
 
-    protected UiState uiState = UiState.freshState();
+    protected UiState uiState;
 
     private final List<BaseTransientBottomBar> transientBottomBars = new ArrayList<>();
 
@@ -117,6 +118,8 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+
+        uiState = savedInstanceState == null ? UiState.freshState() : savedInstanceState.getParcelable(UI_STATE);
     }
 
     @Override
@@ -160,7 +163,18 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             showSystemUI();
             setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
-        update(uiState);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        update(true, uiState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(UI_STATE, uiState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -179,18 +193,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void update(UiState state) {
-        uiState = uiState.diff(state,
-                this::toggleFab,
-                this::toggleToolbar,
-                this::toggleAltToolbar,
-                this::toggleBottombar,
-                this::toggleSystemUI,
-                insetFlag -> {},
-                this::setFabIcon,
-                this::updateMainToolBar,
-                this::updateAltToolbar,
-                this::setFabClickListener
-        );
+        update(false, state);
     }
 
     @Override
@@ -315,6 +318,22 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         transition.excludeTarget(toolbar, true);
 
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
+    }
+
+    private void update(boolean force, UiState state) {
+        uiState = uiState.diff(force,
+                state,
+                this::toggleFab,
+                this::toggleToolbar,
+                this::toggleAltToolbar,
+                this::toggleBottombar,
+                this::toggleSystemUI,
+                insetFlag -> {},
+                this::setFabIcon,
+                this::updateMainToolBar,
+                this::updateAltToolbar,
+                this::setFabClickListener
+        );
     }
 
     private WindowInsetsCompat consumeSystemInsets(WindowInsetsCompat insets) {

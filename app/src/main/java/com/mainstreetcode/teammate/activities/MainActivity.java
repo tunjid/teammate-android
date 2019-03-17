@@ -225,7 +225,7 @@ public class MainActivity extends TeammatesBaseActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState);
         super.onSaveInstanceState(outState);
     }
