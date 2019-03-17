@@ -1,5 +1,6 @@
 package com.mainstreetcode.teammate.model;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -12,6 +13,7 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.Objects;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
@@ -23,6 +25,7 @@ public final class UiState implements Parcelable {
     @StringRes private final int fabText;
     @MenuRes private final int toolBarMenu;
     @MenuRes private final int altToolBarMenu;
+    @ColorInt private final int navBarColor;
 
     private final boolean showsFab;
     private final boolean showsToolbar;
@@ -41,6 +44,7 @@ public final class UiState implements Parcelable {
                 0,
                 0,
                 0,
+                Color.BLACK,
                 true,
                 true,
                 false,
@@ -57,6 +61,7 @@ public final class UiState implements Parcelable {
                    int fabText,
                    int toolBarMenu,
                    int altToolBarMenu,
+                   int navBarColor,
                    boolean showsFab,
                    boolean showsToolbar,
                    boolean showsAltToolbar,
@@ -70,6 +75,7 @@ public final class UiState implements Parcelable {
         this.fabText = fabText;
         this.toolBarMenu = toolBarMenu;
         this.altToolBarMenu = altToolBarMenu;
+        this.navBarColor = navBarColor;
         this.showsFab = showsFab;
         this.showsToolbar = showsToolbar;
         this.showsAltToolbar = showsAltToolbar;
@@ -87,6 +93,7 @@ public final class UiState implements Parcelable {
                         Consumer<Boolean> showsAltToolbarConsumer,
                         Consumer<Boolean> showsBottomNavConsumer,
                         Consumer<Boolean> showsSystemUIConsumer,
+                        Consumer<Integer> navBarColorConsumer,
                         Consumer<InsetFlags> insetFlagsConsumer,
                         BiConsumer<Integer, Integer> fabStateConsumer,
                         BiConsumer<Integer, CharSequence> toolbarStateConsumer,
@@ -98,6 +105,7 @@ public final class UiState implements Parcelable {
         only(force, newState, state -> state.showsAltToolbar, showsAltToolbarConsumer);
         only(force, newState, state -> state.showsBottomNav, showsBottomNavConsumer);
         only(force, newState, state -> state.showsSystemUI, showsSystemUIConsumer);
+        only(force, newState, state -> state.navBarColor, navBarColorConsumer);
         only(force, newState, state -> state.insetFlags, insetFlagsConsumer);
 
         either(force, newState, state -> state.fabIcon, state -> state.fabText, fabStateConsumer);
@@ -136,6 +144,7 @@ public final class UiState implements Parcelable {
         fabText = in.readInt();
         toolBarMenu = in.readInt();
         altToolBarMenu = in.readInt();
+        navBarColor = in.readInt();
         showsFab = in.readByte() != 0x00;
         showsToolbar = in.readByte() != 0x00;
         showsAltToolbar = in.readByte() != 0x00;
@@ -165,6 +174,7 @@ public final class UiState implements Parcelable {
         dest.writeInt(fabText);
         dest.writeInt(toolBarMenu);
         dest.writeInt(altToolBarMenu);
+        dest.writeInt(navBarColor);
         dest.writeByte((byte) (showsFab ? 0x01 : 0x00));
         dest.writeByte((byte) (showsToolbar ? 0x01 : 0x00));
         dest.writeByte((byte) (showsAltToolbar ? 0x01 : 0x00));

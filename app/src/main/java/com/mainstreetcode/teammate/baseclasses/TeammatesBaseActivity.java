@@ -252,6 +252,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     @Override
+    public void setNavBarColor(int color) {
+        getWindow().setNavigationBarColor(color);
+    }
+
+    @Override
     public void setFabExtended(boolean expanded) {
         if (fabInteractor != null) fabInteractor.setExtended(expanded);
     }
@@ -334,6 +339,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 this::toggleAltToolbar,
                 this::toggleBottombar,
                 this::toggleSystemUI,
+                this::setNavBarColor,
                 insetFlag -> {},
                 this::setFabIcon,
                 this::updateMainToolBar,

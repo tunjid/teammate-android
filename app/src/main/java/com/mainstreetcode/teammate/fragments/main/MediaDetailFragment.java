@@ -93,10 +93,7 @@ public class MediaDetailFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         View root = getView();
-        if (root == null) return;
-
-        boolean isImage = media.isImage();
-        bindViewHolder(root, media, isImage);
+        if (root != null) bindViewHolder(root, media, media.isImage());
     }
 
     @Override
@@ -113,6 +110,13 @@ public class MediaDetailFragment extends MainActivityFragment
 
     @Override
     protected int getToolbarMenu() { return R.menu.fragment_media_detail; }
+
+    @Override
+    protected int getNavBarColor() {
+        return mediaViewHolder == null
+                ? super.getNavBarColor()
+                : mediaViewHolder.getBackgroundColor();
+    }
 
     @Override
     public InsetFlags insetFlags() { return NONE; }
@@ -141,19 +145,16 @@ public class MediaDetailFragment extends MainActivityFragment
     }
 
     @Override
-    public boolean onMediaLongClicked(Media media) {
-        return false;
-    }
+    public boolean onMediaLongClicked(Media media) { return false; }
 
     @Override
-    public boolean isSelected(Media media) {
-        return false;
-    }
+    public boolean isSelected(Media media) { return false; }
 
     @Override
-    public boolean isFullScreen() {
-        return true;
-    }
+    public boolean isFullScreen() { return true; }
+
+    @Override
+    public void onFillLoaded() { togglePersistentUi(); }
 
     private void checkMediaFlagged(Media media) {
         if (!media.isFlagged()) return;
@@ -163,10 +164,10 @@ public class MediaDetailFragment extends MainActivityFragment
         if (activity != null) activity.onBackPressed();
     }
 
-    private void bindViewHolder(View rootView, Media media, boolean isImage) {
+    private void bindViewHolder(View root, Media media, boolean isImage) {
         mediaViewHolder = isImage
-                ? new ImageMediaViewHolder(rootView, this)
-                : new VideoMediaViewHolder(rootView, this);
+                ? new ImageMediaViewHolder(root, this)
+                : new VideoMediaViewHolder(root, this);
 
         mediaViewHolder.fullBind(media);
         onMediaClicked(media);

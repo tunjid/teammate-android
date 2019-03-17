@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -47,7 +48,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.palette.graphics.Palette;
 import io.reactivex.Single;
+
+import static io.reactivex.Single.error;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class ViewHolderUtil extends ViewUtil {
 
@@ -149,13 +155,23 @@ public class ViewHolderUtil extends ViewUtil {
                 }))
                 .onErrorResumeNext(throwable -> placeholder != 0
                         ? Single.fromCallable(() -> getBitmapFromVectorDrawable(context, placeholder))
-                        : Single.error(throwable))
+                        : error(throwable))
                 .map(bitmap -> {
                     RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmap);
                     imageDrawable.setCircular(true);
                     imageDrawable.setCornerRadius(size);
                     return imageDrawable;
                 });
+    }
+
+    public static Single<Palette> extractPalette(ImageView imageView) {
+        Drawable drawable = imageView.getDrawable();
+
+        if (drawable == null) return error(new TeammateException("No drawable in ImageView"));
+        if (!(drawable instanceof BitmapDrawable)) return error(new TeammateException("Not a BitmapDrawable"));
+
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        return Single.fromCallable(() -> Palette.from(bitmap).generate()).subscribeOn(io()).observeOn(mainThread());
     }
 
     public static void updateForegroundDrawable(View itemView) {

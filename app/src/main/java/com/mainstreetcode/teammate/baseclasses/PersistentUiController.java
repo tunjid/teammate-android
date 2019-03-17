@@ -8,6 +8,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.model.UiState;
 import com.tunjid.androidbootstrap.functions.Consumer;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
@@ -28,6 +29,8 @@ public interface PersistentUiController {
     void toggleProgress(boolean show);
 
     void toggleSystemUI(boolean show);
+
+    void setNavBarColor(@ColorInt int color);
 
     void setFabIcon(@DrawableRes int icon, @StringRes int textRes);
 
@@ -67,6 +70,9 @@ public interface PersistentUiController {
 
         @Override
         public void toggleSystemUI(boolean show) {}
+
+        @Override
+        public void setNavBarColor(int color) {}
 
         @Override
         public void setFabIcon(int icon, int textRes) {}

@@ -3,6 +3,7 @@ package com.mainstreetcode.teammate.baseclasses;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
@@ -25,6 +26,7 @@ import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
@@ -94,6 +96,9 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     @MenuRes
     protected int getAltToolbarMenu() { return 0; }
+
+    @ColorInt
+    protected int getNavBarColor() { return Color.BLACK; }
 
     public boolean showsFab() { return false; }
 
@@ -206,6 +211,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
                 this.getFabStringResource(),
                 this.getToolbarMenu(),
                 this.getAltToolbarMenu(),
+                this.getNavBarColor(),
                 this.showsFab(),
                 this.showsToolBar(),
                 this.showsAltToolBar(),

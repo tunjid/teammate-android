@@ -1,6 +1,5 @@
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -11,13 +10,14 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Media;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
@@ -75,6 +75,9 @@ public class MediaAdapter extends InteractiveAdapter<InteractiveViewHolder, Medi
     }
 
     public interface MediaAdapterListener extends InteractiveAdapter.AdapterListener {
+
+        default void onFillLoaded() {}
+
         void onMediaClicked(Media item);
 
         boolean onMediaLongClicked(Media media);
