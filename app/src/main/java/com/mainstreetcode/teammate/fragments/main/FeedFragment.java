@@ -163,10 +163,6 @@ public final class FeedFragment extends MainActivityFragment
         }
     }
 
-    @Override protected int getToolbarMenu() {
-        return R.menu.fragment_feed;
-    }
-
     @Override
     public boolean showsFab() { return false; }
 
