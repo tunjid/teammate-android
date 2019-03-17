@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
@@ -24,6 +25,7 @@ import io.reactivex.Single;
 import okhttp3.RequestBody;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 
 public class MediaNotifier extends Notifier<Media> {
@@ -86,7 +88,7 @@ public class MediaNotifier extends Notifier<Media> {
         MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getUploadStats();
         if (!stats.isComplete()) return;
 
-        Completable.timer(800, TimeUnit.MILLISECONDS).subscribe(
+        Completable.timer(1200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe(
                 () -> notifyOfUpload(mediaTransferBuilder()
                         .setContentText(getUploadCompletionContentText(stats))
                         .setContentTitle(getUploadCompletionContentTitle(stats))
@@ -104,7 +106,6 @@ public class MediaNotifier extends Notifier<Media> {
 
     private void notifyOfUpload(NotificationCompat.Builder builder) {
         notifyOfMediaTransfer(builder, UPLOAD_NOTIFICATION_ID);
-
     }
 
     private void notifyOfDownload(NotificationCompat.Builder builder) {
