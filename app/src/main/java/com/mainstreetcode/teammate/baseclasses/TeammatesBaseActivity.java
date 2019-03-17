@@ -168,7 +168,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        update(true, uiState);
+        updateUI(true, uiState);
     }
 
     @Override
@@ -193,7 +193,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
     @Override
     public void update(UiState state) {
-        update(false, state);
+        updateUI(false, state);
     }
 
     @Override
@@ -320,7 +320,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         TransitionManager.beginDelayedTransition((ViewGroup) toolbar.getParent(), transition);
     }
 
-    private void update(boolean force, UiState state) {
+    private void updateUI(boolean force, UiState state) {
         uiState = uiState.diff(force,
                 state,
                 this::toggleFab,
