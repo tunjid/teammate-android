@@ -67,7 +67,7 @@ public class ModelCardViewHolder<H extends RemoteImage, T extends InteractiveAda
     }
 
     void load(String imageUrl, ImageView destination) {
-        RequestCreator creator = Picasso.with(itemView.getContext()).load(imageUrl);
+        RequestCreator creator = Picasso.get().load(imageUrl);
 
         if (!isThumbnail()) creator.fit().centerCrop();
         else creator.placeholder(R.drawable.bg_image_placeholder)

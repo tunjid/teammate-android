@@ -112,14 +112,13 @@ public class ViewHolder {
 
             currentImage = imageUrl;
             viewHolder.hasCustomImage = true;
-            Picasso.with(viewHolder.itemView.getContext())
-                    .load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this);
+            Picasso.get().load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this);
         }
 
         @Override
         public void onSuccess() { viewHolder.onCustomImageLoaded(loaded = true); }
 
         @Override
-        public void onError() { viewHolder.onCustomImageLoaded(loaded = false); }
+        public void onError(Exception e) { viewHolder.onCustomImageLoaded(loaded = false); }
     }
 }

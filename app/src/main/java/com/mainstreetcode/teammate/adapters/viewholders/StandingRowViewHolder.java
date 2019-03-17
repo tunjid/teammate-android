@@ -59,7 +59,7 @@ public class StandingRowViewHolder extends InteractiveViewHolder<StandingsAdapte
 
         String imageUrl = model.getImageUrl();
         if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey);
-        else Picasso.with(itemView.getContext()).load(imageUrl).fit().centerCrop().into(thumbnail);
+        else Picasso.get().load(imageUrl).fit().centerCrop().into(thumbnail);
     }
 
     public void bindColumns(List<String> columns) {

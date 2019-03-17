@@ -143,14 +143,14 @@ public class MainActivity extends TeammatesBaseActivity
         bottomSheetContainer = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer);
 
+        toolbar.setNavigationIcon(R.drawable.ic_supervisor_white_24dp);
         toolbar.setNavigationOnClickListener(view -> showNavOverflow());
         altToolbar.setOnMenuItemClickListener(this::onAltMenuItemSelected);
         bottomSheetToolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState != STATE_HIDDEN) return;
-                restoreHiddenViewState();
+                if (newState == STATE_HIDDEN) restoreHiddenViewState();
             }
 
             @Override
@@ -215,7 +215,7 @@ public class MainActivity extends TeammatesBaseActivity
         disposables.add(teamViewModel.getTeamChangeFlowable()
                 .flatMapSingle(team -> ViewHolderUtil.fetchRoundedDrawable(this,
                         team.getImageUrl(),
-                        getResources().getDimensionPixelSize(R.dimen.double_margin)))
+                        getResources().getDimensionPixelSize(R.dimen.double_margin),R.drawable.ic_supervisor_white_24dp))
                 .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
     }
 
