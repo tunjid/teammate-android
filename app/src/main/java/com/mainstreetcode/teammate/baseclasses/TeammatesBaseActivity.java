@@ -51,6 +51,7 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static android.view.View.VISIBLE;
+import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
@@ -66,6 +67,11 @@ import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
 public abstract class TeammatesBaseActivity extends BaseActivity
         implements PersistentUiController {
+
+    private static final int DEFAULT_SYSTEM_UI_FLAGS = SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 
     protected static final int HIDER_DURATION = 300;
     private static final String UI_STATE = "APP_UI_STATE";
@@ -380,16 +386,14 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     }
 
     private void hideSystemUI() {
-        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-        visibility = visibility | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_FULLSCREEN;
+        int visibility = DEFAULT_SYSTEM_UI_FLAGS | SYSTEM_UI_FLAG_FULLSCREEN;
         if (isInLandscape()) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 
         getDecorView().setSystemUiVisibility(visibility);
     }
 
     private void showSystemUI() {
-        int visibility = SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-        getDecorView().setSystemUiVisibility(visibility);
+        getDecorView().setSystemUiVisibility(DEFAULT_SYSTEM_UI_FLAGS);
     }
 
     private boolean isInLandscape() {
