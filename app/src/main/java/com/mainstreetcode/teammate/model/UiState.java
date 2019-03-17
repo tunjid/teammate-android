@@ -24,7 +24,7 @@ public final class UiState implements Parcelable {
     @MenuRes private final int toolBarMenu;
     @MenuRes private final int altToolBarMenu;
 
-    public final boolean showsFab;
+    private final boolean showsFab;
     private final boolean showsToolbar;
     private final boolean showsAltToolbar;
     private final boolean showsBottomNav;
