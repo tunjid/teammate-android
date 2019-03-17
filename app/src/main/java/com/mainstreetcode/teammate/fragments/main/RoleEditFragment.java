@@ -108,7 +108,7 @@ public class RoleEditFragment extends HeaderedFragment<Role>
     }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {return gofer.canChangeRoleFields();}

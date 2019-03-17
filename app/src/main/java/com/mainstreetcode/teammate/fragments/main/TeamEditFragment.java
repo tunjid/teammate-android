@@ -102,7 +102,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {

@@ -184,7 +184,7 @@ public class EventEditFragment extends HeaderedFragment<Event>
     protected int getToolbarMenu() { return R.menu.fragment_event_edit; }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     protected CharSequence getToolbarTitle() {

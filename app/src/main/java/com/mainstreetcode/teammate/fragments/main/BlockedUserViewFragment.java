@@ -91,7 +91,7 @@ public class BlockedUserViewFragment extends HeaderedFragment<BlockedUser> {
     }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     protected CharSequence getToolbarTitle() {

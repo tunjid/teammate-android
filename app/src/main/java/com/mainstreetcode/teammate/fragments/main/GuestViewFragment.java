@@ -95,7 +95,7 @@ public class GuestViewFragment extends HeaderedFragment<Guest> {
     }
 
     @Override
-    public InsetFlags insetFlags() {return VERTICAL;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     public boolean showsFab() {return false;}

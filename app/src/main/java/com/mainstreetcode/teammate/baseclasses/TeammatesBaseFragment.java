@@ -38,7 +38,7 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class TeammatesBaseFragment extends BaseFragment implements View.OnClickListener {
 
-    protected static final InsetFlags VERTICAL = InsetFlags.create(true, false, true, true);
+    protected static final InsetFlags NO_TOP = InsetFlags.NO_TOP;
     protected static final InsetFlags NONE = InsetFlags.NONE;
     protected static final int PLACE_PICKER_REQUEST = 1;
 
@@ -78,7 +78,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     }
 
     public InsetFlags insetFlags() {
-        return InsetFlags.VERTICAL;
+        return InsetFlags.ALL;
     }
 
     public int[] staticViews() { return new int[]{}; }

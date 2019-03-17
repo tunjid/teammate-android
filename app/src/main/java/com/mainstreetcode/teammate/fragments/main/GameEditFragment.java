@@ -103,7 +103,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
-    public InsetFlags insetFlags() { return VERTICAL; }
+    public InsetFlags insetFlags() { return NO_TOP; }
 
     @Override
     protected CharSequence getToolbarTitle() {
