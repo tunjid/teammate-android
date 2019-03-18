@@ -32,6 +32,7 @@ public final class UiState implements Parcelable {
     private final boolean showsAltToolbar;
     private final boolean showsBottomNav;
     private final boolean showsSystemUI;
+    private final boolean hasLightNavBar;
 
     private final InsetFlags insetFlags;
     private final CharSequence toolbarTitle;
@@ -50,6 +51,7 @@ public final class UiState implements Parcelable {
                 false,
                 true,
                 true,
+                false,
                 InsetFlags.ALL,
                 "",
                 "",
@@ -67,6 +69,7 @@ public final class UiState implements Parcelable {
                    boolean showsAltToolbar,
                    boolean showsBottomNav,
                    boolean showsSystemUI,
+                   boolean hasLightNavBar,
                    InsetFlags insetFlags,
                    CharSequence toolbarTitle,
                    CharSequence altToolbarTitle,
@@ -81,6 +84,7 @@ public final class UiState implements Parcelable {
         this.showsAltToolbar = showsAltToolbar;
         this.showsBottomNav = showsBottomNav;
         this.showsSystemUI = showsSystemUI;
+        this.hasLightNavBar = hasLightNavBar;
         this.insetFlags = insetFlags;
         this.toolbarTitle = toolbarTitle;
         this.altToolbarTitle = altToolbarTitle;
@@ -93,6 +97,7 @@ public final class UiState implements Parcelable {
                         Consumer<Boolean> showsAltToolbarConsumer,
                         Consumer<Boolean> showsBottomNavConsumer,
                         Consumer<Boolean> showsSystemUIConsumer,
+                        Consumer<Boolean> hasLightNavBarConsumer,
                         Consumer<Integer> navBarColorConsumer,
                         Consumer<InsetFlags> insetFlagsConsumer,
                         BiConsumer<Integer, Integer> fabStateConsumer,
@@ -105,6 +110,7 @@ public final class UiState implements Parcelable {
         only(force, newState, state -> state.showsAltToolbar, showsAltToolbarConsumer);
         only(force, newState, state -> state.showsBottomNav, showsBottomNavConsumer);
         only(force, newState, state -> state.showsSystemUI, showsSystemUIConsumer);
+        only(force, newState, state -> state.hasLightNavBar, hasLightNavBarConsumer);
         only(force, newState, state -> state.navBarColor, navBarColorConsumer);
         only(force, newState, state -> state.insetFlags, insetFlagsConsumer);
 
@@ -150,6 +156,7 @@ public final class UiState implements Parcelable {
         showsAltToolbar = in.readByte() != 0x00;
         showsBottomNav = in.readByte() != 0x00;
         showsSystemUI = in.readByte() != 0x00;
+        hasLightNavBar = in.readByte() != 0x00;
 
         boolean hasLeftInset = in.readByte() != 0x00;
         boolean hasTopInset = in.readByte() != 0x00;
@@ -180,6 +187,7 @@ public final class UiState implements Parcelable {
         dest.writeByte((byte) (showsAltToolbar ? 0x01 : 0x00));
         dest.writeByte((byte) (showsBottomNav ? 0x01 : 0x00));
         dest.writeByte((byte) (showsSystemUI ? 0x01 : 0x00));
+        dest.writeByte((byte) (hasLightNavBar ? 0x01 : 0x00));
         dest.writeByte((byte) (insetFlags.hasLeftInset() ? 0x01 : 0x00));
         dest.writeByte((byte) (insetFlags.hasTopInset() ? 0x01 : 0x00));
         dest.writeByte((byte) (insetFlags.hasRightInset() ? 0x01 : 0x00));

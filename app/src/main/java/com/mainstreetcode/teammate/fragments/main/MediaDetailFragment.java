@@ -134,6 +134,9 @@ public class MediaDetailFragment extends MainActivityFragment
     protected boolean showsSystemUI() { return systemUiStatus.get(); }
 
     @Override
+    protected boolean hasLightNavBar() { return false; }
+
+    @Override
     public void onMediaClicked(Media item) {
         Activity activity = getActivity();
         if (activity == null) return;

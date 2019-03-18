@@ -43,6 +43,8 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
 import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -50,6 +52,7 @@ import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
 import static android.view.View.VISIBLE;
 import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
@@ -122,7 +125,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
 
         uiState = savedInstanceState == null ? UiState.freshState() : savedInstanceState.getParcelable(UI_STATE);
@@ -165,7 +168,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             showSystemUI();
             setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         }
@@ -242,6 +245,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void toggleSystemUI(boolean show) {
         if (show) showSystemUI();
         else hideSystemUI();
+    }
+
+    @Override
+    public void toggleLightNavBar(boolean isLight) {
+        if (SDK_INT < O) return;
+
+        View decorView = getDecorView();
+        int visibility = decorView.getSystemUiVisibility();
+
+        if (isLight) visibility = visibility | SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        else visibility &= ~SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+
+        decorView.setSystemUiVisibility(visibility);
     }
 
     @Override
@@ -339,6 +355,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 this::toggleAltToolbar,
                 this::toggleBottombar,
                 this::toggleSystemUI,
+                this::toggleLightNavBar,
                 this::setNavBarColor,
                 insetFlag -> {},
                 this::setFabIcon,
