@@ -52,6 +52,8 @@ public class User extends UserEntity implements
         return new User("", Config.getDefaultUserAvatar(), "", "", "", "", "");
     }
 
+    public void setId(String id) { this.id = id; }
+
     @Override
     public List<Item<User>> asItems() {
         return Arrays.asList(

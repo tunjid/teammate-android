@@ -13,7 +13,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.RemoteImageAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.RemoteImageViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -56,7 +55,7 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_bottom_nav, container, false);
         View itemView = root.findViewById(R.id.item_container);
-        TeamViewHolder teamViewHolder = new TeamViewHolder(itemView, item -> switchTeam());
+        TeamViewHolder teamViewHolder = new TeamViewHolder(itemView, this::viewTeam);
         NavigationView navigationView = root.findViewById(R.id.bottom_nav_view);
 
         List<Team> list = new ArrayList<>();
@@ -64,9 +63,8 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
         Disposable disposable = teamViewModel.nonDefaultTeams(list)
                 .subscribe(ScrollManager.<RemoteImageViewHolder<Team>>with(root.findViewById(R.id.horizontal_list))
                         .withAdapter(new RemoteImageAdapter<>(list, team -> {
-                            dismiss();
                             teamViewModel.updateDefaultTeam(team);
-                            ((BaseActivity) requireActivity()).showFragment(TeamMembersFragment.newInstance(team));
+                            viewTeam(team);
                         }))
                         .withCustomLayoutManager(new LinearLayoutManager(root.getContext(), HORIZONTAL, false))
                         .build()::onDiff, ErrorHandler.EMPTY);
@@ -97,8 +95,8 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
         return requireActivity().onOptionsItemSelected(item);
     }
 
-    private void switchTeam() {
+    private void viewTeam(Team team) {
         dismiss();
-        TeamPickerFragment.change(requireActivity(), R.id.request_default_team_pick);
+        ((BaseActivity) requireActivity()).showFragment(TeamMembersFragment.newInstance(team));
     }
 }
