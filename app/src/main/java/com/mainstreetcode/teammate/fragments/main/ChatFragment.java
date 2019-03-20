@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,9 +21,11 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.util.Deferrer;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
+import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import java.util.List;
 
@@ -32,10 +35,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.AutoTransition;
+import androidx.transition.TransitionManager;
 import io.reactivex.disposables.Disposable;
 
 import static android.text.TextUtils.isEmpty;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
+import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING;
+import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
 public class ChatFragment extends MainActivityFragment
         implements
@@ -50,6 +57,10 @@ public class ChatFragment extends MainActivityFragment
     private Team team;
     private List<Differentiable> items;
     private Disposable chatDisposable;
+
+    private TextView dateView;
+    private Deferrer deferrer;
+    private ViewHider dateHider;
 
     public static ChatFragment newInstance(Team team) {
         ChatFragment fragment = new ChatFragment();
@@ -86,6 +97,10 @@ public class ChatFragment extends MainActivityFragment
         SwipeRefreshLayout refresh = rootView.findViewById(R.id.refresh_layout);
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
+        dateView = rootView.findViewById(R.id.date);
+
+        dateHider = ViewHider.of(dateView).setDirection(TOP).build();
+        deferrer = new Deferrer(2000, dateHider::hide);
 
         scrollManager = ScrollManager.<TeamChatViewHolder>with(rootView.findViewById(R.id.chat))
                 .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
@@ -100,6 +115,7 @@ public class ChatFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
+        dateView.setOnClickListener(view -> dateHider.hide());
         send.setOnClickListener(view -> sendChat(input));
         input.setOnEditorActionListener(this);
         input.addTextChangedListener(new TextWatcher() {
@@ -120,7 +136,7 @@ public class ChatFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         subscribeToChat();
-        fetchChatsBefore(restoredFromBackStack());
+        fetchChatsBefore(true);
     }
 
     @Override
@@ -137,6 +153,9 @@ public class ChatFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         chatViewModel.updateLastSeen(team);
+        dateView = null;
+        dateHider = null;
+        deferrer = null;
     }
 
     @Override
@@ -195,6 +214,16 @@ public class ChatFragment extends MainActivityFragment
                 .build());
 
         disposables.add(chatDisposable);
+        disposables.add(chatViewModel.getChatDate().subscribe(text -> {
+            if (TextUtils.isEmpty(text)) dateHider.hide();
+            else {
+                TransitionManager.beginDelayedTransition(
+                        (ViewGroup) dateView.getParent(),
+                        new AutoTransition().addTarget(dateView));
+                dateView.setText(text);
+                dateHider.show();
+            }
+        }, ErrorHandler.EMPTY));
     }
 
     private void sendChat(TextView textView) {
@@ -265,9 +294,13 @@ public class ChatFragment extends MainActivityFragment
     @SuppressWarnings("unused")
     private void onScroll(int dx, int dy) {
         if (Math.abs(dy) > 8) wasScrolling = true;
+
+        deferrer.advanceDeadline();
+        chatViewModel.onScrollPositionChanged(team, scrollManager.getFirstVisiblePosition());
     }
 
     private void onScrollStateChanged(int newState) {
+        if (newState == SCROLL_STATE_DRAGGING) deferrer.advanceDeadline();
         if (!wasScrolling) return;
         if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) fetchChatsBefore(true);
     }

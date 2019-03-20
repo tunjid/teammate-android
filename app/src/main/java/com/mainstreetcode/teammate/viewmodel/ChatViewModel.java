@@ -2,21 +2,28 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import androidx.arch.core.util.Function;
 
+import com.mainstreetcode.teammate.App;
+import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.notifications.ChatNotifier;
 import com.mainstreetcode.teammate.repository.ChatRepository;
 import com.mainstreetcode.teammate.util.Logger;
+import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.io.EOFException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.processors.PublishProcessor;
 import io.socket.engineio.client.EngineIOException;
 
+import static com.mainstreetcode.teammate.util.ModelUtils.fullPrinter;
 import static com.tunjid.androidbootstrap.functions.collections.Lists.findFirst;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -25,10 +32,12 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     private static final String XHR_POST_ERROR = "xhr post error";
 
+    private final PublishProcessor<String> chatDateProcessor;
     private final ChatRepository repository;
     private final ChatNotifier notifier;
 
     public ChatViewModel() {
+        chatDateProcessor = PublishProcessor.create();
         repository = ChatRepository.getInstance();
         notifier = ChatNotifier.getInstance();
     }
@@ -47,6 +56,31 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
         Chat chat = findFirst(getModelList(team), Chat.class);
         if (chat != null) clearNotifications(chat);
+    }
+
+    public void onScrollPositionChanged(Team team, int position) {
+        Differentiable item = getModelList(team).get(position);
+        if (!(item instanceof Chat)) return;
+
+        Date created = ((Chat) item).getCreated();
+        Calendar then = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        then.setTime(created);
+
+        boolean isToday = !ModelUtils.areDifferentDays(created, now.getTime());
+        boolean isYesterday = !isToday && now.get(Calendar.DAY_OF_MONTH) - then.get(Calendar.DAY_OF_MONTH) == 1
+                && now.get(Calendar.MONTH) == then.get(Calendar.MONTH)
+                && now.get(Calendar.YEAR) == then.get(Calendar.YEAR);
+
+        chatDateProcessor.onNext(isToday
+                ? ""
+                : isYesterday
+                ? App.getInstance().getString(R.string.chat_yesterday)
+                : fullPrinter.format(created));
+    }
+
+    public Flowable<String> getChatDate() {
+        return chatDateProcessor.distinctUntilChanged();
     }
 
     public Flowable<Chat> listenForChat(Team team) {

@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="@dimen/single_margin"
-    android:layout_marginRight="@dimen/single_margin"
     android:layout_marginTop="@dimen/single_margin"
+    android:layout_marginRight="@dimen/single_margin"
     android:background="?attr/selectableItemBackground">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/today"
+        style="@style/Widget.MaterialComponents.Chip.Action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chat_today"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/image"
         android:layout_width="@dimen/double_margin"
         android:layout_height="@dimen/double_margin"
         android:contentDescription="@string/image_description"
-        android:maxHeight="@dimen/double_and_half_margin"
         android:maxWidth="@dimen/double_and_half_margin"
+        android:maxHeight="@dimen/double_and_half_margin"
         app:civ_border_color="?alt_background"
         app:civ_border_width="@dimen/sixteenth_margin"
         app:layout_constraintBottom_toBottomOf="@+id/content"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/mid_guide" />
+        app:layout_constraintRight_toLeftOf="@+id/mid_guide"
+        tools:src="@drawable/ic_globe_white_24dp" />
 
     <View
         android:id="@+id/mid_guide"
@@ -44,15 +56,17 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintLeft_toRightOf="@+id/mid_guide"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="@dimen/sexdecuple_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/today"
+        app:layout_constraintWidth_max="@dimen/sexdecuple_margin"
+        tools:text="Hello" />
 
     <TextView
         android:id="@+id/details"
+        style="@style/TextAppearance.AppDarkTheme.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/TextAppearance.AppDarkTheme.Caption"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/content" />
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        tools:text="Kylian · 3.52" />
 </androidx.constraintlayout.widget.ConstraintLayout>
