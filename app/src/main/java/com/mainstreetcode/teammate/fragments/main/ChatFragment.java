@@ -53,14 +53,18 @@ public class ChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private boolean wasScrolling;
+    private int unreadCount;
 
     private Team team;
     private List<Differentiable> items;
     private Disposable chatDisposable;
 
     private TextView dateView;
+    private TextView newMessages;
+
     private Deferrer deferrer;
     private ViewHider dateHider;
+    private ViewHider newMessageHider;
 
     public static ChatFragment newInstance(Team team) {
         ChatFragment fragment = new ChatFragment();
@@ -98,8 +102,10 @@ public class ChatFragment extends MainActivityFragment
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
         dateView = rootView.findViewById(R.id.date);
+        newMessages = rootView.findViewById(R.id.unread);
 
         dateHider = ViewHider.of(dateView).setDirection(TOP).build();
+        newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build();
         deferrer = new Deferrer(2000, dateHider::hide);
 
         scrollManager = ScrollManager.<TeamChatViewHolder>with(rootView.findViewById(R.id.chat))
@@ -115,6 +121,7 @@ public class ChatFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
+        newMessages.setOnClickListener(view -> scrollManager.withRecyclerView(rv -> rv.smoothScrollToPosition(items.size() - 1)));
         dateView.setOnClickListener(view -> dateHider.hide());
         send.setOnClickListener(view -> sendChat(input));
         input.setOnEditorActionListener(this);
@@ -126,9 +133,10 @@ public class ChatFragment extends MainActivityFragment
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
-            public void afterTextChanged(Editable s) {wasScrolling = false;}
+            public void afterTextChanged(Editable s) { wasScrolling = false; }
         });
 
+        newMessageHider.hide();
         return rootView;
     }
 
@@ -153,8 +161,10 @@ public class ChatFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         chatViewModel.updateLastSeen(team);
-        dateView = null;
+        newMessageHider = null;
+        newMessages = null;
         dateHider = null;
+        dateView = null;
         deferrer = null;
     }
 
@@ -206,8 +216,10 @@ public class ChatFragment extends MainActivityFragment
     private void subscribeToChat() {
         chatDisposable = chatViewModel.listenForChat(team).subscribe(chat -> {
             items.add(chat);
-
-            notifyAndScrollToLast(isNearBottomOfChat());
+            boolean nearBottomOfChat = isNearBottomOfChat();
+            unreadCount = nearBottomOfChat ? 0 : unreadCount + 1;
+            notifyAndScrollToLast(nearBottomOfChat);
+            updateUnreadCount();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
                 .add(message -> showSnackbar(message.getMessage()))
@@ -267,10 +279,7 @@ public class ChatFragment extends MainActivityFragment
         RecyclerView recyclerView = scrollManager.getRecyclerView();
         if (recyclerView == null) return false;
 
-        LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
-        if (layoutManager == null) return false;
-
-        int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        int lastVisibleItemPosition = scrollManager.getLastVisiblePosition();
 
         return Math.abs(items.size() - lastVisibleItemPosition) < 4;
     }
@@ -301,7 +310,18 @@ public class ChatFragment extends MainActivityFragment
 
     private void onScrollStateChanged(int newState) {
         if (newState == SCROLL_STATE_DRAGGING) deferrer.advanceDeadline();
-        if (wasScrolling && newState == SCROLL_STATE_IDLE && isNearBottomOfChat())
+        if (wasScrolling && newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) {
+            unreadCount = 0;
+            updateUnreadCount();
             fetchChatsBefore(true);
+        }
+    }
+
+    private void updateUnreadCount() {
+        if (unreadCount == 0) newMessageHider.hide();
+        else {
+            newMessages.setText(unreadCount == 1 ? getString(R.string.chat_new_message) : getString(R.string.chat_new_messages, unreadCount));
+            newMessageHider.show();
+        }
     }
 }

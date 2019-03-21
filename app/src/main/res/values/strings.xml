@@ -347,6 +347,8 @@
     <string name="team_chat_title">%1$s chat</string>
     <string name="chat_today">Today</string>
     <string name="chat_yesterday">Yesterday</string>
+    <string name="chat_new_message">New message</string>
+    <string name="chat_new_messages">%1$d new messages</string>
     <string name="chat_notification_group_summary">Chats from %1$d teams</string>
     <string name="chat_notification_multiline_item">%1$s: %2$s</string>
     <string name="chat_notification_multiline_summary">+%1$d more</string>
