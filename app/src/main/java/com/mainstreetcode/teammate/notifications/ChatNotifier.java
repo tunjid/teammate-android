@@ -247,7 +247,7 @@ public class ChatNotifier extends Notifier<Chat> {
                     //noinspection ResultOfMethodCallIgnored
                     repository.fetchUnreadChats().count().subscribe(count -> {
                         notifier.clearNotifications(read);
-                        if (count == 0) notifier.clearNotifications(Chat.empty());
+                        if (count < 1) notifier.clearNotifications(Chat.empty());
                     });
                     break;
             }
