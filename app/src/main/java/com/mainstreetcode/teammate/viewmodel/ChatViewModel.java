@@ -14,11 +14,10 @@ import java.io.EOFException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import androidx.arch.core.util.Function;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.socket.engineio.client.EngineIOException;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.fullPrinter;
@@ -83,8 +82,8 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
                 .observeOn(mainThread());
     }
 
-    public Completable post(Chat chat) {
-        return repository.post(chat).onErrorResumeNext(postRetryFunction(chat, 0)::apply).observeOn(mainThread());
+    public Single<Chat> post(Chat chat) {
+        return repository.createOrUpdate(chat).observeOn(mainThread());
     }
 
     @Override
@@ -101,17 +100,6 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
                 .observeOn(mainThread())
                 : Flowable.error(throwable)
         );
-    }
-
-    private Function<Throwable, Completable> postRetryFunction(Chat chat, int previousRetries) {
-        return throwable -> {
-            int retries = previousRetries + 1;
-            return retries <= 3
-                    ? Completable.timer(300, TimeUnit.MILLISECONDS)
-                    .andThen(repository.post(chat).onErrorResumeNext(postRetryFunction(chat, retries)::apply))
-                    .observeOn(mainThread())
-                    : Completable.error(throwable);
-        };
     }
 
     private boolean shouldRetry(Throwable throwable) {

@@ -243,7 +243,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void postChat(Chat chat) {
-        disposables.add(chatViewModel.post(chat).subscribe(() -> {
+        disposables.add(chatViewModel.post(chat).subscribe(__ -> {
             chatViewModel.updateLastSeen(team);
             int index = items.indexOf(chat);
 

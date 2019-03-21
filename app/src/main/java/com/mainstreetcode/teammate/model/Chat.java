@@ -79,7 +79,7 @@ public class Chat implements
         created = tmpCreated != -1 ? new Date(tmpCreated) : null;
     }
 
-    public static Chat chat(String content, User user, Team team) {
+    public static Chat chat(CharSequence content, User user, Team team) {
         return new Chat(new ObjectId().toHexString(), KIND_TEXT, content, user, team, new Date());
     }
 
