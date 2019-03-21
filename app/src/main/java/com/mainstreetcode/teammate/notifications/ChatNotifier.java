@@ -17,7 +17,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
@@ -59,10 +58,10 @@ public class ChatNotifier extends Notifier<Chat> {
 
     private ChatNotifier() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_REPLY);
         filter.addAction(ACTION_MARK_AS_READ);
+        filter.addAction(ACTION_REPLY);
 
-        App.getInstance().registerReceiver(new NotificationActionReceiver(), filter);
+        app.registerReceiver(new NotificationActionReceiver(), filter);
     }
 
     public static ChatNotifier getInstance() {
@@ -97,35 +96,40 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     @Override
-    @SuppressLint("CheckResult")
     protected void handleNotification(FeedItem<Chat> item) {
-        ChatRepository repository = ChatRepository.getInstance();
-        AtomicInteger count = new AtomicInteger(0);
-        //noinspection ResultOfMethodCallIgnored
-        repository.get(item.getModel())
-                .flatMap(chat -> repository.fetchUnreadChats())
-                .doOnNext(chats -> count.incrementAndGet())
-                .map(unreadChats -> new Pair<>(buildNotification(item, unreadChats, count.get()), unreadChats.get(0)))
-                .observeOn(mainThread())
-                .subscribe(notificationChatPair -> sendNotification(notificationChatPair.first, notificationChatPair.second),
-                        ErrorHandler.EMPTY,
-                        () -> buildSummary(item, count.get()));
+        aggregateConversations(item, item.getModel());
     }
 
     public void setChatVisibility(Team team, boolean visible) {
         visibleChatMap.put(team, visible);
     }
 
+    @SuppressLint("CheckResult")
+    private void aggregateConversations(FeedItem<Chat> item, Chat received) {
+        ChatRepository repository = ChatRepository.getInstance();
+        AtomicInteger count = new AtomicInteger(0);
+        //noinspection ResultOfMethodCallIgnored
+        repository.get(received)
+                .flatMap(chat -> repository.fetchUnreadChats())
+                .doOnNext(chats -> count.incrementAndGet())
+                .map(unreadChats -> new Pair<>(buildNotification(item, unreadChats, count.get()), unreadChats.get(0)))
+                .observeOn(mainThread())
+                .subscribe(
+                        notificationChatPair -> sendNotification(notificationChatPair.first, notificationChatPair.second),
+                        ErrorHandler.EMPTY,
+                        () -> buildSummary(item, count.get()));
+    }
+
     private Notification buildNotification(FeedItem<Chat> item, List<Chat> chats, int count) {
         int size = chats.size();
+        Chat latest = chats.get(0);
+        CharSequence teamName = latest.getTeam().getName();
+
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder(item)
-                .setContentIntent(getDeepLinkIntent(item.getModel()))
+                .setContentIntent(getDeepLinkIntent(latest))
                 .setSmallIcon(R.drawable.ic_notification)
                 .setGroup(NOTIFICATION_GROUP)
                 .setAutoCancel(true);
-
-        Chat latest = chats.get(0);
-        CharSequence teamName = latest.getTeam().getName();
 
         notificationBuilder.setSound(getNotificationSound(count));
         setGroupAlertSummary(notificationBuilder);
@@ -143,10 +147,7 @@ public class ChatNotifier extends Notifier<Chat> {
         int min = Math.min(size - 1, MAX_LINES);
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 
-        for (int i = min; i >= 0; i--) {
-            Chat chat = chats.get(i);
-            style.addLine(getChatLine(chat));
-        }
+        for (int i = min; i >= 0; i--) style.addLine(getChatLine(chats.get(i)));
 
         if (size > MAX_LINES) {
             style.setSummaryText(app.getString(R.string.chat_notification_multiline_summary, (size - MAX_LINES)));
@@ -193,7 +194,7 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     private NotificationCompat.Action getReplyAction(FeedItem<Chat> item, Chat latest) {
-        String replyLabel = App.getInstance().getResources().getString(R.string.chat_reply_label);
+        String replyLabel = app.getResources().getString(R.string.chat_reply_label);
         PendingIntent pending = getNotificationActionIntent(latest, ACTION_REPLY, intent -> intent.putExtra(EXTRA_FEED_ITEM, item));
 
         return new NotificationCompat.Action.Builder(R.drawable.ic_notification, replyLabel, pending)
@@ -202,7 +203,7 @@ public class ChatNotifier extends Notifier<Chat> {
     }
 
     private NotificationCompat.Action getMarkAsReadAction(Chat latest) {
-        String markLabel = App.getInstance().getResources().getString(R.string.chat_mark_as_read_label);
+        String markLabel = app.getResources().getString(R.string.chat_mark_as_read_label);
         PendingIntent pending = getNotificationActionIntent(latest, ACTION_MARK_AS_READ, intent -> intent.putExtra(EXTRA_CHAT, latest));
 
         return new NotificationCompat.Action.Builder(R.drawable.ic_notification, markLabel, pending)
@@ -211,12 +212,12 @@ public class ChatNotifier extends Notifier<Chat> {
 
     @TargetApi(Build.VERSION_CODES.O)
     private PendingIntent getNotificationActionIntent(Chat latest, String action, Consumer<Intent> intentConsumer) {
-        Intent pending = new Intent(App.getInstance(), NotificationActionReceiver.class)
+        Intent pending = new Intent(app, NotificationActionReceiver.class)
                 .putExtra(EXTRA_NOTIFICATION_ID, getNotifyId())
                 .setAction(action);
 
         intentConsumer.accept(pending);
-        return PendingIntent.getBroadcast(App.getInstance(), latest.getTeam().hashCode(), pending, FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(app, latest.getTeam().hashCode(), pending, FLAG_UPDATE_CURRENT);
     }
 
     public static final class NotificationActionReceiver extends BroadcastReceiver {
@@ -228,18 +229,17 @@ public class ChatNotifier extends Notifier<Chat> {
             ChatNotifier notifier = ChatNotifier.getInstance();
             String action = intent.getAction();
             switch (action == null ? "" : action) {
-                case ACTION_REPLY: {
+                case ACTION_REPLY:
                     Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
                     if (remoteInput == null) break;
 
                     FeedItem<Chat> received = intent.getParcelableExtra(EXTRA_FEED_ITEM);
                     CharSequence message = remoteInput.getCharSequence(KEY_TEXT_REPLY);
-                    Chat chat = Chat.chat(message, UserRepository.getInstance().getCurrentUser(), received.getModel().getTeam());
+                    Chat toSend = Chat.chat(message, UserRepository.getInstance().getCurrentUser(), received.getModel().getTeam());
 
                     //noinspection ResultOfMethodCallIgnored
-                    repository.createOrUpdate(chat).subscribe(__ -> notifier.handleNotification(received), ErrorHandler.EMPTY);
+                    repository.createOrUpdate(toSend).subscribe(__ -> notifier.aggregateConversations(received, toSend), ErrorHandler.EMPTY);
                     break;
-                }
                 case ACTION_MARK_AS_READ:
                     Chat read = intent.getParcelableExtra(EXTRA_CHAT);
 
