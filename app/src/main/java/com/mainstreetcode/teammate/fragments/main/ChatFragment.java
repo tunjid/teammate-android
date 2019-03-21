@@ -214,16 +214,6 @@ public class ChatFragment extends MainActivityFragment
                 .build());
 
         disposables.add(chatDisposable);
-        disposables.add(chatViewModel.getChatDate().subscribe(text -> {
-            if (TextUtils.isEmpty(text)) dateHider.hide();
-            else {
-                TransitionManager.beginDelayedTransition(
-                        (ViewGroup) dateView.getParent(),
-                        new AutoTransition().addTarget(dateView));
-                dateView.setText(text);
-                dateHider.show();
-            }
-        }, ErrorHandler.EMPTY));
     }
 
     private void sendChat(TextView textView) {
@@ -296,12 +286,22 @@ public class ChatFragment extends MainActivityFragment
         if (Math.abs(dy) > 8) wasScrolling = true;
 
         deferrer.advanceDeadline();
-        chatViewModel.onScrollPositionChanged(team, scrollManager.getFirstVisiblePosition());
+        String date = chatViewModel.onScrollPositionChanged(team, scrollManager.getFirstVisiblePosition());
+
+        if (TextUtils.isEmpty(date)) dateHider.hide();
+        else dateHider.show();
+
+        if (date.equals(dateView.getText().toString())) return;
+
+        TransitionManager.beginDelayedTransition(
+                (ViewGroup) dateView.getParent(),
+                new AutoTransition().addTarget(dateView));
+        dateView.setText(date);
     }
 
     private void onScrollStateChanged(int newState) {
         if (newState == SCROLL_STATE_DRAGGING) deferrer.advanceDeadline();
-        if (!wasScrolling) return;
-        if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) fetchChatsBefore(true);
+        if (wasScrolling && newState == SCROLL_STATE_IDLE && isNearBottomOfChat())
+            fetchChatsBefore(true);
     }
 }

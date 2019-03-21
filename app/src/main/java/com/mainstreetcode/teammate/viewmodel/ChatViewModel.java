@@ -1,7 +1,5 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import androidx.arch.core.util.Function;
-
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
@@ -18,9 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.arch.core.util.Function;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.processors.PublishProcessor;
 import io.socket.engineio.client.EngineIOException;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.fullPrinter;
@@ -32,12 +30,10 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     private static final String XHR_POST_ERROR = "xhr post error";
 
-    private final PublishProcessor<String> chatDateProcessor;
     private final ChatRepository repository;
     private final ChatNotifier notifier;
 
     public ChatViewModel() {
-        chatDateProcessor = PublishProcessor.create();
         repository = ChatRepository.getInstance();
         notifier = ChatNotifier.getInstance();
     }
@@ -58,9 +54,9 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
         if (chat != null) clearNotifications(chat);
     }
 
-    public void onScrollPositionChanged(Team team, int position) {
+    public String onScrollPositionChanged(Team team, int position) {
         Differentiable item = getModelList(team).get(position);
-        if (!(item instanceof Chat)) return;
+        if (!(item instanceof Chat)) return "";
 
         Date created = ((Chat) item).getCreated();
         Calendar then = Calendar.getInstance();
@@ -72,15 +68,11 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
                 && now.get(Calendar.MONTH) == then.get(Calendar.MONTH)
                 && now.get(Calendar.YEAR) == then.get(Calendar.YEAR);
 
-        chatDateProcessor.onNext(isToday
+        return isToday
                 ? ""
                 : isYesterday
                 ? App.getInstance().getString(R.string.chat_yesterday)
-                : fullPrinter.format(created));
-    }
-
-    public Flowable<String> getChatDate() {
-        return chatDateProcessor.distinctUntilChanged();
+                : fullPrinter.format(created);
     }
 
     public Flowable<Chat> listenForChat(Team team) {
