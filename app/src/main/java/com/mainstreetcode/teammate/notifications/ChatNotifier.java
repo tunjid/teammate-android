@@ -152,7 +152,7 @@ public class ChatNotifier extends Notifier<Chat> {
 
     private void setGroupAlertSummary(NotificationCompat.Builder notificationBuilder) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder.setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY);
+            notificationBuilder.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY);
         }
     }
 
