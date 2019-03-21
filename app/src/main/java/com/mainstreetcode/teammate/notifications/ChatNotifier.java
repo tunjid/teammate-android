@@ -25,6 +25,7 @@ import com.mainstreetcode.teammate.repository.ChatRepository;
 import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.tunjid.androidbootstrap.functions.Consumer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ public class ChatNotifier extends Notifier<Chat> {
     private static final String ACTION_MARK_AS_READ = "MARK_AS_READ";
     private static final String ACTION_REPLY = "REPLY";
     private static final String EXTRA_FEED_ITEM = "FEED_ITEM";
+    private static final String EXTRA_CHAT = "CHAT";
 
     private static final int MAX_LINES = 5;
     private static ChatNotifier INSTANCE;
@@ -129,8 +131,8 @@ public class ChatNotifier extends Notifier<Chat> {
         setGroupAlertSummary(notificationBuilder);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notificationBuilder.addAction(getReplyAction(item));
-            notificationBuilder.addAction(getMarkAsReadAction(item));
+            notificationBuilder.addAction(getReplyAction(item, latest));
+            notificationBuilder.addAction(getMarkAsReadAction(latest));
         }
 
         if (size < 2) return notificationBuilder
@@ -190,42 +192,43 @@ public class ChatNotifier extends Notifier<Chat> {
         return app.getString(R.string.chat_notification_multiline_item, firstName, chat.getContent());
     }
 
-    private NotificationCompat.Action getReplyAction(FeedItem<Chat> item) {
+    private NotificationCompat.Action getReplyAction(FeedItem<Chat> item, Chat latest) {
         String replyLabel = App.getInstance().getResources().getString(R.string.chat_reply_label);
-        PendingIntent pending = getNotificationActionIntent(item, ACTION_REPLY);
+        PendingIntent pending = getNotificationActionIntent(latest, ACTION_REPLY, intent -> intent.putExtra(EXTRA_FEED_ITEM, item));
 
         return new NotificationCompat.Action.Builder(R.drawable.ic_notification, replyLabel, pending)
                 .addRemoteInput(new RemoteInput.Builder(KEY_TEXT_REPLY).setLabel(replyLabel).build())
                 .build();
     }
 
-    private NotificationCompat.Action getMarkAsReadAction(FeedItem<Chat> item) {
+    private NotificationCompat.Action getMarkAsReadAction(Chat latest) {
         String markLabel = App.getInstance().getResources().getString(R.string.chat_mark_as_read_label);
-        PendingIntent pending = getNotificationActionIntent(item, ACTION_MARK_AS_READ);
+        PendingIntent pending = getNotificationActionIntent(latest, ACTION_MARK_AS_READ, intent -> intent.putExtra(EXTRA_CHAT, latest));
 
         return new NotificationCompat.Action.Builder(R.drawable.ic_notification, markLabel, pending)
                 .build();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    private PendingIntent getNotificationActionIntent(FeedItem<Chat> item, String action) {
+    private PendingIntent getNotificationActionIntent(Chat latest, String action, Consumer<Intent> intentConsumer) {
         Intent pending = new Intent(App.getInstance(), NotificationActionReceiver.class)
                 .putExtra(EXTRA_NOTIFICATION_ID, getNotifyId())
-                .putExtra(EXTRA_FEED_ITEM, item)
                 .setAction(action);
 
-        return PendingIntent.getBroadcast(App.getInstance(), item.getModel().getTeam().hashCode(), pending, FLAG_UPDATE_CURRENT);
+        intentConsumer.accept(pending);
+        return PendingIntent.getBroadcast(App.getInstance(), latest.getTeam().hashCode(), pending, FLAG_UPDATE_CURRENT);
     }
 
     public static final class NotificationActionReceiver extends BroadcastReceiver {
 
         @Override
+        @SuppressLint("CheckResult")
         public void onReceive(Context context, Intent intent) {
             ChatRepository repository = ChatRepository.getInstance();
             ChatNotifier notifier = ChatNotifier.getInstance();
             String action = intent.getAction();
             switch (action == null ? "" : action) {
-                case ACTION_REPLY:
+                case ACTION_REPLY: {
                     Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
                     if (remoteInput == null) break;
 
@@ -236,11 +239,16 @@ public class ChatNotifier extends Notifier<Chat> {
                     //noinspection ResultOfMethodCallIgnored
                     repository.createOrUpdate(chat).subscribe(__ -> notifier.handleNotification(received), ErrorHandler.EMPTY);
                     break;
+                }
                 case ACTION_MARK_AS_READ:
-                    Chat read = intent.<FeedItem<Chat>>getParcelableExtra(EXTRA_FEED_ITEM).getModel();
+                    Chat read = intent.getParcelableExtra(EXTRA_CHAT);
+
                     repository.updateLastSeen(read.getTeam());
-                    notifier.clearNotifications(Chat.empty());
-                    notifier.clearNotifications(read);
+                    //noinspection ResultOfMethodCallIgnored
+                    repository.fetchUnreadChats().count().subscribe(count -> {
+                        notifier.clearNotifications(read);
+                        if (count == 0) notifier.clearNotifications(Chat.empty());
+                    });
                     break;
             }
         }
