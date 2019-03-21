@@ -102,7 +102,7 @@ public class ChatFragment extends MainActivityFragment
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
         dateView = rootView.findViewById(R.id.date);
-        newMessages = rootView.findViewById(R.id.unread);
+        newMessages = rootView.findViewById(R.id.new_messages);
 
         dateHider = ViewHider.of(dateView).setDirection(TOP).build();
         newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build();
