@@ -83,6 +83,10 @@ public class Chat implements
         return new Chat(new ObjectId().toHexString(), KIND_TEXT, content, user, team, new Date());
     }
 
+    public static Chat empty() {
+        return chat("", User.empty(), Team.empty());
+    }
+
     @Override
     public boolean isEmpty() {
         return TextUtils.isEmpty(id);

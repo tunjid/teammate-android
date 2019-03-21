@@ -21,7 +21,6 @@ import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.ChatRepository;
 import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
@@ -170,7 +169,7 @@ public class ChatNotifier extends Notifier<Chat> {
                 .setGroup(NOTIFICATION_GROUP)
                 .setGroupSummary(true)
                 .setAutoCancel(true)
-                .build(), Chat.chat("", User.empty(), Team.empty()));
+                .build(), Chat.empty()); // Empty chat as the summary is it's own notification
     }
 
     private void setGroupAlertSummary(NotificationCompat.Builder notificationBuilder) {
@@ -222,6 +221,8 @@ public class ChatNotifier extends Notifier<Chat> {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            ChatRepository repository = ChatRepository.getInstance();
+            ChatNotifier notifier = ChatNotifier.getInstance();
             String action = intent.getAction();
             switch (action == null ? "" : action) {
                 case ACTION_REPLY:
@@ -233,12 +234,13 @@ public class ChatNotifier extends Notifier<Chat> {
                     Chat chat = Chat.chat(message, UserRepository.getInstance().getCurrentUser(), received.getModel().getTeam());
 
                     //noinspection ResultOfMethodCallIgnored
-                    ChatRepository.getInstance().createOrUpdate(chat).subscribe(__ -> ChatNotifier.getInstance().handleNotification(received), ErrorHandler.EMPTY);
+                    repository.createOrUpdate(chat).subscribe(__ -> notifier.handleNotification(received), ErrorHandler.EMPTY);
                     break;
                 case ACTION_MARK_AS_READ:
                     Chat read = intent.<FeedItem<Chat>>getParcelableExtra(EXTRA_FEED_ITEM).getModel();
-                    ChatNotifier.getInstance().clearNotifications(read);
-                    ChatRepository.getInstance().updateLastSeen(read.getTeam());
+                    repository.updateLastSeen(read.getTeam());
+                    notifier.clearNotifications(Chat.empty());
+                    notifier.clearNotifications(read);
                     break;
             }
         }

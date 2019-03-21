@@ -1,19 +1,17 @@
 package com.mainstreetcode.teammate.persistence;
 
+import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Event;
+
+import java.util.Date;
+import java.util.List;
+
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
-
-import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.User;
-
-import java.util.Date;
-import java.util.List;
-
 import io.reactivex.Maybe;
 
 /**
