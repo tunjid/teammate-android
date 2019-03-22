@@ -15,6 +15,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ public class ModelUtils {
 
     public static final String EMPTY_STRING = "";
     public static final SimpleDateFormat dateFormatter;
+    public static final SimpleDateFormat fullPrinter = new SimpleDateFormat("MMM, d yyyy", Locale.US);
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
     private static final Pattern alphaNumeric = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
@@ -188,4 +190,16 @@ public class ModelUtils {
         return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(source) : source;
     }
 
+    public static boolean areDifferentDays(@Nullable Date prev, Date next) {
+        if (prev == null) return false;
+
+        Calendar prevCal = Calendar.getInstance();
+        Calendar nextCal = Calendar.getInstance();
+        prevCal.setTime(prev);
+        nextCal.setTime(next);
+
+        return prevCal.get(Calendar.DAY_OF_MONTH) != nextCal.get(Calendar.DAY_OF_MONTH)
+                        || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
+                        || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR);
+    }
 }

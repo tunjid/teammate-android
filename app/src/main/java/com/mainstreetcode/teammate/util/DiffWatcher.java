@@ -29,6 +29,6 @@ public class DiffWatcher<T> {
 
     private void watch() {
         ref.set(PublishSubject.create());
-        disposable.add(ref.get().distinct().subscribe(consumer::accept, ErrorHandler.EMPTY));
+        disposable.add(ref.get().distinctUntilChanged().subscribe(consumer::accept, ErrorHandler.EMPTY));
     }
 }
