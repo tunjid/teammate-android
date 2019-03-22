@@ -137,6 +137,7 @@ public class ChatFragment extends MainActivityFragment
         });
 
         newMessageHider.hide();
+        dateHider.hide();
         return rootView;
     }
 
