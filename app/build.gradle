@@ -112,10 +112,10 @@ dependencies {
     implementation 'com.tunjid.android-bootstrap:core:5.0.0-beta1'
     implementation 'com.tunjid.android-bootstrap:view:5.0.0-beta1'
 
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.github.chrisbanes:PhotoView:2.2.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
-    implementation('com.facebook.android:facebook-login:4.38.1') {
+    implementation('com.facebook.android:facebook-login:4.41.0') {
         exclude module: 'support-media-compat'
         exclude module: 'support-annotations'
         exclude module: 'recyclerview-v7'
