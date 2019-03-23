@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -112,11 +113,7 @@ public class MediaDetailFragment extends MainActivityFragment
     protected int getToolbarMenu() { return R.menu.fragment_media_detail; }
 
     @Override
-    protected int getNavBarColor() {
-        return mediaViewHolder == null
-                ? super.getNavBarColor()
-                : mediaViewHolder.getBackgroundColor();
-    }
+    protected int getNavBarColor() { return Color.TRANSPARENT; }
 
     @Override
     public InsetFlags insetFlags() { return NONE; }
