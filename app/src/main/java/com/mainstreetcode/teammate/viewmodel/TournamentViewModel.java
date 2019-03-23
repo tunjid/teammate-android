@@ -79,7 +79,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     public Completable fetchStandings(Tournament tournament) {
         return api.getStandings(tournament.getId())
-                .observeOn(mainThread()).map(getStandings(tournament)::update).toCompletable();
+                .observeOn(mainThread()).map(getStandings(tournament)::update).ignoreElement();
     }
 
     public Flowable<Boolean> checkForWinner(Tournament tournament) {
@@ -107,6 +107,6 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private void removeTournament(Tournament tournament) {
         for (List<Differentiable> list : modelListMap.values()) list.remove(tournament);
-        pushModelAlert(Alert.tournamentDeletion(tournament));
+        pushModelAlert(Alert.deletion(tournament));
     }
 }

@@ -2,13 +2,16 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.MediaTransferIntentService;
+import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.repository.MediaRepository;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,14 +24,20 @@ import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.processors.PublishProcessor;
+
+import static io.reactivex.schedulers.Schedulers.io;
 
 public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     private final MediaRepository repository;
-    private final Map<Team, Set<Media>> selectionMap = new HashMap<>();
+    private final Map<Team, Set<Media>> selectionMap;
+    private final PublishProcessor<DiffUtil.DiffResult> uploadCompletionProcessor;
 
     public MediaViewModel() {
         repository = MediaRepository.getInstance();
+        selectionMap = new HashMap<>();
+        uploadCompletionProcessor = PublishProcessor.create();
     }
 
     @Override
@@ -37,11 +46,18 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
     @Override
     Class<Media> valueClass() { return Media.class; }
 
-    public Flowable<Media> getMedia(Media model) {
-        return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)
-                .doOnNext(media -> {
-                    if (media.isFlagged()) getModelList(media.getTeam()).remove(media);
-                });
+    @Override
+    void onModelAlert(Alert alert) {
+        super.onModelAlert(alert);
+
+        //noinspection unchecked,ResultOfMethodCallIgnored
+        Alert.matches(alert, Alert.of(Alert.Creation.class, Media.class, media ->
+                FunctionalDiff.of(Single.fromCallable(() -> media)
+                        .subscribeOn(io())
+                        .map(Collections::singletonList)
+                        .map(this::toDifferentiable), getModelList(media.getTeam()), this::preserveList)
+                        .subscribe(uploadCompletionProcessor::onNext, ErrorHandler.EMPTY)
+        ));
     }
 
     @Override
@@ -49,9 +65,21 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
         return repository.modelsBefore(key, getQueryDate(fetchLatest, key, Media::getCreated));
     }
 
+    public Flowable<Media> getMedia(Media model) {
+        return checkForInvalidObject(repository.get(model), model.getTeam(), model).cast(Media.class)
+                .doOnNext(media -> {
+                    if (media.isFlagged()) getModelList(media.getTeam()).remove(media);
+                });
+    }
+
+    public Flowable<DiffUtil.DiffResult> listenForUploads() {
+        return uploadCompletionProcessor;
+    }
+
     public Maybe<Pair<Boolean, DiffUtil.DiffResult>> deleteMedia(Team team, boolean isAdmin) {
         AtomicBoolean partialDelete = new AtomicBoolean();
         List<Differentiable> source = getModelList(team);
+        @SuppressWarnings("ConstantConditions")
         List<Media> toDelete = selectionMap.containsKey(team) ? new ArrayList<>(selectionMap.get(team)) : null;
 
         if (source == null || toDelete == null || toDelete.isEmpty()) return Maybe.empty();

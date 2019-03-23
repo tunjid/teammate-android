@@ -13,11 +13,14 @@ import com.mainstreetcode.teammate.repository.RoleRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Logger;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import androidx.annotation.Nullable;
 import androidx.core.provider.FontRequest;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import io.reactivex.Flowable;
+import io.reactivex.processors.PublishProcessor;
 
 /**
  * Application Singleton
@@ -34,6 +37,8 @@ public class App extends Application {
 
     static App INSTANCE;
 
+    private final PublishProcessor<Alert> eventSource = PublishProcessor.create();
+
     private final BroadcastReceiver mediaDownloadListener = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
@@ -41,9 +46,7 @@ public class App extends Application {
         }
     };
 
-    public static App getInstance() {
-        return INSTANCE;
-    }
+    public static App getInstance() { return INSTANCE; }
 
     @Override
     @SuppressLint("CheckResult")
@@ -68,6 +71,10 @@ public class App extends Application {
                 .flatMap(ignored -> RoleRepository.getInstance().getMyRoles().lastOrError())
                 .subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
+
+   public void pushAlert(Alert alert) { eventSource.onNext(alert); }
+
+   public Flowable<Alert> alerts() { return eventSource; }
 
     private void initializeEmoji() {
         // Use a downloadable font for EmojiCompat

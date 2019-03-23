@@ -109,6 +109,7 @@ public class MediaFragment extends MainActivityFragment
         super.onResume();
         fetchMedia(true);
         toggleContextMenu(mediaViewModel.hasSelections(team));
+        disposables.add(mediaViewModel.listenForUploads().subscribe(this::onMediaUpdated, emptyErrorHandler));
     }
 
     @Override

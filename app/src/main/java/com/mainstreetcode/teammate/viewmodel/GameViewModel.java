@@ -57,9 +57,12 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (alert instanceof Alert.GameDeletion) onGameDeleted((Alert.GameDeletion) alert);
-        else if (alert instanceof Alert.TournamentDeletion)
-            onTournamentDeleted((Alert.TournamentDeletion) alert);
+
+        //noinspection unchecked
+        Alert.matches(alert,
+                Alert.of(Alert.Deletion.class, Game.class, this::onGameDeleted),
+                Alert.of(Alert.Deletion.class, Tournament.class, this::onTournamentDeleted)
+        );
     }
 
     @Override
@@ -120,7 +123,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private Single<Game> delete(final Game game) {
         return gameRepository.delete(game)
                 .doOnSuccess(getModelList(game.getTeam())::remove)
-                .doOnSuccess(deleted -> pushModelAlert(Alert.gameDeletion(deleted)));
+                .doOnSuccess(deleted -> pushModelAlert(Alert.deletion(deleted)));
     }
 
     static Flowable<Team> getEligibleTeamsForGame(Game game) {
@@ -137,9 +140,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void onTournamentDeleted(Alert.TournamentDeletion alert) {
-        Tournament tournament = alert.getModel();
-
+    private void onTournamentDeleted(Tournament tournament) {
         Map<?, List<Differentiable>> tournamentMap = ModelUtils.get(tournament, gameRoundMap, Collections::emptyMap);
         Function<Map<?, List<Differentiable>>, Flowable<Differentiable>> mapListFunction = listMap ->
                 Flowable.fromIterable(listMap.values())
@@ -152,12 +153,10 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
                 .filter(item -> item instanceof Game)
                 .cast(Game.class)
                 .filter(game -> tournament.equals(game.getTournament()))
-                .subscribe(game -> pushModelAlert(Alert.gameDeletion(game)), ErrorHandler.EMPTY);
+                .subscribe(game -> pushModelAlert(Alert.deletion(game)), ErrorHandler.EMPTY);
     }
 
-    private void onGameDeleted(Alert.GameDeletion alert) {
-        Game game = alert.getModel();
-
+    private void onGameDeleted(Game game) {
         headToHeadMatchUps.remove(game);
         getModelList(game.getHost()).remove(game);
 

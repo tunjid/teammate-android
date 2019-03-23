@@ -74,7 +74,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
             User guestUser = guest.getUser();
             Team guestTeam = guest.getEvent().getTeam();
             BlockReason reason = BlockReason.empty();
-            pushModelAlert(Alert.userBlocked(BlockedUser.block(guestUser, guestTeam, reason)));
+            pushModelAlert(Alert.creation(BlockedUser.block(guestUser, guestTeam, reason)));
         }, GuestRepository.getInstance()::get);
     }
 
@@ -91,10 +91,12 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (alert instanceof Alert.UserBlocked)
-            blockedUserAlert.onNext(((Alert.UserBlocked) alert).getModel());
-        else if (alert instanceof Alert.GameDeletion)
-            onGameDeleted(((Alert.GameDeletion) alert).getModel());
+
+        //noinspection unchecked
+        Alert.matches(alert,
+                Alert.of(Alert.Deletion.class, Game.class, this::onGameDeleted),
+                Alert.of(Alert.Creation.class, BlockedUser.class, blockedUserAlert::onNext)
+        );
     }
 
     @Override

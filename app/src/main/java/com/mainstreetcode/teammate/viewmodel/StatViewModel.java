@@ -71,7 +71,7 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     @Override
     void onInvalidKey(Game key) {
         super.onInvalidKey(key);
-        pushModelAlert(Alert.gameDeletion(key));
+        pushModelAlert(Alert.deletion(key));
     }
 
     public List<Differentiable> getStatAggregates() {

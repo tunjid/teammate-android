@@ -1,11 +1,11 @@
 package com.mainstreetcode.teammate.viewmodel;
 
+import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.repository.EventRepository;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,14 +36,12 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
 
-        if (alert instanceof Alert.EventAbsentee) {
-            Event event = ((Alert.EventAbsentee) alert).getModel();
-            getModelList(Event.class).remove(event);
-        }
-        else if (alert instanceof Alert.UserBlocked || alert instanceof Alert.TeamDeletion) {
-            TeamHost host = (TeamHost) alert.getModel();
-            removeDeletedTeamEvents(host.getTeam());
-        }
+        //noinspection unchecked
+        Alert.matches(alert,
+                Alert.of(Alert.Deletion.class, Team.class, this::removeDeletedTeamEvents),
+                Alert.of(Alert.EventAbsentee.class, Event.class, getModelList(Event.class)::remove),
+                Alert.of(Alert.Creation.class, BlockedUser.class, blockedUser -> removeDeletedTeamEvents(blockedUser.getTeam()))
+        );
     }
 
     @Override

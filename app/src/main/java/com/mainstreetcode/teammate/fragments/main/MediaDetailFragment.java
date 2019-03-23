@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -21,6 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.isDisplayingSystemUI;
 
 
 public class MediaDetailFragment extends MainActivityFragment
@@ -112,11 +115,7 @@ public class MediaDetailFragment extends MainActivityFragment
     protected int getToolbarMenu() { return R.menu.fragment_media_detail; }
 
     @Override
-    protected int getNavBarColor() {
-        return mediaViewHolder == null
-                ? super.getNavBarColor()
-                : mediaViewHolder.getBackgroundColor();
-    }
+    protected int getNavBarColor() { return Color.TRANSPARENT; }
 
     @Override
     public InsetFlags insetFlags() { return NONE; }
@@ -141,9 +140,7 @@ public class MediaDetailFragment extends MainActivityFragment
         Activity activity = getActivity();
         if (activity == null) return;
 
-        int visibility = activity.getWindow().getDecorView().getSystemUiVisibility();
-        boolean status = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-        systemUiStatus.set(status);
+        systemUiStatus.set(isDisplayingSystemUI(activity.getWindow().getDecorView()));
         togglePersistentUi();
     }
 

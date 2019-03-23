@@ -23,10 +23,8 @@ public abstract class TeamMappedViewModel<V extends Differentiable & TeamHost> e
     @Override
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (!(alert instanceof Alert.TeamDeletion)) return;
-
-        Team deleted = ((Alert.TeamDeletion) alert).getModel();
-        modelListMap.remove(deleted);
+        //noinspection unchecked
+        Alert.matches(alert, Alert.of(Alert.Deletion.class, Team.class, modelListMap::remove));
     }
 
     public List<Differentiable> getModelList(Team team) {
@@ -36,7 +34,7 @@ public abstract class TeamMappedViewModel<V extends Differentiable & TeamHost> e
     @Override
     void onErrorMessage(Message message, Team key, Differentiable invalid) {
         super.onErrorMessage(message, key, invalid);
-        if (message.isIllegalTeamMember()) pushModelAlert(Alert.teamDeletion(key));
+        if (message.isIllegalTeamMember()) pushModelAlert(Alert.deletion(key));
     }
 
     Consumer<Throwable> onError(V model) {
@@ -46,7 +44,7 @@ public abstract class TeamMappedViewModel<V extends Differentiable & TeamHost> e
     @Override
     void onInvalidKey(Team key) {
         super.onInvalidKey(key);
-        pushModelAlert(Alert.teamDeletion(key));
+        pushModelAlert(Alert.deletion(key));
     }
 
     Flowable<Differentiable> getAllModels() {

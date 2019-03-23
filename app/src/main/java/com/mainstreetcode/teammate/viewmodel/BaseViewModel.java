@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
+import com.mainstreetcode.teammate.App;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -11,20 +12,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.processors.PublishProcessor;
 
 
 abstract class BaseViewModel extends ViewModel {
 
     private static final int AD_THRESH = 5;
 
-    private static final PublishProcessor<Alert> eventSource = PublishProcessor.create();
-
     private LinkedList<Differentiable> ads = new LinkedList<>();
     private CompositeDisposable disposable = new CompositeDisposable();
 
     BaseViewModel() {
-        disposable.add(eventSource.subscribe(this::onModelAlert, ErrorHandler.EMPTY));
+        disposable.add(App.getInstance().alerts().subscribe(this::onModelAlert, ErrorHandler.EMPTY));
         fetchAds();
     }
 
@@ -32,7 +30,7 @@ abstract class BaseViewModel extends ViewModel {
 
     boolean sortsAscending() {return false;}
 
-    void pushModelAlert(Alert alert) { eventSource.onNext(alert); }
+    void pushModelAlert(Alert alert) { App.getInstance().pushAlert(alert); }
 
     void onModelAlert(Alert alert) {}
 
