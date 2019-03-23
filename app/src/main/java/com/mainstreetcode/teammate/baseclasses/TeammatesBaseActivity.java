@@ -60,6 +60,7 @@ import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOOLBAR_ANIM_DELAY;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.isDisplayingSystemUI;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
@@ -168,7 +169,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
 
         View decorView = getDecorView();
         decorView.setSystemUiVisibility(DEFAULT_SYSTEM_UI_FLAGS);
-        decorView.setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
+        decorView.setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar(!isDisplayingSystemUI(decorView)));
         setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
         showSystemUI();
     }

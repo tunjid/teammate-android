@@ -23,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.isDisplayingSystemUI;
+
 
 public class MediaDetailFragment extends MainActivityFragment
         implements MediaAdapter.MediaAdapterListener {
@@ -138,9 +140,7 @@ public class MediaDetailFragment extends MainActivityFragment
         Activity activity = getActivity();
         if (activity == null) return;
 
-        int visibility = activity.getWindow().getDecorView().getSystemUiVisibility();
-        boolean status = (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-        systemUiStatus.set(status);
+        systemUiStatus.set(isDisplayingSystemUI(activity.getWindow().getDecorView()));
         togglePersistentUi();
     }
 
