@@ -14,7 +14,6 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import com.mainstreetcode.teammate.R;
@@ -37,8 +36,9 @@ import androidx.core.app.RemoteInput;
 import androidx.core.util.Pair;
 import io.reactivex.functions.Predicate;
 
-import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 
@@ -78,7 +78,7 @@ public class ChatNotifier extends Notifier<Chat> {
     @Override
     protected ModelRepository<Chat> getRepository() {return ChatRepository.getInstance();}
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(O)
     @Override
     protected NotificationChannel[] getNotificationChannels() {
         NotificationChannel channel = buildNotificationChannel(FeedItem.CHAT, R.string.chats, R.string.chats_notifier_description, NotificationManager.IMPORTANCE_HIGH);
@@ -128,16 +128,13 @@ public class ChatNotifier extends Notifier<Chat> {
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder(item)
                 .setContentIntent(getDeepLinkIntent(latest))
                 .setSmallIcon(R.drawable.ic_notification)
+                .addAction(getReplyAction(item, latest))
+                .addAction(getMarkAsReadAction(latest))
                 .setGroup(NOTIFICATION_GROUP)
                 .setAutoCancel(true);
 
         notificationBuilder.setSound(getNotificationSound(count));
         setGroupAlertSummary(notificationBuilder);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notificationBuilder.addAction(getReplyAction(item, latest));
-            notificationBuilder.addAction(getMarkAsReadAction(latest));
-        }
 
         if (size < 2) return notificationBuilder
                 .setContentTitle(app.getString(R.string.chats_notification_title, teamName, latest.getUser().getFirstName()))
@@ -175,10 +172,8 @@ public class ChatNotifier extends Notifier<Chat> {
                 .build(), Chat.empty()); // Empty chat as the summary is it's own notification
     }
 
-    private void setGroupAlertSummary(NotificationCompat.Builder notificationBuilder) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY);
-        }
+    private void setGroupAlertSummary(NotificationCompat.Builder builder) {
+        if (SDK_INT >= O) builder.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY);
     }
 
     private Uri getNotificationSound(int count) {
@@ -210,11 +205,9 @@ public class ChatNotifier extends Notifier<Chat> {
                 .build();
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
     private PendingIntent getNotificationActionIntent(Chat latest, String action, Consumer<Intent> intentConsumer) {
-        Intent pending = new Intent(app, NotificationActionReceiver.class)
-                .putExtra(EXTRA_NOTIFICATION_ID, getNotifyId())
-                .setAction(action);
+        Intent pending = new Intent(app, NotificationActionReceiver.class).setAction(action);
+        addNotificationId(pending);
 
         intentConsumer.accept(pending);
         return PendingIntent.getBroadcast(app, latest.getTeam().hashCode(), pending, FLAG_UPDATE_CURRENT);
