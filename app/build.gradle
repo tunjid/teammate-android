@@ -8,8 +8,8 @@ android {
         applicationId "com.mainstreetcode.teammate"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 33
-        versionName "3.10.0"
+        versionCode 34
+        versionName "3.11.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true  //add this line
@@ -72,10 +72,9 @@ android {
 
 dependencies {
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.0.0"
-    annotationProcessor "androidx.room:room-compiler:2.1.0-alpha04"
+    annotationProcessor "androidx.room:room-compiler:2.1.0-alpha06"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'androidx.emoji:emoji:1.0.0'
     implementation 'androidx.palette:palette:1.0.0'
@@ -84,13 +83,13 @@ dependencies {
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
-    implementation "androidx.room:room-runtime:2.1.0-alpha04"
-    implementation "androidx.room:room-rxjava2:2.1.0-alpha04"
+    implementation "androidx.room:room-runtime:2.1.0-alpha06"
+    implementation "androidx.room:room-rxjava2:2.1.0-alpha06"
     implementation "androidx.lifecycle:lifecycle-runtime:2.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
 
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation 'com.google.firebase:firebase-messaging:17.5.0'
 
     implementation 'com.google.android:flexbox:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
@@ -112,10 +111,10 @@ dependencies {
     implementation 'com.tunjid.android-bootstrap:core:5.0.0-beta1'
     implementation 'com.tunjid.android-bootstrap:view:5.0.0-beta1'
 
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.github.chrisbanes:PhotoView:2.2.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
-    implementation('com.facebook.android:facebook-login:4.38.1') {
+    implementation('com.facebook.android:facebook-login:4.41.0') {
         exclude module: 'support-media-compat'
         exclude module: 'support-annotations'
         exclude module: 'recyclerview-v7'
@@ -138,7 +137,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
-    androidTestImplementation "androidx.room:room-testing:2.1.0-alpha04"
+    androidTestImplementation "androidx.room:room-testing:2.1.0-alpha06"
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0-beta02', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.gson'

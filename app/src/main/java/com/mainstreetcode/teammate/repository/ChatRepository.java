@@ -2,7 +2,6 @@ package com.mainstreetcode.teammate.repository;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.annotation.Nullable;
 import android.util.Pair;
 
 import com.google.gson.Gson;
@@ -29,7 +28,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -77,7 +78,7 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
 
     @Override
     public Single<Chat> createOrUpdate(Chat model) {
-        return Single.just(model).map(getSaveFunction()).subscribeOn(io());
+        return post(model).andThen(Single.just(model)).map(getSaveFunction());
     }
 
     @Override
@@ -129,14 +130,13 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
     }
 
     public Flowable<List<Chat>> fetchUnreadChats() {
-        User currentUser = UserRepository.getInstance().getCurrentUser();
         return RoleRepository.getInstance().getMyRoles()
                 .firstElement()
                 .toFlowable()
                 .flatMap(Flowable::fromIterable)
                 .map(Role::getTeam)
                 .map(team -> new Pair<>(team.getId(), getLastTeamSeen(team)))
-                .flatMapMaybe(teamDatePair -> chatDao.unreadChats(teamDatePair.first, currentUser, teamDatePair.second))
+                .flatMapMaybe(teamDatePair -> chatDao.unreadChats(teamDatePair.first, teamDatePair.second))
                 .filter(chats -> !chats.isEmpty());
     }
 
@@ -144,7 +144,7 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
         return SocketFactory.getInstance().getTeamChatSocket().flatMapPublisher(socket -> {
             JSONObject result;
             try { result = new JSONObject(CHAT_GSON.toJson(team));}
-            catch (Exception e) {return Flowable.error(e);}
+            catch (Exception e) { return Flowable.error(e); }
 
             socket.emit(SocketFactory.EVENT_JOIN, result);
             User signedInUser = UserRepository.getInstance().getCurrentUser();
@@ -159,10 +159,9 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
         });
     }
 
-    public Completable post(Chat chat) {
+    private Completable post(Chat chat) {
         return SocketFactory.getInstance().getTeamChatSocket().flatMapCompletable(socket -> Completable.create(emitter -> {
             JSONObject result = new JSONObject(CHAT_GSON.toJson(chat));
-
             socket.emit(EVENT_NEW_MESSAGE, new Object[]{result}, args -> {
                 Chat created = parseChat(args);
                 if (created == null) {
@@ -172,8 +171,15 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
                 chat.update(created);
                 emitter.onComplete();
             });
+        })).onErrorResumeNext(throwable -> postRetryFunction(throwable, chat, 0));
+    }
 
-        }));
+    private Completable postRetryFunction(Throwable throwable, Chat chat, int previousRetries) {
+            int retries = previousRetries + 1;
+            return retries <= 3
+                    ? Completable.timer(300, TimeUnit.MILLISECONDS)
+                    .andThen(post(chat).onErrorResumeNext(thrown -> postRetryFunction(thrown, chat, retries)))
+                    : Completable.error(throwable);
     }
 
     public void updateLastSeen(Team team) {

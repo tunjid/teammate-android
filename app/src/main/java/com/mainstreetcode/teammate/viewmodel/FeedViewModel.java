@@ -1,14 +1,8 @@
 package com.mainstreetcode.teammate.viewmodel;
 
-import androidx.core.util.Pair;
-import androidx.recyclerview.widget.DiffUtil;
-
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Guest;
-import com.tunjid.androidbootstrap.functions.BiFunction;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.TeamMember;
@@ -20,13 +14,18 @@ import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.repository.UserRepository;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
+import com.tunjid.androidbootstrap.functions.BiFunction;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.core.util.Pair;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
@@ -59,9 +58,9 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     @Override
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (!(alert instanceof Alert.JoinRequestProcessed)) return;
-        JoinRequest request = ((Alert.JoinRequestProcessed) alert).getModel();
-        removedProcessedRequest(request);
+
+        //noinspection unchecked
+        Alert.matches(alert, Alert.of(Alert.JoinRequestProcessed.class, JoinRequest.class, this::removedProcessedRequest));
     }
 
     @Override

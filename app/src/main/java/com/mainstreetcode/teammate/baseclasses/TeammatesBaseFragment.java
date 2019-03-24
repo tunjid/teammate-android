@@ -34,6 +34,9 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.FragmentTransaction;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
+
 /**
  * Base Fragment for this app
  */
@@ -43,6 +46,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected static final InsetFlags NO_TOP = InsetFlags.NO_TOP;
     protected static final InsetFlags NONE = InsetFlags.NONE;
     protected static final int PLACE_PICKER_REQUEST = 1;
+    private static final int LIGHT_NAV_BAR_COLOR = 0xFFE0E0E0; // Same as R.color.light_grey
 
     protected static final Validator VALIDATOR = new Validator();
 
@@ -98,7 +102,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected int getAltToolbarMenu() { return 0; }
 
     @ColorInt
-    protected int getNavBarColor() { return Color.BLACK; }
+    protected int getNavBarColor() { return SDK_INT >= O ? LIGHT_NAV_BAR_COLOR : Color.BLACK; }
 
     public boolean showsFab() { return false; }
 
@@ -109,6 +113,8 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     public boolean showsBottomNav() { return true; }
 
     protected boolean showsSystemUI() { return true; }
+
+    protected boolean hasLightNavBar() { return SDK_INT >= O; }
 
     protected CharSequence getToolbarTitle() { return ""; }
 
@@ -217,6 +223,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
                 this.showsAltToolBar(),
                 this.showsBottomNav(),
                 this.showsSystemUI(),
+                this.hasLightNavBar(),
                 this.insetFlags(),
                 this.getToolbarTitle(),
                 this.getAltToolbarTitle(),

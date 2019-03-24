@@ -51,6 +51,7 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.palette.graphics.Palette;
 import io.reactivex.Single;
 
+import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static io.reactivex.Single.error;
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 import static io.reactivex.schedulers.Schedulers.io;
@@ -138,6 +139,10 @@ public class ViewHolderUtil extends ViewUtil {
     private static void replaceMenu(Toolbar toolbar, int menu) {
         toolbar.getMenu().clear();
         if (menu != 0) toolbar.inflateMenu(menu);
+    }
+
+    public static boolean isDisplayingSystemUI(View decorView) {
+        return (decorView.getSystemUiVisibility() & SYSTEM_UI_FLAG_FULLSCREEN) != 0;
     }
 
     public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size) {

@@ -2,6 +2,9 @@ package com.mainstreetcode.teammate.notifications;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.google.firebase.messaging.RemoteMessage;
@@ -34,7 +37,10 @@ import java.util.Map;
  * Notifications from a user's feed
  */
 
-public class FeedItem<T extends Model<T>> implements Differentiable, Comparable<FeedItem> {
+public class FeedItem<T extends Model<T>> implements
+        Parcelable,
+        Differentiable,
+        Comparable<FeedItem> {
 
     static final String JOIN_REQUEST = "join-request";
     static final String EVENT = "event";
@@ -62,6 +68,16 @@ public class FeedItem<T extends Model<T>> implements Differentiable, Comparable<
         this.type = type;
         this.model = model;
         this.itemClass = itemClass;
+    }
+
+    @SuppressWarnings("unchecked")
+    private FeedItem(Parcel in) {
+        action = in.readString();
+        title = in.readString();
+        body = in.readString();
+        type = in.readString();
+        itemClass = forType(type);
+        model = (T) in.readValue(itemClass.getClassLoader());
     }
 
     @Nullable
@@ -114,6 +130,58 @@ public class FeedItem<T extends Model<T>> implements Differentiable, Comparable<
         return model.hashCode();
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(action);
+        dest.writeString(title);
+        dest.writeString(body);
+        dest.writeString(type);
+        dest.writeValue(model);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<FeedItem> CREATOR = new Parcelable.Creator<FeedItem>() {
+        @Override
+        public FeedItem createFromParcel(Parcel in) {
+            return new FeedItem(in);
+        }
+
+        @Override
+        public FeedItem[] newArray(int size) {
+            return new FeedItem[size];
+        }
+    };
+
+    private static Class forType(String type) {
+        switch (type != null ? type : "") {
+            case JOIN_REQUEST:
+                return JoinRequest.class;
+            case TOURNAMENT:
+                return Tournament.class;
+            case COMPETITOR:
+                return Competitor.class;
+            case EVENT:
+                return Event.class;
+            case TEAM:
+                return Team.class;
+            case ROLE:
+                return Role.class;
+            case CHAT:
+                return Chat.class;
+            case GAME:
+                return Game.class;
+            case MEDIA:
+                return Media.class;
+            default:
+                return Object.class;
+        }
+    }
+
     public static class GsonAdapter<T extends Model<T>>
             implements JsonDeserializer<FeedItem<T>> {
 
@@ -136,40 +204,7 @@ public class FeedItem<T extends Model<T>> implements Differentiable, Comparable<
             String type = ModelUtils.asString(TYPE_KEY, feedItemJson);
             String title = ModelUtils.asString(TITLE_KEY, feedItemJson);
             String body = ModelUtils.asString(BODY_KEY, feedItemJson);
-
-            Class typeClass;
-
-            switch (type != null ? type : "") {
-                case JOIN_REQUEST:
-                    typeClass = JoinRequest.class;
-                    break;
-                case TOURNAMENT:
-                    typeClass = Tournament.class;
-                    break;
-                case COMPETITOR:
-                    typeClass = Competitor.class;
-                    break;
-                case EVENT:
-                    typeClass = Event.class;
-                    break;
-                case TEAM:
-                    typeClass = Team.class;
-                    break;
-                case ROLE:
-                    typeClass = Role.class;
-                    break;
-                case CHAT:
-                    typeClass = Chat.class;
-                    break;
-                case GAME:
-                    typeClass = Game.class;
-                    break;
-                case MEDIA:
-                    typeClass = Media.class;
-                    break;
-                default:
-                    typeClass = Object.class;
-            }
+            Class itemClass = forType(type);
 
             JsonElement modelElement = feedItemJson.get(MODEL_KEY);
 
@@ -181,9 +216,8 @@ public class FeedItem<T extends Model<T>> implements Differentiable, Comparable<
                 modelElement = modelBody;
             }
 
-            T model = context.deserialize(modelElement, typeClass);
-
-            return new FeedItem<>(action, title, body, type, model, typeClass);
+            T model = context.deserialize(modelElement, itemClass);
+            return new FeedItem<>(action, title, body, type, model, itemClass);
         }
     }
 }

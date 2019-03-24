@@ -30,6 +30,8 @@ public interface PersistentUiController {
 
     void toggleSystemUI(boolean show);
 
+    void toggleLightNavBar(boolean isLight);
+
     void setNavBarColor(@ColorInt int color);
 
     void setFabIcon(@DrawableRes int icon, @StringRes int textRes);
@@ -70,6 +72,9 @@ public interface PersistentUiController {
 
         @Override
         public void toggleSystemUI(boolean show) {}
+
+        @Override
+        public void toggleLightNavBar(boolean isLight) {}
 
         @Override
         public void setNavBarColor(int color) {}

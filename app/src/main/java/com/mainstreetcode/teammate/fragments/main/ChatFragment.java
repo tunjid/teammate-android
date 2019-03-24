@@ -2,6 +2,7 @@ package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,9 +21,11 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
+import com.mainstreetcode.teammate.util.Deferrer;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
+import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import java.util.List;
 
@@ -32,10 +35,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.AutoTransition;
+import androidx.transition.TransitionManager;
 import io.reactivex.disposables.Disposable;
 
 import static android.text.TextUtils.isEmpty;
 import static androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE;
+import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING;
+import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
 
 public class ChatFragment extends MainActivityFragment
         implements
@@ -46,10 +53,18 @@ public class ChatFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.chat};
 
     private boolean wasScrolling;
+    private int unreadCount;
 
     private Team team;
     private List<Differentiable> items;
     private Disposable chatDisposable;
+
+    private TextView dateView;
+    private TextView newMessages;
+
+    private Deferrer deferrer;
+    private ViewHider dateHider;
+    private ViewHider newMessageHider;
 
     public static ChatFragment newInstance(Team team) {
         ChatFragment fragment = new ChatFragment();
@@ -86,6 +101,12 @@ public class ChatFragment extends MainActivityFragment
         SwipeRefreshLayout refresh = rootView.findViewById(R.id.refresh_layout);
         EditText input = rootView.findViewById(R.id.input);
         View send = rootView.findViewById(R.id.send);
+        dateView = rootView.findViewById(R.id.date);
+        newMessages = rootView.findViewById(R.id.new_messages);
+
+        dateHider = ViewHider.of(dateView).setDirection(TOP).build();
+        newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build();
+        deferrer = new Deferrer(2000, dateHider::hide);
 
         scrollManager = ScrollManager.<TeamChatViewHolder>with(rootView.findViewById(R.id.chat))
                 .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
@@ -100,6 +121,8 @@ public class ChatFragment extends MainActivityFragment
                 .withLinearLayoutManager()
                 .build();
 
+        newMessages.setOnClickListener(view -> scrollManager.withRecyclerView(rv -> rv.smoothScrollToPosition(items.size() - 1)));
+        dateView.setOnClickListener(view -> dateHider.hide());
         send.setOnClickListener(view -> sendChat(input));
         input.setOnEditorActionListener(this);
         input.addTextChangedListener(new TextWatcher() {
@@ -110,9 +133,11 @@ public class ChatFragment extends MainActivityFragment
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
-            public void afterTextChanged(Editable s) {wasScrolling = false;}
+            public void afterTextChanged(Editable s) { wasScrolling = false; }
         });
 
+        newMessageHider.hide();
+        dateHider.hide();
         return rootView;
     }
 
@@ -120,7 +145,7 @@ public class ChatFragment extends MainActivityFragment
     public void onResume() {
         super.onResume();
         subscribeToChat();
-        fetchChatsBefore(restoredFromBackStack());
+        fetchChatsBefore(true);
     }
 
     @Override
@@ -137,6 +162,11 @@ public class ChatFragment extends MainActivityFragment
     public void onDestroyView() {
         super.onDestroyView();
         chatViewModel.updateLastSeen(team);
+        newMessageHider = null;
+        newMessages = null;
+        dateHider = null;
+        dateView = null;
+        deferrer = null;
     }
 
     @Override
@@ -187,8 +217,10 @@ public class ChatFragment extends MainActivityFragment
     private void subscribeToChat() {
         chatDisposable = chatViewModel.listenForChat(team).subscribe(chat -> {
             items.add(chat);
-
-            notifyAndScrollToLast(isNearBottomOfChat());
+            boolean nearBottomOfChat = isNearBottomOfChat();
+            unreadCount = nearBottomOfChat ? 0 : unreadCount + 1;
+            notifyAndScrollToLast(nearBottomOfChat);
+            updateUnreadCount();
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
                 .add(message -> showSnackbar(message.getMessage()))
@@ -212,7 +244,7 @@ public class ChatFragment extends MainActivityFragment
     }
 
     private void postChat(Chat chat) {
-        disposables.add(chatViewModel.post(chat).subscribe(() -> {
+        disposables.add(chatViewModel.post(chat).subscribe(__ -> {
             chatViewModel.updateLastSeen(team);
             int index = items.indexOf(chat);
 
@@ -248,10 +280,7 @@ public class ChatFragment extends MainActivityFragment
         RecyclerView recyclerView = scrollManager.getRecyclerView();
         if (recyclerView == null) return false;
 
-        LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
-        if (layoutManager == null) return false;
-
-        int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        int lastVisibleItemPosition = scrollManager.getLastVisiblePosition();
 
         return Math.abs(items.size() - lastVisibleItemPosition) < 4;
     }
@@ -265,10 +294,35 @@ public class ChatFragment extends MainActivityFragment
     @SuppressWarnings("unused")
     private void onScroll(int dx, int dy) {
         if (Math.abs(dy) > 8) wasScrolling = true;
+
+        deferrer.advanceDeadline();
+        String date = chatViewModel.onScrollPositionChanged(team, scrollManager.getFirstVisiblePosition());
+
+        if (TextUtils.isEmpty(date)) dateHider.hide();
+        else dateHider.show();
+
+        if (date.equals(dateView.getText().toString())) return;
+
+        TransitionManager.beginDelayedTransition(
+                (ViewGroup) dateView.getParent(),
+                new AutoTransition().addTarget(dateView));
+        dateView.setText(date);
     }
 
     private void onScrollStateChanged(int newState) {
-        if (!wasScrolling) return;
-        if (newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) fetchChatsBefore(true);
+        if (newState == SCROLL_STATE_DRAGGING) deferrer.advanceDeadline();
+        if (wasScrolling && newState == SCROLL_STATE_IDLE && isNearBottomOfChat()) {
+            unreadCount = 0;
+            updateUnreadCount();
+            fetchChatsBefore(true);
+        }
+    }
+
+    private void updateUnreadCount() {
+        if (unreadCount == 0) newMessageHider.hide();
+        else {
+            newMessages.setText(unreadCount == 1 ? getString(R.string.chat_new_message) : getString(R.string.chat_new_messages, unreadCount));
+            newMessageHider.show();
+        }
     }
 }

@@ -52,8 +52,8 @@ public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor
             if (accept) return sourceCopy;
 
             pushModelAlert(competitor.inOneOffGame()
-                    ? Alert.gameDeletion(competitor.getGame())
-                    : Alert.tournamentDeletion(competitor.getTournament()));
+                    ? Alert.deletion(competitor.getGame())
+                    : Alert.deletion(competitor.getTournament()));
 
             return sourceCopy;
         });

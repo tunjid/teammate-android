@@ -90,10 +90,10 @@ public abstract class Notifier<T extends Model<T>> {
         return builder;
     }
 
-    PendingIntent getDeepLinkIntent(FeedItem<T> item) {
+    PendingIntent getDeepLinkIntent(T model) {
         Intent intent = new Intent(app, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(MainActivity.FEED_DEEP_LINK, item.getModel());
+        intent.putExtra(MainActivity.FEED_DEEP_LINK, model);
 
         return getActivity(app, DEEP_LINK_REQ_CODE, intent, FLAG_ONE_SHOT);
     }
@@ -112,7 +112,7 @@ public abstract class Notifier<T extends Model<T>> {
                 .setContentText(item.getBody())
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(getDeepLinkIntent(item))
+                .setContentIntent(getDeepLinkIntent(item.getModel()))
                 .build(), item.getModel());
     }
 

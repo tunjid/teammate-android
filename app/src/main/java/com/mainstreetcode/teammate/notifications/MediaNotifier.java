@@ -10,6 +10,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.MediaTransferIntentService;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Media;
@@ -17,6 +18,7 @@ import com.mainstreetcode.teammate.repository.MediaRepository;
 import com.mainstreetcode.teammate.repository.ModelRepository;
 import com.mainstreetcode.teammate.rest.ProgressRequestBody;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.concurrent.TimeUnit;
 
@@ -62,11 +64,12 @@ public class MediaNotifier extends Notifier<Media> {
         if (!(requestBody instanceof ProgressRequestBody)) return mediaSingle;
 
         ProgressRequestBody progressRequestBody = (ProgressRequestBody) requestBody;
+        //noinspection ResultOfMethodCallIgnored
         progressRequestBody.getProgressSubject()
                 .doFinally(this::onUploadComplete)
                 .subscribe(this::updateProgress, ErrorHandler.EMPTY);
 
-        return mediaSingle;
+        return mediaSingle.doOnSuccess(media -> App.getInstance().pushAlert(Alert.creation(media)));
     }
 
     public void notifyDownloadComplete() {
@@ -88,6 +91,7 @@ public class MediaNotifier extends Notifier<Media> {
         MediaTransferIntentService.UploadStats stats = MediaTransferIntentService.getUploadStats();
         if (!stats.isComplete()) return;
 
+        //noinspection ResultOfMethodCallIgnored
         Completable.timer(1200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe(
                 () -> notifyOfUpload(mediaTransferBuilder()
                         .setContentText(getUploadCompletionContentText(stats))

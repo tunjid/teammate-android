@@ -77,7 +77,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Single<Team> deleteTeam(Team team) {
-        return repository.delete(team).doOnSuccess(deleted -> pushModelAlert(Alert.teamDeletion(deleted)));
+        return repository.delete(team).doOnSuccess(deleted -> pushModelAlert(Alert.deletion(deleted)));
     }
 
     public Single<DiffUtil.DiffResult> nonDefaultTeams(List<Team> sink) {
@@ -103,12 +103,11 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     void onModelAlert(Alert alert) {
-        if (!(alert instanceof Alert.TeamDeletion)) return;
-        Team deleted = ((Alert.TeamDeletion) alert).getModel();
-
-        teams.remove(deleted);
-        if (defaultTeam.equals(deleted)) defaultTeam.update(Team.empty());
-
-        repository.queueForLocalDeletion(deleted);
+        //noinspection unchecked
+        Alert.matches(alert, Alert.of(Alert.Deletion.class, Team.class, team -> {
+            teams.remove(team);
+            repository.queueForLocalDeletion(team);
+            if (defaultTeam.equals(team)) defaultTeam.update(Team.empty());
+        }));
     }
 }

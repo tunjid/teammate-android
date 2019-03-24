@@ -57,6 +57,7 @@ public class UserRepository extends ModelRepository<User> {
         app = App.getInstance();
         api = TeammateService.getApiInstance();
         userDao = AppDatabase.getInstance().userDao();
+        currentUser.setId(getUserId());
     }
 
     public static UserRepository getInstance() {
@@ -159,13 +160,13 @@ public class UserRepository extends ModelRepository<User> {
     }
 
     public boolean isSignedIn() {
-        return getUserId() != null;
+        return !TextUtils.isEmpty(getUserId());
     }
 
     @Nullable
     private String getUserId() {
         return app.getSharedPreferences(PREFS, MODE_PRIVATE)
-                .getString(USER_ID, null);
+                .getString(USER_ID, "");
     }
 
     public Single<Message> forgotPassword(String email) {
@@ -186,7 +187,7 @@ public class UserRepository extends ModelRepository<User> {
 
     private Single<Boolean> clearUser() {
         String userId = getUserId();
-        if (userId == null) return just(false);
+        if (TextUtils.isEmpty(userId)) return just(false);
 
         app.getSharedPreferences(PREFS, MODE_PRIVATE)
                 .edit()

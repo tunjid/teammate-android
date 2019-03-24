@@ -42,14 +42,17 @@ import androidx.transition.AutoTransition;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
 import static android.view.KeyEvent.ACTION_UP;
 import static android.view.View.GONE;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+import static android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
 import static android.view.View.VISIBLE;
 import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
@@ -57,6 +60,7 @@ import static com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE;
 import static com.google.android.material.snackbar.Snackbar.LENGTH_LONG;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.TOOLBAR_ANIM_DELAY;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
+import static com.mainstreetcode.teammate.util.ViewHolderUtil.isDisplayingSystemUI;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM;
 import static com.tunjid.androidbootstrap.view.animator.ViewHider.TOP;
@@ -122,7 +126,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
 
         uiState = savedInstanceState == null ? UiState.freshState() : savedInstanceState.getParcelable(UI_STATE);
@@ -163,12 +167,11 @@ public abstract class TeammatesBaseActivity extends BaseActivity
             return selected || onOptionsItemSelected(item);
         });
 
-        getDecorView().setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar((visibility & SYSTEM_UI_FLAG_FULLSCREEN) == 0));
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            showSystemUI();
-            setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
-        }
+        View decorView = getDecorView();
+        decorView.setSystemUiVisibility(DEFAULT_SYSTEM_UI_FLAGS);
+        decorView.setOnSystemUiVisibilityChangeListener(visibility -> toggleToolbar(!isDisplayingSystemUI(decorView)));
+        setOnApplyWindowInsetsListener(constraintLayout, (view, insets) -> consumeSystemInsets(insets));
+        showSystemUI();
     }
 
     @Override
@@ -242,6 +245,19 @@ public abstract class TeammatesBaseActivity extends BaseActivity
     public void toggleSystemUI(boolean show) {
         if (show) showSystemUI();
         else hideSystemUI();
+    }
+
+    @Override
+    public void toggleLightNavBar(boolean isLight) {
+        if (SDK_INT < O) return;
+
+        View decorView = getDecorView();
+        int visibility = decorView.getSystemUiVisibility();
+
+        if (isLight) visibility = visibility | SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        else visibility &= ~SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+
+        decorView.setSystemUiVisibility(visibility);
     }
 
     @Override
@@ -339,6 +355,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
                 this::toggleAltToolbar,
                 this::toggleBottombar,
                 this::toggleSystemUI,
+                this::toggleLightNavBar,
                 this::setNavBarColor,
                 insetFlag -> {},
                 this::setFabIcon,
@@ -387,23 +404,28 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         InsetFlags insetFlags = ((TeammatesBaseFragment) fragment).insetFlags();
 
         getLayoutParams(toolbar).topMargin = insetFlags.hasTopInset() ? 0 : topInset;
+        bottomInsetView.setVisibility(insetFlags.hasTopInset() ? VISIBLE : GONE);
         topInsetView.setVisibility(insetFlags.hasTopInset() ? VISIBLE : GONE);
         constraintLayout.setPadding(insetFlags.hasLeftInset() ? leftInset : 0, 0, insetFlags.hasRightInset() ? rightInset : 0, 0);
     }
 
     private void hideSystemUI() {
-        int visibility = DEFAULT_SYSTEM_UI_FLAGS | SYSTEM_UI_FLAG_FULLSCREEN;
-        if (isInLandscape()) visibility = visibility | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-
-        getDecorView().setSystemUiVisibility(visibility);
+        View decorView = getDecorView();
+        int visibility = decorView.getSystemUiVisibility()
+                | SYSTEM_UI_FLAG_FULLSCREEN
+                | SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        decorView.setSystemUiVisibility(visibility);
     }
 
     private void showSystemUI() {
-        getDecorView().setSystemUiVisibility(DEFAULT_SYSTEM_UI_FLAGS);
-    }
+        View decorView = getDecorView();
+        int visibility = decorView.getSystemUiVisibility();
+        visibility &= ~SYSTEM_UI_FLAG_FULLSCREEN;
+        visibility &= ~SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        visibility &= ~SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
-    private boolean isInLandscape() {
-        return getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE;
+        decorView.setSystemUiVisibility(visibility);
     }
 
     private View getDecorView() {return getWindow().getDecorView();}

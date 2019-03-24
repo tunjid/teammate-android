@@ -36,7 +36,7 @@ public class BlockedUserViewModel extends TeamMappedViewModel<BlockedUser> {
 
     public Single<BlockedUser> blockUser(BlockedUser blockedUser) {
         return BlockedUserRepository.getInstance().createOrUpdate(blockedUser)
-                .doOnSuccess(blocked -> pushModelAlert(Alert.userBlocked(blockedUser)));
+                .doOnSuccess(blocked -> pushModelAlert(Alert.creation(blockedUser)));
     }
 
     private Single<BlockedUser> unblockUser(BlockedUser blockedUser) {

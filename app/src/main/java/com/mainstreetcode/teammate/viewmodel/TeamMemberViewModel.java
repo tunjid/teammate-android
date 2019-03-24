@@ -3,7 +3,6 @@ package com.mainstreetcode.teammate.viewmodel;
 import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.BlockedUser;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
@@ -18,6 +17,7 @@ import com.mainstreetcode.teammate.repository.TeamMemberRepository;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,8 +49,9 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     @SuppressLint("CheckResult")
     void onModelAlert(Alert alert) {
         super.onModelAlert(alert);
-        if (!(alert instanceof Alert.UserBlocked)) return;
-        removeBlockedUser(((Alert.UserBlocked) alert).getModel());
+
+        //noinspection unchecked
+        Alert.matches(alert, Alert.of(Alert.Creation.class, BlockedUser.class, this::removeBlockedUser));
     }
 
     @Override

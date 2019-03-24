@@ -1,19 +1,17 @@
 package com.mainstreetcode.teammate.persistence;
 
+import com.mainstreetcode.teammate.model.Chat;
+import com.mainstreetcode.teammate.model.Event;
+
+import java.util.Date;
+import java.util.List;
+
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
-
-import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.User;
-
-import java.util.Date;
-import java.util.List;
-
 import io.reactivex.Maybe;
 
 /**
@@ -37,11 +35,10 @@ public abstract class ChatDao extends EntityDao<Chat> {
 
     @Query("SELECT * FROM team_chats" +
             " WHERE team_chat_team = :teamId" +
-            " AND team_chat_user != :signedInUser" +
             " AND team_chat_created > :date" +
             " ORDER BY team_chat_created DESC" +
             " LIMIT 10")
-    public abstract Maybe<List<Chat>> unreadChats(String teamId, User signedInUser, Date date);
+    public abstract Maybe<List<Chat>> unreadChats(String teamId, Date date);
 
     @Query("SELECT * FROM team_chats" +
             " WHERE :id = team_chat_id")
