@@ -404,7 +404,7 @@ public abstract class TeammatesBaseActivity extends BaseActivity
         InsetFlags insetFlags = ((TeammatesBaseFragment) fragment).insetFlags();
 
         getLayoutParams(toolbar).topMargin = insetFlags.hasTopInset() ? 0 : topInset;
-        bottomInsetView.setVisibility(insetFlags.hasTopInset() ? VISIBLE : GONE);
+        bottomInsetView.setVisibility(insetFlags.hasBottomInset() ? VISIBLE : GONE);
         topInsetView.setVisibility(insetFlags.hasTopInset() ? VISIBLE : GONE);
         constraintLayout.setPadding(insetFlags.hasLeftInset() ? leftInset : 0, 0, insetFlags.hasRightInset() ? rightInset : 0, 0);
     }
