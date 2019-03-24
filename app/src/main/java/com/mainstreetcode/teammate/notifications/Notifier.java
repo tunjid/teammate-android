@@ -36,9 +36,12 @@ import java.util.Map;
 
 import io.reactivex.functions.Predicate;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static android.app.PendingIntent.getActivity;
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
 
 public abstract class Notifier<T extends Model<T>> {
 
@@ -94,6 +97,7 @@ public abstract class Notifier<T extends Model<T>> {
         Intent intent = new Intent(app, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(MainActivity.FEED_DEEP_LINK, model);
+        addNotificationId(intent);
 
         return getActivity(app, DEEP_LINK_REQ_CODE, intent, FLAG_ONE_SHOT);
     }
@@ -102,6 +106,10 @@ public abstract class Notifier<T extends Model<T>> {
         NotificationManager notifier = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
         if (notifier != null)
             notifier.notify(getNotificationTag(model), getNotifyId().hashCode(), notification);
+    }
+
+    void addNotificationId(Intent intent) {
+        if (SDK_INT >= O) intent.putExtra(EXTRA_NOTIFICATION_ID, getNotifyId());
     }
 
     protected void handleNotification(FeedItem<T> item) {
