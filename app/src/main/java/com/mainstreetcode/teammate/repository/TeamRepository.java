@@ -93,7 +93,7 @@ public class TeamRepository extends ModelRepository<Team> {
     }
 
     public Single<List<Team>> findTeams(TeamSearchRequest request) {
-        return api.findTeam(request.getName(), request.getSport());
+        return api.findTeam(request.getName(), request.getScreenName(), request.getSport());
     }
 
     public Maybe<Team> getDefaultTeam() {
