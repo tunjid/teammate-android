@@ -33,6 +33,7 @@ import com.mainstreetcode.teammate.fragments.main.MyEventsFragment;
 import com.mainstreetcode.teammate.fragments.main.SettingsFragment;
 import com.mainstreetcode.teammate.fragments.main.StatAggregateFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment;
+import com.mainstreetcode.teammate.fragments.main.TeamSearchFragment;
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment;
 import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
@@ -214,7 +215,7 @@ public class MainActivity extends TeammatesBaseActivity
         disposables.add(teamViewModel.getTeamChangeFlowable()
                 .flatMapSingle(team -> ViewHolderUtil.fetchRoundedDrawable(this,
                         team.getImageUrl(),
-                        getResources().getDimensionPixelSize(R.dimen.double_margin),R.drawable.ic_supervisor_white_24dp))
+                        getResources().getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp))
                 .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY));
     }
 
@@ -354,6 +355,9 @@ public class MainActivity extends TeammatesBaseActivity
                 return true;
             case R.id.action_games:
                 TeamPickerFragment.pick(this, R.id.request_game_team_pick);
+                return true;
+            case R.id.action_find_teams:
+                showFragment(TeamSearchFragment.newInstance());
                 return true;
             case R.id.action_team:
                 showFragment(TeamsFragment.newInstance());
