@@ -26,9 +26,9 @@ These assumptions are realized via the following core objects.
 Besides the sign up flow and a few others, all data is presented in a RecyclerView. Model objects of any kind are broken up into Lists of `Identifiables`
 and bound to their respective `ViewHolders`. UI Changes are broadcast soley through `diffResult.dispatchUpdatesTo(RecyclerView)` or `RecyclerView.notifyDataSetChanged()`;
 
-### Identifiable
+### Differentiable
 
-An `Identifiable` is the basic building block of this app. It represents an item that can change and therefore is "Diff-able", so a List of it can
+An `Differentiable` is the basic building block of this app. It represents an item that can change and therefore is "Diff-able", so a List of it can
 be diffed against another List and the result dispatched to the hosting `RecyclerView`.
 
 ### Repository
