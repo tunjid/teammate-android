@@ -53,7 +53,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected CompositeDisposable disposables = new CompositeDisposable();
     protected io.reactivex.functions.Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
     protected ErrorHandler defaultErrorHandler;
-    private Message lastMessage;
 
     @Override
     public void onAttach(Context context) {
@@ -173,8 +172,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     }
 
     protected void handleErrorMessage(Message message) {
-        if (lastMessage == null || !lastMessage.equals(message)) showSnackbar(message.getMessage());
-        lastMessage = message;
+        showSnackbar(message.getMessage());
         toggleProgress(false);
     }
 

@@ -137,7 +137,7 @@ public class EventSearchFragment extends MainActivityFragment {
     public boolean showsFab() { return locationViewModel.hasPermission(this); }
 
     @Override
-    public InsetFlags insetFlags() {return NONE;}
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     @StringRes

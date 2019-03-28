@@ -3,6 +3,8 @@ package com.mainstreetcode.teammate.util;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+
+import androidx.annotation.NonNull;
 import androidx.collection.LruCache;
 import android.view.View;
 import android.widget.TextView;
@@ -48,7 +50,7 @@ public class TextBitmapUtil {
 
         return new LruCache<String, Bitmap>(cacheSize) {
             @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
+            protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
                 return bitmap.getByteCount() / 1024;
             }
         };

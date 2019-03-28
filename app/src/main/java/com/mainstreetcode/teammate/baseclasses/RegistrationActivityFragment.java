@@ -14,6 +14,8 @@ import com.mainstreetcode.teammate.viewmodel.UserViewModel;
 
 public abstract class RegistrationActivityFragment extends TeammatesBaseFragment {
 
+    private static final int GRASS_COLOR = 0xFF93BB51;
+
     protected UserViewModel viewModel;
 
     @Override
@@ -21,5 +23,15 @@ public abstract class RegistrationActivityFragment extends TeammatesBaseFragment
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+    }
+
+    @Override
+    protected boolean hasLightNavBar() {
+        return false;
+    }
+
+    @Override
+    protected int getNavBarColor() {
+        return GRASS_COLOR;
     }
 }
