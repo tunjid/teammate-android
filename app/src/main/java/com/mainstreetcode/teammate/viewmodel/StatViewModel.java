@@ -3,6 +3,8 @@ package com.mainstreetcode.teammate.viewmodel;
 import androidx.arch.core.util.Function;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
@@ -10,8 +12,7 @@ import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.StatAggregate;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.StatRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.StatRepo;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -40,15 +41,13 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     private final Map<Game, List<Differentiable>> modelListMap = new HashMap<>();
     private final List<Differentiable> aggregates = new ArrayList<>();
 
-    private final StatRepository repository;
+    private final StatRepo repository;
 
-    public StatViewModel() {
-        repository = StatRepository.getInstance();
-    }
+    public StatViewModel() { repository = RepoProvider.forRepo(StatRepo.class); }
 
     public StatGofer gofer(Stat stat) {
         Consumer<Throwable> onError = throwable -> checkForInvalidObject(throwable, stat, stat.getGame());
-        Function<Team, User> userFunction = team -> UserRepository.getInstance().getCurrentUser();
+        Function<Team, User> userFunction = team -> RepoProvider.forRepo(UserRepo.class).getCurrentUser();
         Function<Stat, Flowable<Team>> eligibleTeamSource = sourceStat -> GameViewModel.getEligibleTeamsForGame(stat.getGame());
         return new StatGofer(stat, onError, userFunction, repository::get, repository::createOrUpdate, this::delete, eligibleTeamSource);
     }
@@ -83,12 +82,12 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     }
 
     public Single<Boolean> canEditGameStats(Game game) {
-        User current = UserRepository.getInstance().getCurrentUser();
+        User current = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
         return isPrivilegedInGame(game).map(isPrivileged -> isPrivilegedOrIsReferee(isPrivileged, current, game));
     }
 
     public Single<Boolean> isPrivilegedInGame(Game game) {
-        User current = UserRepository.getInstance().getCurrentUser();
+        User current = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
         if (game.betweenUsers()) return Single.just(game.isCompeting(current));
         return GameViewModel.getEligibleTeamsForGame(game).count().map(value -> value > 0);
     }

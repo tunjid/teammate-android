@@ -42,33 +42,21 @@ import static com.mainstreetcode.teammate.socket.SocketFactory.EVENT_NEW_MESSAGE
 import static io.reactivex.schedulers.Schedulers.io;
 import static io.socket.client.Socket.EVENT_ERROR;
 
-public class ChatRepository extends TeamQueryRepository<Chat> {
+public class ChatRepo extends TeamQueryRepo<Chat> {
 
 
     private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";
     private static final int TEAM_NOT_SEEN = -1;
-
     private static final Gson CHAT_GSON = getChatGson();
-
-    private static ChatRepository ourInstance;
 
     private final App app;
     private final TeammateApi api;
     private final ChatDao chatDao;
-    private final ModelRepository<User> userModelRepository;
-    private final ModelRepository<Team> teamModelRepository;
 
-    private ChatRepository() {
+    ChatRepo() {
         app = App.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
-        userModelRepository = UserRepository.getInstance();
-        teamModelRepository = TeamRepository.getInstance();
-    }
-
-    public static ChatRepository getInstance() {
-        if (ourInstance == null) ourInstance = new ChatRepository();
-        return ourInstance;
     }
 
     @Override
@@ -110,8 +98,8 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
                 teams.add(chat.getTeam());
             }
 
-            userModelRepository.saveAsNested().apply(users);
-            teamModelRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
 
             chatDao.upsert(chats);
             return chats;
@@ -130,7 +118,7 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
     }
 
     public Flowable<List<Chat>> fetchUnreadChats() {
-        return RoleRepository.getInstance().getMyRoles()
+        return RepoProvider.forRepo(RoleRepo.class).getMyRoles()
                 .firstElement()
                 .toFlowable()
                 .flatMap(Flowable::fromIterable)
@@ -147,7 +135,7 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
             catch (Exception e) { return Flowable.error(e); }
 
             socket.emit(SocketFactory.EVENT_JOIN, result);
-            User signedInUser = UserRepository.getInstance().getCurrentUser();
+            User signedInUser = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
 
             return Flowable.<Chat>create(emitter -> {
                 socket.on(EVENT_NEW_MESSAGE, args -> emitter.onNext(parseChat(args)));
@@ -175,11 +163,11 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
     }
 
     private Completable postRetryFunction(Throwable throwable, Chat chat, int previousRetries) {
-            int retries = previousRetries + 1;
-            return retries <= 3
-                    ? Completable.timer(300, TimeUnit.MILLISECONDS)
-                    .andThen(post(chat).onErrorResumeNext(thrown -> postRetryFunction(thrown, chat, retries)))
-                    : Completable.error(throwable);
+        int retries = previousRetries + 1;
+        return retries <= 3
+                ? Completable.timer(300, TimeUnit.MILLISECONDS)
+                .andThen(post(chat).onErrorResumeNext(thrown -> postRetryFunction(thrown, chat, retries)))
+                : Completable.error(throwable);
     }
 
     public void updateLastSeen(Team team) {

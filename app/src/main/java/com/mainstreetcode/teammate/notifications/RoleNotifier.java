@@ -8,8 +8,8 @@ import android.os.Build;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.repository.ModelRepository;
-import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 
 
 public class RoleNotifier extends Notifier<Role> {
@@ -26,10 +26,10 @@ public class RoleNotifier extends Notifier<Role> {
     }
 
     @Override
-    String getNotifyId() {return FeedItem.ROLE;}
+    String getNotifyId() { return FeedItem.ROLE; }
 
     @Override
-    protected ModelRepository<Role> getRepository() {return RoleRepository.getInstance();}
+    protected ModelRepo<Role> getRepository() { return RepoProvider.forModel(Role.class); }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

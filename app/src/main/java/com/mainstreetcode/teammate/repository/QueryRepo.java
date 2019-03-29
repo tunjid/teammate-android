@@ -12,9 +12,9 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 
-abstract class QueryRepository<T extends Model<T>, S extends Model<S>, R> extends ModelRepository<T> {
+abstract class QueryRepo<T extends Model<T>, S extends Model<S>, R> extends ModelRepo<T> {
 
-    QueryRepository() {}
+    QueryRepo() {}
 
     public final Flowable<List<T>> modelsBefore(S key, @Nullable R pagination) {
         return fetchThenGet(localModelsBefore(key, pagination), remoteModelsBefore(key, pagination));

@@ -28,7 +28,7 @@ import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.HashMap;
@@ -136,7 +136,7 @@ public abstract class Notifier<T extends Model<T>> {
 
     String getNotificationTag(T model) {return model.getId();}
 
-    protected abstract ModelRepository<T> getRepository();
+    protected abstract ModelRepo<T> getRepository();
 
     protected abstract NotificationChannel[] getNotificationChannels();
 

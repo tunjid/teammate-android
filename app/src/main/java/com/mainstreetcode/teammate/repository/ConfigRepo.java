@@ -19,7 +19,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
-public class ConfigRepository extends ModelRepository<Config> {
+public class ConfigRepo extends ModelRepo<Config> {
 
     private static final int REFRESH_THRESHOLD = 10;
 
@@ -29,16 +29,9 @@ public class ConfigRepository extends ModelRepository<Config> {
     private final TeammateApi api;
     private final ConfigDao dao;
 
-    private static ConfigRepository ourInstance;
-
-    private ConfigRepository() {
+    ConfigRepo() {
         api = TeammateService.getApiInstance();
         dao = AppDatabase.getInstance().configDao();
-    }
-
-    public static ConfigRepository getInstance() {
-        if (ourInstance == null) ourInstance = new ConfigRepository();
-        return ourInstance;
     }
 
     public Config getCurrent() { return dao.getCurrent(); }

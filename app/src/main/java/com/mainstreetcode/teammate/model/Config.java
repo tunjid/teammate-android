@@ -22,7 +22,8 @@ import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
-import com.mainstreetcode.teammate.repository.ConfigRepository;
+import com.mainstreetcode.teammate.repository.ConfigRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -64,25 +65,13 @@ public class Config implements Model<Config> {
         this.defaultTournamentLogo = defaultTournamentLogo;
     }
 
-    static String getDefaultTeamLogo() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultTeamLogo;
-    }
+    static String getDefaultTeamLogo() { return cached.defaultTeamLogo; }
 
-    static String getDefaultEventLogo() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultEventLogo;
-    }
+    static String getDefaultEventLogo() { return cached.defaultEventLogo; }
 
-    static String getDefaultUserAvatar() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultUserAvatar;
-    }
+    static String getDefaultUserAvatar() { return cached.defaultUserAvatar; }
 
-    static String getDefaultTournamentLogo() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultTournamentLogo;
-    }
+    static String getDefaultTournamentLogo() { return cached.defaultTournamentLogo; }
 
     public static List<Sport> getSports() {
         return getList(config -> config.sports);
@@ -149,7 +138,7 @@ public class Config implements Model<Config> {
     }
 
     private static Config getCurrentConfig() {
-        if (cached.isEmpty()) cached.update(ConfigRepository.getInstance().getCurrent());
+        if (cached.isEmpty()) cached.update(RepoProvider.forRepo(ConfigRepo.class).getCurrent());
         return cached;
     }
 
@@ -224,7 +213,7 @@ public class Config implements Model<Config> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void fetchConfig() {
-        ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
+        RepoProvider.forRepo(ConfigRepo.class).get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
     }
 
     public static class GsonAdapter

@@ -1,8 +1,6 @@
 package com.mainstreetcode.teammate.repository;
 
 
-import androidx.annotation.Nullable;
-
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
@@ -18,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -25,27 +24,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class StatRepository extends QueryRepository<Stat, Game, Date> {
-
-    private static StatRepository ourInstance;
+public class StatRepo extends QueryRepo<Stat, Game, Date> {
 
     private final TeammateApi api;
     private final StatDao statDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
-    private final ModelRepository<Game> gameRepository;
 
-    private StatRepository() {
+    StatRepo() {
         api = TeammateService.getApiInstance();
         statDao = AppDatabase.getInstance().statDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-        gameRepository = GameRoundRepository.getInstance();
-    }
-
-    public static StatRepository getInstance() {
-        if (ourInstance == null) ourInstance = new StatRepository();
-        return ourInstance;
     }
 
     @Override
@@ -105,9 +91,9 @@ public class StatRepository extends QueryRepository<Stat, Game, Date> {
                 games.add(stat.getGame());
             }
 
-            userRepository.saveAsNested().apply(users);
-            teamRepository.saveAsNested().apply(teams);
-            gameRepository.saveAsNested().apply(games);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+            RepoProvider.forModel(Game.class).saveAsNested().apply(games);
             statDao.upsert(Collections.unmodifiableList(models));
 
             return models;

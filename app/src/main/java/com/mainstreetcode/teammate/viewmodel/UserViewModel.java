@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel;
 import com.facebook.login.LoginResult;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.TeammateException;
 import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
@@ -21,10 +22,10 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class UserViewModel extends ViewModel {
 
-    private final UserRepository repository;
+    private final UserRepo repository;
 
     public UserViewModel() {
-        repository = UserRepository.getInstance();
+        repository = RepoProvider.forRepo(UserRepo.class);
     }
 
     public boolean isSignedIn() {

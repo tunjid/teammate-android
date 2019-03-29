@@ -7,21 +7,20 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.MediaTransferIntentService;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Media;
-import com.mainstreetcode.teammate.repository.MediaRepository;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.rest.ProgressRequestBody;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import okhttp3.RequestBody;
@@ -49,7 +48,7 @@ public class MediaNotifier extends Notifier<Media> {
     String getNotifyId() {return FeedItem.MEDIA;}
 
     @Override
-    protected ModelRepository<Media> getRepository() {return MediaRepository.getInstance();}
+    protected ModelRepo<Media> getRepository() { return RepoProvider.forModel(Media.class); }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

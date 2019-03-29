@@ -8,8 +8,8 @@ import android.os.Build;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.repository.EventRepository;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 
 
 public class EventNotifier extends Notifier<Event> {
@@ -29,7 +29,7 @@ public class EventNotifier extends Notifier<Event> {
     String getNotifyId() {return FeedItem.EVENT;}
 
     @Override
-    protected ModelRepository<Event> getRepository() {return EventRepository.getInstance();}
+    protected ModelRepo<Event> getRepository() { return RepoProvider.forModel(Event.class); }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

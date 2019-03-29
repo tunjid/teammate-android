@@ -20,21 +20,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class GameRoundRepository extends QueryRepository<Game, Tournament, Integer> {
-
-    private static GameRoundRepository ourInstance;
+public class GameRoundRepo extends QueryRepo<Game, Tournament, Integer> {
 
     private final TeammateApi api;
     private final GameDao gameDao;
 
-    private GameRoundRepository() {
+    GameRoundRepo() {
         api = TeammateService.getApiInstance();
         gameDao = AppDatabase.getInstance().gameDao();
-    }
-
-    public static GameRoundRepository getInstance() {
-        if (ourInstance == null) ourInstance = new GameRoundRepository();
-        return ourInstance;
     }
 
     @Override
@@ -44,17 +37,17 @@ public class GameRoundRepository extends QueryRepository<Game, Tournament, Integ
 
     @Override
     public Single<Game> createOrUpdate(Game game) {
-        return GameRepository.getInstance().createOrUpdate(game);
+        return RepoProvider.forRepo(GameRepo.class).createOrUpdate(game);
     }
 
     @Override
     public Flowable<Game> get(String id) {
-        return GameRepository.getInstance().get(id);
+        return RepoProvider.forRepo(GameRepo.class).get(id);
     }
 
     @Override
     public Single<Game> delete(Game game) {
-        return GameRepository.getInstance().delete(game);
+        return RepoProvider.forRepo(GameRepo.class).delete(game);
     }
 
     @Override
@@ -70,6 +63,6 @@ public class GameRoundRepository extends QueryRepository<Game, Tournament, Integ
 
     @Override
     Function<List<Game>, List<Game>> provideSaveManyFunction() {
-        return GameRepository.getInstance().provideSaveManyFunction();
+        return list -> RepoProvider.forRepo(GameRepo.class).provideSaveManyFunction().apply(list);
     }
 }

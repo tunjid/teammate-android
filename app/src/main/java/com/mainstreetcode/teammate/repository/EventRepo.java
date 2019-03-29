@@ -28,23 +28,14 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends TeamQueryRepository<Event> {
-
-    private static EventRepository ourInstance;
+public class EventRepo extends TeamQueryRepo<Event> {
 
     private final TeammateApi api;
     private final EventDao eventDao;
-    private final ModelRepository<Team> teamRepository;
 
-    private EventRepository() {
+    EventRepo() {
         api = TeammateService.getApiInstance();
         eventDao = AppDatabase.getInstance().eventDao();
-        teamRepository = TeamRepository.getInstance();
-    }
-
-    public static EventRepository getInstance() {
-        if (ourInstance == null) ourInstance = new EventRepository();
-        return ourInstance;
     }
 
     @Override
@@ -95,7 +86,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
     }
 
     public Flowable<List<Event>> attending(@Nullable Date date) {
-        User current = UserRepository.getInstance().getCurrentUser();
+        User current = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
         Date localDate = date == null ? getFutureDate() : date;
 
         Maybe<List<Event>> local = AppDatabase.getInstance().guestDao().getRsvpList(current.getId(), localDate)
@@ -113,7 +104,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
             List<Team> teams = new ArrayList<>(models.size());
             for (Event event : models) teams.add(event.getTeam());
 
-            teamRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
             eventDao.upsert(Collections.unmodifiableList(models));
 
             return models;

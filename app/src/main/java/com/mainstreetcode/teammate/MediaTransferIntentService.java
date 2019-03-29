@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -16,8 +15,8 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
-import com.mainstreetcode.teammate.repository.MediaRepository;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -29,6 +28,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 
 public class MediaTransferIntentService extends IntentService {
@@ -63,6 +63,7 @@ public class MediaTransferIntentService extends IntentService {
         Intent intent = new Intent(context, MediaTransferIntentService.class);
         intent.setAction(ACTION_DOWNLOAD);
 
+        //noinspection ResultOfMethodCallIgnored
         Flowable.fromIterable(mediaList)
                 .filter(media -> !TextUtils.isEmpty(media.getUrl()))
                 .collectInto(new ArrayList<Media>(mediaList.size()), List::add)
@@ -122,7 +123,7 @@ public class MediaTransferIntentService extends IntentService {
         private String maxStorageMessage = "";
 
         private final Queue<Media> uploadQueue = new ConcurrentLinkedQueue<>();
-        private final ModelRepository<Media> repository = MediaRepository.getInstance();
+        private final ModelRepo<Media> repository = RepoProvider.forModel(Media.class);
 
         void enqueue(Media media) {
             numToUpload++;
@@ -144,6 +145,7 @@ public class MediaTransferIntentService extends IntentService {
             numAttempted++;
             isOnGoing = true;
 
+            //noinspection ResultOfMethodCallIgnored
             repository.createOrUpdate(uploadQueue.remove())
                     .doOnSuccess(media -> maxStorageMessage = "")
                     .doOnError(this::onError)
@@ -207,7 +209,7 @@ public class MediaTransferIntentService extends IntentService {
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)));
         }
 
-        public void onDownloadComplete(long id) {
+        void onDownloadComplete(long id) {
             if (downloadQueue.remove(id) && downloadQueue.isEmpty())
                 MediaNotifier.getInstance().notifyDownloadComplete();
         }

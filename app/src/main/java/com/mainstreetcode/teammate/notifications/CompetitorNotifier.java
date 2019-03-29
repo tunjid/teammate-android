@@ -7,12 +7,12 @@ import android.app.NotificationManager;
 import android.os.Build;
 
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.repository.ModelRepository;
-import com.mainstreetcode.teammate.repository.TournamentRepository;
+import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 
 
-public class CompetitorNotifier extends Notifier<Tournament> {
+public class CompetitorNotifier extends Notifier<Competitor> {
 
     private static CompetitorNotifier INSTANCE;
 
@@ -29,7 +29,7 @@ public class CompetitorNotifier extends Notifier<Tournament> {
     String getNotifyId() {return FeedItem.COMPETITOR;}
 
     @Override
-    protected ModelRepository<Tournament> getRepository() {return TournamentRepository.getInstance();}
+    protected ModelRepo<Competitor> getRepository() { return RepoProvider.forModel(Competitor.class); }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

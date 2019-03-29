@@ -27,27 +27,14 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TournamentRepository extends TeamQueryRepository<Tournament> {
-
-    private static TournamentRepository ourInstance;
+public class TournamentRepo extends TeamQueryRepo<Tournament> {
 
     private final TeammateApi api;
     private final TournamentDao tournamentDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
-    private final ModelRepository<Competitor> competitorRepository;
 
-    private TournamentRepository() {
+    TournamentRepo() {
         api = TeammateService.getApiInstance();
         tournamentDao = AppDatabase.getInstance().tournamentDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-        competitorRepository = CompetitorRepository.getInstance();
-    }
-
-    public static TournamentRepository getInstance() {
-        if (ourInstance == null) ourInstance = new TournamentRepository();
-        return ourInstance;
     }
 
     @Override
@@ -127,10 +114,11 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
                 if (competitive instanceof Team) teams.add((Team) competitive);
             }
 
-            userRepository.saveAsNested().apply(users);
-            teamRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+
             tournamentDao.upsert(Collections.unmodifiableList(models));
-            competitorRepository.saveAsNested().apply(competitors);
+            RepoProvider.forModel(Competitor.class).saveAsNested().apply(competitors);
 
             return models;
         };

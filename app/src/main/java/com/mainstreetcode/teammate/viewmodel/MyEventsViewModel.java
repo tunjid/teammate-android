@@ -3,7 +3,8 @@ package com.mainstreetcode.teammate.viewmodel;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.repository.EventRepository;
+import com.mainstreetcode.teammate.repository.EventRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
@@ -20,10 +21,10 @@ import io.reactivex.Flowable;
 public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
 
     private final List<Differentiable> attending = new ArrayList<>();
-    private final EventRepository repository;
+    private final EventRepo repository;
 
     public MyEventsViewModel() {
-        repository = EventRepository.getInstance();
+        repository = RepoProvider.forRepo(EventRepo.class);
     }
 
     @Override

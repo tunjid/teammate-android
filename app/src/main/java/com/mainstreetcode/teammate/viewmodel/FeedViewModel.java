@@ -7,11 +7,12 @@ import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.notifications.FeedItem;
-import com.mainstreetcode.teammate.repository.CompetitorRepository;
-import com.mainstreetcode.teammate.repository.GuestRepository;
-import com.mainstreetcode.teammate.repository.JoinRequestRepository;
-import com.mainstreetcode.teammate.repository.TeamMemberRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.CompetitorRepo;
+import com.mainstreetcode.teammate.repository.GuestRepo;
+import com.mainstreetcode.teammate.repository.JoinRequestRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.TeamMemberRepo;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
@@ -33,10 +34,10 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
-    private final GuestRepository guestRepository = GuestRepository.getInstance();
-    private final CompetitorRepository competitorRepository = CompetitorRepository.getInstance();
-    private final JoinRequestRepository joinRequestRepository = JoinRequestRepository.getInstance();
-    private final TeamMemberRepository<JoinRequest> memberRepository = TeamMemberRepository.getInstance();
+    private final GuestRepo guestRepository = RepoProvider.forRepo(GuestRepo.class);
+    private final CompetitorRepo competitorRepository = RepoProvider.forRepo(CompetitorRepo.class);
+    private final JoinRequestRepo joinRequestRepository = RepoProvider.forRepo(JoinRequestRepo.class);
+    @SuppressWarnings("unchecked") private final TeamMemberRepo<JoinRequest> memberRepository = RepoProvider.forRepo(TeamMemberRepo.class);
 
     private final List<Differentiable> feedItems = new ArrayList<>();
 
@@ -102,7 +103,7 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     public Single<DiffUtil.DiffResult> processJoinRequest(FeedItem<JoinRequest> feedItem, boolean approved) {
         JoinRequest request = feedItem.getModel();
 
-        boolean isOwner = UserRepository.getInstance().getCurrentUser().equals(request.getUser());
+        boolean isOwner = RepoProvider.forRepo(UserRepo.class).getCurrentUser().equals(request.getUser());
         boolean leaveUnchanged = approved && request.isUserApproved() && isOwner;
 
         Single<? extends Model> sourceSingle = leaveUnchanged

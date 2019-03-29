@@ -8,8 +8,8 @@ import android.os.Build;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.JoinRequest;
-import com.mainstreetcode.teammate.repository.JoinRequestRepository;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 
 
 public class JoinRequestNotifier extends Notifier<JoinRequest> {
@@ -29,7 +29,7 @@ public class JoinRequestNotifier extends Notifier<JoinRequest> {
     String getNotifyId() {return FeedItem.JOIN_REQUEST;}
 
     @Override
-    protected ModelRepository<JoinRequest> getRepository() {return JoinRequestRepository.getInstance();}
+    protected ModelRepo<JoinRequest> getRepository() { return RepoProvider.forModel(JoinRequest.class); }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override

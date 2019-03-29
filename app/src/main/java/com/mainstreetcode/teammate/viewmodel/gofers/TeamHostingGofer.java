@@ -5,8 +5,9 @@ import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.RoleRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.RoleRepo;
+import com.mainstreetcode.teammate.repository.UserRepo;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
@@ -19,14 +20,14 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public abstract class TeamHostingGofer<T extends Model<T> & ListableModel<T> & TeamHost> extends Gofer<T> {
 
     private Role currentRole;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final UserRepo userRepository;
+    private final RoleRepo roleRepository;
 
     TeamHostingGofer(T model, Consumer<Throwable> onError) {
         super(model, onError);
         currentRole = Role.empty();
-        userRepository = UserRepository.getInstance();
-        roleRepository = RoleRepository.getInstance();
+        userRepository = RepoProvider.forRepo(UserRepo.class);
+        roleRepository = RepoProvider.forRepo(RoleRepo.class);
 
         startPrep();
     }

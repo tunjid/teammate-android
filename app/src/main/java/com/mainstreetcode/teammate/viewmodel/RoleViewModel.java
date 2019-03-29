@@ -5,11 +5,12 @@ import android.annotation.SuppressLint;
 import com.mainstreetcode.teammate.model.Competitive;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Game;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.RoleRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.ArrayList;
@@ -24,14 +25,14 @@ import io.reactivex.Maybe;
 
 public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
 
-    private final RoleRepository roleRepository;
+    private final RoleRepo roleRepository;
 
     static final List<Differentiable> roles = new ArrayList<>();
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public RoleViewModel() {
-        roleRepository = RoleRepository.getInstance();
+        roleRepository = RepoProvider.forRepo(RoleRepo.class);
         getMore(Role.class).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 

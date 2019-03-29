@@ -25,26 +25,19 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamRepository extends ModelRepository<Team> {
+public class TeamRepo extends ModelRepo<Team> {
 
     private static final String TEAM_REPOSITORY_KEY = "TeamRepository";
     private static final String DEFAULT_TEAM = "default.team";
-
-    private static TeamRepository ourInstance;
 
     private final App app;
     private final TeammateApi api;
     private final TeamDao teamDao;
 
-    private TeamRepository() {
+    TeamRepo() {
         app = App.getInstance();
         api = TeammateService.getApiInstance();
         teamDao = AppDatabase.getInstance().teamDao();
-    }
-
-    public static TeamRepository getInstance() {
-        if (ourInstance == null) ourInstance = new TeamRepository();
-        return ourInstance;
     }
 
     @Override
@@ -56,7 +49,7 @@ public class TeamRepository extends ModelRepository<Team> {
     public Single<Team> createOrUpdate(Team model) {
         Single<Team> teamSingle = model.isEmpty()
                 ? api.createTeam(model).map(getLocalUpdateFunction(model))
-                .flatMap(team -> RoleRepository.getInstance().getMyRoles().lastOrError())
+                .flatMap(team -> RepoProvider.forRepo(RoleRepo.class).getMyRoles().lastOrError())
                 .map(roles -> model)
                 : api.updateTeam(model.getId(), model).map(getLocalUpdateFunction(model))
                 .doOnError(throwable -> deleteInvalidModel(model, throwable));

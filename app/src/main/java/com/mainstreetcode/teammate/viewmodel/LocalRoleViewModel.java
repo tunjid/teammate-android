@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.RoleRepo;
 
 import java.util.Arrays;
 
@@ -21,10 +22,10 @@ public class LocalRoleViewModel extends ViewModel {
 
     private Role role = Role.empty();
 
-    private final RoleRepository repository;
+    private final RoleRepo repository;
 
     public LocalRoleViewModel() {
-        repository = RoleRepository.getInstance();
+        repository = RepoProvider.forRepo(RoleRepo.class);
     }
 
     public boolean hasPrivilegedRole() {
