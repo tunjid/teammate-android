@@ -65,25 +65,20 @@ public class Config implements Model<Config> {
         this.defaultTournamentLogo = defaultTournamentLogo;
     }
 
-    static String getDefaultTeamLogo() { return cached.defaultTeamLogo; }
+    static String getDefaultTeamLogo() { return getCurrentConfig().defaultTeamLogo; }
 
-    static String getDefaultEventLogo() { return cached.defaultEventLogo; }
+    static String getDefaultEventLogo() { return getCurrentConfig().defaultEventLogo; }
 
-    static String getDefaultUserAvatar() { return cached.defaultUserAvatar; }
+    static String getDefaultUserAvatar() { return getCurrentConfig().defaultUserAvatar; }
 
-    static String getDefaultTournamentLogo() { return cached.defaultTournamentLogo; }
+    static String getDefaultTournamentLogo() { return getCurrentConfig().defaultTournamentLogo; }
 
-    public static List<Sport> getSports() {
-        return getList(config -> config.sports);
-    }
+    public static List<Sport> getSports() { return getList(config -> config.sports); }
 
-    public static List<String> getPrivileged() {
-        return getList(config -> config.privileged);
-    }
+    @SuppressWarnings("WeakerAccess")
+    public static List<String> getPrivileged() { return getList(config -> config.privileged); }
 
-    public static List<Position> getPositions() {
-        return getList(config -> config.positions);
-    }
+    public static List<Position> getPositions() { return getList(config -> config.positions); }
 
     public static List<Visibility> getVisibilities() {
         return getList(config -> config.visibilities);
@@ -121,6 +116,7 @@ public class Config implements Model<Config> {
         return getFromCode(code, config -> config.visibilities, Visibility.empty());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static BlockReason reasonFromCode(String code) {
         return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
     }
@@ -138,7 +134,7 @@ public class Config implements Model<Config> {
     }
 
     private static Config getCurrentConfig() {
-        if (cached.isEmpty()) cached.update(RepoProvider.forRepo(ConfigRepo.class).getCurrent());
+        if (cached.isEmpty() && RepoProvider.initialized()) cached.update(RepoProvider.forRepo(ConfigRepo.class).getCurrent());
         return cached;
     }
 
