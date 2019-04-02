@@ -14,6 +14,7 @@ import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.SingletonCache;
 
@@ -21,10 +22,10 @@ public class NotifierProvider {
 
     private static NotifierProvider ourInstance;
 
-    private final SingletonCache<Model<?>, Notifier<?>> singletonCache;
+    private final SingletonCache<Model, Notifier> singletonCache;
 
     private NotifierProvider() {
-        singletonCache = new SingletonCache<>(itemClass -> {
+        singletonCache = new SingletonCache<Model, Notifier>(itemClass -> {
             if (itemClass.equals(Team.class)) return TeamNotifier.class;
             if (itemClass.equals(Role.class)) return RoleNotifier.class;
             if (itemClass.equals(Chat.class)) return ChatNotifier.class;
@@ -34,8 +35,9 @@ public class NotifierProvider {
             if (itemClass.equals(Tournament.class)) return TournamentNotifier.class;
             if (itemClass.equals(Competitor.class)) return CompetitorNotifier.class;
             if (itemClass.equals(JoinRequest.class)) return JoinRequestNotifier.class;
-            return TeamNotifier.class;
-        },NotifierProvider::get,
+            return falseNotifier.getClass();
+        }, NotifierProvider::get,
+                new Pair<>(falseNotifier.getClass(), falseNotifier),
                 new Pair<>(TeamNotifier.class, new TeamNotifier()),
                 new Pair<>(RoleNotifier.class, new RoleNotifier()),
                 new Pair<>(ChatNotifier.class, new ChatNotifier()),
@@ -64,16 +66,19 @@ public class NotifierProvider {
         return (R) getInstance().singletonCache.forInstance(itemClass);
     }
 
-    private static <T extends Model<T>> Notifier<?> get(Class<? extends Notifier<?>> unknown) {
-
+    private static Notifier get(Class<? extends Notifier> unknown) {
         { Logger.log("NotifierProvider", "Dummy Notifier created for unrecognized class" + unknown.getName()); }
-
-        return new Notifier<T>() {
-            @Override String getNotifyId() { return ""; }
-
-            @Override protected ModelRepo<T> getRepository() { return null; }
-
-            @Override protected NotificationChannel[] getNotificationChannels() { return new NotificationChannel[0]; }
-        };
+        return falseNotifier;
     }
+
+    private static Notifier falseNotifier =  new Notifier() {
+        @Override String getNotifyId() { return ""; }
+
+        @SuppressWarnings("unchecked") @Override protected ModelRepo getRepository() { //noinspection unchecked
+            return RepoProvider.falseRepo;
+        }
+
+        @Override
+        protected NotificationChannel[] getNotificationChannels() { return new NotificationChannel[0]; }
+    };
 }

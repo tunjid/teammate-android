@@ -11,29 +11,20 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.core.app.NotificationCompat;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
-import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.JoinRequest;
-import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
-import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.repository.ModelRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.app.NotificationCompat;
 import io.reactivex.functions.Predicate;
 
 import static android.app.Notification.EXTRA_NOTIFICATION_ID;

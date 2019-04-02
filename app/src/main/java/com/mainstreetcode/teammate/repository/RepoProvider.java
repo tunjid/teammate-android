@@ -59,9 +59,10 @@ public class RepoProvider {
             if (itemClass.equals(BlockedUser.class)) return BlockedUserRepo.class;
             if (itemClass.equals(JoinRequest.class)) return JoinRequestRepo.class;
             if (itemClass.equals(TeamMember.class)) return  TeamMemberRepo.class;
-            return UserRepo.class;
+            return falseRepo.getClass();
         },
                 RepoProvider::get,
+                new Pair<>(falseRepo.getClass(), falseRepo),
                 new Pair<>(UserRepo.class, new UserRepo()),
                 new Pair<>(TeamRepo.class, new TeamRepo()),
                 new Pair<>(RoleRepo.class, new RoleRepo()),
@@ -102,23 +103,11 @@ public class RepoProvider {
     }
 
     private static ModelRepo get(Class<? extends ModelRepo> unknown) {
-        return new ModelRepo() {
-            { Logger.log("RepoProvider", "Dummy Repo created for unrecognized class" + unknown.getName()); }
-
-            @Override public EntityDao dao() { return EntityDao.daDont(); }
-
-            @Override public Single createOrUpdate(Model model) { return Single.just(model); }
-
-            @Override public Flowable get(String id) { return Flowable.empty(); }
-
-            @Override public Single delete(Model model) { return Single.just(model); }
-
-            @Override
-            Function<List, List> provideSaveManyFunction() { return __ -> Collections.emptyList(); }
-        };
+        Logger.log("RepoProvider", "Dummy Repo created for unrecognized class" + unknown.getName());
+        return falseRepo;
     }
 
-    public static final ModelRepo repo = new ModelRepo() {
+    public static final ModelRepo falseRepo = new ModelRepo() {
         @Override public EntityDao dao() { return EntityDao.daDont(); }
 
         @Override public Single createOrUpdate(Model model) { return Single.just(model); }
@@ -130,61 +119,4 @@ public class RepoProvider {
         @Override
         Function<List, List> provideSaveManyFunction() { return __ -> Collections.emptyList(); }
     };
-//
-//    ModelRepo repo = null;
-//    Map<Class<? extends ModelRepo>, ModelRepo<?>> repoMap = getInstance().map;
-//
-//        if (itemClass.equals(User.class)) repo = repoMap.get(UserRepo.class);
-//        if (itemClass.equals(Team.class)) repo = repoMap.get(TeamRepo.class);
-//        if (itemClass.equals(Role.class)) repo = repoMap.get(RoleRepo.class);
-//        if (itemClass.equals(Chat.class)) repo = repoMap.get(ChatRepo.class);
-//        if (itemClass.equals(Game.class)) repo = repoMap.get(GameRepo.class);
-//        if (itemClass.equals(Stat.class)) repo = repoMap.get(StatRepo.class);
-//        if (itemClass.equals(Prefs.class)) repo = repoMap.get(PrefsRepo.class);
-//        if (itemClass.equals(Media.class)) repo = repoMap.get(MediaRepo.class);
-//        if (itemClass.equals(Guest.class)) repo = repoMap.get(GuestRepo.class);
-//        if (itemClass.equals(Event.class)) repo = repoMap.get(EventRepo.class);
-//        if (itemClass.equals(Config.class)) repo = repoMap.get(ConfigRepo.class);
-//        if (itemClass.equals(Device.class)) repo = repoMap.get(DeviceRepo.class);
-//        if (itemClass.equals(Tournament.class)) repo = repoMap.get(TournamentRepo.class);
-//        if (itemClass.equals(Competitor.class)) repo = repoMap.get(CompetitorRepo.class);
-//        if (itemClass.equals(TeamMember.class)) repo = repoMap.get(TeamMemberRepo.class);
-//        if (itemClass.equals(BlockedUser.class)) repo = repoMap.get(BlockedUserRepo.class);
-//        if (itemClass.equals(JoinRequest.class)) repo = repoMap.get(JoinRequestRepo.class);
-//
-//        if (repo == null) repo = new ModelRepo() {
-//        { Logger.log("RepoProvider", "Dummy Repo created for unrecognized class" + itemClass.getName()); }
-//
-//        @Override public EntityDao dao() { return EntityDao.daDont(); }
-//
-//        @Override public Single createOrUpdate(Model model) { return Single.just(model); }
-//
-//        @Override public Flowable get(String id) { return Flowable.empty(); }
-//
-//        @Override public Single delete(Model model) { return Single.just(model); }
-//
-//        @Override
-//        Function<List, List> provideSaveManyFunction() { return __ -> Collections.emptyList(); }
-//    };
-
-//    map = new HashMap<>();
-//
-//        map.put(UserRepo.class, new UserRepo());
-//        map.put(TeamRepo.class, new TeamRepo());
-//        map.put(RoleRepo.class, new RoleRepo());
-//        map.put(ChatRepo.class, new ChatRepo());
-//        map.put(GameRepo.class, new GameRepo());
-//        map.put(StatRepo.class, new StatRepo());
-//        map.put(PrefsRepo.class, new PrefsRepo());
-//        map.put(MediaRepo.class, new MediaRepo());
-//        map.put(GuestRepo.class, new GuestRepo());
-//        map.put(EventRepo.class, new EventRepo());
-//        map.put(ConfigRepo.class, new ConfigRepo());
-//        map.put(DeviceRepo.class, new DeviceRepo());
-//        map.put(GameRoundRepo.class, new GameRoundRepo());
-//        map.put(TournamentRepo.class, new TournamentRepo());
-//        map.put(CompetitorRepo.class, new CompetitorRepo());
-//        map.put(TeamMemberRepo.class, new TeamMemberRepo());
-//        map.put(BlockedUserRepo.class, new BlockedUserRepo());
-//        map.put(JoinRequestRepo.class, new JoinRequestRepo());
 }
