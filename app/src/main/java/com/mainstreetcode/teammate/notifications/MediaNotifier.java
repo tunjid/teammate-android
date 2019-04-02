@@ -35,23 +35,16 @@ public class MediaNotifier extends Notifier<Media> {
     private static final int UPLOAD_NOTIFICATION_ID = 1;
     private static final int DOWNLOAD_NOTIFICATION_ID = 2;
 
-    private static MediaNotifier INSTANCE;
-
-    private MediaNotifier() {}
-
-    public static MediaNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new MediaNotifier();
-        return INSTANCE;
-    }
+    MediaNotifier() {}
 
     @Override
-    String getNotifyId() {return FeedItem.MEDIA;}
+    String getNotifyId() { return FeedItem.MEDIA; }
 
     @Override
     protected ModelRepo<Media> getRepository() { return RepoProvider.forModel(Media.class); }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{
                 buildNotificationChannel(FeedItem.MEDIA, R.string.media, R.string.media_notifier_description, NotificationManager.IMPORTANCE_MIN),

@@ -144,25 +144,4 @@ public abstract class Notifier<T extends Model<T>> {
         return t -> true;
     }
 
-    public static class NotifierFactory {
-
-        @Nullable
-        @SuppressWarnings("unchecked")
-        public <T extends Model<T>> Notifier<T> forClass(Class itemClass) {
-
-            Notifier notifier = null;
-
-            if (itemClass.equals(Team.class)) notifier = TeamNotifier.getInstance();
-            if (itemClass.equals(Role.class)) notifier = RoleNotifier.getInstance();
-            if (itemClass.equals(Chat.class)) notifier = ChatNotifier.getInstance();
-            if (itemClass.equals(Game.class)) notifier = GameNotifier.getInstance();
-            if (itemClass.equals(Media.class)) notifier = MediaNotifier.getInstance();
-            if (itemClass.equals(Event.class)) notifier = EventNotifier.getInstance();
-            if (itemClass.equals(Tournament.class)) notifier = TournamentNotifier.getInstance();
-            if (itemClass.equals(Competitor.class)) notifier = CompetitorNotifier.getInstance();
-            if (itemClass.equals(JoinRequest.class)) notifier = JoinRequestNotifier.getInstance();
-
-            return (Notifier<T>) notifier;
-        }
-    }
 }

@@ -14,25 +14,16 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 
 public class TeamNotifier extends Notifier<Team> {
 
-    private static TeamNotifier INSTANCE;
-
-    private TeamNotifier() {
-
-    }
-
-    public static TeamNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new TeamNotifier();
-        return INSTANCE;
-    }
+    TeamNotifier() {}
 
     @Override
-    String getNotifyId() {return FeedItem.TEAM;}
+    String getNotifyId() { return FeedItem.TEAM; }
 
     @Override
     protected ModelRepo<Team> getRepository() { return RepoProvider.forModel(Team.class); }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{buildNotificationChannel(FeedItem.TEAM, R.string.teams, R.string.team_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }

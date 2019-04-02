@@ -14,16 +14,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 
 public class RoleNotifier extends Notifier<Role> {
 
-    private static RoleNotifier INSTANCE;
-
-    private RoleNotifier() {
-
-    }
-
-    public static RoleNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new RoleNotifier();
-        return INSTANCE;
-    }
+    RoleNotifier() {}
 
     @Override
     String getNotifyId() { return FeedItem.ROLE; }
@@ -31,8 +22,8 @@ public class RoleNotifier extends Notifier<Role> {
     @Override
     protected ModelRepo<Role> getRepository() { return RepoProvider.forModel(Role.class); }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{buildNotificationChannel(FeedItem.ROLE, R.string.roles, R.string.role_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }

@@ -15,6 +15,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.repository.ModelRepo;
 import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -211,7 +212,7 @@ public class MediaTransferIntentService extends IntentService {
 
         void onDownloadComplete(long id) {
             if (downloadQueue.remove(id) && downloadQueue.isEmpty())
-                MediaNotifier.getInstance().notifyDownloadComplete();
+                NotifierProvider.forNotifier(MediaNotifier.class).notifyDownloadComplete();
         }
 
         private String getMediaTitle(Media media, App app) {

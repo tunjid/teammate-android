@@ -53,11 +53,10 @@ public class ChatNotifier extends Notifier<Chat> {
     private static final String EXTRA_CHAT = "CHAT";
 
     private static final int MAX_LINES = 5;
-    private static ChatNotifier INSTANCE;
 
     private final Map<Team, Boolean> visibleChatMap = new HashMap<>();
 
-    private ChatNotifier() {
+    ChatNotifier() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_MARK_AS_READ);
         filter.addAction(ACTION_REPLY);
@@ -65,13 +64,8 @@ public class ChatNotifier extends Notifier<Chat> {
         app.registerReceiver(new NotificationActionReceiver(), filter);
     }
 
-    public static ChatNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new ChatNotifier();
-        return INSTANCE;
-    }
-
     @Override
-    String getNotifyId() {return FeedItem.CHAT;}
+    String getNotifyId() { return FeedItem.CHAT; }
 
     @Override
     String getNotificationTag(Chat model) { return model.getTeam().getId(); }
@@ -220,7 +214,7 @@ public class ChatNotifier extends Notifier<Chat> {
         @SuppressLint("CheckResult")
         public void onReceive(Context context, Intent intent) {
             ChatRepo repository = RepoProvider.forRepo(ChatRepo.class);
-            ChatNotifier notifier = ChatNotifier.getInstance();
+            ChatNotifier notifier = new ChatNotifier();
             String action = intent.getAction();
             switch (action == null ? "" : action) {
                 case ACTION_REPLY:

@@ -14,16 +14,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 
 public class TournamentNotifier extends Notifier<Tournament> {
 
-    private static TournamentNotifier INSTANCE;
-
-    private TournamentNotifier() {
-
-    }
-
-    public static TournamentNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new TournamentNotifier();
-        return INSTANCE;
-    }
+    TournamentNotifier() {}
 
     @Override
     String getNotifyId() {return FeedItem.TOURNAMENT;}

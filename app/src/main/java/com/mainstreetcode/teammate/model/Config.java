@@ -36,6 +36,8 @@ import androidx.arch.core.util.Function;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Predicate;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 @SuppressLint("ParcelCreator")
 public class Config implements Model<Config> {
 
@@ -209,7 +211,10 @@ public class Config implements Model<Config> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void fetchConfig() {
-        RepoProvider.forRepo(ConfigRepo.class).get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
+        RepoProvider.forRepo(ConfigRepo.class)
+                .get(EMPTY_STRING)
+                .observeOn(mainThread()) // Necessary to prevent a concurrent modification exception
+                .subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
     }
 
     public static class GsonAdapter

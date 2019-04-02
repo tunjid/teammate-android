@@ -9,7 +9,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.mainstreetcode.teammate.model.Device;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.notifications.FeedItem;
-import com.mainstreetcode.teammate.notifications.Notifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.repository.DeviceRepo;
 import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.repository.UserRepo;
@@ -17,8 +17,6 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 
 
 public class TeammateMessagingService extends FirebaseMessagingService {
-
-    private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
 
     @Override
     public void onCreate() {
@@ -36,13 +34,9 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         FeedItem<T> item = FeedItem.fromNotification(remoteMessage);
         if (item == null) return;
 
-        if (item.isDeleteAction()) {
+        if (item.isDeleteAction())
             RepoProvider.forModel(item.getItemClass()).queueForLocalDeletion(item.getModel());
-        }
-        else {
-            Notifier<T> notifier = factory.forClass(item.getItemClass());
-            if (notifier != null) notifier.notify(item);
-        }
+        else NotifierProvider.forModel(item.getItemClass()).notify(item);
     }
 
     @SuppressLint("CheckResult")

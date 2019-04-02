@@ -14,25 +14,16 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 
 public class GameNotifier extends Notifier<Game> {
 
-    private static GameNotifier INSTANCE;
-
-    private GameNotifier() {
-
-    }
-
-    public static GameNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new GameNotifier();
-        return INSTANCE;
-    }
+    GameNotifier() {}
 
     @Override
-    String getNotifyId() {return FeedItem.GAME;}
+    String getNotifyId() { return FeedItem.GAME; }
 
     @Override
     protected ModelRepo<Game> getRepository() { return RepoProvider.forModel(Game.class); }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{buildNotificationChannel(FeedItem.GAME, R.string.games, R.string.games_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }

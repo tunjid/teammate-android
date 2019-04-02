@@ -5,6 +5,7 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.notifications.ChatNotifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.repository.ChatRepo;
 import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.Logger;
@@ -35,7 +36,7 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     public ChatViewModel() {
         repository = RepoProvider.forRepo(ChatRepo.class);
-        notifier = ChatNotifier.getInstance();
+        notifier = NotifierProvider.forNotifier(ChatNotifier.class);
     }
 
     @Override

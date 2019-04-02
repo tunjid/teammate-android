@@ -14,16 +14,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 
 public class EventNotifier extends Notifier<Event> {
 
-    private static EventNotifier INSTANCE;
-
-    private EventNotifier() {
-
-    }
-
-    public static EventNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new EventNotifier();
-        return INSTANCE;
-    }
+     EventNotifier() {}
 
     @Override
     String getNotifyId() {return FeedItem.EVENT;}
@@ -31,8 +22,8 @@ public class EventNotifier extends Notifier<Event> {
     @Override
     protected ModelRepo<Event> getRepository() { return RepoProvider.forModel(Event.class); }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{buildNotificationChannel(FeedItem.EVENT, R.string.events, R.string.events_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }

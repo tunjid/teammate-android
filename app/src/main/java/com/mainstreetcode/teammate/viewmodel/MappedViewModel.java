@@ -3,11 +3,11 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
-import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Model;
-import com.mainstreetcode.teammate.notifications.Notifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import static com.tunjid.androidbootstrap.functions.collections.Lists.findLast;
 public abstract class MappedViewModel<K, V extends Differentiable> extends BaseViewModel {
 
     private AtomicInteger pullToRefreshCount = new AtomicInteger(0);
-    private Notifier.NotifierFactory factory = new Notifier.NotifierFactory();
 
     MappedViewModel() {}
 
@@ -41,7 +40,8 @@ public abstract class MappedViewModel<K, V extends Differentiable> extends BaseV
         return source.cast(Differentiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
-    Single<Differentiable> checkForInvalidObject(Single<? extends Differentiable> source, K key, V value) {
+    Single<Differentiable> checkForInvalidObject(Single<? extends Differentiable> source,
+                                                 @SuppressWarnings("SameParameterValue") K key, V value) {
         return source.cast(Differentiable.class).doOnError(throwable -> checkForInvalidObject(throwable, value, key));
     }
 
@@ -102,8 +102,7 @@ public abstract class MappedViewModel<K, V extends Differentiable> extends BaseV
     @SuppressWarnings("unchecked")
     private void clearNotification(Pair<Model, Class> pair) {
         if (pair.first == null || pair.second == null) return;
-        Notifier notifier = factory.forClass(pair.second);
-        if (notifier != null) notifier.clearNotifications(pair.first);
+        NotifierProvider.forModel(pair.second).clearNotifications(pair.first);
     }
 
     void checkForInvalidObject(Throwable throwable, V model, K key) {

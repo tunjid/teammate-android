@@ -9,6 +9,7 @@ import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.MediaDao;
@@ -62,7 +63,7 @@ public class MediaRepo extends TeamQueryRepo<Media> {
                 .map(getLocalUpdateFunction(model))
                 .map(getSaveFunction());
 
-        return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());
+        return NotifierProvider.forNotifier(MediaNotifier.class).notifyOfUploads(mediaSingle, body.body());
     }
 
     @Override

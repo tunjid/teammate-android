@@ -14,25 +14,16 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 
 public class CompetitorNotifier extends Notifier<Competitor> {
 
-    private static CompetitorNotifier INSTANCE;
-
-    private CompetitorNotifier() {
-
-    }
-
-    public static CompetitorNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new CompetitorNotifier();
-        return INSTANCE;
-    }
+    CompetitorNotifier() {}
 
     @Override
-    String getNotifyId() {return FeedItem.COMPETITOR;}
+    String getNotifyId() { return FeedItem.COMPETITOR; }
 
     @Override
     protected ModelRepo<Competitor> getRepository() { return RepoProvider.forModel(Competitor.class); }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{buildNotificationChannel(FeedItem.COMPETITOR, R.string.competitor, R.string.competitors_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }
