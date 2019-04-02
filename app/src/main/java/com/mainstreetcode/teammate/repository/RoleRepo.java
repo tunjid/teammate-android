@@ -22,21 +22,14 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class RoleRepository extends ModelRepository<Role> {
+public class RoleRepo extends ModelRepo<Role> {
 
     private final TeammateApi api;
     private final RoleDao roleDao;
 
-    private static RoleRepository ourInstance;
-
-    private RoleRepository() {
+    RoleRepo() {
         api = TeammateService.getApiInstance();
         roleDao = AppDatabase.getInstance().roleDao();
-    }
-
-    public static RoleRepository getInstance() {
-        if (ourInstance == null) ourInstance = new RoleRepository();
-        return ourInstance;
     }
 
     @Override
@@ -86,8 +79,8 @@ public class RoleRepository extends ModelRepository<Role> {
                 teams.add(role.getTeam());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
+            if (!teams.isEmpty()) RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+            if (!users.isEmpty()) RepoProvider.forModel(User.class).saveAsNested().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));
 
@@ -102,7 +95,7 @@ public class RoleRepository extends ModelRepository<Role> {
     }
 
     public Flowable<List<Role>> getMyRoles() {
-        String userId = UserRepository.getInstance().getCurrentUser().getId();
+        String userId = RepoProvider.forRepo(UserRepo.class).getCurrentUser().getId();
         Maybe<List<Role>> local = roleDao.userRoles(userId).subscribeOn(io());
         Maybe<List<Role>> remote = api.getMyRoles().map(getSaveManyFunction()).toMaybe();
 

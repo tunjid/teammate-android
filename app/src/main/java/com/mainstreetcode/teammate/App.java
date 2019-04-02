@@ -8,9 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.mainstreetcode.teammate.repository.ConfigRepository;
-import com.mainstreetcode.teammate.repository.RoleRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.ConfigRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.RoleRepo;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
@@ -62,13 +63,13 @@ public class App extends Application {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void prime() {
         // Load user from cache if they exist
-        UserRepository userRepository = UserRepository.getInstance();
+        UserRepo userRepository = RepoProvider.forRepo(UserRepo.class);
         if (!userRepository.isSignedIn()) return;
 
         userRepository.getMe()
                 .lastOrError()
-                .flatMap(ignored -> ConfigRepository.getInstance().get("").lastOrError())
-                .flatMap(ignored -> RoleRepository.getInstance().getMyRoles().lastOrError())
+                .flatMap(ignored -> RepoProvider.forRepo(ConfigRepo.class).get("").lastOrError())
+                .flatMap(ignored -> RepoProvider.forRepo(RoleRepo.class).getMyRoles().lastOrError())
                 .subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 

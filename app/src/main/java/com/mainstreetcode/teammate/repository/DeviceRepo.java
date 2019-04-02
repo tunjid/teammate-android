@@ -20,21 +20,14 @@ import io.reactivex.functions.Function;
 import static android.text.TextUtils.isEmpty;
 import static com.mainstreetcode.teammate.model.Message.fromThrowable;
 
-public class DeviceRepository extends ModelRepository<Device> {
+public class DeviceRepo extends ModelRepo<Device> {
 
     private final TeammateApi api;
     private final DeviceDao dao;
 
-    private static DeviceRepository ourInstance;
-
-    private DeviceRepository() {
+    DeviceRepo() {
         api = TeammateService.getApiInstance();
         dao = AppDatabase.getInstance().deviceDao();
-    }
-
-    public static DeviceRepository getInstance() {
-        if (ourInstance == null) ourInstance = new DeviceRepository();
-        return ourInstance;
     }
 
     @Override

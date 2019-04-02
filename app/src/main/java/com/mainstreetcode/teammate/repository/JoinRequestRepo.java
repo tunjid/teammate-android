@@ -20,21 +20,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class JoinRequestRepository extends ModelRepository<JoinRequest> {
+public class JoinRequestRepo extends ModelRepo<JoinRequest> {
 
     private final TeammateApi api;
     private final JoinRequestDao joinRequestDao;
 
-    private static JoinRequestRepository ourInstance;
-
-    private JoinRequestRepository() {
+    JoinRequestRepo() {
         api = TeammateService.getApiInstance();
         joinRequestDao = AppDatabase.getInstance().joinRequestDao();
-    }
-
-    public static JoinRequestRepository getInstance() {
-        if (ourInstance == null) ourInstance = new JoinRequestRepository();
-        return ourInstance;
     }
 
     @Override
@@ -74,8 +67,8 @@ public class JoinRequestRepository extends ModelRepository<JoinRequest> {
                 users.add(request.getUser());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
+            if (!teams.isEmpty()) RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+            if (!users.isEmpty()) RepoProvider.forModel(User.class).saveAsNested().apply(users);
 
             joinRequestDao.upsert(Collections.unmodifiableList(models));
 

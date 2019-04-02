@@ -24,21 +24,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class GuestRepository extends QueryRepository<Guest, Event, Date> {
+public class GuestRepo extends QueryRepo<Guest, Event, Date> {
 
     private final TeammateApi api;
     private final GuestDao guestDao;
 
-    private static GuestRepository ourInstance;
-
-    private GuestRepository() {
+    GuestRepo() {
         api = TeammateService.getApiInstance();
         guestDao = AppDatabase.getInstance().guestDao();
-    }
-
-    public static GuestRepository getInstance() {
-        if (ourInstance == null) ourInstance = new GuestRepository();
-        return ourInstance;
     }
 
     @Override
@@ -88,8 +81,8 @@ public class GuestRepository extends QueryRepository<Guest, Event, Date> {
                 events.add(guest.getEvent());
             }
 
-            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
-            if (!events.isEmpty()) EventRepository.getInstance().saveAsNested().apply(events);
+            if (!users.isEmpty()) RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            if (!events.isEmpty()) RepoProvider.forModel(Event.class).saveAsNested().apply(events);
 
             dao().upsert(Collections.unmodifiableList(models));
 

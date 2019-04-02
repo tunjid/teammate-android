@@ -5,8 +5,8 @@ import android.annotation.SuppressLint;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
-import com.mainstreetcode.teammate.repository.TeamRepository;
-import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.TeamRepo;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -22,6 +22,8 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 
 /**
  * ViewModel for team
@@ -32,15 +34,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     private final Team defaultTeam = Team.empty();
     static final List<Differentiable> teams = Lists.transform(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
-    private final TeamRepository repository;
+    private final TeamRepo repository;
     private final PublishProcessor<Team> teamChangeProcessor;
 
-    @SuppressLint("CheckResult")
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public TeamViewModel() {
-        repository = TeamRepository.getInstance();
         teamChangeProcessor = PublishProcessor.create();
-        repository.getDefaultTeam().subscribe(this::updateDefaultTeam, ErrorHandler.EMPTY);
+        repository = RepoProvider.forRepo(TeamRepo.class);
     }
 
     @Override
@@ -65,7 +64,11 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public Flowable<Team> getTeamChangeFlowable() {
-        return Flowable.fromCallable(() -> defaultTeam).concatWith(teamChangeProcessor);
+        return repository.getDefaultTeam().flatMapPublisher(team -> {
+            updateDefaultTeam(team);
+            return Flowable.fromCallable(() -> defaultTeam).concatWith(teamChangeProcessor);
+        }).observeOn(mainThread());
+
     }
 
     private Flowable<Team> getTeam(Team team) {

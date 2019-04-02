@@ -1,8 +1,6 @@
 package com.mainstreetcode.teammate.repository;
 
 
-import androidx.annotation.Nullable;
-
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
@@ -14,24 +12,18 @@ import com.mainstreetcode.teammate.rest.TeammateService;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
-public class BlockedUserRepository extends TeamQueryRepository<BlockedUser> {
-
-    private static BlockedUserRepository ourInstance;
+public class BlockedUserRepo extends TeamQueryRepo<BlockedUser> {
 
     private final TeammateApi api;
 
-    private BlockedUserRepository() {
+    BlockedUserRepo() {
         api = TeammateService.getApiInstance();
-    }
-
-    public static BlockedUserRepository getInstance() {
-        if (ourInstance == null) ourInstance = new BlockedUserRepository();
-        return ourInstance;
     }
 
     @Override

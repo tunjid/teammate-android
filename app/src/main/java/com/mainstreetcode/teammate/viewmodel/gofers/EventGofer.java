@@ -6,11 +6,12 @@ import com.google.android.gms.location.places.Place;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Guest;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.GuestRepository;
+import com.mainstreetcode.teammate.repository.GuestRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -40,7 +41,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     private final Function<Event, Flowable<Event>> getFunction;
     private final Function<Event, Single<Event>> deleteFunction;
     private final Function<Event, Single<Event>> updateFunction;
-    private final GuestRepository guestRepository;
+    private final GuestRepo guestRepository;
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -56,7 +57,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.rsvpFunction = rsvpFunction;
         this.updateFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
-        this.guestRepository = GuestRepository.getInstance();
+        this.guestRepository = RepoProvider.forRepo(GuestRepo.class);
 
         items.addAll(model.asDifferentiables());
         items.add(model.getTeam());
@@ -122,7 +123,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     Completable delete() {
-        return deleteFunction.apply(model).toCompletable();
+        return deleteFunction.apply(model).ignoreElement();
     }
 
     public Single<DiffUtil.DiffResult> setPlace(Place place) {

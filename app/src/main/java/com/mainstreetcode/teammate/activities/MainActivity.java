@@ -44,7 +44,6 @@ import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.notifications.TeammatesInstanceIdService;
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ViewHolderUtil;
@@ -134,8 +133,6 @@ public class MainActivity extends TeammatesBaseActivity
             startRegistrationActivity(this);
             return;
         }
-
-        TeammatesInstanceIdService.updateFcmToken();
 
         disposables = new CompositeDisposable();
 

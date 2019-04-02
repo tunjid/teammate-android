@@ -3,6 +3,8 @@ package com.mainstreetcode.teammate.viewmodel;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitor;
+import com.mainstreetcode.teammate.repository.CompetitorRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
@@ -10,8 +12,7 @@ import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.enums.StatType;
-import com.mainstreetcode.teammate.repository.CompetitorRepository;
-import com.mainstreetcode.teammate.repository.TournamentRepository;
+import com.mainstreetcode.teammate.repository.TournamentRepo;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -36,18 +37,18 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private final TeammateApi api;
-    private final TournamentRepository repository;
+    private final TournamentRepo repository;
     private final Map<Tournament, Standings> standingsMap = new HashMap<>();
     private final Map<Tournament, List<Differentiable>> ranksMap = new HashMap<>();
 
     public TournamentViewModel() {
         api = TeammateService.getApiInstance();
-        repository = TournamentRepository.getInstance();
+        repository = RepoProvider.forRepo(TournamentRepo.class);
     }
 
     public TournamentGofer gofer(Tournament tournament) {
         return new TournamentGofer(tournament, onError(tournament), this::getTournament, this::createOrUpdateTournament, this::delete,
-                ignored -> CompetitorRepository.getInstance().modelsBefore(tournament, 0));
+                ignored -> RepoProvider.forRepo(CompetitorRepo.class).modelsBefore(tournament, 0));
     }
 
     @Override

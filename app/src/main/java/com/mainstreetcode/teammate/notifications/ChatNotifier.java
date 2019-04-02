@@ -19,9 +19,10 @@ import android.os.Bundle;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.repository.ChatRepository;
-import com.mainstreetcode.teammate.repository.ModelRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.ChatRepo;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.tunjid.androidbootstrap.functions.Consumer;
 
@@ -52,11 +53,10 @@ public class ChatNotifier extends Notifier<Chat> {
     private static final String EXTRA_CHAT = "CHAT";
 
     private static final int MAX_LINES = 5;
-    private static ChatNotifier INSTANCE;
 
     private final Map<Team, Boolean> visibleChatMap = new HashMap<>();
 
-    private ChatNotifier() {
+    ChatNotifier() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_MARK_AS_READ);
         filter.addAction(ACTION_REPLY);
@@ -64,19 +64,14 @@ public class ChatNotifier extends Notifier<Chat> {
         app.registerReceiver(new NotificationActionReceiver(), filter);
     }
 
-    public static ChatNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new ChatNotifier();
-        return INSTANCE;
-    }
+    @Override
+    String getNotifyId() { return FeedItem.CHAT; }
 
     @Override
-    String getNotifyId() {return FeedItem.CHAT;}
+    String getNotificationTag(Chat model) { return model.getTeam().getId(); }
 
     @Override
-    String getNotificationTag(Chat model) {return model.getTeam().getId();}
-
-    @Override
-    protected ModelRepository<Chat> getRepository() {return ChatRepository.getInstance();}
+    protected ModelRepo<Chat> getRepository() { return RepoProvider.forModel(Chat.class); }
 
     @TargetApi(O)
     @Override
@@ -106,7 +101,7 @@ public class ChatNotifier extends Notifier<Chat> {
 
     @SuppressLint("CheckResult")
     private void aggregateConversations(FeedItem<Chat> item, Chat received) {
-        ChatRepository repository = ChatRepository.getInstance();
+        ChatRepo repository = RepoProvider.forRepo(ChatRepo.class);
         AtomicInteger count = new AtomicInteger(0);
         //noinspection ResultOfMethodCallIgnored
         repository.get(received)
@@ -218,8 +213,8 @@ public class ChatNotifier extends Notifier<Chat> {
         @Override
         @SuppressLint("CheckResult")
         public void onReceive(Context context, Intent intent) {
-            ChatRepository repository = ChatRepository.getInstance();
-            ChatNotifier notifier = ChatNotifier.getInstance();
+            ChatRepo repository = RepoProvider.forRepo(ChatRepo.class);
+            ChatNotifier notifier = new ChatNotifier();
             String action = intent.getAction();
             switch (action == null ? "" : action) {
                 case ACTION_REPLY:
@@ -228,7 +223,7 @@ public class ChatNotifier extends Notifier<Chat> {
 
                     FeedItem<Chat> received = intent.getParcelableExtra(EXTRA_FEED_ITEM);
                     CharSequence message = remoteInput.getCharSequence(KEY_TEXT_REPLY);
-                    Chat toSend = Chat.chat(message, UserRepository.getInstance().getCurrentUser(), received.getModel().getTeam());
+                    Chat toSend = Chat.chat(message, RepoProvider.forRepo(UserRepo.class).getCurrentUser(), received.getModel().getTeam());
 
                     //noinspection ResultOfMethodCallIgnored
                     repository.createOrUpdate(toSend).subscribe(__ -> notifier.aggregateConversations(received, toSend), ErrorHandler.EMPTY);

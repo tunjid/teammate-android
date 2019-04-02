@@ -22,7 +22,8 @@ import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.model.enums.TournamentStyle;
 import com.mainstreetcode.teammate.model.enums.TournamentType;
 import com.mainstreetcode.teammate.model.enums.Visibility;
-import com.mainstreetcode.teammate.repository.ConfigRepository;
+import com.mainstreetcode.teammate.repository.ConfigRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -34,6 +35,8 @@ import androidx.annotation.NonNull;
 import androidx.arch.core.util.Function;
 import io.reactivex.Flowable;
 import io.reactivex.functions.Predicate;
+
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 @SuppressLint("ParcelCreator")
 public class Config implements Model<Config> {
@@ -64,37 +67,20 @@ public class Config implements Model<Config> {
         this.defaultTournamentLogo = defaultTournamentLogo;
     }
 
-    static String getDefaultTeamLogo() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultTeamLogo;
-    }
+    static String getDefaultTeamLogo() { return getCurrentConfig().defaultTeamLogo; }
 
-    static String getDefaultEventLogo() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultEventLogo;
-    }
+    static String getDefaultEventLogo() { return getCurrentConfig().defaultEventLogo; }
 
-    static String getDefaultUserAvatar() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultUserAvatar;
-    }
+    static String getDefaultUserAvatar() { return getCurrentConfig().defaultUserAvatar; }
 
-    static String getDefaultTournamentLogo() {
-        if (getCurrentConfig().isEmpty()) fetchConfig();
-        return getCurrentConfig().defaultTournamentLogo;
-    }
+    static String getDefaultTournamentLogo() { return getCurrentConfig().defaultTournamentLogo; }
 
-    public static List<Sport> getSports() {
-        return getList(config -> config.sports);
-    }
+    public static List<Sport> getSports() { return getList(config -> config.sports); }
 
-    public static List<String> getPrivileged() {
-        return getList(config -> config.privileged);
-    }
+    @SuppressWarnings("WeakerAccess")
+    public static List<String> getPrivileged() { return getList(config -> config.privileged); }
 
-    public static List<Position> getPositions() {
-        return getList(config -> config.positions);
-    }
+    public static List<Position> getPositions() { return getList(config -> config.positions); }
 
     public static List<Visibility> getVisibilities() {
         return getList(config -> config.visibilities);
@@ -132,6 +118,7 @@ public class Config implements Model<Config> {
         return getFromCode(code, config -> config.visibilities, Visibility.empty());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static BlockReason reasonFromCode(String code) {
         return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
     }
@@ -149,7 +136,7 @@ public class Config implements Model<Config> {
     }
 
     private static Config getCurrentConfig() {
-        if (cached.isEmpty()) cached.update(ConfigRepository.getInstance().getCurrent());
+        if (cached.isEmpty() && RepoProvider.initialized()) cached.update(RepoProvider.forRepo(ConfigRepo.class).getCurrent());
         return cached;
     }
 
@@ -224,7 +211,10 @@ public class Config implements Model<Config> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void fetchConfig() {
-        ConfigRepository.getInstance().get(EMPTY_STRING).subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
+        RepoProvider.forRepo(ConfigRepo.class)
+                .get(EMPTY_STRING)
+                .observeOn(mainThread()) // Necessary to prevent a concurrent modification exception
+                .subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
     }
 
     public static class GsonAdapter

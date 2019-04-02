@@ -2,11 +2,12 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.MediaTransferIntentService;
-import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.repository.MediaRepository;
+import com.mainstreetcode.teammate.repository.MediaRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
@@ -30,13 +31,13 @@ import static io.reactivex.schedulers.Schedulers.io;
 
 public class MediaViewModel extends TeamMappedViewModel<Media> {
 
-    private final MediaRepository repository;
+    private final MediaRepo repository;
     private final Map<Team, Set<Media>> selectionMap;
     private final PublishProcessor<DiffUtil.DiffResult> uploadCompletionProcessor;
 
     public MediaViewModel() {
-        repository = MediaRepository.getInstance();
         selectionMap = new HashMap<>();
+        repository = RepoProvider.forRepo(MediaRepo.class);
         uploadCompletionProcessor = PublishProcessor.create();
     }
 

@@ -6,11 +6,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.UserRepository;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class RoleGofer extends TeamHostingGofer<Role> {
 
     public String getDropRolePrompt(Fragment fragment) {
         User roleUser = model.getUser();
-        return UserRepository.getInstance().getCurrentUser().equals(roleUser)
+        return RepoProvider.forRepo(UserRepo.class).getCurrentUser().equals(roleUser)
                 ? fragment.getString(R.string.confirm_user_leave)
                 : fragment.getString(R.string.confirm_user_drop, roleUser.getFirstName());
     }
@@ -63,6 +64,6 @@ public class RoleGofer extends TeamHostingGofer<Role> {
     }
 
     public Completable delete() {
-        return deleteFunction.apply(model).toCompletable();
+        return deleteFunction.apply(model).ignoreElement();
     }
 }

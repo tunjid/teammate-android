@@ -12,18 +12,11 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
-public class PrefsRepository extends ModelRepository<Prefs> {
+public class PrefsRepo extends ModelRepo<Prefs> {
 
     private final PrefsDao dao;
 
-    private static PrefsRepository ourInstance;
-
-    private PrefsRepository() { dao = AppDatabase.getInstance().prefsDao(); }
-
-    public static PrefsRepository getInstance() {
-        if (ourInstance == null) ourInstance = new PrefsRepository();
-        return ourInstance;
-    }
+    PrefsRepo() { dao = AppDatabase.getInstance().prefsDao(); }
 
     public Prefs getCurrent() { return dao.getCurrent(); }
 

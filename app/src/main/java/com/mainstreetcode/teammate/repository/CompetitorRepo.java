@@ -28,21 +28,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class CompetitorRepository extends QueryRepository<Competitor, Tournament, Integer> {
-
-    private static CompetitorRepository ourInstance;
+public class CompetitorRepo extends QueryRepo<Competitor, Tournament, Integer> {
 
     private final TeammateApi api;
     private final CompetitorDao competitorDao;
 
-    private CompetitorRepository() {
+    CompetitorRepo() {
         api = TeammateService.getApiInstance();
         competitorDao = AppDatabase.getInstance().competitorDao();
-    }
-
-    public static CompetitorRepository getInstance() {
-        if (ourInstance == null) ourInstance = new CompetitorRepository();
-        return ourInstance;
     }
 
     @Override
@@ -100,12 +93,12 @@ public class CompetitorRepository extends QueryRepository<Competitor, Tournament
                 Competitive entity = competitor.getEntity();
                 if (entity instanceof Team) teams.add((Team) entity);
                 else if (entity instanceof User) users.add((User) entity);
-                if(!game.isEmpty())games.add(game);
+                if (!game.isEmpty()) games.add(game);
             }
 
-            UserRepository.getInstance().saveAsNested().apply(users);
-            TeamRepository.getInstance().saveAsNested().apply(teams);
-            GameRepository.getInstance().saveAsNested().apply(games);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+            RepoProvider.forModel(Game.class).saveAsNested().apply(games);
             competitorDao.upsert(Collections.unmodifiableList(models));
 
             return models;

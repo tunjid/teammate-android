@@ -26,28 +26,17 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
+import static com.mainstreetcode.teammate.repository.RepoProvider.forModel;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> extends TeamQueryRepository<TeamMember<T>> {
+public class TeamMemberRepo<T extends Model<T> & TeamHost & UserHost> extends TeamQueryRepo<TeamMember<T>> {
 
     private final TeammateApi api;
     private final TeamMemberDao dao;
-    private final RoleRepository roleRepository;
-    private final JoinRequestRepository requestRepository;
 
-    private static TeamMemberRepository ourInstance;
-
-    private TeamMemberRepository() {
+    TeamMemberRepo() {
         api = TeammateService.getApiInstance();
         dao = AppDatabase.getInstance().teamMemberDao();
-        roleRepository = RoleRepository.getInstance();
-        requestRepository = JoinRequestRepository.getInstance();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <S extends Model<S> & TeamHost & UserHost> TeamMemberRepository<S> getInstance() {
-        if (ourInstance == null) ourInstance = new TeamMemberRepository();
-        return ourInstance;
     }
 
     @Override
@@ -61,7 +50,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
         Single<TeamMember<T>> single;
 
         if (wrapped instanceof Role) {
-            single = unsafeCast(roleRepository.createOrUpdate((Role) wrapped));
+            single = unsafeCast(forModel(Role.class).createOrUpdate((Role) wrapped));
         }
         else if (wrapped instanceof JoinRequest) {
             JoinRequest request = (JoinRequest) wrapped;
@@ -85,10 +74,10 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
         Single<TeamMember<T>> single;
 
         if (wrapped instanceof Role) {
-            single = unsafeCast(roleRepository.delete((Role) wrapped));
+            single = unsafeCast(forModel(Role.class).delete((Role) wrapped));
         }
         else if (wrapped instanceof JoinRequest) {
-            single = unsafeCast(requestRepository.delete((JoinRequest) wrapped));
+            single = unsafeCast(forModel(JoinRequest.class).delete((JoinRequest) wrapped));
         }
         else single = Single.error(new TeammateException("Unimplemented"));
 
@@ -119,7 +108,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
 
     private Single<TeamMember<T>> createJoinRequest(JoinRequest request) {
         TeamMember<T> member = TeamMember.unsafeCast(TeamMember.fromModel(request));
-        return requestRepository.createOrUpdate(request).map(updated -> member);
+        return forModel(JoinRequest.class).createOrUpdate(request).map(updated -> member);
     }
 
     private Single<TeamMember<T>> createRole(JoinRequest request) {
@@ -137,7 +126,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
     private Single<TeamMember<T>> apply(JoinRequest request, Single<Role> apiSingle) {
         TeamMember<T> member = TeamMember.unsafeCast(TeamMember.fromModel(request));
         return apiSingle
-                .map(roleRepository.getSaveFunction())
+                .map(forModel(Role.class).getSaveFunction())
                 .doOnSuccess(role -> AppDatabase.getInstance().joinRequestDao().delete(request))
                 .map(role -> member)
                 .doOnError(throwable -> deleteInvalidModel(member, throwable));
@@ -145,7 +134,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
 
     @Override
     Maybe<List<TeamMember<T>>> remoteModelsBefore(Team key, @Nullable Date date) {
-        Maybe<List<TeamMember<T>>> maybe = TeamMemberRepository.unsafeCastList(api.getTeamMembers(key.getId(), date, DEF_QUERY_LIMIT).toMaybe());
+        Maybe<List<TeamMember<T>>> maybe = TeamMemberRepo.unsafeCastList(api.getTeamMembers(key.getId(), date, DEF_QUERY_LIMIT).toMaybe());
         return maybe.map(getSaveManyFunction());
     }
 
@@ -155,8 +144,8 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
             TeamMember.split(Collections.unmodifiableList(models), (roles, requests) -> {
                 deleteStaleJoinRequests(roles);
 
-                if (!requests.isEmpty()) requestRepository.saveAsNested().apply(requests);
-                if (!roles.isEmpty()) roleRepository.saveAsNested().apply(roles);
+                if (!requests.isEmpty()) forModel(JoinRequest.class).saveAsNested().apply(requests);
+                if (!roles.isEmpty()) forModel(Role.class).saveAsNested().apply(roles);
             });
             return models;
         };
@@ -179,7 +168,7 @@ public class TeamMemberRepository<T extends Model<T> & TeamHost & UserHost> exte
     }
 
     private static <S extends Model<S> & TeamHost & UserHost> Maybe<List<TeamMember<S>>> unsafeCastList(final Maybe<List<TeamMember>> single) {
-        return single.map(TeamMemberRepository::unsafeCastList);
+        return single.map(TeamMemberRepo::unsafeCastList);
     }
 
     @SuppressWarnings("unchecked")

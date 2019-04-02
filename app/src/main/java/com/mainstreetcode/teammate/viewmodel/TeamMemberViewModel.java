@@ -11,9 +11,10 @@ import com.mainstreetcode.teammate.model.TeamHost;
 import com.mainstreetcode.teammate.model.TeamMember;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.UserHost;
-import com.mainstreetcode.teammate.repository.JoinRequestRepository;
-import com.mainstreetcode.teammate.repository.RoleRepository;
-import com.mainstreetcode.teammate.repository.TeamMemberRepository;
+import com.mainstreetcode.teammate.repository.JoinRequestRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.RoleRepo;
+import com.mainstreetcode.teammate.repository.TeamMemberRepo;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer;
@@ -31,10 +32,11 @@ import io.reactivex.functions.BiFunction;
 
 public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
 
-    private final TeamMemberRepository repository;
+    private final TeamMemberRepo repository;
 
     public TeamMemberViewModel() {
-        repository = TeamMemberRepository.getInstance();
+        //noinspection unchecked,RedundantCast(The redundant cast is not redundant, it fixes a compiler error)
+        repository = (TeamMemberRepo) RepoProvider.forRepo(TeamMemberRepo.class);
     }
 
     @Override
@@ -73,17 +75,18 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public JoinRequestGofer gofer(JoinRequest joinRequest) {
-        return new JoinRequestGofer(joinRequest, onError(TeamMember.fromModel(joinRequest)), JoinRequestRepository.getInstance()::get, this::processRequest);
+        return new JoinRequestGofer(joinRequest, onError(TeamMember.fromModel(joinRequest)), RepoProvider.forRepo(JoinRequestRepo.class)::get, this::processRequest);
     }
 
     public RoleGofer gofer(Role role) {
-        return new RoleGofer(role, onError(TeamMember.fromModel(role)), RoleRepository.getInstance()::get, this::deleteRole, this::updateRole);
+        return new RoleGofer(role, onError(TeamMember.fromModel(role)), RepoProvider.forRepo(RoleRepo.class)::get, this::deleteRole, this::updateRole);
     }
 
     public Flowable<User> getAllUsers() {
         return getAllModels().filter(model -> model instanceof UserHost)
                 .cast(UserHost.class).map(UserHost::getUser).distinct();
     }
+
     private Single<Role> deleteRole(Role role) {
         return asTypedTeamMember(role, (member, repository) -> repository.delete(member).doOnSuccess(getModelList(role.getTeam())::remove).map(deleted -> role));
     }
@@ -114,11 +117,11 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     @SuppressWarnings("unchecked")
-    private <S extends Model<S> & UserHost & TeamHost> TeamMemberRepository<S> repository() {
-        return repository;
+    private <S extends Model<S> & UserHost & TeamHost> TeamMemberRepo<S> repository() {
+        return (TeamMemberRepo<S>) repository;
     }
 
-    private <T extends Model<T> & TeamHost & UserHost, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepository<T>, S> function) {
+    private <T extends Model<T> & TeamHost & UserHost, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepo<T>, S> function) {
         try {return function.apply(TeamMember.fromModel(model), repository());}
         catch (Exception e) {throw new RuntimeException(e);}
     }

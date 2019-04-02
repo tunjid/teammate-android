@@ -1,6 +1,7 @@
 package com.mainstreetcode.teammate.repository;
 
 import android.net.Uri;
+
 import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.App;
@@ -8,6 +9,7 @@ import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.MediaDao;
@@ -34,27 +36,16 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class MediaRepository extends TeamQueryRepository<Media> {
+public class MediaRepo extends TeamQueryRepo<Media> {
 
     private final int num;
     private final TeammateApi api;
     private final MediaDao mediaDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
 
-    private static MediaRepository ourInstance;
-
-    private MediaRepository() {
+    MediaRepo() {
         num = getNumCallsToIgnore();
         api = TeammateService.getApiInstance();
         mediaDao = AppDatabase.getInstance().mediaDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-    }
-
-    public static MediaRepository getInstance() {
-        if (ourInstance == null) ourInstance = new MediaRepository();
-        return ourInstance;
     }
 
     @Override
@@ -72,7 +63,7 @@ public class MediaRepository extends TeamQueryRepository<Media> {
                 .map(getLocalUpdateFunction(model))
                 .map(getSaveFunction());
 
-        return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());
+        return NotifierProvider.forNotifier(MediaNotifier.class).notifyOfUploads(mediaSingle, body.body());
     }
 
     @Override
@@ -107,8 +98,8 @@ public class MediaRepository extends TeamQueryRepository<Media> {
                 teams.add(media.getTeam());
             }
 
-            userRepository.saveAsNested().apply(users);
-            teamRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
 
             mediaDao.upsert(Collections.unmodifiableList(models));
 
@@ -136,7 +127,8 @@ public class MediaRepository extends TeamQueryRepository<Media> {
     }
 
     @Nullable
-    private MultipartBody.Part getBody(String path, String photoKey) {
+    private MultipartBody.Part getBody(String path, @SuppressWarnings(
+            "SameParameterValue") String photoKey) {
         Uri uri = Uri.parse(path);
         String type = App.getInstance().getContentResolver().getType(uri);
 

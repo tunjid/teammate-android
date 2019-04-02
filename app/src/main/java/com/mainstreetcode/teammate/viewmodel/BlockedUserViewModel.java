@@ -2,7 +2,8 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.repository.BlockedUserRepository;
+import com.mainstreetcode.teammate.repository.BlockedUserRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.BlockedUserGofer;
 
@@ -13,10 +14,10 @@ import io.reactivex.Single;
 
 public class BlockedUserViewModel extends TeamMappedViewModel<BlockedUser> {
 
-    private final BlockedUserRepository repository;
+    private final BlockedUserRepo repository;
 
     public BlockedUserViewModel() {
-        repository = BlockedUserRepository.getInstance();
+        repository = RepoProvider.forRepo(BlockedUserRepo.class);
     }
 
     public BlockedUserGofer gofer(BlockedUser blockedUser) {
@@ -35,7 +36,7 @@ public class BlockedUserViewModel extends TeamMappedViewModel<BlockedUser> {
     }
 
     public Single<BlockedUser> blockUser(BlockedUser blockedUser) {
-        return BlockedUserRepository.getInstance().createOrUpdate(blockedUser)
+        return RepoProvider.forRepo(BlockedUserRepo.class).createOrUpdate(blockedUser)
                 .doOnSuccess(blocked -> pushModelAlert(Alert.creation(blockedUser)));
     }
 

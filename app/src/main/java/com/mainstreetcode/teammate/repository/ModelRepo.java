@@ -2,21 +2,10 @@ package com.mainstreetcode.teammate.repository;
 
 
 import android.annotation.SuppressLint;
-import androidx.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
-import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.JoinRequest;
-import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Model;
-import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.model.Stat;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
@@ -26,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -43,7 +33,7 @@ import static io.reactivex.Maybe.concatDelayError;
  * Repository that manages {@link Model} CRUD operations
  */
 
-public abstract class ModelRepository<T extends Model<T>> {
+public abstract class ModelRepo<T extends Model<T>> {
 
     static final int DEF_QUERY_LIMIT = 12;
 
@@ -142,27 +132,4 @@ public abstract class ModelRepository<T extends Model<T>> {
         return concatDelayError(Arrays.asList(local, remote));
     }
 
-    public static class RepositoryFactory {
-
-        @Nullable
-        @SuppressWarnings("unchecked")
-        public <T extends Model<T>> ModelRepository<T> forClass(Class<T> itemClass) {
-
-            ModelRepository repository = null;
-
-            if (itemClass.equals(Team.class)) repository = TeamRepository.getInstance();
-            if (itemClass.equals(Role.class)) repository = RoleRepository.getInstance();
-            if (itemClass.equals(Chat.class)) repository = ChatRepository.getInstance();
-            if (itemClass.equals(Stat.class)) repository = StatRepository.getInstance();
-            if (itemClass.equals(Game.class)) repository = GameRepository.getInstance();
-            if (itemClass.equals(Media.class)) repository = MediaRepository.getInstance();
-            if (itemClass.equals(Event.class)) repository = EventRepository.getInstance();
-            if (itemClass.equals(Tournament.class)) repository = TournamentRepository.getInstance();
-            if (itemClass.equals(Competitor.class)) repository = CompetitorRepository.getInstance();
-            if (itemClass.equals(JoinRequest.class))
-                repository = JoinRequestRepository.getInstance();
-
-            return (ModelRepository<T>) repository;
-        }
-    }
 }

@@ -8,31 +8,22 @@ import android.os.Build;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.repository.ModelRepository;
-import com.mainstreetcode.teammate.repository.RoleRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 
 
 public class RoleNotifier extends Notifier<Role> {
 
-    private static RoleNotifier INSTANCE;
-
-    private RoleNotifier() {
-
-    }
-
-    public static RoleNotifier getInstance() {
-        if (INSTANCE == null) INSTANCE = new RoleNotifier();
-        return INSTANCE;
-    }
+    RoleNotifier() {}
 
     @Override
-    String getNotifyId() {return FeedItem.ROLE;}
+    String getNotifyId() { return FeedItem.ROLE; }
 
     @Override
-    protected ModelRepository<Role> getRepository() {return RoleRepository.getInstance();}
+    protected ModelRepo<Role> getRepository() { return RepoProvider.forModel(Role.class); }
 
+    @Override
     @TargetApi(Build.VERSION_CODES.O)
-    @Override
     protected NotificationChannel[] getNotificationChannels() {
         return new NotificationChannel[]{buildNotificationChannel(FeedItem.ROLE, R.string.roles, R.string.role_notifier_description, NotificationManager.IMPORTANCE_DEFAULT)};
     }

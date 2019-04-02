@@ -1,25 +1,25 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
-import androidx.arch.core.util.Function;
-import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DiffUtil;
-
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.util.FunctionalDiff;
-import com.tunjid.androidbootstrap.functions.BiFunction;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.TeamMember;
-import com.mainstreetcode.teammate.repository.TeamMemberRepository;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.TeamMemberRepo;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.BiFunction;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.arch.core.util.Function;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -152,12 +152,12 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
 
     @Override
     public Completable delete() {
-        return joinCompleter.apply(model, false).toCompletable().observeOn(mainThread());
+        return joinCompleter.apply(model, false).ignoreElement().observeOn(mainThread());
     }
 
     private Single<JoinRequest> joinTeam() {
         TeamMember<JoinRequest> member = TeamMember.fromModel(model);
-        TeamMemberRepository<JoinRequest> repository = TeamMemberRepository.getInstance();
+        @SuppressWarnings("unchecked") TeamMemberRepo<JoinRequest> repository = RepoProvider.forRepo(TeamMemberRepo.class);
 
         return repository.createOrUpdate(member).map(ignored -> model);
     }

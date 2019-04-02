@@ -5,7 +5,9 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Chat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.notifications.ChatNotifier;
-import com.mainstreetcode.teammate.repository.ChatRepository;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
+import com.mainstreetcode.teammate.repository.ChatRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
@@ -29,12 +31,12 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
 
     private static final String XHR_POST_ERROR = "xhr post error";
 
-    private final ChatRepository repository;
+    private final ChatRepo repository;
     private final ChatNotifier notifier;
 
     public ChatViewModel() {
-        repository = ChatRepository.getInstance();
-        notifier = ChatNotifier.getInstance();
+        repository = RepoProvider.forRepo(ChatRepo.class);
+        notifier = NotifierProvider.forNotifier(ChatNotifier.class);
     }
 
     @Override
