@@ -136,7 +136,7 @@ public class Config implements Model<Config> {
     }
 
     private static Config getCurrentConfig() {
-        if (cached.isEmpty() && RepoProvider.initialized()) cached.update(RepoProvider.forRepo(ConfigRepo.class).getCurrent());
+        if (cached.isEmpty()) fetchConfig();
         return cached;
     }
 
@@ -144,8 +144,6 @@ public class Config implements Model<Config> {
         Config config = getCurrentConfig();
 
         if (config != null && !config.isEmpty()) return function.apply(config);
-
-        fetchConfig();
         return new ArrayList<>();
     }
 
@@ -211,10 +209,10 @@ public class Config implements Model<Config> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void fetchConfig() {
-        RepoProvider.forRepo(ConfigRepo.class)
+        if (RepoProvider.initialized()) RepoProvider.forRepo(ConfigRepo.class)
                 .get(EMPTY_STRING)
                 .observeOn(mainThread()) // Necessary to prevent a concurrent modification exception
-                .subscribe(getCurrentConfig()::update, ErrorHandler.EMPTY);
+                .subscribe(cached::update, ErrorHandler.EMPTY);
     }
 
     public static class GsonAdapter

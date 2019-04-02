@@ -45,21 +45,19 @@ public class TeamChatViewHolder extends InteractiveViewHolder<TeamChatAdapter.Ch
 
         this.item = item;
         Context context = itemView.getContext();
-        boolean chatFailed = !item.isSuccessful();
 
         content.setText(item.getContent());
         itemView.setAlpha(item.isEmpty() ? 0.6F : 1F);
         image.setVisibility(showPicture ? View.VISIBLE : View.GONE);
         space.setVisibility(showPicture ? View.VISIBLE : View.GONE);
         today.setVisibility(isFirstMessageToday ? View.VISIBLE : View.GONE);
-        details.setVisibility(showDetails || item.isEmpty() || chatFailed ? View.VISIBLE : View.GONE);
+        details.setVisibility(showDetails || item.isEmpty() ? View.VISIBLE : View.GONE);
         content.setBackgroundResource(isSignedInUser ? R.drawable.bg_chat_box : R.drawable.bg_chat_box_alt);
 
         if (!isSignedInUser && !TextUtils.isEmpty(item.getImageUrl()))
             Picasso.get().load(item.getImageUrl()).fit().centerCrop().into(image);
 
-        if (chatFailed) details.setText(R.string.chat_failed);
-        else if (item.isEmpty()) details.setText(R.string.chat_sending);
+        if (item.isEmpty()) details.setText(R.string.chat_sending);
         else if (showDetails) details.setText(getDetailsText(item, isSignedInUser, context));
 
         if (isFirstMessageToday)

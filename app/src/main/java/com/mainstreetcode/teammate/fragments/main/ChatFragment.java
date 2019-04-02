@@ -189,7 +189,7 @@ public class ChatFragment extends MainActivityFragment
 
     @Override
     public void onChatClicked(Chat chat) {
-        if (chat.isSuccessful() || !chat.isEmpty()) return;
+        if (!chat.isEmpty()) return;
 
         int index = items.indexOf(chat);
         if (index == -1) return;
@@ -253,8 +253,6 @@ public class ChatFragment extends MainActivityFragment
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
                 .add(errorMessage -> {
-                    chat.setSuccessful(false);
-
                     int index = items.indexOf(chat);
                     if (index != -1) scrollManager.notifyItemChanged(index);
                 })
