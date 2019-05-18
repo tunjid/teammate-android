@@ -27,6 +27,7 @@ Teammate is a fully featured modern Android team management app that:
 * Uses the latest iteration of material design including expandable Floating Action Buttons, vertical drawer navigation, bottom sheets and the like.
 * Makes animation and transitions a priority and treats them as first class parts of the user experience.
 * Is Android Q edge to edge ready.
+* Highly themeable and dark mode compatible, checkout the feature/nike branch for a Nike inspired theme.
 
 ## Architecture Overview
 
