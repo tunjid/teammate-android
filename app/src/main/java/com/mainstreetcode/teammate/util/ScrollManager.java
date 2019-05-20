@@ -36,6 +36,7 @@ import java.util.List;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.recyclerview.widget.RecyclerView.LayoutManager;
@@ -104,6 +105,10 @@ public class ScrollManager<VH extends RecyclerView.ViewHolder> extends ListManag
         Builder<VH> setRecyclerView(RecyclerView recyclerView) {
             this.recyclerView = recyclerView;
             return thisInstance;
+        }
+
+        public Builder<VH> withLines() {
+            return addDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         }
     }
 }
