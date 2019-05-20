@@ -1,16 +1,42 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel;
 
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.repository.CompetitorRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Standings;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
 import com.mainstreetcode.teammate.model.enums.StatType;
-import com.mainstreetcode.teammate.repository.CompetitorRepository;
-import com.mainstreetcode.teammate.repository.TournamentRepository;
+import com.mainstreetcode.teammate.repository.TournamentRepo;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
@@ -35,18 +61,18 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     private final TeammateApi api;
-    private final TournamentRepository repository;
+    private final TournamentRepo repository;
     private final Map<Tournament, Standings> standingsMap = new HashMap<>();
-    private final Map<Tournament, List<Identifiable>> ranksMap = new HashMap<>();
+    private final Map<Tournament, List<Differentiable>> ranksMap = new HashMap<>();
 
     public TournamentViewModel() {
         api = TeammateService.getApiInstance();
-        repository = TournamentRepository.getInstance();
+        repository = RepoProvider.forRepo(TournamentRepo.class);
     }
 
     public TournamentGofer gofer(Tournament tournament) {
         return new TournamentGofer(tournament, onError(tournament), this::getTournament, this::createOrUpdateTournament, this::delete,
-                ignored -> CompetitorRepository.getInstance().modelsBefore(tournament, 0));
+                ignored -> RepoProvider.forRepo(CompetitorRepo.class).modelsBefore(tournament, 0));
     }
 
     @Override
@@ -62,7 +88,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     @Override
-    void onErrorMessage(Message message, Team key, Identifiable invalid) {
+    void onErrorMessage(Message message, Team key, Differentiable invalid) {
         super.onErrorMessage(message, key, invalid);
         boolean shouldRemove = message.isInvalidObject() && invalid instanceof Tournament;
         if (shouldRemove) removeTournament((Tournament) invalid);
@@ -72,13 +98,13 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
         return ModelUtils.get(tournament, standingsMap, () -> Standings.forTournament(tournament));
     }
 
-    public List<Identifiable> getStatRanks(Tournament tournament) {
+    public List<Differentiable> getStatRanks(Tournament tournament) {
         return ModelUtils.get(tournament, ranksMap, ArrayList::new);
     }
 
     public Completable fetchStandings(Tournament tournament) {
         return api.getStandings(tournament.getId())
-                .observeOn(mainThread()).map(getStandings(tournament)::update).toCompletable();
+                .observeOn(mainThread()).map(getStandings(tournament)::update).ignoreElement();
     }
 
     public Flowable<Boolean> checkForWinner(Tournament tournament) {
@@ -92,8 +118,8 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     public Single<DiffUtil.DiffResult> getStatRank(Tournament tournament, StatType type) {
-        Single<List<Identifiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(ArrayList<Identifiable>::new);
-        return Identifiable.diff(sourceSingle, () -> getStatRanks(tournament), ModelUtils::replaceList).observeOn(mainThread());
+        Single<List<Differentiable>> sourceSingle = api.getStatRanks(tournament.getId(), type).map(ArrayList<Differentiable>::new);
+        return FunctionalDiff.of(sourceSingle, getStatRanks(tournament), ModelUtils::replaceList).observeOn(mainThread());
     }
 
     private Flowable<Tournament> getTournament(Tournament tournament) {
@@ -105,7 +131,7 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
     }
 
     private void removeTournament(Tournament tournament) {
-        for (List<Identifiable> list : modelListMap.values()) list.remove(tournament);
-        pushModelAlert(Alert.tournamentDeletion(tournament));
+        for (List<Differentiable> list : modelListMap.values()) list.remove(tournament);
+        pushModelAlert(Alert.deletion(tournament));
     }
 }

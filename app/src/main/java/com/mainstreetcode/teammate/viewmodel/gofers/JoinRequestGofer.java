@@ -1,24 +1,49 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
-import androidx.arch.core.util.Function;
-import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DiffUtil;
-
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
 import com.mainstreetcode.teammate.model.Item;
 import com.mainstreetcode.teammate.model.JoinRequest;
 import com.mainstreetcode.teammate.model.TeamMember;
-import com.mainstreetcode.teammate.repository.TeamMemberRepository;
-import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.repository.TeamMemberRepo;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.BiFunction;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.arch.core.util.Function;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -43,12 +68,12 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
     private int index;
 
     private final Function<JoinRequest, Flowable<JoinRequest>> getFunction;
-    private final ModelUtils.BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
+    private final BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter;
 
     public JoinRequestGofer(JoinRequest model,
                             Consumer<Throwable> onError,
                             Function<JoinRequest, Flowable<JoinRequest>> getFunction,
-                            ModelUtils.BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
+                            BiFunction<JoinRequest, Boolean, Single<JoinRequest>> joinCompleter) {
         super(model, onError);
         this.getFunction = getFunction;
         this.joinCompleter = joinCompleter;
@@ -138,25 +163,25 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(JoinRequest::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(JoinRequest::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), (items, updated) -> filteredItems(model));
     }
 
     @Override
     Single<DiffUtil.DiffResult> upsert() {
         Single<JoinRequest> single = model.isEmpty() ? joinTeam() : approveRequest();
-        Single<List<Identifiable>> source = single.map(JoinRequest::asIdentifiables).doOnSuccess(ignored -> updateState());
-        return Identifiable.diff(source, this::getItems, (items, updated) -> filteredItems(model));
+        Single<List<Differentiable>> source = single.map(JoinRequest::asDifferentiables).doOnSuccess(ignored -> updateState());
+        return FunctionalDiff.of(source, getItems(), (items, updated) -> filteredItems(model));
     }
 
     @Override
     public Completable delete() {
-        return joinCompleter.apply(model, false).toCompletable().observeOn(mainThread());
+        return joinCompleter.apply(model, false).ignoreElement().observeOn(mainThread());
     }
 
     private Single<JoinRequest> joinTeam() {
         TeamMember<JoinRequest> member = TeamMember.fromModel(model);
-        TeamMemberRepository<JoinRequest> repository = TeamMemberRepository.getInstance();
+        @SuppressWarnings("unchecked") TeamMemberRepo<JoinRequest> repository = RepoProvider.forRepo(TeamMemberRepo.class);
 
         return repository.createOrUpdate(member).map(ignored -> model);
     }
@@ -194,10 +219,10 @@ public class JoinRequestGofer extends TeamHostingGofer<JoinRequest> {
                 .blockingGet();
     }
 
-    private List<Identifiable> filteredItems(JoinRequest request) {
+    private List<Differentiable> filteredItems(JoinRequest request) {
         return Flowable.fromIterable(request.asItems())
                 .filter(this::filter)
-                .collect(ArrayList<Identifiable>::new, List::add)
+                .collect(ArrayList<Differentiable>::new, List::add)
                 .blockingGet();
     }
 }

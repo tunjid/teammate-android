@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.model;
 
 import androidx.room.Ignore;
@@ -15,6 +39,7 @@ import com.mainstreetcode.teammate.model.enums.Sport;
 import com.mainstreetcode.teammate.model.enums.StatType;
 import com.mainstreetcode.teammate.util.IdCache;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,7 +55,7 @@ public class StatAggregate {
         private Team team;
         private Sport sport;
 
-        private final List<Identifiable> items;
+        private final List<Differentiable> items;
 
         private Request(User user, Team team, Sport sport) {
             this.user = user;
@@ -52,9 +77,9 @@ public class StatAggregate {
         public void setSport(String sport) { this.sport = Config.sportFromCode(sport); }
 
 
-        public List<Identifiable> getItems() { return items; }
+        public List<Differentiable> getItems() { return items; }
 
-        private List<Identifiable> buildItems() {
+        private List<Differentiable> buildItems() {
             return Arrays.asList(
                     Item.text(holder.get(0), 0, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
                             .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
@@ -118,7 +143,7 @@ public class StatAggregate {
         }
     }
 
-    public static class Aggregate implements Identifiable {
+    public static class Aggregate implements Differentiable {
         int count;
         StatType type;
 

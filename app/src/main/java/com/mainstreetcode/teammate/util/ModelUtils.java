@@ -1,8 +1,29 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.util;
 
-import androidx.annotation.Nullable;
-import androidx.arch.core.util.Function;
-import androidx.emoji.text.EmojiCompat;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.util.BiConsumer;
@@ -11,23 +32,29 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.functions.Supplier;
+import com.tunjid.androidbootstrap.functions.collections.Lists;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import static com.mainstreetcode.teammate.util.TransformingSequentialList.transform;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.emoji.text.EmojiCompat;
+
+import static com.tunjid.androidbootstrap.functions.collections.Lists.transform;
 
 /**
  * Static methods for models
@@ -37,17 +64,18 @@ public class ModelUtils {
 
     public static final String EMPTY_STRING = "";
     public static final SimpleDateFormat dateFormatter;
+    public static final SimpleDateFormat fullPrinter = new SimpleDateFormat("MMM, d yyyy", Locale.US);
     public static final SimpleDateFormat prettyPrinter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US);
 
-    private static final Pattern alphaNumeric = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern screenName = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE);
 
     static {
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    static boolean hasNoSpecialChars(CharSequence sequence) {
-        return !alphaNumeric.matcher(sequence).find();
+    static boolean isValidScreenName(CharSequence sequence) {
+        return !screenName.matcher(sequence).find();
     }
 
     public static boolean asBoolean(String key, JsonObject jsonObject) {
@@ -122,52 +150,33 @@ public class ModelUtils {
         catch (ParseException e) { return new Date(); }
     }
 
-    public static List<Identifiable> asIdentifiables(List<? extends Identifiable> subTypeList) {
+    public static List<Differentiable> asDifferentiables(List<? extends Differentiable> subTypeList) {
         return new ArrayList<>(subTypeList);
     }
 
     public static void replaceStringList(List<String> sourceList, List<String> updatedList) {
-        List<Identifiable> source = transform(sourceList, Identifiable::fromString, Identifiable::getId);
-        List<Identifiable> updated = transform(updatedList, Identifiable::fromString, Identifiable::getId);
+        List<Differentiable> source = transform(sourceList, s -> Differentiable.fromCharSequence(() -> s), Differentiable::getId);
+        List<Differentiable> updated = transform(updatedList, s -> Differentiable.fromCharSequence(() -> s), Differentiable::getId);
         replaceList(source, updated);
     }
 
-    public static <T extends Identifiable> void preserveAscending(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> void preserveAscending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, Identifiable.COMPARATOR);
+        Collections.sort(source, FunctionalDiff.COMPARATOR);
     }
 
-    public static <T extends Identifiable> void preserveDescending(List<T> source, List<T> additions) {
+    public static <T extends Differentiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, Identifiable.DESCENDING_COMPARATOR);
+        Collections.sort(source, FunctionalDiff.DESCENDING_COMPARATOR);
     }
 
-    public static <T extends Identifiable> List<T> replaceList(List<T> source, List<T> additions) {
-        source.clear();
-        source.addAll(additions);
-        Collections.sort(source, Identifiable.COMPARATOR);
+    public static <T extends Differentiable> List<T> replaceList(List<T> source, List<T> additions) {
+        Lists.replace(source, additions);
+        Collections.sort(source, FunctionalDiff.COMPARATOR);
         return source;
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findFirst(List<?> list, Class<T> typeClass) {
-        for (Object item : list) if (typeClass.isAssignableFrom(item.getClass())) return (T) item;
-        return null;
-    }
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public static <T> T findLast(List<?> list, Class<T> typeClass) {
-        ListIterator<?> li = list.listIterator(list.size());
-        while (li.hasPrevious()) {
-            Object item = li.previous();
-            if (typeClass.isAssignableFrom(item.getClass())) return ((T) item);
-        }
-        return null;
-    }
-
-    private static <T extends Identifiable> void concatenateList(List<T> source, List<T> additions) {
+    private static <T extends Differentiable> void concatenateList(List<T> source, List<T> additions) {
         Set<T> set = new HashSet<>(additions);
         set.addAll(source);
         source.clear();
@@ -205,12 +214,16 @@ public class ModelUtils {
         return emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED ? emojiCompat.process(source) : source;
     }
 
-    @FunctionalInterface
-    public interface Consumer<T> {
-        void accept(T t);
-    }
+    public static boolean areDifferentDays(@Nullable Date prev, Date next) {
+        if (prev == null) return false;
 
-    public interface BiFunction<R, S, T> {
-        T apply(R r, S s);
+        Calendar prevCal = Calendar.getInstance();
+        Calendar nextCal = Calendar.getInstance();
+        prevCal.setTime(prev);
+        nextCal.setTime(next);
+
+        return prevCal.get(Calendar.DAY_OF_MONTH) != nextCal.get(Calendar.DAY_OF_MONTH)
+                        || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
+                        || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR);
     }
 }

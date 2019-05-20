@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
@@ -6,10 +30,12 @@ import com.google.android.gms.location.places.Place;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
+import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.repository.GuestRepository;
+import com.mainstreetcode.teammate.repository.GuestRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -39,7 +65,7 @@ public class EventGofer extends TeamHostingGofer<Event> {
     private final Function<Event, Flowable<Event>> getFunction;
     private final Function<Event, Single<Event>> deleteFunction;
     private final Function<Event, Single<Event>> updateFunction;
-    private final GuestRepository guestRepository;
+    private final GuestRepo guestRepository;
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -55,9 +81,9 @@ public class EventGofer extends TeamHostingGofer<Event> {
         this.rsvpFunction = rsvpFunction;
         this.updateFunction = upsertFunction;
         this.deleteFunction = deleteFunction;
-        this.guestRepository = GuestRepository.getInstance();
+        this.guestRepository = RepoProvider.forRepo(GuestRepo.class);
 
-        items.addAll(model.asIdentifiables());
+        items.addAll(model.asDifferentiables());
         items.add(model.getTeam());
 
         blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY);
@@ -71,10 +97,10 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return isSettingLocation;
     }
 
-    public String getToolbarTitle(Fragment fragment) {
+    public CharSequence getToolbarTitle(Fragment fragment) {
         return model.isEmpty()
                 ? fragment.getString(R.string.create_event)
-                : fragment.getString(R.string.edit_event, model.getName());
+                : model.getName();
     }
 
     @Nullable
@@ -87,20 +113,20 @@ public class EventGofer extends TeamHostingGofer<Event> {
     @Override
     Flowable<DiffUtil.DiffResult> fetch() {
         if (isSettingLocation) return Flowable.empty();
-        Flowable<List<Identifiable>> eventFlowable = getFunction.apply(model).map(Event::asIdentifiables);
-        Flowable<List<Identifiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asIdentifiables);
-        Flowable<List<Identifiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(eventFlowable, guestsFlowable));
-        return Identifiable.diff(sourceFlowable, this::getItems, this::preserveItems);
+        Flowable<List<Differentiable>> eventFlowable = getFunction.apply(model).map(Event::asDifferentiables);
+        Flowable<List<Differentiable>> guestsFlowable = guestRepository.modelsBefore(model, new Date()).map(ModelUtils::asDifferentiables);
+        Flowable<List<Differentiable>> sourceFlowable = Flowable.concatDelayError(Arrays.asList(eventFlowable, guestsFlowable));
+        return FunctionalDiff.of(sourceFlowable, getItems(), this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = updateFunction.apply(model).map(Event::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Single<List<Differentiable>> source = updateFunction.apply(model).map(Event::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     public Single<DiffUtil.DiffResult> rsvpEvent(boolean attending) {
-        Single<List<Identifiable>> single = rsvpFunction.apply(Guest.forEvent(model, attending)).map(Collections::singletonList);
-        return Identifiable.diff(single, this::getItems, (staleCopy, singletonGuestList) -> {
+        Single<List<Differentiable>> single = rsvpFunction.apply(Guest.forEvent(model, attending)).map(Collections::singletonList);
+        return FunctionalDiff.of(single, getItems(), (staleCopy, singletonGuestList) -> {
             staleCopy.removeAll(singletonGuestList);
             staleCopy.addAll(singletonGuestList);
             return staleCopy;
@@ -121,22 +147,22 @@ public class EventGofer extends TeamHostingGofer<Event> {
     }
 
     Completable delete() {
-        return deleteFunction.apply(model).toCompletable();
+        return deleteFunction.apply(model).ignoreElement();
     }
 
     public Single<DiffUtil.DiffResult> setPlace(Place place) {
         isSettingLocation = true;
         model.setPlace(place);
-        return Identifiable.diff(Single.just(model.asIdentifiables()), this::getItems, this::preserveItems).doFinally(() -> isSettingLocation = false);
+        return FunctionalDiff.of(Single.just(model.asDifferentiables()), getItems(), this::preserveItems).doFinally(() -> isSettingLocation = false);
     }
 
     private void onUserBlocked(BlockedUser blockedUser) {
         if (!blockedUser.getTeam().equals(model.getTeam())) return;
 
-        Iterator<Identifiable> iterator = items.iterator();
+        Iterator<Differentiable> iterator = items.iterator();
 
         while (iterator.hasNext()) {
-            Identifiable identifiable = iterator.next();
+            Differentiable identifiable = iterator.next();
             if (!(identifiable instanceof Guest)) continue;
             User blocked = blockedUser.getUser();
             User guestUser = ((Guest) identifiable).getUser();

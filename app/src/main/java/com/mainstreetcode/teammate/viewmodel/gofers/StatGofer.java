@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import androidx.arch.core.util.Function;
@@ -7,11 +31,12 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
+import com.tunjid.androidbootstrap.functions.Supplier;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Stat;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.Supplier;
 import com.mainstreetcode.teammate.util.TeammateException;
 
 import java.util.ArrayList;
@@ -77,13 +102,13 @@ public class StatGofer extends Gofer<Stat> {
 
     @Override
     public Flowable<DiffUtil.DiffResult> fetch() {
-        Flowable<List<Identifiable>> source = getFunction.apply(model).map(Stat::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Flowable<List<Differentiable>> source = getFunction.apply(model).map(Stat::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     Single<DiffUtil.DiffResult> upsert() {
-        Single<List<Identifiable>> source = upsertFunction.apply(model).map(Stat::asIdentifiables);
-        return Identifiable.diff(source, this::getItems, this::preserveItems);
+        Single<List<Differentiable>> source = upsertFunction.apply(model).map(Stat::asDifferentiables);
+        return FunctionalDiff.of(source, getItems(), this::preserveItems);
     }
 
     public Single<DiffUtil.DiffResult> chooseUser(User otherUser) {
@@ -115,19 +140,19 @@ public class StatGofer extends Gofer<Stat> {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Identifiable> Single<DiffUtil.DiffResult> swap(Identifiable item,
+    private <T extends Differentiable> Single<DiffUtil.DiffResult> swap(Differentiable item,
                                                                       Supplier<T> swapDestination,
                                                                       BiConsumer<T, T> onSwapComplete) {
 
         AtomicReference<T> cache = new AtomicReference<>();
-        Single<List<Identifiable>> swapSource = Single.just(Collections.singletonList(item));
-        return Identifiable.diff(swapSource, this::getItems, (sourceCopy, fetched) -> {
+        Single<List<Differentiable>> swapSource = Single.just(Collections.singletonList(item));
+        return FunctionalDiff.of(swapSource, getItems(), (sourceCopy, fetched) -> {
             T toSwap = (T) fetched.get(0);
             sourceCopy.remove(swapDestination.get());
             sourceCopy.add(toSwap);
             cache.set(toSwap);
 
-            Collections.sort(sourceCopy, Identifiable.COMPARATOR);
+            Collections.sort(sourceCopy, FunctionalDiff.COMPARATOR);
             return sourceCopy;
         }).doOnSuccess(ignored -> onSwapComplete.accept(swapDestination.get(), cache.get()));
     }

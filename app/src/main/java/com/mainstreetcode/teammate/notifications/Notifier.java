@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.notifications;
 
 
@@ -11,34 +35,28 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.core.app.NotificationCompat;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
-import com.mainstreetcode.teammate.model.Chat;
-import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.model.JoinRequest;
-import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
-import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.repository.ModelRepo;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.app.NotificationCompat;
 import io.reactivex.functions.Predicate;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static android.app.PendingIntent.getActivity;
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
 
 public abstract class Notifier<T extends Model<T>> {
 
@@ -90,10 +108,11 @@ public abstract class Notifier<T extends Model<T>> {
         return builder;
     }
 
-    PendingIntent getDeepLinkIntent(FeedItem<T> item) {
+    PendingIntent getDeepLinkIntent(T model) {
         Intent intent = new Intent(app, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(MainActivity.FEED_DEEP_LINK, item.getModel());
+        intent.putExtra(MainActivity.FEED_DEEP_LINK, model);
+        addNotificationId(intent);
 
         return getActivity(app, DEEP_LINK_REQ_CODE, intent, FLAG_ONE_SHOT);
     }
@@ -104,6 +123,10 @@ public abstract class Notifier<T extends Model<T>> {
             notifier.notify(getNotificationTag(model), getNotifyId().hashCode(), notification);
     }
 
+    void addNotificationId(Intent intent) {
+        if (SDK_INT >= O) intent.putExtra(EXTRA_NOTIFICATION_ID, getNotifyId());
+    }
+
     protected void handleNotification(FeedItem<T> item) {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         sendNotification(getNotificationBuilder(item)
@@ -112,7 +135,7 @@ public abstract class Notifier<T extends Model<T>> {
                 .setContentText(item.getBody())
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(getDeepLinkIntent(item))
+                .setContentIntent(getDeepLinkIntent(item.getModel()))
                 .build(), item.getModel());
     }
 
@@ -128,7 +151,7 @@ public abstract class Notifier<T extends Model<T>> {
 
     String getNotificationTag(T model) {return model.getId();}
 
-    protected abstract ModelRepository<T> getRepository();
+    protected abstract ModelRepo<T> getRepository();
 
     protected abstract NotificationChannel[] getNotificationChannels();
 
@@ -136,25 +159,4 @@ public abstract class Notifier<T extends Model<T>> {
         return t -> true;
     }
 
-    public static class NotifierFactory {
-
-        @Nullable
-        @SuppressWarnings("unchecked")
-        public <T extends Model<T>> Notifier<T> forClass(Class itemClass) {
-
-            Notifier notifier = null;
-
-            if (itemClass.equals(Team.class)) notifier = TeamNotifier.getInstance();
-            if (itemClass.equals(Role.class)) notifier = RoleNotifier.getInstance();
-            if (itemClass.equals(Chat.class)) notifier = ChatNotifier.getInstance();
-            if (itemClass.equals(Game.class)) notifier = GameNotifier.getInstance();
-            if (itemClass.equals(Media.class)) notifier = MediaNotifier.getInstance();
-            if (itemClass.equals(Event.class)) notifier = EventNotifier.getInstance();
-            if (itemClass.equals(Tournament.class)) notifier = TournamentNotifier.getInstance();
-            if (itemClass.equals(Competitor.class)) notifier = CompetitorNotifier.getInstance();
-            if (itemClass.equals(JoinRequest.class)) notifier = JoinRequestNotifier.getInstance();
-
-            return (Notifier<T>) notifier;
-        }
-    }
 }

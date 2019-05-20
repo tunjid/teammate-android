@@ -1,8 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.baseclasses;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.transition.ChangeBounds;
 import android.transition.ChangeImageTransform;
@@ -18,19 +43,23 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
 import com.mainstreetcode.teammate.model.Config;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.UiState;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.Validator;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.functions.Consumer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.FragmentTransaction;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
+
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.O;
 
 /**
  * Base Fragment for this app
@@ -38,16 +67,16 @@ import io.reactivex.functions.Consumer;
 
 public class TeammatesBaseFragment extends BaseFragment implements View.OnClickListener {
 
-    protected static final InsetFlags VERTICAL = InsetFlags.create(true, false, true, true);
+    protected static final InsetFlags NO_TOP = InsetFlags.NO_TOP;
     protected static final InsetFlags NONE = InsetFlags.NONE;
     protected static final int PLACE_PICKER_REQUEST = 1;
+    private static final int LIGHT_NAV_BAR_COLOR = 0xFFE0E0E0; // Same as R.color.light_grey
 
     protected static final Validator VALIDATOR = new Validator();
 
     protected CompositeDisposable disposables = new CompositeDisposable();
-    protected Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
+    protected io.reactivex.functions.Consumer<Throwable> emptyErrorHandler = ErrorHandler.EMPTY;
     protected ErrorHandler defaultErrorHandler;
-    private Message lastMessage;
 
     @Override
     public void onAttach(Context context) {
@@ -78,52 +107,55 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     }
 
     public InsetFlags insetFlags() {
-        return InsetFlags.VERTICAL;
+        return InsetFlags.ALL;
     }
 
-    public int[] staticViews() {
-        return new int[]{};
-    }
+    public int[] staticViews() { return new int[]{}; }
 
-    public boolean showsFab() {return false;}
+    @StringRes
+    protected int getFabStringResource() { return R.string.empty_string; }
 
-    public boolean showsToolBar() {return true;}
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
-    public boolean showsBottomNav() {return true;}
+    @MenuRes
+    protected int getToolbarMenu() { return 0; }
+
+    @MenuRes
+    protected int getAltToolbarMenu() { return 0; }
+
+    @ColorInt
+    protected int getNavBarColor() { return SDK_INT >= O ? LIGHT_NAV_BAR_COLOR : Color.BLACK; }
+
+    public boolean showsFab() { return false; }
+
+    public boolean showsToolBar() { return true; }
+
+    public boolean showsAltToolBar() { return false; }
+
+    public boolean showsBottomNav() { return true; }
+
+    protected boolean showsSystemUI() { return true; }
+
+    protected boolean hasLightNavBar() { return SDK_INT >= O; }
+
+    protected CharSequence getToolbarTitle() { return ""; }
+
+    protected CharSequence getAltToolbarTitle() { return ""; }
 
     @Override
     public void onClick(View v) {}
 
-    protected void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
-
-    protected void toggleToolbar(boolean show) {getPersistentUiController().toggleToolbar(show);}
-
-    protected void toggleAltToolbar(boolean show) {getPersistentUiController().toggleAltToolbar(show);}
-
     protected void toggleProgress(boolean show) {getPersistentUiController().toggleProgress(show);}
-
-    protected void toggleSystemUI(boolean show) {getPersistentUiController().toggleSystemUI(show);}
-
-    protected void toggleBottombar(boolean show) {getPersistentUiController().toggleBottombar(show);}
-
-    protected void updateFabIcon() {getPersistentUiController().setFabIcon(getFabIconResource(), getFabStringResource());}
 
     @SuppressWarnings("WeakerAccess")
     protected void setFabExtended(boolean extended) {getPersistentUiController().setFabExtended(extended);}
 
-    protected void setToolbarTitle(CharSequence title) {getPersistentUiController().setToolbarTitle(title);}
-
-    protected void setAltToolbarTitle(CharSequence title) {getPersistentUiController().setAltToolbarTitle(title);}
-
-    protected void setAltToolbarMenu(@MenuRes int menu) {getPersistentUiController().setAltToolbarMenu(menu);}
-
     protected void showSnackbar(CharSequence message) {getPersistentUiController().showSnackBar(message);}
 
-    protected void showSnackbar(ModelUtils.Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}
+    protected void showSnackbar(Consumer<Snackbar> consumer) {getPersistentUiController().showSnackBar(consumer);}
 
-    protected void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {getPersistentUiController().showChoices(consumer);}
-
-    protected void setFabClickListener(@Nullable View.OnClickListener clickListener) {getPersistentUiController().setFabClickListener(clickListener);}
+    protected void showChoices(Consumer<ChoiceBar> consumer) {getPersistentUiController().showChoices(consumer);}
 
     @Nullable
     @Override
@@ -133,12 +165,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                         android.R.anim.fade_in, android.R.anim.fade_out);
     }
-
-    @StringRes
-    protected int getFabStringResource() { return R.string.add_competitor; }
-
-    @DrawableRes
-    protected int getFabIconResource() { return R.drawable.ic_add_white_24dp; }
 
     protected void setEnterExitTransitions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -170,8 +196,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     }
 
     protected void handleErrorMessage(Message message) {
-        if (lastMessage == null || !lastMessage.equals(message)) showSnackbar(message.getMessage());
-        lastMessage = message;
+        showSnackbar(message.getMessage());
         toggleProgress(false);
     }
 
@@ -183,11 +208,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     protected void onKeyBoardChanged(boolean appeared) {}
 
     public void togglePersistentUi() {
-        toggleFab(showsFab());
-        toggleSystemUI(true);
-        toggleToolbar(showsToolBar());
-        toggleBottombar(showsBottomNav());
-        setFabClickListener(this);
+        getPersistentUiController().update(fromThis());
     }
 
     @SuppressLint("CommitTransaction")
@@ -199,7 +220,7 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
     @SuppressWarnings("WeakerAccess")
     protected PersistentUiController getPersistentUiController() {
         Activity activity = getActivity();
-        return activity == null ? DUMMY : ((PersistentUiController) activity);
+        return activity == null ? PersistentUiController.DUMMY : ((PersistentUiController) activity);
     }
 
     protected void hideKeyboard() {
@@ -210,50 +231,26 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
         if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
 
-    private static final PersistentUiController DUMMY = new PersistentUiController() {
-        @Override
-        public void toggleToolbar(boolean show) {}
+    private void toggleFab(boolean show) {getPersistentUiController().toggleFab(show);}
 
-        @Override
-        public void toggleAltToolbar(boolean show) {}
+    private UiState fromThis() {
+        return new UiState(
+                this.getFabIconResource(),
+                this.getFabStringResource(),
+                this.getToolbarMenu(),
+                this.getAltToolbarMenu(),
+                this.getNavBarColor(),
+                this.showsFab(),
+                this.showsToolBar(),
+                this.showsAltToolBar(),
+                this.showsBottomNav(),
+                this.showsSystemUI(),
+                this.hasLightNavBar(),
+                this.insetFlags(),
+                this.getToolbarTitle(),
+                this.getAltToolbarTitle(),
+                getView() == null ? null : this
+        );
+    }
 
-        @Override
-        public void toggleBottombar(boolean show) {}
-
-        @Override
-        public void toggleFab(boolean show) {}
-
-        @Override
-        public void toggleProgress(boolean show) {}
-
-        @Override
-        public void toggleSystemUI(boolean show) {}
-
-        @Override
-        public void setFabIcon(int icon, int textRes) {}
-
-        @Override
-        public void setFabExtended(boolean expanded) {}
-
-        @Override
-        public void showSnackBar(CharSequence message) {}
-
-        @Override
-        public void showSnackBar(ModelUtils.Consumer<Snackbar> consumer) {}
-
-        @Override
-        public void showChoices(ModelUtils.Consumer<ChoiceBar> consumer) {}
-
-        @Override
-        public void setToolbarTitle(CharSequence title) {}
-
-        @Override
-        public void setAltToolbarTitle(CharSequence title) {}
-
-        @Override
-        public void setAltToolbarMenu(int menu) {}
-
-        @Override
-        public void setFabClickListener(View.OnClickListener clickListener) {}
-    };
 }

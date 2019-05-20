@@ -1,21 +1,37 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.FeedAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar;
@@ -25,12 +41,13 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Competitor;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.JoinRequest;
+import com.mainstreetcode.teammate.model.ListState;
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Model;
-import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.FeedItem;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -39,6 +56,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Single;
 
 import static com.google.android.material.snackbar.Snackbar.Callback.DISMISS_EVENT_MANUAL;
@@ -67,7 +91,6 @@ public final class FeedFragment extends MainActivityFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         bottomBarState = new AtomicBoolean(true);
     }
 
@@ -77,8 +100,8 @@ public final class FeedFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(feedViewModel.refresh(FeedItem.class).subscribe(this::onFeedUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(new FeedAdapter(feedViewModel.getModelList(FeedItem.class), this))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
@@ -92,12 +115,6 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setToolbarTitle(userViewModel.getCurrentUser());
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         scrollManager.setRefreshing();
@@ -108,17 +125,15 @@ public final class FeedFragment extends MainActivityFragment
     public void togglePersistentUi() {
         super.togglePersistentUi();
         onBoard();
-        setToolbarTitle(userViewModel.getCurrentUser());
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_feed, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab:
+                showFragment(TeamSearchFragment.newInstance());
+                break;
+        }
     }
 
     @Override
@@ -168,16 +183,29 @@ public final class FeedFragment extends MainActivityFragment
         }
         else if (model instanceof Media) {
             bottomBarState.set(false);
-            toggleBottombar(false);
+            togglePersistentUi();
             showFragment(MediaDetailFragment.newInstance((Media) model));
         }
     }
 
     @Override
-    public boolean showsFab() {return false;}
+    @StringRes
+    protected int getFabStringResource() { return R.string.team_search_create; }
 
     @Override
-    public boolean showsBottomNav() {return bottomBarState.get();}
+    @DrawableRes
+    protected int getFabIconResource() { return R.drawable.ic_search_white_24dp; }
+
+    @Override
+    public boolean showsFab() { return !teamViewModel.isOnATeam(); }
+
+    @Override
+    public boolean showsBottomNav() { return bottomBarState.get(); }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.home_greeting, getTimeOfDay(), userViewModel.getCurrentUser().getFirstName());
+    }
 
     @Override
     @Nullable
@@ -230,17 +258,14 @@ public final class FeedFragment extends MainActivityFragment
     }
 
     private void onFeedUpdated(DiffUtil.DiffResult diffResult) {
+        togglePersistentUi();
         toggleProgress(false);
         boolean isOnATeam = teamViewModel.isOnATeam();
         scrollManager.onDiff(diffResult);
         feedViewModel.clearNotifications(FeedItem.class);
-        scrollManager.updateForEmptyList(
+        scrollManager.updateForEmptyList(ListState.of(
                 isOnATeam ? R.drawable.ic_notifications_white_24dp : R.drawable.ic_group_black_24dp,
-                isOnATeam ? R.string.no_feed : R.string.no_team_feed);
-    }
-
-    private void setToolbarTitle(User user) {
-        setToolbarTitle(getString(R.string.home_greeting, getTimeOfDay(), user.getFirstName()));
+                isOnATeam ? R.string.no_feed : R.string.no_team_feed));
     }
 
     private void onBoard() {

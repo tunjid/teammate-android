@@ -1,3 +1,27 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2019 Adetunji Dahunsi
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
 <resources>
     <string name="app_name">Teammate</string>
     <string name="teammates">Teammate</string>
@@ -45,7 +69,7 @@
     <string name="events">Events</string>
     <string name="chats">Chats</string>
     <string name="media">Gallery</string>
-    <string name="my_teams">Teams</string>
+    <string name="my_teams">My Teams</string>
     <string name="expand_nav">Expand bottom nav</string>
 
     <string name="team">Team</string>
@@ -203,6 +227,7 @@
     <string name="event_not_attending">Not Going</string>
 
     <!--TournamentDetailFragment-->
+    <string name="tourneys">Tourneys</string>
     <string name="tournaments">Tournaments</string>
     <string name="editing_competitors">Editing</string>
     <string name="add_tournament_competitors_prompt">Add Competitors?</string>
@@ -344,6 +369,12 @@
     <string name="message_hint">Type a message…</string>
     <string name="team_chat_rooms">Team Chat Rooms</string>
     <string name="team_chat_title">%1$s chat</string>
+    <string name="chat_today">Today</string>
+    <string name="chat_yesterday">Yesterday</string>
+    <string name="chat_new_message">New message</string>
+    <string name="chat_new_messages">%1$d new messages</string>
+    <string name="chat_reply_label">Reply</string>
+    <string name="chat_mark_as_read_label">Mark As Read</string>
     <string name="chat_notification_group_summary">Chats from %1$d teams</string>
     <string name="chat_notification_multiline_item">%1$s: %2$s</string>
     <string name="chat_notification_multiline_summary">+%1$d more</string>
@@ -397,10 +428,11 @@
     <string name="no_chats">Say hi to your teammates!</string>
     <string name="no_media">Share the highlights of your team!</string>
     <string name="no_rsvp">You aren\'t attending any events.</string>
-    <string name="no_team_feed">Welcome! Use the tabs to join your team, or browse nearby events.</string>
+    <string name="no_team_feed">Welcome! Use the button below to find or create your team, or the bottom nav to explore categories like public events.</string>
     <string name="no_team_event">Your teams\' events. Join a team or browse nearby public events.</string>
     <string name="no_team_chat">Your teams\' chats. Join a team to start chatting</string>
     <string name="no_team_media">Your teams\' moments. Join a team and relive them all.</string>
+    <string name="no_team_tournament">Your teams\' tournaments. Come one, come all</string>
 
     <!--Facebook-->
     <string name="facebook_app_id">2000415723539146</string>

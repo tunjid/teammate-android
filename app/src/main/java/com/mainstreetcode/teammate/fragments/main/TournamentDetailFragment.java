@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Context;
@@ -6,7 +30,6 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +104,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
     @SuppressWarnings("ConstantConditions")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         Bundle args = getArguments();
         tournament = args.getParcelable(ARG_TOURNAMENT);
         competitor = args.getParcelable(ARG_COMPETITOR);
@@ -112,11 +134,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
         boolean hasPrivilegedRole = localRoleViewModel.hasPrivilegedRole();
         menu.findItem(R.id.action_edit).setVisible(hasPrivilegedRole);
         menu.findItem(R.id.action_delete).setVisible(hasPrivilegedRole);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_tournament_detail, menu);
     }
 
     @Override
@@ -151,14 +168,6 @@ public class TournamentDetailFragment extends MainActivityFragment {
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setToolbarTitle(getString(R.string.tournament_fixtures));
-        requireActivity().invalidateOptionsMenu();
-        super.togglePersistentUi();
-    }
-
-    @Override
     public void onDestroyView() {
         viewPager = null;
         tabLayout = null;
@@ -179,8 +188,16 @@ public class TournamentDetailFragment extends MainActivityFragment {
     protected int getFabIconResource() { return R.drawable.ic_group_add_white_24dp; }
 
     @Override
+    protected int getToolbarMenu() { return R.menu.fragment_tournament_detail; }
+
+    @Override
     public boolean showsFab() {
         return localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors();
+    }
+
+    @Override
+    protected CharSequence getToolbarTitle() {
+        return getString(R.string.tournament_fixtures);
     }
 
     @Override

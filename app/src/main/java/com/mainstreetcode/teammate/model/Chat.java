@@ -1,16 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.model;
 
 
 import android.annotation.SuppressLint;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -22,11 +39,19 @@ import com.google.gson.JsonSerializer;
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.util.ObjectId;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 import static com.mainstreetcode.teammate.util.ModelUtils.processString;
@@ -78,13 +103,19 @@ public class Chat implements
         created = tmpCreated != -1 ? new Date(tmpCreated) : null;
     }
 
-    public static Chat chat(String content, User user, Team team) {
-        return new Chat(new ObjectId().toHexString(), KIND_TEXT, content, user, team, new Date());
+    public static Chat chat(CharSequence content, User user, Team team) {
+        Chat chat = new Chat(new ObjectId().toHexString(), KIND_TEXT, content, user, team, new Date());
+        chat.isSuccessful = false;
+        return chat;
+    }
+
+    public static Chat empty() {
+        return chat("", User.empty(), Team.empty());
     }
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return !isSuccessful;
     }
 
     @NonNull
@@ -94,14 +125,14 @@ public class Chat implements
     }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (!(other instanceof Chat)) return id.equals(other.getId());
         Chat casted = (Chat) other;
         return content.equals(casted.content) && user.areContentsTheSame(casted.getUser());
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 
@@ -150,14 +181,6 @@ public class Chat implements
     public String getCreatedDate() {
         if (created == null) return "";
         return CHAT_DATE_FORMAT.format(created);
-    }
-
-    public void setSuccessful(boolean successful) {
-        isSuccessful = successful;
-    }
-
-    public boolean isSuccessful() {
-        return isSuccessful;
     }
 
     @Override

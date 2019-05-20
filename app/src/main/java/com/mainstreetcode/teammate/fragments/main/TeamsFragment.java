@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
@@ -15,10 +39,11 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.util.ScrollManager;
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
 
 import java.util.List;
 
@@ -32,7 +57,7 @@ public final class TeamsFragment extends MainActivityFragment
 
     private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
 
-    private List<Identifiable> roles;
+    private List<Differentiable> roles;
 
     public static TeamsFragment newInstance() {
         TeamsFragment fragment = new TeamsFragment();
@@ -62,8 +87,8 @@ public final class TeamsFragment extends MainActivityFragment
 
         Runnable refreshAction = () -> disposables.add(roleViewModel.refresh(Role.class).subscribe(TeamsFragment.this::onTeamsUpdated, defaultErrorHandler));
 
-        scrollManager = ScrollManager.withRecyclerView(rootView.findViewById(R.id.list_layout))
-                .withEmptyViewholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
+        scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
+                .withPlaceholder(new EmptyViewHolder(rootView, getEmptyDrawable(), getEmptyText()))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener((dx, dy) -> updateFabForScrollState(dy))
                 .addScrollListener((dx, dy) -> updateTopSpacerElevation())
@@ -82,14 +107,6 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     @Override
-    public void togglePersistentUi() {
-        updateFabIcon();
-        setFabClickListener(this);
-        if (!isTeamPicker()) setToolbarTitle(getString(R.string.my_teams));
-        super.togglePersistentUi();
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return R.string.team_search_create; }
 
@@ -98,15 +115,16 @@ public final class TeamsFragment extends MainActivityFragment
     protected int getFabIconResource() { return R.drawable.ic_search_white_24dp; }
 
     @Override
-    public int[] staticViews() {return EXCLUDED_VIEWS;}
+    protected CharSequence getToolbarTitle() { return getString(R.string.my_teams); }
 
     @Override
-    public boolean showsBottomNav() {return true;}
+    public int[] staticViews() { return EXCLUDED_VIEWS; }
 
     @Override
-    public boolean showsFab() {
-        return !isTeamPicker();
-    }
+    public boolean showsBottomNav() { return true; }
+
+    @Override
+    public boolean showsFab() { return !isTeamPicker() || roles.isEmpty(); }
 
     @Override
     @SuppressWarnings("ConstantConditions")
@@ -115,7 +133,10 @@ public final class TeamsFragment extends MainActivityFragment
         boolean canPick = target instanceof TeamAdapter.AdapterListener;
 
         if (canPick) ((TeamAdapter.AdapterListener) target).onTeamClicked(team);
-        else showFragment(TeamMembersFragment.newInstance(team));
+        else {
+            teamViewModel.updateDefaultTeam(team);
+            showFragment(TeamMembersFragment.newInstance(team));
+        }
     }
 
     @Override
@@ -134,9 +155,8 @@ public final class TeamsFragment extends MainActivityFragment
     }
 
     private void onTeamsUpdated(DiffUtil.DiffResult result) {
-        boolean isEmpty = roles.isEmpty();
-        if (isTeamPicker()) toggleFab(isEmpty);
         scrollManager.onDiff(result);
+        togglePersistentUi();
     }
 
     private boolean isTeamPicker() {
@@ -170,6 +190,8 @@ public final class TeamsFragment extends MainActivityFragment
                 return R.string.no_team_chat;
             case R.id.request_media_team_pick:
                 return R.string.no_team_media;
+            case R.id.request_tournament_team_pick:
+                return R.string.no_team_tournament;
             default:
                 return R.string.no_team;
         }

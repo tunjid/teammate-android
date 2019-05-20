@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.content.Intent;
@@ -17,6 +41,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter;
+import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
 import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.util.ExpandingToolbar;
@@ -62,7 +87,7 @@ public class EventSearchFragment extends MainActivityFragment {
         View root = inflater.inflate(R.layout.fragment_public_event, container, false);
         getLayoutParams(root.findViewById(R.id.status_bar_dimmer)).height = MainActivity.topInset;
 
-        scrollManager = ScrollManager.withRecyclerView(root.findViewById(R.id.search_options))
+        scrollManager = ScrollManager.<BaseViewHolder>with(root.findViewById(R.id.search_options))
                 .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest(), this::startPlacePicker))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
@@ -136,14 +161,7 @@ public class EventSearchFragment extends MainActivityFragment {
     public boolean showsFab() { return locationViewModel.hasPermission(this); }
 
     @Override
-    public InsetFlags insetFlags() {return NONE;}
-
-    @Override
-    public void togglePersistentUi() {
-        super.togglePersistentUi();
-        updateFabIcon();
-        setFabClickListener(this);
-    }
+    public InsetFlags insetFlags() {return NO_TOP;}
 
     @Override
     @StringRes

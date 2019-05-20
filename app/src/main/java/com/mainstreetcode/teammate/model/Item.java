@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.model;
 
 import android.text.InputType;
@@ -5,7 +29,8 @@ import android.text.TextUtils;
 
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.util.Supplier;
+import com.tunjid.androidbootstrap.functions.Supplier;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.lang.annotation.Retention;
 
@@ -20,7 +45,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 /**
  * Item for listing properties of a {@link Model}
  */
-public class Item<T> implements Identifiable, Comparable<Item> {
+public class Item<T> implements Differentiable, Comparable<Item> {
 
     @Retention(SOURCE)
     @IntDef({INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY})
@@ -142,13 +167,13 @@ public class Item<T> implements Identifiable, Comparable<Item> {
     public int compareTo(@NonNull Item o) { return Integer.compare(sortPosition, o.sortPosition); }
 
     @Override
-    public boolean areContentsTheSame(Identifiable other) {
+    public boolean areContentsTheSame(Differentiable other) {
         if (other instanceof Item) return value.equals(((Item) other).value);
         return id.equals(other.getId());
     }
 
     @Override
-    public Object getChangePayload(Identifiable other) {
+    public Object getChangePayload(Differentiable other) {
         return other;
     }
 

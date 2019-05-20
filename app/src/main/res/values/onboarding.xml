@@ -1,9 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2019 Adetunji Dahunsi
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
 <resources>
     <array name="on_boarding" translatable="true">
         <item>Hi there, and welcome to Teammate! Tap "Next" to continue onboarding or swipe to skip.</item>
-        <item>The navbar is your primary mode of navigation; swipe up or long press on it for more options and use the back button to go back at anytime.</item>
-        <item>The navbar also contains your current team in focus. You can switch teams at anytime from the expanded navbar, or in context menus on various screens.</item>
+        <item>The bottom navbar is your primary mode of navigation; swipe up or long press on it for more options and use the back button to go back at anytime.</item>
+        <item>The icon on the left of the top toolbar also contains your current team in focus. You can switch the current team at anytime by tapping on it, or in context menus on various screens.</item>
         <item>When adding team roles, be careful who you make an admin! An admin cannot be downgraded, and can delete any team they\'re on.</item>
         <item>That\'s it! Hope you enjoy using Teammate!</item>
     </array>

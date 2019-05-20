@@ -1,8 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
-import com.mainstreetcode.teammate.model.Identifiable;
+import com.mainstreetcode.teammate.App;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
@@ -11,20 +36,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.processors.PublishProcessor;
 
 
 abstract class BaseViewModel extends ViewModel {
 
     private static final int AD_THRESH = 5;
 
-    private static final PublishProcessor<Alert> eventSource = PublishProcessor.create();
-
-    private LinkedList<Identifiable> ads = new LinkedList<>();
+    private LinkedList<Differentiable> ads = new LinkedList<>();
     private CompositeDisposable disposable = new CompositeDisposable();
 
     BaseViewModel() {
-        disposable.add(eventSource.subscribe(this::onModelAlert, ErrorHandler.EMPTY));
+        disposable.add(App.getInstance().alerts().subscribe(this::onModelAlert, ErrorHandler.EMPTY));
         fetchAds();
     }
 
@@ -32,7 +54,7 @@ abstract class BaseViewModel extends ViewModel {
 
     boolean sortsAscending() {return false;}
 
-    void pushModelAlert(Alert alert) { eventSource.onNext(alert); }
+    void pushModelAlert(Alert alert) { App.getInstance().pushAlert(alert); }
 
     void onModelAlert(Alert alert) {}
 
@@ -42,7 +64,7 @@ abstract class BaseViewModel extends ViewModel {
         super.onCleared();
     }
 
-    final List<Identifiable> preserveList(List<Identifiable> source, List<Identifiable> additions) {
+    final List<Differentiable> preserveList(List<Differentiable> source, List<Differentiable> additions) {
         if (sortsAscending()) ModelUtils.preserveAscending(source, additions);
         else ModelUtils.preserveDescending(source, additions);
 
@@ -51,9 +73,9 @@ abstract class BaseViewModel extends ViewModel {
         return source;
     }
 
-    void afterPreserveListDiff(List<Identifiable> source) {}
+    void afterPreserveListDiff(List<Differentiable> source) {}
 
-    private void distributeAds(List<Identifiable> source) {
+    private void distributeAds(List<Differentiable> source) {
         //filterAds(source);
         if (source.isEmpty() || ads.isEmpty()) return;
 
@@ -95,8 +117,8 @@ abstract class BaseViewModel extends ViewModel {
 //        adLoader.loadAds(new AdRequest.Builder().build(), 2);
     }
     //        while (iterator.hasNext()) if (iterator.next() instanceof ContentAd) iterator.remove();
-    //        Iterator<Identifiable> iterator = source.iterator();
-//    private void filterAds(List<Identifiable> source) {
+    //        Iterator<Differentiable> iterator = source.iterator();
+//    private void filterAds(List<Differentiable> source) {
 
 //    }
 
