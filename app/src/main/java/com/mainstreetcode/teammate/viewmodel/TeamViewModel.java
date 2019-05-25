@@ -24,8 +24,6 @@
 
 package com.mainstreetcode.teammate.viewmodel;
 
-import android.annotation.SuppressLint;
-
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
@@ -40,6 +38,7 @@ import com.tunjid.androidbootstrap.functions.collections.Lists;
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
@@ -55,7 +54,7 @@ import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
-    private final Team defaultTeam = Team.empty();
+    private final AtomicReference<Team> defaultTeamRef = new AtomicReference<>(Team.empty());
     static final List<Differentiable> teams = Lists.transform(RoleViewModel.roles, role -> role instanceof Role ? ((Role) role).getTeam() : role);
 
     private final TeamRepo repository;
@@ -90,17 +89,17 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     public Flowable<Team> getTeamChangeFlowable() {
         return repository.getDefaultTeam().flatMapPublisher(team -> {
             updateDefaultTeam(team);
-            return Flowable.fromCallable(() -> defaultTeam).concatWith(teamChangeProcessor);
+            return Flowable.fromCallable(defaultTeamRef::get).concatWith(teamChangeProcessor);
         }).observeOn(mainThread());
 
     }
 
     private Flowable<Team> getTeam(Team team) {
-        return repository.get(team);
+        return repository.get(team).doOnNext(this::onTeamChanged);
     }
 
     private Single<Team> createOrUpdate(Team team) {
-        return repository.createOrUpdate(team);
+        return repository.createOrUpdate(team).doOnSuccess(this::onTeamChanged);
     }
 
     public Single<Team> deleteTeam(Team team) {
@@ -109,32 +108,36 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public Single<DiffUtil.DiffResult> nonDefaultTeams(List<Team> sink) {
         return FunctionalDiff.of(Flowable.fromIterable(teams)
-                        .filter(item -> item instanceof Team && !item.equals(defaultTeam))
-                        .cast(Team.class)
-                        .toList(), sink, ModelUtils::replaceList);
+                .filter(item -> item instanceof Team && !item.equals(defaultTeamRef))
+                .cast(Team.class)
+                .toList(), sink, ModelUtils::replaceList);
     }
 
     public void updateDefaultTeam(Team newDefault) {
-        defaultTeam.update(newDefault);
-        repository.saveDefaultTeam(defaultTeam);
-        teamChangeProcessor.onNext(defaultTeam);
+        defaultTeamRef.set(newDefault);
+        repository.saveDefaultTeam(newDefault);
+        teamChangeProcessor.onNext(newDefault);
     }
 
     public boolean isOnATeam() {
-        return !teams.isEmpty() || !defaultTeam.isEmpty();
+        return !teams.isEmpty() || !defaultTeamRef.get().isEmpty();
     }
 
-    public Team getDefaultTeam() {return defaultTeam;}
+    public Team getDefaultTeam() { return defaultTeamRef.get(); }
+
+    private void onTeamChanged(Team updated) {
+        Team currentDefault = defaultTeamRef.get();
+        if (currentDefault.equals(updated) && !currentDefault.areContentsTheSame(updated))
+            updateDefaultTeam(updated);
+    }
 
     @Override
-    @SuppressLint("CheckResult")
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     void onModelAlert(Alert alert) {
         //noinspection unchecked
         Alert.matches(alert, Alert.of(Alert.Deletion.class, Team.class, team -> {
             teams.remove(team);
             repository.queueForLocalDeletion(team);
-            if (defaultTeam.equals(team)) defaultTeam.update(Team.empty());
+            if (team.equals(defaultTeamRef.get())) defaultTeamRef.set(Team.empty());
         }));
     }
 }
