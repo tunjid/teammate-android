@@ -37,8 +37,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
@@ -50,6 +51,8 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
+
+import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -174,7 +177,9 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     @Override
     public void onAddressClicked() {
         gofer.setSettingAddress(true);
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+        Autocomplete.IntentBuilder builder = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN,
+                Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
 
         try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
         catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
@@ -197,7 +202,7 @@ public class TeamEditFragment extends HeaderedFragment<Team>
         if (context == null) return;
 
         toggleProgress(true);
-        Place place = PlacePicker.getPlace(context, data);
+        Place place = Autocomplete.getPlaceFromIntent(data);
         disposables.add(locationViewModel.fromPlace(place)
                 .subscribe(this::onAddressFound, defaultErrorHandler));
     }

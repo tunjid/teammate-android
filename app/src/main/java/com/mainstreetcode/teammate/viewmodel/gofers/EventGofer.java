@@ -26,7 +26,7 @@ package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
 
-import com.google.android.gms.location.places.Place;
+import com.google.android.libraries.places.api.model.Place;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;

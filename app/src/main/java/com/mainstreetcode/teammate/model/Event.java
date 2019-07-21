@@ -31,10 +31,10 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -170,7 +170,7 @@ public class Event extends EventEntity
 
     @SuppressLint("CheckResult")
     public void setPlace(Place place) {
-        locationName = place.getName().toString();
+        locationName = place.getName();
         location = place.getLatLng();
     }
 

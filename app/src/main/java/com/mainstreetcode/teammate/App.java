@@ -32,6 +32,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import com.google.android.libraries.places.api.Places;
 import com.mainstreetcode.teammate.repository.ConfigRepo;
 import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.repository.RoleRepo;
@@ -81,6 +82,7 @@ public class App extends Application {
         initializeEmoji();
         registerReceiver(mediaDownloadListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         //MobileAds.initialize(this, getString(R.string.admob_app_id));
+        Places.initialize(getApplicationContext(), getString(R.string.google_api_key));
     }
 
     @SuppressLint("CheckResult")
