@@ -24,6 +24,7 @@
 
 package com.mainstreetcode.teammate.util;
 
+import android.location.Address;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.util.BiConsumer;
@@ -143,11 +144,22 @@ public class ModelUtils {
         catch (Exception e) {return null;}
     }
 
-
     public static Date parseDate(String date, SimpleDateFormat formatter) {
         if (TextUtils.isEmpty(date)) return new Date();
         try { return formatter.parse(date); }
         catch (ParseException e) { return new Date(); }
+    }
+
+    public static String nameAddress(Address address) {
+        StringBuilder addressBuilder = new StringBuilder();
+        int end = address.getMaxAddressLineIndex();
+
+        for (int i = 0; i <= end; i++) {
+            addressBuilder.append(address.getAddressLine(i));
+            if (i != end) addressBuilder.append("\n");
+        }
+
+        return addressBuilder.toString();
     }
 
     public static List<Differentiable> asDifferentiables(List<? extends Differentiable> subTypeList) {
@@ -223,7 +235,7 @@ public class ModelUtils {
         nextCal.setTime(next);
 
         return prevCal.get(Calendar.DAY_OF_MONTH) != nextCal.get(Calendar.DAY_OF_MONTH)
-                        || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
-                        || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR);
+                || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
+                || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR);
     }
 }

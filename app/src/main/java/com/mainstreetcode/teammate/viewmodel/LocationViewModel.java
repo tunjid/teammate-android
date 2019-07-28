@@ -26,23 +26,34 @@ package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import androidx.lifecycle.ViewModel;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
+import android.text.style.StyleSpan;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
+import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.TeammateException;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
+import java.util.List;
+
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.os.Build.VERSION.SDK_INT;
@@ -55,15 +66,20 @@ public class LocationViewModel extends ViewModel {
 
     public static final int PERMISSIONS_REQUEST_LOCATION = 99;
     private static final int MAX_RESULTS = 1;
+    private static final StyleSpan CHARACTER_STYLE = new StyleSpan(Typeface.BOLD);
+
+    private final Geocoder geocoder = new Geocoder(App.getInstance());
+    private final PlacesClient client = Places.createClient(App.getInstance());
 
     public LocationViewModel() {}
 
-    public Maybe<Address> fromPlace(Place place) {
-        return fromLocation(place.getLatLng());
+    public Maybe<Address> fromMap(GoogleMap map) {
+        LatLng location = map.getCameraPosition().target;
+        return withGeocoder(it -> it.getFromLocation(location.latitude, location.longitude, MAX_RESULTS));
     }
 
-    public Maybe<Address> fromMap(GoogleMap map) {
-        return fromLocation(map.getCameraPosition().target);
+    public Maybe<Address> fromAutoComplete(AutocompletePrediction prediction) {
+        return withGeocoder(it -> it.getFromLocationName(prediction.getFullText(CHARACTER_STYLE).toString(), MAX_RESULTS));
     }
 
     @SuppressLint("MissingPermission")
@@ -87,6 +103,10 @@ public class LocationViewModel extends ViewModel {
                 .addOnFailureListener(emit::onError));
     }
 
+    public InstantSearch<String, AutocompletePrediction> instantSearch() {
+        return new InstantSearch<>(this::fromQuery, prediction -> Differentiable.fromCharSequence(prediction::getPlaceId));
+    }
+
     public boolean hasPermission(Fragment fragment) {
         return SDK_INT < M || ContextCompat.checkSelfPermission(fragment.requireActivity(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
@@ -104,12 +124,17 @@ public class LocationViewModel extends ViewModel {
                 .show();
     }
 
-    private Maybe<Address> fromLocation(LatLng location) {
-        Geocoder geocoder = new Geocoder(App.getInstance());
-
-        return Maybe.fromCallable(() -> geocoder.getFromLocation(location.latitude, location.longitude, MAX_RESULTS))
+    private Maybe<Address> withGeocoder(Function<Geocoder, List<Address>> addressFunction) {
+        return Maybe.fromCallable(() -> addressFunction.apply(geocoder))
                 .flatMap(addresses -> addresses.isEmpty() ? Maybe.empty() : Maybe.just(addresses.get(0)))
                 .subscribeOn(io())
                 .observeOn(mainThread());
+    }
+
+    private Single<List<AutocompletePrediction>> fromQuery(String query) {
+        return Single.create(emitter -> client.findAutocompletePredictions(
+                FindAutocompletePredictionsRequest.builder().setQuery(query).build())
+                .addOnSuccessListener(response -> emitter.onSuccess(response.getAutocompletePredictions()))
+                .addOnFailureListener(emitter::onError));
     }
 }

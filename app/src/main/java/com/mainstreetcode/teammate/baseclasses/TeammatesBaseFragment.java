@@ -69,7 +69,6 @@ public class TeammatesBaseFragment extends BaseFragment implements View.OnClickL
 
     protected static final InsetFlags NO_TOP = InsetFlags.NO_TOP;
     protected static final InsetFlags NONE = InsetFlags.NONE;
-    protected static final int PLACE_PICKER_REQUEST = 1;
     private static final int LIGHT_NAV_BAR_COLOR = 0xFFE0E0E0; // Same as R.color.light_grey
 
     protected static final Validator VALIDATOR = new Validator();

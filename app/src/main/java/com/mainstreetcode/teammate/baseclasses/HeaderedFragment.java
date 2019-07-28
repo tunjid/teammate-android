@@ -161,7 +161,7 @@ public abstract class HeaderedFragment<T extends HeaderedModel<T> & ListableMode
         super.onKeyBoardChanged(appeared);
         if (!appeared) return;
         if (appBarLayout != null) appBarLayout.setExpanded(false);
-        if (showsFab()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
+        if (showsFab() && !isBottomSheetShowing()) disposables.add(timer(FAB_DELAY, MILLISECONDS)
                 .observeOn(mainThread())
                 .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY));
     }
