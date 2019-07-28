@@ -114,9 +114,12 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
     }
 
     public void updateDefaultTeam(Team newDefault) {
-        defaultTeamRef.set(newDefault);
-        repository.saveDefaultTeam(newDefault);
-        teamChangeProcessor.onNext(newDefault);
+        Team copy = Team.empty();
+        copy.update(newDefault);
+
+        defaultTeamRef.set(copy);
+        repository.saveDefaultTeam(copy);
+        teamChangeProcessor.onNext(copy);
     }
 
     public boolean isOnATeam() {
