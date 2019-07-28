@@ -24,14 +24,11 @@
 
 package com.mainstreetcode.teammate.model;
 
-import android.annotation.SuppressLint;
-import androidx.room.Ignore;
+import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -56,8 +53,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.room.Ignore;
+
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
+import static com.mainstreetcode.teammate.util.ModelUtils.nameAddress;
 
 /**
  * Event events
@@ -168,10 +169,9 @@ public class Event extends EventEntity
         this.team.update(team);
     }
 
-    @SuppressLint("CheckResult")
-    public void setPlace(Place place) {
-        locationName = place.getName().toString();
-        location = place.getLatLng();
+    public void setAddress(Address address) {
+        locationName = nameAddress(address);
+        location = new LatLng(address.getLatitude(), address.getLongitude());
     }
 
     void setGame(Game game) {

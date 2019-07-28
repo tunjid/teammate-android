@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.TeammateException;
 import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -64,8 +65,8 @@ public class UserViewModel extends ViewModel {
         return new UserGofer(user, getCurrentUser()::equals, this::getUser, this::updateUser);
     }
 
-    public InstantSearch<String, User> instantSearch() {
-        return new InstantSearch<>(repository::findUser);
+    public InstantSearch<String, Differentiable> instantSearch() {
+        return new InstantSearch<>(repository::findUser, user -> user);
     }
 
     public Single<User> signUp(String firstName, String lastName, String primaryEmail, String password) {

@@ -25,19 +25,19 @@
 package com.mainstreetcode.teammate.viewmodel.gofers;
 
 import android.annotation.SuppressLint;
+import android.location.Address;
 
-import com.google.android.gms.location.places.Place;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.BlockedUser;
 import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.repository.RepoProvider;
-import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Guest;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.repository.GuestRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
+import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.util.ModelUtils;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,9 +150,9 @@ public class EventGofer extends TeamHostingGofer<Event> {
         return deleteFunction.apply(model).ignoreElement();
     }
 
-    public Single<DiffUtil.DiffResult> setPlace(Place place) {
+    public Single<DiffUtil.DiffResult> setAddress(Address address) {
         isSettingLocation = true;
-        model.setPlace(place);
+        model.setAddress(address);
         return FunctionalDiff.of(Single.just(model.asDifferentiables()), getItems(), this::preserveItems).doFinally(() -> isSettingLocation = false);
     }
 

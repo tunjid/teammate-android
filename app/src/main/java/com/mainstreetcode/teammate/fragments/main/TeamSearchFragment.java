@@ -34,7 +34,6 @@ import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamAdapter;
 import com.mainstreetcode.teammate.adapters.TeamSearchAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.TeamSearchRequest;
 import com.mainstreetcode.teammate.model.enums.Sport;
@@ -42,8 +41,8 @@ import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -68,9 +67,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     private View createTeam;
     private SearchView searchView;
     private TeamSearchRequest request;
-    private InstantSearch<TeamSearchRequest, Team> instantSearch;
-
-    private final List<Differentiable> teams = new ArrayList<>();
+    private InstantSearch<TeamSearchRequest, Differentiable> instantSearch;
 
     public static TeamSearchFragment newInstance() {
         TeamSearchFragment fragment = new TeamSearchFragment();
@@ -113,7 +110,7 @@ public final class TeamSearchFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new TeamSearchAdapter(teams, this))
+                .withAdapter(new TeamSearchAdapter(instantSearch.getCurrentItems(), this))
                 .withGridLayoutManager(2)
                 .build();
 
@@ -123,10 +120,11 @@ public final class TeamSearchFragment extends MainActivityFragment
         createTeam.setOnClickListener(this);
 
         if (getTargetRequestCode() != 0) {
-            teams.clear();
+            List<Differentiable> items = instantSearch.getCurrentItems();
+            items.clear();
             disposables.add(Flowable.fromIterable(teamViewModel.getModelList(Team.class))
                     .filter(this::IsEligibleTeam)
-                    .subscribe(teams::add, ErrorHandler.EMPTY));
+                    .subscribe(items::add, ErrorHandler.EMPTY));
         }
 
         return rootView;
@@ -135,7 +133,7 @@ public final class TeamSearchFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        subscribeToSearch(request.query(searchView.getQuery().toString()));
+        subscribeToSearch();
     }
 
     @Override
@@ -181,17 +179,9 @@ public final class TeamSearchFragment extends MainActivityFragment
         return true;
     }
 
-    private void subscribeToSearch(TeamSearchRequest searchRequest) {
-        if (instantSearch.postSearch(searchRequest)) return;
+    private void subscribeToSearch() {
         disposables.add(instantSearch.subscribe()
-                .doOnSubscribe(subscription -> subscribeToSearch(searchRequest))
-                .subscribe(this::onTeamsUpdated, defaultErrorHandler));
-    }
-
-    private void onTeamsUpdated(List<Team> teams) {
-        this.teams.clear();
-        this.teams.addAll(teams);
-        scrollManager.notifyDataSetChanged();
+                .subscribe(scrollManager::onDiff, defaultErrorHandler));
     }
 
     private boolean IsEligibleTeam(Differentiable team) {

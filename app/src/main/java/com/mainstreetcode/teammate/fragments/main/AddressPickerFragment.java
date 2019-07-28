@@ -27,48 +27,50 @@ package com.mainstreetcode.teammate.fragments.main;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.activities.MainActivity;
-import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter;
+import com.mainstreetcode.teammate.adapters.AutoCompleteAdapter;
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.util.ExpandingToolbar;
+import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
-import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
+import static com.mainstreetcode.teammate.util.ModelUtils.nameAddress;
 import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION;
 
-public class EventSearchFragment extends MainActivityFragment
-        implements AddressPickerFragment.AddressPicker {
+public class AddressPickerFragment extends MainActivityFragment {
 
     private static final int MAP_ZOOM = 10;
 
-    private boolean leaveMap;
+    private boolean canQueryMap;
 
     private MapView mapView;
-    private ExpandingToolbar expandingToolbar;
+    private TextView location;
+    private InstantSearch<String, AutocompletePrediction> instantSearch;
+    private AtomicReference<Address> currentAddress = new AtomicReference<>();
 
-    public static EventSearchFragment newInstance() {
-        EventSearchFragment fragment = new EventSearchFragment();
+    public static AddressPickerFragment newInstance() {
+        AddressPickerFragment fragment = new AddressPickerFragment();
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
@@ -76,32 +78,58 @@ public class EventSearchFragment extends MainActivityFragment
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        instantSearch = locationViewModel.instantSearch();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_public_event, container, false);
-        getLayoutParams(root.findViewById(R.id.status_bar_dimmer)).height = MainActivity.topInset;
+        View root = inflater.inflate(R.layout.fragment_place_picker, container, false);
+        ViewGroup mapContainer = root.findViewById(R.id.map_view_container);
+        SearchView searchView = root.findViewById(R.id.search_field);
+        RecyclerView recyclerView = root.findViewById(R.id.search_predictions);
+        location = root.findViewById(R.id.location);
 
-        scrollManager = ScrollManager.<BaseViewHolder>with(root.findViewById(R.id.search_options))
-                .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest(), this::pickPlace))
+        scrollManager = ScrollManager.<BaseViewHolder>with(recyclerView)
+                .withAdapter(new AutoCompleteAdapter(instantSearch.getCurrentItems(), prediction -> {
+                    searchView.setQuery("", false);
+                    searchView.clearFocus();
+                    recyclerView.setVisibility(View.GONE);
+                    mapContainer.setVisibility(View.VISIBLE);
+                    disposables.add(locationViewModel.fromAutoComplete(prediction).subscribe(this::onMapAddressFound, defaultErrorHandler));
+                }))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build();
+
+        searchView.setIconifiedByDefault(false);
+        searchView.setIconified(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override public boolean onQueryTextSubmit(String query) { return false; }
+
+            @Override public boolean onQueryTextChange(String query) {
+                if (TextUtils.isEmpty(query)) return true;
+
+                instantSearch.postSearch(query);
+                mapContainer.setVisibility(TextUtils.isEmpty(query) ? View.VISIBLE : View.GONE);
+                recyclerView.setVisibility(TextUtils.isEmpty(query) ? View.GONE : View.VISIBLE);
+                return true;
+            }
+        });
 
         mapView = root.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this::onMapReady);
-
-        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper), () -> mapView.getMapAsync(this::fetchPublicEvents));
-        expandingToolbar.setTitle(R.string.event_public_search);
-        expandingToolbar.setTitleIcon(false);
 
         return root;
     }
 
     @Override
     public void onResume() {
+        disposables.add(instantSearch.subscribe().subscribe(diffResult -> scrollManager.onDiff(diffResult), defaultErrorHandler));
         mapView.onResume();
         super.onResume();
     }
@@ -136,7 +164,6 @@ public class EventSearchFragment extends MainActivityFragment
     public void onDestroyView() {
         mapView.onDestroy();
         mapView = null;
-        expandingToolbar = null;
         super.onDestroyView();
     }
 
@@ -150,26 +177,28 @@ public class EventSearchFragment extends MainActivityFragment
     public boolean showsToolBar() { return false; }
 
     @Override
-    public boolean showsBottomNav() { return false; }
+    public boolean showsBottomNav() { return true; }
 
     @Override
-    public boolean showsFab() { return locationViewModel.hasPermission(this); }
-
-    @Override
-    public InsetFlags insetFlags() {return NO_TOP;}
+    public boolean showsFab() { return currentAddress.get() != null; }
 
     @Override
     @StringRes
-    protected int getFabStringResource() { return R.string.event_my_location; }
+    protected int getFabStringResource() { return R.string.place_picker_pick; }
 
     @Override
     @DrawableRes
-    protected int getFabIconResource() { return R.drawable.ic_crosshairs_gps_white_24dp; }
+    protected int getFabIconResource() { return R.drawable.ic_check_white_24dp; }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.fab) disposables.add(locationViewModel.getLastLocation(this)
-                .subscribe(location -> onLocationFound(location, true), defaultErrorHandler));
+        if (view.getId() == R.id.fab) {
+            if (!(getTargetFragment() instanceof AddressPicker)) return;
+            Address current = currentAddress.get();
+
+            if (current != null) ((AddressPicker) getTargetFragment()).onAddressPicked(current);
+            hideBottomSheet();
+        }
     }
 
     @Override
@@ -178,71 +207,52 @@ public class EventSearchFragment extends MainActivityFragment
         if (permissionGranted && requestCode == PERMISSIONS_REQUEST_LOCATION) requestLocation();
     }
 
-    @Override
-    public void onAddressPicked(Address address) {
-        onLocationFound(new LatLng(address.getLatitude(), address.getLongitude()), true);
-    }
-
-    private void fetchPublicEvents(GoogleMap map) {
-        disposables.add(eventViewModel.getPublicEvents(map).subscribe(events -> populateMap(map, events), defaultErrorHandler));
-    }
-
     private void requestLocation() {
-        LatLng lastLocation = eventViewModel.getLastPublicSearchLocation();
-
-        if (lastLocation != null) onLocationFound(lastLocation, false);
-        else disposables.add(locationViewModel.getLastLocation(this)
-                .subscribe(location -> onLocationFound(location, true), defaultErrorHandler));
+        disposables.add(locationViewModel.getLastLocation(this)
+                .subscribe(this::onLocationFound, defaultErrorHandler));
     }
 
-    private void onLocationFound(LatLng location, boolean animate) {
-        mapView.getMapAsync(map -> {
-            if (animate) map.animateCamera(newLatLngZoom(location, MAP_ZOOM));
-            else map.moveCamera(newLatLngZoom(location, MAP_ZOOM));
-        });
+    private void onLocationFound(LatLng location) {
+        mapView.getMapAsync(map -> map.animateCamera(newLatLngZoom(location, MAP_ZOOM)));
     }
 
     private void onMapReady(GoogleMap map) {
         map.setOnCameraIdleListener(() -> onMapIdle(map));
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted);
-        map.setOnInfoWindowClickListener(this::onMarkerInfoWindowClicked);
-    }
-
-    private void populateMap(GoogleMap map, List<Event> events) {
-        if (leaveMap) return;
-        map.clear();
-        for (Event event : events) map.addMarker(event.getMarkerOptions()).setTag(event);
     }
 
     private void onMapIdle(GoogleMap map) {
-        fetchPublicEvents(map);
-        disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler));
-        scrollManager.notifyDataSetChanged();
+        if (canQueryMap)
+            disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler));
     }
 
     private void onCameraMoveStarted(int reason) {
-        if (scrollManager.getRecyclerView().getVisibility() == View.VISIBLE)
-            expandingToolbar.changeVisibility(true);
-
         switch (reason) {
             case GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION:
-                leaveMap = true;
+            case GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION:
+                canQueryMap = false;
                 break;
             case GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE:
-            case GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION:
-                leaveMap = false;
+                canQueryMap = true;
                 break;
         }
     }
 
-    private void onMarkerInfoWindowClicked(Marker marker) {
-        Object tag = marker.getTag();
-        if (!(tag instanceof Event)) return;
-        showFragment(EventEditFragment.newInstance((Event) tag));
+    private void onAddressFound(Address address) {
+        scrollManager.getRecyclerView().setVisibility(View.GONE);
+        location.setText(nameAddress(address));
+        location.setVisibility(View.VISIBLE);
+        currentAddress.set(address);
+
+        togglePersistentUi();
     }
 
-    private void onAddressFound(Address address) {
-        eventViewModel.getEventRequest().setAddress(address);
-        scrollManager.notifyItemChanged(0);
+    private void onMapAddressFound(Address address) {
+        onLocationFound(new LatLng(address.getLatitude(), address.getLongitude()));
+        onAddressFound(address);
+    }
+
+    public interface AddressPicker {
+        void onAddressPicked(Address address);
     }
 }

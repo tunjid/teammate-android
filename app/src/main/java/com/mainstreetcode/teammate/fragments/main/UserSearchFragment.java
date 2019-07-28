@@ -25,10 +25,6 @@
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,18 +33,22 @@ import android.view.ViewGroup;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.UserAdapter;
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.InstantSearch;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
+
 /**
- * Searches for teams
+ * Searches for users
  */
 
 public final class UserSearchFragment extends MainActivityFragment
@@ -60,9 +60,7 @@ public final class UserSearchFragment extends MainActivityFragment
     private static final int[] EXCLUDED_VIEWS = {R.id.list_layout};
 
     private SearchView searchView;
-    private InstantSearch<String, User> instantSearch;
-
-    private final List<Differentiable> items = new ArrayList<>();
+    private InstantSearch<String, Differentiable> instantSearch;
 
     public static UserSearchFragment newInstance() {
         UserSearchFragment fragment = new UserSearchFragment();
@@ -85,7 +83,7 @@ public final class UserSearchFragment extends MainActivityFragment
 
         scrollManager = ScrollManager.<InteractiveViewHolder>with(rootView.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(new UserAdapter(items, this))
+                .withAdapter(new UserAdapter(instantSearch.getCurrentItems(), this))
                 .withGridLayoutManager(2)
                 .build();
 
@@ -94,6 +92,7 @@ public final class UserSearchFragment extends MainActivityFragment
         searchView.setIconified(false);
 
         if (getTargetRequestCode() != 0) {
+            List<Differentiable> items = instantSearch.getCurrentItems();
             items.clear();
             disposables.add(teamMemberViewModel.getAllUsers()
                     .startWith(userViewModel.getCurrentUser())
@@ -107,7 +106,7 @@ public final class UserSearchFragment extends MainActivityFragment
     @Override
     public void onResume() {
         super.onResume();
-        subScribeToSearch(searchView.getQuery().toString());
+        subScribeToSearch();
     }
 
     @Override
@@ -147,16 +146,8 @@ public final class UserSearchFragment extends MainActivityFragment
         return true;
     }
 
-    private void subScribeToSearch(String query) {
-        if (instantSearch.postSearch(query)) return;
+    private void subScribeToSearch() {
         disposables.add(instantSearch.subscribe()
-                .doOnSubscribe(subscription -> subScribeToSearch(query))
-                .subscribe(this::onUsersUpdated, defaultErrorHandler));
-    }
-
-    private void onUsersUpdated(List<User> users) {
-        this.items.clear();
-        this.items.addAll(users);
-        scrollManager.notifyDataSetChanged();
+                .subscribe(scrollManager::onDiff, defaultErrorHandler));
     }
 }

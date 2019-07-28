@@ -338,6 +338,9 @@
     <string name="no_stat_ranks">Who\'s the MVP? Individual stats show here.</string>
     <string name="stat_ranks">Leaderboard</string>
 
+    <!--AddressPickerFragment-->
+    <string name="place_picker_pick">Select Location</string>
+    <string name="place_picker_hint">Search for a place</string>
 
     <!--BlockUserFragment-->
     <string name="blocked_user">Blocked User</string>

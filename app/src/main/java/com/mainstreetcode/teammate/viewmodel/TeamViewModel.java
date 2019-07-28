@@ -82,8 +82,8 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
         return new TeamGofer(team, throwable -> checkForInvalidObject(throwable, team, Team.class), this::getTeam, this::createOrUpdate, this::deleteTeam);
     }
 
-    public InstantSearch<TeamSearchRequest, Team> instantSearch() {
-        return new InstantSearch<>(repository::findTeams);
+    public InstantSearch<TeamSearchRequest, Differentiable> instantSearch() {
+        return new InstantSearch<>(repository::findTeams, team -> team);
     }
 
     public Flowable<Team> getTeamChangeFlowable() {

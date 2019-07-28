@@ -31,6 +31,7 @@ import android.view.View;
 
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.activities.MainActivity;
+import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment;
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment;
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment;
 import com.mainstreetcode.teammate.model.Competitive;
@@ -217,6 +218,17 @@ public class MainActivityFragment extends TeammatesBaseFragment {
                 ? UserEditFragment.newInstance((User) entity)
                 : null;
         if (fragment != null) showFragment(fragment);
+    }
+
+    protected void pickPlace() {
+        AddressPickerFragment picker = AddressPickerFragment.newInstance();
+        picker.setTargetFragment(this, R.id.request_place_pick);
+
+        showBottomSheet(BottomSheetController.Args.builder()
+                .setMenuRes(R.menu.empty)
+                .setFragment(picker)
+                .setTitle("")
+                .build());
     }
 
     protected void watchForRoleChanges(Team team, Runnable onChanged) {
