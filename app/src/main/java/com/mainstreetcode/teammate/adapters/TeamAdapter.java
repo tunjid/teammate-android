@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.adapters;
 
-import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import com.mainstreetcode.teammate.R;
@@ -33,14 +32,15 @@ import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder;
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder;
 import com.mainstreetcode.teammate.model.Ad;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.util.ViewHolderUtil;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;

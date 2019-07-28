@@ -206,6 +206,7 @@ public class GameEditFragment extends HeaderedFragment<Game>
     private void updateCompetitor(Competitive item) {
         game.getAway().updateEntity(item);
         scrollManager.notifyDataSetChanged();
+        hideBottomSheet();
         hideKeyboard();
     }
 
