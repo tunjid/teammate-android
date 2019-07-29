@@ -1,8 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,8 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.EventEditAdapter;
@@ -26,7 +49,6 @@ import com.mainstreetcode.teammate.model.Guest;
 import com.mainstreetcode.teammate.model.Model;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
@@ -41,15 +63,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Edits a Team member
  */
 
 public class EventEditFragment extends HeaderedFragment<Event>
         implements
-        EventEditAdapter.EventEditAdapterListener {
+        EventEditAdapter.EventEditAdapterListener,
+        AddressPickerFragment.AddressPicker {
 
     static final String ARG_EVENT = "event";
     private static final String ARG_GAME = "game";
@@ -161,18 +182,6 @@ public class EventEditFragment extends HeaderedFragment<Event>
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        boolean failed = resultCode != RESULT_OK;
-        boolean isFromPlacePicker = requestCode == PLACE_PICKER_REQUEST;
-
-        if (failed && isFromPlacePicker) gofer.setSettingLocation(false);
-        if (failed || !isFromPlacePicker) return;
-
-        Place place = PlacePicker.getPlace(requireContext(), data);
-        disposables.add(gofer.setPlace(place).subscribe(this::onModelUpdated, emptyErrorHandler));
-    }
-
-    @Override
     @StringRes
     protected int getFabStringResource() { return event.isEmpty() ? R.string.event_create : R.string.event_update; }
 
@@ -221,16 +230,14 @@ public class EventEditFragment extends HeaderedFragment<Event>
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab:
-                boolean wasEmpty = event.isEmpty();
-                toggleProgress(true);
-                disposables.add(gofer.save().subscribe(diffResult -> {
-                    int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
-                    onModelUpdated(diffResult);
-                    showSnackbar(getString(stringRes, event.getName()));
-                }, defaultErrorHandler));
-                break;
+        if (view.getId() == R.id.fab) {
+            boolean wasEmpty = event.isEmpty();
+            toggleProgress(true);
+            disposables.add(gofer.save().subscribe(diffResult -> {
+                int stringRes = wasEmpty ? R.string.added_user : R.string.updated_user;
+                onModelUpdated(diffResult);
+                showSnackbar(getString(stringRes, event.getName()));
+            }, defaultErrorHandler));
         }
     }
 
@@ -272,10 +279,13 @@ public class EventEditFragment extends HeaderedFragment<Event>
     @Override
     public void onLocationClicked() {
         gofer.setSettingLocation(true);
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        pickPlace();
+    }
 
-        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
+    @Override
+    public void onAddressPicked(Address address) {
+        gofer.setSettingLocation(false);
+        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler));
     }
 
     private void rsvpEvent(boolean attending) {

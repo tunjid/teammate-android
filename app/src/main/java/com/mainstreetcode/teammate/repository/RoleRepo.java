@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 import com.mainstreetcode.teammate.model.Role;
@@ -22,21 +46,14 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class RoleRepository extends ModelRepository<Role> {
+public class RoleRepo extends ModelRepo<Role> {
 
     private final TeammateApi api;
     private final RoleDao roleDao;
 
-    private static RoleRepository ourInstance;
-
-    private RoleRepository() {
+    RoleRepo() {
         api = TeammateService.getApiInstance();
         roleDao = AppDatabase.getInstance().roleDao();
-    }
-
-    public static RoleRepository getInstance() {
-        if (ourInstance == null) ourInstance = new RoleRepository();
-        return ourInstance;
     }
 
     @Override
@@ -86,8 +103,8 @@ public class RoleRepository extends ModelRepository<Role> {
                 teams.add(role.getTeam());
             }
 
-            if (!teams.isEmpty()) TeamRepository.getInstance().saveAsNested().apply(teams);
-            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
+            if (!teams.isEmpty()) RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+            if (!users.isEmpty()) RepoProvider.forModel(User.class).saveAsNested().apply(users);
 
             roleDao.upsert(Collections.unmodifiableList(models));
 
@@ -102,7 +119,7 @@ public class RoleRepository extends ModelRepository<Role> {
     }
 
     public Flowable<List<Role>> getMyRoles() {
-        String userId = UserRepository.getInstance().getCurrentUser().getId();
+        String userId = RepoProvider.forRepo(UserRepo.class).getCurrentUser().getId();
         Maybe<List<Role>> local = roleDao.userRoles(userId).subscribeOn(io());
         Maybe<List<Role>> remote = api.getMyRoles().map(getSaveManyFunction()).toMaybe();
 

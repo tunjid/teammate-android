@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate;
 
 import android.annotation.SuppressLint;
@@ -7,7 +31,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -16,8 +39,9 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
-import com.mainstreetcode.teammate.repository.MediaRepository;
-import com.mainstreetcode.teammate.repository.ModelRepository;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
+import com.mainstreetcode.teammate.repository.ModelRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
 import com.mainstreetcode.teammate.util.ModelUtils;
 
@@ -29,6 +53,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 
 public class MediaTransferIntentService extends IntentService {
@@ -63,6 +88,7 @@ public class MediaTransferIntentService extends IntentService {
         Intent intent = new Intent(context, MediaTransferIntentService.class);
         intent.setAction(ACTION_DOWNLOAD);
 
+        //noinspection ResultOfMethodCallIgnored
         Flowable.fromIterable(mediaList)
                 .filter(media -> !TextUtils.isEmpty(media.getUrl()))
                 .collectInto(new ArrayList<Media>(mediaList.size()), List::add)
@@ -122,7 +148,7 @@ public class MediaTransferIntentService extends IntentService {
         private String maxStorageMessage = "";
 
         private final Queue<Media> uploadQueue = new ConcurrentLinkedQueue<>();
-        private final ModelRepository<Media> repository = MediaRepository.getInstance();
+        private final ModelRepo<Media> repository = RepoProvider.forModel(Media.class);
 
         void enqueue(Media media) {
             numToUpload++;
@@ -144,6 +170,7 @@ public class MediaTransferIntentService extends IntentService {
             numAttempted++;
             isOnGoing = true;
 
+            //noinspection ResultOfMethodCallIgnored
             repository.createOrUpdate(uploadQueue.remove())
                     .doOnSuccess(media -> maxStorageMessage = "")
                     .doOnError(this::onError)
@@ -207,9 +234,9 @@ public class MediaTransferIntentService extends IntentService {
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)));
         }
 
-        public void onDownloadComplete(long id) {
+        void onDownloadComplete(long id) {
             if (downloadQueue.remove(id) && downloadQueue.isEmpty())
-                MediaNotifier.getInstance().notifyDownloadComplete();
+                NotifierProvider.forNotifier(MediaNotifier.class).notifyDownloadComplete();
         }
 
         private String getMediaTitle(Media media, App app) {

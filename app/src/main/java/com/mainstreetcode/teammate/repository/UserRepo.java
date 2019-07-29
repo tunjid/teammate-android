@@ -1,9 +1,31 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 
 import android.annotation.SuppressLint;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.facebook.login.LoginResult;
@@ -23,6 +45,8 @@ import com.mainstreetcode.teammate.util.TeammateException;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -35,15 +59,13 @@ import static com.mainstreetcode.teammate.rest.TeammateService.SESSION_COOKIE;
 import static io.reactivex.Single.just;
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class UserRepository extends ModelRepository<User> {
+public class UserRepo extends ModelRepo<User> {
 
     private static final String PREFS = "prefs";
     private static final String USER_ID = "user_id_key";
     private static final String PRIMARY_EMAIL = "primaryEmail";
     private static final String TOKEN = "token";
     private static final String PASSWORD = "password";
-
-    private static UserRepository ourInstance;
 
     private final App app;
     private final TeammateApi api;
@@ -53,16 +75,11 @@ public class UserRepository extends ModelRepository<User> {
 
     private final Consumer<User> currentUserUpdater = updatedUser -> currentUser = updatedUser;
 
-    private UserRepository() {
+    UserRepo() {
         app = App.getInstance();
         api = TeammateService.getApiInstance();
         userDao = AppDatabase.getInstance().userDao();
         currentUser.setId(getUserId());
-    }
-
-    public static UserRepository getInstance() {
-        if (ourInstance == null) ourInstance = new UserRepository();
-        return ourInstance;
     }
 
     @Override

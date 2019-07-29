@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 
@@ -20,21 +44,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class GameRoundRepository extends QueryRepository<Game, Tournament, Integer> {
-
-    private static GameRoundRepository ourInstance;
+public class GameRoundRepo extends QueryRepo<Game, Tournament, Integer> {
 
     private final TeammateApi api;
     private final GameDao gameDao;
 
-    private GameRoundRepository() {
+    GameRoundRepo() {
         api = TeammateService.getApiInstance();
         gameDao = AppDatabase.getInstance().gameDao();
-    }
-
-    public static GameRoundRepository getInstance() {
-        if (ourInstance == null) ourInstance = new GameRoundRepository();
-        return ourInstance;
     }
 
     @Override
@@ -44,17 +61,17 @@ public class GameRoundRepository extends QueryRepository<Game, Tournament, Integ
 
     @Override
     public Single<Game> createOrUpdate(Game game) {
-        return GameRepository.getInstance().createOrUpdate(game);
+        return RepoProvider.forRepo(GameRepo.class).createOrUpdate(game);
     }
 
     @Override
     public Flowable<Game> get(String id) {
-        return GameRepository.getInstance().get(id);
+        return RepoProvider.forRepo(GameRepo.class).get(id);
     }
 
     @Override
     public Single<Game> delete(Game game) {
-        return GameRepository.getInstance().delete(game);
+        return RepoProvider.forRepo(GameRepo.class).delete(game);
     }
 
     @Override
@@ -70,6 +87,6 @@ public class GameRoundRepository extends QueryRepository<Game, Tournament, Integ
 
     @Override
     Function<List<Game>, List<Game>> provideSaveManyFunction() {
-        return GameRepository.getInstance().provideSaveManyFunction();
+        return list -> RepoProvider.forRepo(GameRepo.class).provideSaveManyFunction().apply(list);
     }
 }

@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 import android.content.Context;
@@ -42,33 +66,21 @@ import static com.mainstreetcode.teammate.socket.SocketFactory.EVENT_NEW_MESSAGE
 import static io.reactivex.schedulers.Schedulers.io;
 import static io.socket.client.Socket.EVENT_ERROR;
 
-public class ChatRepository extends TeamQueryRepository<Chat> {
+public class ChatRepo extends TeamQueryRepo<Chat> {
 
 
     private static final String TEAM_SEEN_TIMES = "TeamRepository.team.seen.times";
     private static final int TEAM_NOT_SEEN = -1;
-
     private static final Gson CHAT_GSON = getChatGson();
-
-    private static ChatRepository ourInstance;
 
     private final App app;
     private final TeammateApi api;
     private final ChatDao chatDao;
-    private final ModelRepository<User> userModelRepository;
-    private final ModelRepository<Team> teamModelRepository;
 
-    private ChatRepository() {
+    ChatRepo() {
         app = App.getInstance();
         api = TeammateService.getApiInstance();
         chatDao = AppDatabase.getInstance().teamChatDao();
-        userModelRepository = UserRepository.getInstance();
-        teamModelRepository = TeamRepository.getInstance();
-    }
-
-    public static ChatRepository getInstance() {
-        if (ourInstance == null) ourInstance = new ChatRepository();
-        return ourInstance;
     }
 
     @Override
@@ -110,8 +122,8 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
                 teams.add(chat.getTeam());
             }
 
-            userModelRepository.saveAsNested().apply(users);
-            teamModelRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
 
             chatDao.upsert(chats);
             return chats;
@@ -130,7 +142,7 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
     }
 
     public Flowable<List<Chat>> fetchUnreadChats() {
-        return RoleRepository.getInstance().getMyRoles()
+        return RepoProvider.forRepo(RoleRepo.class).getMyRoles()
                 .firstElement()
                 .toFlowable()
                 .flatMap(Flowable::fromIterable)
@@ -147,7 +159,7 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
             catch (Exception e) { return Flowable.error(e); }
 
             socket.emit(SocketFactory.EVENT_JOIN, result);
-            User signedInUser = UserRepository.getInstance().getCurrentUser();
+            User signedInUser = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
 
             return Flowable.<Chat>create(emitter -> {
                 socket.on(EVENT_NEW_MESSAGE, args -> emitter.onNext(parseChat(args)));
@@ -175,11 +187,11 @@ public class ChatRepository extends TeamQueryRepository<Chat> {
     }
 
     private Completable postRetryFunction(Throwable throwable, Chat chat, int previousRetries) {
-            int retries = previousRetries + 1;
-            return retries <= 3
-                    ? Completable.timer(300, TimeUnit.MILLISECONDS)
-                    .andThen(post(chat).onErrorResumeNext(thrown -> postRetryFunction(thrown, chat, retries)))
-                    : Completable.error(throwable);
+        int retries = previousRetries + 1;
+        return retries <= 3
+                ? Completable.timer(300, TimeUnit.MILLISECONDS)
+                .andThen(post(chat).onErrorResumeNext(thrown -> postRetryFunction(thrown, chat, retries)))
+                : Completable.error(throwable);
     }
 
     public void updateLastSeen(Team team) {

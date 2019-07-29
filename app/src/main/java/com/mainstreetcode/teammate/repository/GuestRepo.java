@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 import androidx.annotation.Nullable;
@@ -24,21 +48,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class GuestRepository extends QueryRepository<Guest, Event, Date> {
+public class GuestRepo extends QueryRepo<Guest, Event, Date> {
 
     private final TeammateApi api;
     private final GuestDao guestDao;
 
-    private static GuestRepository ourInstance;
-
-    private GuestRepository() {
+    GuestRepo() {
         api = TeammateService.getApiInstance();
         guestDao = AppDatabase.getInstance().guestDao();
-    }
-
-    public static GuestRepository getInstance() {
-        if (ourInstance == null) ourInstance = new GuestRepository();
-        return ourInstance;
     }
 
     @Override
@@ -88,8 +105,8 @@ public class GuestRepository extends QueryRepository<Guest, Event, Date> {
                 events.add(guest.getEvent());
             }
 
-            if (!users.isEmpty()) UserRepository.getInstance().saveAsNested().apply(users);
-            if (!events.isEmpty()) EventRepository.getInstance().saveAsNested().apply(events);
+            if (!users.isEmpty()) RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            if (!events.isEmpty()) RepoProvider.forModel(Event.class).saveAsNested().apply(events);
 
             dao().upsert(Collections.unmodifiableList(models));
 

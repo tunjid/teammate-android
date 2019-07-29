@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Teammate" pattern="src[app]:*..*" />
+</component>

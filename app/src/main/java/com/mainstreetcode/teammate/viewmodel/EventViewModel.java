@@ -1,8 +1,30 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
-import androidx.arch.core.util.Function;
-import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -13,24 +35,27 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.model.EventSearchRequest;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Guest;
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.model.enums.BlockReason;
 import com.mainstreetcode.teammate.model.enums.Sport;
-import com.mainstreetcode.teammate.repository.EventRepository;
-import com.mainstreetcode.teammate.repository.GuestRepository;
+import com.mainstreetcode.teammate.repository.EventRepo;
+import com.mainstreetcode.teammate.repository.GuestRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ModelUtils;
 import com.mainstreetcode.teammate.viewmodel.events.Alert;
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
@@ -48,7 +73,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     private static final LatLngBounds DEFAULT_BOUNDS;
     private static final int DEFAULT_BAR_RANGE = 50;
 
-    private final EventRepository repository;
+    private final EventRepo repository;
     private final List<Event> publicEvents = new ArrayList<>();
     private final EventSearchRequest eventRequest = EventSearchRequest.empty();
     private final PublishProcessor<BlockedUser> blockedUserAlert = PublishProcessor.create();
@@ -56,11 +81,11 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     static { DEFAULT_BOUNDS = new LatLngBounds.Builder().include(new LatLng(0, 0)).build(); }
 
     public EventViewModel() {
-        repository = EventRepository.getInstance();
+        repository = RepoProvider.forRepo(EventRepo.class);
     }
 
     public EventGofer gofer(Event event) {
-        Function<Guest, Single<Guest>> rsvpFunction = source -> GuestRepository.getInstance().createOrUpdate(source).doOnSuccess(guest -> {
+        Function<Guest, Single<Guest>> rsvpFunction = source -> RepoProvider.forRepo(GuestRepo.class).createOrUpdate(source).doOnSuccess(guest -> {
             if (!guest.isAttending()) pushModelAlert(Alert.eventAbsentee(guest.getEvent()));
         });
         return new EventGofer(event, onError(event), blockedUserAlert, this::getEvent, this::createOrUpdateEvent, this::delete, rsvpFunction);
@@ -75,7 +100,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
             Team guestTeam = guest.getEvent().getTeam();
             BlockReason reason = BlockReason.empty();
             pushModelAlert(Alert.creation(BlockedUser.block(guestUser, guestTeam, reason)));
-        }, GuestRepository.getInstance()::get);
+        }, RepoProvider.forRepo(GuestRepo.class)::get);
     }
 
     @Override

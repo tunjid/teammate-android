@@ -1,6 +1,31 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 import android.net.Uri;
+
 import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.App;
@@ -8,6 +33,7 @@ import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
+import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.EntityDao;
 import com.mainstreetcode.teammate.persistence.MediaDao;
@@ -34,27 +60,16 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class MediaRepository extends TeamQueryRepository<Media> {
+public class MediaRepo extends TeamQueryRepo<Media> {
 
     private final int num;
     private final TeammateApi api;
     private final MediaDao mediaDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
 
-    private static MediaRepository ourInstance;
-
-    private MediaRepository() {
+    MediaRepo() {
         num = getNumCallsToIgnore();
         api = TeammateService.getApiInstance();
         mediaDao = AppDatabase.getInstance().mediaDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-    }
-
-    public static MediaRepository getInstance() {
-        if (ourInstance == null) ourInstance = new MediaRepository();
-        return ourInstance;
     }
 
     @Override
@@ -72,7 +87,7 @@ public class MediaRepository extends TeamQueryRepository<Media> {
                 .map(getLocalUpdateFunction(model))
                 .map(getSaveFunction());
 
-        return MediaNotifier.getInstance().notifyOfUploads(mediaSingle, body.body());
+        return NotifierProvider.forNotifier(MediaNotifier.class).notifyOfUploads(mediaSingle, body.body());
     }
 
     @Override
@@ -107,8 +122,8 @@ public class MediaRepository extends TeamQueryRepository<Media> {
                 teams.add(media.getTeam());
             }
 
-            userRepository.saveAsNested().apply(users);
-            teamRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
 
             mediaDao.upsert(Collections.unmodifiableList(models));
 
@@ -136,7 +151,8 @@ public class MediaRepository extends TeamQueryRepository<Media> {
     }
 
     @Nullable
-    private MultipartBody.Part getBody(String path, String photoKey) {
+    private MultipartBody.Part getBody(String path, @SuppressWarnings(
+            "SameParameterValue") String photoKey) {
         Uri uri = Uri.parse(path);
         String type = App.getInstance().getContentResolver().getType(uri);
 

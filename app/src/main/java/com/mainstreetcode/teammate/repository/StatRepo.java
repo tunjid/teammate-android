@@ -1,7 +1,29 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
-
-import androidx.annotation.Nullable;
 
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.Stat;
@@ -18,6 +40,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -25,27 +48,14 @@ import io.reactivex.functions.Function;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class StatRepository extends QueryRepository<Stat, Game, Date> {
-
-    private static StatRepository ourInstance;
+public class StatRepo extends QueryRepo<Stat, Game, Date> {
 
     private final TeammateApi api;
     private final StatDao statDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
-    private final ModelRepository<Game> gameRepository;
 
-    private StatRepository() {
+    StatRepo() {
         api = TeammateService.getApiInstance();
         statDao = AppDatabase.getInstance().statDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-        gameRepository = GameRoundRepository.getInstance();
-    }
-
-    public static StatRepository getInstance() {
-        if (ourInstance == null) ourInstance = new StatRepository();
-        return ourInstance;
     }
 
     @Override
@@ -105,9 +115,9 @@ public class StatRepository extends QueryRepository<Stat, Game, Date> {
                 games.add(stat.getGame());
             }
 
-            userRepository.saveAsNested().apply(users);
-            teamRepository.saveAsNested().apply(teams);
-            gameRepository.saveAsNested().apply(games);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+            RepoProvider.forModel(Game.class).saveAsNested().apply(games);
             statDao.upsert(Collections.unmodifiableList(models));
 
             return models;

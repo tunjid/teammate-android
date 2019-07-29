@@ -1,6 +1,29 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.os.Bundle;
@@ -8,8 +31,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
@@ -23,7 +44,6 @@ import com.mainstreetcode.teammate.model.Event;
 import com.mainstreetcode.teammate.util.ExpandingToolbar;
 import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
 import java.util.List;
@@ -32,14 +52,13 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.fragment.app.FragmentTransaction;
 
-import static android.app.Activity.RESULT_OK;
 import static com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom;
 import static com.mainstreetcode.teammate.util.ViewHolderUtil.getLayoutParams;
 import static com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION;
 
-public class EventSearchFragment extends MainActivityFragment {
+public class EventSearchFragment extends MainActivityFragment
+        implements AddressPickerFragment.AddressPicker {
 
     private static final int MAP_ZOOM = 10;
 
@@ -64,7 +83,7 @@ public class EventSearchFragment extends MainActivityFragment {
         getLayoutParams(root.findViewById(R.id.status_bar_dimmer)).height = MainActivity.topInset;
 
         scrollManager = ScrollManager.<BaseViewHolder>with(root.findViewById(R.id.search_options))
-                .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest(), this::startPlacePicker))
+                .withAdapter(new EventSearchRequestAdapter(eventViewModel.getEventRequest(), this::pickPlace))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
@@ -153,25 +172,15 @@ public class EventSearchFragment extends MainActivityFragment {
                 .subscribe(location -> onLocationFound(location, true), defaultErrorHandler));
     }
 
-    @Nullable
     @Override
-    public FragmentTransaction provideFragmentTransaction(BaseFragment fragmentTo) {
-        return super.provideFragmentTransaction(fragmentTo);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != PLACE_PICKER_REQUEST) return;
-        if (resultCode != RESULT_OK) return;
-
-        Place place = PlacePicker.getPlace(requireContext(), data);
-        if (place != null) onLocationFound(place.getLatLng(), true);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean permissionGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
         if (permissionGranted && requestCode == PERMISSIONS_REQUEST_LOCATION) requestLocation();
+    }
+
+    @Override
+    public void onAddressPicked(Address address) {
+        onLocationFound(new LatLng(address.getLatitude(), address.getLongitude()), true);
     }
 
     private void fetchPublicEvents(GoogleMap map) {
@@ -191,12 +200,6 @@ public class EventSearchFragment extends MainActivityFragment {
             if (animate) map.animateCamera(newLatLngZoom(location, MAP_ZOOM));
             else map.moveCamera(newLatLngZoom(location, MAP_ZOOM));
         });
-    }
-
-    private void startPlacePicker() {
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
     }
 
     private void onMapReady(GoogleMap map) {

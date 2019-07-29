@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 
@@ -28,23 +52,14 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class EventRepository extends TeamQueryRepository<Event> {
-
-    private static EventRepository ourInstance;
+public class EventRepo extends TeamQueryRepo<Event> {
 
     private final TeammateApi api;
     private final EventDao eventDao;
-    private final ModelRepository<Team> teamRepository;
 
-    private EventRepository() {
+    EventRepo() {
         api = TeammateService.getApiInstance();
         eventDao = AppDatabase.getInstance().eventDao();
-        teamRepository = TeamRepository.getInstance();
-    }
-
-    public static EventRepository getInstance() {
-        if (ourInstance == null) ourInstance = new EventRepository();
-        return ourInstance;
     }
 
     @Override
@@ -95,7 +110,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
     }
 
     public Flowable<List<Event>> attending(@Nullable Date date) {
-        User current = UserRepository.getInstance().getCurrentUser();
+        User current = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
         Date localDate = date == null ? getFutureDate() : date;
 
         Maybe<List<Event>> local = AppDatabase.getInstance().guestDao().getRsvpList(current.getId(), localDate)
@@ -113,7 +128,7 @@ public class EventRepository extends TeamQueryRepository<Event> {
             List<Team> teams = new ArrayList<>(models.size());
             for (Event event : models) teams.add(event.getTeam());
 
-            teamRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
             eventDao.upsert(Collections.unmodifiableList(models));
 
             return models;

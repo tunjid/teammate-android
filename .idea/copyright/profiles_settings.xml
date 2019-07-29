@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="teammate">
+    <module2copyright>
+      <element module="Teammate" copyright="teammate" />
+    </module2copyright>
+  </settings>
+</component>

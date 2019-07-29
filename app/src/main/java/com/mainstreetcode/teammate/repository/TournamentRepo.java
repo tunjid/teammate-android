@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.repository;
 
 
@@ -27,27 +51,14 @@ import okhttp3.MultipartBody;
 
 import static io.reactivex.schedulers.Schedulers.io;
 
-public class TournamentRepository extends TeamQueryRepository<Tournament> {
-
-    private static TournamentRepository ourInstance;
+public class TournamentRepo extends TeamQueryRepo<Tournament> {
 
     private final TeammateApi api;
     private final TournamentDao tournamentDao;
-    private final ModelRepository<User> userRepository;
-    private final ModelRepository<Team> teamRepository;
-    private final ModelRepository<Competitor> competitorRepository;
 
-    private TournamentRepository() {
+    TournamentRepo() {
         api = TeammateService.getApiInstance();
         tournamentDao = AppDatabase.getInstance().tournamentDao();
-        userRepository = UserRepository.getInstance();
-        teamRepository = TeamRepository.getInstance();
-        competitorRepository = CompetitorRepository.getInstance();
-    }
-
-    public static TournamentRepository getInstance() {
-        if (ourInstance == null) ourInstance = new TournamentRepository();
-        return ourInstance;
     }
 
     @Override
@@ -127,10 +138,11 @@ public class TournamentRepository extends TeamQueryRepository<Tournament> {
                 if (competitive instanceof Team) teams.add((Team) competitive);
             }
 
-            userRepository.saveAsNested().apply(users);
-            teamRepository.saveAsNested().apply(teams);
+            RepoProvider.forModel(User.class).saveAsNested().apply(users);
+            RepoProvider.forModel(Team.class).saveAsNested().apply(teams);
+
             tournamentDao.upsert(Collections.unmodifiableList(models));
-            competitorRepository.saveAsNested().apply(competitors);
+            RepoProvider.forModel(Competitor.class).saveAsNested().apply(competitors);
 
             return models;
         };

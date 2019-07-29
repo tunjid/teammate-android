@@ -1,5 +1,30 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.util;
 
+import android.location.Address;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.util.BiConsumer;
@@ -119,11 +144,22 @@ public class ModelUtils {
         catch (Exception e) {return null;}
     }
 
-
     public static Date parseDate(String date, SimpleDateFormat formatter) {
         if (TextUtils.isEmpty(date)) return new Date();
         try { return formatter.parse(date); }
         catch (ParseException e) { return new Date(); }
+    }
+
+    public static String nameAddress(Address address) {
+        StringBuilder addressBuilder = new StringBuilder();
+        int end = address.getMaxAddressLineIndex();
+
+        for (int i = 0; i <= end; i++) {
+            addressBuilder.append(address.getAddressLine(i));
+            if (i != end) addressBuilder.append("\n");
+        }
+
+        return addressBuilder.toString();
     }
 
     public static List<Differentiable> asDifferentiables(List<? extends Differentiable> subTypeList) {
@@ -199,7 +235,7 @@ public class ModelUtils {
         nextCal.setTime(next);
 
         return prevCal.get(Calendar.DAY_OF_MONTH) != nextCal.get(Calendar.DAY_OF_MONTH)
-                        || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
-                        || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR);
+                || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
+                || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR);
     }
 }

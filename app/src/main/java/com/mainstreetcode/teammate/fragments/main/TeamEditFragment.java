@@ -1,33 +1,51 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.fragments.main;
 
-import android.content.Context;
-import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter;
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder;
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment;
 import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.util.Logger;
 import com.mainstreetcode.teammate.util.ScrollManager;
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer;
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer;
 import com.tunjid.androidbootstrap.view.util.InsetFlags;
 
-import static android.app.Activity.RESULT_OK;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.DiffUtil;
 
 /**
  * Creates, edits or lets a {@link com.mainstreetcode.teammate.model.User} join a {@link Team}
@@ -35,6 +53,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class TeamEditFragment extends HeaderedFragment<Team>
         implements
+        AddressPickerFragment.AddressPicker,
         TeamEditAdapter.TeamEditAdapterListener {
 
     private static final String ARG_TEAM = "team";
@@ -150,36 +169,18 @@ public class TeamEditFragment extends HeaderedFragment<Team>
     @Override
     public void onAddressClicked() {
         gofer.setSettingAddress(true);
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        pickPlace();
+    }
 
-        try {startActivityForResult(builder.build(requireActivity()), PLACE_PICKER_REQUEST);}
-        catch (Exception e) {Logger.log(getStableTag(), "Unable to start places api", e);}
+    @Override
+    public void onAddressPicked(Address address) {
+        gofer.setSettingAddress(false);
+        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler));
+        toggleProgress(false);
     }
 
     @Override
     public boolean canEditFields() {
         return gofer.canEditTeam();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        boolean failed = resultCode != RESULT_OK;
-        boolean isFromPlacePicker = requestCode == PLACE_PICKER_REQUEST;
-
-        if (failed && isFromPlacePicker) gofer.setSettingAddress(false);
-        if (failed || !isFromPlacePicker) return;
-
-        Context context = getContext();
-        if (context == null) return;
-
-        toggleProgress(true);
-        Place place = PlacePicker.getPlace(context, data);
-        disposables.add(locationViewModel.fromPlace(place)
-                .subscribe(this::onAddressFound, defaultErrorHandler));
-    }
-
-    private void onAddressFound(Address address) {
-        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler));
-        toggleProgress(false);
     }
 }

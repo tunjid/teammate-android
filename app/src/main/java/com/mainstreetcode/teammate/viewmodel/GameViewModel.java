@@ -1,8 +1,35 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.mainstreetcode.teammate.viewmodel;
 
 import android.annotation.SuppressLint;
 
 import com.mainstreetcode.teammate.model.Competitive;
+import com.mainstreetcode.teammate.repository.GameRepo;
+import com.mainstreetcode.teammate.repository.GameRoundRepo;
+import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.FunctionalDiff;
 import com.mainstreetcode.teammate.model.Game;
 import com.mainstreetcode.teammate.model.HeadToHead;
@@ -10,9 +37,7 @@ import com.mainstreetcode.teammate.model.Message;
 import com.mainstreetcode.teammate.model.Role;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.Tournament;
-import com.mainstreetcode.teammate.repository.GameRepository;
-import com.mainstreetcode.teammate.repository.GameRoundRepository;
-import com.mainstreetcode.teammate.repository.UserRepository;
+import com.mainstreetcode.teammate.repository.UserRepo;
 import com.mainstreetcode.teammate.rest.TeammateApi;
 import com.mainstreetcode.teammate.rest.TeammateService;
 import com.mainstreetcode.teammate.util.ErrorHandler;
@@ -43,8 +68,8 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private final Map<Tournament, Map<Integer, List<Differentiable>>> gameRoundMap = new HashMap<>();
     private final List<Differentiable> headToHeadMatchUps = new ArrayList<>();
 
-    private final GameRoundRepository gameRoundRepository = GameRoundRepository.getInstance();
-    private final GameRepository gameRepository = GameRepository.getInstance();
+    private final GameRoundRepo gameRoundRepository = RepoProvider.forRepo(GameRoundRepo.class);
+    private final GameRepo gameRepository = RepoProvider.forRepo(GameRepo.class);
 
     public GameGofer gofer(Game game) {
         return new GameGofer(game, onError(game), this::getGame, this::updateGame, this::delete, GameViewModel::getEligibleTeamsForGame);
@@ -173,7 +198,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         Iterator<Game> iterator = games.iterator();
         while (iterator.hasNext()) {
             Game game = iterator.next();
-            Competitive entity = game.betweenUsers() ? UserRepository.getInstance().getCurrentUser() : key;
+            Competitive entity = game.betweenUsers() ? RepoProvider.forRepo(UserRepo.class).getCurrentUser() : key;
             boolean isAway = entity.equals(game.getAway().getEntity());
             if (isAway && game.getAway().isDeclined()) iterator.remove();
         }
