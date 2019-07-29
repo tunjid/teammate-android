@@ -32,8 +32,8 @@ android {
         applicationId "com.mainstreetcode.teammate"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 37
-        versionName "3.12.0"
+        versionCode 38
+        versionName "3.13.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true  //add this line
@@ -74,14 +74,11 @@ android {
         }
         staging {
             debuggable false
-            useProguard true
-            minifyEnabled true
             signingConfig signingConfigs.staging
             buildConfigField "boolean", "DEV", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
             signingConfig signingConfigs.release
             buildConfigField "boolean", "DEV", "false"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
