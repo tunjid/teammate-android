@@ -100,5 +100,14 @@
             android:paddingBottom="@dimen/single_margin"
             android:textSize="@dimen/small_text"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/pin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/place_picker_pin"
+            android:textColor="@color/black"
+            android:textSize="@dimen/regular_text" />
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
