@@ -25,10 +25,13 @@
 package com.mainstreetcode.teammate.model;
 
 import androidx.room.Ignore;
+
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
+
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -187,8 +190,14 @@ public class Team extends TeamEntity
 
     public void setAddress(Address address) {
         city = address.getLocality();
+        if (city == null) city = address.getSubLocality();
+
         state = address.getAdminArea();
         zip = address.getPostalCode();
+
+        if (city == null) city = "N/A";
+        if (state == null) state = "N/A";
+
         location = new LatLng(address.getLatitude(), address.getLongitude());
     }
 

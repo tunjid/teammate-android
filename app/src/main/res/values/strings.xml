@@ -341,6 +341,7 @@
     <!--AddressPickerFragment-->
     <string name="place_picker_pick">Select Location</string>
     <string name="place_picker_hint">Search for a place</string>
+    <string name="place_picker_pin">📍</string>
 
     <!--BlockUserFragment-->
     <string name="blocked_user">Blocked User</string>
