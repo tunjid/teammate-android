@@ -36,6 +36,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
@@ -237,15 +238,9 @@ class TournamentDetailFragment : MainActivityFragment() {
         private const val ARG_TOURNAMENT = "tournament"
         private const val ARG_COMPETITOR = "competitor"
 
-        fun newInstance(tournament: Tournament): TournamentDetailFragment {
-            val fragment = TournamentDetailFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TOURNAMENT, tournament)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(tournament: Tournament): TournamentDetailFragment = TournamentDetailFragment().apply {
+            arguments = bundleOf(ARG_TOURNAMENT to tournament)
+            setEnterExitTransitions()
         }
     }
 }

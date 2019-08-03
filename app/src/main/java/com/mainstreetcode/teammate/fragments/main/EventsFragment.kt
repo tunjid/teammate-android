@@ -45,6 +45,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 
@@ -175,13 +176,6 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
 
         private const val ARG_TEAM = "team"
 
-        fun newInstance(team: Team): EventsFragment {
-            val fragment = EventsFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TEAM, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Team): EventsFragment = EventsFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }
 }

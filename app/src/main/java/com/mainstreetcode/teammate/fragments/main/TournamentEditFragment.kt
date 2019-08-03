@@ -32,6 +32,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -110,9 +111,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-         R.id.action_rounds -> showFragment(TournamentDetailFragment.newInstance(headeredModel))
-         else -> super.onOptionsItemSelected(item)
-     }
+        R.id.action_rounds -> showFragment(TournamentDetailFragment.newInstance(headeredModel))
+        else -> super.onOptionsItemSelected(item)
+    }
 
     override fun onResume() {
         super.onResume()
@@ -190,15 +191,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         internal const val ARG_TOURNAMENT = "tournament"
         private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
-        fun newInstance(tournament: Tournament): TournamentEditFragment {
-            val fragment = TournamentEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TOURNAMENT, tournament)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(tournament: Tournament): TournamentEditFragment = TournamentEditFragment().apply {
+            arguments = bundleOf(ARG_TOURNAMENT to tournament)
+            setEnterExitTransitions()
         }
     }
 }

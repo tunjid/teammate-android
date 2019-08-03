@@ -43,12 +43,7 @@ class BlankBottomSheetFragment : MainActivityFragment() {
 
     companion object {
 
-        fun newInstance(): BlankBottomSheetFragment {
-            val bottomSheetFragment = BlankBottomSheetFragment()
-            bottomSheetFragment.arguments = Bundle()
-
-            return bottomSheetFragment
-        }
+        fun newInstance(): BlankBottomSheetFragment = BlankBottomSheetFragment().apply { arguments = Bundle() }
     }
 }
 

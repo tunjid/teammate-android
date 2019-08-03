@@ -122,12 +122,6 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
         private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
 
-        fun newInstance(): UserSearchFragment {
-            val fragment = UserSearchFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): UserSearchFragment = UserSearchFragment().apply { arguments = Bundle() }
     }
 }

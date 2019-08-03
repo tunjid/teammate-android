@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter
 import com.mainstreetcode.teammate.adapters.TeamAdapter
@@ -211,13 +212,6 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
 
         private const val ARG_TOURNAMENT = "tournament"
 
-        fun newInstance(tournament: Tournament): CompetitorsFragment {
-            val fragment = CompetitorsFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TOURNAMENT, tournament)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(tournament: Tournament): CompetitorsFragment = CompetitorsFragment().apply { arguments = bundleOf(ARG_TOURNAMENT to tournament) }
     }
 }

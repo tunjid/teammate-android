@@ -216,13 +216,9 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
         private const val MAP_ZOOM = 10
 
-        fun newInstance(): EventSearchFragment {
-            val fragment = EventSearchFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): EventSearchFragment = EventSearchFragment().apply {
+            arguments = Bundle()
+            setEnterExitTransitions()
         }
     }
 }

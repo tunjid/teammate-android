@@ -30,6 +30,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.UserEditAdapter
@@ -121,13 +122,6 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
 
         private const val ARG_USER = "user"
 
-        fun newInstance(user: User): UserEditFragment {
-            val fragment = UserEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_USER, user)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(user: User): UserEditFragment = UserEditFragment().apply { arguments = bundleOf(ARG_USER to user) }
     }
 }

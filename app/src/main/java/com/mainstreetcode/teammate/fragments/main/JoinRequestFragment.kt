@@ -33,6 +33,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.JoinRequestAdapter
@@ -236,15 +237,9 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
             return fragment
         }
 
-        private fun newInstance(joinRequest: JoinRequest): JoinRequestFragment {
-            val fragment = JoinRequestFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_JOIN_REQUEST, joinRequest)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        private fun newInstance(joinRequest: JoinRequest): JoinRequestFragment = JoinRequestFragment().apply {
+            arguments = bundleOf(ARG_JOIN_REQUEST to joinRequest)
+            setEnterExitTransitions()
         }
     }
 }

@@ -31,6 +31,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ImageMediaViewHolder
@@ -156,15 +157,9 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
         internal const val ARG_MEDIA = "media"
 
-        fun newInstance(media: Media): MediaDetailFragment {
-            val fragment = MediaDetailFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_MEDIA, media)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(media: Media): MediaDetailFragment = MediaDetailFragment().apply {
+            arguments = bundleOf(ARG_MEDIA to media)
+            setEnterExitTransitions()
         }
     }
 }

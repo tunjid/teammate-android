@@ -31,6 +31,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameEditAdapter
@@ -188,15 +189,9 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
         private const val ARG_GAME = "game"
         private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
-        fun newInstance(game: Game): GameEditFragment {
-            val fragment = GameEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_GAME, game)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(game: Game): GameEditFragment = GameEditFragment().apply {
+            arguments = bundleOf(ARG_GAME to game)
+            setEnterExitTransitions()
         }
     }
 }

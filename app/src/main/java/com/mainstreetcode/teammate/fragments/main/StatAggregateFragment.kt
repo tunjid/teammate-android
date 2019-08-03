@@ -143,13 +143,9 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
 
     companion object {
 
-        fun newInstance(): StatAggregateFragment {
-            val fragment = StatAggregateFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): StatAggregateFragment = StatAggregateFragment().apply {
+            arguments = Bundle()
+            setEnterExitTransitions()
         }
     }
 

@@ -33,6 +33,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.core.util.Pair
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
@@ -252,13 +253,6 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         private const val MEDIA_DELETE_SNACKBAR_DELAY = 350
         private const val ARG_TEAM = "team"
 
-        fun newInstance(team: Team): MediaFragment {
-            val fragment = MediaFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TEAM, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Team): MediaFragment = MediaFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }
 }

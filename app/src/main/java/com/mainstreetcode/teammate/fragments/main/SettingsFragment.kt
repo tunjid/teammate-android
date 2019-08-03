@@ -101,12 +101,6 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
                 SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp)
         )
 
-        fun newInstance(): SettingsFragment {
-            val fragment = SettingsFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): SettingsFragment = SettingsFragment().apply { arguments = Bundle() }
     }
 }

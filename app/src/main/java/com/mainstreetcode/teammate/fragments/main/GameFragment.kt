@@ -61,6 +61,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.adapters.GameAdapter
 import com.mainstreetcode.teammate.util.yes
@@ -370,13 +371,6 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
         private const val ARG_GAME = "game"
 
-        fun newInstance(game: Game): GameFragment {
-            val fragment = GameFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_GAME, game)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(game: Game): GameFragment = GameFragment().apply { arguments = bundleOf(ARG_GAME to game) }
     }
 }

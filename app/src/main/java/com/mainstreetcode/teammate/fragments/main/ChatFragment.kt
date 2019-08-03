@@ -36,6 +36,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
@@ -311,13 +312,6 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         private const val ARG_TEAM = "team"
         private val EXCLUDED_VIEWS = intArrayOf(R.id.chat)
 
-        fun newInstance(team: Team): ChatFragment {
-            val fragment = ChatFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TEAM, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Team): ChatFragment = ChatFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }
 }

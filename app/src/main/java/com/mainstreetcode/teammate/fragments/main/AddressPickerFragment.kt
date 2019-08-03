@@ -229,13 +229,9 @@ class AddressPickerFragment : MainActivityFragment() {
 
         private const val MAP_ZOOM = 10
 
-        fun newInstance(): AddressPickerFragment {
-            val fragment = AddressPickerFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): AddressPickerFragment = AddressPickerFragment().apply {
+            arguments = Bundle()
+            setEnterExitTransitions()
         }
     }
 }

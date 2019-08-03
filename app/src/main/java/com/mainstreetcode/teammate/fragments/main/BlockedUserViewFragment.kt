@@ -41,6 +41,7 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 
 class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
@@ -118,13 +119,6 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
 
         internal const val ARG_BLOCKED_USER = "blockedUser"
 
-        fun newInstance(guest: BlockedUser): BlockedUserViewFragment {
-            val fragment = BlockedUserViewFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_BLOCKED_USER, guest)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(guest: BlockedUser): BlockedUserViewFragment = BlockedUserViewFragment().apply { arguments = bundleOf(ARG_BLOCKED_USER to guest) }
     }
 }

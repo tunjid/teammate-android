@@ -163,12 +163,6 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
 
         private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
 
-        fun newInstance(): TeamsFragment {
-            val fragment = TeamsFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): TeamsFragment = TeamsFragment().apply { arguments = Bundle() }
     }
 }

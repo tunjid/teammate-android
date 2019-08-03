@@ -37,6 +37,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -288,21 +289,13 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         internal const val ARG_EVENT = "event"
         private const val ARG_GAME = "game"
 
-        fun newInstance(event: Event): EventEditFragment {
-            val fragment = EventEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_EVENT, event)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(event: Event): EventEditFragment = EventEditFragment().apply {
+            arguments = bundleOf(ARG_EVENT to event)
+            setEnterExitTransitions()
         }
 
-        fun newInstance(game: Game): EventEditFragment {
-            val fragment = newInstance(game.event)
-            fragment.arguments!!.putParcelable(ARG_GAME, game)
-            return fragment
+        fun newInstance(game: Game): EventEditFragment = newInstance(game.event).apply {
+            arguments?.putParcelable(ARG_GAME, game)
         }
     }
 }

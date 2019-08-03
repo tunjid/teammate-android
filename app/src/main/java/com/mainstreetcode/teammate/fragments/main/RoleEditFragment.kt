@@ -45,6 +45,7 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.util.yes
 
@@ -174,15 +175,9 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
 
         internal const val ARG_ROLE = "role"
 
-        fun newInstance(role: Role): RoleEditFragment {
-            val fragment = RoleEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_ROLE, role)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(role: Role): RoleEditFragment = RoleEditFragment().apply {
+            arguments = bundleOf(ARG_ROLE to role)
+            setEnterExitTransitions()
         }
     }
 }

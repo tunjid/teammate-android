@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -184,13 +185,6 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
 
         private const val ARG_TEAM = "team"
 
-        fun newInstance(team: Team): GamesFragment {
-            val fragment = GamesFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TEAM, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Team): GamesFragment = GamesFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }
 }

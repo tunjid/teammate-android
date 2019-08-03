@@ -30,6 +30,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GuestAdapter
@@ -119,13 +120,6 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
 
         private const val ARG_GUEST = "guest"
 
-        fun newInstance(guest: Guest): GuestViewFragment {
-            val fragment = GuestViewFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_GUEST, guest)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(guest: Guest): GuestViewFragment = GuestViewFragment().apply { arguments = bundleOf(ARG_GUEST to guest) }
     }
 }

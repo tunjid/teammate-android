@@ -31,6 +31,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatRankAdapter
@@ -125,13 +126,6 @@ class StatRankFragment : MainActivityFragment() {
 
         private const val ARG_TOURNAMENT = "team"
 
-        fun newInstance(team: Tournament): StatRankFragment {
-            val fragment = StatRankFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TOURNAMENT, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Tournament): StatRankFragment = StatRankFragment().apply { arguments = bundleOf(ARG_TOURNAMENT to team) }
     }
 }

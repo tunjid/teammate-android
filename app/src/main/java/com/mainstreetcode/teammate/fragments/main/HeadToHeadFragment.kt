@@ -189,13 +189,9 @@ class HeadToHeadFragment : MainActivityFragment(), UserAdapter.AdapterListener, 
 
     companion object {
 
-        fun newInstance(): HeadToHeadFragment {
-            val fragment = HeadToHeadFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): HeadToHeadFragment = HeadToHeadFragment().apply {
+            arguments = Bundle()
+            setEnterExitTransitions()
         }
     }
 }

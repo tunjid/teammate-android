@@ -28,6 +28,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -140,13 +141,6 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
 
         private const val ARG_TEAM = "team"
 
-        fun newInstance(team: Team): BlockedUsersFragment {
-            val fragment = BlockedUsersFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TEAM, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Team): BlockedUsersFragment = BlockedUsersFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }
 }

@@ -30,6 +30,7 @@ import androidx.viewpager.widget.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentStatAdapter
@@ -73,15 +74,9 @@ class StatDetailFragment : MainActivityFragment() {
 
         private const val ARG_TOURNAMENT = "tournament"
 
-        fun newInstance(tournament: Tournament): StatDetailFragment {
-            val fragment = StatDetailFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TOURNAMENT, tournament)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(tournament: Tournament): StatDetailFragment = StatDetailFragment().apply {
+            arguments = bundleOf(ARG_TOURNAMENT to tournament)
+            setEnterExitTransitions()
         }
     }
 }

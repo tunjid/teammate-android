@@ -263,13 +263,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
 
     companion object {
 
-        fun newInstance(): FeedFragment {
-            val fragment = FeedFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): FeedFragment = FeedFragment().apply { arguments = Bundle() }
 
         private val timeOfDay: String
             get() {

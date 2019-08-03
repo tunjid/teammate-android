@@ -28,6 +28,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StandingsAdapter
@@ -134,13 +135,6 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
 
         private const val ARG_TOURNAMENT = "team"
 
-        fun newInstance(team: Tournament): StandingsFragment {
-            val fragment = StandingsFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TOURNAMENT, team)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(team: Tournament): StandingsFragment = StandingsFragment().apply { arguments = bundleOf(ARG_TOURNAMENT to team) }
     }
 }

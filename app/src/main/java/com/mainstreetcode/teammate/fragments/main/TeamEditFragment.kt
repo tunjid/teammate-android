@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamEditAdapter
@@ -145,13 +146,6 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
 
         internal fun newEditInstance(team: Team): TeamEditFragment = newInstance(team)
 
-        private fun newInstance(team: Team): TeamEditFragment {
-            val fragment = TeamEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_TEAM, team)
-            fragment.arguments = args
-            return fragment
-        }
+        private fun newInstance(team: Team): TeamEditFragment = TeamEditFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }
 }

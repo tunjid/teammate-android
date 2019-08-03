@@ -143,13 +143,7 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
         private const val ARG_SPORT = "sport-code"
 
-        fun newInstance(): TeamSearchFragment {
-            val fragment = TeamSearchFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): TeamSearchFragment = TeamSearchFragment().apply { arguments = Bundle() }
 
         fun newInstance(sport: Sport): TeamSearchFragment {
             val fragment = newInstance()

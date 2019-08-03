@@ -130,12 +130,6 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
 
     companion object {
 
-        fun newInstance(): DeclinedCompetitionsFragment {
-            val fragment = DeclinedCompetitionsFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): DeclinedCompetitionsFragment = DeclinedCompetitionsFragment().apply { arguments = Bundle() }
     }
 }

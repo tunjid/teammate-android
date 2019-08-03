@@ -33,6 +33,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatEditAdapter
@@ -137,7 +138,7 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
         toggleProgress(false)
         scrollManager.onDiff(result)
         viewHolder.bind(headeredModel)
-activity?.invalidateOptionsMenu()
+        activity?.invalidateOptionsMenu()
     }
 
     override fun onUserClicked(item: User) {
@@ -207,15 +208,9 @@ activity?.invalidateOptionsMenu()
         private const val ARG_STAT = "stat"
         private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
-        fun newInstance(stat: Stat): StatEditFragment {
-            val fragment = StatEditFragment()
-            val args = Bundle()
-
-            args.putParcelable(ARG_STAT, stat)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-
-            return fragment
+        fun newInstance(stat: Stat): StatEditFragment = StatEditFragment().apply {
+            arguments = bundleOf(ARG_STAT to stat)
+            setEnterExitTransitions()
         }
     }
 }

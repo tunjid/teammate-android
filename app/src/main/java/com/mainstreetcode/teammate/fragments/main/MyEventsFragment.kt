@@ -133,12 +133,6 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
 
     companion object {
 
-        fun newInstance(): MyEventsFragment {
-            val fragment = MyEventsFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): MyEventsFragment = MyEventsFragment().apply { arguments = Bundle() }
     }
 }
