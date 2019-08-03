@@ -74,16 +74,16 @@ public class Guest extends GuestEntity
 
     @Override
     public Item<Guest> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
     public List<Item<Guest>> asItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, ignored -> {}, this),
-                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, ignored -> {}, this),
-                Item.email(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, ignored -> {}, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, ignored -> {}, this),
+                Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, ignored -> {}, this),
+                Item.Companion.email(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, ignored -> {}, this)
         );
     }
 

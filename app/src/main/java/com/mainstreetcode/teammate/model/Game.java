@@ -93,17 +93,17 @@ public class Game extends GameEntity
     @Override
     public List<Item<Game>> asItems() {
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.NUMBER, R.string.game_competitors, this::getName, ignored -> {}, this),
-                Item.number(holder.get(1), 1, Item.INPUT, R.string.game_home_score, () -> String.valueOf(homeScore), this::setHomeScore, this),
-                Item.number(holder.get(2), 2, Item.INPUT, R.string.game_away_score, () -> String.valueOf(awayScore), this::setAwayScore, this),
-                Item.number(holder.get(3), 3, Item.NUMBER, R.string.game_round, () -> String.valueOf(round), ignored -> {}, this),
-                Item.number(holder.get(4), 4, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this)
+                Item.Companion.text(holder.get(0), 0, Item.NUMBER, R.string.game_competitors, this::getName, ignored -> {}, this),
+                Item.Companion.number(holder.get(1), 1, Item.INPUT, R.string.game_home_score, () -> String.valueOf(homeScore), this::setHomeScore, this),
+                Item.Companion.number(holder.get(2), 2, Item.INPUT, R.string.game_away_score, () -> String.valueOf(awayScore), this::setAwayScore, this),
+                Item.Companion.number(holder.get(3), 3, Item.NUMBER, R.string.game_round, () -> String.valueOf(round), ignored -> {}, this),
+                Item.Companion.number(holder.get(4), 4, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this)
         );
     }
 
     @Override
     public Item<Game> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, () -> "", url -> {}, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, () -> "", url -> {}, this);
     }
 
     @Override

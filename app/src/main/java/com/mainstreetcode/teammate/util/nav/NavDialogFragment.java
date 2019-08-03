@@ -129,6 +129,6 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
 
     private void viewTeam(Team team) {
         dismiss();
-        ((BaseActivity) requireActivity()).showFragment(TeamMembersFragment.newInstance(team));
+        ((BaseActivity) requireActivity()).showFragment(TeamMembersFragment.Companion.newInstance(team));
     }
 }

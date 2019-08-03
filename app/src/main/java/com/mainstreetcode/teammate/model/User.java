@@ -81,17 +81,17 @@ public class User extends UserEntity implements
     @Override
     public List<Item<User>> asItems() {
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
-                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-                Item.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), this::setScreenName, this),
-                Item.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.Companion.nullToEmpty(firstName), this::setFirstName, this),
+                Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.Companion.nullToEmpty(lastName), this::setLastName, this),
+                Item.Companion.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.Companion.nullToEmpty(screenName), this::setScreenName, this),
+                Item.Companion.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.Companion.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
+                Item.Companion.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.Companion.nullToEmpty(about), this::setAbout, this)
         );
     }
 
     @Override
     public Item<User> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override

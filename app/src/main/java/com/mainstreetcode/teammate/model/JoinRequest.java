@@ -92,29 +92,29 @@ public class JoinRequest extends JoinRequestEntity
     public List<Item<JoinRequest>> asItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, Item::ignore, this),
-                Item.email(holder.get(3), 3, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.Companion.text(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, Item.Companion::ignore, this),
+                Item.Companion.email(holder.get(3), 3, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
                 // END USER ITEMS
-                Item.text(holder.get(4),4, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.Companion.text(holder.get(4),4, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName()),
                 // START TEAM ITEMS
-                Item.text(holder.get(5), 5, Item.INPUT, R.string.team_name, team::getName, Item::ignore, this),
-                Item.text(holder.get(6), 6, Item.SPORT, R.string.team_sport, team.getSport()::getCode, Item::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(holder.get(7), 7, Item.CITY, R.string.city, team::getCity, Item::ignore, this),
-                Item.text(holder.get(8), 8, Item.STATE, R.string.state, team::getState, Item::ignore, this),
-                Item.text(holder.get(9), 9, Item.ZIP, R.string.zip, team::getZip, Item::ignore, this),
-                Item.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, team::getDescription, Item::ignore, this),
-                Item.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(team.getMinAge()), Item::ignore, this),
-                Item.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(team.getMaxAge()), Item::ignore, this)
+                Item.Companion.text(holder.get(5), 5, Item.INPUT, R.string.team_name, team::getName, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(6), 6, Item.SPORT, R.string.team_sport, team.getSport()::getCode, Item.Companion::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
+                Item.Companion.text(holder.get(7), 7, Item.CITY, R.string.city, team::getCity, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(8), 8, Item.STATE, R.string.state, team::getState, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(9), 9, Item.ZIP, R.string.zip, team::getZip, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, team::getDescription, Item.Companion::ignore, this),
+                Item.Companion.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(team.getMinAge()), Item.Companion::ignore, this),
+                Item.Companion.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(team.getMaxAge()), Item.Companion::ignore, this)
         );
     }
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
         RemoteImage image = userApproved ? team : user;
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, image::getImageUrl, imageUrl -> {}, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, image::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override

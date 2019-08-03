@@ -99,9 +99,9 @@ public class HeadToHead {
 
         private List<Differentiable> buildItems() {
             return Arrays.asList(
-                    Item.text(holder.get(0), 0, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::getCode, this::setType, this)
+                    Item.Companion.text(holder.get(0), 0, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::getCode, this::setType, this)
                             .textTransformer(value -> Config.tournamentTypeFromCode(value.toString()).getName()),
-                    Item.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
+                    Item.Companion.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
                             .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
                     home,
                     away

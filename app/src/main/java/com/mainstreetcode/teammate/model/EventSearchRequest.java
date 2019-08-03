@@ -115,12 +115,12 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
     @SuppressWarnings("unchecked")
     private List<Item<EventSearchRequest>> buildItems() {
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.LOCATION, R.string.location, this::getAddress, ignored -> {}, this),
-                Item.text(holder.get(1),1, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
-                Item.text(holder.get(2),2, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
+                Item.Companion.text(holder.get(0), 0, Item.LOCATION, R.string.location, this::getAddress, ignored -> {}, this),
+                Item.Companion.text(holder.get(1),1, Item.INFO, R.string.event_distance, this::getDistance, ignored -> {}, this),
+                Item.Companion.text(holder.get(2),2, Item.SPORT, R.string.team_sport, this::getSportName, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.text(holder.get(3),3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
-                Item.text(holder.get(4),4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
+                Item.Companion.text(holder.get(3),3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
+                Item.Companion.text(holder.get(4),4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
         );
     }
 

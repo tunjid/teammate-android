@@ -100,16 +100,16 @@ public class BlockedUser implements UserHost,
 
     @Override
     public Item<BlockedUser> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.getImageUrl()), Item::ignore, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.Companion.nullToEmpty(user.getImageUrl()), Item.Companion::ignore, this);
     }
 
     @Override
     public List<Item<BlockedUser>> asItems() {
         User user = getUser();
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
-                Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
-                Item.text(holder.get(2), 2, Item.ROLE, R.string.team_role, reason::getCode, Item::ignore, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::getFirstName, user::setFirstName, this),
+                Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
+                Item.Companion.text(holder.get(2), 2, Item.ROLE, R.string.team_role, reason::getCode, Item.Companion::ignore, this)
                         .textTransformer(value -> Config.reasonFromCode(value.toString()).getName())
         );
     }

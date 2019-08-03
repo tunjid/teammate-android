@@ -86,15 +86,15 @@ public class Stat extends StatEntity
     @Override
     public List<Item<Stat>> asItems() {
         return Arrays.asList(
-                Item.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this),
-                Item.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
+                Item.Companion.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this),
+                Item.Companion.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
                         .textTransformer(value -> sport.statTypeFromCode(value.toString()).getName())
         );
     }
 
     @Override
     public Item<Stat> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, () -> "", url -> {}, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, () -> "", url -> {}, this);
     }
 
     @Override

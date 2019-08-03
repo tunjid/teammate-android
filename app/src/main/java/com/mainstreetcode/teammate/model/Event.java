@@ -97,20 +97,20 @@ public class Event extends EventEntity
     @Override
     public List<Item<Event>> asItems() {
         return Arrays.asList(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, visibility::getCode, this::setVisibility, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.Companion.nullToEmpty(name), this::setName, this),
+                Item.Companion.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, visibility::getCode, this::setVisibility, this)
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
-                Item.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, () -> String.valueOf(spots), this::setSpots, this),
-                Item.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-                Item.text(holder.get(4), 4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
-                Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this),
-                Item.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
+                Item.Companion.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, () -> String.valueOf(spots), this::setSpots, this),
+                Item.Companion.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.Companion.nullToEmpty(locationName), this::setLocationName, this),
+                Item.Companion.text(holder.get(4), 4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
+                Item.Companion.text(holder.get(5), 5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this),
+                Item.Companion.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.Companion.nullToEmpty(notes), this::setNotes, this)
                 );
     }
 
     @Override
     public Item<Event> getHeaderItem() {
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
     }
 
     @Override
