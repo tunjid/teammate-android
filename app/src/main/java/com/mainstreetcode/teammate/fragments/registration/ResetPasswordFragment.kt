@@ -49,15 +49,15 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
     private var tokenInput: EditText? = null
     private var passwordInput: EditText? = null
 
-    protected override val fabStringResource: Int
+    override val fabStringResource: Int
         @StringRes
         get() = R.string.submit
 
-    protected override val fabIconResource: Int
+    override val fabIconResource: Int
         @DrawableRes
         get() = R.drawable.ic_check_white_24dp
 
-    protected override val toolbarTitle: CharSequence
+    override val toolbarTitle: CharSequence
         get() = getString(R.string.sign_in_forgot_password)
 
     override fun getStableTag(): String {

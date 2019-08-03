@@ -67,12 +67,12 @@ public class TournamentViewModel extends TeamMappedViewModel<Tournament> {
 
     public TournamentViewModel() {
         api = TeammateService.getApiInstance();
-        repository = RepoProvider.forRepo(TournamentRepo.class);
+        repository = RepoProvider.Companion.forRepo(TournamentRepo.class);
     }
 
     public TournamentGofer gofer(Tournament tournament) {
         return new TournamentGofer(tournament, onError(tournament), this::getTournament, this::createOrUpdateTournament, this::delete,
-                ignored -> RepoProvider.forRepo(CompetitorRepo.class).modelsBefore(tournament, 0));
+                ignored -> RepoProvider.Companion.forRepo(CompetitorRepo.class).modelsBefore(tournament, 0));
     }
 
     @Override

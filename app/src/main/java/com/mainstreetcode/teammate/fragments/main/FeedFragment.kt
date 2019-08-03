@@ -276,5 +276,5 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> FeedItem<*>.isOf() where T : Any, T : Model<T> =
-        if (getModel() is T) this as FeedItem<T>
+        if (model is T) this as FeedItem<T>
         else null

@@ -105,7 +105,7 @@ public class FunctionalDiff {
         if (identifiable instanceof FeedItem)
             identifiable = ((FeedItem) identifiable).getModel();
         if (identifiable instanceof TeamMember)
-            identifiable = ((TeamMember) identifiable).getWrappedModel();
+            identifiable = (Differentiable) ((TeamMember) identifiable).getWrappedModel();
         if (identifiable.getClass().equals(Item.class)) return 0;
         if (identifiable.getClass().equals(JoinRequest.class)) return 5;
         if (identifiable.getClass().equals(Competitor.class)) return 10;

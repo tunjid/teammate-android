@@ -49,7 +49,7 @@ public class LocalRoleViewModel extends ViewModel {
     private final RoleRepo repository;
 
     public LocalRoleViewModel() {
-        repository = RepoProvider.forRepo(RoleRepo.class);
+        repository = RepoProvider.Companion.forRepo(RoleRepo.class);
     }
 
     public boolean hasPrivilegedRole() {

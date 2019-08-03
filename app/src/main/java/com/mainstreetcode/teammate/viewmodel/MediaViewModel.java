@@ -61,7 +61,7 @@ public class MediaViewModel extends TeamMappedViewModel<Media> {
 
     public MediaViewModel() {
         selectionMap = new HashMap<>();
-        repository = RepoProvider.forRepo(MediaRepo.class);
+        repository = RepoProvider.Companion.forRepo(MediaRepo.class);
         uploadCompletionProcessor = PublishProcessor.create();
     }
 

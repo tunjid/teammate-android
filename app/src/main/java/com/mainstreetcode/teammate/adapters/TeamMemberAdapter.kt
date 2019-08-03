@@ -72,7 +72,7 @@ class TeamMemberAdapter(
         if (item is Ad<*>) (viewHolder as AdViewHolder<*>).bind(item)
         if (item !is TeamMember<*>) return
 
-        when (val wrapped = item.getWrappedModel()) {
+        when (val wrapped = item.wrappedModel) {
             is Role -> (viewHolder as RoleViewHolder).bind(wrapped)
             is JoinRequest -> (viewHolder as JoinRequestViewHolder).bind(wrapped)
         }
@@ -87,7 +87,7 @@ class TeamMemberAdapter(
         if (item is Ad<*>) return item.type
         if (item !is TeamMember<*>) return JOIN_REQUEST
 
-        val wrapped = item.getWrappedModel()
+        val wrapped = item.wrappedModel
         return if (wrapped is Role) ROLE else JOIN_REQUEST
     }
 

@@ -50,7 +50,7 @@ public class UserViewModel extends ViewModel {
     private final UserRepo repository;
 
     public UserViewModel() {
-        repository = RepoProvider.forRepo(UserRepo.class);
+        repository = RepoProvider.Companion.forRepo(UserRepo.class);
     }
 
     public boolean isSignedIn() {

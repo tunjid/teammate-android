@@ -52,10 +52,10 @@ class FeedItemViewHolder(
 
     fun bind(item: FeedItem<*>) {
         this.item = item
-        bind(item.getModel())
+        bind(item.model)
 
-        title.text = item.getTitle()
-        subtitle.text = item.getBody()
+        title.text = item.title
+        subtitle.text = item.body
     }
 
     override fun bind(model: RemoteImage) {

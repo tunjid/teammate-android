@@ -55,21 +55,21 @@ public class TeammateMessagingService extends FirebaseMessagingService {
     public void onNewToken(String token) { updateFcmToken(token); }
 
     public <T extends Model<T>> void handleMessage(RemoteMessage remoteMessage) {
-        FeedItem<T> item = FeedItem.fromNotification(remoteMessage);
+        FeedItem<T> item = FeedItem.Companion.fromNotification(remoteMessage);
         if (item == null) return;
 
         if (item.isDeleteAction())
-            RepoProvider.forModel(item.getItemClass()).queueForLocalDeletion(item.getModel());
-        else NotifierProvider.forModel(item.getItemClass()).notify(item);
+            RepoProvider.Companion.forModel(item.getItemClass()).queueForLocalDeletion(item.getModel());
+        else NotifierProvider.Companion.forModel(item.getItemClass()).notify(item);
     }
 
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void updateFcmToken(String token) {
-        if (TextUtils.isEmpty(token) || RepoProvider.forRepo(UserRepo.class).getCurrentUser().isEmpty())
+        if (TextUtils.isEmpty(token) || RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser().isEmpty())
             return;
 
-        RepoProvider.forRepo(DeviceRepo.class).createOrUpdate(Device.withFcmToken(token)).subscribe(__ -> {}, ErrorHandler.EMPTY);
+        RepoProvider.Companion.forRepo(DeviceRepo.class).createOrUpdate(Device.withFcmToken(token)).subscribe(__ -> {}, ErrorHandler.EMPTY);
     }
 
 }

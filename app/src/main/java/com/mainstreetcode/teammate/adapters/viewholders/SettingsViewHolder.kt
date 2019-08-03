@@ -46,7 +46,7 @@ class SettingsViewHolder(
 
     internal val icon: Drawable?
         get() {
-            val src = ContextCompat.getDrawable(itemView.context, item!!.drawableRes) ?: return null
+            val src = ContextCompat.getDrawable(itemView.context, item.drawableRes) ?: return null
 
             val wrapped = DrawableCompat.wrap(src)
             DrawableCompat.setTint(wrapped, ViewHolderUtil.resolveThemeColor(itemView.context, R.attr.alt_icon_tint))

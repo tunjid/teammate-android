@@ -89,13 +89,13 @@ public class App extends Application {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void prime() {
         // Load user from cache if they exist
-        UserRepo userRepository = RepoProvider.forRepo(UserRepo.class);
+        UserRepo userRepository = RepoProvider.Companion.forRepo(UserRepo.class);
         if (!userRepository.isSignedIn()) return;
 
         userRepository.getMe()
                 .lastOrError()
-                .flatMap(ignored -> RepoProvider.forRepo(ConfigRepo.class).get("").lastOrError())
-                .flatMap(ignored -> RepoProvider.forRepo(RoleRepo.class).getMyRoles().lastOrError())
+                .flatMap(ignored -> RepoProvider.Companion.forRepo(ConfigRepo.class).get("").lastOrError())
+                .flatMap(ignored -> RepoProvider.Companion.forRepo(RoleRepo.class).getMyRoles().lastOrError())
                 .subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 

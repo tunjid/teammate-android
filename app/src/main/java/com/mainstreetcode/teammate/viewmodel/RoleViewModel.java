@@ -56,7 +56,7 @@ public class RoleViewModel extends MappedViewModel<Class<Role>, Role> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public RoleViewModel() {
-        roleRepository = RepoProvider.forRepo(RoleRepo.class);
+        roleRepository = RepoProvider.Companion.forRepo(RoleRepo.class);
         getMore(Role.class).subscribe(ignored -> {}, ErrorHandler.EMPTY);
     }
 

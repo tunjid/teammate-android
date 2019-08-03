@@ -62,7 +62,7 @@ public class TeamViewModel extends MappedViewModel<Class<Team>, Team> {
 
     public TeamViewModel() {
         teamChangeProcessor = PublishProcessor.create();
-        repository = RepoProvider.forRepo(TeamRepo.class);
+        repository = RepoProvider.Companion.forRepo(TeamRepo.class);
     }
 
     @Override

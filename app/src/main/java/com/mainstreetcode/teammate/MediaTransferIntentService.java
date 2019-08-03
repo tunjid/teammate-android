@@ -148,7 +148,7 @@ public class MediaTransferIntentService extends IntentService {
         private String maxStorageMessage = "";
 
         private final Queue<Media> uploadQueue = new ConcurrentLinkedQueue<>();
-        private final ModelRepo<Media> repository = RepoProvider.forModel(Media.class);
+        private final ModelRepo<Media> repository = RepoProvider.Companion.forModel(Media.class);
 
         void enqueue(Media media) {
             numToUpload++;
@@ -236,7 +236,7 @@ public class MediaTransferIntentService extends IntentService {
 
         void onDownloadComplete(long id) {
             if (downloadQueue.remove(id) && downloadQueue.isEmpty())
-                NotifierProvider.forNotifier(MediaNotifier.class).notifyDownloadComplete();
+                NotifierProvider.Companion.forNotifier(MediaNotifier.class).notifyDownloadComplete();
         }
 
         private String getMediaTitle(Media media, App app) {

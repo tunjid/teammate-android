@@ -54,13 +54,15 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.functions.BiFunction;
 
+import static com.mainstreetcode.teammate.model.TeamMemberKt.toTeamMember;
+
 public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
 
     private final TeamMemberRepo repository;
 
     public TeamMemberViewModel() {
         //noinspection unchecked,RedundantCast(The redundant cast is not redundant, it fixes a compiler error)
-        repository = (TeamMemberRepo) RepoProvider.forRepo(TeamMemberRepo.class);
+        repository = (TeamMemberRepo) RepoProvider.Companion.forRepo(TeamMemberRepo.class);
     }
 
     @Override
@@ -99,11 +101,11 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     public JoinRequestGofer gofer(JoinRequest joinRequest) {
-        return new JoinRequestGofer(joinRequest, onError(TeamMember.fromModel(joinRequest)), RepoProvider.forRepo(JoinRequestRepo.class)::get, this::processRequest);
+        return new JoinRequestGofer(joinRequest, onError(toTeamMember(joinRequest)), RepoProvider.Companion.forRepo(JoinRequestRepo.class)::get, this::processRequest);
     }
 
     public RoleGofer gofer(Role role) {
-        return new RoleGofer(role, onError(TeamMember.fromModel(role)), RepoProvider.forRepo(RoleRepo.class)::get, this::deleteRole, this::updateRole);
+        return new RoleGofer(role, onError(toTeamMember(role)), RepoProvider.Companion.forRepo(RoleRepo.class)::get, this::deleteRole, this::updateRole);
     }
 
     public Flowable<User> getAllUsers() {
@@ -136,7 +138,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     private void onRequestProcessed(JoinRequest request, boolean approved, Team team, Differentiable processedMember) {
         pushModelAlert(Alert.requestProcessed(request));
         List<Differentiable> list = getModelList(team);
-        list.remove(TeamMember.fromModel(request));
+        list.remove(toTeamMember(request));
         if (approved) list.add(processedMember);
     }
 
@@ -146,7 +148,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
     }
 
     private <T extends Model<T> & TeamHost & UserHost, S> S asTypedTeamMember(T model, BiFunction<TeamMember<T>, TeamMemberRepo<T>, S> function) {
-        try {return function.apply(TeamMember.fromModel(model), repository());}
+        try {return function.apply(toTeamMember(model), repository());}
         catch (Exception e) {throw new RuntimeException(e);}
     }
 
@@ -171,7 +173,7 @@ public class TeamMemberViewModel extends TeamMappedViewModel<TeamMember> {
             if (!(item instanceof TeamMember)) continue;
 
             TeamMember member = ((TeamMember) item);
-            item = member.getWrappedModel();
+            item = (Differentiable) member.getWrappedModel();
 
             if (item instanceof Role) userIds.add(member.getUser().getId());
             else if (item instanceof JoinRequest) {

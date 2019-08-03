@@ -52,7 +52,7 @@ public class CompetitorViewModel extends MappedViewModel<Class<User>, Competitor
     private final CompetitorRepo repository;
     private final List<Differentiable> declined = new ArrayList<>();
 
-    public CompetitorViewModel() { repository = RepoProvider.forRepo(CompetitorRepo.class); }
+    public CompetitorViewModel() { repository = RepoProvider.Companion.forRepo(CompetitorRepo.class); }
 
     @Override
     Class<Competitor> valueClass() { return Competitor.class; }

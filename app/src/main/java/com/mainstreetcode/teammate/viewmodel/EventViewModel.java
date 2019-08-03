@@ -81,11 +81,11 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
     static { DEFAULT_BOUNDS = new LatLngBounds.Builder().include(new LatLng(0, 0)).build(); }
 
     public EventViewModel() {
-        repository = RepoProvider.forRepo(EventRepo.class);
+        repository = RepoProvider.Companion.forRepo(EventRepo.class);
     }
 
     public EventGofer gofer(Event event) {
-        Function<Guest, Single<Guest>> rsvpFunction = source -> RepoProvider.forRepo(GuestRepo.class).createOrUpdate(source).doOnSuccess(guest -> {
+        Function<Guest, Single<Guest>> rsvpFunction = source -> RepoProvider.Companion.forRepo(GuestRepo.class).createOrUpdate(source).doOnSuccess(guest -> {
             if (!guest.isAttending()) pushModelAlert(Alert.eventAbsentee(guest.getEvent()));
         });
         return new EventGofer(event, onError(event), blockedUserAlert, this::getEvent, this::createOrUpdateEvent, this::delete, rsvpFunction);
@@ -100,7 +100,7 @@ public class EventViewModel extends TeamMappedViewModel<Event> {
             Team guestTeam = guest.getEvent().getTeam();
             BlockReason reason = BlockReason.empty();
             pushModelAlert(Alert.creation(BlockedUser.block(guestUser, guestTeam, reason)));
-        }, RepoProvider.forRepo(GuestRepo.class)::get);
+        }, RepoProvider.Companion.forRepo(GuestRepo.class)::get);
     }
 
     @Override

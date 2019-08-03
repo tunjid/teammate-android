@@ -48,7 +48,7 @@ public class MyEventsViewModel extends MappedViewModel<Class<Event>, Event> {
     private final EventRepo repository;
 
     public MyEventsViewModel() {
-        repository = RepoProvider.forRepo(EventRepo.class);
+        repository = RepoProvider.Companion.forRepo(EventRepo.class);
     }
 
     @Override

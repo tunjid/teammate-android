@@ -46,11 +46,11 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.yes
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer
-import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.ACCEPTING
-import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.APPROVING
-import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.INVITING
-import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.JOINING
-import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.WAITING
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.ACCEPTING
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.APPROVING
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.INVITING
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.JOINING
+import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.WAITING
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
@@ -80,7 +80,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
         get() = gofer.getToolbarTitle(this)
 
     override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_JOIN_REQUEST))
+            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_JOIN_REQUEST)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -68,8 +68,8 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
     private final Map<Tournament, Map<Integer, List<Differentiable>>> gameRoundMap = new HashMap<>();
     private final List<Differentiable> headToHeadMatchUps = new ArrayList<>();
 
-    private final GameRoundRepo gameRoundRepository = RepoProvider.forRepo(GameRoundRepo.class);
-    private final GameRepo gameRepository = RepoProvider.forRepo(GameRepo.class);
+    private final GameRoundRepo gameRoundRepository = RepoProvider.Companion.forRepo(GameRoundRepo.class);
+    private final GameRepo gameRepository = RepoProvider.Companion.forRepo(GameRepo.class);
 
     public GameGofer gofer(Game game) {
         return new GameGofer(game, onError(game), this::getGame, this::updateGame, this::delete, GameViewModel::getEligibleTeamsForGame);
@@ -198,7 +198,7 @@ public class GameViewModel extends TeamMappedViewModel<Game> {
         Iterator<Game> iterator = games.iterator();
         while (iterator.hasNext()) {
             Game game = iterator.next();
-            Competitive entity = game.betweenUsers() ? RepoProvider.forRepo(UserRepo.class).getCurrentUser() : key;
+            Competitive entity = game.betweenUsers() ? RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser() : key;
             boolean isAway = entity.equals(game.getAway().getEntity());
             if (isAway && game.getAway().isDeclined()) iterator.remove();
         }

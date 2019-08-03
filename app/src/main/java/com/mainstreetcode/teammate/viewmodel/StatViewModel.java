@@ -67,11 +67,11 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
 
     private final StatRepo repository;
 
-    public StatViewModel() { repository = RepoProvider.forRepo(StatRepo.class); }
+    public StatViewModel() { repository = RepoProvider.Companion.forRepo(StatRepo.class); }
 
     public StatGofer gofer(Stat stat) {
         Consumer<Throwable> onError = throwable -> checkForInvalidObject(throwable, stat, stat.getGame());
-        Function<Team, User> userFunction = team -> RepoProvider.forRepo(UserRepo.class).getCurrentUser();
+        Function<Team, User> userFunction = team -> RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser();
         Function<Stat, Flowable<Team>> eligibleTeamSource = sourceStat -> GameViewModel.getEligibleTeamsForGame(stat.getGame());
         return new StatGofer(stat, onError, userFunction, repository::get, repository::createOrUpdate, this::delete, eligibleTeamSource);
     }
@@ -106,12 +106,12 @@ public class StatViewModel extends MappedViewModel<Game, Stat> {
     }
 
     public Single<Boolean> canEditGameStats(Game game) {
-        User current = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
+        User current = RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser();
         return isPrivilegedInGame(game).map(isPrivileged -> isPrivilegedOrIsReferee(isPrivileged, current, game));
     }
 
     public Single<Boolean> isPrivilegedInGame(Game game) {
-        User current = RepoProvider.forRepo(UserRepo.class).getCurrentUser();
+        User current = RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser();
         if (game.betweenUsers()) return Single.just(game.isCompeting(current));
         return GameViewModel.getEligibleTeamsForGame(game).count().map(value -> value > 0);
     }

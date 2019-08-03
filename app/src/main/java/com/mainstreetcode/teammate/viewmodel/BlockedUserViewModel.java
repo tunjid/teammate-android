@@ -41,7 +41,7 @@ public class BlockedUserViewModel extends TeamMappedViewModel<BlockedUser> {
     private final BlockedUserRepo repository;
 
     public BlockedUserViewModel() {
-        repository = RepoProvider.forRepo(BlockedUserRepo.class);
+        repository = RepoProvider.Companion.forRepo(BlockedUserRepo.class);
     }
 
     public BlockedUserGofer gofer(BlockedUser blockedUser) {
@@ -60,7 +60,7 @@ public class BlockedUserViewModel extends TeamMappedViewModel<BlockedUser> {
     }
 
     public Single<BlockedUser> blockUser(BlockedUser blockedUser) {
-        return RepoProvider.forRepo(BlockedUserRepo.class).createOrUpdate(blockedUser)
+        return RepoProvider.Companion.forRepo(BlockedUserRepo.class).createOrUpdate(blockedUser)
                 .doOnSuccess(blocked -> pushModelAlert(Alert.creation(blockedUser)));
     }
 

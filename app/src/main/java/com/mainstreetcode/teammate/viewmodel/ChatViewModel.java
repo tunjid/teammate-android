@@ -59,8 +59,8 @@ public class ChatViewModel extends TeamMappedViewModel<Chat> {
     private final ChatNotifier notifier;
 
     public ChatViewModel() {
-        repository = RepoProvider.forRepo(ChatRepo.class);
-        notifier = NotifierProvider.forNotifier(ChatNotifier.class);
+        repository = RepoProvider.Companion.forRepo(ChatRepo.class);
+        notifier = NotifierProvider.Companion.forNotifier(ChatNotifier.class);
     }
 
     @Override

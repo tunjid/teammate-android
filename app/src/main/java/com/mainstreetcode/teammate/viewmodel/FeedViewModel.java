@@ -54,14 +54,16 @@ import androidx.recyclerview.widget.DiffUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
+import static com.mainstreetcode.teammate.model.TeamMemberKt.toTeamMember;
+
 public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
 
     private final TeammateApi api = TeammateService.getApiInstance();
 
-    private final GuestRepo guestRepository = RepoProvider.forRepo(GuestRepo.class);
-    private final CompetitorRepo competitorRepository = RepoProvider.forRepo(CompetitorRepo.class);
-    private final JoinRequestRepo joinRequestRepository = RepoProvider.forRepo(JoinRequestRepo.class);
-    @SuppressWarnings("unchecked") private final TeamMemberRepo<JoinRequest> memberRepository = RepoProvider.forRepo(TeamMemberRepo.class);
+    private final GuestRepo guestRepository = RepoProvider.Companion.forRepo(GuestRepo.class);
+    private final CompetitorRepo competitorRepository = RepoProvider.Companion.forRepo(CompetitorRepo.class);
+    private final JoinRequestRepo joinRequestRepository = RepoProvider.Companion.forRepo(JoinRequestRepo.class);
+    @SuppressWarnings("unchecked") private final TeamMemberRepo<JoinRequest> memberRepository = RepoProvider.Companion.forRepo(TeamMemberRepo.class);
 
     private final List<Differentiable> feedItems = new ArrayList<>();
 
@@ -127,15 +129,15 @@ public class FeedViewModel extends MappedViewModel<Class<FeedItem>, FeedItem> {
     public Single<DiffUtil.DiffResult> processJoinRequest(FeedItem<JoinRequest> feedItem, boolean approved) {
         JoinRequest request = feedItem.getModel();
 
-        boolean isOwner = RepoProvider.forRepo(UserRepo.class).getCurrentUser().equals(request.getUser());
+        boolean isOwner = RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser().equals(request.getUser());
         boolean leaveUnchanged = approved && request.isUserApproved() && isOwner;
 
         Single<? extends Model> sourceSingle = leaveUnchanged
                 ? Single.just(request)
                 : approved && request.isTeamApproved()
-                ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
+                ? memberRepository.createOrUpdate(toTeamMember(request))
                 : approved && request.isUserApproved()
-                ? memberRepository.createOrUpdate(TeamMember.fromModel(request))
+                ? memberRepository.createOrUpdate(toTeamMember(request))
                 : joinRequestRepository.delete(request);
 
         Single<List<Differentiable>> sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem.class, feedItem)

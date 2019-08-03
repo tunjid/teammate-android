@@ -126,7 +126,7 @@ public abstract class MappedViewModel<K, V extends Differentiable> extends BaseV
     @SuppressWarnings("unchecked")
     private void clearNotification(Pair<Model, Class> pair) {
         if (pair.first == null || pair.second == null) return;
-        NotifierProvider.forModel(pair.second).clearNotifications(pair.first);
+        NotifierProvider.Companion.forModel(pair.second).clearNotifications(pair.first);
     }
 
     void checkForInvalidObject(Throwable throwable, V model, K key) {

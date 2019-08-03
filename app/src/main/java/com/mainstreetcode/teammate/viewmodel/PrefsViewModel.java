@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider;
 public class PrefsViewModel extends BaseViewModel {
 
     private Prefs prefs;
-    private final PrefsRepo prefsRepository = RepoProvider.forRepo(PrefsRepo.class);
+    private final PrefsRepo prefsRepository = RepoProvider.Companion.forRepo(PrefsRepo.class);
 
     public PrefsViewModel() {
         prefs = prefsRepository.getCurrent();

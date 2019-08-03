@@ -233,7 +233,7 @@ public class Config implements Model<Config> {
     @SuppressLint("CheckResult")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void fetchConfig() {
-        if (RepoProvider.initialized()) RepoProvider.forRepo(ConfigRepo.class)
+        if (RepoProvider.Companion.initialized()) RepoProvider.Companion.forRepo(ConfigRepo.class)
                 .get(EMPTY_STRING)
                 .observeOn(mainThread()) // Necessary to prevent a concurrent modification exception
                 .subscribe(cached::update, ErrorHandler.EMPTY);
