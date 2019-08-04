@@ -33,7 +33,9 @@ import com.mainstreetcode.teammate.repository.split
 import java.util.*
 
 class TeamMemberDao : EntityDao<TeamMember<*>>() {
-    override fun getTableName(): String = "INVALID"
+
+    override val tableName: String
+        get() = "INVALID"
 
     override fun insert(models: List<TeamMember<*>>) = daos { roleDao, requestDao ->
         models.split { roles, requests ->
@@ -44,8 +46,8 @@ class TeamMemberDao : EntityDao<TeamMember<*>>() {
 
     override fun update(models: List<TeamMember<*>>) = daos { roleDao, requestDao ->
         models.split { roles, requests ->
-            roleDao.update(Collections.unmodifiableList<RoleEntity>(roles))
-            requestDao.update(Collections.unmodifiableList<JoinRequestEntity>(requests))
+            roleDao.update(roles)
+            requestDao.update(requests)
         }
     }
 
@@ -63,7 +65,7 @@ class TeamMemberDao : EntityDao<TeamMember<*>>() {
     }
 
     private fun daos(daoBiConsumer: (EntityDao<RoleEntity>, EntityDao<JoinRequestEntity>) -> Unit) {
-        val appDatabase = AppDatabase.getInstance()
+        val appDatabase = AppDatabase.instance
         daoBiConsumer.invoke(appDatabase.roleDao(), appDatabase.joinRequestDao())
     }
 }

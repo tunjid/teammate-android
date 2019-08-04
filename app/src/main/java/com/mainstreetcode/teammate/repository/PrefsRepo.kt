@@ -33,7 +33,7 @@ import io.reactivex.Single
 
 class PrefsRepo internal constructor() : ModelRepo<Prefs>() {
 
-    private val dao: PrefsDao = AppDatabase.getInstance().prefsDao()
+    private val dao: PrefsDao = AppDatabase.instance.prefsDao()
 
     val current: Prefs
         get() = dao.current

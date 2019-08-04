@@ -22,52 +22,50 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.persistence.entity.EventEntity;
-
-import java.util.Date;
-import java.util.List;
-
-import io.reactivex.Maybe;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.mainstreetcode.teammate.model.Media
+import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.User
+import io.reactivex.Maybe
+import java.util.*
 
 /**
- * DAO for {@link Event}
+ * DAO for [User]
  */
 
 @Dao
-public abstract class EventDao extends EntityDao<EventEntity> {
+abstract class MediaDao : EntityDao<Media>() {
 
-    @Override
-    protected String getTableName() {
-        return "events";
-    }
-
-    @Query("SELECT * FROM events as event" +
-            " WHERE :teamId = event_team" +
-            " AND event_start_date < :date" +
-            " ORDER BY event_start_date DESC" +
-            " LIMIT :limit")
-    public abstract Maybe<List<Event>> getEvents(String teamId, Date date, int limit);
-
-    @Query("SELECT * FROM events" +
-            " WHERE :id = event_id")
-    public abstract Maybe<Event> get(String id);
+    override val tableName: String
+        get() = "team_media"
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<EventEntity> teams);
+    abstract override fun insert(models: List<Media>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<EventEntity> teams);
+    abstract override fun update(models: List<Media>)
 
     @Delete
-    public abstract void delete(EventEntity event);
+    abstract override fun delete(models: List<Media>)
+
+    @Query("SELECT *" +
+            " FROM team_media" +
+            " WHERE :id = media_id")
+    abstract operator fun get(id: String): Maybe<Media>
+
+    @Query("SELECT *" +
+            " FROM team_media" +
+            " WHERE :team = media_team" +
+            " AND media_created < :date" +
+            " AND media_flagged = 0" +
+            " ORDER BY media_created DESC" +
+            " LIMIT :limit")
+    abstract fun getTeamMedia(team: Team, date: Date, limit: Int): Maybe<List<Media>>
 }

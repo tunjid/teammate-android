@@ -22,43 +22,39 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
-import com.mainstreetcode.teammate.model.Guest;
-import com.mainstreetcode.teammate.persistence.entity.GuestEntity;
+import com.mainstreetcode.teammate.model.Guest
+import com.mainstreetcode.teammate.persistence.entity.GuestEntity
 
-import java.util.Date;
-import java.util.List;
+import java.util.Date
 
-import io.reactivex.Maybe;
+import io.reactivex.Maybe
 
 @Dao
-public abstract class GuestDao extends EntityDao<GuestEntity> {
+abstract class GuestDao : EntityDao<GuestEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "guests";
-    }
+    override val tableName: String
+        get() = "guests"
 
-    @Query("SELECT * FROM guests" +
-            " WHERE :id = guest_id")
-    public abstract Maybe<Guest> get(String id);
+    @Query("SELECT * FROM guests" + " WHERE :id = guest_id")
+    abstract operator fun get(id: String): Maybe<Guest>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<GuestEntity> guests);
+    abstract override fun insert(models: List<GuestEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<GuestEntity> guests);
+    abstract override fun update(models: List<GuestEntity>)
 
     @Delete
-    public abstract void delete(List<GuestEntity> guests);
+    abstract override fun delete(models: List<GuestEntity>)
 
     @Query("DELETE FROM guests " +
             " WHERE guest_user = :userId" +
@@ -68,14 +64,14 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
             " ON (event.event_team = team.team_id)" +
             " WHERE team.team_id = :teamId" +
             ")")
-    public abstract void deleteUsers(String userId, String teamId);
+    abstract fun deleteUsers(userId: String, teamId: String)
 
     @Query("SELECT * FROM guests" +
             " WHERE :eventId = guest_event" +
             " AND guest_created < :date" +
             " ORDER BY guest_created DESC" +
             " LIMIT :limit")
-    public abstract Maybe<List<Guest>> getGuests(String eventId, Date date, int limit);
+    abstract fun getGuests(eventId: String, date: Date, limit: Int): Maybe<List<Guest>>
 
     @Query("SELECT * FROM guests" +
             " WHERE :userId = guest_user" +
@@ -83,5 +79,5 @@ public abstract class GuestDao extends EntityDao<GuestEntity> {
             " AND guest_attending = 1" +
             " ORDER BY guest_created DESC" +
             " LIMIT 40")
-    public abstract Maybe<List<Guest>> getRsvpList(String userId, Date date);
+    abstract fun getRsvpList(userId: String, date: Date): Maybe<List<Guest>>
 }

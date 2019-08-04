@@ -45,7 +45,7 @@ import java.util.*
 class GameRepo internal constructor() : TeamQueryRepo<Game>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val gameDao: GameDao = AppDatabase.getInstance().gameDao()
+    private val gameDao: GameDao = AppDatabase.instance.gameDao()
 
     override fun dao(): EntityDao<in Game> = gameDao
 
@@ -120,7 +120,7 @@ class GameRepo internal constructor() : TeamQueryRepo<Game>() {
     }
 
     override fun deleteLocally(model: Game): Game {
-        AppDatabase.getInstance().eventDao().delete(model.event)
+        AppDatabase.instance.eventDao().delete(model.event)
         return super.deleteLocally(model)
     }
 

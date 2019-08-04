@@ -22,32 +22,31 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.annotation.NonNull;
+import androidx.room.Dao
 
-import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.model.Prefs;
-import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.model.Device
 
 /**
- * DAO for {@link Config}
+ * DAO for [com.mainstreetcode.teammate.model.Device]
  */
 
 @Dao
-public class PrefsDao extends SharedPreferencesDao<Prefs> {
+class DeviceDao : SharedPreferencesDao<Device>() {
 
-    @Override
-    String preferenceName() {return "device-prefs";}
+    internal override val empty: Device
+        get() = Device.empty()
 
-    @NonNull
-    @Override
-    Prefs getEmpty() { return Prefs.empty(); }
+    internal override fun preferenceName(): String {
+        return "user_devices"
+    }
 
-    @Override
-    String to(Prefs device) {return TeammateService.getGson().toJson(device);}
+    internal override fun to(device: Device): String {
+        return device.id
+    }
 
-    @Override
-    Prefs from(String json) {return TeammateService.getGson().fromJson(json, Prefs.class);}
+    internal override fun from(id: String): Device {
+        return Device(id)
+    }
 }

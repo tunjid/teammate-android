@@ -22,56 +22,46 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
-import com.mainstreetcode.teammate.model.Media;
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.model.User;
+import com.mainstreetcode.teammate.model.Competitor
+import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity
 
-import java.util.Date;
-import java.util.List;
-
-import io.reactivex.Maybe;
+import io.reactivex.Maybe
 
 /**
- * DAO for {@link User}
+ * DAO for [Event]
  */
 
 @Dao
-public abstract class MediaDao extends EntityDao<Media> {
+abstract class CompetitorDao : EntityDao<CompetitorEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "team_media";
-    }
+     override val tableName: String
+        get() = "competitors"
+
+    @Query("SELECT * FROM competitors" +
+            " WHERE :tournamentId = competitor_tournament" +
+            " ORDER BY competitor_created DESC" +
+            " LIMIT 40")
+    abstract fun getCompetitors(tournamentId: String): Maybe<List<Competitor>>
+
+    @Query("SELECT * FROM competitors" + " WHERE :id = competitor_id")
+    abstract operator fun get(id: String): Maybe<Competitor>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<Media> roles);
+    abstract override fun insert(models: List<CompetitorEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<Media> roles);
+    abstract override fun update(models: List<CompetitorEntity>)
 
     @Delete
-    public abstract void delete(List<Media> roles);
-
-    @Query("SELECT *" +
-            " FROM team_media" +
-            " WHERE :id = media_id")
-    public abstract Maybe<Media> get(String id);
-
-    @Query("SELECT *" +
-            " FROM team_media" +
-            " WHERE :team = media_team" +
-            " AND media_created < :date" +
-            " AND media_flagged = 0" +
-            " ORDER BY media_created DESC" +
-            " LIMIT :limit")
-    public abstract Maybe<List<Media>> getTeamMedia(Team team, Date date, int limit);
+    abstract override fun delete(model: CompetitorEntity)
 }

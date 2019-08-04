@@ -45,7 +45,7 @@ class ConfigRepo internal constructor() : ModelRepo<Config>() {
     private var retryPeriod = 3
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val dao: ConfigDao = AppDatabase.getInstance().configDao()
+    private val dao: ConfigDao = AppDatabase.instance.configDao()
 
     val current: Config
         get() = dao.current

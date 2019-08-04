@@ -22,53 +22,45 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Stat;
-import com.mainstreetcode.teammate.persistence.entity.StatEntity;
-
-import java.util.Date;
-import java.util.List;
-
-import io.reactivex.Maybe;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.persistence.entity.EventEntity
+import io.reactivex.Maybe
+import java.util.*
 
 /**
- * DAO for {@link Event}
+ * DAO for [Event]
  */
 
 @Dao
-public abstract class StatDao extends EntityDao<StatEntity> {
+abstract class EventDao : EntityDao<EventEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "stats";
-    }
+    override val tableName: String
+        get() = "events"
 
-    @Query("SELECT * FROM stats as stat" +
-            " WHERE :game_id = stat_game" +
-            " AND stat_created < :date" +
-            " ORDER BY stat_created DESC" +
+    @Query("SELECT * FROM events as event" +
+            " WHERE :teamId = event_team" +
+            " AND event_start_date < :date" +
+            " ORDER BY event_start_date DESC" +
             " LIMIT :limit")
-    public abstract Maybe<List<Stat>> getStats(String game_id, Date date, int limit);
+    abstract fun getEvents(teamId: String, date: Date, limit: Int): Maybe<List<Event>>
 
-    @Query("SELECT * FROM stats" +
-            " WHERE :id = stat_id")
-    public abstract Maybe<Stat> get(String id);
+    @Query("SELECT * FROM events" + " WHERE :id = event_id")
+    abstract operator fun get(id: String): Maybe<Event>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<StatEntity> stats);
+    abstract override fun insert(models: List<EventEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<StatEntity> stats);
+    abstract override fun update(models: List<EventEntity>)
 
     @Delete
-    public abstract void delete(StatEntity stat);
+    abstract override fun delete(model: EventEntity)
 }

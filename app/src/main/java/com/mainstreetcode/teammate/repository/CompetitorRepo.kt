@@ -45,7 +45,7 @@ import java.util.*
 class CompetitorRepo internal constructor() : QueryRepo<Competitor, Tournament, Int>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val competitorDao: CompetitorDao = AppDatabase.getInstance().competitorDao()
+    private val competitorDao: CompetitorDao = AppDatabase.instance.competitorDao()
 
     override fun dao(): EntityDao<in Competitor> = competitorDao
 

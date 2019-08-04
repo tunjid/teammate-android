@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.repository
 
 
 import android.content.Context
-import android.text.TextUtils
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
@@ -45,14 +44,14 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
 
     private val app: App = App.getInstance()
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val teamDao: TeamDao = AppDatabase.getInstance().teamDao()
+    private val teamDao: TeamDao = AppDatabase.instance.teamDao()
 
     val defaultTeam: Maybe<Team>
         get() {
             val preferences = app.getSharedPreferences(TEAM_REPOSITORY_KEY, Context.MODE_PRIVATE)
             val defaultTeamId = preferences.getString(DEFAULT_TEAM, "")
 
-            return if (TextUtils.isEmpty(defaultTeamId)) Maybe.empty() else teamDao.get(defaultTeamId).subscribeOn(io())
+            return if (defaultTeamId.isNullOrBlank()) Maybe.empty() else teamDao[defaultTeamId].subscribeOn(io())
         }
 
     override fun dao(): EntityDao<in Team> = teamDao
@@ -76,7 +75,7 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
     }
 
     override fun get(id: String): Flowable<Team> {
-        val local = teamDao.get(id).subscribeOn(io())
+        val local = teamDao[id].subscribeOn(io())
         val remote = api.getTeam(id).map(saveFunction).toMaybe()
 
         return fetchThenGetModel(local, remote)
@@ -100,9 +99,10 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
         preferences.edit().putString(DEFAULT_TEAM, team.id).apply()
     }
 
+    @Suppress("unused")
     private fun clearStaleTeamMembers(team: Team) {
         // Clear stale join requests and roles because the api version has the latest
-        val database = AppDatabase.getInstance()
+        val database = AppDatabase.instance
         database.roleDao().deleteByTeam(team.id)
         database.joinRequestDao().deleteByTeam(team.id)
     }

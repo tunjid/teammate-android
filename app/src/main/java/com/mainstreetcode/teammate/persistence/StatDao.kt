@@ -22,49 +22,49 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
-import com.mainstreetcode.teammate.model.Team;
-import com.mainstreetcode.teammate.persistence.entity.TeamEntity;
+import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.model.Stat
+import com.mainstreetcode.teammate.persistence.entity.StatEntity
 
-import java.util.List;
+import java.util.Date
 
-import io.reactivex.Maybe;
+import io.reactivex.Maybe
 
 /**
- * DAO for {@link Team}
- * <p>
- * Created by Shemanigans on 6/12/17.
+ * DAO for [Event]
  */
 
 @Dao
-public abstract class TeamDao extends EntityDao<TeamEntity> {
+abstract class StatDao : EntityDao<StatEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "teams";
-    }
+    override val tableName: String
+        get() = "stats"
 
-    @Query("SELECT * FROM teams" +
-            " WHERE :id = team_id")
-    public abstract Maybe<Team> get(String id);
+    @Query("SELECT * FROM stats as stat" +
+            " WHERE :game_id = stat_game" +
+            " AND stat_created < :date" +
+            " ORDER BY stat_created DESC" +
+            " LIMIT :limit")
+    abstract fun getStats(game_id: String, date: Date, limit: Int): Maybe<List<Stat>>
 
-    @Query("SELECT * FROM teams")
-    public abstract Maybe<List<Team>> getTeams();
+    @Query("SELECT * FROM stats" + " WHERE :id = stat_id")
+    abstract operator fun get(id: String): Maybe<Stat>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<TeamEntity> teams);
+    abstract override fun insert(models: List<StatEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<TeamEntity> teams);
+    abstract override fun update(models: List<StatEntity>)
 
     @Delete
-    public abstract void delete(TeamEntity teamEntity);
+    abstract override fun delete(model: StatEntity)
 }

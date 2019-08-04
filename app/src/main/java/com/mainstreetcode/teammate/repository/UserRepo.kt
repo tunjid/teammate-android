@@ -50,7 +50,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
 
     private val app: App = App.getInstance()
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val userDao: UserDao = AppDatabase.getInstance().userDao()
+    private val userDao: UserDao = AppDatabase.instance.userDao()
 
     var currentUser: User = User.empty()
         private set
@@ -137,7 +137,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     }
 
     fun signOut(): Single<Boolean> {
-        val device = AppDatabase.getInstance().deviceDao().current
+        val device = AppDatabase.instance.deviceDao().current
 
         return api.signOut(device.id)
                 .flatMap { clearTables() }
@@ -165,7 +165,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
 
     private fun clearUser(): Single<Boolean> {
         val userId = userId
-        if (TextUtils.isEmpty(userId)) return just(false)
+        if (userId.isNullOrBlank()) return just(false)
 
         app.getSharedPreferences(PREFS, MODE_PRIVATE)
                 .edit()
@@ -173,7 +173,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
                 .remove(SESSION_COOKIE) // Delete cookies when signing out
                 .apply()
 
-        return userDao.get(userId)
+        return userDao[userId]
                 .flatMapSingle { this.delete(it) }
                 .flatMap {
                     currentUser = User.empty()
@@ -187,7 +187,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     }
 
     private fun clearTables(): Single<Boolean> {
-        val database = AppDatabase.getInstance()
+        val database = AppDatabase.instance
         return database.clearTables().flatMap { clearUser() }.onErrorReturn { false }
     }
 

@@ -40,6 +40,6 @@ public class GameTypeConverter {
 
     @TypeConverter
     public Game fromId(String id) {
-        return AppDatabase.getInstance().gameDao().get(id).blockingGet(Game.empty(Team.empty()));
+        return AppDatabase.Companion.getInstance().gameDao().get(id).blockingGet(Game.empty(Team.empty()));
     }
 }

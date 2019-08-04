@@ -64,7 +64,7 @@ class BlockedUserRepo internal constructor() : TeamQueryRepo<BlockedUser>() {
     private fun deleteBlockedUser(user: User, team: Team) {
         val userId = user.id
         val teamId = team.id
-        val database = AppDatabase.getInstance()
+        val database = AppDatabase.instance
         database.roleDao().deleteUsers(userId, teamId)
         database.guestDao().deleteUsers(userId, teamId)
         database.joinRequestDao().deleteUsers(userId, teamId)

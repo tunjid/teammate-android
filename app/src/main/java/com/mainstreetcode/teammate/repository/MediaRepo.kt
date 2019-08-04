@@ -51,7 +51,7 @@ import java.util.*
 class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val mediaDao: MediaDao = AppDatabase.getInstance().mediaDao()
+    private val mediaDao: MediaDao = AppDatabase.instance.mediaDao()
     private val numCallsToIgnore: Int = {
         var callsToIgnore = 0
         val client = TeammateService.getHttpClient()

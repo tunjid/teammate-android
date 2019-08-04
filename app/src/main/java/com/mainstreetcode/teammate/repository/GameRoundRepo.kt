@@ -42,7 +42,7 @@ import io.reactivex.schedulers.Schedulers.io
 class GameRoundRepo internal constructor() : QueryRepo<Game, Tournament, Int>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val gameDao: GameDao = AppDatabase.getInstance().gameDao()
+    private val gameDao: GameDao = AppDatabase.instance.gameDao()
 
     override fun dao(): EntityDao<in Game> = gameDao
 

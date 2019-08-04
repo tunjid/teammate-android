@@ -40,7 +40,7 @@ import java.util.*
 class JoinRequestRepo internal constructor() : ModelRepo<JoinRequest>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val joinRequestDao: JoinRequestDao = AppDatabase.getInstance().joinRequestDao()
+    private val joinRequestDao: JoinRequestDao = AppDatabase.instance.joinRequestDao()
 
     override fun dao(): EntityDao<in JoinRequest> = joinRequestDao
 

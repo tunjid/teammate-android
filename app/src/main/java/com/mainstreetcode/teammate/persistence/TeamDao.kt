@@ -22,31 +22,45 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.annotation.NonNull;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
-import com.mainstreetcode.teammate.model.Config;
-import com.mainstreetcode.teammate.rest.TeammateService;
+import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.persistence.entity.TeamEntity
+
+import io.reactivex.Maybe
 
 /**
- * DAO for {@link Config}
+ * DAO for [Team]
+ *
+ *
+ * Created by Shemanigans on 6/12/17.
  */
 
 @Dao
-public class ConfigDao extends SharedPreferencesDao<Config> {
+abstract class TeamDao : EntityDao<TeamEntity>() {
 
-    @NonNull
-    @Override
-    Config getEmpty() { return Config.empty(); }
+    override val tableName: String
+        get() = "teams"
 
-    @Override
-    String preferenceName() {return "config";}
+    @get:Query("SELECT * FROM teams")
+    abstract val teams: Maybe<List<Team>>
 
-    @Override
-    String to(Config device) {return TeammateService.getGson().toJson(device);}
+    @Query("SELECT * FROM teams" + " WHERE :id = team_id")
+    abstract operator fun get(id: String): Maybe<Team>
 
-    @Override
-    Config from(String json) {return TeammateService.getGson().fromJson(json, Config.class);}
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract override fun insert(models: List<TeamEntity>)
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    abstract override fun update(models: List<TeamEntity>)
+
+    @Delete
+    abstract override fun delete(model: TeamEntity)
 }

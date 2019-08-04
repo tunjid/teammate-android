@@ -63,7 +63,7 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
 
     private val app: App = App.getInstance()
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val chatDao: ChatDao = AppDatabase.getInstance().teamChatDao()
+    private val chatDao: ChatDao = AppDatabase.instance.teamChatDao()
 
     override fun dao(): EntityDao<in Chat> = chatDao
 

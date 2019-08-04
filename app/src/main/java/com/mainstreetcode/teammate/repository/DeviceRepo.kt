@@ -39,7 +39,7 @@ import io.reactivex.Single
 class DeviceRepo internal constructor() : ModelRepo<Device>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val dao: DeviceDao = AppDatabase.getInstance().deviceDao()
+    private val dao: DeviceDao = AppDatabase.instance.deviceDao()
 
     override fun dao(): EntityDao<in Device> = dao
 

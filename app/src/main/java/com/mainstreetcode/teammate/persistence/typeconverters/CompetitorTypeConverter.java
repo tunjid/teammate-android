@@ -39,7 +39,7 @@ public class CompetitorTypeConverter {
 
     @TypeConverter
     public Competitor fromId(String id) {
-        Competitor found = AppDatabase.getInstance().competitorDao().get(id).blockingGet();
+        Competitor found = AppDatabase.Companion.getInstance().competitorDao().get(id).blockingGet();
         return found == null ? Competitor.empty() : found;
     }
 }

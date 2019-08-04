@@ -22,55 +22,51 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Delete;
+import androidx.room.Delete
 
-import java.util.List;
-
-import io.reactivex.Single;
+import io.reactivex.Single
 
 
-public abstract class EntityDao<T> {
+abstract class EntityDao<T> {
 
-    protected abstract String getTableName();
+    abstract val tableName: String
 
-    public abstract void insert(List<T> models);
+    abstract fun insert(models: List<T>)
 
-    protected abstract void update(List<T> models);
+    internal abstract fun update(models: List<T>)
 
     @Delete
-    public abstract void delete(T model);
+    abstract fun delete(model: T)
 
     @Delete
-    public abstract void delete(List<T> models);
+    abstract fun delete(models: List<T>)
 
-    public void upsert(List<T> models) {
-        insert(models);
-        update(models);
+    fun upsert(models: List<T>) {
+        insert(models)
+        update(models)
     }
 
-    Single<Integer> deleteAll() {
-        final String sql = "DELETE FROM " + getTableName();
-        return Single.fromCallable(() -> AppDatabase.getInstance().compileStatement(sql).executeUpdateDelete());
+    internal open fun deleteAll(): Single<Int> {
+        val sql = "DELETE FROM $tableName"
+        return Single.fromCallable { AppDatabase.instance.compileStatement(sql).executeUpdateDelete() }
     }
 
-    public static <T> EntityDao<T> daDont(){
-        return new EntityDao<T>() {
-            @Override
-            protected String getTableName() { return ""; }
+    companion object {
 
-            @Override
-            public void insert(List<T> models) {}
+        fun <T> daDont(): EntityDao<T> {
+            return object : EntityDao<T>() {
+                override val tableName: String = ""
 
-            @Override
-            protected void update(List<T> models) {}
+                override fun insert(models: List<T>) = Unit
 
-            @Override
-            public void delete(T model) {}
+                override fun update(models: List<T>) = Unit
 
-            @Override
-            public void delete(List<T> models) {}
-        };
+                override fun delete(model: T) = Unit
+
+                override fun delete(models: List<T>) = Unit
+            }
+        }
     }
 }

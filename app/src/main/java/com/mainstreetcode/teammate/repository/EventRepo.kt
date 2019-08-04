@@ -44,7 +44,7 @@ import java.util.*
 class EventRepo internal constructor() : TeamQueryRepo<Event>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val eventDao: EventDao = AppDatabase.getInstance().eventDao()
+    private val eventDao: EventDao = AppDatabase.instance.eventDao()
 
     override fun dao(): EntityDao<in Event> = eventDao
 
@@ -85,7 +85,7 @@ class EventRepo internal constructor() : TeamQueryRepo<Event>() {
         val current = RepoProvider.forRepo(UserRepo::class.java).currentUser
         val localDate = date ?: futureDate
 
-        val local = AppDatabase.getInstance().guestDao().getRsvpList(current.id, localDate)
+        val local = AppDatabase.instance.guestDao().getRsvpList(current.id, localDate)
                 .map<List<Event>> { guests -> ArrayList(Lists.transform<Guest, Event>(guests) { it.event }) }
                 .subscribeOn(io())
 
@@ -106,7 +106,7 @@ class EventRepo internal constructor() : TeamQueryRepo<Event>() {
 
     override fun deleteLocally(model: Event): Event {
         val game = Game.withId(model.gameId)
-        if (!game.isEmpty) AppDatabase.getInstance().gameDao().delete(game)
+        if (!game.isEmpty) AppDatabase.instance.gameDao().delete(game)
         return super.deleteLocally(model)
     }
 }

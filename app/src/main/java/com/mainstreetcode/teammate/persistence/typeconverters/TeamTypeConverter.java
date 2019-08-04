@@ -39,7 +39,7 @@ public class TeamTypeConverter {
 
     @TypeConverter
     public Team fromId(String id) {
-        return AppDatabase.getInstance().teamDao().get(id)
+        return AppDatabase.Companion.getInstance().teamDao().get(id)
                 .onErrorReturn(error -> Team.empty()).blockingGet(Team.empty());
     }
 }

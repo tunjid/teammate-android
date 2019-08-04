@@ -42,7 +42,7 @@ import java.util.*
 class GuestRepo internal constructor() : QueryRepo<Guest, Event, Date>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val guestDao: GuestDao = AppDatabase.getInstance().guestDao()
+    private val guestDao: GuestDao = AppDatabase.instance.guestDao()
 
     override fun dao(): EntityDao<in Guest> = guestDao
 

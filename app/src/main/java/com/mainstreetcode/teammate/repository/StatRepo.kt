@@ -43,7 +43,7 @@ import java.util.*
 class StatRepo internal constructor() : QueryRepo<Stat, Game, Date>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val statDao: StatDao = AppDatabase.getInstance().statDao()
+    private val statDao: StatDao = AppDatabase.instance.statDao()
 
     override fun dao(): EntityDao<in Stat> = statDao
 

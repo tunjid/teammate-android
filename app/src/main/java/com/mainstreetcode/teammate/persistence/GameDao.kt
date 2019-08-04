@@ -22,35 +22,29 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.model.Game;
-import com.mainstreetcode.teammate.persistence.entity.GameEntity;
-
-import java.util.Date;
-import java.util.List;
-
-import io.reactivex.Maybe;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.model.Game
+import com.mainstreetcode.teammate.persistence.entity.GameEntity
+import io.reactivex.Maybe
+import java.util.*
 
 /**
- * DAO for {@link Event}
+ * DAO for [Event]
  */
 
 @Dao
-public abstract class GameDao extends EntityDao<GameEntity> {
+abstract class GameDao : EntityDao<GameEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "games";
-    }
+    override val tableName: String
+        get() = "games"
 
     @Query("SELECT * FROM games as game" +
             " WHERE (:teamId = game_host AND game_ref_path = 'user')" +
@@ -59,25 +53,24 @@ public abstract class GameDao extends EntityDao<GameEntity> {
             " AND game_created < :date" +
             " ORDER BY game_created DESC" +
             " LIMIT :limit")
-    public abstract Maybe<List<Game>> getGames(String teamId, Date date, int limit);
+    abstract fun getGames(teamId: String, date: Date, limit: Int): Maybe<List<Game>>
 
     @Query("SELECT * FROM games as game" +
             " WHERE :tournamentId = game_tournament" +
             " AND game_round = :round" +
             " ORDER BY game_created DESC" +
             " LIMIT :limit")
-    public abstract Maybe<List<Game>> getGames(String tournamentId, int round, int limit);
+    abstract fun getGames(tournamentId: String, round: Int, limit: Int): Maybe<List<Game>>
 
-    @Query("SELECT * FROM games" +
-            " WHERE :id = game_id")
-    public abstract Maybe<Game> get(String id);
+    @Query("SELECT * FROM games" + " WHERE :id = game_id")
+    abstract operator fun get(id: String): Maybe<Game>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<GameEntity> games);
+    abstract override fun insert(models: List<GameEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<GameEntity> games);
+    abstract override fun update(models: List<GameEntity>)
 
     @Delete
-    public abstract void delete(GameEntity game);
+    abstract override fun delete(model: GameEntity)
 }

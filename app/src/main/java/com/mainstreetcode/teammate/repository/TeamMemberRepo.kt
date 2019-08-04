@@ -50,7 +50,7 @@ import java.util.*
 class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() where T : UserHost, T : TeamHost, T : Model<T> {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val dao: TeamMemberDao = AppDatabase.getInstance().teamMemberDao()
+    private val dao: TeamMemberDao = AppDatabase.instance.teamMemberDao()
 
     override fun dao(): EntityDao<in TeamMember<*>> = dao
 
@@ -74,7 +74,7 @@ class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() 
     override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember<T>>> {
         val date = pagination ?: Date()
 
-        val database = AppDatabase.getInstance()
+        val database = AppDatabase.instance
         val teamId = key.id
 
         val rolesMaybe = database.roleDao().getRoles(key.id, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
@@ -108,7 +108,7 @@ class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() 
         val member = request.toTeamMember().unsafeCast<T>()
         return apiSingle
                 .map(forModel(Role::class.java).saveFunction)
-                .doOnSuccess { AppDatabase.getInstance().joinRequestDao().delete(request) }
+                .doOnSuccess { AppDatabase.instance.joinRequestDao().delete(request) }
                 .map { member }
                 .doOnError { throwable -> deleteInvalidModel(member, throwable) }
     }
@@ -129,14 +129,12 @@ class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() 
     }
 
     private fun deleteStaleJoinRequests(roles: List<Role>?) {
-        if (roles == null) return
+        if (roles == null || roles.isEmpty()) return
 
         val teamId = roles[0].team.id
-        val userIds = arrayOfNulls<String>(roles.size)
+        val userIds = roles.map { it.user.id }.toTypedArray()
 
-        for (i in roles.indices) userIds[i] = roles[i].user.id
-
-        AppDatabase.getInstance().joinRequestDao().deleteRequestsFromTeam(teamId, userIds)
+        AppDatabase.instance.joinRequestDao().deleteRequestsFromTeam(teamId, userIds)
     }
 
 }

@@ -22,72 +22,69 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
-import com.mainstreetcode.teammate.model.Role;
-import com.mainstreetcode.teammate.model.User;
-import com.mainstreetcode.teammate.persistence.entity.RoleEntity;
+import com.mainstreetcode.teammate.model.Role
+import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.persistence.entity.RoleEntity
 
-import java.util.Date;
-import java.util.List;
+import java.util.Date
 
-import io.reactivex.Maybe;
+import io.reactivex.Maybe
 
 /**
- * DAO for {@link User}
- * <p>
+ * DAO for [User]
+ *
+ *
  * Created by Shemanigans on 6/12/17.
  */
 
 @Dao
-public abstract class RoleDao extends EntityDao<RoleEntity> {
+abstract class RoleDao : EntityDao<RoleEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "roles";
-    }
+    override val tableName: String
+        get() = "roles"
 
-    @Query("SELECT * FROM roles" +
-            " WHERE :id = role_id")
-    public abstract Maybe<Role> get(String id);
+    @Query("SELECT * FROM roles" + " WHERE :id = role_id")
+    abstract operator fun get(id: String): Maybe<Role>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<RoleEntity> roles);
+    abstract override fun insert(models: List<RoleEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<RoleEntity> roles);
+    abstract override fun update(models: List<RoleEntity>)
 
     @Delete
-    public abstract void delete(List<RoleEntity> roles);
+    abstract override fun delete(models: List<RoleEntity>)
 
     @Query("SELECT *" +
             " FROM roles" +
             " WHERE :teamId = role_team" +
             " AND :userId = role_user")
-    public abstract Maybe<Role> getRoleInTeam(String userId, String teamId);
+    abstract fun getRoleInTeam(userId: String, teamId: String): Maybe<Role>
 
     @Query("SELECT *" +
             " FROM roles" +
             " WHERE :userId = role_user")
-    public abstract Maybe<List<Role>> userRoles(String userId);
+    abstract fun userRoles(userId: String): Maybe<List<Role>>
 
     @Query("DELETE FROM roles WHERE role_team = :teamId")
-    public abstract void deleteByTeam(String teamId);
+    abstract fun deleteByTeam(teamId: String)
 
     @Query("DELETE FROM roles WHERE role_user = :userId AND role_team = :teamId")
-    public abstract void deleteUsers(String userId, String teamId);
+    abstract fun deleteUsers(userId: String, teamId: String)
 
     @Query("SELECT * FROM roles as role" +
             " WHERE :teamId = role_team" +
             " AND role_created < :date" +
             " ORDER BY role_created DESC" +
             " LIMIT :limit")
-    public abstract Maybe<List<Role>> getRoles(String teamId, Date date, int limit);
+    abstract fun getRoles(teamId: String, date: Date, limit: Int): Maybe<List<Role>>
 }

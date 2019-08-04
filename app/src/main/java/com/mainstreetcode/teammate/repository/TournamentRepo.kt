@@ -43,7 +43,7 @@ import java.util.*
 class TournamentRepo internal constructor() : TeamQueryRepo<Tournament>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val tournamentDao: TournamentDao = AppDatabase.getInstance().tournamentDao()
+    private val tournamentDao: TournamentDao = AppDatabase.instance.tournamentDao()
 
     override fun dao(): EntityDao<in Tournament> = tournamentDao
 

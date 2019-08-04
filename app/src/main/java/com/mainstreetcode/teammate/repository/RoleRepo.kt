@@ -41,7 +41,7 @@ import java.util.*
 class RoleRepo internal constructor() : ModelRepo<Role>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
-    private val roleDao: RoleDao = AppDatabase.getInstance().roleDao()
+    private val roleDao: RoleDao = AppDatabase.instance.roleDao()
 
     val myRoles: Flowable<List<Role>>
         get() {

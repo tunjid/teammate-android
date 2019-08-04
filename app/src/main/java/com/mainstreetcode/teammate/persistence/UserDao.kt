@@ -22,51 +22,42 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.persistence;
+package com.mainstreetcode.teammate.persistence
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
-import com.mainstreetcode.teammate.model.Competitor;
-import com.mainstreetcode.teammate.model.Event;
-import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity;
+import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.persistence.entity.UserEntity
 
-import java.util.List;
-
-import io.reactivex.Maybe;
+import io.reactivex.Maybe
 
 /**
- * DAO for {@link Event}
+ * DAO for [User]
+ *
+ *
+ * Created by Shemanigans on 6/12/17.
  */
 
 @Dao
-public abstract class CompetitorDao extends EntityDao<CompetitorEntity> {
+abstract class UserDao : EntityDao<UserEntity>() {
 
-    @Override
-    protected String getTableName() {
-        return "competitors";
-    }
+    override val tableName: String
+        get() = "users"
 
-    @Query("SELECT * FROM competitors" +
-            " WHERE :tournamentId = competitor_tournament" +
-            " ORDER BY competitor_created DESC" +
-            " LIMIT 40")
-    public abstract Maybe<List<Competitor>> getCompetitors(String tournamentId);
-
-    @Query("SELECT * FROM competitors" +
-            " WHERE :id = competitor_id")
-    public abstract Maybe<Competitor> get(String id);
+    @Query("SELECT * FROM users WHERE :id = user_id")
+    abstract operator fun get(id: String): Maybe<User>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(List<CompetitorEntity> tournaments);
+    abstract override fun insert(models: List<UserEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void update(List<CompetitorEntity> tournaments);
+    abstract override fun update(models: List<UserEntity>)
 
     @Delete
-    public abstract void delete(CompetitorEntity tournament);
+    abstract override fun delete(model: UserEntity)
 }
