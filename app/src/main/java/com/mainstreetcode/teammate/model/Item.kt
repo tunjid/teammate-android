@@ -24,21 +24,15 @@
 
 package com.mainstreetcode.teammate.model
 
+
 import android.text.InputType
 import android.text.TextUtils
-
-import com.mainstreetcode.teammate.App
-import com.mainstreetcode.teammate.R
-import com.tunjid.androidbootstrap.functions.Supplier
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
-import java.lang.annotation.Retention
-
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
-import androidx.arch.core.util.Function
+import com.mainstreetcode.teammate.App
+import com.mainstreetcode.teammate.R
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-import java.lang.annotation.RetentionPolicy.SOURCE
 
 /**
  * Item for listing properties of a [Model]
@@ -52,12 +46,12 @@ class Item<T> internal constructor(
         private var value: CharSequence?,
         private val changeCallBack: ValueChangeCallBack?,
         val itemizedObject: T) : Differentiable, Comparable<Item<*>> {
-    private var textTransformer: Function<CharSequence, CharSequence>? = null
+    private var textTransformer: ((CharSequence?) -> CharSequence)? = null
 
     val rawValue: String
         get() = value!!.toString()
 
-    @Retention(SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     @IntDef(INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY)
     internal annotation class ItemType
 
@@ -66,13 +60,12 @@ class Item<T> internal constructor(
         changeCallBack?.onValueChanged(value.toString())
     }
 
-    fun textTransformer(textTransformer: Function<CharSequence, CharSequence>): Item<T> {
+    fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item<T> {
         this.textTransformer = textTransformer
         return this
     }
 
-    fun getValue(): CharSequence? =
-            if (textTransformer == null) value else textTransformer!!.apply(value)
+    fun getValue(): CharSequence? = textTransformer?.run { invoke(value) } ?: value
 
     override fun getId(): String? = id
 
@@ -83,11 +76,11 @@ class Item<T> internal constructor(
 
     override fun getChangePayload(other: Differentiable?): Any? = other
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o !is Item<*>) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Item<*>) return false
 
-        val item = o as Item<*>?
+        val item = other as Item<*>?
 
         return if (id != null) id == item!!.id else item!!.id == null
     }
@@ -139,23 +132,23 @@ class Item<T> internal constructor(
         fun <T> ignore(ignored: T) {}
 
         fun <T> number(id: String, sortPosition: Int, itemType: Int, stringRes: Int,
-                       supplier: Supplier<CharSequence>, changeCallBack: ValueChangeCallBack?,
+                       supplier: () -> CharSequence, changeCallBack: ValueChangeCallBack?,
                        itemizedObject: T): Item<T> =
-                Item(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject)
+                Item(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.invoke(), changeCallBack, itemizedObject)
 
         fun <T> text(id: String, sortPosition: Int, itemType: Int, stringRes: Int,
-                     supplier: Supplier<CharSequence>, changeCallBack: ValueChangeCallBack?,
+                     supplier: () -> CharSequence, changeCallBack: ValueChangeCallBack?,
                      itemizedObject: T): Item<T> =
-                Item(id, sortPosition, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject)
+                Item(id, sortPosition, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.invoke(), changeCallBack, itemizedObject)
 
         fun <T> email(id: String, sortPosition: Int, itemType: Int, stringRes: Int,
-                      supplier: Supplier<CharSequence>, changeCallBack: ValueChangeCallBack?,
+                      supplier: () -> CharSequence, changeCallBack: ValueChangeCallBack?,
                       itemizedObject: T): Item<T> =
-                Item(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.get(), changeCallBack, itemizedObject)
+                Item(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.invoke(), changeCallBack, itemizedObject)
 
-        fun nullToEmpty(source: CharSequence?): Supplier<CharSequence> {
+        fun nullToEmpty(source: CharSequence?): () -> CharSequence {
             val finalSource = source ?: ""
-            return Supplier { finalSource }
+            return  { finalSource }
         }
     }
 }
