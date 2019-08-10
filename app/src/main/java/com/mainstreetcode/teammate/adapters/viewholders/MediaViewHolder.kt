@@ -34,7 +34,6 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.IdRes
-import androidx.arch.core.util.Function
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat.setTransitionName
@@ -109,17 +108,15 @@ abstract class MediaViewHolder<T : View> internal constructor(
         setTransitionName(thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail))
 
         loadImage(media.thumbnail, false, thumbnailView)
-        if (!adapterListener.isFullScreen) highlightViewHolder(Function { adapterListener.isSelected(it) })
+        if (!adapterListener.isFullScreen) highlightViewHolder(adapterListener::isSelected)
     }
 
-    open fun fullBind(media: Media) {
-        bind(media)
-    }
+    open fun fullBind(media: Media) = bind(media)
 
     open fun unBind() {}
 
     fun performLongClick(): Boolean {
-        highlightViewHolder(Function { adapterListener.onMediaLongClicked(it) })
+        highlightViewHolder(adapterListener::onMediaLongClicked)
         return true
     }
 
@@ -149,8 +146,8 @@ abstract class MediaViewHolder<T : View> internal constructor(
         set.applyTo(container)
     }
 
-    private fun highlightViewHolder(selectionFunction: Function<Media, Boolean>) {
-        val isSelected = selectionFunction.apply(media)
+    private fun highlightViewHolder(selectionFunction: (Media) -> Boolean) {
+        val isSelected = selectionFunction.invoke(media)
         border.visibility = if (isSelected) View.VISIBLE else View.GONE
         scale(isSelected)
     }
@@ -171,9 +168,8 @@ abstract class MediaViewHolder<T : View> internal constructor(
         adapterListener.onFillLoaded()
     }
 
-    private fun animateProperty(property: String, start: Float, end: Float): ObjectAnimator {
-        return ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION.toLong())
-    }
+    private fun animateProperty(property: String, start: Float, end: Float): ObjectAnimator =
+            ObjectAnimator.ofFloat(container, property, start, end).setDuration(DURATION.toLong())
 
     override fun onSuccess() {}
 
