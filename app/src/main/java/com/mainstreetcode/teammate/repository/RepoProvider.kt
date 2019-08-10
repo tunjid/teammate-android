@@ -93,7 +93,7 @@ class RepoProvider private constructor() {
             CompetitorRepo::class.java to CompetitorRepo(),
             BlockedUserRepo::class.java to BlockedUserRepo(),
             JoinRequestRepo::class.java to JoinRequestRepo(),
-            TeamMemberRepo::class.java to TeamMemberRepo<ModelStub>()
+            TeamMemberRepo::class.java to TeamMemberRepo()
     )
 
     companion object {

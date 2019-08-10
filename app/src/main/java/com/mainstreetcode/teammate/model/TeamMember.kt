@@ -26,25 +26,22 @@ package com.mainstreetcode.teammate.model
 
 import android.annotation.SuppressLint
 import android.os.Parcel
-
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
 import java.lang.reflect.Type
-import java.util.Date
+import java.util.*
 
 @SuppressLint("ParcelCreator")
-class TeamMember<S> internal constructor(val wrappedModel: S) : UserHost, TeamHost, Model<TeamMember<S>>
-        where  S : UserHost, S : TeamHost, S : Model<*> {
+class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : UserHost, TeamHost, Model<TeamMember> {
 
     val created: Date
         get() = when (wrappedModel) {
-            is Role -> (wrappedModel as Role).created
-            is JoinRequest -> (wrappedModel as JoinRequest).created
+            is Role -> wrappedModel.created
+            is JoinRequest -> wrappedModel.created
             else -> Date()
         }
 
@@ -58,20 +55,20 @@ class TeamMember<S> internal constructor(val wrappedModel: S) : UserHost, TeamHo
 
     override fun getId(): String = wrappedModel.id
 
-    override fun compareTo(other: TeamMember<S>?): Int =
+    override fun compareTo(other: TeamMember?): Int =
             FunctionalDiff.COMPARATOR.compare(wrappedModel, other)
 
-    override fun update(updated: TeamMember<S>) {}
+    override fun update(updated: TeamMember) {}
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
-        is TeamMember<*> -> wrappedModel.areContentsTheSame(other.wrappedModel as Differentiable)
+        is TeamMember -> wrappedModel.areContentsTheSame(other.wrappedModel as Differentiable)
         else -> id == other.id
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is TeamMember<*>) return false
-        val that = other as TeamMember<*>?
+        if (other !is TeamMember) return false
+        val that = other as TeamMember?
         return wrappedModel == that!!.wrappedModel
     }
 
@@ -85,10 +82,10 @@ class TeamMember<S> internal constructor(val wrappedModel: S) : UserHost, TeamHo
         throw IllegalArgumentException("TeamMember instances are not Parcelable")
     }
 
-    class GsonAdapter : JsonDeserializer<TeamMember<*>> {
+    class GsonAdapter : JsonDeserializer<TeamMember> {
 
         @Throws(JsonParseException::class)
-        override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): TeamMember<*> {
+        override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): TeamMember {
             val jsonObject = json.asJsonObject
             val isJoinRequest = jsonObject.has(NAME_KEY) && jsonObject.get(NAME_KEY).isJsonPrimitive
 
@@ -105,10 +102,3 @@ class TeamMember<S> internal constructor(val wrappedModel: S) : UserHost, TeamHo
     }
 
 }
-
-fun <S> S.toTeamMember(): TeamMember<S> where S : UserHost, S : TeamHost, S : Model<S> =
-        TeamMember(this)
-
-
-fun <S> TeamMember<*>.unsafeCast(): TeamMember<S> where  S : UserHost, S : TeamHost, S : Model<S> =
-        this as TeamMember<S>

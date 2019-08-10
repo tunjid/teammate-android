@@ -26,12 +26,20 @@ package com.mainstreetcode.teammate.viewmodel
 
 
 import androidx.recyclerview.widget.DiffUtil
+import com.mainstreetcode.teammate.model.Chat
+import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.model.Game
+import com.mainstreetcode.teammate.model.JoinRequest
+import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.Message.fromThrowable
 import com.mainstreetcode.teammate.model.Model
+import com.mainstreetcode.teammate.model.Role
+import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.Tournament
+import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.notifications.NotifierProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.mainstreetcode.teammate.util.ModelUtils.asDifferentiables
 import com.mainstreetcode.teammate.util.asDifferentiables
 import com.tunjid.androidbootstrap.functions.collections.Lists.findLast
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -109,8 +117,17 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     private fun clearNotification(model: Model<*>?) {
         if (model == null) return
 
-        val n = NotifierProvider.forModel(model::class.java)
-        n.clearNotifications(model)
+        when (model) {
+            is User -> NotifierProvider.forModel(User::class.java).clearNotifications(model)
+            is Team -> NotifierProvider.forModel(Team::class.java).clearNotifications(model)
+            is Role -> NotifierProvider.forModel(Role::class.java).clearNotifications(model)
+            is Chat -> NotifierProvider.forModel(Chat::class.java).clearNotifications(model)
+            is Game -> NotifierProvider.forModel(Game::class.java).clearNotifications(model)
+            is Media -> NotifierProvider.forModel(Media::class.java).clearNotifications(model)
+            is Event -> NotifierProvider.forModel(Event::class.java).clearNotifications(model)
+            is Tournament -> NotifierProvider.forModel(Tournament::class.java).clearNotifications(model)
+            is JoinRequest -> NotifierProvider.forModel(JoinRequest::class.java).clearNotifications(model)
+        }
     }
 
     internal fun checkForInvalidObject(throwable: Throwable, model: V, key: K) {

@@ -49,7 +49,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchView.OnQueryTextListener, TeamAdapter.AdapterListener {
 
     private lateinit var request: TeamSearchRequest
-    private lateinit var instantSearch: InstantSearch<TeamSearchRequest, Differentiable>
+    private lateinit var instantSearch: InstantSearch<TeamSearchRequest, Team>
 
     private var createTeam: View? = null
     private var searchView: SearchView? = null
@@ -86,7 +86,9 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         if (targetRequestCode != 0) {
             val items = instantSearch.currentItems
             items.clear()
-            items.addAll(teamViewModel.getModelList(Team::class.java).filter(this::isEligibleTeam))
+            items.addAll(teamViewModel.getModelList(Team::class.java)
+                    .filterIsInstance(Team::class.java)
+                    .filter(this::isEligibleTeam))
         }
 
         return root

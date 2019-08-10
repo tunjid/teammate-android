@@ -46,7 +46,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchView.OnQueryTextListener, UserAdapter.AdapterListener {
 
     private var searchView: SearchView? = null
-    private lateinit var instantSearch: InstantSearch<String, Differentiable>
+    private lateinit var instantSearch: InstantSearch<String, User>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

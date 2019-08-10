@@ -61,9 +61,9 @@ public class Role extends RoleEntity
         implements
         UserHost,
         TeamHost,
-        Model<Role>,
         HeaderedModel<Role>,
-        ListableModel<Role> {
+        ListableModel<Role>,
+        TeamMemberModel<Role> {
 
     public static final String PHOTO_UPLOAD_KEY = "role-photo";
 

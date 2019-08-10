@@ -24,4 +24,6 @@
 
 package com.mainstreetcode.teammate.model
 
-interface UserTeamHost : UserHost, TeamHost
+interface TeamMemberModel<T> : UserHost, TeamHost, Model<T>
+
+fun TeamMemberModel<*>.toTeamMember(): TeamMember = TeamMember(this)

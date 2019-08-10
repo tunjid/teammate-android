@@ -32,32 +32,32 @@ import com.mainstreetcode.teammate.persistence.entity.RoleEntity
 import com.mainstreetcode.teammate.repository.split
 import java.util.*
 
-class TeamMemberDao : EntityDao<TeamMember<*>>() {
+class TeamMemberDao : EntityDao<TeamMember>() {
 
     override val tableName: String
         get() = "INVALID"
 
-    override fun insert(models: List<TeamMember<*>>) = daos { roleDao, requestDao ->
+    override fun insert(models: List<TeamMember>) = daos { roleDao, requestDao ->
         models.split { roles, requests ->
             roleDao.insert(Collections.unmodifiableList<RoleEntity>(roles))
             requestDao.insert(Collections.unmodifiableList<JoinRequestEntity>(requests))
         }
     }
 
-    override fun update(models: List<TeamMember<*>>) = daos { roleDao, requestDao ->
+    override fun update(models: List<TeamMember>) = daos { roleDao, requestDao ->
         models.split { roles, requests ->
             roleDao.update(roles)
             requestDao.update(requests)
         }
     }
 
-    override fun delete(model: TeamMember<*>) = daos { roleDao, requestDao ->
+    override fun delete(model: TeamMember) = daos { roleDao, requestDao ->
         val wrapped = model.wrappedModel
         if (wrapped is Role) roleDao.delete(wrapped)
         else if (wrapped is JoinRequest) requestDao.delete(wrapped)
     }
 
-    override fun delete(models: List<TeamMember<*>>) = daos { roleDao, requestDao ->
+    override fun delete(models: List<TeamMember>) = daos { roleDao, requestDao ->
         models.split { roles, requests ->
             roleDao.delete(Collections.unmodifiableList<RoleEntity>(roles))
             requestDao.delete(Collections.unmodifiableList<JoinRequestEntity>(requests))

@@ -83,8 +83,8 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
                 this::deleteTeam)
     }
 
-    fun instantSearch(): InstantSearch<TeamSearchRequest, Differentiable> =
-            InstantSearch(repository::findTeams) { team -> team }
+    fun instantSearch(): InstantSearch<TeamSearchRequest, Team> =
+            InstantSearch(repository::findTeams) { it }
 
     private fun getTeam(team: Team): Flowable<Team> = repository[team].doOnNext(this::onTeamChanged)
 

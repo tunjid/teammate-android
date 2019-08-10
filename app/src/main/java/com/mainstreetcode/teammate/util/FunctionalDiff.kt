@@ -97,7 +97,7 @@ object FunctionalDiff {
     private fun getPoints(identifiable: Differentiable): Int {
         val it = when (identifiable) {
             is FeedItem<*> -> identifiable.model
-            is TeamMember<*> -> identifiable.wrappedModel as Differentiable
+            is TeamMember -> identifiable.wrappedModel
             else -> identifiable
         }
 

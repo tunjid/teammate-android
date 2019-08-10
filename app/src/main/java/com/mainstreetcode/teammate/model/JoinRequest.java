@@ -59,9 +59,9 @@ public class JoinRequest extends JoinRequestEntity
         implements
         UserHost,
         TeamHost,
-        Model<JoinRequest>,
         HeaderedModel<JoinRequest>,
-        ListableModel<JoinRequest> {
+        ListableModel<JoinRequest>,
+        TeamMemberModel<JoinRequest> {
 
     @Ignore private static final IdCache holder = IdCache.cache(13);
 

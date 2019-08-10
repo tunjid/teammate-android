@@ -61,8 +61,8 @@ class UserViewModel : ViewModel() {
             this::getUser,
             this::updateUser)
 
-    fun instantSearch(): InstantSearch<String, Differentiable> =
-            InstantSearch(repository::findUser) { user -> user as Differentiable }
+    fun instantSearch(): InstantSearch<String, User> =
+            InstantSearch(repository::findUser) { it }
 
     fun signUp(firstName: String, lastName: String, primaryEmail: String, password: String): Single<User> =
             repository.signUp(firstName, lastName, primaryEmail, password).observeOn(mainThread())

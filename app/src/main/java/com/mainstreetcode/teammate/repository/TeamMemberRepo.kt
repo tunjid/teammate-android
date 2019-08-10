@@ -25,14 +25,10 @@
 package com.mainstreetcode.teammate.repository
 
 import com.mainstreetcode.teammate.model.JoinRequest
-import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
-import com.mainstreetcode.teammate.model.TeamHost
 import com.mainstreetcode.teammate.model.TeamMember
-import com.mainstreetcode.teammate.model.UserHost
 import com.mainstreetcode.teammate.model.toTeamMember
-import com.mainstreetcode.teammate.model.unsafeCast
 import com.mainstreetcode.teammate.persistence.AppDatabase
 import com.mainstreetcode.teammate.persistence.EntityDao
 import com.mainstreetcode.teammate.persistence.TeamMemberDao
@@ -47,31 +43,31 @@ import io.reactivex.rxkotlin.Maybes
 import io.reactivex.schedulers.Schedulers.io
 import java.util.*
 
-class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() where T : UserHost, T : TeamHost, T : Model<T> {
+class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val dao: TeamMemberDao = AppDatabase.instance.teamMemberDao()
 
-    override fun dao(): EntityDao<in TeamMember<*>> = dao
+    override fun dao(): EntityDao<in TeamMember> = dao
 
-    override fun createOrUpdate(model: TeamMember<T>): Single<TeamMember<T>> = when (val wrapped = model.wrappedModel) {
-        is Role -> forModel(Role::class.java).createOrUpdate(wrapped).unsafeCast()
+    override fun createOrUpdate(model: TeamMember): Single<TeamMember> = when (val wrapped = model.wrappedModel) {
+        is Role -> forModel(Role::class.java).createOrUpdate(wrapped).map(Role::toTeamMember)
         is JoinRequest ->
             if (wrapped.isEmpty) createJoinRequest(wrapped)
             else createRole(wrapped)
         else -> Single.error(TeammateException("Unimplemented"))
     }.map(getLocalUpdateFunction(model))
 
-    override fun get(id: String): Flowable<TeamMember<T>> =
+    override fun get(id: String): Flowable<TeamMember> =
             Flowable.error(IllegalArgumentException("Unimplementable"))
 
-    override fun delete(model: TeamMember<T>): Single<TeamMember<T>> = when (val wrapped = model.wrappedModel) {
-        is Role -> forModel(Role::class.java).delete(wrapped).unsafeCast()
-        is JoinRequest -> forModel(JoinRequest::class.java).delete(wrapped).unsafeCast()
+    override fun delete(model: TeamMember): Single<TeamMember> = when (val wrapped = model.wrappedModel) {
+        is Role -> forModel(Role::class.java).delete(wrapped).map(Role::toTeamMember)
+        is JoinRequest -> forModel(JoinRequest::class.java).delete(wrapped).map(JoinRequest::toTeamMember)
         else -> Single.error(TeammateException("Unimplemented"))
     }
 
-    override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember<T>>> {
+    override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember>> {
         val date = pagination ?: Date()
 
         val database = AppDatabase.instance
@@ -80,32 +76,30 @@ class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() 
         val rolesMaybe = database.roleDao().getRoles(key.id, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
         val requestsMaybe = database.joinRequestDao().getRequests(teamId, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
 
-        val listMaybe = Maybes.zip<List<Role>, List<JoinRequest>, List<TeamMember<*>>>(rolesMaybe, requestsMaybe, { roles, requests ->
-            val result = ArrayList<TeamMember<*>>(roles.size + requests.size)
+        return Maybes.zip<List<Role>, List<JoinRequest>, List<TeamMember>>(rolesMaybe, requestsMaybe, { roles, requests ->
+            val result = ArrayList<TeamMember>(roles.size + requests.size)
 
             for (role in roles) result.add(role.toTeamMember())
             for (request in requests) result.add(request.toTeamMember())
 
             result
         }).subscribeOn(io())
-
-        return listMaybe.unsafeCastList()
     }
 
-    private fun createJoinRequest(request: JoinRequest): Single<TeamMember<T>> =
-            forModel(JoinRequest::class.java).createOrUpdate(request).map { request.toTeamMember().unsafeCast<T>() }
+    private fun createJoinRequest(request: JoinRequest): Single<TeamMember> =
+            forModel(JoinRequest::class.java).createOrUpdate(request).map(JoinRequest::toTeamMember)
 
-    private fun createRole(request: JoinRequest): Single<TeamMember<T>> =
+    private fun createRole(request: JoinRequest): Single<TeamMember> =
             if (request.isUserApproved) approveUser(request) else acceptInvite(request)
 
-    private fun acceptInvite(request: JoinRequest): Single<TeamMember<T>> =
+    private fun acceptInvite(request: JoinRequest): Single<TeamMember> =
             invoke(request, api.acceptInvite(request.id))
 
-    private fun approveUser(request: JoinRequest): Single<TeamMember<T>> =
+    private fun approveUser(request: JoinRequest): Single<TeamMember> =
             invoke(request, api.approveUser(request.id))
 
-    private fun invoke(request: JoinRequest, apiSingle: Single<Role>): Single<TeamMember<T>> {
-        val member = request.toTeamMember().unsafeCast<T>()
+    private fun invoke(request: JoinRequest, apiSingle: Single<Role>): Single<TeamMember> {
+        val member = request.toTeamMember()
         return apiSingle
                 .map(forModel(Role::class.java).saveFunction)
                 .doOnSuccess { AppDatabase.instance.joinRequestDao().delete(request) }
@@ -113,12 +107,12 @@ class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() 
                 .doOnError { throwable -> deleteInvalidModel(member, throwable) }
     }
 
-    override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember<T>>> {
-        val maybe = api.getTeamMembers(key.id, pagination, DEF_QUERY_LIMIT).toMaybe().unsafeCastList<T>()
+    override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember>> {
+        val maybe = api.getTeamMembers(key.id, pagination, DEF_QUERY_LIMIT).toMaybe()
         return maybe.map(saveManyFunction)
     }
 
-    override fun provideSaveManyFunction(): (List<TeamMember<T>>) -> List<TeamMember<T>> = { models ->
+    override fun provideSaveManyFunction(): (List<TeamMember>) -> List<TeamMember> = { models ->
         models.split { roles, requests ->
             deleteStaleJoinRequests(roles)
 
@@ -139,19 +133,7 @@ class TeamMemberRepo<T> internal constructor() : TeamQueryRepo<TeamMember<T>>() 
 
 }
 
-private fun <S, R> Single<R>.unsafeCast(): Single<TeamMember<S>>
-        where  S : UserHost, S : TeamHost, S : Model<S>, R : UserHost, R : TeamHost, R : Model<R> =
-        map { it.toTeamMember() }.map { it.unsafeCast<S>() }
-
-private fun <S> Maybe<List<TeamMember<*>>>.unsafeCastList(): Maybe<List<TeamMember<S>>>
-        where  S : UserHost, S : TeamHost, S : Model<S> =
-        map { it.unsafeCastList<TeamMember<S>>() }
-
-@Suppress("UNCHECKED_CAST")
-private fun <S : Model<S>> List<TeamMember<*>>.unsafeCastList(): List<S> =
-        this.map { it as S }
-
-fun List<TeamMember<*>>.split(listBiConsumer: (List<Role>, List<JoinRequest>) -> Unit) {
+fun List<TeamMember>.split(listBiConsumer: (List<Role>, List<JoinRequest>) -> Unit) {
     val unwrapped = map { it.wrappedModel }
     val roles = unwrapped.filterIsInstance(Role::class.java)
     val requests = unwrapped.filterIsInstance(JoinRequest::class.java)

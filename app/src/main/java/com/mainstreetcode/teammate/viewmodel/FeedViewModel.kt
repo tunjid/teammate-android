@@ -34,8 +34,8 @@ import com.mainstreetcode.teammate.model.toTeamMember
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.repository.CompetitorRepo
 import com.mainstreetcode.teammate.repository.GuestRepo
-import com.mainstreetcode.teammate.repository.JoinRequestRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
+import com.mainstreetcode.teammate.repository.TeamMemberRepo
 import com.mainstreetcode.teammate.repository.UserRepo
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.FunctionalDiff
@@ -51,8 +51,8 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
     private val api = TeammateService.getApiInstance()
 
     private val guestRepository = RepoProvider.forRepo(GuestRepo::class.java)
+    private val teamMemberRepository = RepoProvider.forRepo(TeamMemberRepo::class.java)
     private val competitorRepository = RepoProvider.forRepo(CompetitorRepo::class.java)
-    private val joinRequestRepository = RepoProvider.forRepo(JoinRequestRepo::class.java)
 
     private val feedItems = mutableListOf<Differentiable>()
 
@@ -81,7 +81,8 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
                 .map { feedItem }
                 .cast(FeedItem::class.java)
                 .map { listOf(it) }
-                .toFlowable().map(List<Differentiable>::asDifferentiables)
+                .toFlowable()
+                .map(List<Differentiable>::asDifferentiables)
 
         return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(false)).firstOrError()
     }
@@ -105,12 +106,13 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
 
         val isOwner = RepoProvider.forRepo(UserRepo::class.java).currentUser == request.user
         val leaveUnchanged = approved && request.isUserApproved && isOwner
+        val member = request.toTeamMember()
 
         val sourceSingle = when {
-            leaveUnchanged -> Single.just(request.toTeamMember())
-            approved && request.isTeamApproved -> request.toTeamMember().let { RepoProvider.forModel(it).createOrUpdate(it) }
-            approved && request.isUserApproved -> request.toTeamMember().let { RepoProvider.forModel(it).createOrUpdate(it) }
-            else -> joinRequestRepository.delete(request).map(JoinRequest::toTeamMember)
+            leaveUnchanged -> Single.just(member)
+            approved && request.isTeamApproved -> teamMemberRepository.createOrUpdate(member)
+            approved && request.isUserApproved -> teamMemberRepository.createOrUpdate(member)
+            else -> teamMemberRepository.delete(member)
         }
 
         val sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem::class.java, feedItem)

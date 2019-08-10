@@ -24,13 +24,10 @@
 
 package com.mainstreetcode.teammate.viewmodel
 
-import android.annotation.SuppressLint
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.JoinRequest
-import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
-import com.mainstreetcode.teammate.model.TeamHost
 import com.mainstreetcode.teammate.model.TeamMember
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.UserHost
@@ -46,9 +43,9 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 
-class TeamMemberViewModel : TeamMappedViewModel<TeamMember<*>>() {
+class TeamMemberViewModel : TeamMappedViewModel<TeamMember>() {
 
-//    private val repository: TeamMemberRepo<*> = RepoProvider.forRepo(TeamMemberRepo::class.java)
+    private val repo: TeamMemberRepo = RepoProvider.forRepo(TeamMemberRepo::class.java)
 
     val allUsers: List<User>
         get() = allModels.filterIsInstance<UserHost>()
@@ -57,9 +54,8 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember<*>>() {
 
     override fun sortsAscending(): Boolean = true
 
-    override fun valueClass(): Class<TeamMember<*>> = TeamMember::class.java
+    override fun valueClass(): Class<TeamMember> = TeamMember::class.java
 
-    @SuppressLint("CheckResult")
     override fun onModelAlert(alert: Alert<*>) {
         super.onModelAlert(alert)
 
@@ -76,18 +72,13 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember<*>>() {
         filterJoinedMembers(source)
     }
 
-    override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<TeamMember<*>>> {
-        val  p = RepoProvider.forRepo(TeamMemberRepo::class.java)
-        val  l = RepoProvider.forModel(TeamMember::class.java)
-
-        val repo = RepoProvider.forRepo(TeamMemberRepo::class.java)
-        return repo.modelsBefore(key, getQueryDate(fetchLatest, key, { it.getCreated() }))
-    }
+    override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<TeamMember>> =
+            repo.modelsBefore(key, getQueryDate(fetchLatest, key, TeamMember::created))
 
     fun gofer(joinRequest: JoinRequest): JoinRequestGofer = JoinRequestGofer(
             joinRequest,
             onError(joinRequest.toTeamMember()),
-            { RepoProvider.forModel(it)[it] },
+            { RepoProvider.forModel(JoinRequest::class.java)[it] },
             this::processRequest)
 
     fun gofer(role: Role): RoleGofer = RoleGofer(
@@ -99,23 +90,19 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember<*>>() {
     )
 
     private fun deleteRole(role: Role): Single<Role> =
-            asTypedTeamMember(role, { member, repository ->
-                repository.delete(member)
-                        .doOnSuccess { getModelList(role.team).remove(it) }
-                        .map { role }
-            })
+            repo.delete(role.toTeamMember())
+                    .doOnSuccess { getModelList(role.team).remove(it) }
+                    .map { role }
 
     private fun updateRole(role: Role): Single<Role> =
-            asTypedTeamMember(role, { member, repository -> repository.createOrUpdate(member).map { role } })
+            repo.createOrUpdate(role.toTeamMember()).map { role }
 
-    private fun processRequest(request: JoinRequest, approved: Boolean): Single<JoinRequest> = asTypedTeamMember(request, { member, repository ->
-        when {
-            approved -> repository.createOrUpdate(member)
-            else -> repository.delete(member)
-        }
-                .doOnSuccess { processedMember -> onRequestProcessed(request, approved, request.team, processedMember) }
-                .map { request }
-    })
+    private fun processRequest(request: JoinRequest, approved: Boolean): Single<JoinRequest> = when {
+        approved -> repo.createOrUpdate(request.toTeamMember())
+        else -> repo.delete(request.toTeamMember())
+    }
+            .doOnSuccess { onRequestProcessed(request, approved, request.team, it) }
+            .map { request }
 
     private fun onRequestProcessed(request: JoinRequest, approved: Boolean, team: Team, processedMember: Differentiable) {
         pushModelAlert(Alert.requestProcessed(request))
@@ -124,23 +111,11 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember<*>>() {
         if (approved) list.add(processedMember)
     }
 
-    private fun <S> repository(): TeamMemberRepo<S> where S : UserHost, S : TeamHost, S : Model<S> =
-            RepoProvider.forRepo(TeamMemberRepo::class.java) as TeamMemberRepo<S>
-
-    private fun <T, S> asTypedTeamMember(model: T, function: (TeamMember<T>, TeamMemberRepo<T>) -> S): S
-            where T : UserHost, T : TeamHost, T : Model<T> {
-        try {
-            return function.invoke(model.toTeamMember(), repository())
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-    }
-
     private fun removeBlockedUser(blockedUser: BlockedUser) {
         val iterator = getModelList(blockedUser.team).iterator()
 
         while (iterator.hasNext()) {
-            val identifiable = iterator.next() as? TeamMember<*> ?: continue
+            val identifiable = iterator.next() as? TeamMember ?: continue
 
             if (identifiable.user == blockedUser.user) iterator.remove()
         }
@@ -151,7 +126,7 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember<*>>() {
         val iterator = source.listIterator(source.size)
 
         while (iterator.hasPrevious()) {
-            val member: TeamMember<*> = iterator.previous() as? TeamMember<*> ?: continue
+            val member: TeamMember = iterator.previous() as? TeamMember ?: continue
 
             val item = member.wrappedModel as Differentiable
 

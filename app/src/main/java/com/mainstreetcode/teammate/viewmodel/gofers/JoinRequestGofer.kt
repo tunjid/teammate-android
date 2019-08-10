@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.JoinRequest
+import com.mainstreetcode.teammate.model.TeamMember
 import com.mainstreetcode.teammate.model.toTeamMember
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
@@ -134,9 +135,8 @@ class JoinRequestGofer(
                     .ignoreElement()
                     .observeOn(mainThread())
 
-    private fun joinTeam(): Single<JoinRequest> = model.toTeamMember<JoinRequest>().let {
-        RepoProvider.forModel(it).createOrUpdate(it).map { member -> member.wrappedModel }
-    }
+    private fun joinTeam(): Single<JoinRequest> =
+            RepoProvider.forModel(TeamMember::class.java).createOrUpdate(model.toTeamMember()).map { model }
 
     private fun approveRequest(): Single<JoinRequest> =
             Single.defer { joinCompleter.invoke(model, true) }

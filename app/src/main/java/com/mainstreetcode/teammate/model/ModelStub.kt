@@ -29,7 +29,7 @@ import android.os.Parcel
 
 
 @SuppressLint("ParcelCreator")
-class ModelStub : UserHost, TeamHost, Model<ModelStub> {
+object ModelStub : UserHost, TeamHost, Model<ModelStub> {
     override fun getImageUrl(): String = throw UnsupportedOperationException()
 
     override fun isEmpty(): Boolean = throw UnsupportedOperationException()
