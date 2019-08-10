@@ -22,49 +22,49 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.viewmodel.gofers
+package com.mainstreetcode.teammate.viewmodel
 
-import com.mainstreetcode.teammate.model.ListableModel
-import com.mainstreetcode.teammate.model.Model
+import androidx.lifecycle.ViewModel
 import com.mainstreetcode.teammate.model.Role
-import com.mainstreetcode.teammate.model.TeamHost
+import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.repository.RoleRepo
-import com.mainstreetcode.teammate.repository.UserRepo
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 
 /**
- * Interface for liaisons between a ViewModel and a single instance of it's Model
+ * ViewModel for checking a role in local contexts
  */
-abstract class TeamHostingGofer<T> internal constructor(
-        model: T,
-        onError: (Throwable) -> Unit
-) : Gofer<T>(model, onError) where T: TeamHost, T : Model<T>, T : ListableModel<T> {
 
-    private val currentRole: Role = Role.empty()
-    private val userRepository: UserRepo = RepoProvider.forRepo(UserRepo::class.java)
-    private val roleRepository: RoleRepo = RepoProvider.forRepo(RoleRepo::class.java)
+class LocalRoleViewModel : ViewModel() {
 
-    internal val signedInUser: User
-        get() = userRepository.currentUser
+    private val role = Role.empty()
 
-    init {
-        startPrep()
+    private val repository: RoleRepo = RepoProvider.forRepo(RoleRepo::class.java)
+
+    fun hasPrivilegedRole(): Boolean = role.isPrivilegedRole
+
+    fun watchRoleChanges(user: User, team: Team): Flowable<Any> = matchInUserRoles(user, team)
+            .map(this::checkChanged)
+            .filter { flag -> flag }
+            .observeOn(mainThread())
+            .cast(Any::class.java)
+
+    private fun checkChanged(foundRole: Role): Boolean {
+        val changed = role.position != foundRole.position
+        role.update(foundRole)
+        return changed
     }
 
-     override fun changeEmitter(): Flowable<Boolean> =
-             roleRepository.getRoleInTeam(userRepository.currentUser.id, model.team.id)
-                     .map(this::onRoleFound).observeOn(mainThread())
+    private fun matchInUserRoles(user: User, team: Team): Flowable<Role> {
+        val inMemory = Flowable.fromIterable(RoleViewModel.roles)
+                .filter { role -> role is Role }
+                .cast(Role::class.java)
+                .filter { role -> user == role.user && team == role.team }
 
-    fun hasRole(): Boolean = !currentRole.isEmpty
+        val fromIo = repository.getRoleInTeam(user.id, team.id)
 
-    fun hasPrivilegedRole(): Boolean = currentRole.isPrivilegedRole
-
-    private fun onRoleFound(foundRole: Role): Boolean {
-        val changed = currentRole.position != foundRole.position
-        currentRole.update(foundRole)
-        return changed
+        return Flowable.concatDelayError(listOf(inMemory, fromIo))
     }
 }

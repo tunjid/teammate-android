@@ -33,7 +33,6 @@ import androidx.appcompat.widget.SearchView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -73,7 +72,7 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
             items.clear()
             items.apply {
                 add(userViewModel.currentUser)
-                addAll(teamViewModel.getModelList(Team::class.java).distinct())
+                addAll(teamMemberViewModel.allUsers)
             }
         }
 

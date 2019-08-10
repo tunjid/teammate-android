@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.viewmodel.gofers
 
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -34,12 +33,11 @@ import com.mainstreetcode.teammate.util.TeammateException
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 
 class GuestGofer(
         model: Guest,
-        onError: Consumer<Throwable>,
-        private val getFunction: Function<Guest, Flowable<Guest>>
+        onError: (Throwable) -> Unit,
+        private val getFunction: (Guest) -> Flowable<Guest>
 ) : TeamHostingGofer<Guest>(model, onError) {
 
     init {
@@ -52,7 +50,7 @@ class GuestGofer(
     fun canBlockUser(): Boolean = hasPrivilegedRole() && signedInUser != model.user
 
     public override fun fetch(): Flowable<DiffUtil.DiffResult> {
-        val source = getFunction.apply(model).map(Guest::asDifferentiables)
+        val source = getFunction.invoke(model).map(Guest::asDifferentiables)
         return FunctionalDiff.of(source, items) { _, updated -> updated }
     }
 

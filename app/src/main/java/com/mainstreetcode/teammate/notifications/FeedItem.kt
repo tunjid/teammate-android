@@ -35,7 +35,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Competitor
-import com.mainstreetcode.teammate.model.Dummy
+import com.mainstreetcode.teammate.model.ModelStub
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.JoinRequest
@@ -54,6 +54,11 @@ import java.lang.reflect.Type
 /**
  * Notifications from a user's feed
  */
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> FeedItem<*>.isOf() where T : Any, T : Model<T> =
+        if (model is T) this as FeedItem<T>
+        else null
 
 class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*>> {
 
@@ -177,7 +182,7 @@ class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*
 
         @JvmField
         val CREATOR: Parcelable.Creator<FeedItem<*>> = object : Parcelable.Creator<FeedItem<*>> {
-            override fun createFromParcel(`in`: Parcel): FeedItem<*> = FeedItem<Dummy>(`in`)
+            override fun createFromParcel(`in`: Parcel): FeedItem<*> = FeedItem<ModelStub>(`in`)
 
             override fun newArray(size: Int): Array<FeedItem<*>?> = arrayOfNulls(size)
         }

@@ -39,7 +39,7 @@ import java.util.Date
 
 @SuppressLint("ParcelCreator")
 class TeamMember<S> internal constructor(val wrappedModel: S) : UserHost, TeamHost, Model<TeamMember<S>>
-        where  S : UserHost, S : TeamHost, S : Model<S> {
+        where  S : UserHost, S : TeamHost, S : Model<*> {
 
     val created: Date
         get() = when (wrappedModel) {

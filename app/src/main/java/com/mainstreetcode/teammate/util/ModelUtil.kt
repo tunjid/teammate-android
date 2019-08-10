@@ -22,24 +22,17 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.viewmodel;
+package com.mainstreetcode.teammate.util
 
-import com.mainstreetcode.teammate.model.Prefs;
-import com.mainstreetcode.teammate.repository.PrefsRepo;
-import com.mainstreetcode.teammate.repository.RepoProvider;
+import com.tunjid.androidbootstrap.functions.collections.Lists
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-public class PrefsViewModel extends BaseViewModel {
+val Unit.yes: Boolean get() = true
 
-    private Prefs prefs;
-    private final PrefsRepo prefsRepository = RepoProvider.Companion.forRepo(PrefsRepo.class);
+fun List<Differentiable>.asDifferentiables(): MutableList<Differentiable> = ArrayList<Differentiable>(this)
 
-    public PrefsViewModel() {
-        prefs = prefsRepository.getCurrent();
-    }
-    public boolean isOnBoarded() { return prefs.isOnBoarded(); }
-
-    public void setOnBoarded(boolean isOnBoarded) {
-        prefs.setOnBoarded(isOnBoarded);
-        prefsRepository.createOrUpdate(prefs);
-    }
+fun <T : Differentiable> replaceList(source: MutableList<T>, additions: MutableList<T>): MutableList<T> {
+    Lists.replace(source, additions)
+    source.sortWith(FunctionalDiff.COMPARATOR)
+    return source
 }

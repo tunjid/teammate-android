@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.viewmodel.gofers
 
 import android.annotation.SuppressLint
 import android.location.Address
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -48,13 +47,15 @@ import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 class EventGofer @SuppressLint("CheckResult")
-constructor(model: Event,
-            onError: Consumer<Throwable>,
-            blockedUserFlowable: Flowable<BlockedUser>,
-            private val getFunction: Function<Event, Flowable<Event>>,
-            private val updateFunction: Function<Event, Single<Event>>,
-            private val deleteFunction: Function<Event, Single<Event>>,
-            private val rsvpFunction: Function<Guest, Single<Guest>>) : TeamHostingGofer<Event>(model, onError) {
+constructor(
+        model: Event,
+        onError: (Throwable) -> Unit,
+        blockedUserFlowable: Flowable<BlockedUser>,
+        private val getFunction: (Event) -> Flowable<Event>,
+        private val updateFunction: (Event) -> Single<Event>,
+        private val deleteFunction: (Event) -> Single<Event>,
+        private val rsvpFunction: (Guest) -> Single<Guest>
+) : TeamHostingGofer<Event>(model, onError) {
 
     var isSettingLocation: Boolean = false
     private val guestRepository: GuestRepo = RepoProvider.forRepo(GuestRepo::class.java)
@@ -92,19 +93,19 @@ constructor(model: Event,
 
     override fun fetch(): Flowable<DiffUtil.DiffResult> {
         if (isSettingLocation) return Flowable.empty()
-        val eventFlowable = getFunction.apply(model).map(Event::asDifferentiables)
+        val eventFlowable = getFunction.invoke(model).map(Event::asDifferentiables)
         val guestsFlowable = guestRepository.modelsBefore(model, Date()).map(ModelUtils::asDifferentiables)
         val sourceFlowable = Flowable.concatDelayError(listOf(eventFlowable, guestsFlowable))
         return FunctionalDiff.of(sourceFlowable, items, this::preserveItems)
     }
 
     override fun upsert(): Single<DiffUtil.DiffResult> {
-        val source = updateFunction.apply(model).map(Event::asDifferentiables)
+        val source = updateFunction.invoke(model).map(Event::asDifferentiables)
         return FunctionalDiff.of(source, items, this::preserveItems)
     }
 
     fun rsvpEvent(attending: Boolean): Single<DiffUtil.DiffResult> {
-        val single: Single<List<Differentiable>> = rsvpFunction.apply(Guest.forEvent(model, attending)).map { listOf(it) }
+        val single: Single<List<Differentiable>> = rsvpFunction.invoke(Guest.forEvent(model, attending)).map { listOf(it) }
 
         return FunctionalDiff.of(single, items) { staleCopy, singletonGuestList ->
             staleCopy.removeAll(singletonGuestList)
@@ -113,7 +114,7 @@ constructor(model: Event,
         }
     }
 
-    override fun delete(): Completable = deleteFunction.apply(model).ignoreElement()
+    override fun delete(): Completable = deleteFunction.invoke(model).ignoreElement()
 
     fun setAddress(address: Address): Single<DiffUtil.DiffResult> {
         isSettingLocation = true

@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.viewmodel.gofers
 
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -35,19 +34,17 @@ import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.toTeamMember
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.tunjid.androidbootstrap.functions.BiFunction
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
-import io.reactivex.functions.Consumer
 
 class JoinRequestGofer(
         model: JoinRequest,
-        onError: Consumer<Throwable>,
-        private val getFunction: Function<JoinRequest, Flowable<JoinRequest>>,
-        private val joinCompleter: BiFunction<JoinRequest, Boolean, Single<JoinRequest>>
+        onError: (Throwable) -> Unit,
+        private val getFunction: (JoinRequest) -> Flowable<JoinRequest>,
+        private val joinCompleter: (JoinRequest, Boolean) -> Single<JoinRequest>
 ) : TeamHostingGofer<JoinRequest>(model, onError) {
 
     @get:JoinRequestState
@@ -121,7 +118,7 @@ class JoinRequestGofer(
             fragment.getString(R.string.no_permission)
 
     public override fun fetch(): Flowable<DiffUtil.DiffResult> {
-        val source = getFunction.apply(model).map { it.asDifferentiables() }
+        val source = getFunction.invoke(model).map { it.asDifferentiables() }
         return FunctionalDiff.of(source, items) { _, _ -> filteredItems(model) }
     }
 
@@ -133,14 +130,16 @@ class JoinRequestGofer(
     }
 
     public override fun delete(): Completable =
-            joinCompleter.apply(model, false).ignoreElement().observeOn(mainThread())
+            joinCompleter.invoke(model, false)
+                    .ignoreElement()
+                    .observeOn(mainThread())
 
     private fun joinTeam(): Single<JoinRequest> = model.toTeamMember<JoinRequest>().let {
         RepoProvider.forModel(it).createOrUpdate(it).map { member -> member.wrappedModel }
     }
 
     private fun approveRequest(): Single<JoinRequest> =
-            Single.defer { joinCompleter.apply(model, true) }
+            Single.defer { joinCompleter.invoke(model, true) }
 
     private fun filter(item: Item<JoinRequest>): Boolean {
         val isEmpty = model.isEmpty

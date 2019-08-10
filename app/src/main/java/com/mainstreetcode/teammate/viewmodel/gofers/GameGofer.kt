@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.viewmodel.gofers
 
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.model.Competitor
@@ -36,15 +35,15 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 
 class GameGofer(
         model: Game,
-        onError: Consumer<Throwable>,
-        private val getFunction: Function<Game, Flowable<Game>>,
-        private val upsertFunction: Function<Game, Single<Game>>,
-        private val deleteFunction: Function<Game, Single<Game>>,
-        private val eligibleTeamSource: Function<Game, Flowable<Team>>) : Gofer<Game>(model, onError) {
+        onError: (Throwable) -> Unit,
+        private val getFunction: (Game) -> Flowable<Game>,
+        private val upsertFunction: (Game) -> Single<Game>,
+        private val deleteFunction: (Game) -> Single<Game>,
+        private val eligibleTeamSource: (Game) -> Flowable<Team>
+) : Gofer<Game>(model, onError) {
 
     private val eligibleTeams: MutableList<Team> = mutableListOf()
 
@@ -75,7 +74,7 @@ class GameGofer(
     override fun changeEmitter(): Flowable<Boolean> {
         val count = eligibleTeams.size
         eligibleTeams.clear()
-        return eligibleTeamSource.apply(model)
+        return eligibleTeamSource.invoke(model)
                 .toList()
                 .map { eligibleTeams.addAll(it); eligibleTeams }
                 .map { count != it.size }
@@ -83,15 +82,15 @@ class GameGofer(
     }
 
     public override fun fetch(): Flowable<DiffUtil.DiffResult> =
-            FunctionalDiff.of(getFunction.apply(model).map(Game::asDifferentiables), items, this::preserveItems)
+            FunctionalDiff.of(getFunction.invoke(model).map(Game::asDifferentiables), items, this::preserveItems)
 
     public override fun delete(): Completable =
-            Single.defer { deleteFunction.apply(model) }.ignoreElement()
+            Single.defer { deleteFunction.invoke(model) }.ignoreElement()
 
     override fun getImageClickMessage(fragment: Fragment): String? = null
 
     override fun upsert(): Single<DiffUtil.DiffResult> {
-        val source = upsertFunction.apply(model).map(Game::asDifferentiables)
+        val source = upsertFunction.invoke(model).map(Game::asDifferentiables)
         return FunctionalDiff.of(source, items, this::preserveItems)
     }
 

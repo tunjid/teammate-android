@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.viewmodel.gofers
 
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -35,9 +34,14 @@ import com.mainstreetcode.teammate.util.FunctionalDiff
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 
-class RoleGofer(model: Role, onError: Consumer<Throwable>, private val getFunction: Function<Role, Flowable<Role>>, private val deleteFunction: Function<Role, Single<Role>>, private val updateFunction: Function<Role, Single<Role>>) : TeamHostingGofer<Role>(model, onError) {
+class RoleGofer(
+        model: Role,
+        onError: (Throwable) -> Unit,
+        private val getFunction: (Role) -> Flowable<Role>,
+        private val deleteFunction: (Role) -> Single<Role>,
+        private val updateFunction: (Role) -> Single<Role>
+) : TeamHostingGofer<Role>(model, onError) {
 
     init {
         this.items.addAll(model.asItems())
@@ -54,10 +58,10 @@ class RoleGofer(model: Role, onError: Consumer<Throwable>, private val getFuncti
             if (hasPrivilegedRole() || signedInUser == model.user) null else fragment.getString(R.string.no_permission)
 
     public override fun fetch(): Flowable<DiffUtil.DiffResult> =
-            FunctionalDiff.of(getFunction.apply(model).map(Role::asDifferentiables), items) { _, updated -> updated }
+            FunctionalDiff.of(getFunction.invoke(model).map(Role::asDifferentiables), items) { _, updated -> updated }
 
     override fun upsert(): Single<DiffUtil.DiffResult> =
-            FunctionalDiff.of(updateFunction.apply(model).map(Role::asDifferentiables), items) { _, updated -> updated }
+            FunctionalDiff.of(updateFunction.invoke(model).map(Role::asDifferentiables), items) { _, updated -> updated }
 
-    public override fun delete(): Completable = deleteFunction.apply(model).ignoreElement()
+    public override fun delete(): Completable = deleteFunction.invoke(model).ignoreElement()
 }

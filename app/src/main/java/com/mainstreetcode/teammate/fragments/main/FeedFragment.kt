@@ -49,8 +49,8 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Media
-import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.notifications.FeedItem
+import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
@@ -273,8 +273,3 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
             }
     }
 }
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T> FeedItem<*>.isOf() where T : Any, T : Model<T> =
-        if (model is T) this as FeedItem<T>
-        else null

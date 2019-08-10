@@ -36,11 +36,12 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
-import io.reactivex.functions.Consumer
 import java.util.*
 
-abstract class Gofer<T> internal constructor(protected val model: T, private val onError: Consumer<Throwable>)
-        where T : Model<T>, T : ListableModel<T> {
+abstract class Gofer<T> internal constructor(
+        protected val model: T,
+        private val onError: (Throwable) -> Unit
+) where T : Model<T>, T : ListableModel<T> {
 
     val items: MutableList<Differentiable>
 

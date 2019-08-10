@@ -24,50 +24,46 @@
 
 package com.mainstreetcode.teammate.viewmodel.gofers
 
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
-
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
+import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.TeammateException
-
-import java.util.ArrayList
-
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import java.util.*
 
 class UserGofer(
         model: User,
-                private val authUserFunction: Function<User, Boolean>,
-                private val getFunction: Function<User, Flowable<User>>,
-                private val updateFunction: Function<User, Single<User>>
-) : Gofer<User>(model, ErrorHandler.EMPTY) {
+        private val authUserFunction: (User) -> Boolean,
+        private val getFunction: (User) -> Flowable<User>,
+        private val updateFunction: (User) -> Single<User>
+) : Gofer<User>(model, ErrorHandler.EMPTY::accept) {
 
     init {
         items.addAll(filter(ArrayList(model.asItems())))
     }
 
-     override fun changeEmitter(): Flowable<Boolean> = Flowable.empty()
+    override fun changeEmitter(): Flowable<Boolean> = Flowable.empty()
 
     override fun getImageClickMessage(fragment: Fragment): String? = null
 
     public override fun fetch(): Flowable<DiffUtil.DiffResult> =
-            FunctionalDiff.of(getFunction.apply(model).map(User::asDifferentiables), items) { _, updated -> filter(updated) }
+            FunctionalDiff.of(getFunction.invoke(model).map(User::asDifferentiables), items) { _, updated -> filter(updated) }
 
-     override fun upsert(): Single<DiffUtil.DiffResult> =
-             FunctionalDiff.of(updateFunction.apply(model).map(User::asDifferentiables), items) { _, updated -> updated }
+    override fun upsert(): Single<DiffUtil.DiffResult> =
+            FunctionalDiff.of(updateFunction.invoke(model).map(User::asDifferentiables), items) { _, updated -> updated }
 
     public override fun delete(): Completable =
             Completable.error(TeammateException("Cannot delete"))
 
     private fun filter(list: MutableList<Differentiable>): List<Differentiable> {
-        val isAuthUser = authUserFunction.apply(model)
+        val isAuthUser = authUserFunction.invoke(model)
         if (isAuthUser) return list
 
         val it = list.iterator()

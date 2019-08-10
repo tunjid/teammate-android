@@ -29,7 +29,7 @@ import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Device
-import com.mainstreetcode.teammate.model.Dummy
+import com.mainstreetcode.teammate.model.ModelStub
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Guest
@@ -93,7 +93,7 @@ class RepoProvider private constructor() {
             CompetitorRepo::class.java to CompetitorRepo(),
             BlockedUserRepo::class.java to BlockedUserRepo(),
             JoinRequestRepo::class.java to JoinRequestRepo(),
-            TeamMemberRepo::class.java to TeamMemberRepo<JoinRequest>()
+            TeamMemberRepo::class.java to TeamMemberRepo<ModelStub>()
     )
 
     companion object {
@@ -121,20 +121,20 @@ class RepoProvider private constructor() {
                 instance.singletonCache.forModel(item::class.java) as ModelRepo<T>
 
         private operator fun get(unknown: Class<out ModelRepo<*>>): ModelRepo<*> {
-            Logger.log("RepoProvider", "Dummy Repo created for unrecognized class" + unknown.name)
+            Logger.log("RepoProvider", "ModelStub Repo created for unrecognized class" + unknown.name)
             return falseRepo
         }
 
-        val falseRepo: ModelRepo<*> = object : ModelRepo<Dummy>() {
-            override fun dao(): EntityDao<Dummy> = EntityDao.daDont()
+        val falseRepo: ModelRepo<*> = object : ModelRepo<ModelStub>() {
+            override fun dao(): EntityDao<ModelStub> = EntityDao.daDont()
 
-            override fun createOrUpdate(model: Dummy): Single<Dummy> = Single.just(model)
+            override fun createOrUpdate(model: ModelStub): Single<ModelStub> = Single.just(model)
 
-            override operator fun get(id: String): Flowable<Dummy> = Flowable.error(UnsupportedOperationException())
+            override operator fun get(id: String): Flowable<ModelStub> = Flowable.error(UnsupportedOperationException())
 
-            override fun delete(model: Dummy): Single<Dummy> = Single.error(UnsupportedOperationException())
+            override fun delete(model: ModelStub): Single<ModelStub> = Single.error(UnsupportedOperationException())
 
-            override fun provideSaveManyFunction(): (List<Dummy>) -> List<Dummy> =
+            override fun provideSaveManyFunction(): (List<ModelStub>) -> List<ModelStub> =
                     { _ -> emptyList() }
         }
 

@@ -34,7 +34,6 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
-import androidx.core.util.Pair
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.MediaTransferIntentService
@@ -238,10 +237,9 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
     private fun onMediaDeleted(pair: Pair<Boolean, DiffUtil.DiffResult>) {
         toggleContextMenu(false)
 
-        val partialDelete = pair.first ?: false
-        val diffResult = pair.second
+        val (partialDelete, diffResult) = pair
 
-        if (diffResult != null) scrollManager.onDiff(diffResult)
+        scrollManager.onDiff(diffResult)
         if (!partialDelete) return
 
         scrollManager.notifyDataSetChanged()

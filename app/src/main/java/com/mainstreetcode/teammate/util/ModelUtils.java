@@ -174,17 +174,17 @@ public class ModelUtils {
 
     public static <T extends Differentiable> void preserveAscending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, FunctionalDiff.COMPARATOR);
+        Collections.sort(source, FunctionalDiff.INSTANCE.getCOMPARATOR());
     }
 
     public static <T extends Differentiable> void preserveDescending(List<T> source, List<T> additions) {
         concatenateList(source, additions);
-        Collections.sort(source, FunctionalDiff.DESCENDING_COMPARATOR);
+        Collections.sort(source, FunctionalDiff.INSTANCE.getDESCENDING_COMPARATOR());
     }
 
     public static <T extends Differentiable> List<T> replaceList(List<T> source, List<T> additions) {
         Lists.replace(source, additions);
-        Collections.sort(source, FunctionalDiff.COMPARATOR);
+        Collections.sort(source, FunctionalDiff.INSTANCE.getCOMPARATOR());
         return source;
     }
 

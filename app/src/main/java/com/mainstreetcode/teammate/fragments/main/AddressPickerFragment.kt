@@ -49,7 +49,7 @@ import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ModelUtils.nameAddress
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION
+import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import java.util.concurrent.atomic.AtomicReference
 
 class AddressPickerFragment : MainActivityFragment() {

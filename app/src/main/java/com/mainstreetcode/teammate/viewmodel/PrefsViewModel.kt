@@ -22,26 +22,22 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model
+package com.mainstreetcode.teammate.viewmodel
 
-import android.annotation.SuppressLint
-import android.os.Parcel
+import com.mainstreetcode.teammate.model.Prefs
+import com.mainstreetcode.teammate.repository.PrefsRepo
+import com.mainstreetcode.teammate.repository.RepoProvider
 
+class PrefsViewModel : BaseViewModel() {
 
-@SuppressLint("ParcelCreator")
-class Dummy : Model<Dummy> {
-    override fun getImageUrl(): String = throw UnsupportedOperationException()
+    private val prefsRepository = RepoProvider.forRepo(PrefsRepo::class.java)
+    private val prefs: Prefs = prefsRepository.current
 
-    override fun isEmpty(): Boolean = throw UnsupportedOperationException()
-
-    override fun getId(): String = throw UnsupportedOperationException()
-
-    override fun compareTo(other: Dummy?): Int = throw UnsupportedOperationException()
-
-    override fun writeToParcel(p0: Parcel?, p1: Int) = throw UnsupportedOperationException()
-
-    override fun update(updated: Dummy?) = throw UnsupportedOperationException()
-
-    override fun describeContents(): Int = throw UnsupportedOperationException()
+    var isOnBoarded: Boolean
+        get() = prefs.isOnBoarded
+        set(isOnBoarded) {
+            prefs.isOnBoarded = isOnBoarded
+            prefsRepository.createOrUpdate(prefs)
+        }
 
 }

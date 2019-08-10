@@ -22,6 +22,29 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.util
+package com.mainstreetcode.teammate.model
 
-val Unit.yes: Boolean get() = true
+import android.annotation.SuppressLint
+import android.os.Parcel
+
+
+@SuppressLint("ParcelCreator")
+class ModelStub : UserHost, TeamHost, Model<ModelStub> {
+    override fun getImageUrl(): String = throw UnsupportedOperationException()
+
+    override fun isEmpty(): Boolean = throw UnsupportedOperationException()
+
+    override fun getId(): String = throw UnsupportedOperationException()
+
+    override fun compareTo(other: ModelStub?): Int = throw UnsupportedOperationException()
+
+    override fun writeToParcel(p0: Parcel?, p1: Int) = throw UnsupportedOperationException()
+
+    override fun update(updated: ModelStub?) = throw UnsupportedOperationException()
+
+    override fun describeContents(): Int = throw UnsupportedOperationException()
+
+    override fun getUser(): User = User.empty()
+
+    override fun getTeam(): Team = Team.empty()
+}

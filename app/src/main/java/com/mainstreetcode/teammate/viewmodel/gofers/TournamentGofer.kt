@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers
 
 import android.annotation.SuppressLint
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -36,16 +35,15 @@ import com.mainstreetcode.teammate.util.ModelUtils
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 
 class TournamentGofer @SuppressLint("CheckResult")
 constructor(
         model: Tournament,
-        onError: Consumer<Throwable>,
-        private val getFunction: Function<Tournament, Flowable<Tournament>>,
-        private val updateFunction: Function<Tournament, Single<Tournament>>,
-        private val deleteFunction: Function<Tournament, Single<Tournament>>,
-        private val competitorsFunction: Function<Tournament, Flowable<List<Competitor>>>
+        onError: (Throwable) -> Unit,
+        private val getFunction: (Tournament) -> Flowable<Tournament>,
+        private val updateFunction: (Tournament) -> Single<Tournament>,
+        private val deleteFunction: (Tournament) -> Single<Tournament>,
+        private val competitorsFunction: (Tournament) -> Flowable<List<Competitor>>
 ) : TeamHostingGofer<Tournament>(model, onError) {
 
     private val state: Int
@@ -71,16 +69,16 @@ constructor(
     }
 
     override fun fetch(): Flowable<DiffUtil.DiffResult> {
-        val eventFlowable = getFunction.apply(model).map(Tournament::asDifferentiables)
-        val competitorsFlowable = competitorsFunction.apply(model).map(ModelUtils::asDifferentiables)
+        val eventFlowable = getFunction.invoke(model).map(Tournament::asDifferentiables)
+        val competitorsFlowable = competitorsFunction.invoke(model).map(ModelUtils::asDifferentiables)
         val sourceFlowable = Flowable.mergeDelayError(eventFlowable, competitorsFlowable)
         return FunctionalDiff.of(sourceFlowable, items, this::preserveItems)
     }
 
     override fun upsert(): Single<DiffUtil.DiffResult> =
-            FunctionalDiff.of(updateFunction.apply(model).map(Tournament::asDifferentiables), items, this::preserveItems)
+            FunctionalDiff.of(updateFunction.invoke(model).map(Tournament::asDifferentiables), items, this::preserveItems)
 
-    override fun delete(): Completable = deleteFunction.apply(model).ignoreElement()
+    override fun delete(): Completable = deleteFunction.invoke(model).ignoreElement()
 
     companion object {
 

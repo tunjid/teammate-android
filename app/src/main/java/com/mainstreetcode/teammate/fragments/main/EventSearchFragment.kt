@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.viewmodel.LocationViewModel.PERMISSIONS_REQUEST_LOCATION
+import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
 class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.AddressPicker {
@@ -69,7 +69,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
         root.findViewById<View>(R.id.status_bar_dimmer).layoutParams.height = TeammatesBaseActivity.topInset
 
         scrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.search_options))
-                .withAdapter(EventSearchRequestAdapter(eventViewModel.eventRequest, object: EventSearchRequestAdapter.EventSearchAdapterListener {
+                .withAdapter(EventSearchRequestAdapter(eventViewModel.eventRequest, object : EventSearchRequestAdapter.EventSearchAdapterListener {
                     override fun onLocationClicked() = this@EventSearchFragment.pickPlace()
                 }))
                 .withInconsistencyHandler(this::onInconsistencyDetected)

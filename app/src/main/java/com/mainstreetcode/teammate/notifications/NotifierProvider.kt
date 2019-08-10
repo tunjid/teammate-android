@@ -28,7 +28,7 @@ import android.app.NotificationChannel
 
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Competitor
-import com.mainstreetcode.teammate.model.Dummy
+import com.mainstreetcode.teammate.model.ModelStub
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.JoinRequest
@@ -91,17 +91,17 @@ class NotifierProvider private constructor() {
                 instance.singletonCache.forInstance(itemClass) as R
 
         private operator fun get(unknown: Class<out Notifier<*>>): Notifier<*> {
-            run { Logger.log("NotifierProvider", "Dummy Notifier created for unrecognized class" + unknown.name) }
+            run { Logger.log("NotifierProvider", "ModelStub Notifier created for unrecognized class" + unknown.name) }
             return falseNotifier
         }
 
         @Suppress("UNCHECKED_CAST")
-        private val falseNotifier = object : Notifier<Dummy>() {
+        private val falseNotifier = object : Notifier<ModelStub>() {
             override val notifyId: String
                 get() = ""
 
-            override val repository: ModelRepo<Dummy>
-                get() = RepoProvider.falseRepo as ModelRepo<Dummy>
+            override val repository: ModelRepo<ModelStub>
+                get() = RepoProvider.falseRepo as ModelRepo<ModelStub>
 
             override val notificationChannels: Array<NotificationChannel>
                 get() = arrayOf()

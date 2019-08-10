@@ -1,0 +1,134 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019 Adetunji Dahunsi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package com.mainstreetcode.teammate.viewmodel
+
+
+import androidx.recyclerview.widget.DiffUtil
+import com.mainstreetcode.teammate.model.Message
+import com.mainstreetcode.teammate.model.Message.fromThrowable
+import com.mainstreetcode.teammate.model.Model
+import com.mainstreetcode.teammate.notifications.NotifierProvider
+import com.mainstreetcode.teammate.util.FunctionalDiff
+import com.mainstreetcode.teammate.util.ModelUtils.asDifferentiables
+import com.mainstreetcode.teammate.util.asDifferentiables
+import com.tunjid.androidbootstrap.functions.collections.Lists.findLast
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import io.reactivex.Flowable
+import io.reactivex.Single
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+
+abstract class MappedViewModel<K, V : Differentiable> internal constructor() : BaseViewModel() {
+
+    private val pullToRefreshCount = AtomicInteger(0)
+
+    internal abstract fun valueClass(): Class<V>
+
+    abstract fun getModelList(key: K): MutableList<Differentiable>
+
+    internal abstract fun fetch(key: K, fetchLatest: Boolean): Flowable<List<V>>
+
+    internal fun checkForInvalidObject(source: Flowable<out Differentiable>, key: K, value: V): Flowable<Differentiable> =
+            source.cast(Differentiable::class.java).doOnError { throwable -> checkForInvalidObject(throwable, value, key) }
+
+    internal fun checkForInvalidObject(source: Single<out Differentiable>, key: K, value: V): Single<Differentiable> =
+            source.cast(Differentiable::class.java).doOnError { throwable -> checkForInvalidObject(throwable, value, key) }
+
+    fun getMany(key: K, fetchLatest: Boolean): Flowable<DiffUtil.DiffResult> =
+            if (fetchLatest) getLatest(key) else getMore(key)
+
+    fun getMore(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
+            fetch(key, false).map(List<Differentiable>::asDifferentiables),
+            getModelList(key),
+            this::preserveList
+    )
+            .doOnError { throwable -> checkForInvalidKey(throwable, key) }
+
+    fun refresh(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
+            fetch(key, true).map(List<Differentiable>::asDifferentiables),
+            getModelList(key),
+            this::pullToRefresh
+    )
+            .doOnError { throwable -> checkForInvalidKey(throwable, key) }
+            .doOnTerminate { pullToRefreshCount.set(0) }
+
+    private fun getLatest(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
+            fetch(key, true).map(List<Differentiable>::asDifferentiables),
+            getModelList(key),
+            this::preserveList
+    )
+            .doOnError { throwable -> checkForInvalidKey(throwable, key) }
+
+    fun clearNotifications(value: V) = clearNotification(itemToModel(value))
+
+    fun clearNotifications(key: K) =
+            getModelList(key).mapNotNull(this::itemToModel).forEach(this::clearNotification)
+
+    private fun pullToRefresh(source: MutableList<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
+        if (pullToRefreshCount.getAndIncrement() == 0) source.clear()
+
+        preserveList(source, additions)
+        afterPullToRefreshDiff(source)
+        return source
+    }
+
+    internal open fun afterPullToRefreshDiff(source: MutableList<Differentiable>) {}
+
+    internal open fun onInvalidKey(key: K) {}
+
+    internal open fun onErrorMessage(message: Message, key: K, invalid: Differentiable) {
+        if (message.isInvalidObject) getModelList(key).remove(invalid)
+    }
+
+    internal open fun itemToModel(identifiable: Differentiable): Model<*>? =
+            if (identifiable is Model<*>) identifiable
+            else null
+
+    private fun clearNotification(model: Model<*>?) {
+        if (model == null) return
+
+        val n = NotifierProvider.forModel(model::class.java)
+        n.clearNotifications(model)
+    }
+
+    internal fun checkForInvalidObject(throwable: Throwable, model: V, key: K) {
+        val message = fromThrowable(throwable)
+        if (message != null) onErrorMessage(message, key, model)
+    }
+
+    internal open fun getQueryDate(fetchLatest: Boolean, key: K, dateFunction: (V) -> Date): Date? {
+        if (fetchLatest) return null
+
+        val value = findLast(getModelList(key), valueClass())
+        return if (value == null) null else dateFunction.invoke(value)
+    }
+
+    private fun checkForInvalidKey(throwable: Throwable, key: K) {
+        val message = fromThrowable(throwable)
+        val isInvalidModel = message != null && !message.isValidModel
+
+        if (isInvalidModel) onInvalidKey(key)
+    }
+}

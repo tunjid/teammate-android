@@ -22,35 +22,6 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.viewmodel.gofers
+package com.mainstreetcode.teammate.model
 
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DiffUtil
-import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.model.BlockedUser
-import com.mainstreetcode.teammate.util.TeammateException
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.functions.Consumer
-
-class BlockedUserGofer(
-        model: BlockedUser,
-        onError: (Throwable) -> Unit,
-        private val deleteFunction: (BlockedUser) -> Single<BlockedUser>
-) : TeamHostingGofer<BlockedUser>(model, onError) {
-
-    init {
-        items.addAll(model.asItems())
-    }
-
-    override fun getImageClickMessage(fragment: Fragment): String? =
-            fragment.getString(R.string.no_permission)
-
-    public override fun fetch(): Flowable<DiffUtil.DiffResult> = Flowable.empty()
-
-    override fun upsert(): Single<DiffUtil.DiffResult> =
-            Single.error(TeammateException("Unimplemented"))
-
-    public override fun delete(): Completable = deleteFunction.invoke(model).ignoreElement()
-}
+interface UserTeamHost : UserHost, TeamHost

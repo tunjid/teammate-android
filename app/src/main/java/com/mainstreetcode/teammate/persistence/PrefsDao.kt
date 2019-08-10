@@ -37,18 +37,18 @@ import com.mainstreetcode.teammate.rest.TeammateService
 @Dao
 class PrefsDao : SharedPreferencesDao<Prefs>() {
 
-    internal override val empty: Prefs
+    override val empty: Prefs
         get() = Prefs.empty()
 
-    internal override fun preferenceName(): String {
+    override fun preferenceName(): String {
         return "device-prefs"
     }
 
-    internal override fun to(device: Prefs): String {
+    override fun to(device: Prefs): String {
         return TeammateService.getGson().toJson(device)
     }
 
-    internal override fun from(json: String): Prefs {
+    override fun from(json: String): Prefs {
         return TeammateService.getGson().fromJson(json, Prefs::class.java)
     }
 }

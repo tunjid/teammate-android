@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.viewmodel.gofers
 
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.App
@@ -38,21 +37,20 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 class StatGofer(
         model: Stat,
-        onError: Consumer<Throwable>,
-        private val teamUserFunction: Function<Team, User>,
-        private val getFunction: Function<Stat, Flowable<Stat>>,
-        private val upsertFunction: Function<Stat, Single<Stat>>,
-        private val deleteFunction: Function<Stat, Single<Stat>>,
-        private val eligibleTeamSource: Function<Stat, Flowable<Team>>) : Gofer<Stat>(model, onError) {
+        onError: (Throwable) -> Unit,
+        private val teamUserFunction: (Team) -> User,
+        private val getFunction: (Stat) -> Flowable<Stat>,
+        private val upsertFunction: (Stat) -> Single<Stat>,
+        private val deleteFunction: (Stat) -> Single<Stat>,
+        private val eligibleTeamSource: (Stat) -> Flowable<Team>
+) : Gofer<Stat>(model, onError) {
 
     private val eligibleTeams: MutableList<Team> = mutableListOf()
-
 
     init {
         items.addAll(model.asItems())
@@ -65,7 +63,7 @@ class StatGofer(
     override fun changeEmitter(): Flowable<Boolean> {
         val count = eligibleTeams.size
         eligibleTeams.clear()
-        return eligibleTeamSource.apply(model)
+        return eligibleTeamSource.invoke(model)
                 .toList()
                 .map { eligibleTeams.addAll(it); eligibleTeams }
                 .flatMapPublisher(this::updateDefaultTeam)
@@ -75,12 +73,12 @@ class StatGofer(
     override fun getImageClickMessage(fragment: Fragment): String? = null
 
     public override fun fetch(): Flowable<DiffUtil.DiffResult> {
-        val source = getFunction.apply(model).map(Stat::asDifferentiables)
+        val source = getFunction.invoke(model).map(Stat::asDifferentiables)
         return FunctionalDiff.of(source, items, this::preserveItems)
     }
 
     override fun upsert(): Single<DiffUtil.DiffResult> {
-        val source = upsertFunction.apply(model).map(Stat::asDifferentiables)
+        val source = upsertFunction.invoke(model).map(Stat::asDifferentiables)
         return FunctionalDiff.of(source, items, this::preserveItems)
     }
 
@@ -96,7 +94,7 @@ class StatGofer(
                 .concatWith(updateDefaultUser())
     }
 
-    public override fun delete(): Completable = deleteFunction.apply(model).ignoreElement()
+    public override fun delete(): Completable = deleteFunction.invoke(model).ignoreElement()
 
     private fun updateDefaultTeam(teams: List<Team>): Flowable<DiffUtil.DiffResult> {
         val hasNoDefaultTeam = !model.team.isEmpty || teams.isEmpty()
@@ -107,7 +105,7 @@ class StatGofer(
     }
 
     private fun updateDefaultUser(): Single<DiffUtil.DiffResult> =
-            chooseUser(teamUserFunction.apply(model.team))
+            chooseUser(teamUserFunction.invoke(model.team))
 
     private fun <T : Differentiable> swap(item: Differentiable,
                                           swapDestination: () -> T,

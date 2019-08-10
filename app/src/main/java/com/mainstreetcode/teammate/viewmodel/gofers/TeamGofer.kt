@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.viewmodel.gofers
 
 import android.location.Address
-import androidx.arch.core.util.Function
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -34,14 +33,13 @@ import com.mainstreetcode.teammate.util.FunctionalDiff
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 
 class TeamGofer(
         model: Team,
-        onError: Consumer<Throwable>,
-        private val getFunction: Function<Team, Flowable<Team>>,
-        private val upsertFunction: Function<Team, Single<Team>>,
-        private val deleteFunction: Function<Team, Single<Team>>
+        onError: (Throwable) -> Unit,
+        private val getFunction: (Team) -> Flowable<Team>,
+        private val upsertFunction: (Team) -> Single<Team>,
+        private val deleteFunction: (Team) -> Single<Team>
 ) : TeamHostingGofer<Team>(model, onError) {
 
     private var state: Int = 0
@@ -55,15 +53,15 @@ class TeamGofer(
 
     fun canEditTeam(): Boolean = state == CREATING || hasPrivilegedRole()
 
-    public override fun delete(): Completable = deleteFunction.apply(model).ignoreElement()
+    public override fun delete(): Completable = deleteFunction.invoke(model).ignoreElement()
 
     override fun fetch(): Flowable<DiffUtil.DiffResult> = when {
         isSettingAddress -> Flowable.empty()
-        else -> FunctionalDiff.of(getFunction.apply(model).map(Team::asDifferentiables), items) { _, updated -> updated }
+        else -> FunctionalDiff.of(getFunction.invoke(model).map(Team::asDifferentiables), items) { _, updated -> updated }
     }
 
     override fun upsert(): Single<DiffUtil.DiffResult> =
-            FunctionalDiff.of(upsertFunction.apply(model).map(Team::asDifferentiables), items) { _, updated -> updated }
+            FunctionalDiff.of(upsertFunction.invoke(model).map(Team::asDifferentiables), items) { _, updated -> updated }
                     .doOnSuccess { state = EDITING }
 
     fun setAddress(address: Address): Single<DiffUtil.DiffResult> {

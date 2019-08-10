@@ -35,18 +35,18 @@ import com.mainstreetcode.teammate.model.Device
 @Dao
 class DeviceDao : SharedPreferencesDao<Device>() {
 
-    internal override val empty: Device
+    override val empty: Device
         get() = Device.empty()
 
-    internal override fun preferenceName(): String {
+    override fun preferenceName(): String {
         return "user_devices"
     }
 
-    internal override fun to(device: Device): String {
+    override fun to(device: Device): String {
         return device.id
     }
 
-    internal override fun from(id: String): Device {
+    override fun from(id: String): Device {
         return Device(id)
     }
 }
