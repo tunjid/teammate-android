@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model;
+package com.mainstreetcode.teammate.model
 
-public interface HeaderedModel<T> extends Model<T> {
-    Item<T> getHeaderItem();
+interface HeaderedModel<T> : Model<T> {
+    val headerItem: Item<T>
 }

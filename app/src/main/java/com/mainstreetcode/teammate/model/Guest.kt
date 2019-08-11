@@ -64,8 +64,8 @@ class Guest : GuestEntity,
     override val isEmpty: Boolean
         get() = id.isBlank()
 
-    override fun getHeaderItem(): Item<Guest> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::imageUrl, Item.IGNORE_SET, this)
+    override val headerItem: Item<Guest>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::imageUrl, Item.IGNORE_SET, this)
 
     override fun asItems(): List<Item<Guest>> = listOf(
             Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, Item.IGNORE_SET, this),

@@ -77,6 +77,12 @@ class JoinRequest : JoinRequestEntity,
     override val isEmpty: Boolean
         get() = id.isBlank()
 
+    override val headerItem: Item<JoinRequest>
+        get() {
+            val image: RemoteImage = if (isUserApproved) team else user
+            return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, { image.imageUrl }, Item.IGNORE_SET, this)
+        }
+
     override fun asItems(): List<Item<JoinRequest>> = listOf(
             Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
             Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
@@ -95,11 +101,6 @@ class JoinRequest : JoinRequestEntity,
             Item.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, team.minAge::toString, Item.IGNORE_SET, this),
             Item.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, team.maxAge::toString, Item.IGNORE_SET, this)
     )
-
-    override fun getHeaderItem(): Item<JoinRequest> {
-        val image: RemoteImage = if (isUserApproved) team else user
-        return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, { image.imageUrl }, Item.IGNORE_SET, this)
-    }
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is JoinRequest) id == other.id else position == other.position && user.areContentsTheSame(other.user)

@@ -85,8 +85,8 @@ class Stat : StatEntity,
                     .textTransformer { value -> sport.statTypeFromCode(value.toString()).getName() }
     )
 
-    override fun getHeaderItem(): Item<Stat> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
+    override val headerItem: Item<Stat>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
         !is Stat -> id == other.id

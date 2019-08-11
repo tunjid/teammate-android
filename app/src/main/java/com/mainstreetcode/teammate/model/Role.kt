@@ -60,7 +60,15 @@ class Role : RoleEntity,
         ListableModel<Role>,
         TeamMemberModel<Role> {
 
-    constructor(id: String, imageUrl: String, nickname: String, position: Position, team: Team, user: User, created: Date) : super(id, imageUrl, nickname, position, team, user, created)
+    constructor(
+            id: String,
+            imageUrl: String,
+            nickname: String,
+            position: Position,
+            team: Team,
+            user: User,
+            created: Date
+    ) : super(id, imageUrl, nickname, position, team, user, created)
 
     private constructor(`in`: Parcel) : super(`in`)
 
@@ -71,16 +79,15 @@ class Role : RoleEntity,
         }
 
     val title: CharSequence
-        get() {
-            val title = user.firstName
-            return if (!TextUtils.isEmpty(nickname)) SpanBuilder.of(title)
-                    .appendNewLine().append("\"" + nickname + "\"")
-                    .build() else title
-
-        }
+        get() = if (!TextUtils.isEmpty(nickname)) SpanBuilder.of(user.firstName)
+                .appendNewLine().append("\"" + nickname + "\"")
+                .build() else user.firstName
 
     override val isEmpty: Boolean
         get() = id.isBlank()
+
+    override val headerItem: Item<Role>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun asItems(): List<Item<Role>> = listOf(
             Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
@@ -90,9 +97,6 @@ class Role : RoleEntity,
             Item.text(holder.get(4), 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() }
     )
-
-    override fun getHeaderItem(): Item<Role> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl),  { this.imageUrl = it }, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is Role) id == other.id else position == other.position

@@ -65,6 +65,8 @@ class User : UserEntity,
             about: CharSequence
     ) : super(id, imageUrl, screenName, primaryEmail, firstName, lastName, about)
 
+    private constructor(`in`: Parcel) : super(`in`)
+
     override val refType: String
         get() = COMPETITOR_TYPE
 
@@ -74,7 +76,8 @@ class User : UserEntity,
     override val isEmpty: Boolean
         get() = id.isBlank()
 
-    private constructor(`in`: Parcel) : super(`in`)
+    override val headerItem: Item<User>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun asItems(): List<Item<User>> = listOf(
             Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
@@ -83,9 +86,6 @@ class User : UserEntity,
             Item.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), { this.primaryEmail = it }, this),
             Item.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
     )
-
-    override fun getHeaderItem(): Item<User> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is User) id == other.id else firstName == other.firstName && lastName == other.lastName

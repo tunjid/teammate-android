@@ -91,6 +91,9 @@ class Game : GameEntity,
     override val isEmpty: Boolean
         get() = TextUtils.isEmpty(id)
 
+    override val headerItem: Item<Game>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
+
     override fun asItems(): List<Item<Game>> = listOf(
             Item.text(holder.get(0), 0, Item.NUMBER, R.string.game_competitors, this::name, Item.IGNORE_SET, this),
             Item.number(holder.get(1), 1, Item.INPUT, R.string.game_home_score, homeScore::toString, this::setHomeScore, this),
@@ -98,9 +101,6 @@ class Game : GameEntity,
             Item.number(holder.get(3), 3, Item.NUMBER, R.string.game_round, round::toString, Item.IGNORE_SET, this),
             Item.number(holder.get(4), 4, Item.NUMBER, R.string.game_leg, leg::toString, Item.IGNORE_SET, this)
     )
-
-    override fun getHeaderItem(): Item<Game> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is Game) id == other.id else score == other.score
@@ -167,7 +167,7 @@ class Game : GameEntity,
             body.addProperty(AWAY_SCORE, src.awayScore)
             body.addProperty(HOME, src.home.entity.getId())
             body.addProperty(AWAY, src.away.entity.getId())
-            body.addProperty(REFEREE, if (src.referee.isEmpty) null else src.referee.getId())
+            body.addProperty(REFEREE, if (src.referee.isEmpty) null else src.referee.id)
             return body
         }
 

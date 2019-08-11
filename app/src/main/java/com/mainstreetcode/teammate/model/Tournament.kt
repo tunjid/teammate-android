@@ -86,6 +86,9 @@ class Tournament : TournamentEntity,
     override val isEmpty: Boolean
         get() = id.isBlank()
 
+    override val headerItem: Item<Tournament>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+
     override fun asItems(): List<Item<Tournament>> = listOf(
             Item.text(holder.get(0), 0, Item.INPUT, R.string.tournament_name, Item.nullToEmpty(name), this::setName, this),
             Item.text(holder.get(1), 1, Item.DESCRIPTION, R.string.tournament_description, Item.nullToEmpty(description), this::setDescription, this),
@@ -96,9 +99,6 @@ class Tournament : TournamentEntity,
             Item.number(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, numLegs::toString, this::setNumLegs, this),
             Item.number(holder.get(5), 5, Item.INFO, R.string.tournament_single_final, { App.getInstance().getString(if (isSingleFinal) R.string.yes else R.string.no) }, this::setSingleFinal, this)
     )
-
-    override fun getHeaderItem(): Item<Tournament> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
         !is Tournament -> id == other.id

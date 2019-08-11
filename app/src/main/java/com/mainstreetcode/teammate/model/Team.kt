@@ -96,24 +96,22 @@ class Team : TeamEntity,
     override val team: Team
         get() = this
 
-    override fun asItems(): List<Item<Team>> {
-        return listOf(
-                Item.text(holder.get(0), 0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
-                Item.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::code, this::setSport, this)
-                        .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
-                Item.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), { this.screenName= it }, this),
-                Item.text(holder.get(3), 3, Item.CITY, R.string.city, Item.nullToEmpty(city), { this.city= it }, this),
-                Item.text(holder.get(4), 4, Item.STATE, R.string.state, Item.nullToEmpty(state), { this.state= it }, this),
-                Item.text(holder.get(5), 5, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), { this.zip= it }, this),
-                Item.text(holder.get(6), 6, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
-                Item.number(holder.get(7), 7, Item.NUMBER, R.string.team_min_age, minAge::toString, this::setMinAge, this),
-                Item.number(holder.get(8), 8, Item.NUMBER, R.string.team_max_age, maxAge::toString, this::setMaxAge, this),
-                Item.text(holder.get(9), 9, Item.ABOUT, R.string.team_storage_used, { "$storageUsed/$maxStorage MB" }, null, this)
-        )
-    }
+    override val headerItem: Item<Team>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
-    override fun getHeaderItem(): Item<Team> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+    override fun asItems(): List<Item<Team>> = listOf(
+            Item.text(holder.get(0), 0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName, this),
+            Item.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::code, this::setSport, this)
+                    .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
+            Item.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), { this.screenName= it }, this),
+            Item.text(holder.get(3), 3, Item.CITY, R.string.city, Item.nullToEmpty(city), { this.city= it }, this),
+            Item.text(holder.get(4), 4, Item.STATE, R.string.state, Item.nullToEmpty(state), { this.state= it }, this),
+            Item.text(holder.get(5), 5, Item.ZIP, R.string.zip, Item.nullToEmpty(zip), { this.zip= it }, this),
+            Item.text(holder.get(6), 6, Item.DESCRIPTION, R.string.team_description, Item.nullToEmpty(description), this::setDescription, this),
+            Item.number(holder.get(7), 7, Item.NUMBER, R.string.team_min_age, minAge::toString, this::setMinAge, this),
+            Item.number(holder.get(8), 8, Item.NUMBER, R.string.team_max_age, maxAge::toString, this::setMaxAge, this),
+            Item.text(holder.get(9), 9, Item.ABOUT, R.string.team_storage_used, { "$storageUsed/$maxStorage MB" }, null, this)
+    )
 
     override fun areContentsTheSame(other: Differentiable): Boolean {
         if (other !is Team) return id == other.id

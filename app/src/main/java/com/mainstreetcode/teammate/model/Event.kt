@@ -93,6 +93,9 @@ class Event : EventEntity,
     override val isEmpty: Boolean
         get() = equals(empty())
 
+    override val headerItem: Item<Event>
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+
     fun setName(game: Game) {
         setName(game.home.name.toString() + " Vs. " + game.away.name)
     }
@@ -107,9 +110,6 @@ class Event : EventEntity,
             Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, { ModelUtils.prettyPrinter.format(endDate) }, this::setEndDate, this),
             Item.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
     )
-
-    override fun getHeaderItem(): Item<Event> =
-            Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is Event) id == other.id else name == other.name
