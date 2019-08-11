@@ -22,16 +22,13 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model;
+package com.mainstreetcode.teammate.model
 
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable;
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-import java.util.ArrayList;
-import java.util.List;
+interface ListableModel<T> {
 
-public interface ListableModel<T> {
+    fun asItems(): List<Item<T>>
 
-    List<Item<T>> asItems();
-
-    default List<Differentiable> asDifferentiables() {return new ArrayList<>(asItems());}
+    fun asDifferentiables(): List<Differentiable> = ArrayList(asItems())
 }

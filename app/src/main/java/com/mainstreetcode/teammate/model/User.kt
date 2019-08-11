@@ -51,10 +51,6 @@ class User : UserEntity,
         HeaderedModel<User>,
         ListableModel<User> {
 
-    @Ignore
-    @Transient
-    private var password: String? = null
-
     constructor(
             id: String,
             imageUrl: String,
@@ -67,11 +63,15 @@ class User : UserEntity,
 
     private constructor(`in`: Parcel) : super(`in`)
 
-    override val refType: String
-        get() = COMPETITOR_TYPE
+    @Ignore
+    @Transient
+    private var password: String? = null
 
     override val name: CharSequence
         get() = "$firstName $lastName"
+
+    override val refType: String
+        get() = COMPETITOR_TYPE
 
     override val isEmpty: Boolean
         get() = id.isBlank()
@@ -91,15 +91,9 @@ class User : UserEntity,
             if (other !is User) id == other.id else firstName == other.firstName && lastName == other.lastName
                     && imageUrl == other.imageUrl
 
-//    override fun getName(): CharSequence = "$firstName $lastName"
-
-//    override fun getRefType(): String = COMPETITOR_TYPE
-
     override fun hasMajorFields(): Boolean = areNotEmpty(id, firstName, lastName)
 
     override fun getChangePayload(other: Differentiable?): Any? = other
-
-//    override fun isEmpty(): Boolean = TextUtils.isEmpty(id)
 
     override fun update(updated: User) {
         this.id = updated.id

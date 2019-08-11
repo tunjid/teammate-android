@@ -53,14 +53,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.ripple.RippleUtils;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
-import com.mainstreetcode.teammate.adapters.GameAdapter;
-import com.mainstreetcode.teammate.model.Game;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter;
 import com.tunjid.androidbootstrap.view.util.ViewUtil;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
