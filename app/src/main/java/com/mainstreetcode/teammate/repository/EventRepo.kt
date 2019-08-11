@@ -75,17 +75,17 @@ class EventRepo internal constructor() : TeamQueryRepo<Event>() {
     override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<Event>> {
         var date = pagination
         if (date == null) date = futureDate
-        return eventDao.getEvents(key.id, date, DEF_QUERY_LIMIT).subscribeOn(io())
+        return eventDao.getEvents(key.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io())
     }
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<Event>> =
-            api.getEvents(key.id, pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
+            api.getEvents(key.getId(), pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
 
     fun attending(date: Date?): Flowable<List<Event>> {
         val current = RepoProvider.forRepo(UserRepo::class.java).currentUser
         val localDate = date ?: futureDate
 
-        val local = AppDatabase.instance.guestDao().getRsvpList(current.id, localDate)
+        val local = AppDatabase.instance.guestDao().getRsvpList(current.getId(), localDate)
                 .map<List<Event>> { guests -> ArrayList(Lists.transform<Guest, Event>(guests) { it.event }) }
                 .subscribeOn(io())
 

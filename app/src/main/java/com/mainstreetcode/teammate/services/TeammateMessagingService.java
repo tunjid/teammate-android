@@ -69,7 +69,7 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         if (TextUtils.isEmpty(token) || RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser().isEmpty())
             return;
 
-        RepoProvider.Companion.forRepo(DeviceRepo.class).createOrUpdate(Device.withFcmToken(token)).subscribe(__ -> {}, ErrorHandler.EMPTY);
+        RepoProvider.Companion.forRepo(DeviceRepo.class).createOrUpdate(Device.Companion.withFcmToken(token)).subscribe(__ -> {}, ErrorHandler.EMPTY);
     }
 
 }

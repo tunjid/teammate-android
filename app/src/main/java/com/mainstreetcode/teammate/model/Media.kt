@@ -48,24 +48,34 @@ class Media : MediaEntity, TeamHost, Parcelable, Model<Media> {
     val isImage: Boolean
         get() = mimeType.startsWith(IMAGE)
 
-    constructor(hiddenId: String, url: String, mimeType: String, thumbnail: String,
-                user: User, hiddenTeam: Team, created: Date, flagged: Boolean
+    constructor(
+            hiddenId: String,
+            url: String,
+            mimeType: String,
+            thumbnail: String,
+            user: User,
+            hiddenTeam: Team,
+            created: Date,
+            flagged: Boolean
     ) : super(hiddenId, url, mimeType, thumbnail, user, hiddenTeam, created, flagged)
+
+    override val team: Team
+        get() = hiddenTeam
+
+    override val imageUrl: String
+        get() = thumbnail
 
     constructor(`in`: Parcel) : super(`in`)
 
     override fun getId(): String = hiddenId
 
-    override fun getTeam(): Team = hiddenTeam
-
-    override fun isEmpty(): Boolean = TextUtils.isEmpty(id)
+    override val isEmpty: Boolean
+        get() = TextUtils.isEmpty(id)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is Media) id == other.id else thumbnail == other.thumbnail && url == other.url
 
     override fun getChangePayload(other: Differentiable?): Any? = other
-
-    override fun getImageUrl(): String? = thumbnail
 
     override fun update(updated: Media) {
         hiddenId = updated.hiddenId

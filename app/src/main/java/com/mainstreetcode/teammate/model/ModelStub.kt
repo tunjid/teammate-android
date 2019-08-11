@@ -30,21 +30,26 @@ import android.os.Parcel
 
 @SuppressLint("ParcelCreator")
 object ModelStub : UserHost, TeamHost, Model<ModelStub> {
-    override fun getImageUrl(): String = throw UnsupportedOperationException()
 
-    override fun isEmpty(): Boolean = throw UnsupportedOperationException()
+    override val user: User
+        get() = User.empty()
+
+    override val team: Team
+        get() = Team.empty()
+
+    override val imageUrl: String
+        get() = throw UnsupportedOperationException()
+
+    override val isEmpty: Boolean
+        get() = throw UnsupportedOperationException()
 
     override fun getId(): String = throw UnsupportedOperationException()
 
-    override fun compareTo(other: ModelStub?): Int = throw UnsupportedOperationException()
+    override fun compareTo(other: ModelStub): Int = throw UnsupportedOperationException()
 
     override fun writeToParcel(p0: Parcel?, p1: Int) = throw UnsupportedOperationException()
 
-    override fun update(updated: ModelStub?) = throw UnsupportedOperationException()
+    override fun update(updated: ModelStub) = throw UnsupportedOperationException()
 
     override fun describeContents(): Int = throw UnsupportedOperationException()
-
-    override fun getUser(): User = User.empty()
-
-    override fun getTeam(): Team = Team.empty()
 }

@@ -102,18 +102,18 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
     override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<Chat>> {
         var date = pagination
         if (date == null) date = Date()
-        return chatDao.chatsBefore(key.id, date, DEF_QUERY_LIMIT).subscribeOn(io())
+        return chatDao.chatsBefore(key.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io())
     }
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<Chat>> =
-            api.chatsBefore(key.id, pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
+            api.chatsBefore(key.getId(), pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
 
     fun fetchUnreadChats(): Flowable<List<Chat>> = RepoProvider.forRepo(RoleRepo::class.java).myRoles
             .firstElement()
             .toFlowable()
             .flatMap { Flowable.fromIterable(it) }
             .map { it.team }
-            .map { team -> Pair(team.id, getLastTeamSeen(team)) }
+            .map { team -> Pair(team.getId(), getLastTeamSeen(team)) }
             .flatMapMaybe { teamDatePair -> chatDao.unreadChats(teamDatePair.first, teamDatePair.second) }
             .filter { chats -> chats.isNotEmpty() }
 
@@ -159,12 +159,12 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
 
     fun updateLastSeen(team: Team) {
         val preferences = app.getSharedPreferences(TEAM_SEEN_TIMES, Context.MODE_PRIVATE)
-        preferences.edit().putLong(team.id, Date().time).apply()
+        preferences.edit().putLong(team.getId(), Date().time).apply()
     }
 
     private fun getLastTeamSeen(team: Team): Date {
         val preferences = app.getSharedPreferences(TEAM_SEEN_TIMES, Context.MODE_PRIVATE)
-        var timeStamp = preferences.getLong(team.id, TEAM_NOT_SEEN.toLong())
+        var timeStamp = preferences.getLong(team.getId(), TEAM_NOT_SEEN.toLong())
         if (timeStamp == TEAM_NOT_SEEN.toLong()) {
             updateLastSeen(team)
             timeStamp = Date().time - 1000 * 60 * 2
@@ -190,7 +190,7 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
                 val teamAdapter = object : Team.GsonAdapter() {
                     override fun serialize(src: Team, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
                         val result = super.serialize(src, typeOfSrc, context).asJsonObject
-                        result.addProperty("_id", src.id)
+                        result.addProperty("_id", src.getId())
                         return result
                     }
                 }

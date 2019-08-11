@@ -26,6 +26,7 @@ package com.mainstreetcode.teammate.persistence.entity
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -44,13 +45,20 @@ import com.mainstreetcode.teammate.util.ModelUtils.parseFloat
 import java.util.*
 
 
-@Entity(tableName = "stats", foreignKeys = [ForeignKey(entity = GameEntity::class, parentColumns = ["game_id"], childColumns = ["stat_game"], onDelete = CASCADE), ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["stat_team"], onDelete = CASCADE), ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["stat_user"], onDelete = CASCADE)])
+@Entity(
+        tableName = "stats",
+        foreignKeys = [
+            ForeignKey(entity = GameEntity::class, parentColumns = ["game_id"], childColumns = ["stat_game"], onDelete = CASCADE),
+            ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["stat_team"], onDelete = CASCADE),
+            ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["stat_user"], onDelete = CASCADE)
+        ]
+)
 open class StatEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "stat_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "stat_created")
     var created: Date
@@ -118,11 +126,17 @@ open class StatEntity : Parcelable {
         user = `in`.readValue(User::class.java.classLoader) as User
         team = `in`.readValue(Team::class.java.classLoader) as Team
         game = `in`.readValue(Game::class.java.classLoader) as Game
-        sport = Config.sportFromCode(`in`.readString())
+        sport = Config.sportFromCode(`in`.readString()!!)
         statType = sport.statTypeFromCode(`in`.readString()!!)
         value = `in`.readInt()
         time = `in`.readFloat()
         this.attributes = StatAttributes()
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     operator fun contains(attribute: StatAttribute): Boolean = attributes.contains(attribute)

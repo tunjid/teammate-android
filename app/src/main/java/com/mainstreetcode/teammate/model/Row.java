@@ -48,7 +48,7 @@ public class Row implements Differentiable {
     private final List<String> tableValues = new ArrayList<>();
 
     public static Row empty() {
-        return new Row("", Competitor.empty());
+        return new Row("", Competitor.Companion.empty());
     }
 
     private Row(String id, Competitor competitor) {

@@ -166,7 +166,7 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
             enterTransition = baseTransition
             exitTransition = baseTransition
 
-            if (Config.isStaticVariant()) return
+            if (Config.isStaticVariant) return
 
             val baseSharedTransition = TransitionSet()
                     .addTransition(ChangeBounds())

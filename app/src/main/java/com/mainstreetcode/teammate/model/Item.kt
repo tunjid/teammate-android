@@ -37,6 +37,8 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 /**
  * Item for listing properties of a [Model]
  */
+private typealias ValueChangeCallBack = (String) -> Unit
+
 class Item<T> internal constructor(
         private val id: String?,
         val sortPosition: Int,
@@ -57,7 +59,7 @@ class Item<T> internal constructor(
 
     fun setValue(value: CharSequence) {
         this.value = value
-        changeCallBack?.onValueChanged(value.toString())
+        changeCallBack?.invoke(value.toString())
     }
 
     fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item<T> {
@@ -87,11 +89,6 @@ class Item<T> internal constructor(
 
     override fun hashCode(): Int = id!!.hashCode()
 
-    // Used to change the value of the Team's fields
-    interface ValueChangeCallBack {
-        fun onValueChanged(value: String)
-    }
-
     companion object {
 
         const val INPUT = 2
@@ -117,6 +114,8 @@ class Item<T> internal constructor(
         const val TOURNAMENT_TYPE = 19
         const val TOURNAMENT_STYLE = 20
         const val COMPETITOR = 21
+
+        val IGNORE_SET: (String) -> Unit = {}
 
         val NO_CLICK: (() -> Unit)? = null
         val EMPTY_CLICK = { }
@@ -148,7 +147,7 @@ class Item<T> internal constructor(
 
         fun nullToEmpty(source: CharSequence?): () -> CharSequence {
             val finalSource = source ?: ""
-            return  { finalSource }
+            return { finalSource }
         }
     }
 }

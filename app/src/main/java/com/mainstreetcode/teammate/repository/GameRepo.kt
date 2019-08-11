@@ -50,7 +50,7 @@ class GameRepo internal constructor() : TeamQueryRepo<Game>() {
     override fun dao(): EntityDao<in Game> = gameDao
 
     override fun createOrUpdate(model: Game): Single<Game> = when {
-        model.isEmpty -> api.createGame(model.host.id, model).map(getLocalUpdateFunction(model))
+        model.isEmpty -> api.createGame(model.host.getId(), model).map(getLocalUpdateFunction(model))
         else -> api.updateGame(model.id, model)
                 .doOnError { throwable -> deleteInvalidModel(model, throwable) }
                 .map(getLocalUpdateFunction(model))
@@ -73,11 +73,11 @@ class GameRepo internal constructor() : TeamQueryRepo<Game>() {
     override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<Game>> {
         var date = pagination
         if (date == null) date = futureDate
-        return gameDao.getGames(key.id, date, DEF_QUERY_LIMIT).subscribeOn(io())
+        return gameDao.getGames(key.getId(), date, DEF_QUERY_LIMIT).subscribeOn(io())
     }
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<Game>> =
-            api.getGames(key.id, pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
+            api.getGames(key.getId(), pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
 
     override fun provideSaveManyFunction(): (List<Game>) -> List<Game> = { models ->
         val teams = ArrayList<Team>(models.size)

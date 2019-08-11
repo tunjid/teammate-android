@@ -33,7 +33,6 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 import java.util.ArrayList
-import java.util.Collections
 
 import androidx.recyclerview.widget.DiffUtil
 import io.reactivex.Completable
@@ -76,7 +75,7 @@ class CompetitorViewModel : MappedViewModel<Class<User>, Competitor>() {
             if (accept) return@biFunction sourceCopy
 
             pushModelAlert(when {
-                competitor.inOneOffGame() -> Alert.deletion(competitor.game)
+                competitor.isOneOffGame() -> Alert.deletion(competitor.game)
                 else -> Alert.deletion(competitor.tournament)
             })
 

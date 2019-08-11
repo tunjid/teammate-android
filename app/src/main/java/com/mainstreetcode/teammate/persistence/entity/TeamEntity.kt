@@ -29,6 +29,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.google.android.gms.maps.model.LatLng
 import com.mainstreetcode.teammate.model.Config
@@ -43,10 +44,10 @@ import com.mainstreetcode.teammate.util.ModelUtils.processString
 @Entity(tableName = "teams")
 open class TeamEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "team_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "team_image_url")
     open var imageUrl: String
@@ -135,11 +136,17 @@ open class TeamEntity : Parcelable {
         description = `in`.readString()!!
         created = Date(`in`.readLong())
         location = `in`.readValue(LatLng::class.java.classLoader) as? LatLng
-        sport = Config.sportFromCode(`in`.readString())
+        sport = Config.sportFromCode(`in`.readString()!!)
         storageUsed = `in`.readLong()
         maxStorage = `in`.readLong()
         minAge = `in`.readInt()
         maxAge = `in`.readInt()
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     protected fun setName(name: String) {

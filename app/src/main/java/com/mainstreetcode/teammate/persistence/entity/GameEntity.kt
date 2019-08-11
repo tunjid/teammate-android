@@ -30,6 +30,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
@@ -49,13 +50,18 @@ import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
 import com.mainstreetcode.teammate.util.ModelUtils.parse
 
 
-@Entity(tableName = "games", foreignKeys = [ForeignKey(entity = TournamentEntity::class, parentColumns = ["tournament_id"], childColumns = ["game_tournament"], onDelete = CASCADE)])
+@Entity(
+        tableName = "games",
+        foreignKeys = [
+            ForeignKey(entity = TournamentEntity::class, parentColumns = ["tournament_id"], childColumns = ["game_tournament"], onDelete = CASCADE)
+        ]
+)
 open class GameEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "game_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "game_name")
     var name: String
@@ -195,7 +201,7 @@ open class GameEntity : Parcelable {
         awayEntityId = `in`.readString()!!
         winnerEntityId = `in`.readString()!!
         created = Date(`in`.readLong())
-        sport = Config.sportFromCode(`in`.readString())
+        sport = Config.sportFromCode(`in`.readString()!!)
         referee = `in`.readValue(User::class.java.classLoader) as User
         host = `in`.readValue(Team::class.java.classLoader) as Team
         event = `in`.readValue(Event::class.java.classLoader) as Event
@@ -210,6 +216,12 @@ open class GameEntity : Parcelable {
         awayScore = `in`.readInt()
         isEnded = `in`.readByte().toInt() != 0x00
         canDraw = `in`.readByte().toInt() != 0x00
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     fun betweenUsers(): Boolean = User.COMPETITOR_TYPE == refPath

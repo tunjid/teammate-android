@@ -114,8 +114,8 @@ public class StatRank
             Team team = context.deserialize(roleJson.get(TEAM_KEY), Team.class);
             User user = context.deserialize(roleJson.get(USER_KEY), User.class);
 
-            if (user == null) user = User.empty();
-            if (team == null) team = Team.empty();
+            if (user == null) user = User.Companion.empty();
+            if (team == null) team = Team.Companion.empty();
 
             return new StatRank(count, team, user);
         }

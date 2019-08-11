@@ -27,7 +27,6 @@ package com.mainstreetcode.teammate.repository
 
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
-import android.text.TextUtils
 import com.facebook.login.LoginResult
 import com.google.gson.JsonObject
 import com.mainstreetcode.teammate.App
@@ -52,7 +51,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val userDao: UserDao = AppDatabase.instance.userDao()
 
-    var currentUser: User = User.empty()
+    var currentUser: User = User.empty(userId)
         private set
 
     private val userId: String
@@ -60,20 +59,13 @@ class UserRepo internal constructor() : ModelRepo<User>() {
                 .getString(USER_ID, "") ?: ""
 
     val me: Flowable<User>
-        get() {
-            val userId = userId
-            return when {
-                userId.isBlank() -> Flowable.error(TeammateException("No signed in user"))
-                else -> get(userId).map(getLocalUpdateFunction(currentUser))
-            }
+        get() = when {
+            userId.isBlank() -> Flowable.error(TeammateException("No signed in user"))
+            else -> get(userId).map(getLocalUpdateFunction(currentUser))
         }
 
     val isSignedIn: Boolean
-        get() = !TextUtils.isEmpty(userId)
-
-    init {
-        currentUser.id = userId
-    }
+        get() = userId.isNotBlank()
 
     override fun dao(): EntityDao<in User> = userDao
 

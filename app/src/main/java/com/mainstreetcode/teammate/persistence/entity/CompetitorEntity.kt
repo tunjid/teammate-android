@@ -31,6 +31,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.EmptyCompetitor
@@ -44,10 +45,10 @@ import androidx.room.ForeignKey.CASCADE
 @Entity(tableName = "competitors", foreignKeys = [ForeignKey(entity = TournamentEntity::class, parentColumns = ["tournament_id"], childColumns = ["competitor_tournament"], onDelete = CASCADE), ForeignKey(entity = GameEntity::class, parentColumns = ["game_id"], childColumns = ["competitor_game"], onDelete = CASCADE)])
 open class CompetitorEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "competitor_id")
-    open var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "competitor_ref_path")
     var refPath: String
@@ -105,6 +106,12 @@ open class CompetitorEntity : Parcelable {
         seed = `in`.readInt()
         isAccepted = `in`.readByte().toInt() != 0x00
         isDeclined = `in`.readByte().toInt() != 0x00
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     fun hasNotResponded(): Boolean = !isAccepted && !isDeclined

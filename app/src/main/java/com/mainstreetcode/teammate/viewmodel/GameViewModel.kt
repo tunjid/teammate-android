@@ -106,7 +106,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
         return FunctionalDiff.of(sourceSingle, headToHeadMatchUps, ::replaceList).observeOn(mainThread())
     }
 
-    fun getGame(game: Game): Flowable<Game> = gameRoundRepository[game].observeOn(mainThread())
+    private fun getGame(game: Game): Flowable<Game> = gameRoundRepository[game].observeOn(mainThread())
 
     fun endGame(game: Game): Single<Game> {
         game.isEnded = true
@@ -129,7 +129,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
                 .distinct()
                 .filterIsInstance(Game::class.java)
                 .filter { game -> tournament == game.tournament }
-                .forEach { game -> pushModelAlert(Alert.deletion<Game>(game)) }
+                .forEach { game -> pushModelAlert(Alert.deletion(game)) }
     }
 
     private fun onGameDeleted(game: Game) {
@@ -157,7 +157,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
             game.betweenUsers() -> Flowable.just(game.host)
             else -> Flowable.fromIterable(RoleViewModel.roles)
                     .filter { identifiable -> identifiable is Role }.cast(Role::class.java)
-                    .filter(Role::isPrivilegedRole).map(Role::getTeam)
+                    .filter(Role::isPrivilegedRole).map(Role::team)
                     .filter { team -> isParticipant(game, team) }
         }
 

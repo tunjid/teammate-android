@@ -45,17 +45,21 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
             else -> Date()
         }
 
-    override fun getUser(): User = wrappedModel.user
+    override val user: User
+        get() = wrappedModel.user
 
-    override fun getTeam(): Team = wrappedModel.team
+    override val team: Team
+        get() = wrappedModel.team
 
-    override fun isEmpty(): Boolean = wrappedModel.isEmpty
+    override val isEmpty: Boolean
+        get() = wrappedModel.isEmpty
 
-    override fun getImageUrl(): String = wrappedModel.imageUrl
+    override val imageUrl: String
+        get() = wrappedModel.imageUrl
 
     override fun getId(): String = wrappedModel.id
 
-    override fun compareTo(other: TeamMember?): Int =
+    override fun compareTo(other: TeamMember): Int =
             FunctionalDiff.COMPARATOR.compare(wrappedModel, other)
 
     override fun update(updated: TeamMember) {}

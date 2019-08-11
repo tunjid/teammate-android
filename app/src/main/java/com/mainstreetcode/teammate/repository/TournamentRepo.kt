@@ -54,7 +54,7 @@ class TournamentRepo internal constructor() : TeamQueryRepo<Tournament>() {
 
     override fun createOrUpdate(model: Tournament): Single<Tournament> {
         var tournamentSingle = when {
-            model.isEmpty -> api.createTournament(model.host.id, model).map(getLocalUpdateFunction(model))
+            model.isEmpty -> api.createTournament(model.host.getId(), model).map(getLocalUpdateFunction(model))
             else -> api.updateTournament(model.id, model)
                     .map(getLocalUpdateFunction(model))
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
@@ -82,12 +82,12 @@ class TournamentRepo internal constructor() : TeamQueryRepo<Tournament>() {
         var date = pagination
         if (date == null) date = futureDate
         // To concatenate team to account for the way the id is stored in the db to accommodate users and teams
-        val teamId = key.id
+        val teamId = key.getId()
         return tournamentDao.getTournaments(teamId, date, DEF_QUERY_LIMIT).subscribeOn(io())
     }
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<Tournament>> =
-            api.getTournaments(key.id, pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
+            api.getTournaments(key.getId(), pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
 
     override fun provideSaveManyFunction(): (List<Tournament>) -> List<Tournament> = { models ->
         val size = models.size

@@ -89,7 +89,7 @@ class ChatNotifier internal constructor() : Notifier<Chat>() {
         return visible == null || !visible
     }
 
-    override fun getNotificationTag(model: Chat): String = model.team.id
+    override fun getNotificationTag(model: Chat): String = model.team.getId()
 
     override fun handleNotification(item: FeedItem<Chat>) = aggregateConversations(item, item.model)
 

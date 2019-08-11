@@ -48,7 +48,7 @@ open class MetaData internal constructor(
         internal set
 
     val isInvalid: Boolean
-        get() = TextUtils.isEmpty(code)
+        get() = code.isBlank()
 
     init {
         this.code = code

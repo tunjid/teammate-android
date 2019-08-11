@@ -31,6 +31,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Team
@@ -44,13 +45,14 @@ import androidx.room.ForeignKey.CASCADE
 @Entity(tableName = "roles", foreignKeys = [ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["role_team"], onDelete = CASCADE), ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["role_user"], onDelete = CASCADE)])
 open class RoleEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "role_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "role_image_url")
     var imageUrl: String
+        protected set
 
     @ColumnInfo(name = "role_nickname")
     var nickname: String
@@ -85,10 +87,16 @@ open class RoleEntity : Parcelable {
         id = `in`.readString()!!
         imageUrl = `in`.readString()!!
         nickname = `in`.readString()!!
-        position = Config.positionFromCode(`in`.readString())
+        position = Config.positionFromCode(`in`.readString()!!)
         team = `in`.readValue(Team::class.java.classLoader) as Team
         user = `in`.readValue(User::class.java.classLoader) as User
         created = Date(`in`.readLong())
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     fun setPosition(position: String) {

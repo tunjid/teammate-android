@@ -26,6 +26,7 @@ package com.mainstreetcode.teammate.persistence.entity
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.google.android.gms.maps.model.LatLng
 import com.mainstreetcode.teammate.model.Config
@@ -44,15 +45,20 @@ import com.mainstreetcode.teammate.util.ModelUtils.parse
 import com.mainstreetcode.teammate.util.ModelUtils.processString
 
 
-@Entity(tableName = "events", foreignKeys = [ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["event_team"], onDelete = CASCADE)])
+@Entity(
+        tableName = "events",
+        foreignKeys = [
+            ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["event_team"], onDelete = CASCADE)
+        ]
+)
 open class EventEntity : Parcelable {
 
     //private static final SimpleDateFormat timePrinter = new SimpleDateFormat("HH:mm", Locale.US);
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "event_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "event_game_id")
     var gameId: String
@@ -73,7 +79,7 @@ open class EventEntity : Parcelable {
         get() = processString(field)
 
     @ColumnInfo(name = "event_team")
-    open var team: Team
+    var team: Team
 
     @ColumnInfo(name = "event_start_date")
     var startDate: Date
@@ -129,8 +135,14 @@ open class EventEntity : Parcelable {
         endDate = Date(`in`.readLong())
         team = `in`.readValue(Team::class.java.classLoader) as Team
         location = `in`.readValue(LatLng::class.java.classLoader) as? LatLng
-        visibility = Config.visibilityFromCode(`in`.readString())
+        visibility = Config.visibilityFromCode(`in`.readString()!!)
         spots = `in`.readInt()
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     fun setName(name: String) {

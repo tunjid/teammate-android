@@ -31,6 +31,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.User
@@ -39,13 +40,19 @@ import java.util.Date
 
 import androidx.room.ForeignKey.CASCADE
 
-@Entity(tableName = "guests", foreignKeys = [ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["guest_user"], onDelete = CASCADE), ForeignKey(entity = EventEntity::class, parentColumns = ["event_id"], childColumns = ["guest_event"], onDelete = CASCADE)])
+@Entity(
+        tableName = "guests",
+        foreignKeys = [
+            ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["guest_user"], onDelete = CASCADE),
+            ForeignKey(entity = EventEntity::class, parentColumns = ["event_id"], childColumns = ["guest_event"], onDelete = CASCADE)
+        ]
+)
 open class GuestEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "guest_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "guest_user")
     var user: User
@@ -78,6 +85,12 @@ open class GuestEntity : Parcelable {
         val tmpCreated = `in`.readLong()
         created = Date(tmpCreated)
         isAttending = `in`.readByte().toInt() != 0x00
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     override fun equals(other: Any?): Boolean {

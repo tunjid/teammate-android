@@ -55,7 +55,7 @@ abstract class TeamHostingGofer<T> internal constructor(
     }
 
      override fun changeEmitter(): Flowable<Boolean> =
-             roleRepository.getRoleInTeam(userRepository.currentUser.id, model.team.id)
+             roleRepository.getRoleInTeam(userRepository.currentUser.getId(), model.team.getId())
                      .map(this::onRoleFound).observeOn(mainThread())
 
     fun hasRole(): Boolean = !currentRole.isEmpty

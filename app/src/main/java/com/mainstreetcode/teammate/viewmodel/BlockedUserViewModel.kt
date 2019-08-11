@@ -46,7 +46,7 @@ class BlockedUserViewModel : TeamMappedViewModel<BlockedUser>() {
     override fun hasNativeAds(): Boolean = false
 
     override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<BlockedUser>> =
-            repository.modelsBefore(key, getQueryDate(fetchLatest, key, BlockedUser::getCreated))
+            repository.modelsBefore(key, getQueryDate(fetchLatest, key, BlockedUser::created))
 
     fun blockUser(blockedUser: BlockedUser): Single<BlockedUser> {
         return RepoProvider.forRepo(BlockedUserRepo::class.java).createOrUpdate(blockedUser)

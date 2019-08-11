@@ -27,6 +27,7 @@ package com.mainstreetcode.teammate.persistence.entity
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -36,9 +37,10 @@ import com.mainstreetcode.teammate.util.ModelUtils.processString
 @Entity(tableName = "users")
 open class UserEntity : Parcelable {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "user_id")
-    var id: String
+    private var id: String
 
     @ColumnInfo(name = "user_image_url")
     var imageUrl: String
@@ -78,7 +80,7 @@ open class UserEntity : Parcelable {
 
         val user = other as User?
 
-        return id == user!!.id
+        return id == user?.id
     }
 
     override fun hashCode(): Int = id.hashCode()
@@ -106,6 +108,12 @@ open class UserEntity : Parcelable {
         firstName = `in`.readString()!!
         lastName = `in`.readString()!!
         about = `in`.readString()!!
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     override fun describeContents(): Int = 0

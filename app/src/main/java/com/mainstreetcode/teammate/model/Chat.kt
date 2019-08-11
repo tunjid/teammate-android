@@ -61,16 +61,19 @@ class Chat : ChatEntity, TeamHost, Parcelable, Model<Chat> {
 
     override fun getId(): String = hiddenId
 
-    override fun getTeam(): Team = hiddenTeam
+    override val team: Team
+        get() = hiddenTeam
 
-    override fun isEmpty(): Boolean = !isSuccessful
+    override val imageUrl: String
+        get() = user.imageUrl
+
+    override val isEmpty: Boolean
+        get() = !isSuccessful
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
             if (other !is Chat) id == other.id else content == other.content && user.areContentsTheSame(other.user)
 
     override fun getChangePayload(other: Differentiable?): Any? = other
-
-    override fun getImageUrl(): String? = user.imageUrl
 
     override fun update(updated: Chat) {
         hiddenId = updated.hiddenId
@@ -110,7 +113,7 @@ class Chat : ChatEntity, TeamHost, Parcelable, Model<Chat> {
             team.addProperty(KIND_KEY, src.kind)
             team.addProperty(USER_KEY, src.user.id)
             team.addProperty(TEAM_KEY, src.team.id)
-            team.addProperty(CONTENT_KEY, src.content!!.toString())
+            team.addProperty(CONTENT_KEY, src.content.toString())
 
             return team
         }

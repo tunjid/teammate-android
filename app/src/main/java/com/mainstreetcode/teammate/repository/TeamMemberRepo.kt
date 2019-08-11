@@ -71,9 +71,9 @@ class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
         val date = pagination ?: Date()
 
         val database = AppDatabase.instance
-        val teamId = key.id
+        val teamId = key.getId()
 
-        val rolesMaybe = database.roleDao().getRoles(key.id, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
+        val rolesMaybe = database.roleDao().getRoles(key.getId(), date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
         val requestsMaybe = database.joinRequestDao().getRequests(teamId, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
 
         return Maybes.zip<List<Role>, List<JoinRequest>, List<TeamMember>>(rolesMaybe, requestsMaybe, { roles, requests ->
@@ -108,7 +108,7 @@ class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
     }
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember>> {
-        val maybe = api.getTeamMembers(key.id, pagination, DEF_QUERY_LIMIT).toMaybe()
+        val maybe = api.getTeamMembers(key.getId(), pagination, DEF_QUERY_LIMIT).toMaybe()
         return maybe.map(saveManyFunction)
     }
 
@@ -125,8 +125,8 @@ class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
     private fun deleteStaleJoinRequests(roles: List<Role>?) {
         if (roles == null || roles.isEmpty()) return
 
-        val teamId = roles[0].team.id
-        val userIds = roles.map { it.user.id }.toTypedArray()
+        val teamId = roles[0].team.getId()
+        val userIds = roles.map { it.user.getId() }.toTypedArray()
 
         AppDatabase.instance.joinRequestDao().deleteRequestsFromTeam(teamId, userIds)
     }

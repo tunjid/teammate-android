@@ -49,7 +49,7 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember>() {
 
     val allUsers: List<User>
         get() = allModels.filterIsInstance<UserHost>()
-                .map(UserHost::getUser)
+                .map(UserHost::user)
                 .distinct()
 
     override fun sortsAscending(): Boolean = true
@@ -130,8 +130,8 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember>() {
 
             val item = member.wrappedModel as Differentiable
 
-            if (item is Role) userIds.add(member.user.id)
-            else if (item is JoinRequest) if (userIds.contains(member.user.id)) iterator.remove()
+            if (item is Role) userIds.add(member.user.getId())
+            else if (item is JoinRequest) if (userIds.contains(member.user.getId())) iterator.remove()
         }
     }
 }

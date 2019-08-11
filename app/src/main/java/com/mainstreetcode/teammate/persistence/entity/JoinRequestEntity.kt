@@ -31,6 +31,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Team
@@ -41,20 +42,28 @@ import java.util.Date
 
 import androidx.room.ForeignKey.CASCADE
 
-@Entity(tableName = "join_requests", foreignKeys = [ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["join_request_team"], onDelete = CASCADE), ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["join_request_user"], onDelete = CASCADE)])
+@Entity(
+        tableName = "join_requests",
+        foreignKeys = [
+            ForeignKey(entity = TeamEntity::class, parentColumns = ["team_id"], childColumns = ["join_request_team"], onDelete = CASCADE),
+            ForeignKey(entity = UserEntity::class, parentColumns = ["user_id"], childColumns = ["join_request_user"], onDelete = CASCADE)
+        ]
+)
 open class JoinRequestEntity : Parcelable {
 
     @ColumnInfo(name = "join_request_team_approved")
     var isTeamApproved: Boolean = false
         protected set
+
     @ColumnInfo(name = "join_request_team_userApproved")
     var isUserApproved: Boolean = false
         protected set
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "join_request_id")
-    var id: String
-        protected set
+    private var id: String
+
     @ColumnInfo(name = "join_request_role_name")
     var position: Position
         protected set
@@ -84,10 +93,16 @@ open class JoinRequestEntity : Parcelable {
         isTeamApproved = `in`.readByte().toInt() != 0x00
         isUserApproved = `in`.readByte().toInt() != 0x00
         id = `in`.readString()!!
-        position = Config.positionFromCode(`in`.readString())
+        position = Config.positionFromCode(`in`.readString()!!)
         team = `in`.readValue(Team::class.java.classLoader) as Team
         user = `in`.readValue(User::class.java.classLoader) as User
         created = Date(`in`.readLong())
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     fun setPosition(position: String) {

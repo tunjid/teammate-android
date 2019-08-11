@@ -30,6 +30,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.NonNull
 
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
@@ -57,10 +58,10 @@ open class TournamentEntity : Parcelable {
     //    refPath:
     //    winner:
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "tournament_id")
-    var id: String
-        protected set
+    private var id: String
 
     @ColumnInfo(name = "tournament_image_url")
     var imageUrl: String
@@ -157,15 +158,21 @@ open class TournamentEntity : Parcelable {
         description = `in`.readString()!!
         created = Date(`in`.readLong())
         host = `in`.readValue(Team::class.java.classLoader) as Team
-        sport = Config.sportFromCode(`in`.readString())
-        type = Config.tournamentTypeFromCode(`in`.readString())
-        style = Config.tournamentStyleFromCode(`in`.readString())
+        sport = Config.sportFromCode(`in`.readString()!!)
+        type = Config.tournamentTypeFromCode(`in`.readString()!!)
+        style = Config.tournamentStyleFromCode(`in`.readString()!!)
         winner = `in`.readValue(Competitor::class.java.classLoader) as Competitor
         numLegs = `in`.readInt()
         numRounds = `in`.readInt()
         currentRound = `in`.readInt()
         numCompetitors = `in`.readInt()
         isSingleFinal = `in`.readByte().toInt() != 0x00
+    }
+
+    fun getId(): String = id
+
+    protected fun setId(id: String) {
+        this.id = id
     }
 
     fun hasWinner(): Boolean = !winner.isEmpty
