@@ -82,7 +82,7 @@ public class Tournament extends TournamentEntity
 
     public static Tournament withId(String id) {
         Tournament empty = empty();
-        empty.id = id;
+        empty.setId(id);
         return empty;
     }
 
@@ -102,39 +102,39 @@ public class Tournament extends TournamentEntity
     @Override
     public List<Item<Tournament>> asItems() {
         return Arrays.asList(
-                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.tournament_name, Item.Companion.nullToEmpty(name), this::setName, this),
-                Item.Companion.text(holder.get(1), 1, Item.DESCRIPTION, R.string.tournament_description, Item.Companion.nullToEmpty(description), this::setDescription, this),
-                Item.Companion.text(holder.get(2), 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::getCode, this::setType, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.tournament_name, Item.Companion.nullToEmpty(getName()), this::setName, this),
+                Item.Companion.text(holder.get(1), 1, Item.DESCRIPTION, R.string.tournament_description, Item.Companion.nullToEmpty(getDescription()), this::setDescription, this),
+                Item.Companion.text(holder.get(2), 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, getType()::getCode, this::setType, this)
                         .textTransformer(value -> Config.tournamentTypeFromCode(value.toString()).getName()),
-                Item.Companion.text(holder.get(3), 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::getCode, this::setStyle, this)
+                Item.Companion.text(holder.get(3), 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, getStyle()::getCode, this::setStyle, this)
                         .textTransformer(value -> Config.tournamentStyleFromCode(value.toString()).getName()),
-                Item.Companion.number(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, () -> String.valueOf(numLegs), this::setNumLegs, this),
-                Item.Companion.number(holder.get(5), 5, Item.INFO, R.string.tournament_single_final, () -> App.getInstance().getString(singleFinal ? R.string.yes : R.string.no), this::setSingleFinal, this)
+                Item.Companion.number(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, () -> String.valueOf(getNumLegs()), this::setNumLegs, this),
+                Item.Companion.number(holder.get(5), 5, Item.INFO, R.string.tournament_single_final, () -> App.getInstance().getString(isSingleFinal() ? R.string.yes : R.string.no), this::setSingleFinal, this)
         );
     }
 
     @Override
     public Item<Tournament> getHeaderItem() {
-        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(getImageUrl()), this::setImageUrl, this);
     }
 
     @Override
     public Team getTeam() {
-        return host;
+        return getHost();
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Tournament)) return id.equals(other.getId());
+        if (!(other instanceof Tournament)) return getId().equals(other.getId());
         Tournament casted = (Tournament) other;
-        return name.equals(casted.name)
-                && description.equals(casted.description) && currentRound == casted.currentRound
-                && imageUrl.equals(casted.getImageUrl());
+        return getName().equals(casted.getName())
+                && getDescription().equals(casted.getDescription()) && getCurrentRound() == casted.getCurrentRound()
+                && getImageUrl().equals(casted.getImageUrl());
     }
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id, name);
+        return areNotEmpty(getId(), getName());
     }
 
     @Override
@@ -144,38 +144,37 @@ public class Tournament extends TournamentEntity
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
-    public void updateHost(Team team) { host.update(team); }
+    public void updateHost(Team team) { getHost().update(team); }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void update(Tournament updatedTournament) {
-        this.id = updatedTournament.id;
-        this.name = updatedTournament.name;
-        this.refPath = updatedTournament.refPath;
-        this.description = updatedTournament.description;
-        this.imageUrl = updatedTournament.imageUrl;
-        this.created = updatedTournament.created;
-        this.numLegs = updatedTournament.numLegs;
-        this.numRounds = updatedTournament.numRounds;
-        this.currentRound = updatedTournament.currentRound;
-        this.numCompetitors = updatedTournament.numCompetitors;
-        this.singleFinal = updatedTournament.singleFinal;
-        this.type.update(updatedTournament.type);
-        this.style.update(updatedTournament.style);
-        this.sport.update(updatedTournament.sport);
-        if (updatedTournament.host.hasMajorFields()) this.host.update(updatedTournament.host);
-        if (this.winner.hasSameType(updatedTournament.winner))
-            winner.update(updatedTournament.winner);
-        else this.winner = updatedTournament.winner;
+        this.setId(updatedTournament.getId());
+        this.setName(updatedTournament.getName());
+        this.setRefPath(updatedTournament.getRefPath());
+        this.setDescription(updatedTournament.getDescription());
+        this.setImageUrl(updatedTournament.getImageUrl());
+        this.setCreated(updatedTournament.getCreated());
+        this.setNumLegs(updatedTournament.getNumLegs());
+        this.setNumRounds(updatedTournament.getNumRounds());
+        this.setCurrentRound(updatedTournament.getCurrentRound());
+        this.setNumCompetitors(updatedTournament.getNumCompetitors());
+        this.setSingleFinal(updatedTournament.isSingleFinal());
+        this.getType().update(updatedTournament.getType());
+        this.getStyle().update(updatedTournament.getStyle());
+        this.getSport().update(updatedTournament.getSport());
+        if (updatedTournament.getHost().hasMajorFields()) this.getHost().update(updatedTournament.getHost());
+        if (this.getWinner().hasSameType(updatedTournament.getWinner()))
+            getWinner().update(updatedTournament.getWinner());
+        else this.setWinner(updatedTournament.getWinner());
     }
 
     @Override
     public int compareTo(@NonNull Tournament o) {
-        int createdComparison = created.compareTo(o.created);
-        return createdComparison != 0 ? createdComparison : id.compareTo(o.id);
+        int createdComparison = getCreated().compareTo(o.getCreated());
+        return createdComparison != 0 ? createdComparison : getId().compareTo(o.getId());
     }
 
     @Override
@@ -221,16 +220,16 @@ public class Tournament extends TournamentEntity
         public JsonElement serialize(Tournament src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
-            serialized.addProperty(NAME_KEY, src.name.toString());
-            serialized.addProperty(DESCRIPTION_KEY, src.description.toString());
-            serialized.addProperty(TYPE_KEY, src.type.toString());
-            serialized.addProperty(STYLE_KEY, src.style.toString());
-            serialized.addProperty(NUM_LEGS, src.numLegs);
-            serialized.addProperty(HOST_KEY, src.host.getId());
-            serialized.addProperty(SINGLE_FINAL, src.singleFinal);
+            serialized.addProperty(NAME_KEY, src.getName().toString());
+            serialized.addProperty(DESCRIPTION_KEY, src.getDescription().toString());
+            serialized.addProperty(TYPE_KEY, src.getType().toString());
+            serialized.addProperty(STYLE_KEY, src.getStyle().toString());
+            serialized.addProperty(NUM_LEGS, src.getNumLegs());
+            serialized.addProperty(HOST_KEY, src.getHost().getId());
+            serialized.addProperty(SINGLE_FINAL, src.isSingleFinal());
 
-            String typeCode = src.type != null ? src.type.getCode() : "";
-            String styleCode = src.style != null ? src.style.getCode() : "";
+            String typeCode = src.getType().getCode();
+            String styleCode = src.getStyle().getCode();
 
             if (!TextUtils.isEmpty(typeCode)) serialized.addProperty(TYPE_KEY, typeCode);
             if (!TextUtils.isEmpty(styleCode)) serialized.addProperty(STYLE_KEY, styleCode);

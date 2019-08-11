@@ -75,7 +75,7 @@ class TournamentViewModel : TeamMappedViewModel<Tournament>() {
             repository.addCompetitors(tournament, competitors).observeOn(mainThread())
 
     override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<Tournament>> =
-            repository.modelsBefore(key, getQueryDate(fetchLatest, key, Tournament::getCreated))
+            repository.modelsBefore(key, getQueryDate(fetchLatest, key, Tournament::created))
 
     override fun onErrorMessage(message: Message, key: Team, invalid: Differentiable) {
         super.onErrorMessage(message, key, invalid)

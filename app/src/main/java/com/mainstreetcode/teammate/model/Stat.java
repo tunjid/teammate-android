@@ -24,9 +24,7 @@
 
 package com.mainstreetcode.teammate.model;
 
-import androidx.room.Ignore;
 import android.os.Parcel;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.gson.JsonArray;
@@ -51,6 +49,9 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.room.Ignore;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
@@ -86,9 +87,9 @@ public class Stat extends StatEntity
     @Override
     public List<Item<Stat>> asItems() {
         return Arrays.asList(
-                Item.Companion.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, () -> String.valueOf(time), this::setTime, this),
-                Item.Companion.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, statType::getCode, this::setStatType, this)
-                        .textTransformer(value -> sport.statTypeFromCode(value.toString()).getName())
+                Item.Companion.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, () -> String.valueOf(getTime()), this::setTime, this),
+                Item.Companion.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, getStatType()::getCode, this::setStatType, this)
+                        .textTransformer(value -> getSport().statTypeFromCode(value.toString()).getName())
         );
     }
 
@@ -99,15 +100,15 @@ public class Stat extends StatEntity
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Stat)) return id.equals(other.getId());
+        if (!(other instanceof Stat)) return getId().equals(other.getId());
         Stat casted = (Stat) other;
-        return statType.areContentsTheSame(casted.statType) && user.areContentsTheSame(casted.user)
-                && value == casted.value && time == casted.time;
+        return getStatType().areContentsTheSame(casted.getStatType()) && getUser().areContentsTheSame(casted.getUser())
+                && getValue() == casted.getValue() && getTime() == casted.getTime();
     }
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id);
+        return areNotEmpty(getId());
     }
 
     @Override
@@ -117,26 +118,26 @@ public class Stat extends StatEntity
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
     @Override
     public void update(Stat updatedStat) {
-        this.id = updatedStat.id;
-        this.created = updatedStat.created;
-        this.value = updatedStat.value;
-        this.time = updatedStat.time;
-        this.statType.update(updatedStat.statType);
-        this.sport.update(updatedStat.sport);
-        if (updatedStat.user.hasMajorFields()) this.user.update(updatedStat.user);
-        if (updatedStat.team.hasMajorFields()) this.team.update(updatedStat.team);
-        if (updatedStat.game.hasMajorFields()) this.game.update(updatedStat.game);
+        this.setId(updatedStat.getId());
+        this.setCreated(updatedStat.getCreated());
+        this.setValue(updatedStat.getValue());
+        this.setTime(updatedStat.getTime());
+        this.getStatType().update(updatedStat.getStatType());
+        this.getSport().update(updatedStat.getSport());
+        if (updatedStat.getUser().hasMajorFields()) this.getUser().update(updatedStat.getUser());
+        if (updatedStat.getTeam().hasMajorFields()) this.getTeam().update(updatedStat.getTeam());
+        if (updatedStat.getGame().hasMajorFields()) this.getGame().update(updatedStat.getGame());
     }
 
     @Override
     public int compareTo(@NonNull Stat o) {
-        int timeComparison = -Float.compare(time, o.time);
-        return timeComparison != 0 ? timeComparison : -created.compareTo(o.created);
+        int timeComparison = -Float.compare(getTime(), o.getTime());
+        return timeComparison != 0 ? timeComparison : -getCreated().compareTo(o.getCreated());
     }
 
     @Override
@@ -177,28 +178,27 @@ public class Stat extends StatEntity
             JsonObject stat = new JsonObject();
             JsonArray attributes = new JsonArray();
 
-            stat.addProperty(STAT_TYPE, src.statType.getCode());
-            stat.addProperty(USER, src.user.getId());
-            stat.addProperty(TEAM, src.team.getId());
-            stat.addProperty(GAME, src.game.getId());
-            stat.addProperty(TIME, src.time);
-            stat.addProperty(VALUE, src.value);
+            stat.addProperty(STAT_TYPE, src.getStatType().getCode());
+            stat.addProperty(USER, src.getUser().getId());
+            stat.addProperty(TEAM, src.getTeam().getId());
+            stat.addProperty(GAME, src.getGame().getId());
+            stat.addProperty(TIME, src.getTime());
+            stat.addProperty(VALUE, src.getValue());
             stat.add(ATTRIBUTES, attributes);
 
-            String sportCode = src.sport != null ? src.sport.getCode() : "";
+            String sportCode = src.getSport().getCode();
             if (!TextUtils.isEmpty(sportCode)) stat.addProperty(SPORT_KEY, sportCode);
 
-            for (StatAttribute attribute : src.attributes) attributes.add(attribute.getCode());
+            for (StatAttribute attribute : src.getAttributes()) attributes.add(attribute.getCode());
 
             return stat;
         }
 
         @Override
         public Stat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonPrimitive()) {
-                return new Stat(json.getAsString(), new Date(), StatType.empty(), Sport.empty(), User.empty(),
-                        Team.empty(), null, new StatAttributes(), 0, 0);
-            }
+            if (json.isJsonPrimitive()) return new Stat(
+                    json.getAsString(), new Date(), StatType.empty(), Sport.empty(), User.empty(),
+                    Team.empty(), Game.empty(Team.empty()), new StatAttributes(), 0, 0);
 
             JsonObject body = json.getAsJsonObject();
 
@@ -228,7 +228,7 @@ public class Stat extends StatEntity
             for (JsonElement element : attributeElements) {
                 if (!element.isJsonPrimitive()) continue;
                 StatAttribute attribute = statType.fromCode(element.getAsString());
-                if (!attribute.isInvalid()) stat.attributes.add(attribute);
+                if (!attribute.isInvalid()) stat.getAttributes().add(attribute);
             }
 
             return stat;

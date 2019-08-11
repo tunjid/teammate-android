@@ -85,6 +85,6 @@ class CompetitorViewModel : MappedViewModel<Class<User>, Competitor>() {
     }
 
     override fun fetch(key: Class<User>, fetchLatest: Boolean): Flowable<List<Competitor>> {
-        return repository.getDeclined(getQueryDate(fetchLatest, key, { it.getCreated() })!!).toFlowable()
+        return repository.getDeclined(getQueryDate(fetchLatest, key, { it.created })!!).toFlowable()
     }
 }

@@ -131,7 +131,7 @@ public class MediaTransferIntentService extends IntentService {
      */
     private void handleActionUpload(User user, Team team, List<Uri> mediaUris) {
         if (uploadStats == null) uploadStats = new UploadStats();
-        for (Uri uri : mediaUris) uploadStats.enqueue(Media.fromUri(user, team, uri));
+        for (Uri uri : mediaUris) uploadStats.enqueue(Media.Companion.fromUri(user, team, uri));
     }
 
     private void handleActionDownload(List<Media> mediaList) {

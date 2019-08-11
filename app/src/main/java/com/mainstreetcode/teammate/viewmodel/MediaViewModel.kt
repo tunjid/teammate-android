@@ -77,7 +77,7 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
     }
 
     override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<Media>> =
-            repository.modelsBefore(key, getQueryDate(fetchLatest, key, Media::getCreated))
+            repository.modelsBefore(key, getQueryDate(fetchLatest, key, Media::created))
 
     fun getMedia(model: Media): Flowable<Media> =
             checkForInvalidObject(repository[model], model.team, model).cast(Media::class.java)

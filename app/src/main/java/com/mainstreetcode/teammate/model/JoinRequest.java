@@ -97,31 +97,31 @@ public class JoinRequest extends JoinRequestEntity
                 Item.Companion.text(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::getAbout, Item.Companion::ignore, this),
                 Item.Companion.email(holder.get(3), 3, Item.INPUT, R.string.email, user::getPrimaryEmail, user::setPrimaryEmail, this),
                 // END USER ITEMS
-                Item.Companion.text(holder.get(4),4, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.Companion.text(holder.get(4),4, Item.ROLE, R.string.team_role, getPosition()::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName()),
                 // START TEAM ITEMS
-                Item.Companion.text(holder.get(5), 5, Item.INPUT, R.string.team_name, team::getName, Item.Companion::ignore, this),
-                Item.Companion.text(holder.get(6), 6, Item.SPORT, R.string.team_sport, team.getSport()::getCode, Item.Companion::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.Companion.text(holder.get(7), 7, Item.CITY, R.string.city, team::getCity, Item.Companion::ignore, this),
-                Item.Companion.text(holder.get(8), 8, Item.STATE, R.string.state, team::getState, Item.Companion::ignore, this),
-                Item.Companion.text(holder.get(9), 9, Item.ZIP, R.string.zip, team::getZip, Item.Companion::ignore, this),
-                Item.Companion.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, team::getDescription, Item.Companion::ignore, this),
-                Item.Companion.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(team.getMinAge()), Item.Companion::ignore, this),
-                Item.Companion.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(team.getMaxAge()), Item.Companion::ignore, this)
+                Item.Companion.text(holder.get(5), 5, Item.INPUT, R.string.team_name, getTeam()::getName, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(6), 6, Item.SPORT, R.string.team_sport, getTeam().getSport()::getCode, Item.Companion::ignore, this).textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
+                Item.Companion.text(holder.get(7), 7, Item.CITY, R.string.city, getTeam()::getCity, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(8), 8, Item.STATE, R.string.state, getTeam()::getState, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(9), 9, Item.ZIP, R.string.zip, getTeam()::getZip, Item.Companion::ignore, this),
+                Item.Companion.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, getTeam()::getDescription, Item.Companion::ignore, this),
+                Item.Companion.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(getTeam().getMinAge()), Item.Companion::ignore, this),
+                Item.Companion.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(getTeam().getMaxAge()), Item.Companion::ignore, this)
         );
     }
 
     @Override
     public Item<JoinRequest> getHeaderItem() {
-        RemoteImage image = userApproved ? team : user;
+        RemoteImage image = isUserApproved() ? getTeam() : getUser();
         return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, image::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof JoinRequest)) return id.equals(other.getId());
+        if (!(other instanceof JoinRequest)) return getId().equals(other.getId());
         JoinRequest casted = (JoinRequest) other;
-        return position.equals(casted.position) && user.areContentsTheSame(casted.getUser());
+        return getPosition().equals(casted.getPosition()) && getUser().areContentsTheSame(casted.getUser());
     }
 
     @Override
@@ -131,36 +131,36 @@ public class JoinRequest extends JoinRequestEntity
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
     @Override
     public String getImageUrl() {
-        return user == null ? null : user.getImageUrl();
+        return getUser() == null ? null : getUser().getImageUrl();
     }
 
 
     @Override
     public void update(JoinRequest updated) {
-        this.teamApproved = updated.teamApproved;
-        this.userApproved = updated.userApproved;
-        this.id = updated.id;
+        this.setTeamApproved(updated.isTeamApproved());
+        this.setUserApproved(updated.isUserApproved());
+        this.setId(updated.getId());
 
-        position.update(updated.position);
-        if (updated.team.hasMajorFields()) team.update(updated.team);
-        if (updated.user.hasMajorFields()) user.update(updated.user);
+        getPosition().update(updated.getPosition());
+        if (updated.getTeam().hasMajorFields()) getTeam().update(updated.getTeam());
+        if (updated.getUser().hasMajorFields()) getUser().update(updated.getUser());
     }
 
     @Override
     public int compareTo(@NonNull JoinRequest o) {
-        int roleComparison = position.getCode().compareTo(o.position.getCode());
-        int userComparison = user.compareTo(o.user);
+        int roleComparison = getPosition().getCode().compareTo(o.getPosition().getCode());
+        int userComparison = getUser().compareTo(o.getUser());
 
         return roleComparison != 0
                 ? roleComparison
                 : userComparison != 0
                 ? userComparison
-                : id.compareTo(o.id);
+                : getId().compareTo(o.getId());
     }
 
     @Override
@@ -205,13 +205,13 @@ public class JoinRequest extends JoinRequestEntity
         public JsonElement serialize(JoinRequest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
 
-            result.addProperty(TEAM_KEY, src.team.getId());
-            result.addProperty(TEAM_APPROVAL_KEY, src.teamApproved);
-            result.addProperty(USER_APPROVAL_KEY, src.userApproved);
+            result.addProperty(TEAM_KEY, src.getTeam().getId());
+            result.addProperty(TEAM_APPROVAL_KEY, src.isTeamApproved());
+            result.addProperty(USER_APPROVAL_KEY, src.isUserApproved());
 
-            User user = src.user;
+            User user = src.getUser();
 
-            if (src.teamApproved) {
+            if (src.isTeamApproved()) {
                 result.addProperty(USER_FIRST_NAME_KEY, user.getFirstName().toString());
                 result.addProperty(USER_LAST_NAME_KEY, user.getLastName().toString());
                 result.addProperty(USER_PRIMARY_EMAIL_KEY, user.getPrimaryEmail());
@@ -220,7 +220,7 @@ public class JoinRequest extends JoinRequestEntity
                 result.addProperty(USER_KEY, src.getUser().getId());
             }
 
-            String positionCode = src.position != null ? src.position.getCode() : "";
+            String positionCode = src.getPosition().getCode();
             if (!TextUtils.isEmpty(positionCode)) result.addProperty(NAME_KEY, positionCode);
 
             return result;

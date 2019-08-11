@@ -91,40 +91,40 @@ public class Event extends EventEntity
     }
 
     public void setName(Game game) {
-        name = game.getHome().getName() + " Vs. " + game.getAway().getName();
+        setName(game.getHome().getName() + " Vs. " + game.getAway().getName());
     }
 
     @Override
     public List<Item<Event>> asItems() {
         return Arrays.asList(
-                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.Companion.nullToEmpty(name), this::setName, this),
-                Item.Companion.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, visibility::getCode, this::setVisibility, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.Companion.nullToEmpty(getName()), this::setName, this),
+                Item.Companion.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, getVisibility()::getCode, this::setVisibility, this)
                         .textTransformer(value -> Config.visibilityFromCode(value.toString()).getName()),
-                Item.Companion.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, () -> String.valueOf(spots), this::setSpots, this),
-                Item.Companion.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.Companion.nullToEmpty(locationName), this::setLocationName, this),
-                Item.Companion.text(holder.get(4), 4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(startDate), this::setStartDate, this),
-                Item.Companion.text(holder.get(5), 5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(endDate), this::setEndDate, this),
-                Item.Companion.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.Companion.nullToEmpty(notes), this::setNotes, this)
-                );
+                Item.Companion.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, () -> String.valueOf(getSpots()), this::setSpots, this),
+                Item.Companion.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.Companion.nullToEmpty(getLocationName()), this::setLocationName, this),
+                Item.Companion.text(holder.get(4), 4, Item.DATE, R.string.start_date, () -> ModelUtils.prettyPrinter.format(getStartDate()), this::setStartDate, this),
+                Item.Companion.text(holder.get(5), 5, Item.DATE, R.string.end_date, () -> ModelUtils.prettyPrinter.format(getEndDate()), this::setEndDate, this),
+                Item.Companion.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.Companion.nullToEmpty(getNotes()), this::setNotes, this)
+        );
     }
 
     @Override
     public Item<Event> getHeaderItem() {
-        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(getImageUrl()), this::setImageUrl, this);
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Event)) return id.equals(other.getId());
+        if (!(other instanceof Event)) return getId().equals(other.getId());
         Event casted = (Event) other;
-        return name.equals(casted.name)
-                && startDate.equals(casted.getStartDate()) && endDate.equals(casted.getEndDate())
-                && locationName.equals(casted.getLocationName()) && imageUrl.equals(casted.getImageUrl());
+        return getName().equals(casted.getName())
+                && getStartDate().equals(casted.getStartDate()) && getEndDate().equals(casted.getEndDate())
+                && getLocationName().equals(casted.getLocationName()) && getImageUrl().equals(casted.getImageUrl());
     }
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id, name);
+        return areNotEmpty(getId(), getName());
     }
 
     @Override
@@ -139,51 +139,51 @@ public class Event extends EventEntity
 
     @Override
     public void update(Event updatedEvent) {
-        this.id = updatedEvent.id;
-        this.name = updatedEvent.name;
-        this.notes = updatedEvent.notes;
-        this.spots = updatedEvent.spots;
-        this.gameId = updatedEvent.gameId;
-        this.imageUrl = updatedEvent.imageUrl;
-        this.endDate = updatedEvent.endDate;
-        this.startDate = updatedEvent.startDate;
-        this.location = updatedEvent.location;
-        this.locationName = updatedEvent.locationName;
-        this.visibility.update(updatedEvent.visibility);
-        if (updatedEvent.team.hasMajorFields()) this.team.update(updatedEvent.team);
+        this.setId(updatedEvent.getId());
+        this.setName(updatedEvent.getName());
+        this.setNotes(updatedEvent.getNotes());
+        this.setSpots(updatedEvent.getSpots());
+        this.setGameId(updatedEvent.getGameId());
+        this.setImageUrl(updatedEvent.getImageUrl());
+        this.setEndDate(updatedEvent.getEndDate());
+        this.setStartDate(updatedEvent.getStartDate());
+        this.setLocation(updatedEvent.getLocation());
+        this.setLocationName(updatedEvent.getLocationName());
+        this.getVisibility().update(updatedEvent.getVisibility());
+        if (updatedEvent.getTeam().hasMajorFields()) this.getTeam().update(updatedEvent.getTeam());
     }
 
     @Override
     public int compareTo(@NonNull Event o) {
-        int startDateComparison = startDate.compareTo(o.startDate);
-        int endDateComparison = endDate.compareTo(o.endDate);
+        int startDateComparison = getStartDate().compareTo(o.getStartDate());
+        int endDateComparison = getEndDate().compareTo(o.getEndDate());
 
         return startDateComparison != 0
                 ? startDateComparison
                 : endDateComparison != 0
                 ? endDateComparison
-                : id.compareTo(o.id);
+                : getId().compareTo(o.getId());
     }
 
-    public void setTeam(Team team) {
-        this.team.update(team);
+    public void updateTeam(Team team) {
+        this.getTeam().update(team);
     }
 
     public void setAddress(Address address) {
-        locationName = nameAddress(address);
-        location = new LatLng(address.getLatitude(), address.getLongitude());
+        setLocationName(nameAddress(address));
+        setLocation(new LatLng(address.getLatitude(), address.getLongitude()));
     }
 
     void setGame(Game game) {
-        this.gameId = game.getId();
+        this.setGameId(game.getId());
     }
 
     public MarkerOptions getMarkerOptions() {
         return new MarkerOptions()
-                .title(name.toString())
-                .position(location)
-                .snippet(locationName.toString())
-                .icon(BitmapDescriptorFactory.fromBitmap(TextBitmapUtil.getBitmapMarker(team.getSport().getEmoji())));
+                .title(getName().toString())
+                .position(getLocation())
+                .snippet(getLocationName().toString())
+                .icon(BitmapDescriptorFactory.fromBitmap(TextBitmapUtil.getBitmapMarker(getTeam().getSport().getEmoji())));
     }
 
     @Override
@@ -225,23 +225,23 @@ public class Event extends EventEntity
         public JsonElement serialize(Event src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
-            serialized.addProperty(NAME_KEY, src.name.toString());
-            serialized.addProperty(NOTES_KEY, src.notes.toString());
-            serialized.addProperty(LOCATION_NAME_KEY, src.locationName.toString());
+            serialized.addProperty(NAME_KEY, src.getName().toString());
+            serialized.addProperty(NOTES_KEY, src.getNotes().toString());
+            serialized.addProperty(LOCATION_NAME_KEY, src.getLocationName().toString());
             serialized.addProperty(SPOTS_KEY, src.getSpots());
-            serialized.addProperty(TEAM_KEY, src.team.getId());
-            serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate));
-            serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate));
-            if (!TextUtils.isEmpty(src.getGameId())) serialized.addProperty(GAME, src.gameId);
+            serialized.addProperty(TEAM_KEY, src.getTeam().getId());
+            serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.getStartDate()));
+            serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.getEndDate()));
+            if (!TextUtils.isEmpty(src.getGameId())) serialized.addProperty(GAME, src.getGameId());
 
-            String visibilityCode = src.visibility != null ? src.visibility.getCode() : "";
+            String visibilityCode = src.getVisibility().getCode();
             if (!TextUtils.isEmpty(visibilityCode))
                 serialized.addProperty(VISIBILITY_KEY, visibilityCode);
 
-            if (src.location != null) {
+            if (src.getLocation() != null) {
                 JsonArray coordinates = new JsonArray();
-                coordinates.add(src.location.longitude);
-                coordinates.add(src.location.latitude);
+                coordinates.add(src.getLocation().longitude);
+                coordinates.add(src.getLocation().latitude);
                 serialized.add(LOCATION_KEY, coordinates);
             }
 

@@ -89,23 +89,23 @@ public class Role extends RoleEntity
                 Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::getLastName, user::setLastName, this),
                 Item.Companion.text(holder.get(2), 2, Item.NICKNAME, R.string.nickname, this::getNickname, this::setNickname, this),
                 Item.Companion.text(holder.get(3), 3, Item.ABOUT, R.string.user_about, user::getAbout, Item.Companion::ignore, this),
-                Item.Companion.text(holder.get(4), 4, Item.ROLE, R.string.team_role, position::getCode, this::setPosition, this)
+                Item.Companion.text(holder.get(4), 4, Item.ROLE, R.string.team_role, getPosition()::getCode, this::setPosition, this)
                         .textTransformer(value -> Config.positionFromCode(value.toString()).getName())
         );
     }
 
     @Override
     public Item<Role> getHeaderItem() {
-        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.Companion.nullToEmpty(getImageUrl()), this::setImageUrl, this);
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Role)) return id.equals(other.getId());
+        if (!(other instanceof Role)) return getId().equals(other.getId());
         Role casted = (Role) other;
-        return position.equals(casted.position)
-                && user.areContentsTheSame(casted.getUser())
-                && team.areContentsTheSame(casted.team);
+        return getPosition().equals(casted.getPosition())
+                && getUser().areContentsTheSame(casted.getUser())
+                && getTeam().areContentsTheSame(casted.getTeam());
     }
 
     @Override
@@ -115,24 +115,24 @@ public class Role extends RoleEntity
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
     @Override
     public void update(Role updated) {
-        this.id = updated.getId();
-        this.imageUrl = updated.imageUrl;
-        this.nickname = updated.nickname;
-        this.position.update(updated.position);
-        if (updated.team.hasMajorFields()) this.team.update(updated.team);
-        if (updated.user.hasMajorFields()) this.user.update(updated.user);
+        this.setId(updated.getId());
+        this.setImageUrl(updated.getImageUrl());
+        this.setNickname(updated.getNickname());
+        this.getPosition().update(updated.getPosition());
+        if (updated.getTeam().hasMajorFields()) this.getTeam().update(updated.getTeam());
+        if (updated.getUser().hasMajorFields()) this.getUser().update(updated.getUser());
     }
 
     @Override
     public int compareTo(@NonNull Role o) {
-        int roleComparison = position.getCode().compareTo(o.position.getCode());
-        int userComparison = user.compareTo(o.user);
-        int teamComparison = team.compareTo(o.team);
+        int roleComparison = getPosition().getCode().compareTo(o.getPosition().getCode());
+        int userComparison = getUser().compareTo(o.getUser());
+        int teamComparison = getTeam().compareTo(o.getTeam());
 
         return roleComparison != 0
                 ? roleComparison
@@ -140,18 +140,18 @@ public class Role extends RoleEntity
                 ? userComparison
                 : teamComparison != 0
                 ? teamComparison
-                : id.compareTo(o.id);
+                : getId().compareTo(o.getId());
     }
 
     public boolean isPrivilegedRole() {
-        String positionCode = position != null ? position.getCode() : "";
+        String positionCode = getPosition().getCode();
         return !TextUtils.isEmpty(positionCode) && !isEmpty() && Config.getPrivileged().contains(positionCode);
     }
 
     public CharSequence getTitle() {
-        CharSequence title = user.getFirstName();
-        if (!TextUtils.isEmpty(nickname)) return SpanBuilder.of(title)
-                .appendNewLine().append("\"" + nickname + "\"")
+        CharSequence title = getUser().getFirstName();
+        if (!TextUtils.isEmpty(getNickname())) return SpanBuilder.of(title)
+                .appendNewLine().append("\"" + getNickname() + "\"")
                 .build();
 
         return title;
@@ -196,12 +196,12 @@ public class Role extends RoleEntity
         public JsonElement serialize(Role src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject serialized = new JsonObject();
 
-            serialized.addProperty(ID_KEY, src.id);
-            serialized.addProperty(IMAGE_KEY, src.imageUrl);
-            serialized.addProperty(NICK_NAME_KEY, src.nickname);
-            serialized.add(USER_KEY, context.serialize(src.user));
+            serialized.addProperty(ID_KEY, src.getId());
+            serialized.addProperty(IMAGE_KEY, src.getImageUrl());
+            serialized.addProperty(NICK_NAME_KEY, src.getNickname());
+            serialized.add(USER_KEY, context.serialize(src.getUser()));
 
-            String positionCode = src.position != null ? src.position.getCode() : "";
+            String positionCode = src.getPosition().getCode();
             if (!TextUtils.isEmpty(positionCode)) serialized.addProperty(NAME_KEY, positionCode);
 
             return serialized;

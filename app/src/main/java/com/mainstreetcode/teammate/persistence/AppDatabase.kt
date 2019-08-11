@@ -31,13 +31,13 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.BuildConfig
-import com.mainstreetcode.teammate.model.Chat
-import com.mainstreetcode.teammate.model.Media
+import com.mainstreetcode.teammate.persistence.entity.ChatEntity
 import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity
 import com.mainstreetcode.teammate.persistence.entity.EventEntity
 import com.mainstreetcode.teammate.persistence.entity.GameEntity
 import com.mainstreetcode.teammate.persistence.entity.GuestEntity
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity
+import com.mainstreetcode.teammate.persistence.entity.MediaEntity
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity
 import com.mainstreetcode.teammate.persistence.entity.StatEntity
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity
@@ -46,6 +46,7 @@ import com.mainstreetcode.teammate.persistence.entity.UserEntity
 import com.mainstreetcode.teammate.persistence.migrations.Migration1To2
 import com.mainstreetcode.teammate.persistence.migrations.Migration2To3
 import com.mainstreetcode.teammate.persistence.migrations.Migration3To4
+import com.mainstreetcode.teammate.persistence.migrations.Migration4To5
 import com.mainstreetcode.teammate.persistence.typeconverters.CharSequenceConverter
 import com.mainstreetcode.teammate.persistence.typeconverters.CompetitiveTypeConverter
 import com.mainstreetcode.teammate.persistence.typeconverters.CompetitorTypeConverter
@@ -81,10 +82,10 @@ import io.reactivex.Single
     CompetitorEntity::class,
     GameEntity::class,
     StatEntity::class,
-    Chat::class,
-    Media::class
+    ChatEntity::class,
+    MediaEntity::class
 ],
-        version = 4)
+        version = 5)
 @TypeConverters(
         LatLngTypeConverter::class,
         DateTypeConverter::class,
@@ -184,6 +185,7 @@ abstract class AppDatabase : RoomDatabase() {
                             .addMigrations(Migration1To2())
                             .addMigrations(Migration2To3())
                             .addMigrations(Migration3To4())
+                            .addMigrations(Migration4To5())
                             .fallbackToDestructiveMigration()
                             .build()
                 }

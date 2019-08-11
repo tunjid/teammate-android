@@ -76,35 +76,33 @@ public class User extends UserEntity implements
         return new User("", Config.getDefaultUserAvatar(), "", "", "", "", "");
     }
 
-    public void setId(String id) { this.id = id; }
-
     @Override
     public List<Item<User>> asItems() {
         return Arrays.asList(
-                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.Companion.nullToEmpty(firstName), this::setFirstName, this),
-                Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.Companion.nullToEmpty(lastName), this::setLastName, this),
-                Item.Companion.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.Companion.nullToEmpty(screenName), this::setScreenName, this),
-                Item.Companion.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.Companion.nullToEmpty(primaryEmail), this::setPrimaryEmail, this),
-                Item.Companion.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.Companion.nullToEmpty(about), this::setAbout, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.Companion.nullToEmpty(getFirstName()), this::setFirstName, this),
+                Item.Companion.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.Companion.nullToEmpty(getLastName()), this::setLastName, this),
+                Item.Companion.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.Companion.nullToEmpty(getScreenName()), this::setScreenName, this),
+                Item.Companion.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.Companion.nullToEmpty(getPrimaryEmail()), this::setPrimaryEmail, this),
+                Item.Companion.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.Companion.nullToEmpty(getAbout()), this::setAbout, this)
         );
     }
 
     @Override
     public Item<User> getHeaderItem() {
-        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.Companion.nullToEmpty(getImageUrl()), this::setImageUrl, this);
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof User)) return id.equals(other.getId());
+        if (!(other instanceof User)) return getId().equals(other.getId());
         User casted = (User) other;
-        return firstName.equals(casted.getFirstName()) && lastName.equals(casted.getLastName())
-                && imageUrl.equals(casted.getImageUrl());
+        return getFirstName().equals(casted.getFirstName()) && getLastName().equals(casted.getLastName())
+                && getImageUrl().equals(casted.getImageUrl());
     }
 
     @Override
     public CharSequence getName() {
-        return firstName + " " + lastName;
+        return getFirstName() + " " + getLastName();
     }
 
     @Override
@@ -114,7 +112,7 @@ public class User extends UserEntity implements
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id, firstName, lastName);
+        return areNotEmpty(getId(), getFirstName(), getLastName());
     }
 
     @Override
@@ -124,18 +122,18 @@ public class User extends UserEntity implements
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
     @Override
     public void update(User updatedUser) {
-        this.id = updatedUser.id;
-        this.about = updatedUser.about;
-        this.firstName = updatedUser.firstName;
-        this.lastName = updatedUser.lastName;
-        this.imageUrl = updatedUser.imageUrl;
-        this.screenName = updatedUser.screenName;
-        this.primaryEmail = updatedUser.primaryEmail;
+        this.setId(updatedUser.getId());
+        this.setAbout(updatedUser.getAbout());
+        this.setFirstName(updatedUser.getFirstName());
+        this.setLastName(updatedUser.getLastName());
+        this.setImageUrl(updatedUser.getImageUrl());
+        this.setScreenName(updatedUser.getScreenName());
+        this.setPrimaryEmail(updatedUser.getPrimaryEmail());
     }
 
     @Override
@@ -154,14 +152,14 @@ public class User extends UserEntity implements
 
     @Override
     public int compareTo(@NonNull User o) {
-        int firstNameComparison = firstName.toString().compareTo(o.firstName.toString());
-        int lastNameComparison = lastName.toString().compareTo(o.lastName.toString());
+        int firstNameComparison = getFirstName().toString().compareTo(o.getFirstName().toString());
+        int lastNameComparison = getLastName().toString().compareTo(o.getLastName().toString());
 
         return firstNameComparison != 0
                 ? firstNameComparison
                 : lastNameComparison != 0
                 ? lastNameComparison
-                : id.compareTo(o.id);
+                : getId().compareTo(o.getId());
     }
 
     public void setPassword(String password) {
@@ -226,11 +224,11 @@ public class User extends UserEntity implements
         @Override
         public JsonElement serialize(User src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject user = new JsonObject();
-            user.addProperty(FIRST_NAME_KEY, src.firstName.toString());
-            user.addProperty(LAST_NAME_KEY, src.lastName.toString());
-            user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail);
-            user.addProperty(ABOUT_KEY, src.about.toString());
-            if (!TextUtils.isEmpty(src.screenName)) user.addProperty(SCREEN_NAME, src.screenName);
+            user.addProperty(FIRST_NAME_KEY, src.getFirstName().toString());
+            user.addProperty(LAST_NAME_KEY, src.getLastName().toString());
+            user.addProperty(PRIMARY_EMAIL_KEY, src.getPrimaryEmail());
+            user.addProperty(ABOUT_KEY, src.getAbout().toString());
+            if (!TextUtils.isEmpty(src.getScreenName())) user.addProperty(SCREEN_NAME, src.getScreenName());
 
             if (!TextUtils.isEmpty(src.password)) user.addProperty(PASSWORD_KEY, src.password);
 

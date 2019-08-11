@@ -76,69 +76,66 @@ public class Competitor extends CompetitorEntity
         return getRefType().equals(other.getRefType());
     }
 
-    public Tournament getTournament() { return TextUtils.isEmpty(tournamentId) ? Tournament.empty() : Tournament.withId(tournamentId); }
+    public Tournament getTournament() { return TextUtils.isEmpty(getTournamentId()) ? Tournament.empty() : Tournament.withId(getTournamentId()); }
 
-    public Game getGame() { return TextUtils.isEmpty(gameId) ? Game.empty(Team.empty()) : Game.withId(gameId); }
+    public Game getGame() { return TextUtils.isEmpty(getGameId()) ? Game.empty(Team.empty()) : Game.withId(getGameId()); }
 
     public CharSequence getCompetitionName() { return competitonName; }
 
-    public boolean inOneOffGame() { return !TextUtils.isEmpty(gameId);}
+    public boolean inOneOffGame() { return !TextUtils.isEmpty(getGameId());}
 
     @Override
-    public boolean hasMajorFields() { return areNotEmpty(id, refPath) && entity.hasMajorFields(); }
+    public boolean hasMajorFields() { return areNotEmpty(getId(), getRefPath()) && getEntity().hasMajorFields(); }
 
     @Override
-    public String getRefType() { return entity.getRefType(); }
+    public String getRefType() { return getEntity().getRefType(); }
 
     @Override
-    public CharSequence getName() { return entity.getName(); }
+    public CharSequence getName() { return getEntity().getName(); }
 
     @Override
-    public Competitive makeCopy() { return entity.makeCopy(); }
+    public Competitive makeCopy() { return getEntity().makeCopy(); }
 
     @Override
     public void update(Competitor updated) {
-        this.id = updated.id;
-        this.seed = updated.seed;
-        this.accepted = updated.accepted;
-        this.declined = updated.declined;
+        this.setId(updated.getId());
+        this.setSeed(updated.getSeed());
+        this.setAccepted(updated.isAccepted());
+        this.setDeclined(updated.isDeclined());
 
-        this.tournamentId = updated.tournamentId;
-        this.gameId = updated.gameId;
+        this.setTournamentId(updated.getTournamentId());
+        this.setGameId(updated.getGameId());
 
-        updateEntity(updated.entity);
+        updateEntity(updated.getEntity());
     }
 
     public void updateEntity(Competitive updated) {
-        if (entity.update(updated)) return;
-        entity = updated.makeCopy();
+        if (getEntity().update(updated)) return;
+        setEntity(updated.makeCopy());
     }
 
     @Override
-    public boolean isEmpty() { return TextUtils.isEmpty(id); }
+    public boolean isEmpty() { return TextUtils.isEmpty(getId()); }
 
     @Override
-    public String getImageUrl() { return entity.getImageUrl(); }
-
-    @Override
-    public String getId() { return id; }
+    public String getImageUrl() { return getEntity().getImageUrl(); }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Competitor)) return id.equals(other.getId());
+        if (!(other instanceof Competitor)) return getId().equals(other.getId());
         Competitor casted = (Competitor) other;
-        return entity.getClass().equals(casted.entity.getClass())
-                && entity.getRefType().equals(casted.entity.getRefType())
-                && entity.getId().equals(casted.entity.getId());
+        return getEntity().getClass().equals(casted.getEntity().getClass())
+                && getEntity().getRefType().equals(casted.getEntity().getRefType())
+                && getEntity().getId().equals(casted.getEntity().getId());
     }
 
     @Override
     public int compareTo(@NonNull Competitor competitor) {
-        Competitive other = competitor.entity;
-        if (entity instanceof User && other instanceof User)
-            return ((User) entity).compareTo(((User) other));
-        if (entity instanceof Team && other instanceof Team)
-            return ((Team) entity).compareTo(((Team) other));
+        Competitive other = competitor.getEntity();
+        if (getEntity() instanceof User && other instanceof User)
+            return ((User) getEntity()).compareTo(((User) other));
+        if (getEntity() instanceof Team && other instanceof Team)
+            return ((Team) getEntity()).compareTo(((Team) other));
         return 0;
     }
 
@@ -172,11 +169,11 @@ public class Competitor extends CompetitorEntity
 
         @Override
         public JsonElement serialize(Competitor src, Type typeOfSrc, JsonSerializationContext context) {
-            if (src.isEmpty()) return new JsonPrimitive(src.entity.getId());
+            if (src.isEmpty()) return new JsonPrimitive(src.getEntity().getId());
 
             JsonObject json = new JsonObject();
-            json.addProperty(ACCEPTED, src.accepted);
-            json.addProperty(DECLINED, src.declined);
+            json.addProperty(ACCEPTED, src.isAccepted());
+            json.addProperty(DECLINED, src.isDeclined());
 
             return json;
         }

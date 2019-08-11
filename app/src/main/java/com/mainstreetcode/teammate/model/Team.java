@@ -24,14 +24,9 @@
 
 package com.mainstreetcode.teammate.model;
 
-import androidx.room.Ignore;
-
 import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
-
 import android.text.TextUtils;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -54,6 +49,9 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.room.Ignore;
 
 import static com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING;
 import static com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty;
@@ -96,39 +94,41 @@ public class Team extends TeamEntity
     @Override
     public List<Item<Team>> asItems() {
         return Arrays.asList(
-                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.team_name, Item.Companion.nullToEmpty(name), this::setName, this),
-                Item.Companion.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::getCode, this::setSport, this)
+                Item.Companion.text(holder.get(0), 0, Item.INPUT, R.string.team_name, Item.Companion.nullToEmpty(getName()), this::setName, this),
+                Item.Companion.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, getSport()::getCode, this::setSport, this)
                         .textTransformer(value -> Config.sportFromCode(value.toString()).getName()),
-                Item.Companion.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.Companion.nullToEmpty(screenName), this::setScreenName, this),
-                Item.Companion.text(holder.get(3), 3, Item.CITY, R.string.city, Item.Companion.nullToEmpty(city), this::setCity, this),
-                Item.Companion.text(holder.get(4), 4, Item.STATE, R.string.state, Item.Companion.nullToEmpty(state), this::setState, this),
-                Item.Companion.text(holder.get(5), 5, Item.ZIP, R.string.zip, Item.Companion.nullToEmpty(zip), this::setZip, this),
-                Item.Companion.text(holder.get(6), 6, Item.DESCRIPTION, R.string.team_description, Item.Companion.nullToEmpty(description), this::setDescription, this),
-                Item.Companion.number(holder.get(7), 7, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(minAge), this::setMinAge, this),
-                Item.Companion.number(holder.get(8), 8, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(maxAge), this::setMaxAge, this),
-                Item.Companion.text(holder.get(9), 9, Item.ABOUT, R.string.team_storage_used, () -> storageUsed + "/" + maxStorage + " MB", null, this)
+                Item.Companion.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.Companion.nullToEmpty(getScreenName()), this::setScreenName, this),
+                Item.Companion.text(holder.get(3), 3, Item.CITY, R.string.city, Item.Companion.nullToEmpty(getCity()), this::setCity, this),
+                Item.Companion.text(holder.get(4), 4, Item.STATE, R.string.state, Item.Companion.nullToEmpty(getState()), this::setState, this),
+                Item.Companion.text(holder.get(5), 5, Item.ZIP, R.string.zip, Item.Companion.nullToEmpty(getZip()), this::setZip, this),
+                Item.Companion.text(holder.get(6), 6, Item.DESCRIPTION, R.string.team_description, Item.Companion.nullToEmpty(getDescription()), this::setDescription, this),
+                Item.Companion.number(holder.get(7), 7, Item.NUMBER, R.string.team_min_age, () -> String.valueOf(getMinAge()), this::setMinAge, this),
+                Item.Companion.number(holder.get(8), 8, Item.NUMBER, R.string.team_max_age, () -> String.valueOf(getMaxAge()), this::setMaxAge, this),
+                Item.Companion.text(holder.get(9), 9, Item.ABOUT, R.string.team_storage_used, () -> getStorageUsed() + "/" + getMaxStorage() + " MB", null, this)
         );
     }
 
     @Override
     public Item<Team> getHeaderItem() {
-        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(imageUrl), this::setImageUrl, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.Companion.nullToEmpty(getImageUrl()), this::setImageUrl, this);
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Team)) return id.equals(other.getId());
+        if (!(other instanceof Team)) return getId().equals(other.getId());
         Team casted = (Team) other;
-        boolean same = name.equals(casted.name) && city.equals(casted.getCity())
-                && imageUrl.equals(casted.getImageUrl());
+        boolean same = getName().equals(casted.getName()) && getCity().equals(casted.getCity())
+                && getImageUrl().equals(casted.getImageUrl());
 
-        return same && (sport == null || sport.equals(casted.sport));
+        if (!same) return false;
+        getSport();
+        return getSport().equals(casted.getSport());
     }
 
     @Override
     public String getRefType() { return COMPETITOR_TYPE; }
 
-    public String getImageUrl() { return TextUtils.isEmpty(imageUrl) ? Config.getDefaultTeamLogo() : imageUrl; }
+    public String getImageUrl() { return TextUtils.isEmpty(super.getImageUrl()) ? Config.getDefaultTeamLogo() : super.getImageUrl(); }
 
     @Override
     public Object getChangePayload(Differentiable other) {
@@ -147,20 +147,20 @@ public class Team extends TeamEntity
 
     @Override
     public void update(Team updatedTeam) {
-        this.id = updatedTeam.id;
-        this.name = updatedTeam.name;
-        this.screenName = updatedTeam.screenName;
-        this.city = updatedTeam.city;
-        this.state = updatedTeam.state;
-        this.zip = updatedTeam.zip;
-        this.description = updatedTeam.description;
-        this.minAge = updatedTeam.minAge;
-        this.maxAge = updatedTeam.maxAge;
-        this.imageUrl = updatedTeam.imageUrl;
-        this.storageUsed = updatedTeam.storageUsed;
+        this.setId(updatedTeam.getId());
+        this.setName(updatedTeam.getName());
+        this.setScreenName(updatedTeam.getScreenName());
+        this.setCity(updatedTeam.getCity());
+        this.setState(updatedTeam.getState());
+        this.setZip(updatedTeam.getZip());
+        this.setDescription(updatedTeam.getDescription());
+        this.setMinAge(updatedTeam.getMinAge());
+        this.setMaxAge(updatedTeam.getMaxAge());
+        this.setImageUrl(updatedTeam.getImageUrl());
+        this.setStorageUsed(updatedTeam.getStorageUsed());
 
-        this.location = updatedTeam.location;
-        this.sport.update(updatedTeam.sport);
+        this.setLocation(updatedTeam.getLocation());
+        this.getSport().update(updatedTeam.getSport());
     }
 
     @Override
@@ -179,26 +179,30 @@ public class Team extends TeamEntity
 
     @Override
     public int compareTo(@NonNull Team o) {
-        int nameComparision = name.toString().compareTo(o.name.toString());
-        return nameComparision != 0 ? nameComparision : id.compareTo(o.id);
+        int nameComparision = getName().toString().compareTo(o.getName().toString());
+        return nameComparision != 0 ? nameComparision : getId().compareTo(o.getId());
     }
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id, name, city, state);
+        return areNotEmpty(getId(), getName(), getCity(), getState());
     }
 
     public void setAddress(Address address) {
-        city = address.getLocality();
+        String city = address.getLocality();
+        String state = address.getAdminArea();
+        String zip = address.getPostalCode();
+
         if (city == null) city = address.getSubLocality();
-
-        state = address.getAdminArea();
-        zip = address.getPostalCode();
-
         if (city == null) city = "N/A";
         if (state == null) state = "N/A";
+        if (zip == null) zip = "N/A";
 
-        location = new LatLng(address.getLatitude(), address.getLongitude());
+        setCity(city);
+        setState(state);
+        setZip(zip);
+
+        setLocation(new LatLng(address.getLatitude(), address.getLongitude()));
     }
 
     @Override
@@ -273,22 +277,24 @@ public class Team extends TeamEntity
         @Override
         public JsonElement serialize(Team src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject team = new JsonObject();
-            team.addProperty(NAME_KEY, src.name.toString());
-            team.addProperty(CITY_KEY, src.city);
-            team.addProperty(STATE_KEY, src.state);
-            team.addProperty(ZIP_KEY, src.zip);
-            team.addProperty(DESCRIPTION_KEY, src.description.toString());
-            team.addProperty(MIN_AGE_KEY, src.minAge);
-            team.addProperty(MAX_AGE_KEY, src.maxAge);
-            if (!TextUtils.isEmpty(src.screenName)) team.addProperty(SCREEN_NAME, src.screenName);
+            team.addProperty(NAME_KEY, src.getName().toString());
+            team.addProperty(CITY_KEY, src.getCity());
+            team.addProperty(STATE_KEY, src.getState());
+            team.addProperty(ZIP_KEY, src.getZip());
+            team.addProperty(DESCRIPTION_KEY, src.getDescription().toString());
+            team.addProperty(MIN_AGE_KEY, src.getMinAge());
+            team.addProperty(MAX_AGE_KEY, src.getMaxAge());
 
-            String sportCode = src.sport != null ? src.sport.getCode() : "";
+            if (!TextUtils.isEmpty(src.getScreenName()))
+                team.addProperty(SCREEN_NAME, src.getScreenName());
+
+            String sportCode = src.getSport().getCode();
             if (!TextUtils.isEmpty(sportCode)) team.addProperty(SPORT_KEY, sportCode);
 
-            if (src.location != null) {
+            if (src.getLocation() != null) {
                 JsonArray coordinates = new JsonArray();
-                coordinates.add(src.location.longitude);
-                coordinates.add(src.location.latitude);
+                coordinates.add(src.getLocation().longitude);
+                coordinates.add(src.getLocation().latitude);
                 team.add(LOCATION_KEY, coordinates);
             }
 

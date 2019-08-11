@@ -213,10 +213,10 @@ class ChatNotifier internal constructor() : Notifier<Chat>() {
             when (action ?: "") {
                 ACTION_REPLY -> {
                     val remoteInput = RemoteInput.getResultsFromIntent(intent) ?: return
-
+                    val message = remoteInput.getCharSequence(KEY_TEXT_REPLY) ?: return
                     val received = intent.getParcelableExtra<FeedItem<Chat>>(EXTRA_FEED_ITEM)
-                    val message = remoteInput.getCharSequence(KEY_TEXT_REPLY)
-                    val toSend = Chat.chat(message, RepoProvider.forRepo(UserRepo::class.java).currentUser, received!!.model.team)
+                            ?: return
+                    val toSend = Chat.chat(message, RepoProvider.forRepo(UserRepo::class.java).currentUser, received.model.team)
 
                     repository.createOrUpdate(toSend)
                             .subscribe({ notifier.aggregateConversations(received, toSend) }, ErrorHandler.EMPTY::accept)

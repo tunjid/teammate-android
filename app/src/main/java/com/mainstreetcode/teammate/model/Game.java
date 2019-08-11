@@ -82,7 +82,7 @@ public class Game extends GameEntity
 
     public static Game withId(String id) {
         Game empty = empty(Team.empty());
-        empty.id = id;
+        empty.setId(id);
         return empty;
     }
 
@@ -94,10 +94,10 @@ public class Game extends GameEntity
     public List<Item<Game>> asItems() {
         return Arrays.asList(
                 Item.Companion.text(holder.get(0), 0, Item.NUMBER, R.string.game_competitors, this::getName, ignored -> {}, this),
-                Item.Companion.number(holder.get(1), 1, Item.INPUT, R.string.game_home_score, () -> String.valueOf(homeScore), this::setHomeScore, this),
-                Item.Companion.number(holder.get(2), 2, Item.INPUT, R.string.game_away_score, () -> String.valueOf(awayScore), this::setAwayScore, this),
-                Item.Companion.number(holder.get(3), 3, Item.NUMBER, R.string.game_round, () -> String.valueOf(round), ignored -> {}, this),
-                Item.Companion.number(holder.get(4), 4, Item.NUMBER, R.string.game_leg, () -> String.valueOf(leg), ignored -> {}, this)
+                Item.Companion.number(holder.get(1), 1, Item.INPUT, R.string.game_home_score, () -> String.valueOf(getHomeScore()), this::setHomeScore, this),
+                Item.Companion.number(holder.get(2), 2, Item.INPUT, R.string.game_away_score, () -> String.valueOf(getAwayScore()), this::setAwayScore, this),
+                Item.Companion.number(holder.get(3), 3, Item.NUMBER, R.string.game_round, () -> String.valueOf(getRound()), ignored -> {}, this),
+                Item.Companion.number(holder.get(4), 4, Item.NUMBER, R.string.game_leg, () -> String.valueOf(getLeg()), ignored -> {}, this)
         );
     }
 
@@ -108,16 +108,16 @@ public class Game extends GameEntity
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Game)) return id.equals(other.getId());
+        if (!(other instanceof Game)) return getId().equals(other.getId());
         Game casted = (Game) other;
-        return score.equals(casted.score)
-                && home.areContentsTheSame(casted.home)
-                && away.areContentsTheSame(casted.away);
+        return getScore().equals(casted.getScore())
+                && getHome().areContentsTheSame(casted.getHome())
+                && getAway().areContentsTheSame(casted.getAway());
     }
 
     @Override
     public boolean hasMajorFields() {
-        return areNotEmpty(id, refPath, score) && home.hasMajorFields() && away.hasMajorFields();
+        return areNotEmpty(getId(), getRefPath(), getScore()) && getHome().hasMajorFields() && getAway().hasMajorFields();
     }
 
     @Override
@@ -127,53 +127,53 @@ public class Game extends GameEntity
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
     @Override
-    public Team getTeam() { return host; }
+    public Team getTeam() { return getHost(); }
 
     @Override
     @SuppressWarnings("unchecked")
     public void update(Game updatedGame) {
-        this.id = updatedGame.id;
-        this.score = updatedGame.score;
-        this.matchUp = updatedGame.matchUp;
-        this.created = updatedGame.created;
-        this.leg = updatedGame.leg;
-        this.seed = updatedGame.seed;
-        this.round = updatedGame.round;
-        this.homeScore = updatedGame.homeScore;
-        this.awayScore = updatedGame.awayScore;
-        this.ended = updatedGame.ended;
-        this.canDraw = updatedGame.canDraw;
-        this.sport.update(updatedGame.sport);
-        this.homeEntityId = updatedGame.homeEntityId;
-        this.awayEntityId = updatedGame.awayEntityId;
-        this.winnerEntityId = updatedGame.winnerEntityId;
-        if (updatedGame.referee.hasMajorFields())
-            this.referee.update(updatedGame.referee);
-        if (updatedGame.host.hasMajorFields())
-            this.host.update(updatedGame.host);
-        if (updatedGame.tournament.hasMajorFields())
-            this.tournament.update(updatedGame.tournament);
-        if (updatedGame.home.hasMajorFields() && this.home.hasSameType(updatedGame.home))
-            this.home.update(updatedGame.home);
-        else this.home = updatedGame.home;
-        if (updatedGame.away.hasMajorFields() && this.away.hasSameType(updatedGame.away))
-            this.away.update(updatedGame.away);
-        else this.away = updatedGame.away;
-        if (updatedGame.winner.hasMajorFields() && this.winner.hasSameType(updatedGame.winner))
-            this.winner.update(updatedGame.winner);
-        else this.winner = updatedGame.winner;
-        if (updatedGame.event.hasMajorFields()) this.event.update(updatedGame.event);
+        this.setId(updatedGame.getId());
+        this.setScore(updatedGame.getScore());
+        this.setMatchUp(updatedGame.getMatchUp());
+        this.setCreated(updatedGame.getCreated());
+        this.setLeg(updatedGame.getLeg());
+        this.setSeed(updatedGame.getSeed());
+        this.setRound(updatedGame.getRound());
+        this.setHomeScore(updatedGame.getHomeScore());
+        this.setAwayScore(updatedGame.getAwayScore());
+        this.setEnded(updatedGame.isEnded());
+        this.setCanDraw(updatedGame.getCanDraw());
+        this.getSport().update(updatedGame.getSport());
+        this.setHomeEntityId(updatedGame.getHomeEntityId());
+        this.setAwayEntityId(updatedGame.getAwayEntityId());
+        this.setWinnerEntityId(updatedGame.getWinnerEntityId());
+        if (updatedGame.getReferee().hasMajorFields())
+            this.getReferee().update(updatedGame.getReferee());
+        if (updatedGame.getHost().hasMajorFields())
+            this.getHost().update(updatedGame.getHost());
+        if (updatedGame.getTournament().hasMajorFields())
+            this.getTournament().update(updatedGame.getTournament());
+        if (updatedGame.getHome().hasMajorFields() && this.getHome().hasSameType(updatedGame.getHome()))
+            this.getHome().update(updatedGame.getHome());
+        else this.setHome(updatedGame.getHome());
+        if (updatedGame.getAway().hasMajorFields() && this.getAway().hasSameType(updatedGame.getAway()))
+            this.getAway().update(updatedGame.getAway());
+        else this.setAway(updatedGame.getAway());
+        if (updatedGame.getWinner().hasMajorFields() && this.getWinner().hasSameType(updatedGame.getWinner()))
+            this.getWinner().update(updatedGame.getWinner());
+        else this.setWinner(updatedGame.getWinner());
+        if (updatedGame.getEvent().hasMajorFields()) this.getEvent().update(updatedGame.getEvent());
     }
 
     @Override
     public int compareTo(@NonNull Game o) {
-        int createdComparison = created.compareTo(o.created);
+        int createdComparison = getCreated().compareTo(o.getCreated());
 
-        return createdComparison != 0 ? createdComparison : id.compareTo(o.id);
+        return createdComparison != 0 ? createdComparison : getId().compareTo(o.getId());
     }
 
     @Override
@@ -226,13 +226,13 @@ public class Game extends GameEntity
         @Override
         public JsonElement serialize(Game src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject body = new JsonObject();
-            body.addProperty(ENDED, src.ended);
-            body.addProperty(REF_PATH, src.refPath);
-            body.addProperty(HOME_SCORE, src.homeScore);
-            body.addProperty(AWAY_SCORE, src.awayScore);
-            body.addProperty(HOME, src.home.getEntity().getId());
-            body.addProperty(AWAY, src.away.getEntity().getId());
-            body.addProperty(REFEREE, src.referee.isEmpty() ? null : src.referee.getId());
+            body.addProperty(ENDED, src.isEnded());
+            body.addProperty(REF_PATH, src.getRefPath());
+            body.addProperty(HOME_SCORE, src.getHomeScore());
+            body.addProperty(AWAY_SCORE, src.getAwayScore());
+            body.addProperty(HOME, src.getHome().getEntity().getId());
+            body.addProperty(AWAY, src.getAway().getEntity().getId());
+            body.addProperty(REFEREE, src.getReferee().isEmpty() ? null : src.getReferee().getId());
             return body;
         }
 

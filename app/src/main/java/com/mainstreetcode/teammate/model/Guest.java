@@ -74,7 +74,7 @@ public class Guest extends GuestEntity
 
     @Override
     public Item<Guest> getHeaderItem() {
-        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::getImageUrl, imageUrl -> {}, this);
+        return Item.Companion.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, getUser()::getImageUrl, imageUrl -> {}, this);
     }
 
     @Override
@@ -89,24 +89,24 @@ public class Guest extends GuestEntity
 
     @Override
     public boolean isEmpty() {
-        return TextUtils.isEmpty(id);
+        return TextUtils.isEmpty(getId());
     }
 
     @Override
     public boolean hasMajorFields() {
-        return user.hasMajorFields();
+        return getUser().hasMajorFields();
     }
 
     @Override
     public Team getTeam() {
-        return event.getTeam();
+        return getEvent().getTeam();
     }
 
     @Override
     public boolean areContentsTheSame(Differentiable other) {
-        if (!(other instanceof Guest)) return id.equals(other.getId());
+        if (!(other instanceof Guest)) return getId().equals(other.getId());
         Guest casted = (Guest) other;
-        return attending == casted.attending;
+        return isAttending() == casted.isAttending();
     }
 
     @Override
@@ -116,20 +116,20 @@ public class Guest extends GuestEntity
 
     @Override
     public void update(Guest updated) {
-        id = updated.id;
-        attending = updated.attending;
-        created = updated.created;
-        if (updated.user.hasMajorFields()) user.update(updated.user);
+        setId(updated.getId());
+        setAttending(updated.isAttending());
+        setCreated(updated.getCreated());
+        if (updated.getUser().hasMajorFields()) getUser().update(updated.getUser());
     }
 
     @Override
     public int compareTo(@NonNull Guest o) {
-        return created.compareTo(o.created);
+        return getCreated().compareTo(o.getCreated());
     }
 
     @Override
     public String getImageUrl() {
-        return user.getImageUrl();
+        return getUser().getImageUrl();
     }
 
     public static final Creator<Guest> CREATOR = new Creator<Guest>() {
@@ -174,8 +174,8 @@ public class Guest extends GuestEntity
         @Override
         public JsonElement serialize(Guest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject guest = new JsonObject();
-            guest.addProperty(USER_KEY, src.user.getId());
-            guest.addProperty(EVENT_KEY, src.event.getId());
+            guest.addProperty(USER_KEY, src.getUser().getId());
+            guest.addProperty(EVENT_KEY, src.getEvent().getId());
             guest.addProperty(ATTENDING_KEY, src.isAttending());
 
             return guest;

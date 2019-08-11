@@ -24,25 +24,23 @@
 
 package com.mainstreetcode.teammate.persistence
 
-import com.mainstreetcode.teammate.model.Chat
-import com.mainstreetcode.teammate.model.Event
-
-import java.util.Date
-
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.mainstreetcode.teammate.model.Chat
+import com.mainstreetcode.teammate.persistence.entity.ChatEntity
 import io.reactivex.Maybe
+import java.util.*
 
 /**
- * DAO for [Event]
+ * DAO for [Chat]
  */
 
 @Dao
-abstract class ChatDao : EntityDao<Chat>() {
+abstract class ChatDao : EntityDao<ChatEntity>() {
 
     override val tableName: String
         get() = "team_chats"
@@ -65,11 +63,11 @@ abstract class ChatDao : EntityDao<Chat>() {
     abstract operator fun get(id: String): Maybe<Chat>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract override fun insert(models: List<Chat>)
+    abstract override fun insert(models: List<ChatEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    abstract override fun update(models: List<Chat>)
+    abstract override fun update(models: List<ChatEntity>)
 
     @Delete
-    abstract override fun delete(model: Chat)
+    abstract override fun delete(model: ChatEntity)
 }

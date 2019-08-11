@@ -33,6 +33,7 @@ import androidx.room.Update
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.persistence.entity.MediaEntity
 import io.reactivex.Maybe
 import java.util.*
 
@@ -41,19 +42,19 @@ import java.util.*
  */
 
 @Dao
-abstract class MediaDao : EntityDao<Media>() {
+abstract class MediaDao : EntityDao<MediaEntity>() {
 
     override val tableName: String
         get() = "team_media"
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract override fun insert(models: List<Media>)
+    abstract override fun insert(models: List<MediaEntity>)
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
-    abstract override fun update(models: List<Media>)
+    abstract override fun update(models: List<MediaEntity>)
 
     @Delete
-    abstract override fun delete(models: List<Media>)
+    abstract override fun delete(models: List<MediaEntity>)
 
     @Query("SELECT *" +
             " FROM team_media" +

@@ -142,7 +142,7 @@ class EventViewModel : TeamMappedViewModel<Event>() {
 
     fun onEventTeamChanged(event: Event, newTeam: Team) {
         getModelList(event.team).remove(event)
-        event.team = newTeam
+        event.updateTeam(newTeam)
     }
 
     private fun fromMap(map: GoogleMap): EventSearchRequest {

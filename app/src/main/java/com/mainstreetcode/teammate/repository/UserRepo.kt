@@ -55,15 +55,15 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     var currentUser: User = User.empty()
         private set
 
-    private val userId: String?
+    private val userId: String
         get() = app.getSharedPreferences(PREFS, MODE_PRIVATE)
-                .getString(USER_ID, "")
+                .getString(USER_ID, "") ?: ""
 
     val me: Flowable<User>
         get() {
             val userId = userId
             return when {
-                userId.isNullOrBlank() -> Flowable.error(TeammateException("No signed in user"))
+                userId.isBlank() -> Flowable.error(TeammateException("No signed in user"))
                 else -> get(userId).map(getLocalUpdateFunction(currentUser))
             }
         }
@@ -72,7 +72,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
         get() = !TextUtils.isEmpty(userId)
 
     init {
-        currentUser.setId(userId)
+        currentUser.id = userId
     }
 
     override fun dao(): EntityDao<in User> = userDao
@@ -96,7 +96,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     }
 
     override fun get(id: String): Flowable<User> {
-        var local = userDao.get(id).subscribeOn(io())
+        var local = userDao[id].subscribeOn(io())
         var remote = api.me.map(saveFunction)
 
         if (id == currentUser.id) {
@@ -165,7 +165,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
 
     private fun clearUser(): Single<Boolean> {
         val userId = userId
-        if (userId.isNullOrBlank()) return just(false)
+        if (userId.isBlank()) return just(false)
 
         app.getSharedPreferences(PREFS, MODE_PRIVATE)
                 .edit()

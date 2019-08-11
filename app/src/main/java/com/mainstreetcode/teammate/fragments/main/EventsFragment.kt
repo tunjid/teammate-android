@@ -134,8 +134,7 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> {
-                val event = Event.empty()
-                event.team = teamViewModel.defaultTeam
+                val event = Event.empty().apply { updateTeam(teamViewModel.defaultTeam) }
                 showFragment(EventEditFragment.newInstance(event))
             }
         }
