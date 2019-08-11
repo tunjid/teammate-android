@@ -22,9 +22,8 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model.enums;
+package com.mainstreetcode.teammate.model.enums
 
-import java.util.ArrayList;
+import java.util.ArrayList
 
-public class StatAttributes extends ArrayList<StatAttribute> {
-}
+class StatAttributes : ArrayList<StatAttribute>()

@@ -72,7 +72,7 @@ public class EventSearchRequest implements ListableModel<EventSearchRequest> {
     }
 
     public static EventSearchRequest empty() {
-        return new EventSearchRequest(5, Sport.empty(), null, new Date(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)));
+        return new EventSearchRequest(5, Sport.Companion.empty(), null, new Date(), new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)));
     }
 
     public void setAddress(Address address) {

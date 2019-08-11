@@ -241,7 +241,7 @@ public class Tournament extends TournamentEntity
         public Tournament deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
                 return new Tournament(json.getAsString(), "", "", "", "", new Date(), Team.empty(),
-                        Sport.empty(), TournamentType.empty(), TournamentStyle.empty(), Competitor.empty(),
+                        Sport.Companion.empty(), TournamentType.Companion.empty(), TournamentStyle.Companion.empty(), Competitor.empty(),
                         1, 1, 0, 0, false);
             }
 

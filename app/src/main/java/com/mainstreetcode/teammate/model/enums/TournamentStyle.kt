@@ -22,15 +22,34 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model.enums;
+package com.mainstreetcode.teammate.model.enums
 
-import java.util.ArrayList;
+import android.os.Build
 
-public class StatTypes extends ArrayList<StatType> {
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonObject
 
-    public StatType fromCodeOrFirst(String code) {
-        if (isEmpty()) return StatType.empty();
-        for (StatType type : this) if (type.getCode().equals(code)) return type;
-        return get(0);
+import java.util.Objects
+
+class TournamentStyle internal constructor(code: String, name: String) : MetaData(code, name) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TournamentStyle) return false
+        val variant = other as TournamentStyle?
+        return code == variant!!.code && name == variant.name
+    }
+
+    override fun hashCode(): Int = Objects.hash(code, name)
+
+    class GsonAdapter : MetaData.GsonAdapter<TournamentStyle>() {
+        override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): TournamentStyle =
+                TournamentStyle(code, name)
+    }
+
+    companion object {
+
+        fun empty(): TournamentStyle =
+                TournamentStyle(Build.VERSION.SDK_INT.toString(), Build.MODEL)
     }
 }

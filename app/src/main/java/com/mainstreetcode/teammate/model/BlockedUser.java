@@ -186,7 +186,7 @@ public class BlockedUser implements UserHost,
         @Override
         public BlockedUser deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new BlockedUser(json.getAsString(), User.empty(), Team.empty(), BlockReason.empty(), new Date());
+                return new BlockedUser(json.getAsString(), User.empty(), Team.empty(), BlockReason.Companion.empty(), new Date());
             }
 
             JsonObject jsonObject = json.getAsJsonObject();

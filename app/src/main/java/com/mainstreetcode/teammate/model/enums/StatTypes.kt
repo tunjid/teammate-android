@@ -22,30 +22,15 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model.enums;
+package com.mainstreetcode.teammate.model.enums
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import java.util.ArrayList
 
-public class Visibility extends MetaData {
+class StatTypes : ArrayList<StatType>() {
 
-    private static final String PUBLIC = "public";
-    private static final String PRIVATE = "private";
-
-    Visibility(String code, String name) {
-        super(code, name);
-    }
-
-    public static Visibility empty() {
-        return new Visibility(PRIVATE, "Private");
-    }
-
-    public boolean isPublic() {return PUBLIC.equals(getCode());}
-
-    public static class GsonAdapter extends MetaData.GsonAdapter<Visibility> {
-        @Override
-        Visibility fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
-            return new Visibility(code, name);
-        }
+    fun fromCodeOrFirst(code: String): StatType {
+        if (isEmpty()) return StatType.empty()
+        for (type in this) if (type.code == code) return type
+        return get(0)
     }
 }

@@ -22,25 +22,38 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model.enums;
+package com.mainstreetcode.teammate.model.enums
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import android.os.Build
 
-public class BlockReason extends MetaData {
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonObject
 
-    BlockReason(String code, String name) {
-        super(code, name);
+import java.util.Objects
+
+class AndroidVariant internal constructor(code: String, name: String) : MetaData(code, name) {
+
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o !is AndroidVariant) return false
+        val variant = o as AndroidVariant?
+        return code == variant!!.code && name == variant.name
     }
 
-    public static BlockReason empty() {
-        return new BlockReason("", "");
+    override fun hashCode(): Int {
+        return Objects.hash(code, name)
     }
 
-    public static class GsonAdapter extends MetaData.GsonAdapter<BlockReason> {
-        @Override
-        BlockReason fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
-            return new BlockReason(code, name);
+    class GsonAdapter : MetaData.GsonAdapter<AndroidVariant>() {
+        internal override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): AndroidVariant {
+            return AndroidVariant(code, name)
+        }
+    }
+
+    companion object {
+
+        fun empty(): AndroidVariant {
+            return AndroidVariant(Build.VERSION.SDK_INT.toString(), Build.MODEL)
         }
     }
 }

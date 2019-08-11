@@ -78,7 +78,7 @@ public class Event extends EventEntity
 
     public static Event empty() {
         Date date = new Date();
-        return new Event("", "", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
+        return new Event("", "", Config.getDefaultEventLogo(), "", "", "", date, date, Team.empty(), null, Visibility.Companion.empty(), DEFAULT_NUM_SPOTS);
     }
 
     public Event(String id, String gameId, String imageUrl, CharSequence name, CharSequence notes, CharSequence locationName,
@@ -251,7 +251,7 @@ public class Event extends EventEntity
         @Override
         public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
-                return new Event(json.getAsString(), "", "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.empty(), DEFAULT_NUM_SPOTS);
+                return new Event(json.getAsString(), "", "", "", "", "", new Date(), new Date(), Team.empty(), null, Visibility.Companion.empty(), DEFAULT_NUM_SPOTS);
             }
 
             JsonObject eventJson = json.getAsJsonObject();

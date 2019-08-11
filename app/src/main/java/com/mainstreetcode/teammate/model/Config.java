@@ -127,36 +127,36 @@ public class Config implements Model<Config> {
     }
 
     public static boolean isStaticVariant() {
-        return getList(config -> config.staticVariants).contains(AndroidVariant.empty());
+        return getList(config -> config.staticVariants).contains(AndroidVariant.Companion.empty());
     }
 
     public static Sport sportFromCode(String code) {
-        return getFromCode(code, config -> config.sports, Sport.empty());
+        return getFromCode(code, config -> config.sports, Sport.Companion.empty());
     }
 
     public static Position positionFromCode(String code) {
-        return getFromCode(code, config -> config.positions, Position.empty());
+        return getFromCode(code, config -> config.positions, Position.Companion.empty());
     }
 
     public static Visibility visibilityFromCode(String code) {
-        return getFromCode(code, config -> config.visibilities, Visibility.empty());
+        return getFromCode(code, config -> config.visibilities, Visibility.Companion.empty());
     }
 
     @SuppressWarnings("WeakerAccess")
     public static BlockReason reasonFromCode(String code) {
-        return getFromCode(code, config -> config.blockReasons, BlockReason.empty());
+        return getFromCode(code, config -> config.blockReasons, BlockReason.Companion.empty());
     }
 
     public static StatType statTypeFromCode(String code) {
-        return getFromCode(code, config -> config.statTypes, StatType.empty());
+        return getFromCode(code, config -> config.statTypes, StatType.Companion.empty());
     }
 
     public static TournamentType tournamentTypeFromCode(String code) {
-        return getFromCode(code, config -> config.tournamentTypes, TournamentType.empty());
+        return getFromCode(code, config -> config.tournamentTypes, TournamentType.Companion.empty());
     }
 
     public static TournamentStyle tournamentStyleFromCode(String code) {
-        return getFromCode(code, config -> config.tournamentStyles, TournamentStyle.empty());
+        return getFromCode(code, config -> config.tournamentStyles, TournamentStyle.Companion.empty());
     }
 
     private static Config getCurrentConfig() {

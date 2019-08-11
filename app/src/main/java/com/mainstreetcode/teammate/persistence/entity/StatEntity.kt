@@ -119,7 +119,7 @@ open class StatEntity : Parcelable {
         team = `in`.readValue(Team::class.java.classLoader) as Team
         game = `in`.readValue(Game::class.java.classLoader) as Game
         sport = Config.sportFromCode(`in`.readString())
-        statType = sport.statTypeFromCode(`in`.readString())
+        statType = sport.statTypeFromCode(`in`.readString()!!)
         value = `in`.readInt()
         time = `in`.readFloat()
         this.attributes = StatAttributes()

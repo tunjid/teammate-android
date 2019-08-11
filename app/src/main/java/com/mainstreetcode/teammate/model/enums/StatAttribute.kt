@@ -22,41 +22,33 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model.enums;
+package com.mainstreetcode.teammate.model.enums
 
-import android.os.Build;
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonObject
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import java.util.Objects
 
-import java.util.Objects;
+class StatAttribute internal constructor(code: String, name: String) : MetaData(code, name) {
 
-public class AndroidVariant extends MetaData {
+    override fun toString(): String = code
 
-    AndroidVariant(String code, String name) {
-        super(code, name);
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is StatAttribute) return false
+        val variant = other as StatAttribute?
+        return code == variant!!.code && name == variant.name
     }
 
-    public static AndroidVariant empty() {
-        return new AndroidVariant(String.valueOf(Build.VERSION.SDK_INT), Build.MODEL);
+    override fun hashCode(): Int = Objects.hash(code, name)
+
+    class GsonAdapter : MetaData.GsonAdapter<StatAttribute>() {
+        override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): StatAttribute =
+                StatAttribute(code, name)
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AndroidVariant)) return false;
-        AndroidVariant variant = (AndroidVariant) o;
-        return Objects.equals(code, variant.code) && Objects.equals(name, variant.name);    }
+    companion object {
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(code, name);
-    }
-
-    public static class GsonAdapter extends MetaData.GsonAdapter<AndroidVariant> {
-        @Override
-        AndroidVariant fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
-            return new AndroidVariant(code, name);
-        }
+        fun empty(): StatAttribute = StatAttribute("", "")
     }
 }

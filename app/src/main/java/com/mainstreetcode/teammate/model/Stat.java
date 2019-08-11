@@ -197,7 +197,7 @@ public class Stat extends StatEntity
         @Override
         public Stat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) return new Stat(
-                    json.getAsString(), new Date(), StatType.empty(), Sport.empty(), User.empty(),
+                    json.getAsString(), new Date(), StatType.Companion.empty(), Sport.Companion.empty(), User.empty(),
                     Team.empty(), Game.empty(Team.empty()), new StatAttributes(), 0, 0);
 
             JsonObject body = json.getAsJsonObject();

@@ -22,41 +22,26 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model.enums;
+package com.mainstreetcode.teammate.model.enums
 
-import android.os.Build;
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonObject
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+class Visibility internal constructor(code: String, name: String) : MetaData(code, name) {
 
-import java.util.Objects;
+    val isPublic: Boolean
+        get() = PUBLIC == code
 
-public class TournamentStyle extends MetaData {
-
-    TournamentStyle(String code, String name) {
-        super(code, name);
+    class GsonAdapter : MetaData.GsonAdapter<Visibility>() {
+        override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): Visibility =
+                Visibility(code, name)
     }
 
-    public static TournamentStyle empty() {
-        return new TournamentStyle(String.valueOf(Build.VERSION.SDK_INT), Build.MODEL);
-    }
+    companion object {
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TournamentStyle)) return false;
-        TournamentStyle variant = (TournamentStyle) o;
-        return Objects.equals(code, variant.code) && Objects.equals(name, variant.name);    }
+        private const val PUBLIC = "public"
+        private const val PRIVATE = "private"
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(code, name);
-    }
-
-    public static class GsonAdapter extends MetaData.GsonAdapter<TournamentStyle> {
-        @Override
-        TournamentStyle fromJson(String code, String name, JsonObject body, JsonDeserializationContext context) {
-            return new TournamentStyle(code, name);
-        }
+        fun empty(): Visibility = Visibility(PRIVATE, "Private")
     }
 }

@@ -240,7 +240,7 @@ public class Game extends GameEntity
         public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive()) {
                 return new Game(json.getAsString(), "", "", "TBD", "", "", "", "",
-                        new Date(), Sport.empty(), User.empty(), Team.empty(), Event.empty(), Tournament.empty(Team.empty()),
+                        new Date(), Sport.Companion.empty(), User.empty(), Team.empty(), Event.empty(), Tournament.empty(Team.empty()),
                         Competitor.empty(), Competitor.empty(), Competitor.empty(),
                         0, 0, 0, 0, 0, false, false);
             }

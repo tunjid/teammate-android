@@ -78,7 +78,7 @@ public class Role extends RoleEntity
     }
 
     public static Role empty() {
-        return new Role("", Config.getDefaultUserAvatar(), "", Position.empty(), Team.empty(), User.empty(), new Date());
+        return new Role("", Config.getDefaultUserAvatar(), "", Position.Companion.empty(), Team.empty(), User.empty(), new Date());
     }
 
     @Override
