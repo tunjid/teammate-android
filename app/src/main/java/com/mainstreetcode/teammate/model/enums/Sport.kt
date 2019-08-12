@@ -101,9 +101,9 @@ class Sport private constructor(
             val emoji = body.asStringOrEmpty(EMOJI)
 
             val sport = Sport(code, name, emoji)
-            deserializeList(context, body.get(STAT_TYPES), sport.stats, StatType::class.java)
-            deserializeList(context, body.get(TOURNAMENT_TYPES), sport.tournamentTypes, String::class.java)
-            deserializeList(context, body.get(TOURNAMENT_STYLES), sport.tournamentStyles, String::class.java)
+            context.deserializeList(body.get(STAT_TYPES), sport.stats, StatType::class.java)
+            context.deserializeList(body.get(TOURNAMENT_TYPES), sport.tournamentTypes, String::class.java)
+            context.deserializeList(body.get(TOURNAMENT_STYLES), sport.tournamentStyles, String::class.java)
 
             return sport
         }

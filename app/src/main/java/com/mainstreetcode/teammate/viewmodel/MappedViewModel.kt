@@ -68,14 +68,14 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             if (fetchLatest) getLatest(key) else getMore(key)
 
     fun getMore(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, false).map(List<Differentiable>::asDifferentiables),
+            fetch(key, false).map( ::asDifferentiables),
             getModelList(key),
             this::preserveList
     )
             .doOnError { throwable -> checkForInvalidKey(throwable, key) }
 
     fun refresh(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, true).map(List<Differentiable>::asDifferentiables),
+            fetch(key, true).map( ::asDifferentiables),
             getModelList(key),
             this::pullToRefresh
     )
@@ -83,7 +83,7 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             .doOnTerminate { pullToRefreshCount.set(0) }
 
     private fun getLatest(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, true).map(List<Differentiable>::asDifferentiables),
+            fetch(key, true).map( ::asDifferentiables),
             getModelList(key),
             this::preserveList
     )

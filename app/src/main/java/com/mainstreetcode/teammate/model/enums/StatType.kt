@@ -82,7 +82,7 @@ class StatType private constructor(
             val sportCode = body.asStringOrEmpty(SPORT)
 
             val type = StatType(code, name, emoji, sportCode)
-            deserializeList(context, body.get(ATTRIBUTES), type.attributes, StatAttribute::class.java)
+            context.deserializeList(body.get(ATTRIBUTES), type.attributes, StatAttribute::class.java)
             return type
         }
 

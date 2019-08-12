@@ -160,7 +160,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_end_game -> {
-                endGameRequest().yes
+                yes
             }
             R.id.action_event -> {
                 showFragment(EventEditFragment.newInstance(game))

@@ -82,7 +82,7 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
                 .cast(FeedItem::class.java)
                 .map { listOf(it) }
                 .toFlowable()
-                .map(List<Differentiable>::asDifferentiables)
+                .map(::asDifferentiables)
 
         return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(false)).firstOrError()
     }
@@ -96,7 +96,7 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
                 .map { feedItem }
                 .cast(FeedItem::class.java)
                 .map { listOf(it) }
-                .toFlowable().map(List<Differentiable>::asDifferentiables)
+                .toFlowable().map(::asDifferentiables)
 
         return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(false)).firstOrError()
     }
@@ -118,7 +118,7 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
         val sourceFlowable = checkForInvalidObject(sourceSingle, FeedItem::class.java, feedItem)
                 .map { feedItem }
                 .map { listOf(it) }
-                .map(List<Differentiable>::asDifferentiables)
+                .map(::asDifferentiables)
 
         return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(leaveUnchanged))
     }

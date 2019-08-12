@@ -69,7 +69,7 @@ class Standings private constructor(private var id: String?, private var tournam
             val table = body.get(TABLE).asJsonArray
             if (table.size() == 0) return standings
 
-            deserializeList(context, table, standings.table, Row::class.java)
+            context.deserializeList(table, standings.table, Row::class.java)
             val columnObject = table.get(0).asJsonObject.get(COLUMNS).asJsonObject
 
             columnObject.entrySet()

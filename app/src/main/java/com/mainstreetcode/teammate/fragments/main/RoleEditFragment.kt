@@ -135,8 +135,8 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_kick -> showDropRolePrompt().yes
-        R.id.action_block -> blockUser(headeredModel.user, headeredModel.team).yes
+        R.id.action_kick -> yes
+        R.id.action_block -> yes
         else -> super.onOptionsItemSelected(item)
     }
 

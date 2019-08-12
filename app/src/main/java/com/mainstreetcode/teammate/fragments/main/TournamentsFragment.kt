@@ -39,7 +39,6 @@ import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
@@ -115,7 +114,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_tournament_team_pick).yes
+        R.id.action_pick_team -> yes
         else -> super.onOptionsItemSelected(item)
     }
 

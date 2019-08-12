@@ -91,7 +91,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
                     .getOrPut(round) { mutableListOf() }
 
     fun fetchGamesInRound(tournament: Tournament, round: Int): Flowable<DiffUtil.DiffResult> {
-        val flowable = gameRoundRepository.modelsBefore(tournament, round).map(List<Differentiable>::asDifferentiables)
+        val flowable = gameRoundRepository.modelsBefore(tournament, round).map( ::asDifferentiables)
         return FunctionalDiff.of(flowable, getGamesForRound(tournament, round), this::preserveList)
     }
 

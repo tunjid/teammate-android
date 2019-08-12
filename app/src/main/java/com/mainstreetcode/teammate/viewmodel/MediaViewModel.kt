@@ -96,7 +96,7 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
         val sourceFlowable = when {
             isAdmin -> repository.privilegedDelete(team, toDelete)
             else -> repository.ownerDelete(toDelete)
-        }.toFlowable().map(List<Differentiable>::asDifferentiables)
+        }.toFlowable().map( ::asDifferentiables)
 
         return FunctionalDiff.of(sourceFlowable, source) { sourceCopy, deleted ->
             partialDelete.set(deleted.size != toDelete.size)

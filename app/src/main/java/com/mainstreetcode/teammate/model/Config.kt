@@ -159,15 +159,15 @@ class Config internal constructor(
 
             val config = Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar, defaultTournamentLogo)
 
-            deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport::class.java)
-            deserializeList(context, deviceJson.get(PRIVILEGED), config.privileged, String::class.java)
-            deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position::class.java)
-            deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType::class.java)
-            deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility::class.java)
-            deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason::class.java)
-            deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant::class.java)
-            deserializeList(context, deviceJson.get(TOURNAMENT_TYPE_KEY), config.tournamentTypes, TournamentType::class.java)
-            deserializeList(context, deviceJson.get(TOURNAMENT_STYLE_KEY), config.tournamentStyles, TournamentStyle::class.java)
+            context.deserializeList(deviceJson.get(SPORTS_KEY), config.sports, Sport::class.java)
+            context.deserializeList(deviceJson.get(PRIVILEGED), config.privileged, String::class.java)
+            context.deserializeList(deviceJson.get(POSITIONS_KEY), config.positions, Position::class.java)
+            context.deserializeList(deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType::class.java)
+            context.deserializeList(deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility::class.java)
+            context.deserializeList(deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason::class.java)
+            context.deserializeList(deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant::class.java)
+            context.deserializeList(deviceJson.get(TOURNAMENT_TYPE_KEY), config.tournamentTypes, TournamentType::class.java)
+            context.deserializeList(deviceJson.get(TOURNAMENT_STYLE_KEY), config.tournamentStyles, TournamentStyle::class.java)
 
             return config
         }

@@ -102,7 +102,7 @@ class TournamentViewModel : TeamMappedViewModel<Tournament>() {
     fun getStatRank(tournament: Tournament, type: StatType): Single<DiffUtil.DiffResult> =
             FunctionalDiff.of(
                     api.getStatRanks(tournament.id, type)
-                            .map(List<Differentiable>::asDifferentiables),
+                            .map( ::asDifferentiables),
                     getStatRanks(tournament),
                     ::replaceList
             ).observeOn(mainThread())
