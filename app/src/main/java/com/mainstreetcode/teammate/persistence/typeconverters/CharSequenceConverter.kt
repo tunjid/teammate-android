@@ -25,18 +25,13 @@
 package com.mainstreetcode.teammate.persistence.typeconverters
 
 import androidx.room.TypeConverter
-
-import com.mainstreetcode.teammate.util.ModelUtils
-
+import com.mainstreetcode.teammate.util.processEmoji
 
 class CharSequenceConverter {
     @TypeConverter
-    fun formString(value: String?): CharSequence? {
-        return if (value == null) null else ModelUtils.processString(value)
-    }
+    fun formString(value: String?): CharSequence? =
+            if (value == null) null else value.processEmoji()
 
     @TypeConverter
-    fun toString(sequence: CharSequence?): String? {
-        return sequence?.toString()
-    }
+    fun toString(sequence: CharSequence?): String? = sequence?.toString()
 }

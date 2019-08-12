@@ -25,16 +25,14 @@
 package com.mainstreetcode.teammate.viewmodel
 
 import androidx.lifecycle.ViewModel
-
 import com.mainstreetcode.teammate.App
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.preserveAscending
+import com.mainstreetcode.teammate.util.preserveDescending
 import com.mainstreetcode.teammate.viewmodel.events.Alert
-
-import java.util.LinkedList
-
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.disposables.CompositeDisposable
+import java.util.*
 
 
 abstract class BaseViewModel : ViewModel() {
@@ -64,8 +62,8 @@ abstract class BaseViewModel : ViewModel() {
     }
 
     fun preserveList(source: MutableList<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
-        if (sortsAscending()) ModelUtils.preserveAscending(source, additions)
-        else ModelUtils.preserveDescending(source, additions)
+        if (sortsAscending()) preserveAscending(source, additions)
+        else preserveDescending(source, additions)
 
         afterPreserveListDiff(source)
         if (hasNativeAds()) distributeAds(source)

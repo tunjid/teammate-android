@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.asDifferentiables
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -70,7 +70,7 @@ constructor(
 
     override fun fetch(): Flowable<DiffUtil.DiffResult> {
         val eventFlowable = getFunction.invoke(model).map(Tournament::asDifferentiables)
-        val competitorsFlowable = competitorsFunction.invoke(model).map(ModelUtils::asDifferentiables)
+        val competitorsFlowable = competitorsFunction.invoke(model).map(::asDifferentiables)
         val sourceFlowable = Flowable.mergeDelayError(eventFlowable, competitorsFlowable)
         return FunctionalDiff.of(sourceFlowable, items, this::preserveItems)
     }

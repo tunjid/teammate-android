@@ -24,11 +24,10 @@
 
 package com.mainstreetcode.teammate.model
 
-import androidx.room.Ignore
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
-
+import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -39,14 +38,14 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.asBooleanOrFalse
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseDate
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
 import java.lang.reflect.Type
-import java.util.Date
-
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
+import java.util.*
 
 /**
  * Join request for a [Team]
@@ -164,16 +163,16 @@ class JoinRequest : JoinRequestEntity,
 
             val requestJson = json.asJsonObject
 
-            val teamApproved = ModelUtils.asBoolean(TEAM_APPROVAL_KEY, requestJson)
-            val userApproved = ModelUtils.asBoolean(USER_APPROVAL_KEY, requestJson)
+            val teamApproved = requestJson.asBooleanOrFalse(TEAM_APPROVAL_KEY)
+            val userApproved = requestJson.asBooleanOrFalse(USER_APPROVAL_KEY)
 
-            val id = ModelUtils.asString(ID_KEY, requestJson)
-            val positionName = ModelUtils.asString(NAME_KEY, requestJson)
+            val id = requestJson.asStringOrEmpty(ID_KEY)
+            val positionName = requestJson.asStringOrEmpty(NAME_KEY)
             val position = Config.positionFromCode(positionName)
 
             var team: Team? = context.deserialize<Team>(requestJson.get(TEAM_KEY), Team::class.java)
             var user: User? = context.deserialize<User>(requestJson.get(USER_KEY), User::class.java)
-            val created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, requestJson))
+            val created = parseDate(requestJson.asStringOrEmpty(CREATED_KEY))
 
             if (team == null) team = Team.empty()
             if (user == null) user = User.empty()

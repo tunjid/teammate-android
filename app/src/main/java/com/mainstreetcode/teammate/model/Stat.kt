@@ -27,7 +27,7 @@ package com.mainstreetcode.teammate.model
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
-
+import androidx.room.Ignore
 import com.google.gson.JsonArray
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -41,16 +41,15 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.StatAttributes
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.persistence.entity.StatEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseDate
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
 import java.lang.reflect.Type
-import java.util.Date
-import androidx.room.Ignore
-
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
+import java.util.*
 
 /**
  * Event events
@@ -148,13 +147,13 @@ class Stat : StatEntity,
 
             val body = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, body)
-            val created = ModelUtils.asString(CREATED_KEY, body)
-            val typeCode = ModelUtils.asString(STAT_TYPE, body)
-            val sportCode = ModelUtils.asString(SPORT_KEY, body)
+            val id = body.asStringOrEmpty(ID_KEY)
+            val created = body.asStringOrEmpty(CREATED_KEY)
+            val typeCode = body.asStringOrEmpty(STAT_TYPE)
+            val sportCode = body.asStringOrEmpty(SPORT_KEY)
 
-            val value = ModelUtils.asFloat(VALUE, body).toInt()
-            val time = ModelUtils.asFloat(TIME, body)
+            val value = body.asFloatOrZero(VALUE).toInt()
+            val time = body.asFloatOrZero(TIME)
 
             val user = context.deserialize<User>(body.get(USER), User::class.java)
             val team = context.deserialize<Team>(body.get(TEAM), Team::class.java)
@@ -164,7 +163,7 @@ class Stat : StatEntity,
             val statType = sport.statTypeFromCode(typeCode)
             val attributes = StatAttributes()
 
-            val stat = Stat(id, ModelUtils.parseDate(created), statType, sport,
+            val stat = Stat(id, parseDate(created), statType, sport,
                     user, team, game, attributes, value, time)
 
             if (!body.has(ATTRIBUTES) || !body.get(ATTRIBUTES).isJsonArray) return stat

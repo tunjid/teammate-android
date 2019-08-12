@@ -53,7 +53,7 @@ class StatRankViewHolder(
     override fun bind(model: StatRank) {
         super.bind(model)
 
-        count.text = model.count
+        count.text = model.rank
         title.text = model.title
         subtitle.text = model.subtitle
 

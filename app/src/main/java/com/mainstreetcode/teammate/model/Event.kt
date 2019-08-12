@@ -28,7 +28,7 @@ import android.location.Address
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
-
+import androidx.room.Ignore
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -43,18 +43,21 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Visibility
 import com.mainstreetcode.teammate.persistence.entity.EventEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
 import com.mainstreetcode.teammate.util.TextBitmapUtil
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.dateFormatter
+import com.mainstreetcode.teammate.util.fullName
+import com.mainstreetcode.teammate.util.parseCoordinates
+import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.prettyPrint
+import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
 import java.lang.reflect.Type
-import java.util.Date
-import androidx.room.Ignore
-
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
-import com.mainstreetcode.teammate.util.ModelUtils.nameAddress
+import java.util.*
 
 /**
  * Event events
@@ -106,8 +109,8 @@ class Event : EventEntity,
                     .textTransformer { value -> Config.visibilityFromCode(value.toString()).getName() },
             Item.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, spots::toString, this::setSpots, this),
             Item.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-            Item.text(holder.get(4), 4, Item.DATE, R.string.start_date, { ModelUtils.prettyPrinter.format(startDate) }, this::setStartDate, this),
-            Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, { ModelUtils.prettyPrinter.format(endDate) }, this::setEndDate, this),
+            Item.text(holder.get(4), 4, Item.DATE, R.string.start_date, startDate::prettyPrint, this::setStartDate, this),
+            Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, endDate::prettyPrint, this::setEndDate, this),
             Item.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
     )
 
@@ -149,7 +152,7 @@ class Event : EventEntity,
     fun updateTeam(team: Team) = this.team.update(team)
 
     fun setAddress(address: Address) {
-        setLocationName(nameAddress(address))
+        setLocationName(address.fullName)
         location = LatLng(address.latitude, address.longitude)
     }
 
@@ -169,8 +172,8 @@ class Event : EventEntity,
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName.toString())
             serialized.addProperty(SPOTS_KEY, src.spots)
             serialized.addProperty(TEAM_KEY, src.team.id)
-            serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate))
-            serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate))
+            serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate))
+            serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate))
             if (!TextUtils.isEmpty(src.gameId)) serialized.addProperty(GAME, src.gameId)
 
             val visibilityCode = src.visibility.code
@@ -195,28 +198,28 @@ class Event : EventEntity,
 
             val eventJson = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, eventJson)
-            val gameId = ModelUtils.asString(GAME, eventJson)
-            val name = ModelUtils.asString(NAME_KEY, eventJson)
-            val notes = ModelUtils.asString(NOTES_KEY, eventJson)
-            val imageUrl = ModelUtils.asString(IMAGE_KEY, eventJson)
-            val visibilityCode = ModelUtils.asString(VISIBILITY_KEY, eventJson)
-            val locationName = ModelUtils.asString(LOCATION_NAME_KEY, eventJson)
-            val startDate = ModelUtils.asString(START_DATE_KEY, eventJson)
-            val endDate = ModelUtils.asString(END_DATE_KEY, eventJson)
-            var spots = ModelUtils.asFloat(SPOTS_KEY, eventJson).toInt()
+            val id = eventJson.asStringOrEmpty(ID_KEY)
+            val gameId = eventJson.asStringOrEmpty(GAME)
+            val name = eventJson.asStringOrEmpty(NAME_KEY)
+            val notes = eventJson.asStringOrEmpty(NOTES_KEY)
+            val imageUrl = eventJson.asStringOrEmpty(IMAGE_KEY)
+            val visibilityCode = eventJson.asStringOrEmpty(VISIBILITY_KEY)
+            val locationName = eventJson.asStringOrEmpty(LOCATION_NAME_KEY)
+            val startDate = eventJson.asStringOrEmpty(START_DATE_KEY)
+            val endDate = eventJson.asStringOrEmpty(END_DATE_KEY)
+            var spots = eventJson.asFloatOrZero(SPOTS_KEY).toInt()
 
             if (spots == 0) spots = DEFAULT_NUM_SPOTS
 
             var team: Team? = context.deserialize<Team>(eventJson.get(TEAM_KEY), Team::class.java)
-            val location = ModelUtils.parseCoordinates(LOCATION_KEY, eventJson)
+            val location = eventJson.parseCoordinates(LOCATION_KEY)
             val visibility = Config.visibilityFromCode(visibilityCode)
 
             if (team == null) team = Team.empty()
 
             return Event(id, gameId, imageUrl,
-                    ModelUtils.processString(name), ModelUtils.processString(notes), ModelUtils.processString(locationName),
-                    ModelUtils.parseDate(startDate), ModelUtils.parseDate(endDate), team, location, visibility, spots)
+                    name.processEmoji(), notes.processEmoji(), locationName.processEmoji(),
+                    parseDate(startDate), parseDate(endDate), team, location, visibility, spots)
         }
 
         companion object {

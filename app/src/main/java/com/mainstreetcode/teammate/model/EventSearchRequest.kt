@@ -36,9 +36,10 @@ import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.parse
-import com.mainstreetcode.teammate.util.ModelUtils.prettyPrinter
+import com.mainstreetcode.teammate.util.dateFormatter
+import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.prettyPrinter
 import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -71,7 +72,7 @@ class EventSearchRequest private constructor(
     }
 
     fun setDistance(distance: String) {
-        this.distance = parse(distance)
+        this.distance = distance.asIntOrFalse()
         items[1].setValue(getDistance())
     }
 
@@ -80,11 +81,11 @@ class EventSearchRequest private constructor(
     }
 
     private fun setStartDate(startDate: String) {
-        this.startDate = ModelUtils.parseDate(startDate, prettyPrinter)
+        this.startDate = parseDate(startDate, prettyPrinter)
     }
 
     private fun setEndDate(endDate: String) {
-        this.endDate = ModelUtils.parseDate(endDate, prettyPrinter)
+        this.endDate = parseDate(endDate, prettyPrinter)
     }
 
     private fun getAddress(): CharSequence =
@@ -93,9 +94,9 @@ class EventSearchRequest private constructor(
     private fun getDistance(): CharSequence =
             App.getInstance().getString(R.string.event_public_distance, distance)
 
-    private fun getStartDate(): CharSequence = ModelUtils.prettyPrinter.format(startDate!!)
+    private fun getStartDate(): CharSequence = prettyPrinter.format(startDate!!)
 
-    private fun getEndDate(): CharSequence = ModelUtils.prettyPrinter.format(endDate!!)
+    private fun getEndDate(): CharSequence = prettyPrinter.format(endDate!!)
 
     private fun buildItems(): List<Item<EventSearchRequest>> = listOf(
             Item.text(holder.get(0), 0, Item.LOCATION, R.string.location, this::getAddress, Item.IGNORE_SET, this),
@@ -118,8 +119,8 @@ class EventSearchRequest private constructor(
             if (!src.sport.isInvalid) serialized.addProperty(SPORT_KEY, src.sport.code)
 
             if (src.startDate != null) {
-                serialized.addProperty(START_DATE_KEY, ModelUtils.dateFormatter.format(src.startDate!!))
-                if (src.endDate != null) serialized.addProperty(END_DATE_KEY, ModelUtils.dateFormatter.format(src.endDate!!))
+                serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate!!))
+                if (src.endDate != null) serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate!!))
             }
 
             if (src.location != null) {

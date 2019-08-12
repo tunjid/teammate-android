@@ -26,7 +26,7 @@ package com.mainstreetcode.teammate.repository
 
 import android.text.TextUtils.isEmpty
 import com.mainstreetcode.teammate.model.Device
-import com.mainstreetcode.teammate.model.Message.fromThrowable
+import com.mainstreetcode.teammate.model.toMessage
 import com.mainstreetcode.teammate.persistence.AppDatabase
 import com.mainstreetcode.teammate.persistence.DeviceDao
 import com.mainstreetcode.teammate.persistence.EntityDao
@@ -54,7 +54,7 @@ class DeviceRepo internal constructor() : ModelRepo<Device>() {
                     .doOnSuccess(saveFunction)
                     .doOnError { throwable -> deleteInvalidModel(current, throwable) }
                     .onErrorResumeNext { throwable ->
-                        val message = fromThrowable(throwable)
+                        val message = throwable.toMessage()
                         when {
                             message != null && message.isInvalidObject -> api.createDevice(current).doOnSuccess(saveFunction)
                             else -> Single.error(throwable)

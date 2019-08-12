@@ -38,10 +38,13 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.persistence.entity.GameEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asBooleanOrFalse
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseDate
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -182,24 +185,24 @@ class Game : GameEntity,
 
             val body = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, body)
-            val name = ModelUtils.asString(NAME, body)
-            val refPath = ModelUtils.asString(REF_PATH, body)
-            val score = ModelUtils.asString(SCORE, body)
-            val matchUp = ModelUtils.asString(MATCH_UP, body)
-            val homeEntityId = ModelUtils.asString(HOME_ENTITY_ID, body)
-            val awayEntityId = ModelUtils.asString(AWAY_ENTITY_ID, body)
-            val winnerEntityId = ModelUtils.asString(WINNER_ENTITY_ID, body)
-            val created = ModelUtils.asString(CREATED_KEY, body)
-            val sportCode = ModelUtils.asString(SPORT_KEY, body)
+            val id = body.asStringOrEmpty(ID_KEY)
+            val name = body.asStringOrEmpty(NAME)
+            val refPath = body.asStringOrEmpty(REF_PATH)
+            val score = body.asStringOrEmpty(SCORE)
+            val matchUp = body.asStringOrEmpty(MATCH_UP)
+            val homeEntityId = body.asStringOrEmpty(HOME_ENTITY_ID)
+            val awayEntityId = body.asStringOrEmpty(AWAY_ENTITY_ID)
+            val winnerEntityId = body.asStringOrEmpty(WINNER_ENTITY_ID)
+            val created = body.asStringOrEmpty(CREATED_KEY)
+            val sportCode = body.asStringOrEmpty(SPORT_KEY)
 
-            val seed = ModelUtils.asFloat(SEED, body).toInt()
-            val leg = ModelUtils.asFloat(LEG, body).toInt()
-            val round = ModelUtils.asFloat(ROUND, body).toInt()
-            val homeScore = ModelUtils.asFloat(HOME_SCORE, body).toInt()
-            val awayScore = ModelUtils.asFloat(AWAY_SCORE, body).toInt()
-            val ended = ModelUtils.asBoolean(ENDED, body)
-            val canDraw = ModelUtils.asBoolean(CAN_DRAW, body)
+            val seed = body.asFloatOrZero(SEED).toInt()
+            val leg = body.asFloatOrZero(LEG).toInt()
+            val round = body.asFloatOrZero(ROUND).toInt()
+            val homeScore = body.asFloatOrZero(HOME_SCORE).toInt()
+            val awayScore = body.asFloatOrZero(AWAY_SCORE).toInt()
+            val ended = body.asBooleanOrFalse(ENDED)
+            val canDraw = body.asBooleanOrFalse(CAN_DRAW)
 
             val sport = Config.sportFromCode(sportCode)
             val referee: User = context.deserialize<User>(body.get(REFEREE), User::class.java)
@@ -218,7 +221,7 @@ class Game : GameEntity,
             if (tournament == null) tournament = Tournament.empty()
 
             return Game(id, name, refPath, score, matchUp, homeEntityId, awayEntityId, winnerEntityId,
-                    ModelUtils.parseDate(created), sport, referee, host, event, tournament,
+                    parseDate(created), sport, referee, host, event, tournament,
                     home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw)
         }
 

@@ -31,12 +31,19 @@ import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.replaceList
-import com.mainstreetcode.teammate.util.ModelUtils.replaceStringList
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.deserializeList
+import com.mainstreetcode.teammate.util.processEmoji
+import com.mainstreetcode.teammate.util.replaceList
+import com.mainstreetcode.teammate.util.replaceStringList
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 
-class Sport private constructor(code: String, name: String, private var emoji: String?) : MetaData(code, name) {
+class Sport private constructor(
+        code: String,
+        name: String,
+        private var emoji: String
+) : MetaData(code, name) {
+
     val stats = StatTypes()
     private val tournamentTypes = mutableListOf<String>()
     private val tournamentStyles = mutableListOf<String>()
@@ -60,18 +67,16 @@ class Sport private constructor(code: String, name: String, private var emoji: S
             Config.tournamentTypeFromCode(tournamentTypes[0])
     }
 
-    fun defaultTournamentStyle(): TournamentStyle {
-        return if (tournamentStyles.isEmpty())
-            TournamentStyle.empty()
-        else
-            Config.tournamentStyleFromCode(tournamentStyles[0])
+    fun defaultTournamentStyle(): TournamentStyle = when {
+        tournamentStyles.isEmpty() -> TournamentStyle.empty()
+        else -> Config.tournamentStyleFromCode(tournamentStyles[0])
     }
 
     fun statTypeFromCode(code: String): StatType = stats.fromCodeOrFirst(code)
 
     override fun getName(): CharSequence = appendEmoji(name)
 
-    fun getEmoji(): CharSequence = ModelUtils.processString(emoji)
+    fun getEmoji(): CharSequence = emoji.processEmoji()
 
     fun appendEmoji(text: CharSequence): CharSequence =
             SpanBuilder.of(getEmoji()).append("   ").append(text).build()
@@ -93,12 +98,12 @@ class Sport private constructor(code: String, name: String, private var emoji: S
     class GsonAdapter : MetaData.GsonAdapter<Sport>() {
 
         override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): Sport {
-            val emoji = ModelUtils.asString(EMOJI, body)
+            val emoji = body.asStringOrEmpty(EMOJI)
 
             val sport = Sport(code, name, emoji)
-            ModelUtils.deserializeList(context, body.get(STAT_TYPES), sport.stats, StatType::class.java)
-            ModelUtils.deserializeList(context, body.get(TOURNAMENT_TYPES), sport.tournamentTypes, String::class.java)
-            ModelUtils.deserializeList(context, body.get(TOURNAMENT_STYLES), sport.tournamentStyles, String::class.java)
+            deserializeList(context, body.get(STAT_TYPES), sport.stats, StatType::class.java)
+            deserializeList(context, body.get(TOURNAMENT_TYPES), sport.tournamentTypes, String::class.java)
+            deserializeList(context, body.get(TOURNAMENT_STYLES), sport.tournamentStyles, String::class.java)
 
             return sport
         }

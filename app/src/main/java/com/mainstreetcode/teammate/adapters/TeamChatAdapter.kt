@@ -32,9 +32,9 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CHAT
+ import com.mainstreetcode.teammate.util.ViewHolderUtil.CHAT
 import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
+import com.mainstreetcode.teammate.util.areDifferentDays
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -71,7 +71,7 @@ class TeamChatAdapter(
 
         val hideDetails = next != null && chatUser == next.user
         val showPicture = signedInUser != chatUser && (prev == null || chatUser != prev.user)
-        val isFirstMessageToday = DateUtils.isToday(created.time) && ModelUtils.areDifferentDays(prev?.created, created)
+        val isFirstMessageToday = DateUtils.isToday(created.time) && areDifferentDays(prev?.created, created)
 
         viewHolder.bind(chat, signedInUser == chat.user, !hideDetails, showPicture, isFirstMessageToday)
     }

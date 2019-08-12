@@ -24,21 +24,18 @@
 
 package com.mainstreetcode.teammate.persistence.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.NonNull
-
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.enums.Sport
-
-import java.util.Date
-
-import com.mainstreetcode.teammate.util.ModelUtils.parse
-import com.mainstreetcode.teammate.util.ModelUtils.processString
+import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.processEmoji
+import java.util.*
 
 
 @Entity(tableName = "teams")
@@ -70,11 +67,11 @@ open class TeamEntity : Parcelable {
 
     @ColumnInfo(name = "team_name")
     var name: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "team_description")
     var description: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "team_sport")
     var sport: Sport
@@ -162,11 +159,11 @@ open class TeamEntity : Parcelable {
     }
 
     fun setMinAge(minAge: String) {
-        this.minAge = parse(minAge)
+        this.minAge = minAge.asIntOrFalse()
     }
 
     fun setMaxAge(maxAge: String) {
-        this.maxAge = parse(maxAge)
+        this.maxAge = maxAge.asIntOrFalse()
     }
 
     override fun equals(other: Any?): Boolean {

@@ -24,27 +24,24 @@
 
 package com.mainstreetcode.teammate.persistence.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.NonNull
-
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
+import androidx.room.PrimaryKey
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
-
-import java.util.Date
-
-import androidx.room.ForeignKey.CASCADE
-import com.mainstreetcode.teammate.util.ModelUtils.parse
-import com.mainstreetcode.teammate.util.ModelUtils.parseBoolean
-import com.mainstreetcode.teammate.util.ModelUtils.processString
+import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.asBooleanOrFalse
+import com.mainstreetcode.teammate.util.processEmoji
+import java.util.*
 
 
 @Entity(
@@ -73,11 +70,11 @@ open class TournamentEntity : Parcelable {
 
     @ColumnInfo(name = "tournament_name")
     var name: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "tournament_description")
     var description: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "tournament_host")
     var host: Team
@@ -196,11 +193,11 @@ open class TournamentEntity : Parcelable {
     }
 
     protected fun setNumLegs(numLegs: String) {
-        this.numLegs = parse(numLegs)
+        this.numLegs = numLegs.asIntOrFalse()
     }
 
     protected fun setSingleFinal(singleFinal: String) {
-        this.isSingleFinal = parseBoolean(singleFinal)
+        this.isSingleFinal = singleFinal.asBooleanOrFalse()
     }
 
     override fun equals(other: Any?): Boolean {

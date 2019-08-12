@@ -36,7 +36,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -124,8 +124,8 @@ class StatAggregate {
 
                 for (element in jsonArray) {
                     val `object` = element.asJsonObject
-                    val count = ModelUtils.asFloat(COUNT, `object`).toInt()
-                    val type = Config.statTypeFromCode(ModelUtils.asString(ID, `object`))
+                    val count = `object`.asFloatOrZero(COUNT).toInt()
+                    val type = Config.statTypeFromCode(`object`.asStringOrEmpty(ID))
 
                     result.aggregates.add(Aggregate(count, type))
                 }

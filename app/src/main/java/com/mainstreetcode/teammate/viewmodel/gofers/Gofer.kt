@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.model.ListableModel
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.preserveAscending
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -77,7 +77,7 @@ abstract class Gofer<T> internal constructor(
     }
 
     internal open fun preserveItems(old: MutableList<Differentiable>, fetched: MutableList<Differentiable>): MutableList<Differentiable> {
-        ModelUtils.preserveAscending(old, fetched)
+         preserveAscending(old, fetched)
         return old
     }
 

@@ -34,8 +34,7 @@ import androidx.room.ForeignKey.CASCADE
 import androidx.room.PrimaryKey
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.persistence.entity.TeamEntity
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.processEmoji
 import java.util.*
 
 @Entity(
@@ -58,7 +57,7 @@ open class ChatEntity : Parcelable {
 
     @ColumnInfo(name = "team_chat_content")
     var content: CharSequence
-        get() = ModelUtils.processString(field)
+        get() = field.processEmoji()
         protected set
 
     @ColumnInfo(name = "team_chat_user")

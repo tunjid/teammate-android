@@ -38,8 +38,8 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.persistence.entity.GuestEntity
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
+import com.mainstreetcode.teammate.util.*
+import com.mainstreetcode.teammate.util. EMPTY_STRING
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -96,10 +96,10 @@ class Guest : GuestEntity,
 
             val teamJson = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, teamJson)
+            val id = teamJson.asStringOrEmpty(ID_KEY)
             var user: User? = context.deserialize<User>(teamJson.get(USER_KEY), User::class.java)
             val event = context.deserialize<Event>(teamJson.get(EVENT_KEY), Event::class.java)
-            val created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, teamJson))
+            val created = parseDate(teamJson.asStringOrEmpty(DATE_KEY))
             val attending = teamJson.get(ATTENDING_KEY).asBoolean
 
             if (user == null) user = User.empty()

@@ -48,7 +48,7 @@ import com.mainstreetcode.teammate.model.enums.Visibility
 import com.mainstreetcode.teammate.repository.ConfigRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.lang.reflect.Type
 
@@ -80,17 +80,17 @@ class Config internal constructor(
         this.defaultTeamLogo = updated.defaultTeamLogo
         this.defaultEventLogo = updated.defaultEventLogo
         this.defaultUserAvatar = updated.defaultUserAvatar
-        ModelUtils.replaceStringList(privileged, updated.privileged)
+        replaceStringList(privileged, updated.privileged)
 
-        ModelUtils.replaceList(sports, updated.sports)
-        ModelUtils.replaceList(positions, updated.positions)
-        ModelUtils.replaceList(statTypes, updated.statTypes)
-        ModelUtils.replaceList(visibilities, updated.visibilities)
-        ModelUtils.replaceList(blockReasons, updated.blockReasons)
-        ModelUtils.replaceList(staticVariants, updated.staticVariants)
-        ModelUtils.replaceList(staticVariants, updated.staticVariants)
-        ModelUtils.replaceList(tournamentTypes, updated.tournamentTypes)
-        ModelUtils.replaceList(tournamentStyles, updated.tournamentStyles)
+        replaceList(sports, updated.sports)
+        replaceList(positions, updated.positions)
+        replaceList(statTypes, updated.statTypes)
+        replaceList(visibilities, updated.visibilities)
+        replaceList(blockReasons, updated.blockReasons)
+        replaceList(staticVariants, updated.staticVariants)
+        replaceList(staticVariants, updated.staticVariants)
+        replaceList(tournamentTypes, updated.tournamentTypes)
+        replaceList(tournamentStyles, updated.tournamentStyles)
     }
 
     override fun compareTo(other: Config): Int = 0
@@ -152,22 +152,22 @@ class Config internal constructor(
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Config {
             val deviceJson = json.asJsonObject
 
-            val defaultTeamLogo = ModelUtils.asString(TEAM_LOGO_KEY, deviceJson)
-            val defaultEventLogo = ModelUtils.asString(EVENT_LOGO_KEY, deviceJson)
-            val defaultUserAvatar = ModelUtils.asString(USER_AVATAR_KEY, deviceJson)
-            val defaultTournamentLogo = ModelUtils.asString(TOURNAMENT_LOGO_KEY, deviceJson)
+            val defaultTeamLogo = deviceJson.asStringOrEmpty(TEAM_LOGO_KEY)
+            val defaultEventLogo = deviceJson.asStringOrEmpty(EVENT_LOGO_KEY)
+            val defaultUserAvatar = deviceJson.asStringOrEmpty(USER_AVATAR_KEY)
+            val defaultTournamentLogo = deviceJson.asStringOrEmpty(TOURNAMENT_LOGO_KEY)
 
             val config = Config(defaultTeamLogo, defaultEventLogo, defaultUserAvatar, defaultTournamentLogo)
 
-            ModelUtils.deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(PRIVILEGED), config.privileged, String::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(TOURNAMENT_TYPE_KEY), config.tournamentTypes, TournamentType::class.java)
-            ModelUtils.deserializeList(context, deviceJson.get(TOURNAMENT_STYLE_KEY), config.tournamentStyles, TournamentStyle::class.java)
+            deserializeList(context, deviceJson.get(SPORTS_KEY), config.sports, Sport::class.java)
+            deserializeList(context, deviceJson.get(PRIVILEGED), config.privileged, String::class.java)
+            deserializeList(context, deviceJson.get(POSITIONS_KEY), config.positions, Position::class.java)
+            deserializeList(context, deviceJson.get(GAME_STATS_KEY), config.statTypes, StatType::class.java)
+            deserializeList(context, deviceJson.get(VISIBILITIES_KEY), config.visibilities, Visibility::class.java)
+            deserializeList(context, deviceJson.get(BLOCKED_REASONS_KEY), config.blockReasons, BlockReason::class.java)
+            deserializeList(context, deviceJson.get(STATIC_VARIANTS_KEY), config.staticVariants, AndroidVariant::class.java)
+            deserializeList(context, deviceJson.get(TOURNAMENT_TYPE_KEY), config.tournamentTypes, TournamentType::class.java)
+            deserializeList(context, deviceJson.get(TOURNAMENT_STYLE_KEY), config.tournamentStyles, TournamentStyle::class.java)
 
             return config
         }

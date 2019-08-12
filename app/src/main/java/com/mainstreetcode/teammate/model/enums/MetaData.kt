@@ -24,8 +24,6 @@
 
 package com.mainstreetcode.teammate.model.enums
 
-import android.text.TextUtils
-
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -34,7 +32,7 @@ import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 
 import java.lang.reflect.Type
 import java.util.Objects
@@ -81,8 +79,8 @@ open class MetaData internal constructor(
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): T {
             val baseEnumJson = json.asJsonObject
 
-            val code = ModelUtils.asString(CODE_KEY, baseEnumJson)
-            val name = ModelUtils.asString(NAME_KEY, baseEnumJson)
+            val code = baseEnumJson.asStringOrEmpty(CODE_KEY)
+            val name = baseEnumJson.asStringOrEmpty(NAME_KEY)
 
             return fromJson(code, name, baseEnumJson, context)
         }

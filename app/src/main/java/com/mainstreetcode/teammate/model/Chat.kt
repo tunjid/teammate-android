@@ -37,7 +37,7 @@ import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.persistence.entity.ChatEntity
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 import com.mainstreetcode.teammate.util.ObjectId
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -95,15 +95,15 @@ class Chat : ChatEntity, TeamHost, Parcelable, Model<Chat> {
 
             val teamJson = json.asJsonObject
 
-            val id = ModelUtils.asString(UID_KEY, teamJson)
-            val kind = ModelUtils.asString(KIND_KEY, teamJson)
-            val content = ModelUtils.asString(CONTENT_KEY, teamJson)
+            val id = teamJson.asStringOrEmpty(UID_KEY)
+            val kind = teamJson.asStringOrEmpty(KIND_KEY)
+            val content = teamJson.asStringOrEmpty(CONTENT_KEY)
 
             val user: User = context.deserialize<User>(teamJson.get(USER_KEY), User::class.java)
                     ?: User.empty()
             val team: Team = context.deserialize<Team>(teamJson.get(TEAM_KEY), Team::class.java)
                     ?: Team.empty()
-            val created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, teamJson))
+            val created = parseDate(teamJson.asStringOrEmpty(DATE_KEY))
 
             return Chat(id, kind, content, user, team, created)
         }

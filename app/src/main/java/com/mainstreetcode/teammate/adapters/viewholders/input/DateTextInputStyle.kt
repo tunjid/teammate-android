@@ -32,7 +32,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.prettyPrint
 import java.util.Calendar.DATE
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -90,7 +90,7 @@ class DateTextInputStyle(enabler: (Item<*>) -> Boolean) : TextInputStyle(
     }
 
     private fun updateTime() {
-        val updatedDate = ModelUtils.prettyPrinter.format(calendar.time)
+        val updatedDate =  calendar.time.prettyPrint()
         item.setValue(updatedDate)
         viewHolder?.updateText(updatedDate)
     }

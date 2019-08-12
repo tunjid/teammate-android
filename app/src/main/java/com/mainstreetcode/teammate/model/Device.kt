@@ -36,7 +36,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 
 import java.lang.reflect.Type
 
@@ -93,8 +93,8 @@ class Device : Model<Device> {
 
             val deviceJson = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, deviceJson)
-            val fcmToken = ModelUtils.asString(FCM_TOKEN_KEY, deviceJson)
+            val id = deviceJson.asStringOrEmpty(ID_KEY)
+            val fcmToken = deviceJson.asStringOrEmpty(FCM_TOKEN_KEY)
 
             val device = Device(id)
             device.setFcmToken(fcmToken)

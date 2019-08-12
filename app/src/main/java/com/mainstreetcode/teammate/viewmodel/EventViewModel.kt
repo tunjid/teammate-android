@@ -34,14 +34,14 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.EventSearchRequest
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Guest
-import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.BlockReason
+import com.mainstreetcode.teammate.model.toMessage
 import com.mainstreetcode.teammate.repository.EventRepo
 import com.mainstreetcode.teammate.repository.GuestRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.rest.TeammateService
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.preserveAscending
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer
@@ -87,7 +87,7 @@ class EventViewModel : TeamMappedViewModel<Event>() {
     fun gofer(guest: Guest): GuestGofer = GuestGofer(
             guest,
             onError@{ throwable ->
-                val message = Message.fromThrowable(throwable)
+                val message = throwable.toMessage()
                 if (message == null || !message.isInvalidObject) return@onError
 
                 val guestUser = guest.user
@@ -162,7 +162,7 @@ class EventViewModel : TeamMappedViewModel<Event>() {
     }
 
     private fun collatePublicEvents(newEvents: List<Event>): List<Event> {
-        ModelUtils.preserveAscending(publicEvents, newEvents)
+        preserveAscending(publicEvents, newEvents)
         return publicEvents
     }
 

@@ -35,19 +35,19 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Competitor
-import com.mainstreetcode.teammate.model.ModelStub
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Model
+import com.mainstreetcode.teammate.model.ModelStub
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.Logger
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 
@@ -123,10 +123,10 @@ class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): FeedItem<T> {
             val feedItemJson = json.asJsonObject
 
-            val action = ModelUtils.asString(ACTION_KEY, feedItemJson)
-            val type = ModelUtils.asString(TYPE_KEY, feedItemJson)
-            val title = ModelUtils.asString(TITLE_KEY, feedItemJson)
-            val body = ModelUtils.asString(BODY_KEY, feedItemJson)
+            val action = feedItemJson.asStringOrEmpty(ACTION_KEY)
+            val type = feedItemJson.asStringOrEmpty(TYPE_KEY)
+            val title = feedItemJson.asStringOrEmpty(TITLE_KEY)
+            val body = feedItemJson.asStringOrEmpty(BODY_KEY)
             val itemClass = forType<T>(type)
 
             var modelElement = feedItemJson.get(MODEL_KEY)

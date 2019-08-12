@@ -27,7 +27,7 @@ package com.mainstreetcode.teammate.model.enums
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 
 import java.util.Objects
 
@@ -45,7 +45,7 @@ class TournamentType private constructor(code: String, name: String, val refPath
     class GsonAdapter : MetaData.GsonAdapter<TournamentType>() {
 
         override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): TournamentType {
-            val refPath = ModelUtils.asString(REF_PATH, body)
+            val refPath = body.asStringOrEmpty(REF_PATH)
             return TournamentType(code, name, refPath)
         }
 

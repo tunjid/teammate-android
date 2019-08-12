@@ -27,7 +27,7 @@ package com.mainstreetcode.teammate.model
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
-
+import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -38,16 +38,14 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseDate
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
 import java.lang.reflect.Type
-import java.util.Date
-import androidx.room.Ignore
-
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
+import java.util.*
 
 /**
  * Roles on a team
@@ -92,8 +90,8 @@ class Role : RoleEntity,
     override fun asItems(): List<Item<Role>> = listOf(
             Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
             Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder.get(2), 2, Item.NICKNAME, R.string.nickname, this::nickname,  { this.nickname = it }, this),
-            Item.text(holder.get(3), 3, Item.ABOUT, R.string.user_about, user::about,  Item.IGNORE_SET, this),
+            Item.text(holder.get(2), 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }, this),
+            Item.text(holder.get(3), 3, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this),
             Item.text(holder.get(4), 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() }
     )
@@ -152,15 +150,15 @@ class Role : RoleEntity,
 
             val roleJson = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, roleJson)
-            val imageUrl = ModelUtils.asString(IMAGE_KEY, roleJson)
-            val nickname = ModelUtils.asString(NICK_NAME_KEY, roleJson)
-            val positionName = ModelUtils.asString(NAME_KEY, roleJson)
+            val id = roleJson.asStringOrEmpty(ID_KEY)
+            val imageUrl = roleJson.asStringOrEmpty(IMAGE_KEY)
+            val nickname = roleJson.asStringOrEmpty(NICK_NAME_KEY)
+            val positionName = roleJson.asStringOrEmpty(NAME_KEY)
 
             val position = Config.positionFromCode(positionName)
             val team = context.deserialize<Team>(roleJson.get(TEAM_KEY), Team::class.java)
             var user: User? = context.deserialize<User>(roleJson.get(USER_KEY), User::class.java)
-            val created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, roleJson))
+            val created = parseDate(roleJson.asStringOrEmpty(CREATED_KEY))
 
             if (user == null) user = User.empty()
 

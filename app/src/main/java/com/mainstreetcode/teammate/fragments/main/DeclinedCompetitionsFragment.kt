@@ -40,8 +40,8 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Item.Companion.COMPETITOR
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.ViewUtil
 
 /**
  * Lists [tournaments][Event]
@@ -74,7 +74,7 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
                 .withAdapter(object : CompetitorAdapter(items, this) {
                     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder =
                             if (viewType != COMPETITOR) super.onCreateViewHolder(viewGroup, viewType)
-                            else CompetitorViewHolder(ViewHolderUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener)
+                            else CompetitorViewHolder(ViewUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener)
                 })
                 .withLinearLayoutManager()
                 .build()

@@ -27,7 +27,7 @@ package com.mainstreetcode.teammate.model.enums
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.*
@@ -42,7 +42,7 @@ class StatType private constructor(
     val attributes: StatAttributes = StatAttributes()
 
     var emoji: CharSequence = emoji
-        get() = ModelUtils.processString(field)
+        get() = field.processEmoji()
 
     val emojiAndName: CharSequence
         get() = SpanBuilder.of(emoji).append("   ").append(name).build()
@@ -58,7 +58,7 @@ class StatType private constructor(
         super.update(updated)
         this.emoji = updated.emoji
         this.sportCode = updated.sportCode
-        ModelUtils.replaceList(attributes, updated.attributes)
+        replaceList(attributes, updated.attributes)
     }
 
     override fun areContentsTheSame(other: Differentiable): Boolean {
@@ -78,11 +78,11 @@ class StatType private constructor(
     class GsonAdapter : MetaData.GsonAdapter<StatType>() {
 
         override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): StatType {
-            val emoji = ModelUtils.asString(EMOJI_KEY, body)
-            val sportCode = ModelUtils.asString(SPORT, body)
+            val emoji = body.asStringOrEmpty(EMOJI_KEY)
+            val sportCode = body.asStringOrEmpty(SPORT)
 
             val type = StatType(code, name, emoji, sportCode)
-            ModelUtils.deserializeList(context, body.get(ATTRIBUTES), type.attributes, StatAttribute::class.java)
+            deserializeList(context, body.get(ATTRIBUTES), type.attributes, StatAttribute::class.java)
             return type
         }
 

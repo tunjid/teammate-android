@@ -41,10 +41,13 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.persistence.entity.TournamentEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asBooleanOrFalse
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseDate
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -174,22 +177,22 @@ class Tournament : TournamentEntity,
 
             val body = json.asJsonObject
 
-            val id = ModelUtils.asString(ID_KEY, body)
-            val imageUrl = ModelUtils.asString(IMAGE_KEY, body)
-            val name = ModelUtils.asString(NAME_KEY, body)
-            val description = ModelUtils.asString(DESCRIPTION_KEY, body)
+            val id = body.asStringOrEmpty(ID_KEY)
+            val imageUrl = body.asStringOrEmpty(IMAGE_KEY)
+            val name = body.asStringOrEmpty(NAME_KEY)
+            val description = body.asStringOrEmpty(DESCRIPTION_KEY)
 
-            val refPath = ModelUtils.asString(REF_PATH, body)
-            val sportCode = ModelUtils.asString(SPORT_KEY, body)
-            val typeCode = ModelUtils.asString(TYPE_KEY, body)
-            val styleCode = ModelUtils.asString(STYLE_KEY, body)
+            val refPath = body.asStringOrEmpty(REF_PATH)
+            val sportCode = body.asStringOrEmpty(SPORT_KEY)
+            val typeCode = body.asStringOrEmpty(TYPE_KEY)
+            val styleCode = body.asStringOrEmpty(STYLE_KEY)
 
-            val created = ModelUtils.asString(CREATED_KEY, body)
-            val numLegs = ModelUtils.asFloat(NUM_LEGS, body).toInt()
-            val numRounds = ModelUtils.asFloat(NUM_ROUNDS, body).toInt()
-            val currentRound = ModelUtils.asFloat(CURRENT_ROUND, body).toInt()
-            val numCompetitors = ModelUtils.asFloat(NUM_COMPETITORS, body).toInt()
-            val singleFinal = ModelUtils.asBoolean(SINGLE_FINAL, body)
+            val created = body.asStringOrEmpty(CREATED_KEY)
+            val numLegs = body.asFloatOrZero(NUM_LEGS).toInt()
+            val numRounds = body.asFloatOrZero(NUM_ROUNDS).toInt()
+            val currentRound = body.asFloatOrZero(CURRENT_ROUND).toInt()
+            val numCompetitors = body.asFloatOrZero(NUM_COMPETITORS).toInt()
+            val singleFinal = body.asBooleanOrFalse(SINGLE_FINAL)
 
             var host: Team? = context.deserialize<Team>(body.get(HOST_KEY), Team::class.java)
             val sport = Config.sportFromCode(sportCode)
@@ -206,7 +209,7 @@ class Tournament : TournamentEntity,
 
             if (host == null) host = Team.empty()
 
-            return Tournament(id, imageUrl, refPath, name, description, ModelUtils.parseDate(created), host,
+            return Tournament(id, imageUrl, refPath, name, description, parseDate(created), host,
                     sport, type, style, winner, numLegs, numRounds, currentRound, numCompetitors, singleFinal)
         }
 

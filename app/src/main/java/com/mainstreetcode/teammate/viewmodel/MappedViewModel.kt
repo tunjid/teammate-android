@@ -32,12 +32,12 @@ import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Message
-import com.mainstreetcode.teammate.model.Message.fromThrowable
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.model.toMessage
 import com.mainstreetcode.teammate.notifications.NotifierProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.asDifferentiables
@@ -131,7 +131,7 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     }
 
     internal fun checkForInvalidObject(throwable: Throwable, model: V, key: K) {
-        val message = fromThrowable(throwable)
+        val message = throwable.toMessage()
         if (message != null) onErrorMessage(message, key, model)
     }
 
@@ -143,7 +143,7 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     }
 
     private fun checkForInvalidKey(throwable: Throwable, key: K) {
-        val message = fromThrowable(throwable)
+        val message = throwable.toMessage()
         val isInvalidModel = message != null && !message.isValidModel
 
         if (isInvalidModel) onInvalidKey(key)

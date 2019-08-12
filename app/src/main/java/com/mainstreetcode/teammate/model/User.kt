@@ -37,11 +37,11 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.persistence.entity.UserEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
-import com.mainstreetcode.teammate.util.ModelUtils.asString
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 
@@ -146,16 +146,16 @@ class User : UserEntity,
 
             val userObject = json.asJsonObject
 
-            val id = asString(UID_KEY, userObject)
-            val imageUrl = asString(IMAGE_KEY, userObject)
-            val screenName = asString(SCREEN_NAME, userObject)
-            val primaryEmail = asString(PRIMARY_EMAIL_KEY, userObject)
-            val firstName = asString(FIRST_NAME_KEY, userObject)
-            val lastName = asString(LAST_NAME_KEY, userObject)
-            val about = asString(ABOUT_KEY, userObject)
+            val id = userObject.asStringOrEmpty(UID_KEY)
+            val imageUrl = userObject.asStringOrEmpty(IMAGE_KEY)
+            val screenName = userObject.asStringOrEmpty(SCREEN_NAME)
+            val primaryEmail = userObject.asStringOrEmpty(PRIMARY_EMAIL_KEY)
+            val firstName = userObject.asStringOrEmpty(FIRST_NAME_KEY)
+            val lastName = userObject.asStringOrEmpty(LAST_NAME_KEY)
+            val about = userObject.asStringOrEmpty(ABOUT_KEY)
 
             return User(id, imageUrl, screenName, primaryEmail,
-                    ModelUtils.processString(firstName), ModelUtils.processString(lastName), ModelUtils.processString(about))
+                    firstName.processEmoji(), lastName.processEmoji(), about.processEmoji())
         }
 
         override fun serialize(src: User, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {

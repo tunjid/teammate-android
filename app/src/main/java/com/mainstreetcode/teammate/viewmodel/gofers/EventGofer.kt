@@ -36,7 +36,7 @@ import com.mainstreetcode.teammate.repository.GuestRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.asDifferentiables
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -94,7 +94,7 @@ constructor(
     override fun fetch(): Flowable<DiffUtil.DiffResult> {
         if (isSettingLocation) return Flowable.empty()
         val eventFlowable = getFunction.invoke(model).map(Event::asDifferentiables)
-        val guestsFlowable = guestRepository.modelsBefore(model, Date()).map(ModelUtils::asDifferentiables)
+        val guestsFlowable = guestRepository.modelsBefore(model, Date()).map(::asDifferentiables)
         val sourceFlowable = Flowable.concatDelayError(listOf(eventFlowable, guestsFlowable))
         return FunctionalDiff.of(sourceFlowable, items, this::preserveItems)
     }

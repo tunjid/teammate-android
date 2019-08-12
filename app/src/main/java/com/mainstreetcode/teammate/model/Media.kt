@@ -37,7 +37,7 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.persistence.entity.MediaEntity
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 import com.mainstreetcode.teammate.util.ObjectId
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -98,18 +98,18 @@ class Media : MediaEntity, TeamHost, Parcelable, Model<Media> {
 
             val mediaJson = json.asJsonObject
 
-            val id = ModelUtils.asString(UID_KEY, mediaJson)
-            val url = ModelUtils.asString(URL_KEY, mediaJson)
-            val mimeType = ModelUtils.asString(MIME_TYPE_KEY, mediaJson)
-            val thumbnail = ModelUtils.asString(THUMBNAIL_KEY, mediaJson)
+            val id = mediaJson.asStringOrEmpty(UID_KEY)
+            val url = mediaJson.asStringOrEmpty(URL_KEY)
+            val mimeType = mediaJson.asStringOrEmpty(MIME_TYPE_KEY)
+            val thumbnail = mediaJson.asStringOrEmpty(THUMBNAIL_KEY)
 
             val user = context.deserialize<User>(mediaJson.get(USER_KEY), User::class.java)
                     ?: User.empty()
             val team = context.deserialize<Team>(mediaJson.get(TEAM_KEY), Team::class.java)
                     ?: Team.empty()
 
-            val created = ModelUtils.parseDate(ModelUtils.asString(DATE_KEY, mediaJson))
-            val flagged = ModelUtils.asBoolean(FLAGGED_KEY, mediaJson)
+            val created = parseDate(mediaJson.asStringOrEmpty(DATE_KEY))
+            val flagged = mediaJson.asBooleanOrFalse(FLAGGED_KEY)
 
             return Media(id, url, mimeType, thumbnail, user, team, created, flagged)
         }

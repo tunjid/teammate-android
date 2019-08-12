@@ -36,6 +36,7 @@ import android.webkit.MimeTypeMap;
 
 import com.mainstreetcode.teammate.model.Media;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.MessageKt;
 import com.mainstreetcode.teammate.model.Team;
 import com.mainstreetcode.teammate.model.User;
 import com.mainstreetcode.teammate.notifications.MediaNotifier;
@@ -43,7 +44,7 @@ import com.mainstreetcode.teammate.notifications.NotifierProvider;
 import com.mainstreetcode.teammate.repository.ModelRepo;
 import com.mainstreetcode.teammate.repository.RepoProvider;
 import com.mainstreetcode.teammate.util.ErrorHandler;
-import com.mainstreetcode.teammate.util.ModelUtils;
+import com.mainstreetcode.teammate.util.ModelUtilsKt;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -200,7 +201,7 @@ public class MediaTransferIntentService extends IntentService {
 
         private void onError(Throwable throwable) {
             numErrors++;
-            Message message = Message.fromThrowable(throwable);
+            Message message = MessageKt.toMessage(throwable);
             if (message == null || !message.isAtMaxStorage()) return;
 
             maxStorageMessage = message.getMessage();
@@ -240,7 +241,7 @@ public class MediaTransferIntentService extends IntentService {
         }
 
         private String getMediaTitle(Media media, App app) {
-            return app.getString(R.string.media_download_title, media.getTeam().getName(), ModelUtils.prettyPrinter.format(media.getCreated()));
+            return app.getString(R.string.media_download_title, media.getTeam().getName(), ModelUtilsKt.getPrettyPrinter().format(media.getCreated()));
         }
 
         private boolean isExternalStorageWritable() {

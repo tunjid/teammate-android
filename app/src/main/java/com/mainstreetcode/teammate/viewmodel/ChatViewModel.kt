@@ -33,8 +33,8 @@ import com.mainstreetcode.teammate.notifications.NotifierProvider
 import com.mainstreetcode.teammate.repository.ChatRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.Logger
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.fullPrinter
+import com.mainstreetcode.teammate.util.areDifferentDays
+import com.mainstreetcode.teammate.util.fullPrinter
 import com.tunjid.androidbootstrap.functions.collections.Lists.findFirst
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -70,7 +70,7 @@ class ChatViewModel : TeamMappedViewModel<Chat>() {
         val now = Calendar.getInstance()
         then.time = created
 
-        val isToday = !ModelUtils.areDifferentDays(created, now.time)
+        val isToday = !areDifferentDays(created, now.time)
         val isYesterday = (!isToday && now.get(Calendar.DAY_OF_MONTH) - then.get(Calendar.DAY_OF_MONTH) == 1
                 && now.get(Calendar.MONTH) == then.get(Calendar.MONTH)
                 && now.get(Calendar.YEAR) == then.get(Calendar.YEAR))

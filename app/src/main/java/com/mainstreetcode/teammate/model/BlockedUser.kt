@@ -36,9 +36,10 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.BlockReason
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseDate
 import java.lang.reflect.Type
 import java.util.*
 
@@ -129,12 +130,12 @@ class BlockedUser private constructor(
 
             val jsonObject = json.asJsonObject
 
-            val id = ModelUtils.asString(UID_KEY, jsonObject)
-            val reasonCode = ModelUtils.asString(REASON_KEY, jsonObject)
+            val id = jsonObject.asStringOrEmpty(UID_KEY)
+            val reasonCode = jsonObject.asStringOrEmpty(REASON_KEY)
             val reason = Config.reasonFromCode(reasonCode)
             val team = context.deserialize<Team>(jsonObject.get(TEAM_KEY), Team::class.java)
             val user = context.deserialize<User>(jsonObject.get(USER_KEY), User::class.java)
-            val created = ModelUtils.parseDate(ModelUtils.asString(CREATED_KEY, jsonObject))
+            val created = parseDate(jsonObject.asStringOrEmpty(CREATED_KEY))
 
             return BlockedUser(id, user, team, reason, created)
         }

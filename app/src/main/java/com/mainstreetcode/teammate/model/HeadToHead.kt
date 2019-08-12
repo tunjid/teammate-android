@@ -37,7 +37,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.*
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -163,8 +163,8 @@ class HeadToHead {
 
                 for (element in jsonArray) {
                     val `object` = element.asJsonObject
-                    val count = ModelUtils.asFloat(COUNT, `object`).toInt()
-                    val id = ModelUtils.asString(WINNER, `object`.get(ID).asJsonObject)
+                    val count = `object`.asFloatOrZero(COUNT).toInt()
+                    val id = `object`.get(ID).asJsonObject.asStringOrEmpty(WINNER)
 
                     result.aggregates.add(Aggregate(count, id))
                 }

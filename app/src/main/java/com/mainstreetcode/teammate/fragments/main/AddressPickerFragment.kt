@@ -47,8 +47,8 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.Logger
-import com.mainstreetcode.teammate.util.ModelUtils.nameAddress
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.util.fullName
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import java.util.concurrent.atomic.AtomicReference
 
@@ -209,7 +209,7 @@ class AddressPickerFragment : MainActivityFragment() {
 
     private fun onAddressFound(address: Address) {
         scrollManager.recyclerView.visibility = View.GONE
-        location.text = nameAddress(address)
+        location.text = address.fullName
         location.visibility = View.VISIBLE
         currentAddress.set(address)
 

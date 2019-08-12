@@ -42,9 +42,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,7 +61,6 @@ import java.util.Arrays;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
-import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.Toolbar;
@@ -107,7 +104,7 @@ public class ViewHolderUtil extends ViewUtil {
     private static final int DEFAULT_STROKE_VALUE = -1;
 
     public static Function<CharSequence, CharSequence> allowsSpecialCharacters =
-            input -> ModelUtils.isValidScreenName(input) ? "" : App.getInstance().getResources().getString(R.string.no_special_characters);
+            input ->  ModelUtilsKt.isValidScreenName(input) ? "" : App.getInstance().getResources().getString(R.string.no_special_characters);
 
     @ColorInt
     public static int resolveThemeColor(Context context, @AttrRes int colorAttr) {
@@ -115,10 +112,6 @@ public class ViewHolderUtil extends ViewUtil {
         Resources.Theme theme = context.getTheme();
         theme.resolveAttribute(colorAttr, typedValue, true);
         return typedValue.data;
-    }
-
-    public static View getItemView(@LayoutRes int res, ViewGroup parent) {
-        return LayoutInflater.from(parent.getContext()).inflate(res, parent, false);
     }
 
     public static String getTransitionName(Object item, @IdRes int id) {
@@ -169,9 +162,13 @@ public class ViewHolderUtil extends ViewUtil {
     public static Single<Drawable> fetchRoundedDrawable(Context context, String url, int size, int placeholder) {
         return Single.<Bitmap>create(emitter -> Picasso.get().load(url).resize(size, size).centerCrop()
                 .into(new Target() {
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) { emitter.onSuccess(bitmap); }
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        if (!emitter.isDisposed()) emitter.onSuccess(bitmap);
+                    }
 
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) { emitter.onError(e); }
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        if (!emitter.isDisposed()) emitter.onError(e);
+                    }
 
                     public void onPrepareLoad(Drawable placeHolderDrawable) { }
                 }))
@@ -190,7 +187,8 @@ public class ViewHolderUtil extends ViewUtil {
         Drawable drawable = imageView.getDrawable();
 
         if (drawable == null) return error(new TeammateException("No drawable in ImageView"));
-        if (!(drawable instanceof BitmapDrawable)) return error(new TeammateException("Not a BitmapDrawable"));
+        if (!(drawable instanceof BitmapDrawable))
+            return error(new TeammateException("Not a BitmapDrawable"));
 
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         return Single.fromCallable(() -> Palette.from(bitmap).generate()).subscribeOn(io()).observeOn(mainThread());

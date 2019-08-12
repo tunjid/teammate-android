@@ -31,6 +31,7 @@ import android.net.NetworkInfo;
 import com.mainstreetcode.teammate.App;
 import com.mainstreetcode.teammate.R;
 import com.mainstreetcode.teammate.model.Message;
+import com.mainstreetcode.teammate.model.MessageKt;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class ErrorHandler implements Consumer<Throwable> {
     }
 
     private Message parseMessage(Throwable throwable) {
-        Message message = Message.fromThrowable(throwable);
+        Message message = MessageKt.toMessage(throwable);
         if (message != null) return message;
 
         App app = App.getInstance();

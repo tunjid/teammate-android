@@ -29,8 +29,8 @@ import android.util.SparseArray
 import android.view.View
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getActivity
+ import com.mainstreetcode.teammate.util.ViewHolderUtil.getActivity
+import com.mainstreetcode.teammate.util.get
 
 open class TextInputStyle(
         private val textRunnable: (() -> Unit)?,
@@ -83,7 +83,7 @@ open class TextInputStyle(
 
         private val behaviors = SparseArray<TextInputStyle>()
 
-        operator fun get(item: Item<*>): TextInputStyle = ModelUtils.get(
+        operator fun get(item: Item<*>): TextInputStyle =  get(
                 item.stringRes,
                 { behaviors.get(it) },
                 { key, value -> behaviors.put(key, value) },

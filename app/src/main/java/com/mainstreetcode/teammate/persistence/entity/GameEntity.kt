@@ -24,14 +24,14 @@
 
 package com.mainstreetcode.teammate.persistence.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.NonNull
-
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
+import androidx.room.PrimaryKey
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
@@ -40,14 +40,10 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.enums.Sport
-
+import com.mainstreetcode.teammate.util.EMPTY_STRING
+import com.mainstreetcode.teammate.util.asIntOrFalse
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
-import androidx.room.ForeignKey.CASCADE
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.parse
+import java.util.*
 
 
 @Entity(
@@ -234,11 +230,11 @@ open class GameEntity : Parcelable {
     fun competitorsDeclined(): Boolean = home.isDeclined || away.isDeclined
 
     fun setHomeScore(homeScore: String) {
-        this.homeScore = parse(homeScore)
+        this.homeScore = homeScore.asIntOrFalse()
     }
 
     fun setAwayScore(awayScore: String) {
-        this.awayScore = parse(awayScore)
+        this.awayScore = awayScore.asIntOrFalse()
     }
 
     override fun equals(other: Any?): Boolean {

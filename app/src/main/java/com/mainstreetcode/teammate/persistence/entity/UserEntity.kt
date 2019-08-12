@@ -32,7 +32,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.util.ModelUtils.processString
+import com.mainstreetcode.teammate.util.processEmoji
 
 @Entity(tableName = "users")
 open class UserEntity : Parcelable {
@@ -53,15 +53,15 @@ open class UserEntity : Parcelable {
 
     @ColumnInfo(name = "user_first_name")
     var firstName: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "user_last_name")
     var lastName: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "user_about")
     var about: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     constructor(id: String, imageUrl: String, screenName: String, primaryEmail: String,
                 firstName: CharSequence, lastName: CharSequence, about: CharSequence) {

@@ -36,8 +36,7 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
+import com.mainstreetcode.teammate.util.*
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -145,15 +144,15 @@ class Competitor : CompetitorEntity,
             if (tournament == null) tournament = Tournament.empty()
             if (game == null) game = Game.empty(Team.empty())
 
-            val id = ModelUtils.asString(ID, jsonObject)
-            val refPath = ModelUtils.asString(REF_PATH, jsonObject)
-            val created = ModelUtils.asString(CREATED, jsonObject)
+            val id = jsonObject.asStringOrEmpty(ID)
+            val refPath = jsonObject.asStringOrEmpty(REF_PATH)
+            val created = jsonObject.asStringOrEmpty(CREATED)
             val tournamentId = if (tournament.isEmpty) null else tournament.id
             val gameId = if (game.isEmpty) null else game.id
 
-            val seed = ModelUtils.asFloat(SEED, jsonObject).toInt()
-            val accepted = ModelUtils.asBoolean(ACCEPTED, jsonObject)
-            val declined = ModelUtils.asBoolean(DECLINED, jsonObject)
+            val seed = jsonObject.asFloatOrZero(SEED).toInt()
+            val accepted = jsonObject.asBooleanOrFalse(ACCEPTED)
+            val declined = jsonObject.asBooleanOrFalse(DECLINED)
 
             val competitive = context.deserialize<Competitive>(jsonObject.get(ENTITY),
                     if (User.COMPETITOR_TYPE == refPath) User::class.java else Team::class.java)
@@ -164,7 +163,7 @@ class Competitor : CompetitorEntity,
                     tournamentId = tournamentId,
                     gameId = gameId,
                     entity = competitive,
-                    created = ModelUtils.parseDate(created),
+                    created = parseDate(created),
                     seed = seed,
                     accepted = accepted,
                     declined = declined

@@ -27,22 +27,21 @@ package com.mainstreetcode.teammate.persistence.entity
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.NonNull
-
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
+import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.Visibility
-import com.mainstreetcode.teammate.util.ModelUtils
-
-import java.util.Date
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-
-import androidx.room.ForeignKey.CASCADE
-import com.mainstreetcode.teammate.util.ModelUtils.parse
-import com.mainstreetcode.teammate.util.ModelUtils.processString
+import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.prettyPrint
+import com.mainstreetcode.teammate.util.prettyPrinter
+import com.mainstreetcode.teammate.util.processEmoji
+import java.util.*
 
 
 @Entity(
@@ -76,7 +75,7 @@ open class EventEntity : Parcelable {
 
     @ColumnInfo(name = "event_location_name")
     var locationName: CharSequence
-        get() = processString(field)
+        get() = field.processEmoji()
 
     @ColumnInfo(name = "event_team")
     var team: Team
@@ -101,7 +100,7 @@ open class EventEntity : Parcelable {
         protected set
 
     val time: String
-        get() = ModelUtils.prettyPrinter.format(startDate)
+        get() = startDate.prettyPrint()
 
     val isPublic: Boolean
         get() = visibility.isPublic
@@ -162,15 +161,15 @@ open class EventEntity : Parcelable {
     }
 
     protected fun setStartDate(startDate: String) {
-        this.startDate = ModelUtils.parseDate(startDate, ModelUtils.prettyPrinter)
+        this.startDate = parseDate(startDate, prettyPrinter)
     }
 
     protected fun setEndDate(endDate: String) {
-        this.endDate = ModelUtils.parseDate(endDate, ModelUtils.prettyPrinter)
+        this.endDate = parseDate(endDate, prettyPrinter)
     }
 
     protected fun setSpots(spots: String) {
-        this.spots = parse(spots)
+        this.spots = spots.asIntOrFalse()
     }
 
     override fun equals(other: Any?): Boolean {

@@ -41,11 +41,14 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.persistence.entity.TeamEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.ModelUtils
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.areNotEmpty
-import com.mainstreetcode.teammate.util.ModelUtils.asString
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseCoordinates
+import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -185,25 +188,25 @@ class Team : TeamEntity,
 
             val teamJson = json.asJsonObject
 
-            val id = asString(UID_KEY, teamJson)
-            val name = asString(NAME_KEY, teamJson)
-            val screenName = asString(SCREEN_NAME, teamJson)
-            val city = asString(CITY_KEY, teamJson)
-            val state = asString(STATE_KEY, teamJson)
-            val zip = asString(ZIP_KEY, teamJson)
-            val sportCode = asString(SPORT_KEY, teamJson)
-            val description = asString(DESCRIPTION_KEY, teamJson)
-            val imageUrl = asString(IMAGE_URL_KEY, teamJson)
-            val created = ModelUtils.parseDate(asString(CREATED_KEY, teamJson))
-            val location = ModelUtils.parseCoordinates(LOCATION_KEY, teamJson)
+            val id = teamJson.asStringOrEmpty(UID_KEY)
+            val name = teamJson.asStringOrEmpty(NAME_KEY)
+            val screenName = teamJson.asStringOrEmpty(SCREEN_NAME)
+            val city = teamJson.asStringOrEmpty(CITY_KEY)
+            val state = teamJson.asStringOrEmpty(STATE_KEY)
+            val zip = teamJson.asStringOrEmpty(ZIP_KEY)
+            val sportCode = teamJson.asStringOrEmpty(SPORT_KEY)
+            val description = teamJson.asStringOrEmpty(DESCRIPTION_KEY)
+            val imageUrl = teamJson.asStringOrEmpty(IMAGE_URL_KEY)
+            val created = parseDate(teamJson.asStringOrEmpty(CREATED_KEY))
+            val location = teamJson.parseCoordinates(LOCATION_KEY)
             val sport = Config.sportFromCode(sportCode)
-            val storageUsed = ModelUtils.asFloat(STORAGE_USED_KEY, teamJson).toLong()
-            val maxStorage = ModelUtils.asFloat(MAX_STORAGE_KEY, teamJson).toLong()
-            val minAge = ModelUtils.asFloat(MIN_AGE_KEY, teamJson).toInt()
-            val maxAge = ModelUtils.asFloat(MAX_AGE_KEY, teamJson).toInt()
+            val storageUsed = teamJson.asFloatOrZero(STORAGE_USED_KEY).toLong()
+            val maxStorage = teamJson.asFloatOrZero(MAX_STORAGE_KEY).toLong()
+            val minAge = teamJson.asFloatOrZero(MIN_AGE_KEY).toInt()
+            val maxAge = teamJson.asFloatOrZero(MAX_AGE_KEY).toInt()
 
             return Team(id, imageUrl, screenName, city, state, zip,
-                    ModelUtils.processString(name), ModelUtils.processString(description),
+                    name.processEmoji(), description.processEmoji(),
                     created, location, sport, storageUsed, maxStorage, minAge, maxAge)
         }
 

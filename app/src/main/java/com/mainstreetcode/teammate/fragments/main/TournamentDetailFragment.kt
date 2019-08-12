@@ -55,7 +55,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ModelUtils
+import com.mainstreetcode.teammate.util.processEmoji
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 
 class TournamentDetailFragment : MainActivityFragment() {
@@ -230,7 +230,7 @@ class TournamentDetailFragment : MainActivityFragment() {
         winnerText.visibility = View.VISIBLE
         winnerView.visibility = View.VISIBLE
 
-        winnerText.text = ModelUtils.processString(getString(R.string.tournament_winner))
+        winnerText.text = getString(R.string.tournament_winner).processEmoji()
     }
 
     companion object {

@@ -40,8 +40,8 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.StatAttribute
 import com.mainstreetcode.teammate.model.enums.StatAttributes
 import com.mainstreetcode.teammate.model.enums.StatType
-import com.mainstreetcode.teammate.util.ModelUtils.EMPTY_STRING
-import com.mainstreetcode.teammate.util.ModelUtils.parseFloat
+import com.mainstreetcode.teammate.util.EMPTY_STRING
+import com.mainstreetcode.teammate.util.asFloatOrFalse
 import java.util.*
 
 
@@ -147,7 +147,7 @@ open class StatEntity : Parcelable {
     }
 
     protected fun setTime(time: String) {
-        this.time = parseFloat(time)
+        this.time = time.asFloatOrFalse()
     }
 
     fun compoundAttribute(attribute: StatAttribute) {
