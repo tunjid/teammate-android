@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.parseCoordinates
-import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.parseDateISO8601
 import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -197,7 +197,7 @@ class Team : TeamEntity,
             val sportCode = teamJson.asStringOrEmpty(SPORT_KEY)
             val description = teamJson.asStringOrEmpty(DESCRIPTION_KEY)
             val imageUrl = teamJson.asStringOrEmpty(IMAGE_URL_KEY)
-            val created = parseDate(teamJson.asStringOrEmpty(CREATED_KEY))
+            val created = teamJson.asStringOrEmpty(CREATED_KEY).parseDateISO8601()
             val location = teamJson.parseCoordinates(LOCATION_KEY)
             val sport = Config.sportFromCode(sportCode)
             val storageUsed = teamJson.asFloatOrZero(STORAGE_USED_KEY).toLong()

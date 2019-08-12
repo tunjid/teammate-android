@@ -198,7 +198,7 @@ class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*
             CHAT -> Chat::class.java
             GAME -> Game::class.java
             MEDIA -> Media::class.java
-            else -> Any::class.java
+            else -> ModelStub::class.java
         } as Class<T>
     }
 }

@@ -108,7 +108,7 @@ class Media : MediaEntity, TeamHost, Parcelable, Model<Media> {
             val team = context.deserialize<Team>(mediaJson.get(TEAM_KEY), Team::class.java)
                     ?: Team.empty()
 
-            val created = parseDate(mediaJson.asStringOrEmpty(DATE_KEY))
+            val created = mediaJson.asStringOrEmpty(DATE_KEY).parseDateISO8601()
             val flagged = mediaJson.asBooleanOrFalse(FLAGGED_KEY)
 
             return Media(id, url, mimeType, thumbnail, user, team, created, flagged)

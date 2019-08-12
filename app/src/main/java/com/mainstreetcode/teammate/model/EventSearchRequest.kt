@@ -36,9 +36,10 @@ import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.dateFormatter
 import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.dateFormatter
 import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.prettyPrint
 import com.mainstreetcode.teammate.util.prettyPrinter
 import java.lang.reflect.Type
 import java.util.*
@@ -48,11 +49,12 @@ class EventSearchRequest private constructor(
         private var distance: Int,
         sport: Sport,
         var location: LatLng?,
-        private var startDate: Date?,
-        private var endDate: Date?
+        private var startDate: Date,
+        private var endDate: Date
 ) : ListableModel<EventSearchRequest> {
 
     private var address: Address? = null
+
     var sport: Sport
         private set
 
@@ -88,15 +90,15 @@ class EventSearchRequest private constructor(
         this.endDate = parseDate(endDate, prettyPrinter)
     }
 
-    private fun getAddress(): CharSequence =
-            if (address == null) "" else address!!.locality + ", " + address!!.adminArea
+    private fun getAddress(): CharSequence = address?.let { it.locality + ", " + it.adminArea }
+            ?: ""
 
     private fun getDistance(): CharSequence =
             App.getInstance().getString(R.string.event_public_distance, distance)
 
-    private fun getStartDate(): CharSequence = prettyPrinter.format(startDate!!)
+    private fun getStartDate(): CharSequence = startDate.prettyPrint()
 
-    private fun getEndDate(): CharSequence = prettyPrinter.format(endDate!!)
+    private fun getEndDate(): CharSequence = endDate.prettyPrint()
 
     private fun buildItems(): List<Item<EventSearchRequest>> = listOf(
             Item.text(holder.get(0), 0, Item.LOCATION, R.string.location, this::getAddress, Item.IGNORE_SET, this),
@@ -118,10 +120,8 @@ class EventSearchRequest private constructor(
 
             if (!src.sport.isInvalid) serialized.addProperty(SPORT_KEY, src.sport.code)
 
-            if (src.startDate != null) {
-                serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate!!))
-                if (src.endDate != null) serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate!!))
-            }
+            serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate))
+            serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate))
 
             if (src.location != null) {
                 val coordinates = JsonArray()

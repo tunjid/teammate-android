@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.parseDateISO8601
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -163,7 +163,7 @@ class Stat : StatEntity,
             val statType = sport.statTypeFromCode(typeCode)
             val attributes = StatAttributes()
 
-            val stat = Stat(id, parseDate(created), statType, sport,
+            val stat = Stat(id, created.parseDateISO8601(), statType, sport,
                     user, team, game, attributes, value, time)
 
             if (!body.has(ATTRIBUTES) || !body.get(ATTRIBUTES).isJsonArray) return stat

@@ -42,22 +42,22 @@ import java.util.regex.Pattern
  * Static methods for models
  */
 
+const val EMPTY_STRING = ""
+
 val dateFormatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
     timeZone = TimeZone.getTimeZone("UTC")
 }
 
-const val EMPTY_STRING = ""
-val fullPrinter = SimpleDateFormat("MMM, d yyyy", Locale.US)
+private val fullPrinter = SimpleDateFormat("MMM, d yyyy", Locale.US)
 val prettyPrinter = SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US)
 
 
 private val screenName = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE)
 
-fun CharSequence.isValidScreenName(): Boolean {
-    return !screenName.matcher(this).find()
-}
+fun CharSequence.isValidScreenName(): Boolean = !screenName.matcher(this).find()
 
 fun Date.prettyPrint(): String = prettyPrinter.format(this)
+fun Date.calendarPrint(): String = fullPrinter.format(this)
 
 fun <T> deserializeList(context: JsonDeserializationContext, listElement: JsonElement?,
                         destination: MutableList<T>, type: Class<T>) {
@@ -77,9 +77,8 @@ fun <K, V> get(key: K, getter: (K) -> V?, setter: (K, V) -> Unit, instantiator: 
             temp
         }()
 
-fun asDifferentiables(subTypeList: List<Differentiable>): List<Differentiable> {
-    return ArrayList(subTypeList)
-}
+fun asDifferentiables(subTypeList: List<Differentiable>): List<Differentiable> =
+        ArrayList(subTypeList)
 
 fun replaceStringList(sourceList: List<String>, updatedList: List<String>) {
     val source = transform<String, Differentiable>(sourceList, { s -> Differentiable.fromCharSequence { s } }, { it.id })
@@ -173,12 +172,22 @@ fun areNotEmpty(vararg values: CharSequence): Boolean {
     return true
 }
 
-fun parseDate(date: String): Date {
+fun String.parseDateISO8601(): Date {
     val result: Date
     synchronized(dateFormatter) {
-        result = parseDate(date, dateFormatter)
+        result = parseDate(this, dateFormatter)
     }
     return result
+}
+
+fun parseDate(date: String, formatter: SimpleDateFormat): Date {
+    if (date.isBlank()) return Date()
+    return try {
+        formatter.parse(date) ?: Date()
+    } catch (e: ParseException) {
+        Date()
+    }
+
 }
 
 fun JsonElement.parseCoordinates(key: String): LatLng? {
@@ -199,16 +208,6 @@ fun JsonElement.parseCoordinates(key: String): LatLng? {
         LatLng(latitude.asDouble, longitude.asDouble)
     } catch (e: Exception) {
         null
-    }
-
-}
-
-fun parseDate(date: String, formatter: SimpleDateFormat): Date {
-    if (date.isBlank()) return Date()
-    return try {
-        formatter.parse(date) ?: Date()
-    } catch (e: ParseException) {
-        Date()
     }
 
 }

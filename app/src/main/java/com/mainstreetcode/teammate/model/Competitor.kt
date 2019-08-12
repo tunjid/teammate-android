@@ -163,7 +163,7 @@ class Competitor : CompetitorEntity,
                     tournamentId = tournamentId,
                     gameId = gameId,
                     entity = competitive,
-                    created = parseDate(created),
+                    created = created.parseDateISO8601(),
                     seed = seed,
                     accepted = accepted,
                     declined = declined

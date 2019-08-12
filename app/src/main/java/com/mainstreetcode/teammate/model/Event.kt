@@ -52,7 +52,7 @@ import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.dateFormatter
 import com.mainstreetcode.teammate.util.fullName
 import com.mainstreetcode.teammate.util.parseCoordinates
-import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.parseDateISO8601
 import com.mainstreetcode.teammate.util.prettyPrint
 import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -219,7 +219,7 @@ class Event : EventEntity,
 
             return Event(id, gameId, imageUrl,
                     name.processEmoji(), notes.processEmoji(), locationName.processEmoji(),
-                    parseDate(startDate), parseDate(endDate), team, location, visibility, spots)
+                    startDate.parseDateISO8601(), endDate.parseDateISO8601(), team, location, visibility, spots)
         }
 
         companion object {

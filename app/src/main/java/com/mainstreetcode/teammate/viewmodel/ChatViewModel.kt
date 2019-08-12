@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.repository.ChatRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.areDifferentDays
-import com.mainstreetcode.teammate.util.fullPrinter
+import com.mainstreetcode.teammate.util.calendarPrint
 import com.tunjid.androidbootstrap.functions.collections.Lists.findFirst
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -78,7 +78,7 @@ class ChatViewModel : TeamMappedViewModel<Chat>() {
         return when {
             isToday -> ""
             isYesterday -> App.getInstance().getString(R.string.chat_yesterday)
-            else -> fullPrinter.format(created)
+            else -> created.calendarPrint()
         }
     }
 

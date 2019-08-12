@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asBooleanOrFalse
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.parseDateISO8601
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -209,7 +209,7 @@ class Tournament : TournamentEntity,
 
             if (host == null) host = Team.empty()
 
-            return Tournament(id, imageUrl, refPath, name, description, parseDate(created), host,
+            return Tournament(id, imageUrl, refPath, name, description, created.parseDateISO8601(), host,
                     sport, type, style, winner, numLegs, numRounds, currentRound, numCompetitors, singleFinal)
         }
 
