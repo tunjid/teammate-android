@@ -85,8 +85,8 @@ open class TextInputStyle(
 
         operator fun get(item: Item<*>): TextInputStyle =  get(
                 item.stringRes,
-                { behaviors.get(it) },
-                { key, value -> behaviors.put(key, value) },
+                behaviors::get,
+                behaviors::put,
                 { invoke(item) }
         ).with(item)
 

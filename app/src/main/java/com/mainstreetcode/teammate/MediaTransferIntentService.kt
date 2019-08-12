@@ -53,7 +53,7 @@ class MediaTransferIntentService : IntentService("MediaUploadIntentService") {
             ACTION_UPLOAD -> handleActionUpload(
                     intent.getParcelableExtra<User>(EXTRA_USER),
                     intent.getParcelableExtra<Team>(EXTRA_TEAM),
-                    intent.getParcelableArrayListExtra<Uri>(EXTRA_URIS)
+                    intent.getParcelableArrayListExtra(EXTRA_URIS)
             )
             ACTION_DOWNLOAD -> handleActionDownload(intent.getParcelableArrayListExtra(EXTRA_MEDIA))
         }

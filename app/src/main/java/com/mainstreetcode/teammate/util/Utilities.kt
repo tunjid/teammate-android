@@ -48,12 +48,8 @@ fun areNotEmpty(vararg values: CharSequence): Boolean {
     return true
 }
 
-fun <K, V> get(key: K, getter: (K) -> V?, setter: (K, V) -> Unit, instantiator: () -> V): V =
-        getter.invoke(key) ?: {
-            val temp = instantiator.invoke()
-            setter.invoke(key, temp)
-            temp
-        }()
+fun <K, V> get(key: K, getter: (K) -> V?, setter: (K, V) -> Unit, creator: () -> V): V =
+        getter.invoke(key) ?: { creator.invoke().apply { setter.invoke(key, this) } }()
 
 val Address.fullName: String
     get() {
