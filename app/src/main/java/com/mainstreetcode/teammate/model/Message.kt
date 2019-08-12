@@ -94,7 +94,7 @@ class Message {
             Logger.log("ApiMessage", "Unable to read API error message", e)
         }
 
-        return Message(App.getInstance().getString(R.string.error_default))
+        return Message(App.instance.getString(R.string.error_default))
     }
 
     override fun equals(other: Any?): Boolean {

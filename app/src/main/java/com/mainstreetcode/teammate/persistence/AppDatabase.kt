@@ -178,7 +178,7 @@ abstract class AppDatabase : RoomDatabase() {
             get() {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(
-                            App.getInstance(),
+                            App.instance,
                             AppDatabase::class.java,
                             if (BuildConfig.DEV) DEV_DB else PROD_DB
                     )

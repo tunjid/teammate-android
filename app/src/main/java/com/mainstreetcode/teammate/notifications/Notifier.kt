@@ -51,7 +51,7 @@ import java.util.*
 
 abstract class Notifier<T : Model<T>> {
 
-    protected val app: App = App.getInstance()
+    protected val app: App = App.instance
     private val channelMap: MutableMap<String, NotificationChannel>
 
     internal abstract val notifyId: String

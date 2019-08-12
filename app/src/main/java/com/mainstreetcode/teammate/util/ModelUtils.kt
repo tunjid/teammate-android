@@ -26,11 +26,6 @@ package com.mainstreetcode.teammate.util
 
 import android.location.Address
 import androidx.emoji.text.EmojiCompat
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonElement
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.regex.Pattern
 
 /**
@@ -39,20 +34,19 @@ import java.util.regex.Pattern
 
 const val EMPTY_STRING = ""
 
-val dateFormatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
-    timeZone = TimeZone.getTimeZone("UTC")
-}
-
-private val fullPrinter = SimpleDateFormat("MMM, d yyyy", Locale.US)
-val prettyPrinter = SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.US)
-
-
 private val screenName = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE)
 
 fun CharSequence.isValidScreenName(): Boolean = !screenName.matcher(this).find()
 
-fun Date.prettyPrint(): String = prettyPrinter.format(this)
-fun Date.calendarPrint(): String = fullPrinter.format(this)
+fun CharSequence.processEmoji(): CharSequence {
+    val emojiCompat = EmojiCompat.get()
+    return if (emojiCompat.loadState == EmojiCompat.LOAD_STATE_SUCCEEDED) emojiCompat.process(this) else this
+}
+
+fun areNotEmpty(vararg values: CharSequence): Boolean {
+    for (value in values) if (value.isBlank()) return false
+    return true
+}
 
 fun <K, V> get(key: K, getter: (K) -> V?, setter: (K, V) -> Unit, instantiator: () -> V): V =
         getter.invoke(key) ?: {
@@ -60,24 +54,6 @@ fun <K, V> get(key: K, getter: (K) -> V?, setter: (K, V) -> Unit, instantiator: 
             setter.invoke(key, temp)
             temp
         }()
-
-fun CharSequence.processEmoji(): CharSequence {
-    val emojiCompat = EmojiCompat.get()
-    return if (emojiCompat.loadState == EmojiCompat.LOAD_STATE_SUCCEEDED) emojiCompat.process(this) else this
-}
-
-fun areDifferentDays(prev: Date?, next: Date): Boolean {
-    if (prev == null) return false
-
-    val prevCal = Calendar.getInstance()
-    val nextCal = Calendar.getInstance()
-    prevCal.time = prev
-    nextCal.time = next
-
-    return (prevCal.get(Calendar.DAY_OF_MONTH) != nextCal.get(Calendar.DAY_OF_MONTH)
-            || prevCal.get(Calendar.MONTH) != nextCal.get(Calendar.MONTH)
-            || prevCal.get(Calendar.YEAR) != nextCal.get(Calendar.YEAR))
-}
 
 val Address.fullName: String
     get() {
@@ -92,26 +68,4 @@ val Address.fullName: String
         return addressBuilder.toString()
     }
 
-fun areNotEmpty(vararg values: CharSequence): Boolean {
-    for (value in values) if (value.isBlank()) return false
-    return true
-}
-
-fun String.parseDateISO8601(): Date {
-    val result: Date
-    synchronized(dateFormatter) {
-        result = parseDate(this, dateFormatter)
-    }
-    return result
-}
-
-fun parseDate(date: String, formatter: SimpleDateFormat): Date {
-    if (date.isBlank()) return Date()
-    return try {
-        formatter.parse(date) ?: Date()
-    } catch (e: ParseException) {
-        Date()
-    }
-
-}
 

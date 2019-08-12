@@ -129,7 +129,7 @@ class Sport private constructor(
 
         private const val THONK = "\uD83E\uDD14"
 
-        fun empty(): Sport = Sport("", App.getInstance().getString(R.string.any_sport), THONK)
+        fun empty(): Sport = Sport("", App.instance.getString(R.string.any_sport), THONK)
     }
 }
 

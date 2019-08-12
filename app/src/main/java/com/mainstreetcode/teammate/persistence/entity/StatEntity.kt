@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.model.enums.StatAttribute
 import com.mainstreetcode.teammate.model.enums.StatAttributes
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.EMPTY_STRING
-import com.mainstreetcode.teammate.util.asFloatOrFalse
+import com.mainstreetcode.teammate.util.asFloatOrZero
 import java.util.*
 
 
@@ -147,7 +147,7 @@ open class StatEntity : Parcelable {
     }
 
     protected fun setTime(time: String) {
-        this.time = time.asFloatOrFalse()
+        this.time = time.asFloatOrZero()
     }
 
     fun compoundAttribute(attribute: StatAttribute) {

@@ -126,7 +126,7 @@ class Item<T> internal constructor(
         val FALSE = { _: Item<*> -> false }
 
         val ALL_INPUT_VALID = { _: Item<*> -> "" }
-        val NON_EMPTY = { input: Item<*> -> if (TextUtils.isEmpty(input.getValue())) App.getInstance().getString(R.string.team_invalid_empty_field) else "" }
+        val NON_EMPTY = { input: Item<*> -> if (TextUtils.isEmpty(input.getValue())) App.instance.getString(R.string.team_invalid_empty_field) else "" }
 
         fun <T> ignore(ignored: T) {}
 

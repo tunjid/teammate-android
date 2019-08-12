@@ -52,7 +52,7 @@ abstract class SharedPreferencesDao<T> : EntityDao<T>() {
         }
 
     private val preferences: SharedPreferences
-        get() = App.getInstance().getSharedPreferences(tableName, Context.MODE_PRIVATE)
+        get() = App.instance.getSharedPreferences(tableName, Context.MODE_PRIVATE)
 
     fun deleteCurrent() = preferences.edit().remove(KEY).apply()
 

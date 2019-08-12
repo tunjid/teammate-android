@@ -48,7 +48,7 @@ class TournamentStatAdapter(private val tournament: Tournament, fm: FragmentMana
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return App.getInstance().getString(if (shouldDisplayStandings(position))
+        return App.instance.getString(if (shouldDisplayStandings(position))
             R.string.tournament_standings
         else
             R.string.stat_ranks)

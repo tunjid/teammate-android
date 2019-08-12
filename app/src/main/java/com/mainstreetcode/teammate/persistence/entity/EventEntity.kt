@@ -36,10 +36,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.Visibility
-import com.mainstreetcode.teammate.util.asIntOrFalse
-import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.asIntOrZero
+import com.mainstreetcode.teammate.util.parsePrettyDate
 import com.mainstreetcode.teammate.util.prettyPrint
-import com.mainstreetcode.teammate.util.prettyPrinter
 import com.mainstreetcode.teammate.util.processEmoji
 import java.util.*
 
@@ -161,15 +160,15 @@ open class EventEntity : Parcelable {
     }
 
     protected fun setStartDate(startDate: String) {
-        this.startDate = parseDate(startDate, prettyPrinter)
+        this.startDate = startDate.parsePrettyDate()
     }
 
     protected fun setEndDate(endDate: String) {
-        this.endDate = parseDate(endDate, prettyPrinter)
+        this.endDate = endDate.parsePrettyDate()
     }
 
     protected fun setSpots(spots: String) {
-        this.spots = spots.asIntOrFalse()
+        this.spots = spots.asIntOrZero()
     }
 
     override fun equals(other: Any?): Boolean {

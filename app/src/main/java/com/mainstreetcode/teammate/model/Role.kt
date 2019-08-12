@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.persistence.entity.RoleEntity
 import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDateISO8601
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -158,7 +158,7 @@ class Role : RoleEntity,
             val position = Config.positionFromCode(positionName)
             val team = context.deserialize<Team>(roleJson.get(TEAM_KEY), Team::class.java)
             var user: User? = context.deserialize<User>(roleJson.get(USER_KEY), User::class.java)
-            val created = roleJson.asStringOrEmpty(CREATED_KEY).parseDateISO8601()
+            val created = roleJson.asStringOrEmpty(CREATED_KEY).parseISO8601Date()
 
             if (user == null) user = User.empty()
 

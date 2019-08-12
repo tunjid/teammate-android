@@ -71,7 +71,7 @@ class MediaNotifier internal constructor() : Notifier<Media>() {
                 .doFinally(this::onUploadComplete)
                 .subscribe(this::updateProgress, ErrorHandler.EMPTY::accept)
 
-        return mediaSingle.doOnSuccess { media -> App.getInstance().pushAlert(Alert.creation(media)) }
+        return mediaSingle.doOnSuccess { media -> App.instance.pushAlert(Alert.creation(media)) }
     }
 
     fun notifyDownloadComplete() {
@@ -80,7 +80,7 @@ class MediaNotifier internal constructor() : Notifier<Media>() {
     }
 
     private fun updateProgress(percentage: Int) {
-        val stats = MediaTransferIntentService.getUploadStats()
+        val stats = MediaTransferIntentService.uploadStats
 
         notifyOfUpload(mediaTransferBuilder()
                 .setContentText(app.getString(R.string.upload_progress_status, stats.numAttempted, stats.numToUpload, stats.numErrors))
@@ -90,7 +90,7 @@ class MediaNotifier internal constructor() : Notifier<Media>() {
 
     @SuppressLint("CheckResult")
     private fun onUploadComplete() {
-        val stats = MediaTransferIntentService.getUploadStats()
+        val stats = MediaTransferIntentService.uploadStats
         if (!stats.isComplete) return
 
 

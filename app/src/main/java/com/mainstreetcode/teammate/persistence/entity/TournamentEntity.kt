@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
-import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.asIntOrZero
 import com.mainstreetcode.teammate.util.asBooleanOrFalse
 import com.mainstreetcode.teammate.util.processEmoji
 import java.util.*
@@ -193,7 +193,7 @@ open class TournamentEntity : Parcelable {
     }
 
     protected fun setNumLegs(numLegs: String) {
-        this.numLegs = numLegs.asIntOrFalse()
+        this.numLegs = numLegs.asIntOrZero()
     }
 
     protected fun setSingleFinal(singleFinal: String) {

@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.EMPTY_STRING
-import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.asIntOrZero
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -230,11 +230,11 @@ open class GameEntity : Parcelable {
     fun competitorsDeclined(): Boolean = home.isDeclined || away.isDeclined
 
     fun setHomeScore(homeScore: String) {
-        this.homeScore = homeScore.asIntOrFalse()
+        this.homeScore = homeScore.asIntOrZero()
     }
 
     fun setAwayScore(awayScore: String) {
-        this.awayScore = awayScore.asIntOrFalse()
+        this.awayScore = awayScore.asIntOrZero()
     }
 
     override fun equals(other: Any?): Boolean {

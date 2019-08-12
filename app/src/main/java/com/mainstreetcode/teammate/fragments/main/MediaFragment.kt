@@ -206,7 +206,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
     override fun isSelected(media: Media): Boolean = mediaViewModel.isSelected(media)
 
     override fun onFilesSelected(uris: List<Uri>) {
-        MediaTransferIntentService.startActionUpload(context, userViewModel.currentUser, team, uris)
+        MediaTransferIntentService.startActionUpload(requireContext(), userViewModel.currentUser, team, uris)
     }
 
     override fun requestedTeam(): Team = team

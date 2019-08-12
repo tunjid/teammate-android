@@ -51,5 +51,5 @@ class TournamentRoundAdapter(private val tournament: Tournament, fm: FragmentMan
     }
 
     override fun getPageTitle(position: Int): CharSequence? =
-            App.getInstance().getString(R.string.tournament_round_index, position)
+            App.instance.getString(R.string.tournament_round_index, position)
 }

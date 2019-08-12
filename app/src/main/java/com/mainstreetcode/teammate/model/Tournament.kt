@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asBooleanOrFalse
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDateISO8601
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -100,7 +100,7 @@ class Tournament : TournamentEntity,
             Item.text(holder.get(3), 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::code, this::setStyle, this)
                     .textTransformer { value -> Config.tournamentStyleFromCode(value.toString()).getName() },
             Item.number(holder.get(4), 4, Item.NUMBER, R.string.tournament_legs, numLegs::toString, this::setNumLegs, this),
-            Item.number(holder.get(5), 5, Item.INFO, R.string.tournament_single_final, { App.getInstance().getString(if (isSingleFinal) R.string.yes else R.string.no) }, this::setSingleFinal, this)
+            Item.number(holder.get(5), 5, Item.INFO, R.string.tournament_single_final, { App.instance.getString(if (isSingleFinal) R.string.yes else R.string.no) }, this::setSingleFinal, this)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
@@ -209,7 +209,7 @@ class Tournament : TournamentEntity,
 
             if (host == null) host = Team.empty()
 
-            return Tournament(id, imageUrl, refPath, name, description, created.parseDateISO8601(), host,
+            return Tournament(id, imageUrl, refPath, name, description, created.parseISO8601Date(), host,
                     sport, type, style, winner, numLegs, numRounds, currentRound, numCompetitors, singleFinal)
         }
 

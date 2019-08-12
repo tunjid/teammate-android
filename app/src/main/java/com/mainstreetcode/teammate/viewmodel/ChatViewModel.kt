@@ -77,7 +77,7 @@ class ChatViewModel : TeamMappedViewModel<Chat>() {
 
         return when {
             isToday -> ""
-            isYesterday -> App.getInstance().getString(R.string.chat_yesterday)
+            isYesterday -> App.instance.getString(R.string.chat_yesterday)
             else -> created.calendarPrint()
         }
     }

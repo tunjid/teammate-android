@@ -76,7 +76,7 @@ public class ProgressRequestBody extends RequestBody {
 
         InputStream in;
 
-        try { in = App.getInstance().getContentResolver().openInputStream(uri);}
+        try { in = App.Companion.getInstance().getContentResolver().openInputStream(uri);}
         catch (Exception exception) {
             floatPublishSubject.onError(exception);
             throw exception;

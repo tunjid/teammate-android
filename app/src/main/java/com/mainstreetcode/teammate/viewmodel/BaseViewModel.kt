@@ -42,7 +42,7 @@ abstract class BaseViewModel : ViewModel() {
 
     init {
         @Suppress("LeakingThis")
-        disposable.add(App.getInstance().alerts().subscribe(this::onModelAlert, ErrorHandler.EMPTY::accept))
+        disposable.add(App.instance.alerts().subscribe(this::onModelAlert, ErrorHandler.EMPTY::accept))
         fetchAds()
     }
 
@@ -51,7 +51,7 @@ abstract class BaseViewModel : ViewModel() {
     internal open fun sortsAscending(): Boolean = false
 
     fun pushModelAlert(alert: Alert<*>) {
-        App.getInstance().pushAlert(alert)
+        App.instance.pushAlert(alert)
     }
 
     internal open fun onModelAlert(alert: Alert<*>) {}
@@ -99,7 +99,7 @@ abstract class BaseViewModel : ViewModel() {
     }
 
     private fun fetchAds() {
-        //        App app = App.getInstance();
+        //        App app = App.Companion.getInstance();
         //        AdLoader adLoader = new AdLoader.Builder(app, app.getString(R.string.admob_ad_id))
         //                .forAppInstallAd(appInstallAd -> ads.add(new InstallAd(appInstallAd)))
         //                .forContentAd(contentAd -> ads.add(new ContentAd(contentAd)))

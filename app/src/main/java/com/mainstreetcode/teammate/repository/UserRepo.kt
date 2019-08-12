@@ -47,7 +47,7 @@ import io.reactivex.schedulers.Schedulers.io
 
 class UserRepo internal constructor() : ModelRepo<User>() {
 
-    private val app: App = App.getInstance()
+    private val app: App = App.instance
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val userDao: UserDao = AppDatabase.instance.userDao()
 

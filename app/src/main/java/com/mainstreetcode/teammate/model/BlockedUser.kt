@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.model.enums.BlockReason
 import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDateISO8601
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import java.lang.reflect.Type
 import java.util.*
 
@@ -135,7 +135,7 @@ class BlockedUser private constructor(
             val reason = Config.reasonFromCode(reasonCode)
             val team = context.deserialize<Team>(jsonObject.get(TEAM_KEY), Team::class.java)
             val user = context.deserialize<User>(jsonObject.get(USER_KEY), User::class.java)
-            val created = jsonObject.asStringOrEmpty(CREATED_KEY).parseDateISO8601()
+            val created = jsonObject.asStringOrEmpty(CREATED_KEY).parseISO8601Date()
 
             return BlockedUser(id, user, team, reason, created)
         }

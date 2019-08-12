@@ -103,7 +103,7 @@ class Chat : ChatEntity, TeamHost, Parcelable, Model<Chat> {
                     ?: User.empty()
             val team: Team = context.deserialize<Team>(teamJson.get(TEAM_KEY), Team::class.java)
                     ?: Team.empty()
-            val created = teamJson.asStringOrEmpty(DATE_KEY).parseDateISO8601()
+            val created = teamJson.asStringOrEmpty(DATE_KEY).parseISO8601Date()
 
             return Chat(id, kind, content, user, team, created)
         }

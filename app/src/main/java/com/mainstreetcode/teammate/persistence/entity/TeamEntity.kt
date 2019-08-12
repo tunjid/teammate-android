@@ -33,7 +33,7 @@ import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.mainstreetcode.teammate.util.asIntOrFalse
+import com.mainstreetcode.teammate.util.asIntOrZero
 import com.mainstreetcode.teammate.util.processEmoji
 import java.util.*
 
@@ -159,11 +159,11 @@ open class TeamEntity : Parcelable {
     }
 
     fun setMinAge(minAge: String) {
-        this.minAge = minAge.asIntOrFalse()
+        this.minAge = minAge.asIntOrZero()
     }
 
     fun setMaxAge(maxAge: String) {
-        this.maxAge = maxAge.asIntOrFalse()
+        this.maxAge = maxAge.asIntOrZero()
     }
 
     override fun equals(other: Any?): Boolean {

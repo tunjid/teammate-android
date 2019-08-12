@@ -139,7 +139,7 @@ class TournamentEditAdapter(
                     { this.enabler(it) },
                     ALL_INPUT_VALID)
             Item.INFO -> {
-                val resources = App.getInstance().resources
+                val resources = App.instance.resources
                 SpinnerTextInputStyle(
                         R.string.tournament_single_final,
                         listOf(true, false),

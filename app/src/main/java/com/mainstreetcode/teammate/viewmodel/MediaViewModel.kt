@@ -112,7 +112,7 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
         val toDownload = selectionMap[team]?.let { ArrayList(it) }
         if (toDownload == null || toDownload.isEmpty()) return false
 
-        MediaTransferIntentService.startActionDownload(App.getInstance(), toDownload)
+        MediaTransferIntentService.startActionDownload(App.instance, toDownload)
         clearSelections(team)
         return true
     }

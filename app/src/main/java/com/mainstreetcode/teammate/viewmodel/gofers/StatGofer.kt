@@ -87,7 +87,7 @@ class StatGofer(
 
     fun switchTeams(): Flowable<DiffUtil.DiffResult> {
         if (eligibleTeams.size <= 1)
-            return Flowable.error(TeammateException(App.getInstance().getString(R.string.stat_only_team)))
+            return Flowable.error(TeammateException(App.instance.getString(R.string.stat_only_team)))
 
         val toSwap = if (eligibleTeams[0] == model.team) eligibleTeams[1] else eligibleTeams[0]
         return swap(toSwap, { model.team }, Team::update)

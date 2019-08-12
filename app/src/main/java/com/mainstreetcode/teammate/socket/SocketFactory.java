@@ -72,7 +72,7 @@ public class SocketFactory {
 
     private static SocketFactory INSTANCE;
 
-    private App app = App.getInstance();
+    private App app = App.Companion.getInstance();
 
     public static SocketFactory getInstance() {
         if (INSTANCE == null) INSTANCE = new SocketFactory();

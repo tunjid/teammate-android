@@ -99,7 +99,7 @@ class Guest : GuestEntity,
             val id = teamJson.asStringOrEmpty(ID_KEY)
             var user: User? = context.deserialize<User>(teamJson.get(USER_KEY), User::class.java)
             val event = context.deserialize<Event>(teamJson.get(EVENT_KEY), Event::class.java)
-            val created = teamJson.asStringOrEmpty(DATE_KEY).parseDateISO8601()
+            val created = teamJson.asStringOrEmpty(DATE_KEY).parseISO8601Date()
             val attending = teamJson.get(ATTENDING_KEY).asBoolean
 
             if (user == null) user = User.empty()

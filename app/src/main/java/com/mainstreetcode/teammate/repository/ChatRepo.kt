@@ -61,7 +61,7 @@ import io.socket.client.Socket.EVENT_ERROR
 
 class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
 
-    private val app: App = App.getInstance()
+    private val app: App = App.instance
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val chatDao: ChatDao = AppDatabase.instance.teamChatDao()
 

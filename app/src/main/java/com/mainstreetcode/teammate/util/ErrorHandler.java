@@ -105,7 +105,7 @@ public class ErrorHandler implements Consumer<Throwable> {
     }
 
     private boolean isOffline() {
-        App app = App.getInstance();
+        App app = App.Companion.getInstance();
         if (app == null) return true;
 
         ConnectivityManager connectivityManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -119,7 +119,7 @@ public class ErrorHandler implements Consumer<Throwable> {
         Message message = MessageKt.toMessage(throwable);
         if (message != null) return message;
 
-        App app = App.getInstance();
+        App app = App.Companion.getInstance();
 
         if ((isOffline() || throwable instanceof UnknownHostException) && app != null)
             return new Message(app.getString(R.string.error_network));

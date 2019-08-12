@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asBooleanOrFalse
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDateISO8601
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -221,7 +221,7 @@ class Game : GameEntity,
             if (tournament == null) tournament = Tournament.empty()
 
             return Game(id, name, refPath, score, matchUp, homeEntityId, awayEntityId, winnerEntityId,
-                    created.parseDateISO8601(), sport, referee, host, event, tournament,
+                    created.parseISO8601Date(), sport, referee, host, event, tournament,
                     home, away, winner, seed, leg, round, homeScore, awayScore, ended, canDraw)
         }
 

@@ -44,7 +44,7 @@ public class TextBitmapUtil {
         Bitmap bitmap = cache.get(key);
         if (bitmap != null) return bitmap;
 
-        TextView textView = new TextView(App.getInstance());
+        TextView textView = new TextView(App.Companion.getInstance());
 
         textView.setTextColor(Color.BLACK);
         textView.setText(text);

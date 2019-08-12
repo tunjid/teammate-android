@@ -42,7 +42,7 @@ import io.reactivex.schedulers.Schedulers.io
 
 class TeamRepo internal constructor() : ModelRepo<Team>() {
 
-    private val app: App = App.getInstance()
+    private val app: App = App.instance
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val teamDao: TeamDao = AppDatabase.instance.teamDao()
 

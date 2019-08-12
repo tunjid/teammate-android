@@ -35,12 +35,11 @@ import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
+import com.mainstreetcode.teammate.util.ISO8601Print
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.asIntOrFalse
-import com.mainstreetcode.teammate.util.dateFormatter
-import com.mainstreetcode.teammate.util.parseDate
+import com.mainstreetcode.teammate.util.asIntOrZero
+import com.mainstreetcode.teammate.util.parsePrettyDate
 import com.mainstreetcode.teammate.util.prettyPrint
-import com.mainstreetcode.teammate.util.prettyPrinter
 import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -74,7 +73,7 @@ class EventSearchRequest private constructor(
     }
 
     fun setDistance(distance: String) {
-        this.distance = distance.asIntOrFalse()
+        this.distance = distance.asIntOrZero()
         items[1].setValue(getDistance())
     }
 
@@ -83,18 +82,18 @@ class EventSearchRequest private constructor(
     }
 
     private fun setStartDate(startDate: String) {
-        this.startDate = parseDate(startDate, prettyPrinter)
+        this.startDate = startDate.parsePrettyDate()
     }
 
     private fun setEndDate(endDate: String) {
-        this.endDate = parseDate(endDate, prettyPrinter)
+        this.endDate = endDate.parsePrettyDate()
     }
 
     private fun getAddress(): CharSequence = address?.let { it.locality + ", " + it.adminArea }
             ?: ""
 
     private fun getDistance(): CharSequence =
-            App.getInstance().getString(R.string.event_public_distance, distance)
+            App.instance.getString(R.string.event_public_distance, distance)
 
     private fun getStartDate(): CharSequence = startDate.prettyPrint()
 
@@ -120,8 +119,8 @@ class EventSearchRequest private constructor(
 
             if (!src.sport.isInvalid) serialized.addProperty(SPORT_KEY, src.sport.code)
 
-            serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate))
-            serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate))
+            serialized.addProperty(START_DATE_KEY, src.startDate.ISO8601Print())
+            serialized.addProperty(END_DATE_KEY, src.endDate.ISO8601Print())
 
             if (src.location != null) {
                 val coordinates = JsonArray()

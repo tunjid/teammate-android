@@ -56,8 +56,8 @@ import io.reactivex.schedulers.Schedulers.io
 
 class LocationViewModel : ViewModel() {
 
-    private val geocoder = Geocoder(App.getInstance())
-    private val client = Places.createClient(App.getInstance())
+    private val geocoder = Geocoder(App.instance)
+    private val client = Places.createClient(App.instance)
 
     fun fromMap(map: GoogleMap): Maybe<Address> {
         val location = map.cameraPosition.target

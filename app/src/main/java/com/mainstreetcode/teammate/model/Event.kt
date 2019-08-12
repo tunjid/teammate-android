@@ -44,15 +44,15 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Visibility
 import com.mainstreetcode.teammate.persistence.entity.EventEntity
 import com.mainstreetcode.teammate.util.EMPTY_STRING
+import com.mainstreetcode.teammate.util.ISO8601Print
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.TextBitmapUtil
 import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.dateFormatter
 import com.mainstreetcode.teammate.util.fullName
 import com.mainstreetcode.teammate.util.parseCoordinates
-import com.mainstreetcode.teammate.util.parseDateISO8601
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.mainstreetcode.teammate.util.prettyPrint
 import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -172,9 +172,9 @@ class Event : EventEntity,
             serialized.addProperty(LOCATION_NAME_KEY, src.locationName.toString())
             serialized.addProperty(SPOTS_KEY, src.spots)
             serialized.addProperty(TEAM_KEY, src.team.id)
-            serialized.addProperty(START_DATE_KEY, dateFormatter.format(src.startDate))
-            serialized.addProperty(END_DATE_KEY, dateFormatter.format(src.endDate))
-            if (!TextUtils.isEmpty(src.gameId)) serialized.addProperty(GAME, src.gameId)
+            serialized.addProperty(START_DATE_KEY, src.startDate.ISO8601Print())
+            serialized.addProperty(END_DATE_KEY, src.endDate.ISO8601Print())
+            if (src.gameId.isNotBlank()) serialized.addProperty(GAME, src.gameId)
 
             val visibilityCode = src.visibility.code
             if (!TextUtils.isEmpty(visibilityCode))
@@ -219,7 +219,7 @@ class Event : EventEntity,
 
             return Event(id, gameId, imageUrl,
                     name.processEmoji(), notes.processEmoji(), locationName.processEmoji(),
-                    startDate.parseDateISO8601(), endDate.parseDateISO8601(), team, location, visibility, spots)
+                    startDate.parseISO8601Date(), endDate.parseISO8601Date(), team, location, visibility, spots)
         }
 
         companion object {

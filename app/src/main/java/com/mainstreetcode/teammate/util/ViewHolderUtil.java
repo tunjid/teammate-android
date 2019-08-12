@@ -104,7 +104,7 @@ public class ViewHolderUtil extends ViewUtil {
     private static final int DEFAULT_STROKE_VALUE = -1;
 
     public static Function<CharSequence, CharSequence> allowsSpecialCharacters =
-            input ->  ModelUtilsKt.isValidScreenName(input) ? "" : App.getInstance().getResources().getString(R.string.no_special_characters);
+            input ->  ModelUtilsKt.isValidScreenName(input) ? "" : App.Companion.getInstance().getResources().getString(R.string.no_special_characters);
 
     @ColorInt
     public static int resolveThemeColor(Context context, @AttrRes int colorAttr) {

@@ -42,7 +42,7 @@ import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asBooleanOrFalse
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.mainstreetcode.teammate.util.parseDateISO8601
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -172,7 +172,7 @@ class JoinRequest : JoinRequestEntity,
 
             var team: Team? = context.deserialize<Team>(requestJson.get(TEAM_KEY), Team::class.java)
             var user: User? = context.deserialize<User>(requestJson.get(USER_KEY), User::class.java)
-            val created = requestJson.asStringOrEmpty(CREATED_KEY).parseDateISO8601()
+            val created = requestJson.asStringOrEmpty(CREATED_KEY).parseISO8601Date()
 
             if (team == null) team = Team.empty()
             if (user == null) user = User.empty()
