@@ -61,13 +61,13 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
             model.isEmpty -> api.createTeam(model).map(getLocalUpdateFunction(model))
                     .flatMap<List<Role>> { RepoProvider.forRepo(RoleRepo::class.java).myRoles.lastOrError() }
                     .map { model }
-            else -> api.updateTeam(model.getId(), model).map(getLocalUpdateFunction(model))
+            else -> api.updateTeam(model.id, model).map(getLocalUpdateFunction(model))
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
         }
 
         val body = getBody(model.headerItem.getValue(), Team.PHOTO_UPLOAD_KEY)
         if (body != null) teamSingle = teamSingle.flatMap {
-            api.uploadTeamLogo(model.getId(), body)
+            api.uploadTeamLogo(model.id, body)
                     .map(getLocalUpdateFunction(model))
         }
 
@@ -82,7 +82,7 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
     }
 
     override fun delete(model: Team): Single<Team> =
-            api.deleteTeam(model.getId())
+            api.deleteTeam(model.id)
                     .map { this.deleteLocally(it) }
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
@@ -96,15 +96,15 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
 
     fun saveDefaultTeam(team: Team) {
         val preferences = app.getSharedPreferences(TEAM_REPOSITORY_KEY, Context.MODE_PRIVATE)
-        preferences.edit().putString(DEFAULT_TEAM, team.getId()).apply()
+        preferences.edit().putString(DEFAULT_TEAM, team.id).apply()
     }
 
     @Suppress("unused")
     private fun clearStaleTeamMembers(team: Team) {
         // Clear stale join requests and roles because the api version has the latest
         val database = AppDatabase.instance
-        database.roleDao().deleteByTeam(team.getId())
-        database.joinRequestDao().deleteByTeam(team.getId())
+        database.roleDao().deleteByTeam(team.id)
+        database.joinRequestDao().deleteByTeam(team.id)
     }
 
     companion object {

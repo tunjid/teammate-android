@@ -62,7 +62,6 @@ object FunctionalDiff {
         b = modelComparison
         a = b
 
-
         @Suppress("UNCHECKED_CAST")
         if (!isComparable(modelA, modelB)) return@comparing modelComparison
         else a += (modelA as Comparable<Any>).compareTo(modelB)
@@ -116,7 +115,5 @@ object FunctionalDiff {
     }
 
     private fun isComparable(modelA: Differentiable, modelB: Differentiable): Boolean =
-            (modelA is Comparable<*>
-                    && modelB is Comparable<*>
-                    && modelA.javaClass == modelB.javaClass)
+            modelA is Comparable<*> && modelB is Comparable<*> && modelA.javaClass == modelB.javaClass
 }

@@ -51,7 +51,7 @@ class CompetitorRepo internal constructor() : QueryRepo<Competitor, Tournament, 
 
     override fun createOrUpdate(model: Competitor): Single<Competitor> = when {
         model.isEmpty -> Single.error(TeammateException(""))
-        else -> api.updateCompetitor(model.getId(), model)
+        else -> api.updateCompetitor(model.id, model)
                 .map(getLocalUpdateFunction(model))
                 .doOnError { throwable -> deleteInvalidModel(model, throwable) }
     }.map(saveFunction)

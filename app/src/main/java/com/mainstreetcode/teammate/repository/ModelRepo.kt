@@ -42,7 +42,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
 import java.io.File
-import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -77,10 +76,7 @@ abstract class ModelRepo<T : Model<T>> {
                 .subscribe({ }, ErrorHandler.EMPTY::accept)
     }
 
-    internal fun getLocalUpdateFunction(original: T): (T) -> T = { emitted ->
-        original.update(emitted)
-        original
-    }
+    internal fun getLocalUpdateFunction(original: T): (T) -> T = { original.update(it); original }
 
     internal fun saveAsNested(): (List<T>) -> List<T> = inner@{ models ->
         if (models.isEmpty()) return@inner models
@@ -88,7 +84,7 @@ abstract class ModelRepo<T : Model<T>> {
         val litmus = models[0]
         if (litmus.hasMajorFields()) return@inner saveManyFunction.invoke(models)
 
-        dao().insert(Collections.unmodifiableList(models))
+        dao().insert(models)
         models
     }
 

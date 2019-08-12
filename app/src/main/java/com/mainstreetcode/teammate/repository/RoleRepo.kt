@@ -45,7 +45,7 @@ class RoleRepo internal constructor() : ModelRepo<Role>() {
 
     val myRoles: Flowable<List<Role>>
         get() {
-            val userId = RepoProvider.forRepo(UserRepo::class.java).currentUser.getId()
+            val userId = RepoProvider.forRepo(UserRepo::class.java).currentUser.id
             val local = roleDao.userRoles(userId).subscribeOn(io())
             val remote = api.myRoles.map(saveManyFunction).toMaybe()
 

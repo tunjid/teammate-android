@@ -38,13 +38,6 @@ import java.util.*
 @SuppressLint("ParcelCreator")
 class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : UserHost, TeamHost, Model<TeamMember> {
 
-    val created: Date
-        get() = when (wrappedModel) {
-            is Role -> wrappedModel.created
-            is JoinRequest -> wrappedModel.created
-            else -> Date()
-        }
-
     override val user: User
         get() = wrappedModel.user
 
@@ -56,6 +49,13 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
 
     override val imageUrl: String
         get() = wrappedModel.imageUrl
+
+    val created: Date
+        get() = when (wrappedModel) {
+            is Role -> wrappedModel.created
+            is JoinRequest -> wrappedModel.created
+            else -> Date()
+        }
 
     override fun getId(): String = wrappedModel.id
 
@@ -69,22 +69,19 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
         else -> id == other.id
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TeamMember) return false
-        val that = other as TeamMember?
-        return wrappedModel == that!!.wrappedModel
+    override fun equals(other: Any?): Boolean = when {
+        this === other -> true
+        other !is TeamMember -> false
+        else -> wrappedModel == other.wrappedModel
     }
 
     override fun hashCode(): Int = wrappedModel.hashCode()
 
-    override fun describeContents(): Int {
-        throw IllegalArgumentException("TeamMember instances are not Parcelable")
-    }
+    override fun describeContents(): Int =
+            throw IllegalArgumentException("TeamMember instances are not Parcelable")
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        throw IllegalArgumentException("TeamMember instances are not Parcelable")
-    }
+    override fun writeToParcel(dest: Parcel, flags: Int): Unit =
+            throw IllegalArgumentException("TeamMember instances are not Parcelable")
 
     class GsonAdapter : JsonDeserializer<TeamMember> {
 
@@ -105,4 +102,12 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
         }
     }
 
+}
+
+fun List<TeamMember>.split(listBiConsumer: (List<Role>, List<JoinRequest>) -> Unit) {
+    val unwrapped = map { it.wrappedModel }
+    val roles = unwrapped.filterIsInstance(Role::class.java)
+    val requests = unwrapped.filterIsInstance(JoinRequest::class.java)
+
+    listBiConsumer.invoke(roles, requests)
 }

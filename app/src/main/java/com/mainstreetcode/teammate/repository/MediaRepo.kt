@@ -66,7 +66,7 @@ class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
         val body = getBody(model.url, Media.UPLOAD_KEY)
                 ?: return Single.error(TeammateException("Unable to upload media"))
 
-        val mediaSingle = api.uploadTeamMedia(model.team.getId(), body)
+        val mediaSingle = api.uploadTeamMedia(model.team.id, body)
                 .map(getLocalUpdateFunction(model))
                 .map(saveFunction)
 
@@ -74,7 +74,7 @@ class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
     }
 
     override fun get(id: String): Flowable<Media> {
-        val local = mediaDao.get(id).subscribeOn(io())
+        val local = mediaDao[id].subscribeOn(io())
         val remote = api.getMedia(id).map(saveFunction).toMaybe()
 
         return fetchThenGetModel(local, remote)
@@ -116,13 +116,13 @@ class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
     }
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<Media>> =
-            api.getTeamMedia(key.getId(), pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
+            api.getTeamMedia(key.id, pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
 
     fun ownerDelete(models: List<Media>): Single<List<Media>> =
             api.deleteMedia(models).doAfterSuccess(this::delete)
 
     fun privilegedDelete(team: Team, models: List<Media>): Single<List<Media>> =
-            api.adminDeleteMedia(team.getId(), models).doAfterSuccess(this::delete)
+            api.adminDeleteMedia(team.id, models).doAfterSuccess(this::delete)
 
     private fun getBody(path: String, photoKey: String): MultipartBody.Part? {
         val uri = Uri.parse(path)

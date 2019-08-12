@@ -29,7 +29,7 @@ import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.TeamMember
 import com.mainstreetcode.teammate.persistence.entity.JoinRequestEntity
 import com.mainstreetcode.teammate.persistence.entity.RoleEntity
-import com.mainstreetcode.teammate.repository.split
+import com.mainstreetcode.teammate.model.split
 import java.util.*
 
 class TeamMemberDao : EntityDao<TeamMember>() {

@@ -44,26 +44,26 @@ class BlockedUserRepo internal constructor() : TeamQueryRepo<BlockedUser>() {
     override fun dao(): EntityDao<in BlockedUser> = EntityDao.daDont()
 
     override fun createOrUpdate(model: BlockedUser): Single<BlockedUser> =
-            api.blockUser(model.team.getId(), model)
+            api.blockUser(model.team.id, model)
                     .doOnSuccess { deleteBlockedUser(model.user, model.team) }
 
     override fun get(id: String): Flowable<BlockedUser> = Flowable.empty()
 
     override fun delete(model: BlockedUser): Single<BlockedUser> =
-            api.unblockUser(model.team.getId(), model)
+            api.unblockUser(model.team.id, model)
 
     override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<BlockedUser>> =
             Maybe.empty()
 
     override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<BlockedUser>> =
-            api.blockedUsers(key.getId(), pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
+            api.blockedUsers(key.id, pagination, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()
 
     override fun provideSaveManyFunction(): (List<BlockedUser>) -> List<BlockedUser> =
             { models -> models }
 
     private fun deleteBlockedUser(user: User, team: Team) {
-        val userId = user.getId()
-        val teamId = team.getId()
+        val userId = user.id
+        val teamId = team.id
         val database = AppDatabase.instance
         database.roleDao().deleteUsers(userId, teamId)
         database.guestDao().deleteUsers(userId, teamId)

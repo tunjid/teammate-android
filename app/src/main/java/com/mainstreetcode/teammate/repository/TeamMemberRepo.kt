@@ -28,6 +28,7 @@ import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamMember
+import com.mainstreetcode.teammate.model.split
 import com.mainstreetcode.teammate.model.toTeamMember
 import com.mainstreetcode.teammate.persistence.AppDatabase
 import com.mainstreetcode.teammate.persistence.EntityDao
@@ -71,9 +72,9 @@ class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
         val date = pagination ?: Date()
 
         val database = AppDatabase.instance
-        val teamId = key.getId()
+        val teamId = key.id
 
-        val rolesMaybe = database.roleDao().getRoles(key.getId(), date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
+        val rolesMaybe = database.roleDao().getRoles(key.id, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
         val requestsMaybe = database.joinRequestDao().getRequests(teamId, date, DEF_QUERY_LIMIT).defaultIfEmpty(ArrayList())
 
         return Maybes.zip<List<Role>, List<JoinRequest>, List<TeamMember>>(rolesMaybe, requestsMaybe, { roles, requests ->
@@ -98,19 +99,15 @@ class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
     private fun approveUser(request: JoinRequest): Single<TeamMember> =
             invoke(request, api.approveUser(request.id))
 
-    private fun invoke(request: JoinRequest, apiSingle: Single<Role>): Single<TeamMember> {
-        val member = request.toTeamMember()
-        return apiSingle
-                .map(forModel(Role::class.java).saveFunction)
+    private fun invoke(request: JoinRequest, apiSingle: Single<Role>): Single<TeamMember> = request.toTeamMember().let {
+        apiSingle.map(forModel(Role::class.java).saveFunction)
                 .doOnSuccess { AppDatabase.instance.joinRequestDao().delete(request) }
-                .map { member }
-                .doOnError { throwable -> deleteInvalidModel(member, throwable) }
+                .map { _ -> it }
+                .doOnError { throwable -> deleteInvalidModel(it, throwable) }
     }
 
-    override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember>> {
-        val maybe = api.getTeamMembers(key.getId(), pagination, DEF_QUERY_LIMIT).toMaybe()
-        return maybe.map(saveManyFunction)
-    }
+    override fun remoteModelsBefore(key: Team, pagination: Date?): Maybe<List<TeamMember>> =
+            api.getTeamMembers(key.id, pagination, DEF_QUERY_LIMIT).toMaybe().map(saveManyFunction)
 
     override fun provideSaveManyFunction(): (List<TeamMember>) -> List<TeamMember> = { models ->
         models.split { roles, requests ->
@@ -125,18 +122,10 @@ class TeamMemberRepo internal constructor() : TeamQueryRepo<TeamMember>() {
     private fun deleteStaleJoinRequests(roles: List<Role>?) {
         if (roles == null || roles.isEmpty()) return
 
-        val teamId = roles[0].team.getId()
-        val userIds = roles.map { it.user.getId() }.toTypedArray()
+        val teamId = roles[0].team.id
+        val userIds = roles.map { it.user.id }.toTypedArray()
 
         AppDatabase.instance.joinRequestDao().deleteRequestsFromTeam(teamId, userIds)
     }
 
-}
-
-fun List<TeamMember>.split(listBiConsumer: (List<Role>, List<JoinRequest>) -> Unit) {
-    val unwrapped = map { it.wrappedModel }
-    val roles = unwrapped.filterIsInstance(Role::class.java)
-    val requests = unwrapped.filterIsInstance(JoinRequest::class.java)
-
-    listBiConsumer.invoke(roles, requests)
 }

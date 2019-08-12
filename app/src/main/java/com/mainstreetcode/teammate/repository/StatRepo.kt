@@ -55,7 +55,7 @@ class StatRepo internal constructor() : QueryRepo<Stat, Game, Date>() {
     }.map(saveFunction)
 
     override fun get(id: String): Flowable<Stat> {
-        val local = statDao.get(id).subscribeOn(io())
+        val local = statDao[id].subscribeOn(io())
         val remote = api.getStat(id).subscribeOn(io()).toMaybe()
 
         return fetchThenGetModel(local, remote)
@@ -89,9 +89,9 @@ class StatRepo internal constructor() : QueryRepo<Stat, Game, Date>() {
             games.add(stat.game)
         }
 
-        RepoProvider.forModel(User::class.java).saveAsNested().invoke((users))
-        RepoProvider.forModel(Team::class.java).saveAsNested().invoke((teams))
-        RepoProvider.forModel(Game::class.java).saveAsNested().invoke((games))
+        RepoProvider.forModel(User::class.java).saveAsNested().invoke(users)
+        RepoProvider.forModel(Team::class.java).saveAsNested().invoke(teams)
+        RepoProvider.forModel(Game::class.java).saveAsNested().invoke(games)
         statDao.upsert(models)
 
         models
