@@ -165,7 +165,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
                 .remove(SESSION_COOKIE) // Delete cookies when signing out
                 .apply()
 
-        return userDao[userId]
+        return userDao.get(userId)
                 .flatMapSingle { this.delete(it) }
                 .flatMap {
                     currentUser = User.empty()

@@ -33,13 +33,9 @@ import com.mainstreetcode.teammate.persistence.AppDatabase
 class EventTypeConverter {
 
     @TypeConverter
-    fun toId(event: Event): String {
-        return event.id
-    }
+    fun toId(event: Event): String = event.id
 
     @TypeConverter
-    fun fromId(id: String): Event {
-        return AppDatabase.instance.eventDao().get(id)
-                .onErrorReturn { Event.empty() }.blockingGet(Event.empty())
-    }
+    fun fromId(id: String): Event = AppDatabase.instance.eventDao().get(id)
+            .onErrorReturn { Event.empty() }.blockingGet(Event.empty())
 }

@@ -33,12 +33,8 @@ import com.mainstreetcode.teammate.model.enums.TournamentStyle
 class TournamentStyleTypeConverter {
 
     @TypeConverter
-    fun toCode(style: TournamentStyle): String {
-        return style.code
-    }
+    fun toCode(style: TournamentStyle): String = style.code
 
     @TypeConverter
-    fun fromCode(code: String): TournamentStyle {
-        return Config.tournamentStyleFromCode(code)
-    }
+    fun fromCode(code: String): TournamentStyle = Config.tournamentStyleFromCode(code)
 }

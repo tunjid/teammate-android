@@ -33,12 +33,8 @@ import com.mainstreetcode.teammate.model.enums.Visibility
 class VisibilityTypeConverter {
 
     @TypeConverter
-    fun toCode(visibility: Visibility): String {
-        return visibility.code
-    }
+    fun toCode(visibility: Visibility): String = visibility.code
 
     @TypeConverter
-    fun fromCode(code: String): Visibility {
-        return Config.visibilityFromCode(code)
-    }
+    fun fromCode(code: String): Visibility = Config.visibilityFromCode(code)
 }

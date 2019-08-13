@@ -33,12 +33,8 @@ import com.mainstreetcode.teammate.model.enums.Sport
 class SportTypeConverter {
 
     @TypeConverter
-    fun toCode(sport: Sport): String {
-        return sport.code
-    }
+    fun toCode(sport: Sport): String = sport.code
 
     @TypeConverter
-    fun fromCode(code: String): Sport {
-        return Config.sportFromCode(code)
-    }
+    fun fromCode(code: String): Sport = Config.sportFromCode(code)
 }

@@ -29,8 +29,7 @@ import com.mainstreetcode.teammate.util.processEmoji
 
 class CharSequenceConverter {
     @TypeConverter
-    fun formString(value: String?): CharSequence? =
-            if (value == null) null else value.processEmoji()
+    fun formString(value: String?): CharSequence? = value?.processEmoji()
 
     @TypeConverter
     fun toString(sequence: CharSequence?): String? = sequence?.toString()

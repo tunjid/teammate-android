@@ -33,12 +33,8 @@ import com.mainstreetcode.teammate.model.enums.StatType
 class StatTypeTypeConverter {
 
     @TypeConverter
-    fun toCode(type: StatType): String {
-        return type.code
-    }
+    fun toCode(type: StatType): String = type.code
 
     @TypeConverter
-    fun fromCode(code: String): StatType {
-        return Config.statTypeFromCode(code)
-    }
+    fun fromCode(code: String): StatType = Config.statTypeFromCode(code)
 }

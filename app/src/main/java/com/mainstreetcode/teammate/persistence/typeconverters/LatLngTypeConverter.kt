@@ -25,24 +25,23 @@
 package com.mainstreetcode.teammate.persistence.typeconverters
 
 import androidx.room.TypeConverter
-import android.text.TextUtils
-
 import com.google.android.gms.maps.model.LatLng
 
 
 class LatLngTypeConverter {
 
     @TypeConverter
-    fun toDbValue(latLng: LatLng?): String {
-        return if (latLng == null) "" else latLng.latitude.toString() + "," + latLng.longitude
-    }
+    fun toDbValue(latLng: LatLng?): String =
+            if (latLng == null) "" else "${latLng.latitude},${latLng.longitude}"
 
     @TypeConverter
     fun fromId(source: String): LatLng? {
-        if (TextUtils.isEmpty(source)) return null
+        if (source.isBlank()) return null
+
         val split = source.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val latitude = java.lang.Double.parseDouble(split[0])
-        val longitude = java.lang.Double.parseDouble(split[1])
+        val latitude = split[0].toDouble()
+        val longitude = split[1].toDouble()
+
         return LatLng(latitude, longitude)
     }
 }

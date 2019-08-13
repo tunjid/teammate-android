@@ -33,12 +33,8 @@ import com.mainstreetcode.teammate.model.enums.Position
 class PositionTypeConverter {
 
     @TypeConverter
-    fun toCode(position: Position): String {
-        return position.code
-    }
+    fun toCode(position: Position): String = position.code
 
     @TypeConverter
-    fun fromCode(code: String): Position {
-        return Config.positionFromCode(code)
-    }
+    fun fromCode(code: String): Position = Config.positionFromCode(code)
 }

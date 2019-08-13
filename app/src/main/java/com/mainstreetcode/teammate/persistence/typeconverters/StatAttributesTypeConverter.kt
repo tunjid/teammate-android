@@ -33,12 +33,9 @@ import com.mainstreetcode.teammate.rest.TeammateService
 class StatAttributesTypeConverter {
 
     @TypeConverter
-    fun toString(attributes: StatAttributes): String {
-        return TeammateService.getGson().toJson(attributes)
-    }
+    fun toString(attributes: StatAttributes): String = TeammateService.getGson().toJson(attributes)
 
     @TypeConverter
-    fun fromJson(json: String): StatAttributes {
-        return TeammateService.getGson().fromJson(json, StatAttributes::class.java)
-    }
+    fun fromJson(json: String): StatAttributes =
+            TeammateService.getGson().fromJson(json, StatAttributes::class.java)
 }

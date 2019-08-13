@@ -33,13 +33,10 @@ import com.mainstreetcode.teammate.persistence.AppDatabase
 class CompetitorTypeConverter {
 
     @TypeConverter
-    fun toId(competitor: Competitor): String {
-        return competitor.id
-    }
+    fun toId(competitor: Competitor): String = competitor.id
 
     @TypeConverter
-    fun fromId(id: String): Competitor {
-        val found = AppDatabase.instance.competitorDao().get(id).blockingGet()
-        return found ?: Competitor.empty()
-    }
+    fun fromId(id: String): Competitor =
+            AppDatabase.instance.competitorDao().get(id).blockingGet(Competitor.empty())
+
 }

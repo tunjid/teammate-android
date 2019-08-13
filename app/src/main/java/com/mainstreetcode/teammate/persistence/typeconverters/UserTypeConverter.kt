@@ -33,13 +33,9 @@ import com.mainstreetcode.teammate.persistence.AppDatabase
 class UserTypeConverter {
 
     @TypeConverter
-    fun toId(user: User): String {
-        return user.id
-    }
+    fun toId(user: User): String = user.id
 
     @TypeConverter
-    fun fromId(id: String): User {
-        return AppDatabase.instance.userDao().get(id)
-                .onErrorReturn { error -> User.empty() }.blockingGet(User.empty())
-    }
+    fun fromId(id: String): User = AppDatabase.instance.userDao().get(id)
+            .onErrorReturn { User.empty() }.blockingGet(User.empty())
 }

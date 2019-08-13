@@ -33,13 +33,9 @@ import com.mainstreetcode.teammate.persistence.AppDatabase
 class TeamTypeConverter {
 
     @TypeConverter
-    fun toId(team: Team): String {
-        return team.id
-    }
+    fun toId(team: Team): String = team.id
 
     @TypeConverter
-    fun fromId(id: String): Team {
-        return AppDatabase.instance.teamDao().get(id)
-                .onErrorReturn { error -> Team.empty() }.blockingGet(Team.empty())
-    }
+    fun fromId(id: String): Team = AppDatabase.instance.teamDao().get(id)
+            .onErrorReturn { Team.empty() }.blockingGet(Team.empty())
 }

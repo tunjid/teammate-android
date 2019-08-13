@@ -51,7 +51,7 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
             val preferences = app.getSharedPreferences(TEAM_REPOSITORY_KEY, Context.MODE_PRIVATE)
             val defaultTeamId = preferences.getString(DEFAULT_TEAM, "")
 
-            return if (defaultTeamId.isNullOrBlank()) Maybe.empty() else teamDao[defaultTeamId].subscribeOn(io())
+            return if (defaultTeamId.isNullOrBlank()) Maybe.empty() else teamDao.get(defaultTeamId).subscribeOn(io())
         }
 
     override fun dao(): EntityDao<in Team> = teamDao
