@@ -71,7 +71,7 @@ class StatAggregate {
         }
 
         private fun buildItems(): List<Differentiable> = listOf<Differentiable>(
-                Item.text(holder.get(0), 0, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
+                Item.text(holder[0], 0, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
                         .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
                 user,
                 team
@@ -101,7 +101,7 @@ class StatAggregate {
 
         companion object {
             @Ignore
-            private val holder = IdCache.cache(1)
+            private val holder = IdCache(1)
 
             fun empty(): Request =
                     Request(User.empty(), Team.empty(), Config.sportFromCode(""))

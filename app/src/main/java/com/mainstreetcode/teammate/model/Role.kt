@@ -88,11 +88,11 @@ class Role : RoleEntity,
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun asItems(): List<Item<Role>> = listOf(
-            Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
-            Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder.get(2), 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }, this),
-            Item.text(holder.get(3), 3, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this),
-            Item.text(holder.get(4), 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
+            Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }, this),
+            Item.text(holder[3], 3, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this),
+            Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() }
     )
 
@@ -182,7 +182,7 @@ class Role : RoleEntity,
         const val PHOTO_UPLOAD_KEY = "role-photo"
 
         @Ignore
-        private val holder = IdCache.cache(5)
+        private val holder = IdCache(5)
 
         fun empty(): Role =
                 Role("", Config.getDefaultUserAvatar(), "", Position.empty(), Team.empty(), User.empty(), Date())

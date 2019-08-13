@@ -80,11 +80,11 @@ class User : UserEntity,
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
 
     override fun asItems(): List<Item<User>> = listOf(
-            Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
-            Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-            Item.text(holder.get(2), 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), { this.screenName = it }, this),
-            Item.email(holder.get(3), 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), { this.primaryEmail = it }, this),
-            Item.text(holder.get(4), 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
+            Item.text(holder[2], 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), { this.screenName = it }, this),
+            Item.email(holder[3], 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), { this.primaryEmail = it }, this),
+            Item.text(holder[4], 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
@@ -189,7 +189,7 @@ class User : UserEntity,
         const val PHOTO_UPLOAD_KEY = "user-photo"
         const val COMPETITOR_TYPE = "user"
         @Ignore
-        private val holder = IdCache.cache(5)
+        private val holder = IdCache(5)
 
         fun empty(): User = User("", Config.getDefaultUserAvatar(), "", "", "", "", "")
 

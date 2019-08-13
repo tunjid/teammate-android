@@ -83,19 +83,19 @@ class JoinRequest : JoinRequestEntity,
         }
 
     override fun asItems(): List<Item<JoinRequest>> = listOf(
-            Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
-            Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this),
-            Item.email(holder.get(3), 3, Item.INPUT, R.string.email, user::primaryEmail, { user.primaryEmail = it }, this),
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
+            Item.text(holder[2], 2, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this),
+            Item.email(holder[3], 3, Item.INPUT, R.string.email, user::primaryEmail, { user.primaryEmail = it }, this),
             // END USER ITEMS
-            Item.text(holder.get(4), 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
+            Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() },
             // START TEAM ITEMS
-            Item.text(holder.get(5), 5, Item.INPUT, R.string.team_name, team::name, Item.IGNORE_SET, this),
-            Item.text(holder.get(6), 6, Item.SPORT, R.string.team_sport, team.sport::code, Item.IGNORE_SET, this).textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
-            Item.text(holder.get(7), 7, Item.CITY, R.string.city, team::city, Item.IGNORE_SET, this),
-            Item.text(holder.get(8), 8, Item.STATE, R.string.state, team::state, Item.IGNORE_SET, this),
-            Item.text(holder.get(9), 9, Item.ZIP, R.string.zip, team::zip, Item.IGNORE_SET, this),
+            Item.text(holder[5], 5, Item.INPUT, R.string.team_name, team::name, Item.IGNORE_SET, this),
+            Item.text(holder[6], 6, Item.SPORT, R.string.team_sport, team.sport::code, Item.IGNORE_SET, this).textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
+            Item.text(holder[7], 7, Item.CITY, R.string.city, team::city, Item.IGNORE_SET, this),
+            Item.text(holder[8], 8, Item.STATE, R.string.state, team::state, Item.IGNORE_SET, this),
+            Item.text(holder[9], 9, Item.ZIP, R.string.zip, team::zip, Item.IGNORE_SET, this),
             Item.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, team::description, Item.IGNORE_SET, this),
             Item.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, team.minAge::toString, Item.IGNORE_SET, this),
             Item.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, team.maxAge::toString, Item.IGNORE_SET, this)
@@ -198,7 +198,7 @@ class JoinRequest : JoinRequestEntity,
     companion object {
 
         @Ignore
-        private val holder = IdCache.cache(13)
+        private val holder = IdCache(13)
 
         private fun copyTeam(team: Team): Team {
             val copy = Team.empty()

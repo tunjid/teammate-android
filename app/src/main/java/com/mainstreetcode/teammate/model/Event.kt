@@ -104,14 +104,14 @@ class Event : EventEntity,
     }
 
     override fun asItems(): List<Item<Event>> = listOf(
-            Item.text(holder.get(0), 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
-            Item.text(holder.get(1), 1, Item.VISIBILITY, R.string.event_visibility, visibility::code, this::setVisibility, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
+            Item.text(holder[1], 1, Item.VISIBILITY, R.string.event_visibility, visibility::code, this::setVisibility, this)
                     .textTransformer { value -> Config.visibilityFromCode(value.toString()).getName() },
-            Item.number(holder.get(2), 2, Item.NUMBER, R.string.event_spots, spots::toString, this::setSpots, this),
-            Item.text(holder.get(3), 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-            Item.text(holder.get(4), 4, Item.DATE, R.string.start_date, startDate::prettyPrint, this::setStartDate, this),
-            Item.text(holder.get(5), 5, Item.DATE, R.string.end_date, endDate::prettyPrint, this::setEndDate, this),
-            Item.text(holder.get(6), 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
+            Item.number(holder[2], 2, Item.NUMBER, R.string.event_spots, spots::toString, this::setSpots, this),
+            Item.text(holder[3], 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
+            Item.text(holder[4], 4, Item.DATE, R.string.start_date, startDate::prettyPrint, this::setStartDate, this),
+            Item.text(holder[5], 5, Item.DATE, R.string.end_date, endDate::prettyPrint, this::setEndDate, this),
+            Item.text(holder[6], 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
@@ -245,7 +245,7 @@ class Event : EventEntity,
         const val DEFAULT_NUM_SPOTS = 12
 
         @Ignore
-        private val holder = IdCache.cache(7)
+        private val holder = IdCache(7)
 
         fun empty(): Event {
             val date = Date()

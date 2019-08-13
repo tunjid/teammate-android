@@ -79,8 +79,8 @@ class Stat : StatEntity,
         get() = id.isBlank()
 
     override fun asItems(): List<Item<Stat>> = listOf(
-            Item.number(holder.get(0), 0, Item.NUMBER, R.string.stat_time, time::toString, this::setTime, this),
-            Item.text(holder.get(1), 1, Item.STAT_TYPE, R.string.stat_type, statType::code, this::setStatType, this)
+            Item.number(holder[0], 0, Item.NUMBER, R.string.stat_time, time::toString, this::setTime, this),
+            Item.text(holder[1], 1, Item.STAT_TYPE, R.string.stat_type, statType::code, this::setStatType, this)
                     .textTransformer { value -> sport.statTypeFromCode(value.toString()).getName() }
     )
 
@@ -197,7 +197,7 @@ class Stat : StatEntity,
     companion object {
 
         @Ignore
-        private val holder = IdCache.cache(2)
+        private val holder = IdCache(2)
 
         fun empty(game: Game): Stat {
             val sport = game.sport

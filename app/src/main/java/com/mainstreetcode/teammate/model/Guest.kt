@@ -68,9 +68,9 @@ class Guest : GuestEntity,
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::imageUrl, Item.IGNORE_SET, this)
 
     override fun asItems(): List<Item<Guest>> = listOf(
-            Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, Item.IGNORE_SET, this),
-            Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::lastName, Item.IGNORE_SET, this),
-            Item.email(holder.get(2), 2, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, Item.IGNORE_SET, this),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, Item.IGNORE_SET, this),
+            Item.email(holder[2], 2, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this)
     )
 
     override fun hasMajorFields(): Boolean = user.hasMajorFields()
@@ -129,7 +129,7 @@ class Guest : GuestEntity,
     companion object {
 
         @Ignore
-        private val holder = IdCache.cache(3)
+        private val holder = IdCache(3)
 
         fun forEvent(event: Event, attending: Boolean): Guest =
                 Guest("", User.empty(), event, Date(), attending)

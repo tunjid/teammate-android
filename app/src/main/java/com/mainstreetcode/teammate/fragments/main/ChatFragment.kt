@@ -117,7 +117,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
 
         dateHider = ViewHider.of(dateView).setDirection(TOP).build()
         newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build()
-        deferrer = Deferrer(2000, Runnable { dateHider?.hide() })
+        deferrer = Deferrer(2000) { dateHider?.hide() }
 
         scrollManager = ScrollManager.with<TeamChatViewHolder>(rootView.findViewById(R.id.chat))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))

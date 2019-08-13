@@ -76,9 +76,9 @@ class BlockedUser private constructor(
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.imageUrl), { Item.ignore(it) }, this)
 
     override fun asItems(): List<Item<BlockedUser>> = listOf(
-            Item.text(holder.get(0), 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
-            Item.text(holder.get(1), 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder.get(2), 2, Item.ROLE, R.string.team_role, reason::code, { Item.ignore(it) }, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
+            Item.text(holder[2], 2, Item.ROLE, R.string.team_role, reason::code, { Item.ignore(it) }, this)
                     .textTransformer { value -> Config.reasonFromCode(value.toString()).getName() })
 
     override fun update(updated: BlockedUser) {
@@ -153,7 +153,7 @@ class BlockedUser private constructor(
     companion object {
 
         @Ignore
-        private val holder = IdCache.cache(3)
+        private val holder = IdCache(3)
 
         fun block(user: User, team: Team, reason: BlockReason): BlockedUser =
                 BlockedUser("", user, team, reason, Date())

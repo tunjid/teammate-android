@@ -98,11 +98,11 @@ class Game : GameEntity,
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
 
     override fun asItems(): List<Item<Game>> = listOf(
-            Item.text(holder.get(0), 0, Item.NUMBER, R.string.game_competitors, this::name, Item.IGNORE_SET, this),
-            Item.number(holder.get(1), 1, Item.INPUT, R.string.game_home_score, homeScore::toString, this::setHomeScore, this),
-            Item.number(holder.get(2), 2, Item.INPUT, R.string.game_away_score, awayScore::toString, this::setAwayScore, this),
-            Item.number(holder.get(3), 3, Item.NUMBER, R.string.game_round, round::toString, Item.IGNORE_SET, this),
-            Item.number(holder.get(4), 4, Item.NUMBER, R.string.game_leg, leg::toString, Item.IGNORE_SET, this)
+            Item.text(holder[0], 0, Item.NUMBER, R.string.game_competitors, this::name, Item.IGNORE_SET, this),
+            Item.number(holder[1], 1, Item.INPUT, R.string.game_home_score, homeScore::toString, this::setHomeScore, this),
+            Item.number(holder[2], 2, Item.INPUT, R.string.game_away_score, awayScore::toString, this::setAwayScore, this),
+            Item.number(holder[3], 3, Item.NUMBER, R.string.game_round, round::toString, Item.IGNORE_SET, this),
+            Item.number(holder[4], 4, Item.NUMBER, R.string.game_leg, leg::toString, Item.IGNORE_SET, this)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
@@ -257,7 +257,7 @@ class Game : GameEntity,
     companion object {
 
         @Ignore
-        private val holder = IdCache.cache(5)
+        private val holder = IdCache(5)
 
         fun empty(team: Team): Game {
             val sport = team.sport

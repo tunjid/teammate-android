@@ -22,32 +22,24 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.util;
+package com.mainstreetcode.teammate.util
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
-import io.reactivex.Completable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.Completable
+import io.reactivex.disposables.Disposable
 
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 
-public class Deferrer {
+class Deferrer(private val delay: Long, private val toRun: () -> Unit) {
 
-    private final long delay;
-    private final Runnable toRun;
-    private final AtomicReference<Disposable> ref;
+    private val ref: AtomicReference<Disposable> = AtomicReference()
 
-    public Deferrer(long delay, Runnable toRun) {
-        this.delay = delay;
-        this.toRun = toRun;
-        ref = new AtomicReference<>();
-    }
-
-    public final void advanceDeadline() {
-        Disposable disposable = ref.get();
-        if (disposable != null) disposable.dispose();
-        ref.set(Completable.timer(delay, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe(toRun::run));
+    fun advanceDeadline() {
+        val disposable = ref.get()
+        disposable?.dispose()
+        ref.set(Completable.timer(delay, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe(toRun::invoke))
     }
 
 }

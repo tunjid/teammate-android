@@ -100,12 +100,12 @@ class EventSearchRequest private constructor(
     private fun getEndDate(): CharSequence = endDate.prettyPrint()
 
     private fun buildItems(): List<Item<EventSearchRequest>> = listOf(
-            Item.text(holder.get(0), 0, Item.LOCATION, R.string.location, this::getAddress, Item.IGNORE_SET, this),
-            Item.text(holder.get(1), 1, Item.INFO, R.string.event_distance, this::getDistance, Item.IGNORE_SET, this),
-            Item.text(holder.get(2), 2, Item.SPORT, R.string.team_sport, this::sportName, this::setSport, this)
+            Item.text(holder[0], 0, Item.LOCATION, R.string.location, this::getAddress, Item.IGNORE_SET, this),
+            Item.text(holder[1], 1, Item.INFO, R.string.event_distance, this::getDistance, Item.IGNORE_SET, this),
+            Item.text(holder[2], 2, Item.SPORT, R.string.team_sport, this::sportName, this::setSport, this)
                     .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
-            Item.text(holder.get(3), 3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
-            Item.text(holder.get(4), 4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
+            Item.text(holder[3], 3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
+            Item.text(holder[4], 4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
     )
 
     override fun asItems(): List<Item<EventSearchRequest>> = items
@@ -146,7 +146,7 @@ class EventSearchRequest private constructor(
     companion object {
 
         @Ignore
-        private val holder = IdCache.cache(5)
+        private val holder = IdCache(5)
 
         fun empty(): EventSearchRequest =
                 EventSearchRequest(5, Sport.empty(), null, Date(), Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)))

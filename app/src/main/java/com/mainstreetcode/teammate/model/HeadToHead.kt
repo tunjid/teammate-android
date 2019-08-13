@@ -93,9 +93,9 @@ class HeadToHead {
         }
 
         private fun buildItems(): List<Differentiable> = listOf<Differentiable>(
-                Item.text(holder.get(0), 0, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::code, this::setType, this)
+                Item.text(holder[0], 0, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::code, this::setType, this)
                         .textTransformer { value -> Config.tournamentTypeFromCode(value.toString()).getName() },
-                Item.text(holder.get(1), 1, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
+                Item.text(holder[1], 1, Item.SPORT, R.string.team_sport, sport::getName, this::setSport, this)
                         .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
                 home,
                 away
@@ -126,7 +126,7 @@ class HeadToHead {
         companion object {
 
             @Ignore
-            private val holder = IdCache.cache(2)
+            private val holder = IdCache(2)
 
             fun empty(): Request =
                     Request(Competitor.empty(), Competitor.empty(), Config.tournamentTypeFromCode(""), Config.sportFromCode(""))

@@ -22,27 +22,35 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.util;
+package com.mainstreetcode.teammate.util
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.tunjid.androidbootstrap.functions.Consumer
 
-public class IdCache {
+import java.util.concurrent.atomic.AtomicReference
 
-    private final List<String> ids;
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 
-    public static IdCache cache(int count) {return new IdCache(count);}
+class DiffWatcher<T>(private val consumer: (T) -> Unit) {
 
-    private IdCache(int count) {
-        ids = Collections.unmodifiableList(buildUniqueIds(count));
+    private val ref = AtomicReference<PublishSubject<T>>()
+    private val disposable = CompositeDisposable()
+
+    init {
+        watch()
     }
 
-    public String get(int index) {return ids.get(index);}
+    fun push(item: T) = ref.get().onNext(item)
 
-    private List<String> buildUniqueIds(int count) {
-        List<String> result = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) result.add(new ObjectId().toHexString());
-        return result;
+    fun stop() = disposable.clear()
+
+    fun restart() {
+        stop()
+        watch()
+    }
+
+    private fun watch() {
+        ref.set(PublishSubject.create())
+        disposable.add(ref.get().distinctUntilChanged().subscribe(consumer::invoke, ErrorHandler.EMPTY::accept))
     }
 }
