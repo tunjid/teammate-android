@@ -22,20 +22,20 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.util;
+package com.mainstreetcode.teammate.util
 
 
-import android.util.Log;
+import android.util.Log
 
-import com.mainstreetcode.teammate.BuildConfig;
+import com.mainstreetcode.teammate.BuildConfig
 
-public class Logger {
+object Logger {
 
-    public static void log(String source, String message, Throwable e) {
-        if (BuildConfig.DEV) Log.e(source, message, e);
+    fun log(source: String, message: String, e: Throwable) {
+        if (BuildConfig.DEV) Log.e(source, message, e)
     }
 
-    public static void log(String source, String message) {
-        if (BuildConfig.DEV) Log.e(source, message);
+    fun log(source: String, message: String) {
+        if (BuildConfig.DEV) Log.e(source, message)
     }
 }

@@ -29,6 +29,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
+import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
@@ -40,23 +41,21 @@ import android.view.inputmethod.EditorInfo
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
-
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.RegistrationActivity
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.ErrorHandler
+import com.mainstreetcode.teammate.util.hasValidName
+import com.mainstreetcode.teammate.util.hasValidEmail
+import com.mainstreetcode.teammate.util.hasValidPassword
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
-
-import java.util.concurrent.TimeUnit
-
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import io.reactivex.Completable
-
-import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
+import java.util.concurrent.TimeUnit
 
 
 class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionListener {
@@ -136,10 +135,10 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun signUp() {
-        val hasFirstName = VALIDATOR.isNotEmpty(firstNameInput)
-        val hasLastName = VALIDATOR.isNotEmpty(lastNameInput)
-        val hasEmail = VALIDATOR.isValidEmail(emailInput)
-        val hasPassword = VALIDATOR.isValidPassword(passwordInput)
+        val hasFirstName = firstNameInput.hasValidName
+        val hasLastName = lastNameInput.hasValidName
+        val hasEmail = emailInput.hasValidEmail
+        val hasPassword = passwordInput.hasValidPassword
         val acceptedTerms = terms!!.isChecked
 
         if (!acceptedTerms) showSnackbar(getString(R.string.sign_up_terms_accept))

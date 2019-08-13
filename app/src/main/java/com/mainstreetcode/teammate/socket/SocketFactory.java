@@ -130,7 +130,7 @@ public class SocketFactory {
         options.reconnectionAttempts = RECONNECTION_ATTEMPTS;
 
         try {socket = IO.socket(API_BASE_URL, options);}
-        catch (URISyntaxException e) {Logger.log(TAG, "Unable to build Socket", e);}
+        catch (URISyntaxException e) {Logger.INSTANCE.log(TAG, "Unable to build Socket", e);}
 
         return socket;
     }
@@ -174,11 +174,11 @@ public class SocketFactory {
 //    private void onReconnectionAttempt(Object... args) {}
 
     private void onReconnectionError(Object... args) {
-        Logger.log(TAG, "Reconnection Error", ((Exception) args[0]));
+        Logger.INSTANCE.log(TAG, "Reconnection Error", ((Exception) args[0]));
     }
 
     private void onError(Object... args) {
-        Logger.log(TAG, "Socket Error", ((Exception) args[0]));
+        Logger.INSTANCE.log(TAG, "Socket Error", ((Exception) args[0]));
 
         Socket socket = teamChatSocket.get();
 

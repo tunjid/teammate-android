@@ -70,9 +70,7 @@ class App : Application() {
         Places.initialize(applicationContext, getString(R.string.google_api_key))
     }
 
-    fun pushAlert(alert: Alert<*>) {
-        eventSource.onNext(alert)
-    }
+    fun pushAlert(alert: Alert<*>) = eventSource.onNext(alert)
 
     fun alerts(): Flowable<Alert<*>> = eventSource
 
@@ -94,12 +92,10 @@ class App : Application() {
 
     private fun getInitCallBack(tag: String): EmojiCompat.InitCallback {
         return object : EmojiCompat.InitCallback() {
-            override fun onInitialized() {
-                Logger.log(tag, "EmojiCompat initialized")
-            }
+            override fun onInitialized() = Logger.log(tag, "EmojiCompat initialized")
 
             override fun onFailed(throwable: Throwable?) {
-                Logger.log(tag, "EmojiCompat initialization failed", throwable)
+                if (throwable != null) Logger.log(tag, "EmojiCompat initialization failed", throwable)
             }
         }
     }

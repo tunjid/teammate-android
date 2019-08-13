@@ -25,9 +25,6 @@
 package com.mainstreetcode.teammate.fragments.registration
 
 import android.os.Bundle
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -35,10 +32,12 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
-
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
-import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.util.hasValidEmail
 
 /**
  * Forgot password screen
@@ -99,7 +98,7 @@ class ForgotPasswordFragment : RegistrationActivityFragment(), TextView.OnEditor
     }
 
     private fun sendForgotEmail() {
-        if (TeammatesBaseFragment.VALIDATOR.isValidEmail(emailInput)) {
+        if (emailInput.hasValidEmail) {
             toggleProgress(true)
 
             val email = emailInput!!.text.toString()

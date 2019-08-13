@@ -41,6 +41,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.RegistrationActivity
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
 import com.mainstreetcode.teammate.util.ErrorHandler
+import com.mainstreetcode.teammate.util.hasValidEmail
+import com.mainstreetcode.teammate.util.hasValidPassword
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -119,7 +121,7 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun signIn() {
-        if (VALIDATOR.isValidEmail(emailInput) && VALIDATOR.isValidPassword(passwordInput)) {
+        if (emailInput.hasValidEmail && passwordInput.hasValidPassword) {
             toggleProgress(true)
 
             val email = emailInput!!.text.toString()

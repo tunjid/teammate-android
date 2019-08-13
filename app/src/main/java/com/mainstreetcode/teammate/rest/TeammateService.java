@@ -223,7 +223,7 @@ public class TeammateService {
             builder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         }
         catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException | IllegalStateException e) {
-            Logger.log(TAG, "Unable to parse SSL cert", e);
+            Logger.INSTANCE.log(TAG, "Unable to parse SSL cert", e);
         }
     }
 

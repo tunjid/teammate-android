@@ -22,36 +22,37 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.util;
+package com.mainstreetcode.teammate.util
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.widget.HorizontalScrollView;
+import android.widget.EditText
 
-public class SyncedScrollView extends HorizontalScrollView {
+import java.util.regex.Pattern
 
-    private SyncedScrollManager scrollManager = null;
+/**
+ * Validates values
+ *
+ *
+ * Created by Shemanigans on 6/2/17.
+ */
 
-    public SyncedScrollView(Context context) {
-        super(context);
-    }
+private val emailPattern = Pattern.compile("^([a-zA-Z0-9_\\-.]+)@([a-zA-Z0-9_\\-]+)\\.([a-zA-Z]{2,5})$")
 
-    public SyncedScrollView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+val EditText?.hasValidPassword: Boolean
+    get() = guard("Invalid password", CharSequence::isValidPassword)
 
-    public SyncedScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+val EditText?.hasValidName: Boolean
+    get() = guard("Invalid name", CharSequence::isNotBlank)
 
-    @Override
-    protected void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-        super.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
-        if (scrollManager == null) return;
-        scrollManager.onScrollChanged(this, scrollX, scrollY, oldScrollX, oldScrollY);
-    }
+val EditText?.hasValidEmail: Boolean
+    get() = guard("Invalid email", CharSequence::isValidEmail)
 
-    public void setScrollManager(SyncedScrollManager scrollManager) {
-        this.scrollManager = scrollManager;
-    }
+private inline fun EditText?.guard(errorText: CharSequence, checker: (CharSequence) -> Boolean): Boolean {
+    if (this == null) return false
+    val isValid = checker(text)
+    if (!isValid) error = errorText
+    return isValid
 }
+
+private fun CharSequence.isValidEmail(): Boolean = emailPattern.matcher(this).matches()
+
+private fun CharSequence.isValidPassword(): Boolean = length > 6

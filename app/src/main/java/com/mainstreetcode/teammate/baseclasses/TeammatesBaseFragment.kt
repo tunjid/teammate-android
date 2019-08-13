@@ -49,7 +49,6 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.Validator
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
@@ -243,7 +242,6 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         val NONE: InsetFlags = InsetFlags.NONE
         private const val LIGHT_NAV_BAR_COLOR = -0x1f1f20 // Same as R.color.light_grey
 
-        val VALIDATOR = Validator()
     }
 
 }
