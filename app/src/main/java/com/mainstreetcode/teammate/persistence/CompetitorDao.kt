@@ -54,7 +54,7 @@ abstract class CompetitorDao : EntityDao<CompetitorEntity>() {
     abstract fun getCompetitors(tournamentId: String): Maybe<List<Competitor>>
 
     @Query("SELECT * FROM competitors" + " WHERE :id = competitor_id")
-    abstract operator fun get(id: String): Maybe<Competitor>
+    abstract fun get(id: String): Maybe<Competitor>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<CompetitorEntity>)

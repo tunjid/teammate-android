@@ -88,7 +88,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     }
 
     override fun get(id: String): Flowable<User> {
-        var local = userDao[id].subscribeOn(io())
+        var local = userDao.get(id).subscribeOn(io())
         var remote = api.me.map(saveFunction)
 
         if (id == currentUser.id) {

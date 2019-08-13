@@ -45,7 +45,7 @@ abstract class GuestDao : EntityDao<GuestEntity>() {
         get() = "guests"
 
     @Query("SELECT * FROM guests" + " WHERE :id = guest_id")
-    abstract operator fun get(id: String): Maybe<Guest>
+    abstract fun get(id: String): Maybe<Guest>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<GuestEntity>)

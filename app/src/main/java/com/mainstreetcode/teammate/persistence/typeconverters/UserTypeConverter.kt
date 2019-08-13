@@ -39,7 +39,7 @@ class UserTypeConverter {
 
     @TypeConverter
     fun fromId(id: String): User {
-        return AppDatabase.instance.userDao()[id]
+        return AppDatabase.instance.userDao().get(id)
                 .onErrorReturn { error -> User.empty() }.blockingGet(User.empty())
     }
 }

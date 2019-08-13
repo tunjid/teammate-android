@@ -33,6 +33,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonSerializationContext
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.model.Chat
+import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.persistence.AppDatabase
@@ -112,7 +113,7 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
             .firstElement()
             .toFlowable()
             .flatMap { Flowable.fromIterable(it) }
-            .map { it.team }
+            .map(Role::team)
             .map { team -> Pair(team.id, getLastTeamSeen(team)) }
             .flatMapMaybe { teamDatePair -> chatDao.unreadChats(teamDatePair.first, teamDatePair.second) }
             .filter { chats -> chats.isNotEmpty() }

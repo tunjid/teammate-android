@@ -53,7 +53,7 @@ abstract class TeamDao : EntityDao<TeamEntity>() {
     abstract val teams: Maybe<List<Team>>
 
     @Query("SELECT * FROM teams" + " WHERE :id = team_id")
-    abstract operator fun get(id: String): Maybe<Team>
+    abstract fun get(id: String): Maybe<Team>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<TeamEntity>)

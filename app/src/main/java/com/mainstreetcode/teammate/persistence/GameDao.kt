@@ -63,7 +63,7 @@ abstract class GameDao : EntityDao<GameEntity>() {
     abstract fun getGames(tournamentId: String, round: Int, limit: Int): Maybe<List<Game>>
 
     @Query("SELECT * FROM games" + " WHERE :id = game_id")
-    abstract operator fun get(id: String): Maybe<Game>
+    abstract fun get(id: String): Maybe<Game>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<GameEntity>)

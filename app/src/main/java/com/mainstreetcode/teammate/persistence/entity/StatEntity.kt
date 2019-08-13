@@ -139,7 +139,7 @@ open class StatEntity : Parcelable {
         this.id = id
     }
 
-    operator fun contains(attribute: StatAttribute): Boolean = attributes.contains(attribute)
+    fun contains(attribute: StatAttribute): Boolean = attributes.contains(attribute)
 
     protected fun setStatType(statType: String) {
         this.statType = sport.statTypeFromCode(statType)

@@ -40,7 +40,7 @@ class TournamentTypeConverter {
 
     @TypeConverter
     fun fromId(id: String): Tournament {
-        return AppDatabase.instance.tournamentDao()[id]
+        return AppDatabase.instance.tournamentDao().get(id)
                 .onErrorReturn { error -> Tournament.empty(Team.empty()) }.blockingGet(Tournament.empty(Team.empty()))
     }
 }

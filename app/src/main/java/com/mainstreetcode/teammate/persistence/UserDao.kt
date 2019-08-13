@@ -50,7 +50,7 @@ abstract class UserDao : EntityDao<UserEntity>() {
         get() = "users"
 
     @Query("SELECT * FROM users WHERE :id = user_id")
-    abstract operator fun get(id: String): Maybe<User>
+    abstract fun get(id: String): Maybe<User>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<UserEntity>)

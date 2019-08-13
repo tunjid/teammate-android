@@ -53,7 +53,7 @@ abstract class EventDao : EntityDao<EventEntity>() {
     abstract fun getEvents(teamId: String, date: Date, limit: Int): Maybe<List<Event>>
 
     @Query("SELECT * FROM events" + " WHERE :id = event_id")
-    abstract operator fun get(id: String): Maybe<Event>
+    abstract fun get(id: String): Maybe<Event>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<EventEntity>)

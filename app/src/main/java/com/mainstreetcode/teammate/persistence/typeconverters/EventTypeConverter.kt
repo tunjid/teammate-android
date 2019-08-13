@@ -39,7 +39,7 @@ class EventTypeConverter {
 
     @TypeConverter
     fun fromId(id: String): Event {
-        return AppDatabase.instance.eventDao()[id]
+        return AppDatabase.instance.eventDao().get(id)
                 .onErrorReturn { Event.empty() }.blockingGet(Event.empty())
     }
 }

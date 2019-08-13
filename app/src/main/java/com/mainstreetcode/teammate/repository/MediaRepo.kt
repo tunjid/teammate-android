@@ -74,7 +74,7 @@ class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
     }
 
     override fun get(id: String): Flowable<Media> {
-        val local = mediaDao[id].subscribeOn(io())
+        val local = mediaDao.get(id).subscribeOn(io())
         val remote = api.getMedia(id).map(saveFunction).toMaybe()
 
         return fetchThenGetModel(local, remote)
@@ -82,7 +82,7 @@ class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
 
     override fun delete(model: Media): Single<Media> =
             api.deleteMedia(model.id)
-                    .map { this.deleteLocally(it) }
+                    .map(this::deleteLocally)
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
 

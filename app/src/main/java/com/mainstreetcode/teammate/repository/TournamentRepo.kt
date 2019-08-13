@@ -68,7 +68,7 @@ class TournamentRepo internal constructor() : TeamQueryRepo<Tournament>() {
     }
 
     override fun get(id: String): Flowable<Tournament> {
-        val local = tournamentDao[id].subscribeOn(io())
+        val local = tournamentDao.get(id).subscribeOn(io())
         val remote = api.getTournament(id).map(saveFunction).toMaybe()
 
         return fetchThenGetModel(local, remote)

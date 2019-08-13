@@ -75,7 +75,7 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
     }
 
     override fun get(id: String): Flowable<Team> {
-        val local = teamDao[id].subscribeOn(io())
+        val local = teamDao.get(id).subscribeOn(io())
         val remote = api.getTeam(id).map(saveFunction).toMaybe()
 
         return fetchThenGetModel(local, remote)

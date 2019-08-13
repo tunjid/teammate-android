@@ -39,7 +39,7 @@ class CompetitorTypeConverter {
 
     @TypeConverter
     fun fromId(id: String): Competitor {
-        val found = AppDatabase.instance.competitorDao()[id].blockingGet()
+        val found = AppDatabase.instance.competitorDao().get(id).blockingGet()
         return found ?: Competitor.empty()
     }
 }

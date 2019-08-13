@@ -59,7 +59,7 @@ abstract class MediaDao : EntityDao<MediaEntity>() {
     @Query("SELECT *" +
             " FROM team_media" +
             " WHERE :id = media_id")
-    abstract operator fun get(id: String): Maybe<Media>
+    abstract fun get(id: String): Maybe<Media>
 
     @Query("SELECT *" +
             " FROM team_media" +

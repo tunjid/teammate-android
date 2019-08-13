@@ -57,7 +57,7 @@ abstract class StatDao : EntityDao<StatEntity>() {
     abstract fun getStats(game_id: String, date: Date, limit: Int): Maybe<List<Stat>>
 
     @Query("SELECT * FROM stats" + " WHERE :id = stat_id")
-    abstract operator fun get(id: String): Maybe<Stat>
+    abstract fun get(id: String): Maybe<Stat>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<StatEntity>)

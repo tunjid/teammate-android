@@ -25,7 +25,7 @@
 package com.mainstreetcode.teammate.adapters.viewholders.input
 
 import android.view.View
-
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -36,8 +36,6 @@ import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.enums.StatAttribute
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.model.enums.StatTypes
-
-import androidx.recyclerview.widget.RecyclerView
 
 class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder<Nothing>(itemView) {
 
@@ -59,11 +57,9 @@ class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder<Noth
                 get() = if (isEnabled) statType.attributes else stat.attributes
 
             override val isEnabled: Boolean
-                get() = textInputStyle != null && textInputStyle!!.isEditable
+                get() = textInputStyle?.isEditable ?: false
 
-            override fun isSelected(attribute: StatAttribute): Boolean {
-                return stat.contains(attribute)
-            }
+            override fun isSelected(attribute: StatAttribute): Boolean = stat.contains(attribute)
 
             override fun onAttributeTapped(attribute: StatAttribute) {
                 if (!isEnabled) return

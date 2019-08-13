@@ -39,7 +39,7 @@ class TeamTypeConverter {
 
     @TypeConverter
     fun fromId(id: String): Team {
-        return AppDatabase.instance.teamDao()[id]
+        return AppDatabase.instance.teamDao().get(id)
                 .onErrorReturn { error -> Team.empty() }.blockingGet(Team.empty())
     }
 }

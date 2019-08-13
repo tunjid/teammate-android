@@ -60,7 +60,7 @@ abstract class ChatDao : EntityDao<ChatEntity>() {
     abstract fun unreadChats(teamId: String, date: Date): Maybe<List<Chat>>
 
     @Query("SELECT * FROM team_chats" + " WHERE :id = team_chat_id")
-    abstract operator fun get(id: String): Maybe<Chat>
+    abstract fun get(id: String): Maybe<Chat>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<ChatEntity>)

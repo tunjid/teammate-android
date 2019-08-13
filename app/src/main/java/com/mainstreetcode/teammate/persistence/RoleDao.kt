@@ -53,7 +53,7 @@ abstract class RoleDao : EntityDao<RoleEntity>() {
         get() = "roles"
 
     @Query("SELECT * FROM roles" + " WHERE :id = role_id")
-    abstract operator fun get(id: String): Maybe<Role>
+    abstract fun get(id: String): Maybe<Role>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<RoleEntity>)

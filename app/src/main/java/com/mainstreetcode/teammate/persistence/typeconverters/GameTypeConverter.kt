@@ -40,6 +40,6 @@ class GameTypeConverter {
 
     @TypeConverter
     fun fromId(id: String): Game {
-        return AppDatabase.instance.gameDao()[id].blockingGet(Game.empty(Team.empty()))
+        return AppDatabase.instance.gameDao().get(id).blockingGet(Game.empty(Team.empty()))
     }
 }

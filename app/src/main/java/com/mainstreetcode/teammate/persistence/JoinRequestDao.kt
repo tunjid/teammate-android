@@ -53,7 +53,7 @@ abstract class JoinRequestDao : EntityDao<JoinRequestEntity>() {
         get() = "join_requests"
 
     @Query("SELECT * FROM join_requests" + " WHERE :id = join_request_id")
-    abstract operator fun get(id: String): Maybe<JoinRequest>
+    abstract fun get(id: String): Maybe<JoinRequest>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract override fun insert(models: List<JoinRequestEntity>)

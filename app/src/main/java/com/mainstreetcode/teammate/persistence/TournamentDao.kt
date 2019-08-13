@@ -61,7 +61,7 @@ abstract class TournamentDao : EntityDao<TournamentEntity>() {
     abstract fun getTournaments(teamId: String, date: Date, limit: Int): Maybe<List<Tournament>>
 
     @Query("SELECT * FROM tournaments" + " WHERE :id = tournament_id")
-    abstract operator fun get(id: String): Maybe<Tournament>
+    abstract fun get(id: String): Maybe<Tournament>
 
     @Query("DELETE FROM events " +
             " WHERE event_game_id IN (" +
