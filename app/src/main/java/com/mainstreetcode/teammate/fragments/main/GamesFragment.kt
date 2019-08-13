@@ -175,7 +175,7 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         toggleProgress(false)
         val supportsTournaments = team.sport.supportsCompetitions()
         scrollManager.onDiff(result)
-        scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_score_white_24dp,
+        scrollManager.updateForEmptyList(ListState(R.drawable.ic_score_white_24dp,
                 if (supportsTournaments) R.string.no_games
                 else R.string.no_game_support))
     }

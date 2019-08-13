@@ -163,7 +163,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
         toggleProgress(false)
         val supportsTournaments = team.sport.supportsCompetitions()
         scrollManager.onDiff(result)
-        scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_trophy_white_24dp, if (supportsTournaments)
+        scrollManager.updateForEmptyList(ListState(R.drawable.ic_trophy_white_24dp, if (supportsTournaments)
             R.string.no_tournaments
         else
             R.string.no_tournament_support))

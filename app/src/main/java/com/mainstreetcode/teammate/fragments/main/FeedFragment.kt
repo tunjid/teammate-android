@@ -202,7 +202,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
         val isOnATeam = teamViewModel.isOnATeam
         scrollManager.onDiff(diffResult)
         feedViewModel.clearNotifications(FeedItem::class.java)
-        scrollManager.updateForEmptyList(ListState.of(
+        scrollManager.updateForEmptyList(ListState(
                 if (isOnATeam) R.drawable.ic_notifications_white_24dp else R.drawable.ic_group_black_24dp,
                 if (isOnATeam) R.string.no_feed else R.string.no_team_feed))
     }

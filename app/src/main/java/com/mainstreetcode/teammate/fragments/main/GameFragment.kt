@@ -231,9 +231,9 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .subscribe({ togglePersistentUi() }, defaultErrorHandler::accept))
 
         when {
-            game.competitorsDeclined() -> scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined))
-            game.competitorsNotAccepted() -> scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance))
-            else -> scrollManager.updateForEmptyList(ListState.of(R.drawable.ic_stat_white_24dp, R.string.no_stats))
+            game.competitorsDeclined() -> scrollManager.updateForEmptyList(ListState(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined))
+            game.competitorsNotAccepted() -> scrollManager.updateForEmptyList(ListState(R.drawable.ic_stat_white_24dp, R.string.no_competitor_acceptance))
+            else -> scrollManager.updateForEmptyList(ListState(R.drawable.ic_stat_white_24dp, R.string.no_stats))
         }
     }
 
