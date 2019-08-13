@@ -46,7 +46,6 @@ import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
-import com.tunjid.androidbootstrap.view.util.ViewUtil
 import io.reactivex.Completable.timer
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.*
@@ -85,16 +84,11 @@ abstract class HeaderedFragment<T> :
         setTransitionName(view, getTransitionName(model, R.id.fragment_header_background))
         setTransitionName(viewHolder.thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
 
-        val headerToolbar = view.findViewById<Toolbar>(R.id.header_toolbar)
-        ViewUtil.getLayoutParams(headerToolbar).height += TeammatesBaseActivity.topInset
-
-        appBarLayout = view.findViewById(R.id.app_bar)
         view.findViewById<View>(R.id.header).visibility = if (canExpandAppBar()) View.VISIBLE else View.GONE
+        view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += TeammatesBaseActivity.topInset
 
-        AppBarListener.with()
-                .appBarLayout(appBarLayout)
-                .offsetDiffListener(this::onAppBarOffset)
-                .create()
+        appBarLayout = view.findViewById<AppBarLayout>(R.id.app_bar)
+                .apply { AppBarListener(this, this@HeaderedFragment::onAppBarOffset) }
     }
 
     override fun onResume() {

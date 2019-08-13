@@ -37,6 +37,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.mainstreetcode.teammate.R
@@ -130,9 +131,6 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .withLinearLayoutManager()
                 .build()
 
-        AppBarListener.with().appBarLayout(rootView.findViewById(R.id.app_bar))
-                .offsetDiffListener { gameViewHolder?.animate(it) }.create()
-
         scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint)
 
         refereeChip?.setCloseIconResource(R.drawable.ic_close_24dp)
@@ -143,6 +141,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         rootView.findViewById<View>(R.id.away_thumbnail).setOnClickListener { showCompetitor(game.away) }
         rootView.findViewById<View>(R.id.score).setOnClickListener { showFragment(GameEditFragment.newInstance(game)) }
         rootView.findViewById<View>(R.id.date).setOnClickListener { showFragment(EventEditFragment.newInstance(game)) }
+        rootView.findViewById<AppBarLayout>(R.id.app_bar).apply { AppBarListener(this) { gameViewHolder?.animate(it) } }
 
         return rootView
     }
