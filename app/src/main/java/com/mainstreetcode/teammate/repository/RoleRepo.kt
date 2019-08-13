@@ -60,9 +60,8 @@ class RoleRepo internal constructor() : ModelRepo<Role>() {
                 .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
         val body = getBody(model.headerItem.getValue(), Role.PHOTO_UPLOAD_KEY)
-        if (body != null) {
-            roleSingle = roleSingle.flatMap { api.uploadRolePhoto(model.id, body).map(getLocalUpdateFunction(model)) }
-        }
+        if (body != null) roleSingle = roleSingle
+                .flatMap { api.uploadRolePhoto(model.id, body).map(getLocalUpdateFunction(model)) }
 
         return roleSingle.map(getLocalUpdateFunction(model)).map(saveFunction)
     }
@@ -76,7 +75,7 @@ class RoleRepo internal constructor() : ModelRepo<Role>() {
 
     override fun delete(model: Role): Single<Role> =
             api.deleteRole(model.id)
-                    .map { this.deleteLocally(it) }
+                    .map(this::deleteLocally)
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
     override fun provideSaveManyFunction(): (List<Role>) -> List<Role> = { models ->

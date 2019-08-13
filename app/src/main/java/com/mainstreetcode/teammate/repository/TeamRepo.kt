@@ -61,15 +61,14 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
             model.isEmpty -> api.createTeam(model).map(getLocalUpdateFunction(model))
                     .flatMap<List<Role>> { RepoProvider.forRepo(RoleRepo::class.java).myRoles.lastOrError() }
                     .map { model }
+
             else -> api.updateTeam(model.id, model).map(getLocalUpdateFunction(model))
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
         }
 
         val body = getBody(model.headerItem.getValue(), Team.PHOTO_UPLOAD_KEY)
-        if (body != null) teamSingle = teamSingle.flatMap {
-            api.uploadTeamLogo(model.id, body)
-                    .map(getLocalUpdateFunction(model))
-        }
+        if (body != null) teamSingle = teamSingle
+                .flatMap { api.uploadTeamLogo(model.id, body).map(getLocalUpdateFunction(model)) }
 
         return teamSingle.map(saveFunction)
     }

@@ -61,11 +61,10 @@ class StatRepo internal constructor() : QueryRepo<Stat, Game, Date>() {
         return fetchThenGetModel(local, remote)
     }
 
-    override fun delete(model: Stat): Single<Stat> {
-        return api.deleteStat(model.id)
-                .map { this.deleteLocally(it) }
-                .doOnError { throwable -> deleteInvalidModel(model, throwable) }
-    }
+    override fun delete(model: Stat): Single<Stat> =
+            api.deleteStat(model.id)
+                    .map { this.deleteLocally(it) }
+                    .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
     override fun localModelsBefore(key: Game, pagination: Date?): Maybe<List<Stat>> {
         var date = pagination

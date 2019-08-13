@@ -66,7 +66,7 @@ class GameRepo internal constructor() : TeamQueryRepo<Game>() {
 
     override fun delete(model: Game): Single<Game> {
         return api.deleteGame(model.id)
-                .map { this.deleteLocally(it) }
+                .map(this::deleteLocally)
                 .doOnError { throwable -> deleteInvalidModel(model, throwable) }
     }
 
@@ -104,6 +104,7 @@ class GameRepo internal constructor() : TeamQueryRepo<Game>() {
 
             addIfValid(home, users, teams)
             addIfValid(away, users, teams)
+
             if (!home.isEmpty) competitors.add(home)
             if (!away.isEmpty) competitors.add(away)
         }

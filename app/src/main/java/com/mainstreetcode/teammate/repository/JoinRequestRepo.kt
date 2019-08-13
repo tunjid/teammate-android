@@ -44,10 +44,10 @@ class JoinRequestRepo internal constructor() : ModelRepo<JoinRequest>() {
 
     override fun dao(): EntityDao<in JoinRequest> = joinRequestDao
 
-    override fun createOrUpdate(model: JoinRequest): Single<JoinRequest> {
-        val call = if (model.isUserApproved) api.joinTeam(model) else api.inviteUser(model)
-        return call.map(getLocalUpdateFunction(model)).map(saveFunction)
-    }
+    override fun createOrUpdate(model: JoinRequest): Single<JoinRequest> = when {
+        model.isUserApproved -> api.joinTeam(model)
+        else -> api.inviteUser(model)
+    }.map(getLocalUpdateFunction(model)).map(saveFunction)
 
     override fun get(id: String): Flowable<JoinRequest> {
         val local = joinRequestDao.get(id).subscribeOn(io())
@@ -57,7 +57,7 @@ class JoinRequestRepo internal constructor() : ModelRepo<JoinRequest>() {
     }
 
     override fun delete(model: JoinRequest): Single<JoinRequest> = api.deleteJoinRequest(model.id)
-            .map { this.deleteLocally(it) }
+            .map(this::deleteLocally)
             .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
     override fun provideSaveManyFunction(): (List<JoinRequest>) -> List<JoinRequest> = { models ->

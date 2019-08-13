@@ -69,7 +69,7 @@ class EventRepo internal constructor() : TeamQueryRepo<Event>() {
 
     override fun delete(model: Event): Single<Event> =
             api.deleteEvent(model.id)
-                    .map { this.deleteLocally(it) }
+                    .map(this::deleteLocally)
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
     override fun localModelsBefore(key: Team, pagination: Date?): Maybe<List<Event>> {
@@ -86,7 +86,7 @@ class EventRepo internal constructor() : TeamQueryRepo<Event>() {
         val localDate = date ?: futureDate
 
         val local = AppDatabase.instance.guestDao().getRsvpList(current.id, localDate)
-                .map<List<Event>> { guests -> ArrayList(Lists.transform<Guest, Event>(guests) { it.event }) }
+                .map<List<Event>> { guests -> ArrayList(Lists.transform(guests, Guest::event)) }
                 .subscribeOn(io())
 
         val remote = api.eventsAttending(date, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()

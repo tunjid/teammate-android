@@ -77,10 +77,8 @@ class UserRepo internal constructor() : ModelRepo<User>() {
         }
 
         val body = getBody(model.headerItem.getValue(), User.PHOTO_UPLOAD_KEY)
-        if (body != null) remote = remote.flatMap {
-            api.uploadUserPhoto(model.id, body)
-                    .map(getLocalUpdateFunction(model))
-        }
+        if (body != null) remote = remote
+                .flatMap { api.uploadUserPhoto(model.id, body).map(getLocalUpdateFunction(model)) }
 
         remote = remote.map(saveFunction)
 
@@ -100,7 +98,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
     }
 
     override fun delete(model: User): Single<User> = api.deleteUser(model.id)
-            .map { this.deleteLocally(it) }
+            .map(this::deleteLocally)
             .flatMap { clearTables() }
             .map { model }
             .doOnError { throwable -> deleteInvalidModel(model, throwable) }
@@ -166,7 +164,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
                 .apply()
 
         return userDao.get(userId)
-                .flatMapSingle { this.delete(it) }
+                .flatMapSingle(this::delete)
                 .flatMap {
                     currentUser = User.empty()
                     just(true)
@@ -191,7 +189,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
         val result = source.toObservable().publish()
                 .autoConnect(2) // wait for this and the caller to subscribe
                 .singleOrError()
-                .map { this.saveUserId(it) }
+                .map(this::saveUserId)
 
         result.subscribe({ currentUser = it }, ErrorHandler.EMPTY::accept)
         return result

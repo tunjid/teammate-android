@@ -64,6 +64,6 @@ class GameRoundRepo internal constructor() : QueryRepo<Game, Tournament, Int>() 
     override fun remoteModelsBefore(key: Tournament, pagination: Int?): Maybe<List<Game>> =
             api.getGamesForRound(key.id, pagination ?: 0, 30).map(saveManyFunction).toMaybe()
 
-    override fun provideSaveManyFunction(): (List<Game>) -> List<Game> =
-            { list -> RepoProvider.forRepo(GameRepo::class.java).provideSaveManyFunction().invoke(list) }
+    override fun provideSaveManyFunction(): (List<Game>) -> List<Game> = // Will recurse as a method reference
+            { games -> RepoProvider.forRepo(GameRepo::class.java).provideSaveManyFunction().invoke(games) }
 }
