@@ -32,10 +32,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.GameAdapter
 import com.mainstreetcode.teammate.adapters.StatAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
@@ -57,14 +62,6 @@ import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.concurrent.atomic.AtomicBoolean
-
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
-import androidx.recyclerview.widget.DiffUtil
-import com.mainstreetcode.teammate.adapters.GameAdapter
-import com.mainstreetcode.teammate.util.yes
 
 /**
  * Lists [games][Event]
@@ -157,24 +154,15 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         menu.findItem(R.id.action_event)?.isVisible = true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_end_game -> {
-                yes
-            }
-            R.id.action_event -> {
-                showFragment(EventEditFragment.newInstance(game))
-            }
-            R.id.action_delete_game -> {
-                val context = context ?: return true
-                AlertDialog.Builder(context).setTitle(getString(R.string.game_delete_prompt))
-                        .setPositiveButton(R.string.yes) { _, _ -> deleteGame() }
-                        .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_end_game -> endGameRequest().let { true }
+        R.id.action_event -> showFragment(EventEditFragment.newInstance(game))
+        R.id.action_delete_game -> AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.game_delete_prompt))
+                .setPositiveButton(R.string.yes) { _, _ -> deleteGame() }
+                .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                .show().let { true }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
@@ -286,10 +274,8 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     }
 
     private fun fetchStats(fetchLatest: Boolean) {
-        if (fetchLatest)
-            scrollManager.setRefreshing()
-        else
-            toggleProgress(true)
+        if (fetchLatest) scrollManager.setRefreshing()
+        else toggleProgress(true)
 
         disposables.add(statViewModel.getMany(game, fetchLatest).subscribe(this::onStatsFetched, defaultErrorHandler::accept))
         updateStatuses()
