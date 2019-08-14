@@ -22,49 +22,44 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.util.nav;
+package com.mainstreetcode.teammate.util.nav
 
-import android.view.MotionEvent;
+import android.view.MotionEvent
 
-import com.mainstreetcode.teammate.util.GestureListener;
+import com.mainstreetcode.teammate.util.GestureListener
 
-class NavGestureListener extends GestureListener {
+internal class NavGestureListener(private val viewHolder: ViewHolder) : GestureListener() {
+    private var hasSwiped: Boolean = false
 
-    private final ViewHolder viewHolder;
-    private boolean hasSwiped;
-
-    NavGestureListener(ViewHolder viewHolder) {this.viewHolder = viewHolder;}
-
-    @Override
-    public boolean onDown(MotionEvent e) { return !(hasSwiped = false); }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (hasSwiped) return false;
-
-        float x1 = e1.getX();
-        float y1 = e1.getY();
-
-        float x2 = e2.getX();
-        float y2 = e2.getY();
-
-        Direction direction = getDirection(x1, y1, x2, y2);
-        if (direction != Direction.up) return false;
-
-        hasSwiped = true;
-        viewHolder.onSwipedUp();
-        return super.onScroll(e1, e2, distanceX, distanceY);
+    override fun onDown(e: MotionEvent): Boolean {
+        hasSwiped = false
+        return !hasSwiped
     }
 
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-        viewHolder.click();
-        return true;
+    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        if (hasSwiped) return false
+
+        val x1 = e1.x
+        val y1 = e1.y
+
+        val x2 = e2.x
+        val y2 = e2.y
+
+        val direction = getDirection(x1, y1, x2, y2)
+        if (direction != Direction.up) return false
+
+        hasSwiped = true
+        viewHolder.onSwipedUp()
+        return super.onScroll(e1, e2, distanceX, distanceY)
     }
 
-    @Override
-    public void onLongPress(MotionEvent e) {
-        super.onLongPress(e);
-        viewHolder.onSwipedUp();
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        viewHolder.click()
+        return true
+    }
+
+    override fun onLongPress(e: MotionEvent) {
+        super.onLongPress(e)
+        viewHolder.onSwipedUp()
     }
 }

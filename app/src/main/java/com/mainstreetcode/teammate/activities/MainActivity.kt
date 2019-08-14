@@ -169,8 +169,8 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
         })
 
         bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation))
-                .setListener { view -> onNavItemSelected(view.id) }
-                .setSwipeRunnable { this.showNavOverflow() }
+                .setSwipeRunnable(this::showNavOverflow)
+                .setListener (View.OnClickListener { view -> onNavItemSelected(view.id) })
                 .setNavItems(NavItem.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
                         NavItem.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
                         NavItem.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
@@ -406,7 +406,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
             is JoinRequest -> TeamMembersFragment.newInstance(model.team)
             is Tournament -> TournamentDetailFragment.newInstance(model)
             else -> null
-        }?.let { showFragment(it) }
+        }?.let(this@MainActivity::showFragment)
                 ?: if (savedInstanceState == null) showFragment(FeedFragment.newInstance())
     }
 

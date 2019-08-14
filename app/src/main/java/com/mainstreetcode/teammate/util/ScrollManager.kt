@@ -62,7 +62,7 @@ class ScrollManager<VH : RecyclerView.ViewHolder> constructor(
     class Builder<VH : RecyclerView.ViewHolder> : AbstractListManagerBuilder<Builder<VH>, ScrollManager<VH>, VH, ListState>() {
 
         override fun build(): ScrollManager<VH> {
-            val viewHolder = placeholder as EmptyViewHolder
+            val viewHolder = placeholder as? EmptyViewHolder
             val layoutManager = buildLayoutManager()
             val scroller = buildEndlessScroller(layoutManager)
             val scrollListeners = buildScrollListeners()
