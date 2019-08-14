@@ -91,7 +91,7 @@ public class NavDialogFragment extends BottomSheetDialogFragment {
         List<Team> list = new ArrayList<>();
 
         disposables.add(teamViewModel.nonDefaultTeams(list)
-                .subscribe(ScrollManager.<RemoteImageViewHolder<Team>>with(root.findViewById(R.id.horizontal_list))
+                .subscribe(ScrollManager.Companion.<RemoteImageViewHolder<Team>>with(root.findViewById(R.id.horizontal_list))
                         .withAdapter(new RemoteImageAdapter<>(list, team -> {
                             teamViewModel.updateDefaultTeam(team);
                             viewTeam(team);

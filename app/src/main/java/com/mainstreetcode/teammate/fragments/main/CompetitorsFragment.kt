@@ -48,6 +48,7 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.functions.collections.Lists
+import com.tunjid.androidbootstrap.recyclerview.ListManager
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.*
 import kotlin.math.min
@@ -84,7 +85,7 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
         super.onCreate(savedInstanceState)
         tournament = arguments!!.getParcelable(ARG_TOURNAMENT)!!
         entities = ArrayList()
-        competitors = Lists.transform(entities, { Competitor.empty(it) }, { it.entity })
+        competitors = Lists.transform(entities, Competitor.Companion::empty, Competitor::entity)
         competitorDifferentiables = Lists.transform(competitors, { identity -> identity as Differentiable }, { i -> i as Competitor })
     }
 
@@ -104,10 +105,10 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
                 })
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
-                .withSwipeDragOptions(ScrollManager.swipeDragOptionsBuilder<CompetitorViewHolder>()
-                        .setMovementFlagsFunction { ScrollManager.SWIPE_DRAG_ALL_DIRECTIONS }
+                .withSwipeDragOptions(ListManager.swipeDragOptionsBuilder<CompetitorViewHolder>()
+                        .setMovementFlagsFunction { ListManager.SWIPE_DRAG_ALL_DIRECTIONS }
                         .setSwipeConsumer { holder, _ -> removeCompetitor(holder) }
-                        .setDragHandleFunction { it.dragHandle }
+                        .setDragHandleFunction(CompetitorViewHolder::dragHandle)
                         .setLongPressDragEnabledSupplier { false }
                         .setItemViewSwipeSupplier { true }
                         .setDragConsumer(this::moveCompetitor)

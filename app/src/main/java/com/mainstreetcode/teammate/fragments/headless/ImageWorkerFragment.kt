@@ -57,16 +57,10 @@ class ImageWorkerFragment : MainActivityFragment() {
     private var isPicking: Boolean = false
 
     private val isCropListener: Boolean
-        get() {
-            val target = parentFragment
-            return target is CropListener
-        }
+        get() = parentFragment is CropListener
 
     private val isMediaListener: Boolean
-        get() {
-            val target = parentFragment
-            return target is MediaListener
-        }
+        get() = parentFragment is MediaListener
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         val gotPermission = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
