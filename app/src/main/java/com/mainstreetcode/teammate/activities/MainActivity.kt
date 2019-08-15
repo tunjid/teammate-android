@@ -250,7 +250,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
     }
 
     override fun updateAltToolbar(menu: Int, title: CharSequence) {
-        updateToolBar(altToolbar, menu, title)
+        altToolbar.updateToolBar(menu, title)
     }
 
     override fun adjustKeyboardPadding(suggestion: Int): Int {

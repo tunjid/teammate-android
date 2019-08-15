@@ -171,7 +171,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
 
         val decorView = decorView
         decorView.systemUiVisibility = DEFAULT_SYSTEM_UI_FLAGS
-        decorView.setOnSystemUiVisibilityChangeListener { toggleToolbar(!isDisplayingSystemUI(decorView)) }
+        decorView.setOnSystemUiVisibilityChangeListener { toggleToolbar(!decorView.isDisplayingSystemUI()) }
         setOnApplyWindowInsetsListener(constraintLayout) { _, insets -> consumeSystemInsets(insets) }
         showSystemUI()
     }
@@ -202,7 +202,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     }
 
     override fun updateMainToolBar(menu: Int, title: CharSequence) {
-        updateToolBar(toolbar, menu, title)
+        toolbar.updateToolBar(menu, title)
     }
 
     override fun updateAltToolbar(menu: Int, title: CharSequence) {}

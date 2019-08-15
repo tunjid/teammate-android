@@ -125,7 +125,7 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
     override fun onMediaClicked(item: Media) {
         val activity = activity ?: return
 
-        systemUiStatus.set(isDisplayingSystemUI(activity.window.decorView))
+        systemUiStatus.set(activity.window.decorView.isDisplayingSystemUI())
         togglePersistentUi()
     }
 

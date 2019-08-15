@@ -116,42 +116,44 @@ class ViewHolderUtil : ViewUtil() {
         fun Any.getTransitionName(@IdRes id: Int): String =
                 hashCode().toString() + "-" + id
 
-        fun getActivity(context: Context): Activity? {
-            var context = context
-            while (context is ContextWrapper) {
+        fun Context.getActivity(): Activity? {
+            var context = this
+            while (context is ContextWrapper)
                 if (context is Activity) return context
-                context = context.baseContext
-            }
+                else context = context.baseContext
+
             return null
         }
 
-        fun updateToolBar(toolbar: Toolbar, menu: Int, title: CharSequence) {
-            val childCount = toolbar.childCount
+        fun Toolbar.updateToolBar(menu: Int, title: CharSequence) {
+            val childCount = childCount
 
-            if (toolbar.id == R.id.alt_toolbar || childCount <= 2) {
-                toolbar.title = title
-                replaceMenu(toolbar, menu)
-            } else
-                for (i in 0 until childCount) {
-                    val child = toolbar.getChildAt(i)
-                    if (child is ImageView) continue
+            if (id == R.id.alt_toolbar || childCount <= 2) {
+                this.title = title
+                this.replaceMenu(menu)
+            } else for (i in 0 until childCount) {
+                val child = getChildAt(i)
+                if (child is ImageView) continue
 
-                    child.animate().alpha(0f).setDuration(TOOLBAR_ANIM_DELAY.toLong()).withEndAction {
-                        if (child is TextView)
-                            toolbar.title = title
-                        else if (child is ActionMenuView) replaceMenu(toolbar, menu)
-                        child.animate().setDuration(TOOLBAR_ANIM_DELAY.toLong()).setInterpolator(AccelerateDecelerateInterpolator()).alpha(1f).start()
-                    }.start()
-                }
+                child.animate().alpha(0f).setDuration(TOOLBAR_ANIM_DELAY.toLong()).withEndAction {
+                    if (child is TextView) this.title = title
+                    else if (child is ActionMenuView) this.replaceMenu(menu)
+
+                    child.animate()
+                            .setDuration(TOOLBAR_ANIM_DELAY.toLong())
+                            .setInterpolator(AccelerateDecelerateInterpolator())
+                            .alpha(1f).start()
+                }.start()
+            }
         }
 
-        private fun replaceMenu(toolbar: Toolbar, menu: Int) {
-            toolbar.menu.clear()
-            if (menu != 0) toolbar.inflateMenu(menu)
+        private fun Toolbar.replaceMenu(menu: Int) {
+            this.menu.clear()
+            if (menu != 0) inflateMenu(menu)
         }
 
-        fun isDisplayingSystemUI(decorView: View): Boolean =
-                decorView.systemUiVisibility and SYSTEM_UI_FLAG_FULLSCREEN != 0
+        fun View.isDisplayingSystemUI(): Boolean =
+                systemUiVisibility and SYSTEM_UI_FLAG_FULLSCREEN != 0
 
         @JvmOverloads
         fun fetchRoundedDrawable(context: Context, url: String, size: Int, placeholder: Int = 0): Single<Drawable> {

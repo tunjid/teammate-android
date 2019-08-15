@@ -70,7 +70,7 @@ open class TextInputStyle(
     internal open fun onButtonClicked(view: View) = buttonRunnable?.invoke()
 
     internal fun onDialogDismissed(context: Context) {
-        val activity = getActivity(context)
+        val activity = context.getActivity()
         if (activity is TeammatesBaseActivity) activity.onDialogDismissed()
     }
 
