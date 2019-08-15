@@ -39,9 +39,9 @@ import com.mainstreetcode.teammate.model.Team
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.GAME
-import com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.GAME
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
 
 /**
  * Adapter for [Team]

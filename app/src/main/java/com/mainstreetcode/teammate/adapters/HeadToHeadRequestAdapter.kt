@@ -41,9 +41,9 @@ import com.mainstreetcode.teammate.model.HeadToHead
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.mainstreetcode.teammate.util.ViewHolderUtil.AWAY
-import com.mainstreetcode.teammate.util.ViewHolderUtil.HOME
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.AWAY
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.HOME
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import java.util.*
 

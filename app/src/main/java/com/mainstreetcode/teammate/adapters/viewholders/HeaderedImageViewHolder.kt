@@ -35,8 +35,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.HeaderedModel
 import com.mainstreetcode.teammate.util.DiffWatcher
-import com.mainstreetcode.teammate.util.ViewHolderUtil.FULL_RES_LOAD_DELAY
-import com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.FULL_RES_LOAD_DELAY
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.THUMBNAIL_SIZE
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator

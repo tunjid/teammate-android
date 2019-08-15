@@ -31,6 +31,7 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.util.isValidScreenName
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 
@@ -40,18 +41,18 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 private typealias ValueChangeCallBack = (String) -> Unit
 
 class Item<T> internal constructor(
-        private val id: String?,
+        private val id: String,
         val sortPosition: Int,
         val inputType: Int,
         @field:ItemType val itemType: Int,
         @field:StringRes val stringRes: Int,
-        private var value: CharSequence?,
+        private var value: CharSequence,
         private val changeCallBack: ValueChangeCallBack?,
         val itemizedObject: T) : Differentiable, Comparable<Item<*>> {
     private var textTransformer: ((CharSequence?) -> CharSequence)? = null
 
     val rawValue: String
-        get() = value!!.toString()
+        get() = value.toString()
 
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY)
@@ -67,7 +68,7 @@ class Item<T> internal constructor(
         return this
     }
 
-    fun getValue(): CharSequence? = textTransformer?.run { invoke(value) } ?: value
+    fun getValue(): CharSequence = textTransformer?.run { invoke(value) } ?: value
 
     override fun getId(): String? = id
 
@@ -84,10 +85,10 @@ class Item<T> internal constructor(
 
         val item = other as Item<*>?
 
-        return if (id != null) id == item!!.id else item!!.id == null
+        return id == item!!.id
     }
 
-    override fun hashCode(): Int = id!!.hashCode()
+    override fun hashCode(): Int = id.hashCode()
 
     companion object {
 
@@ -127,6 +128,7 @@ class Item<T> internal constructor(
 
         val ALL_INPUT_VALID = { _: Item<*> -> "" }
         val NON_EMPTY = { input: Item<*> -> if (TextUtils.isEmpty(input.getValue())) App.instance.getString(R.string.team_invalid_empty_field) else "" }
+        val ALLOWS_SPECIAL_CHARACTERS = { input: Item<*> -> if (input.getValue().isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters) }
 
         fun <T> ignore(ignored: T) {}
 

@@ -28,15 +28,14 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.StatRank
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.SimpleAdapterListener
 
 class StatRankViewHolder(
         itemView: View,
-        adapterListener: ViewHolderUtil.SimpleAdapterListener<StatRank>
-) : ModelCardViewHolder<StatRank, ViewHolderUtil.SimpleAdapterListener<StatRank>>(itemView, adapterListener), View.OnClickListener {
+        adapterListener: SimpleAdapterListener<StatRank>
+) : ModelCardViewHolder<StatRank, SimpleAdapterListener<StatRank>>(itemView, adapterListener), View.OnClickListener {
 
     private val count: TextView
     private val inset: ImageView

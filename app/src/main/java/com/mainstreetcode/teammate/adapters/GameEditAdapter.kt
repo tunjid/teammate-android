@@ -34,8 +34,8 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.util.ViewHolderUtil.AWAY
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.AWAY
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 

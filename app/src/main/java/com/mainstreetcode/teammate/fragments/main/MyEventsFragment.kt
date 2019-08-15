@@ -45,7 +45,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 /**
  * Lists [events][Event]
@@ -110,8 +110,8 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
                     ?: return superResult
 
             return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, getTransitionName(event, R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.image, getTransitionName(event, R.id.fragment_header_thumbnail))
+                    .addSharedElement(viewHolder.itemView, event.getTransitionName(R.id.fragment_header_background))
+                    .addSharedElement(viewHolder.image, event.getTransitionName(R.id.fragment_header_thumbnail))
 
         }
         return superResult

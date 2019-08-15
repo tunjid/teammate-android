@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.model.User
 
 import androidx.core.view.ViewCompat.setTransitionName
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 class UserViewHolder(
         itemView: View,
@@ -48,8 +48,8 @@ class UserViewHolder(
         setTitle(model.firstName)
         setSubTitle(model.lastName)
 
-        setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background))
-        setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
+        setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
+        setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
     override fun onClick(view: View) {

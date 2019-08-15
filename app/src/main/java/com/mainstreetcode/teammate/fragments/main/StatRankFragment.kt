@@ -38,10 +38,11 @@ import com.mainstreetcode.teammate.adapters.StatRankAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.model.StatRank
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -81,7 +82,7 @@ class StatRankFragment : MainActivityFragment() {
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatRankAdapter(
                         statRanks,
-                        ViewHolderUtil.SimpleAdapterListener { statRank -> showFragment(UserEditFragment.newInstance(statRank.user)) }))
+                        simpleAdapterListener<StatRank> { statRank -> showFragment(UserEditFragment.newInstance(statRank.user)) }))
                 .withLinearLayoutManager()
                 .build()
 

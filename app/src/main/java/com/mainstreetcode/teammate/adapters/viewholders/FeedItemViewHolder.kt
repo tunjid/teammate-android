@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.RemoteImage
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.notifications.FeedItem
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 /**
  * Viewholder for a [Team]
@@ -61,11 +61,11 @@ class FeedItemViewHolder(
     override fun bind(model: RemoteImage) {
         super.bind(model)
         if (model is Media) {
-            setTransitionName(itemView, getTransitionName(model, R.id.fragment_media_background))
-            setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_media_thumbnail))
+            setTransitionName(itemView, model.getTransitionName(R.id.fragment_media_background))
+            setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_media_thumbnail))
         } else if (model is Event || model is JoinRequest) {
-            setTransitionName(itemView, getTransitionName(item, R.id.fragment_header_background))
-            setTransitionName(thumbnail, getTransitionName(item, R.id.fragment_header_thumbnail))
+            setTransitionName(itemView, item.getTransitionName(R.id.fragment_header_background))
+            setTransitionName(thumbnail, item.getTransitionName(R.id.fragment_header_thumbnail))
         }
     }
 

@@ -29,11 +29,11 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
-import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.ViewUtil
 
 class TeamSearchAdapter(items: List<Differentiable>, listener: AdapterListener) : TeamAdapter(items, listener) {
 
@@ -46,7 +46,7 @@ class TeamSearchAdapter(items: List<Differentiable>, listener: AdapterListener) 
     private fun getTeamViewHolder(viewGroup: ViewGroup): TeamViewHolder {
         val itemView = getItemView(R.layout.viewholder_list_item, viewGroup)
         val resources = itemView.resources
-        val params = ViewHolderUtil.getLayoutParams(itemView)
+        val params = ViewUtil.getLayoutParams(itemView)
         params.rightMargin = resources.getDimensionPixelSize(R.dimen.half_margin)
         params.leftMargin = params.rightMargin
         return TeamViewHolder(itemView, adapterListener)

@@ -36,9 +36,9 @@ import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.USER
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.USER
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable

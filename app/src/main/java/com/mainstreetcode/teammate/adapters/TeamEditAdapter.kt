@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ZIP
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
@@ -95,7 +95,7 @@ class TeamEditAdapter(
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
             Item.CITY, Item.STATE, Item.INPUT, Item.NUMBER -> Item.NON_EMPTY.invoke(item)
-            Item.INFO -> ViewHolderUtil.allowsSpecialCharacters.apply(item.getValue())
+            Item.INFO -> Item.ALLOWS_SPECIAL_CHARACTERS.invoke(item)
             ZIP, Item.DESCRIPTION -> Item.ALL_INPUT_VALID.invoke(item)
             else -> Item.NON_EMPTY.invoke(item)
         }

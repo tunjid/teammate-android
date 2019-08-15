@@ -29,10 +29,9 @@ import android.view.View
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.BlockedUserAdapter
 import com.mainstreetcode.teammate.model.BlockedUser
-import com.mainstreetcode.teammate.model.User
 
 import androidx.core.view.ViewCompat.setTransitionName
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 class BlockedUserViewHolder(itemView: View, adapterListener: BlockedUserAdapter.UserAdapterListener) : ModelCardViewHolder<BlockedUser, BlockedUserAdapter.UserAdapterListener>(itemView, adapterListener), View.OnClickListener {
 
@@ -48,8 +47,8 @@ class BlockedUserViewHolder(itemView: View, adapterListener: BlockedUserAdapter.
         title.text = user.firstName
         subtitle.text = model.reason.name
 
-        setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background))
-        setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
+        setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
+        setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
     override fun onClick(view: View) {

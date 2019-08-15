@@ -36,7 +36,7 @@ import com.mainstreetcode.teammate.model.Guest
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
 
 /**
  * Adapter for [Guest]

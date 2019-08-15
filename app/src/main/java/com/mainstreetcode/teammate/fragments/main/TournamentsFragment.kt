@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 import com.mainstreetcode.teammate.util.yes
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
@@ -145,8 +145,8 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
                     ?: return superResult
 
             return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, getTransitionName(tournament, R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.image, getTransitionName(tournament, R.id.fragment_header_thumbnail))
+                    .addSharedElement(viewHolder.itemView, tournament.getTransitionName(R.id.fragment_header_background))
+                    .addSharedElement(viewHolder.image, tournament.getTransitionName(R.id.fragment_header_thumbnail))
 
         }
         return superResult

@@ -22,17 +22,11 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model;
+package com.mainstreetcode.teammate.model
 
 
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD;
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
 
-public class ContentAd extends Ad<Object> {
-
-//    public ContentAd(NativeContentAd nativeAd) {
-//        super(nativeAd);
-//    }
-//
-    @Override
-    public int getType() {return CONTENT_AD;}
+class ContentAd : Ad<Any>() {
+    override fun getType(): Int = CONTENT_AD
 }

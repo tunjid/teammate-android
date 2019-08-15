@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 import com.mainstreetcode.teammate.util.yes
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
@@ -179,8 +179,8 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
 
             holder.bind(media) // Rebind, to make sure transition names remain.
             return beginTransaction()
-                    .addSharedElement(holder.itemView, getTransitionName(media, R.id.fragment_media_background))
-                    .addSharedElement(holder.thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail))
+                    .addSharedElement(holder.itemView, media.getTransitionName(R.id.fragment_media_background))
+                    .addSharedElement(holder.thumbnailView, media.getTransitionName(R.id.fragment_media_thumbnail))
         }
         return null
     }

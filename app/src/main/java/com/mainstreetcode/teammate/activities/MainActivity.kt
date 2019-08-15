@@ -80,7 +80,7 @@ import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.updateToolBar
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.updateToolBar
 import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem

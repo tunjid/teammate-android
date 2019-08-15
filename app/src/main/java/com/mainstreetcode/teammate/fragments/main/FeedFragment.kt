@@ -52,7 +52,7 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import io.reactivex.Single
@@ -257,8 +257,8 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
                 ?: return fallBack
 
         return beginTransaction()
-                .addSharedElement(holder.itemView, getTransitionName(model, itemViewId))
-                .addSharedElement(holder.thumbnail, getTransitionName(model, thumbnailId))
+                .addSharedElement(holder.itemView, model.getTransitionName(itemViewId))
+                .addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
     }
 
     companion object {

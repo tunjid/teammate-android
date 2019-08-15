@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
@@ -33,22 +32,24 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.StatViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.Team
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.SimpleAdapterListener
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.STAT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.STAT
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
  * Adapter for [Team]
  */
 
-class StatAdapter(private val items: List<Differentiable>, listener: ViewHolderUtil.SimpleAdapterListener<Stat>) : InteractiveAdapter<InteractiveViewHolder<*>, ViewHolderUtil.SimpleAdapterListener<Stat>>(listener) {
+class StatAdapter(
+        private val items: List<Differentiable>,
+        listener: SimpleAdapterListener<Stat>
+) : InteractiveAdapter<InteractiveViewHolder<*>, SimpleAdapterListener<Stat>>(listener) {
 
     init {
         setHasStableIds(true)

@@ -40,10 +40,10 @@ import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.MEDIA_IMAGE
-import com.mainstreetcode.teammate.util.ViewHolderUtil.MEDIA_VIDEO
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.MEDIA_IMAGE
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.MEDIA_VIDEO
 
 /**
  * Adapter for [Media]

@@ -31,7 +31,7 @@ import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
 import com.mainstreetcode.teammate.model.Event
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 
 class EventViewHolder(
@@ -54,8 +54,8 @@ class EventViewHolder(
         subtitle.text = model.time
         eventLocation.text = model.locationName
 
-        ViewCompat.setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background))
-        ViewCompat.setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
+        ViewCompat.setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
+        ViewCompat.setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
     override fun onClick(view: View) {

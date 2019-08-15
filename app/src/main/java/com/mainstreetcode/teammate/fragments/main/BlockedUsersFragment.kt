@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -118,8 +118,8 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
                     ?: return superResult
 
             return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, getTransitionName(event, R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.thumbnail, getTransitionName(event, R.id.fragment_header_thumbnail))
+                    .addSharedElement(viewHolder.itemView, event.getTransitionName(R.id.fragment_header_background))
+                    .addSharedElement(viewHolder.thumbnail, event.getTransitionName(R.id.fragment_header_thumbnail))
         }
         return superResult
     }

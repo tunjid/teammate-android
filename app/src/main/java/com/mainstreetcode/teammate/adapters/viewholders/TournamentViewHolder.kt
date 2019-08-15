@@ -32,7 +32,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.model.Tournament
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 
 class TournamentViewHolder(
@@ -52,8 +52,8 @@ class TournamentViewHolder(
         title.text = model.name
         subtitle.text = model.description
 
-        ViewCompat.setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background))
-        ViewCompat.setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
+        ViewCompat.setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
+        ViewCompat.setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
     override fun onClick(view: View) {

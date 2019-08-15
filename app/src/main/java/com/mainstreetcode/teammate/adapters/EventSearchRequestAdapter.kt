@@ -37,7 +37,7 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.EventSearchRequest
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
 import java.util.*
 
 class EventSearchRequestAdapter(private val request: EventSearchRequest,

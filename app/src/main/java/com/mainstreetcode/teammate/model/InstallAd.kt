@@ -22,19 +22,11 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.model;
+package com.mainstreetcode.teammate.model
 
 
-import static com.mainstreetcode.teammate.util.ViewHolderUtil.INSTALL_AD;
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
 
-public class InstallAd extends Ad<Object> {
-
-//public class InstallAd extends Ad<NativeAppInstallAd> {
-//
-//    public InstallAd(NativeAppInstallAd nativeAd) {
-//        super(nativeAd);
-//    }
-//
-    @Override
-    public int getType() {return INSTALL_AD;}
+class InstallAd : Ad<Any>() {
+    override fun getType(): Int = INSTALL_AD
 }

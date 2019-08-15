@@ -48,9 +48,9 @@ import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import java.util.ArrayList
 
 import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
-import com.mainstreetcode.teammate.util.ViewHolderUtil.TEAM
-import com.mainstreetcode.teammate.util.ViewHolderUtil.USER
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.TEAM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.USER
 
 /**
  * Adapter for [Event]

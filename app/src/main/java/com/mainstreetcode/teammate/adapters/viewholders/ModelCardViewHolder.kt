@@ -33,7 +33,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.RemoteImage
 import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.THUMBNAIL_SIZE
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.THUMBNAIL_SIZE
 import com.squareup.picasso.Picasso
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 

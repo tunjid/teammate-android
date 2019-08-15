@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import io.reactivex.Completable.timer
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -81,8 +81,8 @@ abstract class HeaderedFragment<T> :
         viewHolder = HeaderedImageViewHolder(view, this)
         viewHolder.bind(model)
 
-        setTransitionName(view, getTransitionName(model, R.id.fragment_header_background))
-        setTransitionName(viewHolder.thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
+        setTransitionName(view, model.getTransitionName(R.id.fragment_header_background))
+        setTransitionName(viewHolder.thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
 
         view.findViewById<View>(R.id.header).visibility = if (canExpandAppBar()) View.VISIBLE else View.GONE
         view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += TeammatesBaseActivity.topInset

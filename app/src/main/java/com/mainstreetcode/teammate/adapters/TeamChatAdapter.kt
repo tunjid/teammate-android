@@ -32,8 +32,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.User
- import com.mainstreetcode.teammate.util.ViewHolderUtil.CHAT
-import com.mainstreetcode.teammate.util.ViewHolderUtil.CONTENT_AD
+ import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CHAT
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
 import com.mainstreetcode.teammate.util.areDifferentDays
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable

@@ -28,14 +28,14 @@ import android.view.View
 import android.widget.TextView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Stat
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.SimpleAdapterListener
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
 
 class StatViewHolder(
         itemView: View,
-        adapterListener: ViewHolderUtil.SimpleAdapterListener<Stat>
-) : InteractiveViewHolder<ViewHolderUtil.SimpleAdapterListener<Stat>>(itemView, adapterListener) {
+        adapterListener: SimpleAdapterListener<Stat>
+) : InteractiveViewHolder<SimpleAdapterListener<Stat>>(itemView, adapterListener) {
 
     private lateinit var model: Stat
 
@@ -45,7 +45,6 @@ class StatViewHolder(
     private val statEmoji: Array<TextView> = arrayOf(itemView.findViewById(R.id.home_stat_emoji), itemView.findViewById(R.id.away_stat_emoji))
 
     init {
-
         itemView.setOnClickListener { adapterListener.onItemClicked(model) }
     }
 

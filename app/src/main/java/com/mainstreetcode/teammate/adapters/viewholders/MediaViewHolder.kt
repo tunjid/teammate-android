@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
@@ -104,8 +104,8 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     fun bind(media: Media) {
         this.media = media
-        setTransitionName(itemView, getTransitionName(media, R.id.fragment_media_background))
-        setTransitionName(thumbnailView, getTransitionName(media, R.id.fragment_media_thumbnail))
+        setTransitionName(itemView, media.getTransitionName(R.id.fragment_media_background))
+        setTransitionName(thumbnailView, media.getTransitionName(R.id.fragment_media_thumbnail))
 
         loadImage(media.thumbnail, false, thumbnailView)
         if (!adapterListener.isFullScreen) highlightViewHolder(adapterListener::isSelected)

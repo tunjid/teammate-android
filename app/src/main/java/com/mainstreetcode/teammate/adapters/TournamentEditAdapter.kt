@@ -39,8 +39,8 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.mainstreetcode.teammate.util.ViewHolderUtil.ITEM
-import com.mainstreetcode.teammate.util.ViewHolderUtil.TOURNAMENT
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.TOURNAMENT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 

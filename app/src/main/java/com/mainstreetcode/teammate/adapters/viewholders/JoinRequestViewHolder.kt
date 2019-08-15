@@ -29,7 +29,7 @@ import androidx.core.view.ViewCompat.setTransitionName
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
 import com.mainstreetcode.teammate.model.JoinRequest
-import com.mainstreetcode.teammate.util.ViewHolderUtil.getTransitionName
+import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
 
 class JoinRequestViewHolder(
         itemView: View,
@@ -52,8 +52,8 @@ class JoinRequestViewHolder(
         else
             context.getString(R.string.user_requests_join, model.position.name)
 
-        setTransitionName(itemView, getTransitionName(model, R.id.fragment_header_background))
-        setTransitionName(thumbnail, getTransitionName(model, R.id.fragment_header_thumbnail))
+        setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
+        setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
     override fun onClick(view: View) {
