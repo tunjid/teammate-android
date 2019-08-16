@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 import com.mainstreetcode.teammate.util.yes
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder

@@ -79,11 +79,11 @@ import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.updateToolBar
+import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
+import com.mainstreetcode.teammate.util.updateToolBar
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
@@ -224,8 +224,8 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
         val teamViewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
 
         disposables.add(teamViewModel.teamChangeFlowable
-                .flatMapSingle { team ->
-                    ViewHolderUtil.fetchRoundedDrawable(this,
+                .flatMapMaybe { team ->
+                    fetchRoundedDrawable(this,
                             team.imageUrl,
                             resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
                 }

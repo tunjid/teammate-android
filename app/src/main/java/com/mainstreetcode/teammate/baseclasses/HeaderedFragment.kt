@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import io.reactivex.Completable.timer
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread

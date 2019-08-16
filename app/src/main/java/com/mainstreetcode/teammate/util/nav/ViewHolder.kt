@@ -27,7 +27,6 @@ package com.mainstreetcode.teammate.util.nav
 import android.annotation.SuppressLint
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
@@ -35,9 +34,7 @@ import androidx.annotation.AttrRes
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.GestureDetectorCompat
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ViewHolder @SuppressLint("ClickableViewAccessibility")
@@ -48,7 +45,7 @@ internal constructor(internal val itemView: View, private val swipeRunnable: () 
     private lateinit var navItem: NavItem
     private val title: TextView = itemView.findViewById(R.id.item_title)
     private val icon: CircleImageView = itemView.findViewById(R.id.thumbnail)
-    private val callback: ImageCallback = ImageCallback(this)
+//    private val callback: ImageCallback = ImageCallback(this)
 
     init {
         icon.isDisableCircularTransformation = true
@@ -57,7 +54,7 @@ internal constructor(internal val itemView: View, private val swipeRunnable: () 
         itemView.setOnTouchListener { v, event -> onItemViewTouched(detector, v, event) }
     }
 
-    fun setImageUrl(imageUrl: String) = callback.loadUrl(imageUrl)
+//    fun setImageUrl(imageUrl: String) = callback.loadUrl(imageUrl)
 
     internal fun click() {
         itemView.performClick()
@@ -76,7 +73,7 @@ internal constructor(internal val itemView: View, private val swipeRunnable: () 
     }
 
     internal fun tint(@AttrRes colorAttr: Int) {
-        val color = ViewHolderUtil.resolveThemeColor(itemView.context, colorAttr)
+        val color = itemView.context.resolveThemeColor(colorAttr)
         title.setTextColor(color)
         icon.borderColor = color
         if (hasCustomImage) return
@@ -106,32 +103,32 @@ internal constructor(internal val itemView: View, private val swipeRunnable: () 
         return this
     }
 
-    private fun onCustomImageLoaded(succeeded: Boolean) {
-        hasCustomImage = succeeded
-        icon.isDisableCircularTransformation = !succeeded
-        icon.borderWidth = if (succeeded) itemView.resources.getDimensionPixelSize(R.dimen.sixteenth_margin) else 0
-        if (!hasCustomImage) bind(navItem)
-    }
+//    private fun onCustomImageLoaded(succeeded: Boolean) {
+//        hasCustomImage = succeeded
+//        icon.isDisableCircularTransformation = !succeeded
+//        icon.borderWidth = if (succeeded) itemView.resources.getDimensionPixelSize(R.dimen.sixteenth_margin) else 0
+//        if (!hasCustomImage) bind(navItem)
+//    }
 
-    private class ImageCallback internal constructor(internal val viewHolder: ViewHolder) : Callback {
-        internal var loaded = false
-        internal var currentImage: String? = null
-
-        internal fun loadUrl(imageUrl: String) {
-            val sameImage = currentImage != null && currentImage == imageUrl
-            if (sameImage && loaded || TextUtils.isEmpty(imageUrl)) return
-
-            currentImage = imageUrl
-            viewHolder.hasCustomImage = true
-            Picasso.get().load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this)
-        }
-
-        override fun onSuccess() {
-            viewHolder.onCustomImageLoaded(true.apply { loaded = this })
-        }
-
-        override fun onError(e: Exception) {
-            viewHolder.onCustomImageLoaded(false.apply { loaded = this })
-        }
-    }
+//    private class ImageCallback internal constructor(internal val viewHolder: ViewHolder) : Callback {
+//        internal var loaded = false
+//        internal var currentImage: String? = null
+//
+//        internal fun loadUrl(imageUrl: String) {
+//            val sameImage = currentImage != null && currentImage == imageUrl
+//            if (sameImage && loaded || TextUtils.isEmpty(imageUrl)) return
+//
+//            currentImage = imageUrl
+//            viewHolder.hasCustomImage = true
+//            Picasso.get().load(imageUrl).fit().centerCrop().noFade().into(viewHolder.icon, this)
+//        }
+//
+//        override fun onSuccess() {
+//            viewHolder.onCustomImageLoaded(true.apply { loaded = this })
+//        }
+//
+//        override fun onError(e: Exception) {
+//            viewHolder.onCustomImageLoaded(false.apply { loaded = this })
+//        }
+//    }
 }

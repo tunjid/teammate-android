@@ -38,9 +38,9 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.EVENT
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
+import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.util.EVENT
+import com.mainstreetcode.teammate.util.INSTALL_AD
 
 /**
  * Adapter for [com.mainstreetcode.teammate.model.Event]

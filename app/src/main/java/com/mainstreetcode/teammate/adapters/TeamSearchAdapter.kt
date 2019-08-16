@@ -29,8 +29,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
+import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.tunjid.androidbootstrap.view.util.ViewUtil

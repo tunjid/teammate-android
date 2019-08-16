@@ -41,9 +41,9 @@ import com.mainstreetcode.teammate.model.Item.Companion.STAT_TYPE
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.TEAM
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.USER
+import com.mainstreetcode.teammate.util.ITEM
+import com.mainstreetcode.teammate.util.TEAM
+import com.mainstreetcode.teammate.util.USER
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 

@@ -41,9 +41,9 @@ import com.mainstreetcode.teammate.model.Team
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.BLOCKED_USER
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
+import com.mainstreetcode.teammate.util.BLOCKED_USER
+import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.util.INSTALL_AD
 
 /**
  * Adapter for [Team]

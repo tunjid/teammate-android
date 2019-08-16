@@ -31,7 +31,7 @@ import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
 import com.mainstreetcode.teammate.model.Event
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 
 class EventViewHolder(

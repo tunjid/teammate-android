@@ -45,7 +45,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 /**
  * Lists [events][Event]

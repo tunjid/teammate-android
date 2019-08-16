@@ -58,7 +58,7 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
@@ -124,7 +124,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.model_list))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
-                .withAdapter(StatAdapter(items, simpleAdapterListener<Stat> { showFragment(StatEditFragment.newInstance(it)) }))
+                .withAdapter(StatAdapter(items, simpleAdapterListener { showFragment(StatEditFragment.newInstance(it)) }))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withEndlessScroll { fetchStats(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -349,7 +349,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
             else -> getString(R.string.game_referee, referee.name)
         }
 
-        disposables.add(ViewHolderUtil.fetchRoundedDrawable(requireContext(), referee.imageUrl, size)
+        disposables.add(fetchRoundedDrawable(requireContext(), referee.imageUrl, size)
                 .subscribe({ refereeChip?.chipIcon = it }, ErrorHandler.EMPTY::accept))
     }
 

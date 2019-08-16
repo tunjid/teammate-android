@@ -49,7 +49,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 /**
  * Lists [events][com.mainstreetcode.teammate.model.Event]

@@ -32,8 +32,8 @@ import androidx.annotation.StringRes
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.RemoteImage
-import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.THUMBNAIL_SIZE
+import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
+import com.mainstreetcode.teammate.util.updateForegroundDrawable
 import com.squareup.picasso.Picasso
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 
@@ -53,7 +53,7 @@ open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterLi
         get() = true
 
     init {
-        ViewHolderUtil.updateForegroundDrawable(itemView)
+        itemView.updateForegroundDrawable()
         @Suppress("LeakingThis")
         if (isThumbnail) thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
     }

@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.model.Media
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.FULL_RES_LOAD_DELAY
+import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 
 
 class ImageMediaViewHolder(

@@ -25,20 +25,10 @@
 package com.mainstreetcode.teammate.adapters.viewholders
 
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-
-import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.model.ListState
-import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.tunjid.androidbootstrap.recyclerview.ListPlaceholder
-
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
@@ -46,6 +36,10 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.model.ListState
+import com.mainstreetcode.teammate.util.resolveThemeColor
+import com.tunjid.androidbootstrap.recyclerview.ListPlaceholder
 
 class EmptyViewHolder(itemView: View, @DrawableRes iconRes: Int, @StringRes stringRes: Int) : ListPlaceholder<ListState> {
 
@@ -56,11 +50,11 @@ class EmptyViewHolder(itemView: View, @DrawableRes iconRes: Int, @StringRes stri
     private var color: Int = 0
 
     @IntDef(R.attr.empty_view_holder_tint, R.attr.alt_empty_view_holder_tint)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class EmptyTint
 
     init {
-        color = ViewHolderUtil.resolveThemeColor(itemView.context, R.attr.empty_view_holder_tint)
+        color = itemView.context.resolveThemeColor(R.attr.empty_view_holder_tint)
 
         update(iconRes, stringRes)
     }
@@ -71,12 +65,10 @@ class EmptyViewHolder(itemView: View, @DrawableRes iconRes: Int, @StringRes stri
         text.visibility = visibility
     }
 
-    override fun bind(data: ListState) {
-        update(data.imageRes, data.textRes)
-    }
+    override fun bind(data: ListState) = update(data.imageRes, data.textRes)
 
     fun setColor(@EmptyTint @AttrRes attrRes: Int) {
-        this.color = ViewHolderUtil.resolveThemeColor(icon.context, attrRes)
+        this.color = icon.context.resolveThemeColor(attrRes)
         text.setTextColor(color)
         icon.setImageDrawable(getDrawable(icon.drawable))
     }

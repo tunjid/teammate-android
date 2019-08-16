@@ -28,7 +28,6 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextUtils.isEmpty
 import android.text.TextWatcher
@@ -44,10 +43,9 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
 open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView: View) : BaseViewHolder<T>(itemView), TextWatcher {
@@ -202,11 +200,9 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
 
     private fun tintHint(hasFocus: Boolean) {
         val start = hint.currentTextColor
-        val end = ViewHolderUtil.resolveThemeColor(hint.context,
-                if (hasFocus) R.attr.colorAccent
-                else R.attr.input_text_color)
-
+        val end = hint.context.resolveThemeColor(if (hasFocus) R.attr.colorAccent else R.attr.input_text_color)
         val animator = ValueAnimator.ofObject(ArgbEvaluator(), start, end)
+
         animator.duration = HINT_ANIMATION_DURATION.toLong()
         animator.addUpdateListener { animation -> hint.setTextColor(animation.animatedValue as Int) }
         animator.addListener(object : AnimatorListenerAdapter() {

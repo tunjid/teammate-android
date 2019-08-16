@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Media
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.isDisplayingSystemUI
+import com.mainstreetcode.teammate.util.isDisplayingSystemUI
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import java.util.concurrent.atomic.AtomicBoolean
 

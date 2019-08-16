@@ -29,7 +29,7 @@ import androidx.core.view.ViewCompat.setTransitionName
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
 import com.mainstreetcode.teammate.model.JoinRequest
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 class JoinRequestViewHolder(
         itemView: View,

@@ -40,8 +40,9 @@ import androidx.core.view.ViewCompat.setTransitionName
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.model.Media
-import com.mainstreetcode.teammate.util.ViewHolderUtil
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
+import com.mainstreetcode.teammate.util.extractPalette
+import com.mainstreetcode.teammate.util.getTransitionName
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
@@ -128,7 +129,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
         if (!isFullScreen) creator.placeholder(R.drawable.bg_image_placeholder)
 
-        creator = if (fitToSize) creator.fit() else creator.resize(ViewHolderUtil.THUMBNAIL_SIZE, ViewHolderUtil.THUMBNAIL_SIZE)
+        creator = if (fitToSize) creator.fit() else creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
         creator = creator.centerInside()
 
         val callBack = if (isFullScreen && fitToSize) this
@@ -180,7 +181,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
         @SuppressLint("CheckResult")
         override fun onSuccess() {
 
-            ViewHolderUtil.extractPalette(destination).map { palette -> palette.getDarkMutedColor(Color.BLACK) }
+            extractPalette(destination).map { palette -> palette.getDarkMutedColor(Color.BLACK) }
                     .subscribe(integerConsumer::invoke, Throwable::printStackTrace)
         }
 

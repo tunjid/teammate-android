@@ -52,7 +52,7 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import io.reactivex.Single

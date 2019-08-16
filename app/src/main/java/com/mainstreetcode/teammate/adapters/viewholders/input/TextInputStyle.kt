@@ -29,7 +29,7 @@ import android.util.SparseArray
 import android.view.View
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
 import com.mainstreetcode.teammate.model.Item
- import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getActivity
+ import com.mainstreetcode.teammate.util.getActivity
 import com.mainstreetcode.teammate.util.get
 
 open class TextInputStyle(

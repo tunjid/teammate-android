@@ -39,9 +39,9 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Guest
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Team
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.GUEST
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.TEAM
+import com.mainstreetcode.teammate.util.GUEST
+import com.mainstreetcode.teammate.util.ITEM
+import com.mainstreetcode.teammate.util.TEAM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**

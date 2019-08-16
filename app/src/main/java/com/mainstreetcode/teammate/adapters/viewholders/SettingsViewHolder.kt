@@ -27,14 +27,13 @@ package com.mainstreetcode.teammate.adapters.viewholders
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.TextView
-
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.model.SettingsItem
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 
 class SettingsViewHolder(
         itemView: View,
@@ -49,7 +48,7 @@ class SettingsViewHolder(
             val src = ContextCompat.getDrawable(itemView.context, item.drawableRes) ?: return null
 
             val wrapped = DrawableCompat.wrap(src)
-            DrawableCompat.setTint(wrapped, ViewHolderUtil.resolveThemeColor(itemView.context, R.attr.alt_icon_tint))
+            DrawableCompat.setTint(wrapped, itemView.context.resolveThemeColor(R.attr.alt_icon_tint))
 
             return wrapped
         }

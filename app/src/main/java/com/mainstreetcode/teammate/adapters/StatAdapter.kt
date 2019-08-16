@@ -35,9 +35,9 @@ import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.SimpleAdapterListener
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.STAT
+import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.util.INSTALL_AD
+import com.mainstreetcode.teammate.util.STAT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable

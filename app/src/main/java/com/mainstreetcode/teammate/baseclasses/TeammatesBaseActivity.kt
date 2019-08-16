@@ -67,9 +67,9 @@ import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.LoadingBar
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.FabInteractor
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.TOOLBAR_ANIM_DELAY
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.isDisplayingSystemUI
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.updateToolBar
+import com.mainstreetcode.teammate.util.TOOLBAR_ANIM_DELAY
+import com.mainstreetcode.teammate.util.isDisplayingSystemUI
+import com.mainstreetcode.teammate.util.updateToolBar
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
 import com.tunjid.androidbootstrap.view.animator.ViewHider
 import com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM

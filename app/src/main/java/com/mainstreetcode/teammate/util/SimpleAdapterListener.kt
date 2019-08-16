@@ -22,37 +22,16 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.adapters.viewholders
+package com.mainstreetcode.teammate.util
 
-import android.view.View
 
-import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
-import com.mainstreetcode.teammate.model.Role
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 
-import androidx.core.view.ViewCompat.setTransitionName
-import com.mainstreetcode.teammate.util.getTransitionName
-
-class RoleViewHolder(
-        itemView: View,
-        adapterListener: TeamMemberAdapter.UserAdapterListener
-) : ModelCardViewHolder<Role, TeamMemberAdapter.UserAdapterListener>(itemView, adapterListener), View.OnClickListener {
-
-    init {
-        itemView.setOnClickListener(this)
-    }
-
-    override fun bind(model: Role) {
-        super.bind(model)
-
-        title.text = model.title
-        subtitle.text = model.position.name
-
-        setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
-        setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
-    }
-
-    override fun onClick(view: View) {
-        adapterListener.onRoleClicked(model)
-    }
+interface SimpleAdapterListener<T> : InteractiveAdapter.AdapterListener {
+    fun onItemClicked(item: T)
 }
+
+fun <T> simpleAdapterListener(consumer: (T) -> Unit): SimpleAdapterListener<T> = object : SimpleAdapterListener<T> {
+    override fun onItemClicked(item: T) = consumer(item)
+}
+

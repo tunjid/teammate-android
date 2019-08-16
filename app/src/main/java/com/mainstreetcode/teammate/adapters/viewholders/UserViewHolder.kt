@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.model.User
 
 import androidx.core.view.ViewCompat.setTransitionName
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 class UserViewHolder(
         itemView: View,

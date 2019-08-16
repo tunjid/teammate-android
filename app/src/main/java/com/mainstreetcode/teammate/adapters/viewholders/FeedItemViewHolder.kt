@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.RemoteImage
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.notifications.FeedItem
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 /**
  * Viewholder for a [Team]

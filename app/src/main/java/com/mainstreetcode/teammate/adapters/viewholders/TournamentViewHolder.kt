@@ -32,7 +32,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.model.Tournament
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 
 class TournamentViewHolder(

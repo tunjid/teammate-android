@@ -33,7 +33,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.ITEM
+import com.mainstreetcode.teammate.util.ITEM
 
 class AutoCompleteAdapter(
         private val predictions: List<AutocompletePrediction>,

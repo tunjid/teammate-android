@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.adapters.BlockedUserAdapter
 import com.mainstreetcode.teammate.model.BlockedUser
 
 import androidx.core.view.ViewCompat.setTransitionName
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.getTransitionName
+import com.mainstreetcode.teammate.util.getTransitionName
 
 class BlockedUserViewHolder(itemView: View, adapterListener: BlockedUserAdapter.UserAdapterListener) : ModelCardViewHolder<BlockedUser, BlockedUserAdapter.UserAdapterListener>(itemView, adapterListener), View.OnClickListener {
 

@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
@@ -34,15 +33,13 @@ import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Event
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Tournament
-import com.mainstreetcode.teammate.util.ViewHolderUtil
+import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.util.INSTALL_AD
+import com.mainstreetcode.teammate.util.TOURNAMENT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.CONTENT_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.INSTALL_AD
-import com.mainstreetcode.teammate.util.ViewHolderUtil.Companion.TOURNAMENT
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
  * Adapter for [Event]
