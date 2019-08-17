@@ -73,7 +73,7 @@ abstract class Gofer<T> internal constructor(
 
     @SuppressLint("CheckResult")
     internal fun startPrep() {
-        watchForChange().subscribe({ }, ErrorHandler.EMPTY::accept)
+        watchForChange().subscribe({ }, ErrorHandler.EMPTY::invoke)
     }
 
     internal open fun preserveItems(old: MutableList<Differentiable>, fetched: MutableList<Differentiable>): MutableList<Differentiable> {

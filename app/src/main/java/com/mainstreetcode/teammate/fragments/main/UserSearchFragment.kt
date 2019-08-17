@@ -114,7 +114,7 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
     private fun subScribeToSearch() {
         disposables.add(instantSearch.subscribe()
-                .subscribe(scrollManager::onDiff, defaultErrorHandler::accept))
+                .subscribe(scrollManager::onDiff, defaultErrorHandler::invoke))
     }
 
     companion object {

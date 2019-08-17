@@ -103,7 +103,7 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable{ disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable{ disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, emptyDrawable, emptyText))
@@ -151,7 +151,7 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
 
     private fun fetchTeams() {
         scrollManager.setRefreshing()
-        disposables.add(roleViewModel.getMore(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::accept))
+        disposables.add(roleViewModel.getMore(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onTeamsUpdated(result: DiffUtil.DiffResult) {

@@ -89,7 +89,7 @@ class AddressPickerFragment : MainActivityFragment() {
                         recyclerView.visibility = View.GONE
                         mapContainer.visibility = View.VISIBLE
                         disposables.add(locationViewModel.fromAutoComplete(prediction)
-                                .subscribe(this@AddressPickerFragment::onMapAddressFound, defaultErrorHandler::accept))
+                                .subscribe(this@AddressPickerFragment::onMapAddressFound, defaultErrorHandler::invoke))
                     }
                 }))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -119,7 +119,7 @@ class AddressPickerFragment : MainActivityFragment() {
     }
 
     override fun onResume() {
-        disposables.add(instantSearch.subscribe().subscribe(scrollManager::onDiff, defaultErrorHandler::accept))
+        disposables.add(instantSearch.subscribe().subscribe(scrollManager::onDiff, defaultErrorHandler::invoke))
         mapView.onResume()
         super.onResume()
     }
@@ -183,7 +183,7 @@ class AddressPickerFragment : MainActivityFragment() {
 
     private fun requestLocation() {
         disposables.add(locationViewModel.getLastLocation(this)
-                .subscribe(this::onLocationFound, defaultErrorHandler::accept))
+                .subscribe(this::onLocationFound, defaultErrorHandler::invoke))
     }
 
     private fun onLocationFound(location: LatLng) =
@@ -196,7 +196,7 @@ class AddressPickerFragment : MainActivityFragment() {
 
     private fun onMapIdle(map: GoogleMap) {
         if (canQueryMap)
-            disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler::accept))
+            disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler::invoke))
     }
 
     private fun onCameraMoveStarted(reason: Int) {

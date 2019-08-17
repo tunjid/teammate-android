@@ -140,11 +140,11 @@ class HeadToHeadFragment : MainActivityFragment(), UserAdapter.AdapterListener, 
 
     private fun fetchMatchUps() {
         toggleProgress(true)
-        disposables.add(gameViewModel.headToHead(request).subscribe({ summary -> updateHeadToHead(summary.wins, summary.draws, summary.losses) }, ErrorHandler.EMPTY::accept))
+        disposables.add(gameViewModel.headToHead(request).subscribe({ summary -> updateHeadToHead(summary.wins, summary.draws, summary.losses) }, ErrorHandler.EMPTY::invoke))
         disposables.add(gameViewModel.getMatchUps(request).subscribe({ diffResult ->
             toggleProgress(false)
             scrollManager.onDiff(diffResult)
-        }, defaultErrorHandler::accept))
+        }, defaultErrorHandler::invoke))
     }
 
     private fun updateHeadToHead(numWins: Int, numDraws: Int, numLosses: Int) {

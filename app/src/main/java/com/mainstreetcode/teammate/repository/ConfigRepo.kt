@@ -80,7 +80,7 @@ class ConfigRepo internal constructor() : ModelRepo<Config>() {
         if (numRefreshes++ % REFRESH_THRESHOLD != 0) return
         api.config.map(saveFunction)
                 .onErrorResumeNext(retryConfig()::invoke)
-                .subscribe({ }, ErrorHandler.EMPTY::accept)
+                .subscribe({ }, ErrorHandler.EMPTY::invoke)
     }
 
     private fun retryConfig(): (Throwable) -> Single<Config> = {

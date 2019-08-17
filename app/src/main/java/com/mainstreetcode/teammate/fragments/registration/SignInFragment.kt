@@ -81,7 +81,7 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
             rootView.findViewById<View>(R.id.email_wrapper).visibility = View.VISIBLE
             rootView.findViewById<View>(R.id.password_wrapper).visibility = View.VISIBLE
-        }, ErrorHandler.EMPTY::accept))
+        }, ErrorHandler.EMPTY::invoke))
 
         return rootView
     }
@@ -128,7 +128,7 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
             val password = passwordInput!!.text.toString()
 
             disposables.add(viewModel.signIn(email, password)
-                    .subscribe({ onSignIn() }, defaultErrorHandler::accept)
+                    .subscribe({ onSignIn() }, defaultErrorHandler::invoke)
             )
         }
     }

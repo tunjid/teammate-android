@@ -69,7 +69,7 @@ class MediaNotifier internal constructor() : Notifier<Media>() {
 
         requestBody.progressSubject
                 .doFinally(this::onUploadComplete)
-                .subscribe(this::updateProgress, ErrorHandler.EMPTY::accept)
+                .subscribe(this::updateProgress, ErrorHandler.EMPTY::invoke)
 
         return mediaSingle.doOnSuccess { media -> App.instance.pushAlert(Alert.creation(media)) }
     }
@@ -101,7 +101,7 @@ class MediaNotifier internal constructor() : Notifier<Media>() {
                             .setContentTitle(getUploadCompletionContentTitle(stats))
                             .setProgress(0, 0, false))
                 },
-                ErrorHandler.EMPTY::accept)
+                ErrorHandler.EMPTY::invoke)
     }
 
     private fun mediaTransferBuilder(): NotificationCompat.Builder {

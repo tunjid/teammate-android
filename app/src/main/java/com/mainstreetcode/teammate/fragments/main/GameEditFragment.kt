@@ -148,7 +148,7 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
                 .setPositiveButton(R.string.yes) { _, _ ->
                     toggleProgress(true)
                     toggleProgress(true)
-                    disposables.add(gameViewModel.endGame(headeredModel).subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::accept))
+                    disposables.add(gameViewModel.endGame(headeredModel).subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::invoke))
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .show()
@@ -156,7 +156,7 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
 
     private fun createGame() {
         toggleProgress(true)
-        disposables.add(gofer.save().subscribe({ showFragment(GameFragment.newInstance(headeredModel)) }, defaultErrorHandler::accept))
+        disposables.add(gofer.save().subscribe({ showFragment(GameFragment.newInstance(headeredModel)) }, defaultErrorHandler::invoke))
     }
 
     private fun updateCompetitor(item: Competitive) {

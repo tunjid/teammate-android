@@ -72,7 +72,7 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable{ disposables.add(myEventsViewModel.refresh(Event::class.java).subscribe(this::onEventsUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable{ disposables.add(myEventsViewModel.refresh(Event::class.java).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
@@ -123,7 +123,7 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
         else
             toggleProgress(true)
 
-        disposables.add(myEventsViewModel.getMany(Event::class.java, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler::accept))
+        disposables.add(myEventsViewModel.getMany(Event::class.java, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onEventsUpdated(result: DiffUtil.DiffResult) {

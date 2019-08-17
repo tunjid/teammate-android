@@ -199,24 +199,24 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     }
 
     private fun updateGame() {
-        disposables.add(gofer.save().subscribe({ onGameUpdated() }, defaultErrorHandler::accept))
+        disposables.add(gofer.save().subscribe({ onGameUpdated() }, defaultErrorHandler::invoke))
     }
 
     private fun fetchGame() {
-        disposables.add(gofer.fetch().subscribe({ onGameUpdated() }, defaultErrorHandler::accept))
+        disposables.add(gofer.fetch().subscribe({ onGameUpdated() }, defaultErrorHandler::invoke))
     }
 
     private fun refresh() {
         fetchGame()
-        disposables.add(statViewModel.refresh(game).subscribe(this::onStatsFetched, defaultErrorHandler::accept))
+        disposables.add(statViewModel.refresh(game).subscribe(this::onStatsFetched, defaultErrorHandler::invoke))
     }
 
     private fun updateStatuses() {
         disposables.add(statViewModel.isPrivilegedInGame(game)
-                .subscribe(privilegeStatus::set, defaultErrorHandler::accept))
+                .subscribe(privilegeStatus::set, defaultErrorHandler::invoke))
 
         disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(editableStatus::set)
-                .subscribe({ togglePersistentUi() }, defaultErrorHandler::accept))
+                .subscribe({ togglePersistentUi() }, defaultErrorHandler::invoke))
 
         when {
             game.competitorsDeclined() -> scrollManager.updateForEmptyList(ListState(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined))
@@ -254,7 +254,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .setPositiveButton(R.string.yes) { _, _ ->
                     game.isEnded = true
                     toggleProgress(true)
-                    disposables.add(gofer.save().subscribe({ onGameUpdated() }, defaultErrorHandler::accept))
+                    disposables.add(gofer.save().subscribe({ onGameUpdated() }, defaultErrorHandler::invoke))
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .show()
@@ -277,7 +277,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         if (fetchLatest) scrollManager.setRefreshing()
         else toggleProgress(true)
 
-        disposables.add(statViewModel.getMany(game, fetchLatest).subscribe(this::onStatsFetched, defaultErrorHandler::accept))
+        disposables.add(statViewModel.getMany(game, fetchLatest).subscribe(this::onStatsFetched, defaultErrorHandler::invoke))
         updateStatuses()
     }
 
@@ -287,7 +287,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     }
 
     private fun onGameUpdated() {
-        disposables.add(gofer.watchForChange().subscribe({ requireActivity().invalidateOptionsMenu() }, ErrorHandler.EMPTY::accept))
+        disposables.add(gofer.watchForChange().subscribe({ requireActivity().invalidateOptionsMenu() }, ErrorHandler.EMPTY::invoke))
         gameViewHolder?.bind(game)
         toggleProgress(false)
         checkCompetitor()
@@ -301,11 +301,11 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .subscribe({
                     if (accept) fetchGame()
                     else toggleProgress(false)
-                }, defaultErrorHandler::accept))
+                }, defaultErrorHandler::invoke))
     }
 
     private fun deleteGame() {
-        disposables.add(gofer.remove().subscribe(this::onGameDeleted, defaultErrorHandler::accept))
+        disposables.add(gofer.remove().subscribe(this::onGameDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onGameDeleted() {
@@ -330,7 +330,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                             }
                         })
             }
-        }, ErrorHandler.EMPTY::accept))
+        }, ErrorHandler.EMPTY::invoke))
     }
 
     private fun bindReferee() {
@@ -350,7 +350,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         }
 
         disposables.add(fetchRoundedDrawable(requireContext(), referee.imageUrl, size)
-                .subscribe({ refereeChip?.chipIcon = it }, ErrorHandler.EMPTY::accept))
+                .subscribe({ refereeChip?.chipIcon = it }, ErrorHandler.EMPTY::invoke))
     }
 
     companion object {

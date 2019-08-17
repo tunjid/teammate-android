@@ -229,7 +229,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
                             team.imageUrl,
                             resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
                 }
-                .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY::accept))
+                .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY::invoke))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = onNavItemSelected(item.itemId)

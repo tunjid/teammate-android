@@ -72,7 +72,7 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
                     .map { listOf(it) }
 
             FunctionalDiff.of(single, getModelList(media.team), this::preserveList)
-                    .subscribe({ uploadCompletionProcessor.onNext(it) }, ErrorHandler.EMPTY::accept)
+                    .subscribe({ uploadCompletionProcessor.onNext(it) }, ErrorHandler.EMPTY::invoke)
         })
     }
 

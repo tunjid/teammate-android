@@ -43,7 +43,7 @@ class UserGofer(
         private val authUserFunction: (User) -> Boolean,
         private val getFunction: (User) -> Flowable<User>,
         private val updateFunction: (User) -> Single<User>
-) : Gofer<User>(model, ErrorHandler.EMPTY::accept) {
+) : Gofer<User>(model, ErrorHandler.EMPTY::invoke) {
 
     init {
         items.addAll(filter(ArrayList(model.asItems())))

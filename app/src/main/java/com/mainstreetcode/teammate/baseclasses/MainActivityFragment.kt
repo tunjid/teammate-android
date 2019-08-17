@@ -57,7 +57,6 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import io.reactivex.functions.Consumer
 import kotlin.math.abs
 
 /**
@@ -214,6 +213,6 @@ open class MainActivityFragment : TeammatesBaseFragment() {
     protected fun watchForRoleChanges(team: Team, onChanged: () -> Unit) {
         if (team.isEmpty) return
         val user = userViewModel.currentUser
-        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe(Consumer { onChanged.invoke() }, emptyErrorHandler))
+        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe( { onChanged.invoke() }, emptyErrorHandler::invoke))
     }
 }

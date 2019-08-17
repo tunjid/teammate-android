@@ -146,14 +146,14 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
 
     private fun showDropRolePrompt() {
         AlertDialog.Builder(requireActivity()).setTitle(gofer.getDropRolePrompt(this))
-                .setPositiveButton(R.string.yes) { _, _ -> disposables.add(gofer.remove().subscribe(this::onRoleDropped, defaultErrorHandler::accept)) }
+                .setPositiveButton(R.string.yes) { _, _ -> disposables.add(gofer.remove().subscribe(this::onRoleDropped, defaultErrorHandler::invoke)) }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
                 .show()
     }
 
     private fun updateRole() {
         toggleProgress(true)
-        disposables.add(gofer.save().subscribe(this::onRoleUpdated, defaultErrorHandler::accept))
+        disposables.add(gofer.save().subscribe(this::onRoleUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onRoleUpdated(result: DiffUtil.DiffResult) {

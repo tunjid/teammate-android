@@ -62,7 +62,7 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(competitorViewModel.refresh(User::class.java).subscribe(this@DeclinedCompetitionsFragment::onCompetitorsUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable { disposables.add(competitorViewModel.refresh(User::class.java).subscribe(this@DeclinedCompetitionsFragment::onCompetitorsUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<CompetitorViewHolder>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
@@ -113,14 +113,14 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
                 .subscribe({ diffResult ->
                     toggleProgress(false)
                     scrollManager.onDiff(diffResult)
-                }, defaultErrorHandler::accept))
+                }, defaultErrorHandler::invoke))
     }
 
     private fun fetchCompetitions(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
         else toggleProgress(true)
 
-        disposables.add(competitorViewModel.getMany(User::class.java, fetchLatest).subscribe(this::onCompetitorsUpdated, defaultErrorHandler::accept))
+        disposables.add(competitorViewModel.getMany(User::class.java, fetchLatest).subscribe(this::onCompetitorsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onCompetitorsUpdated(result: DiffUtil.DiffResult) {

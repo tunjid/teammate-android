@@ -92,7 +92,7 @@ class NavDialogFragment : BottomSheetDialogFragment() {
             override fun onViewDetachedFromWindow(v: View) = disposables.clear()
         })
 
-        disposables.add(teamViewModel.nonDefaultTeams(list).subscribe(scrollManager::onDiff, ErrorHandler.EMPTY::accept))
+        disposables.add(teamViewModel.nonDefaultTeams(list).subscribe(scrollManager::onDiff, ErrorHandler.EMPTY::invoke))
         disposables.add(teamViewModel.gofer(current).get().subscribe({ teamViewHolder.bind(teamViewModel.defaultTeam) }, Throwable::printStackTrace))
 
         return root

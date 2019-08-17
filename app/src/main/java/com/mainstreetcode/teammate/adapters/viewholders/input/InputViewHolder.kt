@@ -181,7 +181,7 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
             disposables.add(Single.fromCallable { getDrawable(text.context, newIcon) }
                     .subscribeOn(Schedulers.io())
                     .observeOn(mainThread())
-                    .subscribe(button::setImageDrawable, ErrorHandler.EMPTY::accept))
+                    .subscribe(button::setImageDrawable, ErrorHandler.EMPTY::invoke))
     }
 
     private fun scaleHint(grow: Boolean) {

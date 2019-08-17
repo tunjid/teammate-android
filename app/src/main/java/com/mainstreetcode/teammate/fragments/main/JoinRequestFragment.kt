@@ -165,17 +165,17 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
 
     private fun createJoinRequest() {
         toggleProgress(true)
-        disposables.add(gofer.save().subscribe(this::onJoinRequestSent, defaultErrorHandler::accept))
+        disposables.add(gofer.save().subscribe(this::onJoinRequestSent, defaultErrorHandler::invoke))
     }
 
     private fun saveRequest() {
         toggleProgress(true)
-        disposables.add(gofer.save().subscribe({ onRequestSaved() }, defaultErrorHandler::accept))
+        disposables.add(gofer.save().subscribe({ onRequestSaved() }, defaultErrorHandler::invoke))
     }
 
     private fun deleteRequest() {
         toggleProgress(true)
-        disposables.add(gofer.remove().subscribe(this::onRequestDeleted, defaultErrorHandler::accept))
+        disposables.add(gofer.remove().subscribe(this::onRequestDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onJoinRequestSent(result: DiffUtil.DiffResult) {

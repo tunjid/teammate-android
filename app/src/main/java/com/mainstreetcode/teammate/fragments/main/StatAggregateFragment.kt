@@ -119,7 +119,7 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
         disposables.add(statViewModel.aggregate(request).subscribe({ result ->
             toggleProgress(false)
             scrollManager.onDiff(result)
-        }, defaultErrorHandler::accept))
+        }, defaultErrorHandler::invoke))
     }
 
     private fun updateEntity(item: Competitive) {

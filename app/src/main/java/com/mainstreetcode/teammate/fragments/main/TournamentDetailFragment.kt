@@ -141,7 +141,7 @@ class TournamentDetailFragment : MainActivityFragment() {
 
         val rounds = tournament.numRounds
         disposables.add(tournamentViewModel.checkForWinner(tournament)
-                .subscribe({ setUpWinner(view as ViewGroup?, rounds) }, defaultErrorHandler::accept))
+                .subscribe({ setUpWinner(view as ViewGroup?, rounds) }, defaultErrorHandler::invoke))
     }
 
     override fun onDestroyView() {
@@ -163,7 +163,7 @@ class TournamentDetailFragment : MainActivityFragment() {
         if (competitor.isEmpty || competitor.isAccepted) return
         if (restoredFromBackStack())
         // Don't prompt for the same competitor multiple times.
-            disposables.add(competitorViewModel.updateCompetitor(competitor).subscribe(this::promptForCompetitor, ErrorHandler.EMPTY::accept))
+            disposables.add(competitorViewModel.updateCompetitor(competitor).subscribe(this::promptForCompetitor, ErrorHandler.EMPTY::invoke))
         else
             promptForCompetitor()
     }
@@ -182,11 +182,11 @@ class TournamentDetailFragment : MainActivityFragment() {
     private fun respond(accept: Boolean) {
         toggleProgress(true)
         disposables.add(competitorViewModel.respond(competitor, accept)
-                .subscribe({ toggleProgress(false) }, defaultErrorHandler::accept))
+                .subscribe({ toggleProgress(false) }, defaultErrorHandler::invoke))
     }
 
     private fun deleteTournament() {
-        disposables.add(tournamentViewModel.delete(tournament).subscribe(this::onTournamentDeleted, defaultErrorHandler::accept))
+        disposables.add(tournamentViewModel.delete(tournament).subscribe(this::onTournamentDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onTournamentDeleted(deleted: Tournament) {

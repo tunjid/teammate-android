@@ -155,7 +155,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
                         showFragment(TournamentDetailFragment.newInstance(headeredModel))
                     else
                         onModelUpdated(diffResult)
-                }, defaultErrorHandler::accept))
+                }, defaultErrorHandler::invoke))
             }
         }
     }

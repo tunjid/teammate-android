@@ -91,7 +91,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(tournamentViewModel.refresh(team).subscribe(this::onTournamentsUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable { disposables.add(tournamentViewModel.refresh(team).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
@@ -156,7 +156,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
         if (fetchLatest) scrollManager.setRefreshing()
         else toggleProgress(true)
 
-        disposables.add(tournamentViewModel.getMany(team, fetchLatest).subscribe(this::onTournamentsUpdated, defaultErrorHandler::accept))
+        disposables.add(tournamentViewModel.getMany(team, fetchLatest).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onTournamentsUpdated(result: DiffUtil.DiffResult) {

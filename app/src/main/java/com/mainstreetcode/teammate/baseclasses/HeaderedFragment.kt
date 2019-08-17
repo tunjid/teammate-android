@@ -135,7 +135,7 @@ abstract class HeaderedFragment<T> :
         if (showsFab() && !isBottomSheetShowing)
             disposables.add(timer(FAB_DELAY.toLong(), MILLISECONDS)
                     .observeOn(mainThread())
-                    .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY::accept))
+                    .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY::invoke))
     }
 
     protected fun fetch() {
@@ -153,14 +153,14 @@ abstract class HeaderedFragment<T> :
 
         if (cantGetModel()) return
 
-        val get = { disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler::accept, this::checkIfChanged)) }
+        val get = { disposables.add(diffFlowable.subscribe(this::onModelUpdated, defaultErrorHandler::invoke, this::checkIfChanged)) }
 
         if (refresh) get.invoke()
         else appBarLayout?.postDelayed({ if (view != null) get.invoke() }, 800)
     }
 
     private fun checkIfChanged() {
-        disposables.add(gofer().watchForChange().subscribe({ onPrepComplete() }, ErrorHandler.EMPTY::accept))
+        disposables.add(gofer().watchForChange().subscribe({ onPrepComplete() }, ErrorHandler.EMPTY::invoke))
     }
 
     private fun onAppBarOffset(offsetProps: AppBarListener.OffsetProps) {
@@ -179,7 +179,7 @@ abstract class HeaderedFragment<T> :
                     val reason = reasons[index]
                     val request = BlockedUser.block(user, team, reason)
 
-                    disposables.add(blockedUserViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler::accept))
+                    disposables.add(blockedUserViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler::invoke))
                     toggleProgress(true)
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }

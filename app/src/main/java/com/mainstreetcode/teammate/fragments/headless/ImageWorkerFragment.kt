@@ -116,7 +116,7 @@ class ImageWorkerFragment : MainActivityFragment() {
             requestCode == MULTIPLE_MEDIA_CHOOSER && isMediaListener -> {
                 val listener = target as MediaListener
                 val filesMaybe = Maybe.create(MediaQuery(data)).subscribeOn(io()).observeOn(mainThread())
-                disposables.add(filesMaybe.subscribe(listener::onFilesSelected, ErrorHandler.EMPTY::accept))
+                disposables.add(filesMaybe.subscribe(listener::onFilesSelected, ErrorHandler.EMPTY::invoke))
             }
         }
     }

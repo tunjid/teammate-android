@@ -89,7 +89,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable { disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
@@ -107,7 +107,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
     override fun onResume() {
         super.onResume()
         scrollManager.setRefreshing()
-        disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::accept))
+        disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke))
     }
 
     override fun togglePersistentUi() {
@@ -193,7 +193,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
 
     private fun onFeedItemAction(diffResultSingle: Single<DiffUtil.DiffResult>) {
         toggleProgress(true)
-        disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler::accept))
+        disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onFeedUpdated(diffResult: DiffUtil.DiffResult) {

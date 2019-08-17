@@ -80,7 +80,7 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
             val activity = requireActivity()
             MainActivity.startRegistrationActivity(activity)
             activity.finish()
-        }, defaultErrorHandler::accept))
+        }, defaultErrorHandler::invoke))
     }
 
     override fun onSettingsItemClicked(item: SettingsItem) {

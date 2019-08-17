@@ -109,7 +109,7 @@ class ChatNotifier internal constructor() : Notifier<Chat>() {
                 .observeOn(mainThread())
                 .subscribe(
                         { notificationChatPair -> sendNotification(notificationChatPair.first, notificationChatPair.second) },
-                        ErrorHandler.EMPTY::accept,
+                        ErrorHandler.EMPTY::invoke,
                         { buildSummary(item, count.get()) })
     }
 
@@ -219,7 +219,7 @@ class ChatNotifier internal constructor() : Notifier<Chat>() {
                     val toSend = Chat.chat(message, RepoProvider.forRepo(UserRepo::class.java).currentUser, received.model.team)
 
                     repository.createOrUpdate(toSend)
-                            .subscribe({ notifier.aggregateConversations(received, toSend) }, ErrorHandler.EMPTY::accept)
+                            .subscribe({ notifier.aggregateConversations(received, toSend) }, ErrorHandler.EMPTY::invoke)
                 }
                 ACTION_MARK_AS_READ -> {
                     val read = intent.getParcelableExtra<Chat>(EXTRA_CHAT) ?: return

@@ -142,7 +142,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     override fun onClick(view: View) {
         if (view.id == R.id.fab)
             disposables.add(locationViewModel.getLastLocation(this)
-                    .subscribe({ location -> onLocationFound(location, true) }, defaultErrorHandler::accept))
+                    .subscribe({ location -> onLocationFound(location, true) }, defaultErrorHandler::invoke))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -155,7 +155,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     }
 
     private fun fetchPublicEvents(map: GoogleMap) {
-        disposables.add(eventViewModel.getPublicEvents(map).subscribe({ events -> populateMap(map, events) }, defaultErrorHandler::accept))
+        disposables.add(eventViewModel.getPublicEvents(map).subscribe({ events -> populateMap(map, events) }, defaultErrorHandler::invoke))
     }
 
     private fun requestLocation() {
@@ -163,7 +163,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
         if (lastLocation != null) onLocationFound(lastLocation, false)
         else disposables.add(locationViewModel.getLastLocation(this)
-                .subscribe({ location -> onLocationFound(location, true) }, defaultErrorHandler::accept))
+                .subscribe({ location -> onLocationFound(location, true) }, defaultErrorHandler::invoke))
     }
 
     private fun onLocationFound(location: LatLng, animate: Boolean) {
@@ -187,7 +187,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
     private fun onMapIdle(map: GoogleMap) {
         fetchPublicEvents(map)
-        disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler::accept))
+        disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler::invoke))
         scrollManager.notifyDataSetChanged()
     }
 

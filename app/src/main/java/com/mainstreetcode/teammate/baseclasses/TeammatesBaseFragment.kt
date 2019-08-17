@@ -61,7 +61,7 @@ import kotlin.math.abs
 open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
 
     protected var disposables = CompositeDisposable()
-    protected var emptyErrorHandler: io.reactivex.functions.Consumer<Throwable> = ErrorHandler.EMPTY
+    protected var emptyErrorHandler: (Throwable) -> Unit = ErrorHandler.EMPTY
     protected lateinit var defaultErrorHandler: ErrorHandler
 
     protected open val fabStringResource: Int

@@ -48,7 +48,7 @@ constructor() : MappedViewModel<Class<Role>, Role>() {
     private val roleRepository: RoleRepo = RepoProvider.forRepo(RoleRepo::class.java)
 
     init {
-        getMore(Role::class.java).subscribe({ }, ErrorHandler.EMPTY::accept)
+        getMore(Role::class.java).subscribe({ }, ErrorHandler.EMPTY::invoke)
     }
 
     override fun sortsAscending(): Boolean = true

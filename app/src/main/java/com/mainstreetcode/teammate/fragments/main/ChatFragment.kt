@@ -207,7 +207,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
 
     private fun fetchChatsBefore(fetchLatest: Boolean) {
         scrollManager.setRefreshing()
-        disposables.add(chatViewModel.getMany(team, fetchLatest).subscribe(this::onChatsUpdated, defaultErrorHandler::accept))
+        disposables.add(chatViewModel.getMany(team, fetchLatest).subscribe(this::onChatsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun subscribeToChat() {
@@ -220,7 +220,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
                 .add { message -> showSnackbar(message.message) }
-                .build()::accept)
+                .build()::invoke)
 
         disposables.add(chatDisposable)
     }
@@ -252,7 +252,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
                     val index = items.indexOf(chat)
                     if (index != -1) scrollManager.notifyItemChanged(index)
                 }
-                .build()::accept))
+                .build()::invoke))
     }
 
     private fun notifyAndScrollToLast(scrollToLast: Boolean) {

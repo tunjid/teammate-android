@@ -103,7 +103,7 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
             rootView.findViewById<View>(R.id.last_name_wrapper).visibility = View.VISIBLE
             rootView.findViewById<View>(R.id.email_wrapper).visibility = View.VISIBLE
             rootView.findViewById<View>(R.id.password_wrapper).visibility = View.VISIBLE
-        }, ErrorHandler.EMPTY::accept))
+        }, ErrorHandler.EMPTY::invoke))
 
         return rootView
     }
@@ -152,7 +152,7 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
             toggleProgress(true)
 
             disposables.add(viewModel.signUp(firstName, lastName, email, password)
-                    .subscribe({ onSignUp() }, defaultErrorHandler::accept)
+                    .subscribe({ onSignUp() }, defaultErrorHandler::invoke)
             )
         }
     }

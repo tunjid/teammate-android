@@ -95,7 +95,7 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     }
 
     private fun onRefresh() {
-        disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(this::onGamesUpdated, defaultErrorHandler::accept))
+        disposables.add(gameViewModel.fetchGamesInRound(tournament, round).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke))
     }
 
     override fun onResume() {

@@ -42,7 +42,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
@@ -65,7 +64,7 @@ constructor(
             ArrayList(items)
                     .filterIsInstance(Guest::class.java)
                     .filter(Guest::isAttending)
-                    .map { it.user }
+                    .map(Guest::user)
                     .filter { signedInUser == it }
                     .let {
                         if (it.isEmpty()) R.drawable.ic_event_available_white_24dp
@@ -78,7 +77,7 @@ constructor(
         items.addAll(model.asDifferentiables())
         items.add(model.team)
 
-        blockedUserFlowable.subscribe(Consumer { this.onUserBlocked(it) }, ErrorHandler.EMPTY)
+        blockedUserFlowable.subscribe(this::onUserBlocked, ErrorHandler.EMPTY::invoke)
     }
 
     fun getToolbarTitle(fragment: Fragment): CharSequence {

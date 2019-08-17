@@ -106,7 +106,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         super.onCreate(savedInstanceState)
         val args = arguments
         val game = args!!.getParcelable<Game>(ARG_GAME)
-        headeredModel = if (game != null) game.event else args.getParcelable(ARG_EVENT)!!
+        headeredModel = game?.event ?: args.getParcelable(ARG_EVENT)!!
 
         if (game != null && headeredModel.isEmpty) headeredModel.setName(game)
         gofer = eventViewModel.gofer(headeredModel)
@@ -116,7 +116,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
 
         scrollManager = ScrollManager.with<BaseViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(EventEditAdapter(gofer.items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
@@ -135,7 +135,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
         if (canEditEvent() || headeredModel.isPublic) menu.findItem(R.id.action_delete).isVisible = true
 
-        disposables.add(gofer.rsvpStatus.subscribe({ item.setIcon(it) }, emptyErrorHandler::accept))
+        disposables.add(gofer.rsvpStatus.subscribe({ item.setIcon(it) }, emptyErrorHandler::invoke))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -200,7 +200,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
                 val stringRes = if (wasEmpty) R.string.added_user else R.string.updated_user
                 onModelUpdated(diffResult)
                 showSnackbar(getString(stringRes, headeredModel.name))
-            }, defaultErrorHandler::accept))
+            }, defaultErrorHandler::invoke))
         }
     }
 
@@ -239,16 +239,16 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
     override fun onAddressPicked(address: Address) {
         gofer.isSettingLocation = false
-        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler::accept))
+        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler::invoke))
     }
 
     private fun rsvpEvent(attending: Boolean) {
         toggleProgress(true)
-        disposables.add(gofer.rsvpEvent(attending).subscribe(this::onModelUpdated, defaultErrorHandler::accept))
+        disposables.add(gofer.rsvpEvent(attending).subscribe(this::onModelUpdated, defaultErrorHandler::invoke))
     }
 
     private fun deleteEvent() {
-        disposables.add(gofer.remove().subscribe(this::onEventDeleted, defaultErrorHandler::accept))
+        disposables.add(gofer.remove().subscribe(this::onEventDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onEventDeleted() {

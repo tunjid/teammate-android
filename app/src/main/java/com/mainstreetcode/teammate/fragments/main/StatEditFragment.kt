@@ -142,7 +142,7 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
     }
 
     override fun onUserClicked(item: User) {
-        disposables.add(gofer.chooseUser(item).subscribe(this::onModelUpdated, defaultErrorHandler::accept))
+        disposables.add(gofer.chooseUser(item).subscribe(this::onModelUpdated, defaultErrorHandler::invoke))
         hideBottomSheet()
     }
 
@@ -174,11 +174,11 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
         if (view.id != R.id.fab) return
 
         toggleProgress(true)
-        disposables.add(gofer.save().subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::accept))
+        disposables.add(gofer.save().subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::invoke))
     }
 
     private fun deleteStat() {
-        disposables.add(gofer.remove().subscribe(this::onStatDeleted, defaultErrorHandler::accept))
+        disposables.add(gofer.remove().subscribe(this::onStatDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onStatDeleted() {
@@ -200,7 +200,7 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
     }
 
     private fun switchStatTeam() {
-        disposables.add(gofer.switchTeams().subscribe(this::onModelUpdated, defaultErrorHandler::accept))
+        disposables.add(gofer.switchTeams().subscribe(this::onModelUpdated, defaultErrorHandler::invoke))
     }
 
     companion object {

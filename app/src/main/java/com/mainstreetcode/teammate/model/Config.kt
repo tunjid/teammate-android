@@ -269,7 +269,7 @@ class Config internal constructor(
             if (RepoProvider.initialized())
                 RepoProvider.forRepo(ConfigRepo::class.java)[EMPTY_STRING]
                         .observeOn(mainThread()) // Necessary to prevent a concurrent modification exception
-                        .subscribe(cached::update, ErrorHandler.EMPTY::accept)
+                        .subscribe(cached::update, ErrorHandler.EMPTY::invoke)
         }
     }
 }

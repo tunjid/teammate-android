@@ -93,7 +93,7 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(gameViewModel.refresh(team).subscribe(this::onGamesUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable { disposables.add(gameViewModel.refresh(team).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_score_white_24dp, R.string.no_games))
@@ -168,7 +168,7 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         if (fetchLatest) scrollManager.setRefreshing()
         else toggleProgress(true)
 
-        disposables.add(gameViewModel.getMany(team, fetchLatest).subscribe(this::onGamesUpdated, defaultErrorHandler::accept))
+        disposables.add(gameViewModel.getMany(team, fetchLatest).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onGamesUpdated(result: DiffUtil.DiffResult) {

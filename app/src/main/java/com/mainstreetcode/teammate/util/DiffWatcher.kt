@@ -51,6 +51,6 @@ class DiffWatcher<T>(private val consumer: (T) -> Unit) {
 
     private fun watch() {
         ref.set(PublishSubject.create())
-        disposable.add(ref.get().distinctUntilChanged().subscribe(consumer::invoke, ErrorHandler.EMPTY::accept))
+        disposable.add(ref.get().distinctUntilChanged().subscribe(consumer::invoke, ErrorHandler.EMPTY::invoke))
     }
 }

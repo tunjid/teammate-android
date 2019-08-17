@@ -58,9 +58,10 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         FeedItem<T> item = FeedItem.Companion.fromNotification(remoteMessage);
         if (item == null) return;
 
-        if (item.isDeleteAction())
-            RepoProvider.Companion.forModel(item.getItemClass()).queueForLocalDeletion(item.getModel());
-        else NotifierProvider.Companion.forModel(item.getItemClass()).notify(item);
+        Class<T> itemClass = item.getItemClass();
+
+        if (item.isDeleteAction()) RepoProvider.Companion.forModel(itemClass).queueForLocalDeletion(item.getModel());
+        else NotifierProvider.Companion.forModel(itemClass).notify(item);
     }
 
     @SuppressLint("CheckResult")
@@ -69,7 +70,9 @@ public class TeammateMessagingService extends FirebaseMessagingService {
         if (TextUtils.isEmpty(token) || RepoProvider.Companion.forRepo(UserRepo.class).getCurrentUser().isEmpty())
             return;
 
-        RepoProvider.Companion.forRepo(DeviceRepo.class).createOrUpdate(Device.Companion.withFcmToken(token)).subscribe(__ -> {}, ErrorHandler.EMPTY);
+        RepoProvider.Companion.forRepo(DeviceRepo.class)
+                .createOrUpdate(Device.Companion.withFcmToken(token))
+                .subscribe(__ -> {}, ErrorHandler.Companion.getEMPTY()::invoke);
     }
 
 }

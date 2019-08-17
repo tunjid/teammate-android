@@ -121,7 +121,7 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
         else toggleProgress(true)
 
         disposables.add(tournamentViewModel.fetchStandings(tournament)
-                .subscribe(this::onTournamentsUpdated, defaultErrorHandler::accept))
+                .subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onTournamentsUpdated() {

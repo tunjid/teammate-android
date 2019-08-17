@@ -104,7 +104,7 @@ class ForgotPasswordFragment : RegistrationActivityFragment(), TextView.OnEditor
             val email = emailInput!!.text.toString()
 
             disposables.add(viewModel.forgotPassword(email)
-                    .subscribe({ showSnackbar(it.message) }, defaultErrorHandler::accept))
+                    .subscribe({ showSnackbar(it.message) }, defaultErrorHandler::invoke))
         }
     }
 

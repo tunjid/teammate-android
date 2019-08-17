@@ -127,7 +127,7 @@ class MediaTransferIntentService : IntentService("MediaUploadIntentService") {
                     .doOnSuccess { maxStorageMessage = "" }
                     .doOnError(this::onError)
                     .doFinally(this::invoke)
-                    .subscribe({ }, ErrorHandler.EMPTY::accept)
+                    .subscribe({ }, ErrorHandler.EMPTY::invoke)
         }
 
         override fun toString(): String {

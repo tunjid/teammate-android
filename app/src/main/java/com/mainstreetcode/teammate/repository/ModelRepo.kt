@@ -73,7 +73,7 @@ abstract class ModelRepo<T : Model<T>> {
     fun queueForLocalDeletion(model: T) {
         Completable.fromRunnable { deleteLocally(model) }
                 .subscribeOn(Schedulers.io())
-                .subscribe({ }, ErrorHandler.EMPTY::accept)
+                .subscribe({ }, ErrorHandler.EMPTY::invoke)
     }
 
     internal fun getLocalUpdateFunction(original: T): (T) -> T = { original.update(it); original }

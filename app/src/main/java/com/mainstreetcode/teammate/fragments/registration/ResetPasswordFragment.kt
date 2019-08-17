@@ -120,7 +120,7 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
                             snackbar.setText(it.message)
                                     .setAction(R.string.sign_in) { showFragment(SignInFragment.newInstance()) }
                         }
-                    }, defaultErrorHandler::accept))
+                    }, defaultErrorHandler::invoke))
         }
     }
 

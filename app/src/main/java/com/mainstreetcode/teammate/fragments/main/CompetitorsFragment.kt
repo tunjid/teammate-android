@@ -175,7 +175,7 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
     }
 
     private fun addCompetitors() {
-        disposables.add(tournamentViewModel.addCompetitors(tournament, competitors).subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::accept))
+        disposables.add(tournamentViewModel.addCompetitors(tournament, competitors).subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::invoke))
     }
 
     private fun moveCompetitor(start: CompetitorViewHolder, end: CompetitorViewHolder) {

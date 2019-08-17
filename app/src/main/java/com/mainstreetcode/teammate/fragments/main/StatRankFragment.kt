@@ -115,7 +115,7 @@ class StatRankFragment : MainActivityFragment() {
 
     private fun fetchStandings() {
         toggleProgress(true)
-        disposables.add(tournamentViewModel.getStatRank(tournament, type).subscribe(this::onTournamentsUpdated, defaultErrorHandler::accept))
+        disposables.add(tournamentViewModel.getStatRank(tournament, type).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onTournamentsUpdated(diff: DiffUtil.DiffResult) {

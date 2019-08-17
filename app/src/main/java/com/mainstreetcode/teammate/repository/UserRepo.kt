@@ -191,7 +191,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
                 .singleOrError()
                 .map(this::saveUserId)
 
-        result.subscribe({ currentUser = it }, ErrorHandler.EMPTY::accept)
+        result.subscribe({ currentUser = it }, ErrorHandler.EMPTY::invoke)
         return result
     }
 

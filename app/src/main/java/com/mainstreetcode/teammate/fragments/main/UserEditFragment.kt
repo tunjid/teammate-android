@@ -113,7 +113,7 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
                     toggleProgress(false)
                     viewHolder.bind(headeredModel)
                     scrollManager.onDiff(result)
-                }, defaultErrorHandler::accept))
+                }, defaultErrorHandler::invoke))
             }
         }
     }

@@ -122,7 +122,7 @@ class App : Application() {
                     .lastOrError()
                     .flatMap { RepoProvider.forRepo(ConfigRepo::class.java)[""].lastOrError() }
                     .flatMap { RepoProvider.forRepo(RoleRepo::class.java).myRoles.lastOrError() }
-                    .subscribe({ }, ErrorHandler.EMPTY::accept)
+                    .subscribe({ }, ErrorHandler.EMPTY::invoke)
         }
     }
 }

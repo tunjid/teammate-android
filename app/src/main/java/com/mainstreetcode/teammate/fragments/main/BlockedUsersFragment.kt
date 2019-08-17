@@ -78,7 +78,7 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
 
         val refreshAction = Runnable {
             disposables.add(blockedUserViewModel.refresh(team)
-                    .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::accept))
+                    .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke))
         }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
@@ -129,7 +129,7 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
         else toggleProgress(true)
 
         disposables.add(blockedUserViewModel.getMany(team, fetchLatest)
-                .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::accept))
+                .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onBlockedUsersUpdated(result: DiffUtil.DiffResult) {

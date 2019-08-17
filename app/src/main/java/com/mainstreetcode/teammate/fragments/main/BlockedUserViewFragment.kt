@@ -88,7 +88,7 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
 
     override fun onClick(view: View) {
         if (view.id == R.id.fab)
-            disposables.add(gofer.delete().subscribe(this::onUserUnblocked, defaultErrorHandler::accept))
+            disposables.add(gofer.delete().subscribe(this::onUserUnblocked, defaultErrorHandler::invoke))
     }
 
     override fun showsFab(): Boolean = gofer.hasPrivilegedRole()

@@ -90,7 +90,7 @@ abstract class Notifier<T : Model<T>> {
         repository[item.model].lastElement()
                 .filter(this::filterNotifications)
                 .map { item }
-                .subscribe(this::handleNotification, ErrorHandler.EMPTY::accept)
+                .subscribe(this::handleNotification, ErrorHandler.EMPTY::invoke)
     }
 
     internal fun getNotificationBuilder(item: FeedItem<T>): NotificationCompat.Builder {

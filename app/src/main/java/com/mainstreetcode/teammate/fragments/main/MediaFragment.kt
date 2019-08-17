@@ -102,7 +102,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_media, container, false)
 
-        val refreshAction = Runnable { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::accept)) }
+        val refreshAction = Runnable { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.team_media))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
@@ -123,7 +123,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         super.onResume()
         fetchMedia(true)
         toggleContextMenu(mediaViewModel.hasSelections(team))
-        disposables.add(mediaViewModel.listenForUploads().subscribe(this::onMediaUpdated, emptyErrorHandler::accept))
+        disposables.add(mediaViewModel.listenForUploads().subscribe(this::onMediaUpdated, emptyErrorHandler::invoke))
     }
 
     private fun fetchMedia(fetchLatest: Boolean) {
@@ -132,14 +132,14 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         else
             toggleProgress(true)
 
-        disposables.add(mediaViewModel.getMany(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler::accept))
+        disposables.add(mediaViewModel.getMany(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_pick_team -> yes
 
         R.id.action_delete -> disposables.add(mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
-                .subscribe(this::onMediaDeleted, defaultErrorHandler::accept))
+                .subscribe(this::onMediaDeleted, defaultErrorHandler::invoke))
 
         R.id.action_download -> {
             if (ImageWorkerFragment.requestDownload(this, team)) scrollManager.notifyDataSetChanged()

@@ -134,7 +134,7 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
     private fun subscribeToSearch() {
         disposables.add(instantSearch.subscribe()
-                .subscribe(scrollManager::onDiff, defaultErrorHandler::accept))
+                .subscribe(scrollManager::onDiff, defaultErrorHandler::invoke))
     }
 
     private fun isEligibleTeam(team: Differentiable): Boolean =

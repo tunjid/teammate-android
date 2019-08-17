@@ -76,7 +76,7 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        disposables.add(mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler::accept))
+        disposables.add(mediaViewModel.getMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler::invoke))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -87,7 +87,7 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
         AlertDialog.Builder(activity)
                 .setTitle(R.string.flag_media)
                 .setMessage(R.string.flag_media_message)
-                .setPositiveButton(R.string.yes) { _, _ -> disposables.add(mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler::accept)) }
+                .setPositiveButton(R.string.yes) { _, _ -> disposables.add(mediaViewModel.flagMedia(media).subscribe(this::checkMediaFlagged, defaultErrorHandler::invoke)) }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
                 .show()
 

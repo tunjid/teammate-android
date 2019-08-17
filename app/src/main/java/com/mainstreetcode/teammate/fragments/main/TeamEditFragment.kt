@@ -106,7 +106,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
                     val message = if (wasEmpty) getString(R.string.created_team, headeredModel.name) else getString(R.string.updated_team)
                     onModelUpdated(result)
                     showSnackbar(message)
-                }, defaultErrorHandler::accept))
+                }, defaultErrorHandler::invoke))
     }
 
     override fun gofer(): TeamHostingGofer<Team> = gofer
@@ -132,7 +132,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
 
     override fun onAddressPicked(address: Address) {
         gofer.isSettingAddress = false
-        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler::accept))
+        disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler::invoke))
         toggleProgress(false)
     }
 

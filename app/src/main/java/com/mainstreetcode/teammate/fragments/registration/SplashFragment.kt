@@ -56,7 +56,7 @@ class SplashFragment : RegistrationActivityFragment(), View.OnClickListener {
         override fun onSuccess(loginResult: LoginResult) {
             toggleProgress(true)
             disposables.add(viewModel.signIn(loginResult)
-                    .subscribe({ RegistrationActivity.startMainActivity(activity) }, defaultErrorHandler::accept))
+                    .subscribe({ RegistrationActivity.startMainActivity(activity) }, defaultErrorHandler::invoke))
         }
 
         override fun onCancel() {

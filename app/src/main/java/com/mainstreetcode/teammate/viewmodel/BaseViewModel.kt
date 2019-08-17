@@ -42,7 +42,7 @@ abstract class BaseViewModel : ViewModel() {
 
     init {
         @Suppress("LeakingThis")
-        disposable.add(App.instance.alerts().subscribe(this::onModelAlert, ErrorHandler.EMPTY::accept))
+        disposable.add(App.instance.alerts().subscribe(this::onModelAlert, ErrorHandler.EMPTY::invoke))
         fetchAds()
     }
 
