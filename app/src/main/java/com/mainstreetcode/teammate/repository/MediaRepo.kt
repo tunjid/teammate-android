@@ -127,9 +127,9 @@ class MediaRepo internal constructor() : TeamQueryRepo<Media>() {
     private fun getBody(path: String, photoKey: String): MultipartBody.Part? {
         val uri = Uri.parse(path)
         val type = App.instance.contentResolver.getType(uri) ?: return null
+        val mediaType = MediaType.parse(type) ?: return null
 
-        val requestBody = ProgressRequestBody(uri, numCallsToIgnore, MediaType.parse(type))
-
+        val requestBody = ProgressRequestBody(uri, numCallsToIgnore, mediaType)
         return MultipartBody.Part.createFormData(photoKey, "test.jpg", requestBody)
     }
 
