@@ -67,7 +67,7 @@ class MediaNotifier internal constructor() : Notifier<Media>() {
     fun notifyOfUploads(mediaSingle: Single<Media>, requestBody: RequestBody): Single<Media> {
         if (requestBody !is ProgressRequestBody) return mediaSingle
 
-        requestBody.progressSubject
+        requestBody.progressFlowable
                 .doFinally(this::onUploadComplete)
                 .subscribe(this::updateProgress, ErrorHandler.EMPTY::invoke)
 

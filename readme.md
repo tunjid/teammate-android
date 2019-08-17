@@ -119,10 +119,12 @@ Some very opinionated Android specific decisions to note if you're interested, o
 * Why not Kotlin? I started this in 2017. At the time I was choosing between learning a backend / web stack or building this with Kotlin. I chose the former, and I think it was the right choice.
 I've recently started learning and working with Kotlin professionally and should be up to speed pretty soon.
 
+    EDIT: The app has now been migrated to Kotlin.
+
 * Why no Dagger? While I love dependency injection, I actively despise Dagger for it's opaqueness, slow build times, and infamously verbose compile time errors.
 The latter has been greatly improved recently, but I think for an Android App of this size, Dagger is overkill.
 Now this is hardly backed up by much, however the things that would be injected in this app are the ```repositories``` and ```notifiers```, and that job is done by
-the ```RepoProviders``` and ```NotifierProviders``` respectively and can very easily be mocked. I don't think I'm missing out on much.
+the ```RepoProviders``` and ```NotifierProviders``` respectively, are provided via the service locator pattern and can very easily be mocked. I don't think I'm missing out on much.
 
 * Why Picasso and not Glide? I love dependencies with small binaries and a focused feature set that doesn't try to do too much.
 Glide is amazing, but this app doesn't support gifs, and Picasso works very well. There's no reason to bloat the app for a feature it doesn't need.
