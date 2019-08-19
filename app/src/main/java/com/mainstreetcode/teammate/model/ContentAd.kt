@@ -28,5 +28,5 @@ package com.mainstreetcode.teammate.model
 import com.mainstreetcode.teammate.util.CONTENT_AD
 
 class ContentAd : Ad<Any>() {
-    override fun getType(): Int = CONTENT_AD
+    override val type: Int = CONTENT_AD
 }

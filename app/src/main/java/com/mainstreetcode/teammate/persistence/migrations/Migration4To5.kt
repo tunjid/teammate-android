@@ -42,13 +42,12 @@ class Migration4To5 : Migration(4, 5) {
     sealed class ColumnDesc(
             open val name: String,
             open val type: String,
-            open val isNullable: Boolean,
-            @Suppress("unused") open val wasNullable: Boolean
+            open val change: Int
     ) {
 
         class PrimaryKey(
                 override val name: String
-        ) : ColumnDesc(name, "STRING", false, false) {
+        ) : ColumnDesc(name, "STRING", NEVER_NULLABLE) {
             override fun toString(): String = " PRIMARY KEY(`$name`)"
         }
 
@@ -56,7 +55,7 @@ class Migration4To5 : Migration(4, 5) {
                 override val name: String,
                 val referenceTable: String,
                 val referenceKey: String
-        ) : ColumnDesc(name, "STRING", false, false) {
+        ) : ColumnDesc(name, "STRING", NEVER_NULLABLE) {
             override fun toString(): String {
                 return " FOREIGN KEY(`$name`) REFERENCES `$referenceTable`(`$referenceKey`) ON UPDATE NO ACTION ON DELETE CASCADE "
             }
@@ -65,23 +64,13 @@ class Migration4To5 : Migration(4, 5) {
         class Regular(
                 override val name: String,
                 override val type: String,
-                nullChange: Int
-        ) : ColumnDesc(
-                name = name,
-                type = type,
-                isNullable = when (nullChange) {
-                    NEVER_NULLABLE, NOW_NON_NULL -> false
-                    ALWAYS_NULLABLE -> true
-                    else -> true
-                },
-                wasNullable = when (nullChange) {
-                    NEVER_NULLABLE -> false
-                    NOW_NON_NULL, ALWAYS_NULLABLE -> true
-                    else -> true
-                }
-        ) {
-            override fun toString(): String = when {
-                isNullable -> " `$name` $type"
+                override val change: Int
+        ) : ColumnDesc(name = name, type = type, change = change) {
+            val default: String
+                get() = if (type == TEXT) "''" else "0"
+
+            override fun toString(): String = when (change) {
+                ALWAYS_NULLABLE -> " `$name` $type"
                 else -> " `$name` $type NOT NULL"
             }
         }
@@ -323,19 +312,30 @@ class Migration4To5 : Migration(4, 5) {
     }
 
     private fun Array<out ColumnDesc>.copySQL(tableName: String): String {
+        val toCopy = filterIsInstance(ColumnDesc.Regular::class.java)
         val tempName = tempName(tableName)
+        val destBuilder = StringBuilder()
+        val srcBuilder = StringBuilder()
         val result = StringBuilder()
-        val copier = StringBuilder()
-        val last = size - 1
+        val last = toCopy.size - 1
 
-        forEachIndexed { index, item ->
-            copier.append(item.name)
-            if (index != last) copier.append(",")
+        toCopy.forEachIndexed { index, item ->
+            destBuilder.append(item.name)
+            srcBuilder.append(
+                    if (item.change == NOW_NON_NULL) "coalesce(${item.name}, ${item.default}) ${item.name}"
+                    else item.name
+            )
+
+            if (index != last) {
+                srcBuilder.append(",")
+                destBuilder.append(",")
+            }
         }
 
-        val copied = copier.toString()
+        val src = srcBuilder.toString()
+        val dest = destBuilder.toString()
 
-        result.append("INSERT INTO $tempName ($copied) SELECT $copied FROM $tableName")
+        result.append("INSERT INTO $tempName ($dest) SELECT $src FROM $tableName")
 
 
         return result.toString()

@@ -28,5 +28,5 @@ package com.mainstreetcode.teammate.model
 import com.mainstreetcode.teammate.util.INSTALL_AD
 
 class InstallAd : Ad<Any>() {
-    override fun getType(): Int = INSTALL_AD
+    override val type: Int = INSTALL_AD
 }

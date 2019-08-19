@@ -211,14 +211,16 @@ class Game : GameEntity,
                     ?: Team.empty()
             val event: Event = context.deserialize<Event>(body.get(EVENT), Event::class.java)
                     ?: Event.empty()
-            var tournament: Tournament? = context.deserialize<Tournament>(body.get(TOURNAMENT), Tournament::class.java)
+            val tournament: Tournament = context.deserialize<Tournament>(body.get(TOURNAMENT), Tournament::class.java)
+                    ?: Tournament.empty()
             val home: Competitor = context.deserialize<Competitor>(body.get(HOME), Competitor::class.java)
                     ?: Competitor.empty()
             val away: Competitor = context.deserialize<Competitor>(body.get(AWAY), Competitor::class.java)
                     ?: Competitor.empty()
-            val winner = if (body.has(WINNER)) context.deserialize(body.get(WINNER), Competitor::class.java) else Competitor.empty()
-
-            if (tournament == null) tournament = Tournament.empty()
+            val winner =
+                    if (body.has(WINNER)) context.deserialize(body.get(WINNER), Competitor::class.java)
+                            ?: Competitor.empty()
+                    else Competitor.empty()
 
             return Game(id, name, refPath, score, matchUp, homeEntityId, awayEntityId, winnerEntityId,
                     created.parseISO8601Date(), sport, referee, host, event, tournament,
