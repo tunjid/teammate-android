@@ -81,10 +81,11 @@ abstract class ModelRepo<T : Model<T>> {
     internal fun saveAsNested(): (List<T>) -> List<T> = inner@{ models ->
         if (models.isEmpty()) return@inner models
 
-        val litmus = models[0]
-        if (litmus.hasMajorFields()) return@inner saveManyFunction.invoke(models)
+        val parted = models.partition { it.hasMajorFields() }
 
-        dao().insert(models)
+        saveManyFunction.invoke(parted.first)
+        dao().insert(parted.second)
+
         models
     }
 
