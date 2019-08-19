@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.persistence.AppDatabase
 class TournamentTypeConverter {
 
     @TypeConverter
-    fun toId(tournament: Tournament): String? = if (tournament.isEmpty) null else tournament.id
+    fun toId(tournament: Tournament): String? = tournament.id
 
     @TypeConverter
     fun fromId(id: String): Tournament = AppDatabase.instance.tournamentDao().get(id)

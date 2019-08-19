@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.persistence.AppDatabase
 class GameTypeConverter {
 
     @TypeConverter
-    fun toId(game: Game): String? = if (game.isEmpty) null else game.id
+    fun toId(game: Game): String? = game.id
 
     @TypeConverter
     fun fromId(id: String): Game =
