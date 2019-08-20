@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders
 
-import android.text.TextUtils
 import android.view.Gravity.CENTER
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -73,7 +72,7 @@ class StandingRowViewHolder(
 
         val imageUrl = model.imageUrl
 
-        if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey)
+        if (imageUrl.isBlank()) thumbnail.setImageResource(R.color.dark_grey)
         else Picasso.get().load(imageUrl).fit().centerCrop().into(thumbnail)
     }
 

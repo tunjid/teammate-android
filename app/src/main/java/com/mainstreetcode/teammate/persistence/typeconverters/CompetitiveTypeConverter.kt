@@ -25,8 +25,6 @@
 package com.mainstreetcode.teammate.persistence.typeconverters
 
 import androidx.room.TypeConverter
-import android.text.TextUtils
-
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.EmptyCompetitor
 import com.mainstreetcode.teammate.model.Team
@@ -43,7 +41,7 @@ class CompetitiveTypeConverter {
 
     @TypeConverter
     fun fromId(source: String): Competitive {
-        if (TextUtils.isEmpty(source)) return EmptyCompetitor()
+        if (source.isBlank()) return EmptyCompetitor()
         val split = source.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val type = split[0]
         val id = split[1]

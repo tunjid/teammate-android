@@ -27,7 +27,6 @@ package com.mainstreetcode.teammate.adapters.viewholders
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
@@ -65,7 +64,7 @@ class HeaderedImageViewHolder(
 
     fun bind(model: HeaderedModel<*>) {
         val url = model.headerItem.getValue()
-        if (TextUtils.isEmpty(url)) return
+        if (url.isBlank()) return
 
         diff.push(url.toString())
     }
@@ -82,7 +81,7 @@ class HeaderedImageViewHolder(
     }
 
     private fun getCreator(url: String): RequestCreator? {
-        if (TextUtils.isEmpty(url)) return null
+        if (url.isBlank()) return null
 
         val file = File(url)
         val picasso = Picasso.get()

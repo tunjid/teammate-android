@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.TextUtils
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -83,8 +82,7 @@ constructor(
         itemView.setBackgroundResource(R.color.black)
 
         val videoUrl = media.url
-
-        if (TextUtils.isEmpty(videoUrl)) return
+        if (videoUrl.isBlank()) return
 
         fullResView.setVideoPath(videoUrl)
         fullResView.setOnPreparedListener {
@@ -114,13 +112,10 @@ constructor(
         }
 
         override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
-            if (fullResView == null) return true
             val videoControls = fullResView.videoControlsCore
 
-            if (videoControls != null && videoControls.isVisible)
-                videoControls.hide(false)
-            else
-                fullResView.showControls()
+            if (videoControls != null && videoControls.isVisible) videoControls.hide(false)
+            else fullResView.showControls()
 
             adapterListener.onMediaClicked(media)
             return true

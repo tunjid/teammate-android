@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.model
 
 
 import android.text.InputType
-import android.text.TextUtils
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import com.mainstreetcode.teammate.App
@@ -127,7 +126,7 @@ class Item<T> internal constructor(
         val FALSE = { _: Item<*> -> false }
 
         val ALL_INPUT_VALID = { _: Item<*> -> "" }
-        val NON_EMPTY = { input: Item<*> -> if (TextUtils.isEmpty(input.getValue())) App.instance.getString(R.string.team_invalid_empty_field) else "" }
+        val NON_EMPTY = { input: Item<*> -> if (input.getValue().isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else "" }
         val ALLOWS_SPECIAL_CHARACTERS = { input: Item<*> -> if (input.getValue().isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters) }
 
         fun <T> ignore(ignored: T) {}

@@ -28,7 +28,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ImageView
@@ -123,7 +122,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     internal fun loadImage(url: String, fitToSize: Boolean, destination: ImageView) {
         val isFullScreen = adapterListener.isFullScreen
-        if (TextUtils.isEmpty(url)) return
+        if (url.isBlank()) return
 
         var creator = Picasso.get().load(url)
 

@@ -56,7 +56,7 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 
-import com.mainstreetcode.teammate.socket.SocketFactory.EVENT_NEW_MESSAGE
+import com.mainstreetcode.teammate.socket.SocketFactory.Companion.EVENT_NEW_MESSAGE
 import io.reactivex.schedulers.Schedulers.io
 import io.socket.client.Socket.EVENT_ERROR
 
@@ -118,7 +118,7 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
             .flatMapMaybe { teamDatePair -> chatDao.unreadChats(teamDatePair.first, teamDatePair.second) }
             .filter { chats -> chats.isNotEmpty() }
 
-    fun listenForChat(team: Team): Flowable<Chat> = SocketFactory.getInstance().teamChatSocket.flatMapPublisher { socket ->
+    fun listenForChat(team: Team): Flowable<Chat> = SocketFactory.instance.teamChatSocket.flatMapPublisher { socket ->
         val result: JSONObject = try {
             JSONObject(CHAT_GSON.toJson(team))
         } catch (e: Exception) {
@@ -137,17 +137,14 @@ class ChatRepo internal constructor() : TeamQueryRepo<Chat>() {
                 .filter { chat -> team == chat.team && signedInUser != chat.user }
     }
 
-    private fun post(chat: Chat): Completable = SocketFactory.getInstance().teamChatSocket.flatMapCompletable { socket ->
+    private fun post(chat: Chat): Completable = SocketFactory.instance.teamChatSocket.flatMapCompletable { socket ->
         Completable.create { emitter ->
             val result = JSONObject(CHAT_GSON.toJson(chat))
             socket.emit(EVENT_NEW_MESSAGE, arrayOf<Any>(result)) { args ->
-                val created = parseChat(*args)
-                if (created == null) {
-                    emitter.onError(TeammateException("Unable to post chat"))
-                    return@emit
-                }
-                chat.update(created)
-                emitter.onComplete()
+                parseChat(*args)?.let { chat.update(it) }
+                        ?: return@emit emitter.onError(TeammateException("Unable to post chat"))
+
+                if (!emitter.isDisposed) emitter.onComplete()
             }
         }
     }.onErrorResumeNext { throwable -> postRetryFunction(throwable, chat, 0) }

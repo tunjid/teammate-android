@@ -25,18 +25,15 @@
 package com.mainstreetcode.teammate.adapters.viewholders
 
 
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.mainstreetcode.teammate.R
 import androidx.core.view.ViewCompat
-
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT
+import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.SnackBarUtils.findSuitableParent
 
 class ChoiceBar
@@ -47,7 +44,11 @@ class ChoiceBar
  * @param content  The content view for this transient bottom bar.
  * @param callback The content view callback for this transient bottom bar.
  */
-private constructor(parent: ViewGroup, content: View, callback: com.google.android.material.snackbar.ContentViewCallback) : BaseTransientBottomBar<ChoiceBar>(parent, content, callback) {
+private constructor(
+        parent: ViewGroup,
+        content: View,
+        callback: com.google.android.material.snackbar.ContentViewCallback
+) : BaseTransientBottomBar<ChoiceBar>(parent, content, callback) {
 
     private var positiveButton: TextView? = null
     private var negativeButton: TextView? = null
@@ -60,50 +61,37 @@ private constructor(parent: ViewGroup, content: View, callback: com.google.andro
         // Remove the default insets applied that account for the keyboard showing up
         // since it's handled by us
         val wrapper = content.parent as View
-        ViewCompat.setOnApplyWindowInsetsListener(wrapper) { view, insets -> insets }
+        ViewCompat.setOnApplyWindowInsetsListener(wrapper) { _, insets -> insets }
     }
 
     override fun show() {
-        if (TextUtils.isEmpty(positiveButton!!.text)) positiveButton!!.visibility = View.GONE
-        if (TextUtils.isEmpty(negativeButton!!.text)) negativeButton!!.visibility = View.GONE
+        if (positiveButton?.text.isNullOrBlank()) positiveButton?.visibility = View.GONE
+        if (negativeButton?.text.isNullOrBlank()) negativeButton?.visibility = View.GONE
         negativeButton = null
         positiveButton = negativeButton
         super.show()
     }
 
-    fun dismissAsTimeout() {
-        dispatchDismiss(DISMISS_EVENT_TIMEOUT)
-    }
+    fun dismissAsTimeout() = dispatchDismiss(DISMISS_EVENT_TIMEOUT)
 
-    fun setText(message: CharSequence): ChoiceBar {
-        getView().findViewById<TextView>(R.id.text).text = message
-        return this
-    }
+    fun setText(message: CharSequence): ChoiceBar = apply { getView().findViewById<TextView>(R.id.text)?.text = message }
 
-    fun setPositiveText(message: CharSequence): ChoiceBar {
-        positiveButton!!.text = message
-        return this
-    }
+    fun setPositiveText(message: CharSequence): ChoiceBar = apply { positiveButton?.text = message }
 
-    fun setNegativeText(message: CharSequence): ChoiceBar {
-        negativeButton!!.text = message
-        return this
-    }
+    fun setNegativeText(message: CharSequence): ChoiceBar = apply { negativeButton?.text = message }
 
-    fun setPositiveClickListener(listener: View.OnClickListener): ChoiceBar {
+    fun setPositiveClickListener(listener: View.OnClickListener): ChoiceBar = apply {
         positiveButton!!.setOnClickListener { view ->
             listener.onClick(view)
             dispatchDismiss(DISMISS_EVENT_ACTION)
         }
-        return this
     }
 
-    fun setNegativeClickListener(listener: View.OnClickListener): ChoiceBar {
+    fun setNegativeClickListener(listener: View.OnClickListener): ChoiceBar = apply {
         negativeButton!!.setOnClickListener { view ->
             listener.onClick(view)
             dispatchDismiss(DISMISS_EVENT_ACTION)
         }
-        return this
     }
 
     companion object {

@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders
 
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -62,7 +61,7 @@ open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterLi
         this.model = model
         val imageUrl = model.imageUrl
 
-        if (TextUtils.isEmpty(imageUrl)) thumbnail.setImageResource(R.color.dark_grey)
+        if (imageUrl.isBlank()) thumbnail.setImageResource(R.color.dark_grey)
         else load(imageUrl, thumbnail)
     }
 

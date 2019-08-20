@@ -27,7 +27,6 @@ package com.mainstreetcode.teammate.fragments.main
 import android.content.pm.PackageManager
 import android.location.Address
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -102,11 +101,11 @@ class AddressPickerFragment : MainActivityFragment() {
             override fun onQueryTextSubmit(query: String): Boolean = false
 
             override fun onQueryTextChange(query: String): Boolean {
-                if (TextUtils.isEmpty(query)) return true
+                if (query.isBlank()) return true
 
                 instantSearch.postSearch(query)
-                mapContainer.visibility = if (TextUtils.isEmpty(query)) View.VISIBLE else View.GONE
-                recyclerView.visibility = if (TextUtils.isEmpty(query)) View.GONE else View.VISIBLE
+                mapContainer.visibility = if (query.isBlank()) View.VISIBLE else View.GONE
+                recyclerView.visibility = if (query.isBlank()) View.GONE else View.VISIBLE
                 return true
             }
         })
