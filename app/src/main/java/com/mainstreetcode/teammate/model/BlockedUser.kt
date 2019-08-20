@@ -73,10 +73,10 @@ class BlockedUser private constructor(
     override val imageUrl: String
         get() = user.imageUrl
 
-    override val headerItem: Item<BlockedUser>
+    override val headerItem: Item
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.imageUrl), CharSequence::noOp)
 
-    override fun asItems(): List<Item<BlockedUser>> = listOf(
+    override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName),
             Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName),
             Item.text(holder[2], 2, Item.ROLE, R.string.team_role, reason::code, CharSequence::noOp)

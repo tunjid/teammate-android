@@ -88,10 +88,10 @@ class Tournament : TournamentEntity,
     override val isEmpty: Boolean
         get() = id.isBlank()
 
-    override val headerItem: Item<Tournament>
+    override val headerItem: Item
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
-    override fun asItems(): List<Item<Tournament>> = listOf(
+    override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.tournament_name, Item.nullToEmpty(name), this::setName),
             Item.text(holder[1], 1, Item.DESCRIPTION, R.string.tournament_description, Item.nullToEmpty(description), this::setDescription),
             Item.text(holder[2], 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::code, this::setType)

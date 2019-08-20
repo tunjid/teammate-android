@@ -81,7 +81,7 @@ class EventEditAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val item = identifiables[position]) {
-            is Item<*> -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
             is Team -> (holder as TeamViewHolder).bind(item)
             is Guest -> (holder as GuestViewHolder).bind(item)
         }
@@ -92,7 +92,7 @@ class EventEditAdapter(
     override fun getItemId(position: Int): Long = identifiables[position].id.hashCode().toLong()
 
     override fun getItemViewType(position: Int): Int = when (identifiables[position]) {
-        is Item<*> -> ITEM
+        is Item -> ITEM
         is Team -> TEAM
         else -> GUEST
     }
@@ -110,14 +110,14 @@ class EventEditAdapter(
 
     internal class Chooser internal constructor(private val adapterListener: EventEditAdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun iconGetter(item: Item<*>): Int =
+        override fun iconGetter(item: Item): Int =
                 if (item.itemType == Item.LOCATION) R.drawable.ic_location_on_white_24dp else 0
 
-        override fun enabler(item: Item<*>): Boolean {
+        override fun enabler(item: Item): Boolean {
             return adapterListener.canEditEvent()
         }
 
-        override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
+        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT,
             Item.DATE -> item.noBlankFields
             Item.TEXT,
@@ -126,7 +126,7 @@ class EventEditAdapter(
             else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.TEXT, Item.NUMBER, Item.LOCATION -> TextInputStyle(
                     Item.NO_CLICK,
                     adapterListener::onLocationClicked,

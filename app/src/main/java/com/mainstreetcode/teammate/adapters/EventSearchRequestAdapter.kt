@@ -84,25 +84,25 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
             sports.add(0, Sport.empty())
         }
 
-        override fun iconGetter(item: Item<*>): Int = when (item.itemType) {
+        override fun iconGetter(item: Item): Int = when (item.itemType) {
             Item.LOCATION -> R.drawable.ic_location_on_white_24dp
             else -> 0
         }
 
-        override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
+        override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.INFO -> false
             Item.DATE, Item.SPORT, Item.LOCATION -> true
             else -> false
         }
 
-        override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
+        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.DATE -> item.noBlankFields
             Item.SPORT,
             Item.LOCATION -> item.noInputValidation
             else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (val itemType = item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (val itemType = item.itemType) {
             Item.INFO,
             Item.LOCATION -> TextInputStyle(
                     adapterListener::onLocationClicked,

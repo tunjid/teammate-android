@@ -87,7 +87,7 @@ class HeadToHeadRequestAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val identifiable = request.items[position]) {
-            is Item<*> -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
+            is Item -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
             is Competitor -> (holder as CompetitorViewHolder).bind(identifiable)
         }
     }
@@ -97,7 +97,7 @@ class HeadToHeadRequestAdapter(
     override fun getItemViewType(position: Int): Int {
         val identifiable = request.items[position]
         return when {
-            identifiable is Item<*> -> ITEM
+            identifiable is Item -> ITEM
             position == 2 -> HOME
             else -> AWAY
         }
@@ -118,29 +118,29 @@ class HeadToHeadRequestAdapter(
             sports.add(0, Sport.empty())
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.SPORT -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item<*>::always,
-                    Item<*>::noInputValidation)
-            Item.DATE -> DateTextInputStyle(Item<*>::always)
+                    Item::always,
+                    Item::noInputValidation)
+            Item.DATE -> DateTextInputStyle(Item::always)
             Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
                     R.string.tournament_type,
                     Config.getTournamentTypes { true },
                     TournamentType::name,
                     TournamentType::code,
-                    Item<*>::always,
-                    Item<*>::noInputValidation)
+                    Item::always,
+                    Item::noInputValidation)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item<*>::always,
-                    Item<*>::noInputValidation)
+                    Item::always,
+                    Item::noInputValidation)
         }
     }
 }

@@ -78,7 +78,7 @@ class TournamentEditAdapter(
         super.onBindViewHolder(holder, position)
 
         when (val item = items[position]) {
-            is Item<*> -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
             is Competitor -> (holder as CompetitorViewHolder).bind(item)
         }
     }
@@ -89,7 +89,7 @@ class TournamentEditAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val thing = items[position]
-        return if (thing is Item<*>) ITEM else TOURNAMENT
+        return if (thing is Item) ITEM else TOURNAMENT
     }
 
     interface AdapterListener : ImageWorkerFragment.ImagePickerListener {
@@ -103,12 +103,12 @@ class TournamentEditAdapter(
 
     private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun iconGetter(item: Item<*>): Int = when {
+        override fun iconGetter(item: Item): Int = when {
             item.stringRes == R.string.tournament_name && adapterListener.canEditAfterCreation() -> R.drawable.ic_picture_white_24dp
             else -> 0
         }
 
-        override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
+        override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.ABOUT -> item.never
             Item.INFO,
             Item.INPUT,
@@ -119,7 +119,7 @@ class TournamentEditAdapter(
             else -> item.never
         }
 
-        override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
+        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT,
             Item.NUMBER -> item.noBlankFields
             Item.INFO,
@@ -129,7 +129,7 @@ class TournamentEditAdapter(
             else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT,
             Item.NUMBER,
             Item.DESCRIPTION -> TextInputStyle(
@@ -144,14 +144,14 @@ class TournamentEditAdapter(
                     TournamentType::name,
                     TournamentType::code,
                     this::enabler,
-                    Item<*>::noInputValidation)
+                    Item::noInputValidation)
             Item.TOURNAMENT_STYLE -> SpinnerTextInputStyle(
                     R.string.tournament_style,
                     Config.getTournamentStyles(adapterListener.sport::supportsTournamentStyle),
                     TournamentStyle::name,
                     TournamentStyle::code,
                     this::enabler,
-                    Item<*>::noInputValidation)
+                    Item::noInputValidation)
             Item.INFO -> {
                 val resources = App.instance.resources
                 SpinnerTextInputStyle(
@@ -160,7 +160,7 @@ class TournamentEditAdapter(
                         { flag -> resources.getString(if (flag) R.string.yes else R.string.no) },
                         Boolean::toString,
                         this::enabler,
-                        Item<*>::noInputValidation)
+                        Item::noInputValidation)
             }
             else -> TextInputStyle(
                     Item.NO_CLICK,

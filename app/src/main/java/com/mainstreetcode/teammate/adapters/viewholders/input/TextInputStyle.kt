@@ -35,11 +35,11 @@ import com.mainstreetcode.teammate.util.get
 open class TextInputStyle(
         private val textRunnable: (() -> Unit)?,
         private val buttonRunnable: (() -> Unit)?,
-        private val enabler: (Item<*>) -> Boolean,
-        private val errorChecker: (Item<*>) -> CharSequence?,
-        private val iconVisibilityFunction: (Item<*>) -> Int) {
+        private val enabler: (Item) -> Boolean,
+        private val errorChecker: (Item) -> CharSequence?,
+        private val iconVisibilityFunction: (Item) -> Int) {
 
-    lateinit var item: Item<*>
+    lateinit var item: Item
     var viewHolder: InputViewHolder<*>? = null
 
     internal open val isSelector: Boolean
@@ -52,9 +52,9 @@ open class TextInputStyle(
         get() = iconVisibilityFunction.invoke(item)
 
     constructor(
-            enabler: (Item<*>) -> Boolean,
-            errorChecker: (Item<*>) -> CharSequence,
-            iconVisibilityFunction: (Item<*>) -> Int
+            enabler: (Item) -> Boolean,
+            errorChecker: (Item) -> CharSequence,
+            iconVisibilityFunction: (Item) -> Int
     ) : this(Item.NO_CLICK, Item.NO_CLICK, enabler, errorChecker, iconVisibilityFunction)
 
     internal fun errorText(): CharSequence? = errorChecker.invoke(item)
@@ -74,27 +74,24 @@ open class TextInputStyle(
         if (activity is TeammatesBaseActivity) activity.onDialogDismissed()
     }
 
-    private fun with(item: Item<*>): TextInputStyle {
-        this.item = item
-        return this
-    }
+    private fun with(item: Item): TextInputStyle = apply { this.item = item }
 
-    abstract class InputChooser : (Item<*>) -> TextInputStyle {
+    abstract class InputChooser : (Item) -> TextInputStyle {
 
         private val behaviors = SparseArray<TextInputStyle>()
 
-        operator fun get(item: Item<*>): TextInputStyle =  get(
+        operator fun get(item: Item): TextInputStyle =  get(
                 item.stringRes,
                 behaviors::get,
                 behaviors::put,
                 { invoke(item) }
         ).with(item)
 
-        open fun iconGetter(item: Item<*>): Int = 0
+        open fun iconGetter(item: Item): Int = 0
 
-        open fun enabler(item: Item<*>): Boolean = false
+        open fun enabler(item: Item): Boolean = false
 
-        open fun textChecker(item: Item<*>): CharSequence? = null
+        open fun textChecker(item: Item): CharSequence? = null
     }
 }
 

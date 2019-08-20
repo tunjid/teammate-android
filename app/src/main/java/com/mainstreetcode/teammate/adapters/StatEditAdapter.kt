@@ -84,7 +84,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
         super.onBindViewHolder(holder, position)
 
         when (val item = items[position]) {
-            is Item<*> -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
             is User -> (holder as UserViewHolder).bind(item)
             is Team -> (holder as TeamViewHolder).bind(item)
         }
@@ -94,7 +94,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
 
     override fun getItemViewType(position: Int): Int {
         return when (val differentiable = items[position]) {
-            is Item<*> ->
+            is Item ->
                 if (STAT_TYPE == differentiable.itemType) STAT_TYPE
                 else ITEM
             is User -> USER
@@ -114,26 +114,26 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
 
     internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.NUMBER -> TextInputStyle(
                     Item.NO_CLICK,
                     Item.NO_CLICK,
-                    Item<*>::always,
-                    Item<*>::noBlankFields,
-                    Item<*>::noIcon)
+                    Item::always,
+                    Item::noBlankFields,
+                    Item::noIcon)
             STAT_TYPE -> SpinnerTextInputStyle(
                     R.string.choose_stat,
                     adapterListener.stat.sport.stats,
                     StatType::emojiAndName,
                     StatType::code,
                     { adapterListener.canChangeStat() },
-                    Item<*>::noInputValidation)
+                    Item::noInputValidation)
             else -> TextInputStyle(
                     Item.NO_CLICK,
                     Item.NO_CLICK,
-                    Item<*>::always,
-                    Item<*>::noBlankFields,
-                    Item<*>::noIcon
+                    Item::always,
+                    Item::noBlankFields,
+                    Item::noIcon
             )
         }
     }

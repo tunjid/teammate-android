@@ -58,7 +58,7 @@ class EventSearchRequest private constructor(
     var sport: Sport
         private set
 
-    private val items: List<Item<EventSearchRequest>>
+    private val items: List<Item>
 
     private val sportName: CharSequence
         get() = sport.getName()
@@ -100,7 +100,7 @@ class EventSearchRequest private constructor(
 
     private fun getEndDate(): CharSequence = endDate.prettyPrint()
 
-    private fun buildItems(): List<Item<EventSearchRequest>> = listOf(
+    private fun buildItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.LOCATION, R.string.location, this::getAddress, CharSequence::noOp),
             Item.text(holder[1], 1, Item.INFO, R.string.event_distance, this::getDistance, CharSequence::noOp),
             Item.text(holder[2], 2, Item.SPORT, R.string.team_sport, this::sportName, this::setSport)
@@ -109,7 +109,7 @@ class EventSearchRequest private constructor(
             Item.text(holder[4], 4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate)
     )
 
-    override fun asItems(): List<Item<EventSearchRequest>> = items
+    override fun asItems(): List<Item> = items
 
     class GsonAdapter : JsonSerializer<EventSearchRequest> {
 

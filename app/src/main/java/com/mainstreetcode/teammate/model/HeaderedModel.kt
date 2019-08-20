@@ -25,5 +25,5 @@
 package com.mainstreetcode.teammate.model
 
 interface HeaderedModel<T> : Model<T> {
-    val headerItem: Item<T>
+    val headerItem: Item
 }

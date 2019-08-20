@@ -105,15 +105,13 @@ class JoinRequestGofer(
         }
     }
 
-    fun getToolbarTitle(fragment: Fragment): String {
-        return fragment.getString(when (state) {
-            JOINING -> R.string.join_team
-            INVITING -> R.string.invite_user
-            WAITING -> R.string.pending_request
-            APPROVING -> R.string.approve_request
-            else -> R.string.accept_request
-        })
-    }
+    fun getToolbarTitle(fragment: Fragment): String = fragment.getString(when (state) {
+        JOINING -> R.string.join_team
+        INVITING -> R.string.invite_user
+        WAITING -> R.string.pending_request
+        APPROVING -> R.string.approve_request
+        else -> R.string.accept_request
+    })
 
     override fun getImageClickMessage(fragment: Fragment): String? =
             fragment.getString(R.string.no_permission)
@@ -141,7 +139,7 @@ class JoinRequestGofer(
     private fun approveRequest(): Single<JoinRequest> =
             Single.defer { joinCompleter.invoke(model, true) }
 
-    private fun filter(item: Item<JoinRequest>): Boolean {
+    private fun filter(item: Item): Boolean {
         val isEmpty = model.isEmpty
         val sortPosition = item.sortPosition
 

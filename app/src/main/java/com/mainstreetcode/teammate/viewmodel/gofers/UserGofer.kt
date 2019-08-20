@@ -69,7 +69,7 @@ class UserGofer(
         val it = list.iterator()
 
         while (it.hasNext()) {
-            val next = it.next() as? Item<*> ?: continue
+            val next = it.next() as? Item ?: continue
             if (next.stringRes == R.string.email) it.remove()
         }
 

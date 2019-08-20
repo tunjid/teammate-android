@@ -68,7 +68,7 @@ class RoleEditAdapter(
     override fun onBindViewHolder(holder: InputViewHolder<RoleEditAdapterListener>, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
-        if (item is Item<*>) holder.bind(chooser[item])
+        if (item is Item) holder.bind(chooser[item])
     }
 
     override fun getItemCount(): Int = items.size
@@ -83,13 +83,13 @@ class RoleEditAdapter(
 
     internal class Chooser internal constructor(private val adapterListener: RoleEditAdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
+        override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.INPUT, Item.ABOUT -> false
             Item.NICKNAME -> adapterListener.canChangeRoleFields()
             else -> false
         }
 
-        override fun iconGetter(item: Item<*>): Int = when (item.itemType) {
+        override fun iconGetter(item: Item): Int = when (item.itemType) {
             Item.ROLE, Item.ABOUT, Item.NICKNAME -> 0
             Item.INPUT -> when {
                 item.stringRes == R.string.first_name && adapterListener.canChangeRolePosition() -> R.drawable.ic_picture_white_24dp
@@ -98,14 +98,14 @@ class RoleEditAdapter(
             else -> 0
         }
 
-        override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
+        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT -> item.noBlankFields
             Item.ABOUT,
             Item.NICKNAME -> item.noInputValidation
             else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT,
             Item.ABOUT,
             Item.NICKNAME -> TextInputStyle(

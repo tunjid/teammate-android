@@ -96,14 +96,14 @@ class Event : EventEntity,
     override val isEmpty: Boolean
         get() = equals(empty())
 
-    override val headerItem: Item<Event>
+    override val headerItem: Item
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
     fun setName(game: Game) {
         setName(game.home.name.toString() + " Vs. " + game.away.name)
     }
 
-    override fun asItems(): List<Item<Event>> = listOf(
+    override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName),
             Item.text(holder[1], 1, Item.VISIBILITY, R.string.event_visibility, visibility::code, this::setVisibility)
                     .textTransformer { value -> Config.visibilityFromCode(value.toString()).getName() },

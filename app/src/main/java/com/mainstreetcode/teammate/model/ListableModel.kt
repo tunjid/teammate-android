@@ -28,7 +28,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 interface ListableModel<T> {
 
-    fun asItems(): List<Item<T>>
+    fun asItems(): List<Item>
 
     fun asDifferentiables(): List<Differentiable> = ArrayList(asItems())
 }

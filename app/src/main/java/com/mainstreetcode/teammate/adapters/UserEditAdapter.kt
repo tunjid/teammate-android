@@ -65,7 +65,7 @@ class UserEditAdapter(
     override fun onBindViewHolder(holder: InputViewHolder<AdapterListener>, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
-        if (item is Item<*>) holder.bind(chooser[item])
+        if (item is Item) holder.bind(chooser[item])
     }
 
     override fun getItemCount(): Int = items.size
@@ -80,17 +80,17 @@ class UserEditAdapter(
 
     private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun iconGetter(item: Item<*>): Int =
+        override fun iconGetter(item: Item): Int =
                 if (adapterListener.canEdit() && item.stringRes == R.string.first_name) R.drawable.ic_picture_white_24dp else 0
 
-        override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
+        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT -> item.noBlankFields
             Item.INFO -> item.noSpecialCharacters
             Item.ABOUT -> item.noInputValidation
             else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INFO,
             Item.INPUT,
             Item.ABOUT -> TextInputStyle(

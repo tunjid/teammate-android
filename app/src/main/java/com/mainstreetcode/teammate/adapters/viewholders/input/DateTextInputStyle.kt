@@ -44,11 +44,11 @@ import java.util.Calendar.getInstance
 /**
  * ViewHolder for selecting [com.mainstreetcode.teammate.model.Role]
  */
-class DateTextInputStyle(enabler: (Item<*>) -> Boolean) : TextInputStyle(
+class DateTextInputStyle(enabler: (Item) -> Boolean) : TextInputStyle(
         Item.EMPTY_CLICK,
         Item.EMPTY_CLICK,
         enabler,
-        Item<*>::noInputValidation,
+        Item::noInputValidation,
         { R.drawable.ic_access_time_white_24dp }
 ), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 

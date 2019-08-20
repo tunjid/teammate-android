@@ -84,10 +84,10 @@ class Role : RoleEntity,
     override val isEmpty: Boolean
         get() = id.isBlank()
 
-    override val headerItem: Item<Role>
+    override val headerItem: Item
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
-    override fun asItems(): List<Item<Role>> = listOf(
+    override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName),
             Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName),
             Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }),

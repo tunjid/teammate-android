@@ -69,7 +69,7 @@ class JoinRequestAdapter(
     override fun onBindViewHolder(holder: InputViewHolder<AdapterListener>, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
-        if (item is Item<*>) holder.bind(chooser[item])
+        if (item is Item) holder.bind(chooser[item])
     }
 
     override fun getItemCount(): Int = items.size
@@ -84,28 +84,28 @@ class JoinRequestAdapter(
 
     internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun invoke(item: Item<*>): TextInputStyle {
+        override fun invoke(item: Item): TextInputStyle {
             when (val itemType = item.itemType) {
                 Item.SPORT -> return SpinnerTextInputStyle(
                         R.string.choose_sport,
                         Config.getSports(),
                         Sport::name,
                         Sport::code,
-                        Item<*>::never,
-                        Item<*>::noInputValidation)
+                        Item::never,
+                        Item::noInputValidation)
                 Item.ROLE -> return SpinnerTextInputStyle(
                         R.string.choose_role,
                         Config.getPositions(),
                         Position::name,
                         Position::code,
                         { adapterListener.canEditRole() },
-                        Item<*>::noInputValidation)
+                        Item::noInputValidation)
                 else -> return TextInputStyle(
                         Item.NO_CLICK,
                         Item.NO_CLICK,
-                        or<(Item<*>) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item<*>::never),
-                        Item<*>::noInputValidation,
-                        Item<*>::noIcon)
+                        or<(Item) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item::never),
+                        Item::noInputValidation,
+                        Item::noIcon)
             }
         }
     }

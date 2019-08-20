@@ -63,7 +63,7 @@ class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdap
     override fun onBindViewHolder(holder: InputViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
-        if (item is Item<*>) holder.bind(chooser[item])
+        if (item is Item) holder.bind(chooser[item])
     }
 
     override fun getItemCount(): Int = items.size
@@ -71,12 +71,12 @@ class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdap
     override fun getItemViewType(position: Int): Int = ITEM
 
     private class Chooser : TextInputStyle.InputChooser() {
-        override fun invoke(input: Item<*>): TextInputStyle = TextInputStyle(
+        override fun invoke(input: Item): TextInputStyle = TextInputStyle(
                 Item.NO_CLICK,
                 Item.NO_CLICK,
-                Item<*>::never,
-                Item<*>::noInputValidation,
-                Item<*>::noIcon
+                Item::never,
+                Item::noInputValidation,
+                Item::noIcon
         )
     }
 }

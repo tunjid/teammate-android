@@ -99,10 +99,10 @@ class Team : TeamEntity,
     override val team: Team
         get() = this
 
-    override val headerItem: Item<Team>
+    override val headerItem: Item
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
-    override fun asItems(): List<Item<Team>> = listOf(
+    override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.team_name, Item.nullToEmpty(name), this::setName),
             Item.text(holder[1], 1, Item.SPORT, R.string.team_sport, sport::code, this::setSport)
                     .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },

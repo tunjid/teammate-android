@@ -39,14 +39,14 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  */
 private typealias ValueChangeCallBack = (String) -> Unit
 
-class Item<T> internal constructor(
+class Item internal constructor(
         private val id: String,
         val sortPosition: Int,
         val inputType: Int,
         @field:ItemType val itemType: Int,
         @field:StringRes val stringRes: Int,
         private var value: CharSequence,
-        private val changeCallBack: ValueChangeCallBack?) : Differentiable, Comparable<Item<*>> {
+        private val changeCallBack: ValueChangeCallBack?) : Differentiable, Comparable<Item> {
     private var textTransformer: ((CharSequence?) -> CharSequence)? = null
 
     val rawValue: String
@@ -61,7 +61,7 @@ class Item<T> internal constructor(
         changeCallBack?.invoke(value.toString())
     }
 
-    fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item<T> {
+    fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item {
         this.textTransformer = textTransformer
         return this
     }
@@ -70,18 +70,18 @@ class Item<T> internal constructor(
 
     override fun getId(): String? = id
 
-    override fun compareTo(other: Item<*>): Int = sortPosition.compareTo(other.sortPosition)
+    override fun compareTo(other: Item): Int = sortPosition.compareTo(other.sortPosition)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other is Item<*>) value == other.value else id == other.id
+            if (other is Item) value == other.value else id == other.id
 
     override fun getChangePayload(other: Differentiable?): Any? = other
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Item<*>) return false
+        if (other !is Item) return false
 
-        val item = other as Item<*>?
+        val item = other as Item?
 
         return id == item!!.id
     }
@@ -117,49 +117,53 @@ class Item<T> internal constructor(
         val NO_CLICK: (() -> Unit)? = null
         val EMPTY_CLICK = { }
 
-        fun <T> number(
+        fun number(
                 id: String,
                 sortPosition: Int,
                 itemType: Int,
                 stringRes: Int,
                 supplier: () -> CharSequence,
                 changeCallBack: ValueChangeCallBack?
-        ): Item<T> = Item(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.invoke(), changeCallBack)
+        ): Item = Item(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.invoke(), changeCallBack)
 
-        fun <T> text(
+        fun text(
                 id: String,
                 sortPosition: Int,
                 itemType: Int,
                 stringRes: Int,
                 supplier: () -> CharSequence,
                 changeCallBack: ValueChangeCallBack?
-        ): Item<T> = Item(id, sortPosition, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.invoke(), changeCallBack)
+        ): Item = Item(id, sortPosition, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.invoke(), changeCallBack)
 
-        fun <T> email(
+        fun email(
                 id: String,
                 sortPosition: Int,
                 itemType: Int,
                 stringRes: Int,
                 supplier: () -> CharSequence,
                 changeCallBack: ValueChangeCallBack?
-        ): Item<T> = Item(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.invoke(), changeCallBack)
+        ): Item = Item(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.invoke(), changeCallBack)
 
         fun nullToEmpty(source: CharSequence?): () -> CharSequence = { source ?: "" }
     }
 }
 
 @Suppress("unused")
-val Item<*>.always get() = true
+val Item.always
+    get() = true
 
 @Suppress("unused")
-val Item<*>.never get() = false
+val Item.never
+    get() = false
 
 @Suppress("unused")
-val Item<*>.noIcon get() = 0
+val Item.noIcon
+    get() = 0
 
 @Suppress("unused")
-val Item<*>.noInputValidation get() = ""
+val Item.noInputValidation
+    get() = ""
 
-val Item<*>.noBlankFields get() = if (getValue().isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else ""
+val Item.noBlankFields get() = if (getValue().isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else ""
 
-val Item<*>.noSpecialCharacters get() = if (getValue().isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters)
+val Item.noSpecialCharacters get() = if (getValue().isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters)

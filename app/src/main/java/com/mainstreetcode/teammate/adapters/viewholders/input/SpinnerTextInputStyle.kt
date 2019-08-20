@@ -43,8 +43,8 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
             @StringRes titleRes: Int, items: List<T>,
             displayFunction: (T) -> CharSequence,
             valueFunction: (T) -> String,
-            enabler: (Item<*>) -> Boolean
-    ) : super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, Item<*>::noBlankFields, Item<*>::noIcon) {
+            enabler: (Item) -> Boolean
+    ) : super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, Item::noBlankFields, Item::noIcon) {
         this.titleRes = titleRes
         this.items = items
         this.displayFunction = displayFunction
@@ -54,9 +54,9 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
     constructor(@StringRes titleRes: Int, items: List<T>,
                 displayFunction: (T) -> CharSequence,
                 valueFunction: (T) -> String,
-                enabler: (Item<*>) -> Boolean,
-                errorChecker: (Item<*>) -> CharSequence?
-    ) : super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, errorChecker, Item<*>::noIcon) {
+                enabler: (Item) -> Boolean,
+                errorChecker: (Item) -> CharSequence?
+    ) : super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, errorChecker, Item::noIcon) {
         this.titleRes = titleRes
         this.items = items
         this.displayFunction = displayFunction

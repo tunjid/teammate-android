@@ -70,7 +70,7 @@ class TeamEditAdapter(
     override fun onBindViewHolder(holder: InputViewHolder<TeamEditAdapterListener>, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
-        if (item is Item<*>) holder.bind(chooser[item])
+        if (item is Item) holder.bind(chooser[item])
     }
 
     override fun getItemCount(): Int = items.size
@@ -86,18 +86,18 @@ class TeamEditAdapter(
 
     private class Chooser internal constructor(private val adapterListener: TeamEditAdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun iconGetter(item: Item<*>): Int = when {
+        override fun iconGetter(item: Item): Int = when {
             item.stringRes == R.string.team_name && adapterListener.canEditFields() -> R.drawable.ic_picture_white_24dp
             else -> 0
         }
 
-        override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
+        override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.ABOUT -> item.never
             ZIP, Item.CITY, Item.INFO, Item.STATE, Item.INPUT, Item.SPORT, Item.NUMBER, Item.DESCRIPTION -> adapterListener.canEditFields()
             else -> item.never
         }
 
-        override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
+        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.CITY,
             Item.STATE,
             Item.INPUT,
@@ -108,7 +108,7 @@ class TeamEditAdapter(
             else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (val itemType = item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (val itemType = item.itemType) {
             ZIP,
             Item.CITY,
             Item.INFO,

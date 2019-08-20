@@ -95,10 +95,10 @@ class Game : GameEntity,
     override val isEmpty: Boolean
         get() = TextUtils.isEmpty(id)
 
-    override val headerItem: Item<Game>
+    override val headerItem: Item
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, CharSequence::noOp)
 
-    override fun asItems(): List<Item<Game>> = listOf(
+    override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.NUMBER, R.string.game_competitors, this::name, CharSequence::noOp),
             Item.number(holder[1], 1, Item.INPUT, R.string.game_home_score, homeScore::toString, this::setHomeScore),
             Item.number(holder[2], 2, Item.INPUT, R.string.game_away_score, awayScore::toString, this::setAwayScore),

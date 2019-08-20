@@ -83,7 +83,7 @@ class StatAggregateRequestAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val identifiable = request.items[position]) {
-            is Item<*> -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
+            is Item -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
             is User -> (holder as UserViewHolder).bind(identifiable)
             is Team -> (holder as TeamViewHolder).bind(identifiable)
         }
@@ -93,7 +93,7 @@ class StatAggregateRequestAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val identifiable = request.items[position]
-        return if (identifiable is Item<*>) ITEM else if (identifiable is User) USER else TEAM
+        return if (identifiable is Item) ITEM else if (identifiable is User) USER else TEAM
     }
 
     interface AdapterListener : InteractiveAdapter.AdapterListener {
@@ -111,22 +111,22 @@ class StatAggregateRequestAdapter(
             sports.add(0, Sport.empty())
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.SPORT -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item<*>::always,
-                    Item<*>::noInputValidation)
-            Item.DATE -> DateTextInputStyle(Item<*>::always)
+                    Item::always,
+                    Item::noInputValidation)
+            Item.DATE -> DateTextInputStyle(Item::always)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item<*>::always,
-                    Item<*>::noInputValidation)
+                    Item::always,
+                    Item::noInputValidation)
         }
     }
 }

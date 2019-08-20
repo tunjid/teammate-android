@@ -73,7 +73,7 @@ class GameEditAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val item = items[position]) {
-            is Item<*> -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
             is Competitor -> (holder as CompetitorViewHolder).bind(item)
         }
     }
@@ -81,7 +81,7 @@ class GameEditAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun getItemViewType(position: Int): Int = when (items[position]) {
-        is Item<*> -> ITEM
+        is Item -> ITEM
         else -> AWAY
     }
 
@@ -93,26 +93,26 @@ class GameEditAdapter(
 
     private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
+        override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.INPUT -> adapterListener.canEditGame()
             else -> false
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT,
             Item.NUMBER -> TextInputStyle(
                     Item.NO_CLICK,
                     Item.NO_CLICK,
                     this::enabler,
-                    Item<*>::noBlankFields,
-                    Item<*>::noIcon
+                    Item::noBlankFields,
+                    Item::noIcon
             )
             else -> TextInputStyle(
                     Item.NO_CLICK,
                     Item.NO_CLICK,
                     this::enabler,
-                    Item<*>::noBlankFields,
-                    Item<*>::noIcon
+                    Item::noBlankFields,
+                    Item::noIcon
             )
         }
     }
