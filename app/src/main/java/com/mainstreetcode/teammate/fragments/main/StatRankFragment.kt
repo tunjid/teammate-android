@@ -37,18 +37,12 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatRankAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.model.Event
-import com.mainstreetcode.teammate.model.StatRank
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
-/**
- * Lists [tournaments][Event]
- */
 
 class StatRankFragment : MainActivityFragment() {
 
@@ -60,10 +54,8 @@ class StatRankFragment : MainActivityFragment() {
         val superResult = super.getStableTag()
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
-        return if (tempTournament != null)
-            superResult + "-" + tempTournament.hashCode()
-        else
-            superResult
+        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
+        else superResult
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,12 +85,12 @@ class StatRankFragment : MainActivityFragment() {
 
         spinner.adapter = adapter
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 type.update(statTypes[position])
                 fetchStandings()
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onNothingSelected(parent: AdapterView<*>) = Unit
         }
 
         return root
@@ -125,8 +117,8 @@ class StatRankFragment : MainActivityFragment() {
 
     companion object {
 
-        private const val ARG_TOURNAMENT = "team"
+        private const val ARG_TOURNAMENT = "tournament"
 
-        fun newInstance(team: Tournament): StatRankFragment = StatRankFragment().apply { arguments = bundleOf(ARG_TOURNAMENT to team) }
+        fun newInstance(tournament: Tournament): StatRankFragment = StatRankFragment().apply { arguments = bundleOf(ARG_TOURNAMENT to tournament) }
     }
 }
