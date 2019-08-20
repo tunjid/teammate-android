@@ -41,6 +41,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.STAT_TYPE
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
@@ -123,8 +124,8 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
                     return SpinnerTextInputStyle(
                             R.string.choose_stat,
                             stat.sport.stats,
-                            { it.emojiAndName },
-                            { it.code },
+                            StatType::emojiAndName,
+                            StatType::code,
                             { adapterListener.canChangeStat() },
                             ALL_INPUT_VALID)
                 }

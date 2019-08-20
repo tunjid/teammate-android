@@ -90,15 +90,15 @@ class UserEditAdapter(
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
             Item.INFO, Item.INPUT, Item.ABOUT -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onImageClick() },
+                    adapterListener::onImageClick,
                     { adapterListener.canEdit() },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    this::textChecker,
+                    this::iconGetter)
             else -> TextInputStyle(Item.NO_CLICK,
-                    { adapterListener.onImageClick() },
+                    adapterListener::onImageClick,
                     { adapterListener.canEdit() },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    this::textChecker,
+                    this::iconGetter)
         }
     }
 }

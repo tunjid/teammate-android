@@ -102,25 +102,25 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
         override fun invoke(item: Item<*>): TextInputStyle {
             return when (val itemType = item.itemType) {
                 Item.INFO, Item.LOCATION -> TextInputStyle(
-                        Item.EMPTY_CLICK,
+                        adapterListener::onLocationClicked,
                         or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.NO_CLICK),
-                        { this.enabler(it) },
-                        { this.textChecker(it) },
-                        { this.iconGetter(it) })
+                        this::enabler,
+                        this::textChecker,
+                        this::iconGetter)
                 Item.SPORT -> SpinnerTextInputStyle(
                         R.string.choose_sport,
                         sports,
-                        { it.name },
-                        { it.code },
-                        { this.enabler(it) },
-                        { this.textChecker(it) })
-                Item.DATE -> DateTextInputStyle { this.enabler(it) }
+                        Sport::name,
+                        Sport::code,
+                        this::enabler,
+                        this::textChecker)
+                Item.DATE -> DateTextInputStyle(this::enabler)
                 else -> TextInputStyle(
                         Item.EMPTY_CLICK,
                         or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.NO_CLICK),
-                        { this.enabler(it) },
-                        { this.textChecker(it) },
-                        { this.iconGetter(it) })
+                        this::enabler,
+                        this::textChecker,
+                        this::iconGetter)
             }
         }
     }

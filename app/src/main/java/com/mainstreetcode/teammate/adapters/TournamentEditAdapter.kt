@@ -39,6 +39,8 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Sport
+import com.mainstreetcode.teammate.model.enums.TournamentStyle
+import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TOURNAMENT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
@@ -61,10 +63,10 @@ class TournamentEditAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
-                ITEM -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-                TOURNAMENT -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), listener)
-                else -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-            }
+        ITEM -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+        TOURNAMENT -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), listener)
+        else -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    }
 
     @Suppress("UNCHECKED_CAST")
     override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
@@ -106,37 +108,47 @@ class TournamentEditAdapter(
 
         override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
             Item.ABOUT -> Item.FALSE.invoke(item)
-            Item.INFO, Item.INPUT, Item.NUMBER, Item.TOURNAMENT_TYPE, Item.TOURNAMENT_STYLE -> adapterListener.canEditBeforeCreation()
+            Item.INFO,
+            Item.INPUT,
+            Item.NUMBER,
+            Item.TOURNAMENT_TYPE,
+            Item.TOURNAMENT_STYLE -> adapterListener.canEditBeforeCreation()
             Item.DESCRIPTION -> adapterListener.canEditAfterCreation()
             else -> Item.FALSE.invoke(item)
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
-            Item.INPUT, Item.NUMBER -> Item.NON_EMPTY.invoke(item)
-            Item.INFO, Item.DESCRIPTION, Item.TOURNAMENT_TYPE, Item.TOURNAMENT_STYLE -> Item.ALL_INPUT_VALID.invoke(item)
+            Item.INPUT,
+            Item.NUMBER -> Item.NON_EMPTY.invoke(item)
+            Item.INFO,
+            Item.DESCRIPTION,
+            Item.TOURNAMENT_TYPE,
+            Item.TOURNAMENT_STYLE -> Item.ALL_INPUT_VALID.invoke(item)
             else -> Item.NON_EMPTY.invoke(item)
         }
 
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
-            Item.INPUT, Item.NUMBER, Item.DESCRIPTION -> TextInputStyle(
+            Item.INPUT,
+            Item.NUMBER,
+            Item.DESCRIPTION -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onImageClick() },
-                    { this.enabler(it) },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    adapterListener::onImageClick,
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
             Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
                     R.string.tournament_type,
-                    Config.getTournamentTypes { adapterListener.sport.supportsTournamentType(it) },
-                    { it.name },
-                    { it.code },
-                    { this.enabler(it) },
+                    Config.getTournamentTypes(adapterListener.sport::supportsTournamentType),
+                    TournamentType::name,
+                    TournamentType::code,
+                    this::enabler,
                     ALL_INPUT_VALID)
             Item.TOURNAMENT_STYLE -> SpinnerTextInputStyle(
                     R.string.tournament_style,
-                    Config.getTournamentStyles { adapterListener.sport.supportsTournamentStyle(it) },
-                    { it.name },
-                    { it.code },
-                    { this.enabler(it) },
+                    Config.getTournamentStyles(adapterListener.sport::supportsTournamentStyle),
+                    TournamentStyle::name,
+                    TournamentStyle::code,
+                    this::enabler,
                     ALL_INPUT_VALID)
             Item.INFO -> {
                 val resources = App.instance.resources
@@ -144,16 +156,16 @@ class TournamentEditAdapter(
                         R.string.tournament_single_final,
                         listOf(true, false),
                         { flag -> resources.getString(if (flag) R.string.yes else R.string.no) },
-                        { it.toString() },
-                        { this.enabler(it) },
+                        Boolean::toString,
+                        this::enabler,
                         ALL_INPUT_VALID)
             }
             else -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onImageClick() },
-                    { this.enabler(it) },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    adapterListener::onImageClick,
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
         }
     }
 }

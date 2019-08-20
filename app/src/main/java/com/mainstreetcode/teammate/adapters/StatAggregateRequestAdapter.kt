@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
@@ -39,18 +38,16 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Item
+import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.StatAggregate
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-
-import java.util.ArrayList
-
-import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import java.util.*
 
 /**
  * Adapter for [Event]
@@ -68,17 +65,17 @@ class StatAggregateRequestAdapter(
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
         ITEM -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        USER -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), UserAdapter.AdapterListener.asSAM { adapterListener.onUserPicked(it) })
+        USER -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), UserAdapter.AdapterListener.asSAM(adapterListener::onUserPicked))
                 .withTitle(R.string.pick_user)
-        TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), TeamAdapter.AdapterListener.asSAM { adapterListener.onTeamPicked(it) })
+        TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), TeamAdapter.AdapterListener.asSAM(adapterListener::onTeamPicked))
                 .withTitle(R.string.pick_team)
         else -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S = when {
-        viewHolder.itemViewType == USER -> UserAdapter.AdapterListener.asSAM { adapterListener.onUserPicked(it) } as S
-        viewHolder.itemViewType == TEAM -> TeamAdapter.AdapterListener.asSAM { adapterListener.onTeamPicked(it) } as S
+        viewHolder.itemViewType == USER -> UserAdapter.AdapterListener.asSAM(adapterListener::onUserPicked) as S
+        viewHolder.itemViewType == TEAM -> TeamAdapter.AdapterListener.asSAM(adapterListener::onTeamPicked) as S
         else -> adapterListener as S
     }
 
@@ -117,16 +114,16 @@ class StatAggregateRequestAdapter(
             Item.SPORT -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
-                    { it.name },
-                    { it.code },
+                    Sport::name,
+                    Sport::code,
                     Item.TRUE,
                     ALL_INPUT_VALID)
             Item.DATE -> DateTextInputStyle(Item.TRUE)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
-                    { it.name },
-                    { it.code },
+                    Sport::name,
+                    Sport::code,
                     Item.TRUE,
                     ALL_INPUT_VALID)
         }

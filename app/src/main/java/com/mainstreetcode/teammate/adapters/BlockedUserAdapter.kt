@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.BlockedUserViewHolder
@@ -34,16 +33,13 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.BlockedUser
-import com.mainstreetcode.teammate.model.ContentAd
-import com.mainstreetcode.teammate.model.InstallAd
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Team
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-
 import com.mainstreetcode.teammate.util.BLOCKED_USER
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
  * Adapter for [Team]

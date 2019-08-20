@@ -48,7 +48,7 @@ class GameEditAdapter(
         listener: AdapterListener
 ) : BaseAdapter<BaseViewHolder<*>, GameEditAdapter.AdapterListener>(listener) {
     private val chooser: TextInputStyle.InputChooser
-    private val competitorPicker = CompetitorAdapter.AdapterListener.asSAM { adapterListener.onAwayClicked(it) }
+    private val competitorPicker = CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked)
 
     init {
         this.chooser = Chooser(adapterListener)
@@ -98,8 +98,20 @@ class GameEditAdapter(
 
         override fun invoke(item: Item<*>): TextInputStyle {
             return when (item.itemType) {
-                Item.INPUT, Item.NUMBER -> TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, { this.enabler(it) }, Item.NON_EMPTY, Item.NO_ICON)
-                else -> TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, { this.enabler(it) }, Item.NON_EMPTY, Item.NO_ICON)
+                Item.INPUT, Item.NUMBER -> TextInputStyle(
+                        Item.NO_CLICK,
+                        Item.NO_CLICK,
+                        this::enabler,
+                        Item.NON_EMPTY,
+                        Item.NO_ICON
+                )
+                else -> TextInputStyle(
+                        Item.NO_CLICK,
+                        Item.NO_CLICK,
+                        this::enabler,
+                        Item.NON_EMPTY,
+                        Item.NO_ICON
+                )
             }
         }
     }

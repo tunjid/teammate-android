@@ -35,6 +35,7 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Role
+import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -104,22 +105,22 @@ class RoleEditAdapter(
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.ABOUT, Item.NICKNAME -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onImageClick() },
-                    { this.enabler(it) },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    adapterListener::onImageClick,
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
             Item.ROLE -> SpinnerTextInputStyle(
                     R.string.choose_role,
                     Config.getPositions(),
-                    { it.name },
-                    { it.code },
-                    { adapterListener.canChangeRolePosition() })
+                    Position::name,
+                    Position::code
+            ) { adapterListener.canChangeRolePosition() }
             else -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onImageClick() },
-                    { this.enabler(it) },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    adapterListener::onImageClick,
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
         }
     }
 }
