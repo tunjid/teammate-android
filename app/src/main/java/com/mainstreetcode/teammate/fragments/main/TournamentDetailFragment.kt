@@ -88,9 +88,8 @@ class TournamentDetailFragment : MainActivityFragment() {
         return this
     }
 
-    override fun getStableTag(): String {
-        return Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
-    }
+    override fun getStableTag(): String =
+            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,13 +123,10 @@ class TournamentDetailFragment : MainActivityFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_edit -> showFragment(TournamentEditFragment.newInstance(tournament))
         R.id.action_standings -> showFragment(StatDetailFragment.newInstance(tournament))
-        R.id.action_delete -> {
-            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_tournament_prompt))
-                    .setPositiveButton(R.string.yes) { _, _ -> deleteTournament() }
-                    .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-                    .show()
-            true
-        }
+        R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_tournament_prompt))
+                .setPositiveButton(R.string.yes) { _, _ -> deleteTournament() }
+                .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                .show().let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -151,9 +147,8 @@ class TournamentDetailFragment : MainActivityFragment() {
         super.onDestroyView()
     }
 
-    override fun showsFab(): Boolean {
-        return localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors()
-    }
+    override fun showsFab(): Boolean =
+            localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors()
 
     override fun onClick(view: View) {
         if (view.id == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament))

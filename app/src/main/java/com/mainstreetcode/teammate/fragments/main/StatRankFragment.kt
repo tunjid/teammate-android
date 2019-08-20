@@ -82,7 +82,7 @@ class StatRankFragment : MainActivityFragment() {
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatRankAdapter(
                         statRanks,
-                        simpleAdapterListener<StatRank> { statRank -> showFragment(UserEditFragment.newInstance(statRank.user)) }))
+                        simpleAdapterListener { statRank -> showFragment(UserEditFragment.newInstance(statRank.user)) }))
                 .withLinearLayoutManager()
                 .build()
 

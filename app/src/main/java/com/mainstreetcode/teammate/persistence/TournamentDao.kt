@@ -52,10 +52,11 @@ abstract class TournamentDao : EntityDao<TournamentEntity>() {
     @Query("SELECT * FROM tournaments as tournament" +
             " INNER JOIN games AS game" +
             " ON tournament.tournament_id = game.game_tournament" +
-            " WHERE :teamId = game.game_host" +
+            " WHERE (:teamId = game.game_host" +
             " OR :teamId = game.game_home_entity" +
-            " OR :teamId = game.game_away_entity" +
+            " OR :teamId = game.game_away_entity)" +
             " AND tournament.tournament_created < :date" +
+            " AND tournament.tournament_id != ''" +
             " ORDER BY tournament.tournament_created DESC" +
             " LIMIT :limit")
     abstract fun getTournaments(teamId: String, date: Date, limit: Int): Maybe<List<Tournament>>
