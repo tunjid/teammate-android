@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.notifications
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -73,7 +72,7 @@ class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*
         get() = model.imageUrl
 
     val isDeleteAction: Boolean
-        get() = !TextUtils.isEmpty(action) && "DELETE" == action
+        get() = action.isNotBlank() && "DELETE" == action
 
     private constructor(action: String, title: String, body: String, type: String, model: T, itemClass: Class<T>) {
         this.action = action

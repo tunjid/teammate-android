@@ -28,7 +28,6 @@ import android.content.Intent
 import android.location.Address
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -218,7 +217,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
     override fun selectTeam() {
         when {
-            !TextUtils.isEmpty(headeredModel.gameId) -> showSnackbar(getString(R.string.game_event_team_change))
+            headeredModel.gameId.isNotBlank() -> showSnackbar(getString(R.string.game_event_team_change))
             gofer.hasPrivilegedRole() -> chooseTeam()
             !gofer.hasRole() -> showFragment(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser))
         }

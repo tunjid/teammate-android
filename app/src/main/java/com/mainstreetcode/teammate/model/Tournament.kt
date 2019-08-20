@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -161,8 +160,8 @@ class Tournament : TournamentEntity,
             val typeCode = src.type.code
             val styleCode = src.style.code
 
-            if (!TextUtils.isEmpty(typeCode)) serialized.addProperty(TYPE_KEY, typeCode)
-            if (!TextUtils.isEmpty(styleCode)) serialized.addProperty(STYLE_KEY, styleCode)
+            if (typeCode.isNotBlank()) serialized.addProperty(TYPE_KEY, typeCode)
+            if (styleCode.isNotBlank()) serialized.addProperty(STYLE_KEY, styleCode)
 
             return serialized
         }

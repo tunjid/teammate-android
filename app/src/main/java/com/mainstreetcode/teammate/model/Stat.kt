@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import androidx.room.Ignore
 import com.google.gson.JsonArray
 import com.google.gson.JsonDeserializationContext
@@ -131,7 +130,7 @@ class Stat : StatEntity,
             stat.add(ATTRIBUTES, attributes)
 
             val sportCode = src.sport.code
-            if (!TextUtils.isEmpty(sportCode)) stat.addProperty(SPORT_KEY, sportCode)
+            if (sportCode.isNotBlank()) stat.addProperty(SPORT_KEY, sportCode)
 
             for (attribute in src.attributes) attributes.add(attribute.code)
 

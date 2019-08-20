@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -73,11 +72,11 @@ class Role : RoleEntity,
     val isPrivilegedRole: Boolean
         get() {
             val positionCode = position.code
-            return !TextUtils.isEmpty(positionCode) && !isEmpty && Config.getPrivileged().contains(positionCode)
+            return positionCode.isNotBlank() && !isEmpty && Config.getPrivileged().contains(positionCode)
         }
 
     val title: CharSequence
-        get() = if (!TextUtils.isEmpty(nickname)) SpanBuilder.of(user.firstName)
+        get() = if (nickname.isNotBlank()) SpanBuilder.of(user.firstName)
                 .appendNewLine().append("\"" + nickname + "\"")
                 .build() else user.firstName
 
@@ -140,7 +139,7 @@ class Role : RoleEntity,
             serialized.add(USER_KEY, context.serialize(src.user))
 
             val positionCode = src.position.code
-            if (!TextUtils.isEmpty(positionCode)) serialized.addProperty(NAME_KEY, positionCode)
+            if (positionCode.isNotBlank()) serialized.addProperty(NAME_KEY, positionCode)
 
             return serialized
         }

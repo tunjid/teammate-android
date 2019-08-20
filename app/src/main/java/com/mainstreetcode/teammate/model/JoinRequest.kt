@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -151,7 +150,7 @@ class JoinRequest : JoinRequestEntity,
             }
 
             val positionCode = src.position.code
-            if (!TextUtils.isEmpty(positionCode)) result.addProperty(NAME_KEY, positionCode)
+            if (positionCode.isNotBlank()) result.addProperty(NAME_KEY, positionCode)
 
             return result
         }

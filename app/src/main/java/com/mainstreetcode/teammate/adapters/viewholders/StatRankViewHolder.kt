@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders
 
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -58,7 +57,7 @@ class StatRankViewHolder(
 
         val imageUrl = model.inset
 
-        if (!TextUtils.isEmpty(imageUrl)) load(imageUrl, inset)
+        if (imageUrl.isNotBlank()) load(imageUrl, inset)
     }
 
     override fun onClick(view: View) {

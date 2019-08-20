@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -41,6 +40,7 @@ import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.isNotNullOrBlank
 import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -164,9 +164,9 @@ class User : UserEntity,
             user.addProperty(LAST_NAME_KEY, src.lastName.toString())
             user.addProperty(PRIMARY_EMAIL_KEY, src.primaryEmail)
             user.addProperty(ABOUT_KEY, src.about.toString())
-            if (!TextUtils.isEmpty(src.screenName)) user.addProperty(SCREEN_NAME, src.screenName)
+            if (src.screenName.isNotBlank()) user.addProperty(SCREEN_NAME, src.screenName)
 
-            if (!TextUtils.isEmpty(src.password)) user.addProperty(PASSWORD_KEY, src.password)
+            if (src.password.isNotNullOrBlank()) user.addProperty(PASSWORD_KEY, src.password)
 
             return user
         }

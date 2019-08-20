@@ -77,11 +77,11 @@ open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterLi
     }
 
     internal fun setTitle(title: CharSequence) {
-        if (!TextUtils.isEmpty(title)) this.title.text = title
+        if (title.isNotBlank()) this.title.text = title
     }
 
     internal fun setSubTitle(subTitle: CharSequence) {
-        if (!TextUtils.isEmpty(subTitle)) this.subtitle.text = subTitle
+        if (subTitle.isNotBlank()) this.subtitle.text = subTitle
     }
 
     internal fun load(imageUrl: String, destination: ImageView) {
@@ -89,8 +89,8 @@ open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterLi
 
         if (!isThumbnail) creator.fit().centerCrop()
         else creator.placeholder(R.drawable.bg_image_placeholder)
-                    .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
-                    .centerInside()
+                .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
+                .centerInside()
 
         creator.into(destination)
     }

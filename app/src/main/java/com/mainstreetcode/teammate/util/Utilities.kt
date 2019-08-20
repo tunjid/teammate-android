@@ -38,6 +38,8 @@ private val screenName = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE)
 
 fun CharSequence.isValidScreenName(): Boolean = !screenName.matcher(this).find()
 
+fun CharSequence?.isNotNullOrBlank(): Boolean = !isNullOrBlank()
+
 fun CharSequence.processEmoji(): CharSequence {
     val emojiCompat = EmojiCompat.get()
     return if (emojiCompat.loadState == EmojiCompat.LOAD_STATE_SUCCEEDED) emojiCompat.process(this) else this
