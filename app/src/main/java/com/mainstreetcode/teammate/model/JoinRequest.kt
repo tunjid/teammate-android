@@ -96,9 +96,9 @@ class JoinRequest : JoinRequestEntity,
             Item.text(holder[7], 7, Item.CITY, R.string.city, team::city, Item.IGNORE_SET, this),
             Item.text(holder[8], 8, Item.STATE, R.string.state, team::state, Item.IGNORE_SET, this),
             Item.text(holder[9], 9, Item.ZIP, R.string.zip, team::zip, Item.IGNORE_SET, this),
-            Item.text(holder.get(10), 10, Item.DESCRIPTION, R.string.team_description, team::description, Item.IGNORE_SET, this),
-            Item.number(holder.get(11), 11, Item.NUMBER, R.string.team_min_age, team.minAge::toString, Item.IGNORE_SET, this),
-            Item.number(holder.get(12), 12, Item.NUMBER, R.string.team_max_age, team.maxAge::toString, Item.IGNORE_SET, this)
+            Item.text(holder[10], 10, Item.DESCRIPTION, R.string.team_description, team::description, Item.IGNORE_SET, this),
+            Item.number(holder[11], 11, Item.NUMBER, R.string.team_min_age, team.minAge::toString, Item.IGNORE_SET, this),
+            Item.number(holder[12], 12, Item.NUMBER, R.string.team_max_age, team.maxAge::toString, Item.IGNORE_SET, this)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
