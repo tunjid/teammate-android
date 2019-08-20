@@ -123,12 +123,11 @@ class EventViewModel : TeamMappedViewModel<Event>() {
 
     private fun createOrUpdateEvent(event: Event): Single<Event> = repository.createOrUpdate(event)
 
-    private fun delete(event: Event): Single<Event> {
-        return repository.delete(event).doOnSuccess { deleted ->
-            getModelList(event.team).remove(deleted)
-            pushModelAlert(Alert.eventAbsentee(deleted))
-        }
-    }
+    private fun delete(event: Event): Single<Event> =
+            repository.delete(event).doOnSuccess { deleted ->
+                getModelList(event.team).remove(deleted)
+                pushModelAlert(Alert.eventAbsentee(deleted))
+            }
 
     fun getPublicEvents(map: GoogleMap): Flowable<List<Event>> {
         val fetched = TeammateService.getApiInstance()

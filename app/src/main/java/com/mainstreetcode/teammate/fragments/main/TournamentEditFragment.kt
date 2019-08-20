@@ -106,7 +106,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        menu.findItem(R.id.action_rounds).isVisible = !headeredModel.isEmpty
+        menu.findItem(R.id.action_rounds)?.isVisible = !headeredModel.isEmpty
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

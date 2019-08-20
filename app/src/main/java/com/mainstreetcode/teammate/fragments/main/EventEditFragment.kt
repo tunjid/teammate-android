@@ -126,10 +126,10 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
+
+        if (canEditEvent() || headeredModel.isPublic) menu.findItem(R.id.action_delete)?.isVisible = true
+
         val item = menu.findItem(R.id.action_rsvp) ?: return
-
-        if (canEditEvent() || headeredModel.isPublic) menu.findItem(R.id.action_delete).isVisible = true
-
         disposables.add(gofer.rsvpStatus.subscribe({ item.setIcon(it) }, emptyErrorHandler::invoke))
     }
 

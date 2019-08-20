@@ -323,18 +323,18 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     private fun updateUI(force: Boolean, state: UiState) {
         uiState = uiState.diff(force,
                 state,
-                { this.toggleFab(it) },
-                { this.toggleToolbar(it) },
-                { this.toggleAltToolbar(it) },
-                { this.toggleBottombar(it) },
-                { this.toggleSystemUI(it) },
-                { this.toggleLightNavBar(it) },
-                { this.setNavBarColor(it) },
+                this::toggleFab,
+                this::toggleToolbar,
+                this::toggleAltToolbar,
+                this::toggleBottombar,
+                this::toggleSystemUI,
+                this::toggleLightNavBar,
+                this::setNavBarColor,
                 { },
-                { icon, title -> this.setFabIcon(icon, title) },
-                { menu, title -> this.updateMainToolBar(menu, title) },
-                { menu, title -> this.updateAltToolbar(menu, title) },
-                { this.setFabClickListener(it) }
+                this::setFabIcon,
+                this::updateMainToolBar,
+                this::updateAltToolbar,
+                this::setFabClickListener
         )
     }
 
