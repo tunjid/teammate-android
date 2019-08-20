@@ -39,10 +39,10 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.HeadToHead
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.always
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentType
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.HOME
 import com.mainstreetcode.teammate.util.ITEM
@@ -125,7 +125,7 @@ class HeadToHeadRequestAdapter(
                     Sport::name,
                     Sport::code,
                     Item<*>::always,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
             Item.DATE -> DateTextInputStyle(Item<*>::always)
             Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
                     R.string.tournament_type,
@@ -133,14 +133,14 @@ class HeadToHeadRequestAdapter(
                     TournamentType::name,
                     TournamentType::code,
                     Item<*>::always,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
                     Item<*>::always,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
         }
     }
 }

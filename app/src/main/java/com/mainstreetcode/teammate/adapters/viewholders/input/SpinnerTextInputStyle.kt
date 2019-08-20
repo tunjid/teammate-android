@@ -28,6 +28,7 @@ import android.view.View
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.mainstreetcode.teammate.model.Item
+import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noIcon
 
 
@@ -43,7 +44,7 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
             displayFunction: (T) -> CharSequence,
             valueFunction: (T) -> String,
             enabler: (Item<*>) -> Boolean
-    ) : super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, Item.NON_EMPTY, Item<*>::noIcon) {
+    ) : super(Item.EMPTY_CLICK, Item.EMPTY_CLICK, enabler, Item<*>::noBlankFields, Item<*>::noIcon) {
         this.titleRes = titleRes
         this.items = items
         this.displayFunction = displayFunction

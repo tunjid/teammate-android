@@ -39,6 +39,9 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Guest
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.enums.Visibility
+import com.mainstreetcode.teammate.model.noBlankFields
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.GUEST
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
@@ -115,31 +118,34 @@ class EventEditAdapter(
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
-            Item.INPUT, Item.DATE -> Item.NON_EMPTY.invoke(item)
-            Item.TEXT, Item.NUMBER, Item.LOCATION -> Item.ALL_INPUT_VALID.invoke(item)
-            else -> Item.NON_EMPTY.invoke(item)
+            Item.INPUT,
+            Item.DATE -> item.noBlankFields
+            Item.TEXT,
+            Item.NUMBER,
+            Item.LOCATION -> item.noInputValidation
+            else -> item.noBlankFields
         }
 
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.TEXT, Item.NUMBER, Item.LOCATION -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onLocationClicked() },
+                    adapterListener::onLocationClicked,
                     { adapterListener.canEditEvent() },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) })
+                    this::textChecker,
+                    this::iconGetter)
             Item.VISIBILITY -> SpinnerTextInputStyle(
                     R.string.event_visibility_selection,
                     Config.getVisibilities(),
-                    { it.name },
-                    { it.code },
-                    { adapterListener.canEditEvent() })
+                    Visibility::name,
+                    Visibility::code
+            ) { adapterListener.canEditEvent() }
             Item.DATE -> DateTextInputStyle { adapterListener.canEditEvent() }
             else -> TextInputStyle(
                     Item.NO_CLICK,
-                    { adapterListener.onLocationClicked() },
+                    adapterListener::onLocationClicked,
                     { adapterListener.canEditEvent() },
-                    { this.textChecker(it) },
-                    { this.iconGetter(it) }
+                    this::textChecker,
+                    this::iconGetter
             )
         }
     }

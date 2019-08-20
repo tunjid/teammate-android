@@ -37,7 +37,11 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ZIP
 import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.noBlankFields
+import com.mainstreetcode.teammate.model.noInputValidation
+import com.mainstreetcode.teammate.model.noSpecialCharacters
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -94,42 +98,50 @@ class TeamEditAdapter(
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
-            Item.CITY, Item.STATE, Item.INPUT, Item.NUMBER -> Item.NON_EMPTY.invoke(item)
-            Item.INFO -> Item.ALLOWS_SPECIAL_CHARACTERS.invoke(item)
-            ZIP, Item.DESCRIPTION -> Item.ALL_INPUT_VALID.invoke(item)
-            else -> Item.NON_EMPTY.invoke(item)
+            Item.CITY,
+            Item.STATE,
+            Item.INPUT,
+            Item.NUMBER -> item.noBlankFields
+            Item.INFO -> item.noSpecialCharacters
+            ZIP,
+            Item.DESCRIPTION -> item.noInputValidation
+            else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle {
-            when (val itemType = item.itemType) {
-                ZIP, Item.CITY, Item.INFO, Item.STATE, Item.ABOUT, Item.INPUT, Item.NUMBER, Item.DESCRIPTION -> return TextInputStyle(
-                        or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
-                                { adapterListener.onAddressClicked() },
-                                Item.NO_CLICK),
-                        or(itemType == Item.INPUT,
-                                { adapterListener.onImageClick() },
-
-                                { adapterListener.onAddressClicked() }),
-                        { this.enabler(it) },
-                        { this.textChecker(it) },
-                        { this.iconGetter(it) })
-                Item.SPORT -> return SpinnerTextInputStyle(
-                        R.string.choose_sport,
-                        Config.getSports(),
-                        { it.name },
-                        { it.code },
-                        { this.enabler(it) })
-                else -> return TextInputStyle(
-                        or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
-                                { adapterListener.onAddressClicked() },
-                                Item.NO_CLICK),
-                        or(itemType == Item.INPUT,
-                                { adapterListener.onImageClick() },
-                                { adapterListener.onAddressClicked() }),
-                        { this.enabler(it) },
-                        { this.textChecker(it) },
-                        { this.iconGetter(it) })
-            }
+        override fun invoke(item: Item<*>): TextInputStyle = when (val itemType = item.itemType) {
+            ZIP,
+            Item.CITY,
+            Item.INFO,
+            Item.STATE,
+            Item.ABOUT,
+            Item.INPUT,
+            Item.NUMBER,
+            Item.DESCRIPTION -> TextInputStyle(
+                    or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
+                            adapterListener::onAddressClicked,
+                            Item.NO_CLICK),
+                    or(itemType == Item.INPUT,
+                            adapterListener::onImageClick,
+                            adapterListener::onAddressClicked),
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
+            Item.SPORT -> SpinnerTextInputStyle(
+                    R.string.choose_sport,
+                    Config.getSports(),
+                    Sport::name,
+                    Sport::code,
+                    this::enabler)
+            else -> TextInputStyle(
+                    or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
+                            adapterListener::onAddressClicked,
+                            Item.NO_CLICK),
+                    or(itemType == Item.INPUT,
+                            adapterListener::onImageClick,
+                            adapterListener::onAddressClicked),
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
         }
     }
 }

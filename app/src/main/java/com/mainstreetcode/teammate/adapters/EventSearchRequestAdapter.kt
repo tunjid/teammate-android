@@ -37,6 +37,8 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.EventSearchRequest
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.enums.Sport
+import com.mainstreetcode.teammate.model.noBlankFields
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import java.util.*
 
@@ -94,34 +96,34 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
-            Item.DATE -> Item.NON_EMPTY.invoke(item)
-            Item.SPORT, Item.LOCATION -> Item.ALL_INPUT_VALID.invoke(item)
-            else -> Item.NON_EMPTY.invoke(item)
+            Item.DATE -> item.noBlankFields
+            Item.SPORT,
+            Item.LOCATION -> item.noInputValidation
+            else -> item.noBlankFields
         }
 
-        override fun invoke(item: Item<*>): TextInputStyle {
-            return when (val itemType = item.itemType) {
-                Item.INFO, Item.LOCATION -> TextInputStyle(
-                        adapterListener::onLocationClicked,
-                        or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.NO_CLICK),
-                        this::enabler,
-                        this::textChecker,
-                        this::iconGetter)
-                Item.SPORT -> SpinnerTextInputStyle(
-                        R.string.choose_sport,
-                        sports,
-                        Sport::name,
-                        Sport::code,
-                        this::enabler,
-                        this::textChecker)
-                Item.DATE -> DateTextInputStyle(this::enabler)
-                else -> TextInputStyle(
-                        Item.EMPTY_CLICK,
-                        or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.NO_CLICK),
-                        this::enabler,
-                        this::textChecker,
-                        this::iconGetter)
-            }
+        override fun invoke(item: Item<*>): TextInputStyle = when (val itemType = item.itemType) {
+            Item.INFO,
+            Item.LOCATION -> TextInputStyle(
+                    adapterListener::onLocationClicked,
+                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.NO_CLICK),
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
+            Item.SPORT -> SpinnerTextInputStyle(
+                    R.string.choose_sport,
+                    sports,
+                    Sport::name,
+                    Sport::code,
+                    this::enabler,
+                    this::textChecker)
+            Item.DATE -> DateTextInputStyle(this::enabler)
+            else -> TextInputStyle(
+                    Item.EMPTY_CLICK,
+                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.NO_CLICK),
+                    this::enabler,
+                    this::textChecker,
+                    this::iconGetter)
         }
     }
 }

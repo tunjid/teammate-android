@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Item
+import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.ITEM
@@ -98,18 +99,19 @@ class GameEditAdapter(
         }
 
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
-            Item.INPUT, Item.NUMBER -> TextInputStyle(
+            Item.INPUT,
+            Item.NUMBER -> TextInputStyle(
                     Item.NO_CLICK,
                     Item.NO_CLICK,
                     this::enabler,
-                    Item.NON_EMPTY,
+                    Item<*>::noBlankFields,
                     Item<*>::noIcon
             )
             else -> TextInputStyle(
                     Item.NO_CLICK,
                     Item.NO_CLICK,
                     this::enabler,
-                    Item.NON_EMPTY,
+                    Item<*>::noBlankFields,
                     Item<*>::noIcon
             )
         }

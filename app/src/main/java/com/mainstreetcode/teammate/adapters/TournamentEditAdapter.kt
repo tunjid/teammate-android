@@ -37,11 +37,12 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.noBlankFields
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TOURNAMENT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
@@ -120,12 +121,12 @@ class TournamentEditAdapter(
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
             Item.INPUT,
-            Item.NUMBER -> Item.NON_EMPTY.invoke(item)
+            Item.NUMBER -> item.noBlankFields
             Item.INFO,
             Item.DESCRIPTION,
             Item.TOURNAMENT_TYPE,
-            Item.TOURNAMENT_STYLE -> Item.ALL_INPUT_VALID.invoke(item)
-            else -> Item.NON_EMPTY.invoke(item)
+            Item.TOURNAMENT_STYLE -> item.noInputValidation
+            else -> item.noBlankFields
         }
 
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
@@ -143,14 +144,14 @@ class TournamentEditAdapter(
                     TournamentType::name,
                     TournamentType::code,
                     this::enabler,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
             Item.TOURNAMENT_STYLE -> SpinnerTextInputStyle(
                     R.string.tournament_style,
                     Config.getTournamentStyles(adapterListener.sport::supportsTournamentStyle),
                     TournamentStyle::name,
                     TournamentStyle::code,
                     this::enabler,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
             Item.INFO -> {
                 val resources = App.instance.resources
                 SpinnerTextInputStyle(
@@ -159,7 +160,7 @@ class TournamentEditAdapter(
                         { flag -> resources.getString(if (flag) R.string.yes else R.string.no) },
                         Boolean::toString,
                         this::enabler,
-                        ALL_INPUT_VALID)
+                        Item<*>::noInputValidation)
             }
             else -> TextInputStyle(
                     Item.NO_CLICK,

@@ -33,6 +33,9 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.model.noBlankFields
+import com.mainstreetcode.teammate.model.noInputValidation
+import com.mainstreetcode.teammate.model.noSpecialCharacters
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -81,14 +84,16 @@ class UserEditAdapter(
                 if (adapterListener.canEdit() && item.stringRes == R.string.first_name) R.drawable.ic_picture_white_24dp else 0
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
-            Item.INPUT -> Item.NON_EMPTY.invoke(item)
-            Item.INFO -> Item.ALLOWS_SPECIAL_CHARACTERS.invoke(item)
-            Item.ABOUT -> Item.ALL_INPUT_VALID.invoke(item)
-            else -> Item.NON_EMPTY.invoke(item)
+            Item.INPUT -> item.noBlankFields
+            Item.INFO -> item.noSpecialCharacters
+            Item.ABOUT -> item.noInputValidation
+            else -> item.noBlankFields
         }
 
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
-            Item.INFO, Item.INPUT, Item.ABOUT -> TextInputStyle(
+            Item.INFO,
+            Item.INPUT,
+            Item.ABOUT -> TextInputStyle(
                     Item.NO_CLICK,
                     adapterListener::onImageClick,
                     { adapterListener.canEdit() },

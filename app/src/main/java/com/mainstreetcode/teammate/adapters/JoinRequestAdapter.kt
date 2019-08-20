@@ -40,6 +40,7 @@ import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.never
 import com.mainstreetcode.teammate.model.noIcon
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -92,14 +93,14 @@ class JoinRequestAdapter(
                         Sport::name,
                         Sport::code,
                         Item<*>::never,
-                        ALL_INPUT_VALID)
+                        Item<*>::noInputValidation)
                 Item.ROLE -> return SpinnerTextInputStyle(
                         R.string.choose_role,
                         Config.getPositions(),
                         Position::name,
                         Position::code,
                         { adapterListener.canEditRole() },
-                        ALL_INPUT_VALID)
+                        Item<*>::noInputValidation)
                 else -> return TextInputStyle(
                         Item.NO_CLICK,
                         Item.NO_CLICK,

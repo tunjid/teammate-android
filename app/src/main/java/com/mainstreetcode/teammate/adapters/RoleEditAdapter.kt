@@ -36,6 +36,8 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.enums.Position
+import com.mainstreetcode.teammate.model.noBlankFields
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -97,13 +99,16 @@ class RoleEditAdapter(
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {
-            Item.INPUT -> Item.NON_EMPTY.invoke(item)
-            Item.ABOUT, Item.NICKNAME -> Item.ALL_INPUT_VALID.invoke(item)
-            else -> Item.NON_EMPTY.invoke(item)
+            Item.INPUT -> item.noBlankFields
+            Item.ABOUT,
+            Item.NICKNAME -> item.noInputValidation
+            else -> item.noBlankFields
         }
 
         override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
-            Item.INPUT, Item.ABOUT, Item.NICKNAME -> TextInputStyle(
+            Item.INPUT,
+            Item.ABOUT,
+            Item.NICKNAME -> TextInputStyle(
                     Item.NO_CLICK,
                     adapterListener::onImageClick,
                     this::enabler,

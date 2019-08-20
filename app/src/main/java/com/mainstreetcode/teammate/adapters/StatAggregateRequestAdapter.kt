@@ -38,12 +38,12 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.StatAggregate
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.always
 import com.mainstreetcode.teammate.model.enums.Sport
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
@@ -118,7 +118,7 @@ class StatAggregateRequestAdapter(
                     Sport::name,
                     Sport::code,
                     Item<*>::always,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
             Item.DATE -> DateTextInputStyle(Item<*>::always)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
@@ -126,7 +126,7 @@ class StatAggregateRequestAdapter(
                     Sport::name,
                     Sport::code,
                     Item<*>::always,
-                    ALL_INPUT_VALID)
+                    Item<*>::noInputValidation)
         }
     }
 }
