@@ -152,11 +152,8 @@ class Game : GameEntity,
         if (updated.event.hasMajorFields()) this.event.update(updated.event)
     }
 
-    override fun compareTo(other: Game): Int {
-        val createdComparison = created.compareTo(other.created)
-
-        return if (createdComparison != 0) createdComparison else id.compareTo(other.id)
-    }
+    override fun compareTo(other: Game): Int =
+            compareValuesBy(this, other, Game::created, Game::getId)
 
     override fun describeContents(): Int = 0
 

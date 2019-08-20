@@ -137,10 +137,8 @@ class Tournament : TournamentEntity,
             this.winner = updated.winner
     }
 
-    override fun compareTo(other: Tournament): Int {
-        val createdComparison = created.compareTo(other.created)
-        return if (createdComparison != 0) createdComparison else id.compareTo(other.id)
-    }
+    override fun compareTo(other: Tournament): Int =
+            compareValuesBy(this, other, Tournament::created, Tournament::getId)
 
     override fun describeContents(): Int = 0
 

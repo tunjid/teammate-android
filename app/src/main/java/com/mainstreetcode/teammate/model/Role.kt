@@ -111,18 +111,8 @@ class Role : RoleEntity,
         if (updated.user.hasMajorFields()) this.user.update(updated.user)
     }
 
-    override fun compareTo(other: Role): Int {
-        val roleComparison = position.code.compareTo(other.position.code)
-        val userComparison = user.compareTo(other.user)
-        val teamComparison = team.compareTo(other.team)
-
-        return when {
-            roleComparison != 0 -> roleComparison
-            userComparison != 0 -> userComparison
-            teamComparison != 0 -> teamComparison
-            else -> id.compareTo(other.id)
-        }
-    }
+    override fun compareTo(other: Role): Int =
+            compareValuesBy(this, other, { it.position.code }, Role::user, Role::team, Role::getId)
 
     override fun describeContents(): Int = 0
 

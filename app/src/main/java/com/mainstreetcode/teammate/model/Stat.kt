@@ -108,10 +108,8 @@ class Stat : StatEntity,
         if (updated.game.hasMajorFields()) this.game.update(updated.game)
     }
 
-    override fun compareTo(other: Stat): Int {
-        val timeComparison = -time.compareTo(other.time)
-        return if (timeComparison != 0) timeComparison else -created.compareTo(other.created)
-    }
+    override fun compareTo(other: Stat): Int =
+        compareValuesBy(this, other, { -it.time }, { -it.created.time })
 
     override fun describeContents(): Int = 0
 

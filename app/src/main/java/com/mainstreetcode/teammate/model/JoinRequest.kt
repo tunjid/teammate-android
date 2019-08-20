@@ -115,16 +115,8 @@ class JoinRequest : JoinRequestEntity,
         if (updated.user.hasMajorFields()) user.update(updated.user)
     }
 
-    override fun compareTo(other: JoinRequest): Int {
-        val roleComparison = position.code.compareTo(other.position.code)
-        val userComparison = user.compareTo(other.user)
-
-        return when {
-            roleComparison != 0 -> roleComparison
-            userComparison != 0 -> userComparison
-            else -> id.compareTo(other.id)
-        }
-    }
+    override fun compareTo(other: JoinRequest): Int =
+            compareValuesBy(this, other, { it.position.code }, JoinRequest::user, JoinRequest::getId)
 
     override fun describeContents(): Int = 0
 

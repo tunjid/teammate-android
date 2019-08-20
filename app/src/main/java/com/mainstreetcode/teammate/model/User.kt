@@ -117,16 +117,8 @@ class User : UserEntity,
         return copy
     }
 
-    override fun compareTo(other: User): Int {
-        val firstNameComparison = firstName.toString().compareTo(other.firstName.toString())
-        val lastNameComparison = lastName.toString().compareTo(other.lastName.toString())
-
-        return when {
-            firstNameComparison != 0 -> firstNameComparison
-            lastNameComparison != 0 -> lastNameComparison
-            else -> id.compareTo(other.id)
-        }
-    }
+    override fun compareTo(other: User): Int =
+            compareValuesBy(this, other, { it.firstName.toString() }, { it.lastName.toString() }, User::getId)
 
     fun setPassword(password: String) {
         this.password = password

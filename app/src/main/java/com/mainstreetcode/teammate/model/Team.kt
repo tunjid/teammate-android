@@ -157,10 +157,8 @@ class Team : TeamEntity,
         return copy
     }
 
-    override fun compareTo(other: Team): Int {
-        val nameComparision = name.toString().compareTo(other.name.toString())
-        return if (nameComparision != 0) nameComparision else id.compareTo(other.id)
-    }
+    override fun compareTo(other: Team): Int =
+            compareValuesBy(this, other, { it.name.toString() }, Team::getId)
 
     override fun hasMajorFields(): Boolean = areNotEmpty(id, name, city, state)
 

@@ -138,16 +138,8 @@ class Event : EventEntity,
         if (updated.team.hasMajorFields()) this.team.update(updated.team)
     }
 
-    override fun compareTo(other: Event): Int {
-        val startDateComparison = startDate.compareTo(other.startDate)
-        val endDateComparison = endDate.compareTo(other.endDate)
-
-        return when {
-            startDateComparison != 0 -> startDateComparison
-            endDateComparison != 0 -> endDateComparison
-            else -> id.compareTo(other.id)
-        }
-    }
+    override fun compareTo(other: Event): Int =
+            compareValuesBy(this, other, Event::startDate, Event::endDate, Event::getId)
 
     fun updateTeam(team: Team) = this.team.update(team)
 
