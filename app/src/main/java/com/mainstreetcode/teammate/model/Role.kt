@@ -85,14 +85,14 @@ class Role : RoleEntity,
         get() = id.isBlank()
 
     override val headerItem: Item<Role>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
     override fun asItems(): List<Item<Role>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
-            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }, this),
-            Item.text(holder[3], 3, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp, this),
-            Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName),
+            Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }),
+            Item.text(holder[3], 3, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp),
+            Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() }
     )
 

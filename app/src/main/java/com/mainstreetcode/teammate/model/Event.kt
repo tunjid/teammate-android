@@ -97,21 +97,21 @@ class Event : EventEntity,
         get() = equals(empty())
 
     override val headerItem: Item<Event>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
     fun setName(game: Game) {
         setName(game.home.name.toString() + " Vs. " + game.away.name)
     }
 
     override fun asItems(): List<Item<Event>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName, this),
-            Item.text(holder[1], 1, Item.VISIBILITY, R.string.event_visibility, visibility::code, this::setVisibility, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.event_name, Item.nullToEmpty(name), this::setName),
+            Item.text(holder[1], 1, Item.VISIBILITY, R.string.event_visibility, visibility::code, this::setVisibility)
                     .textTransformer { value -> Config.visibilityFromCode(value.toString()).getName() },
-            Item.number(holder[2], 2, Item.NUMBER, R.string.event_spots, spots::toString, this::setSpots, this),
-            Item.text(holder[3], 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName, this),
-            Item.text(holder[4], 4, Item.DATE, R.string.start_date, startDate::prettyPrint, this::setStartDate, this),
-            Item.text(holder[5], 5, Item.DATE, R.string.end_date, endDate::prettyPrint, this::setEndDate, this),
-            Item.text(holder[6], 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes, this)
+            Item.number(holder[2], 2, Item.NUMBER, R.string.event_spots, spots::toString, this::setSpots),
+            Item.text(holder[3], 3, Item.LOCATION, R.string.location, Item.nullToEmpty(locationName), this::setLocationName),
+            Item.text(holder[4], 4, Item.DATE, R.string.start_date, startDate::prettyPrint, this::setStartDate),
+            Item.text(holder[5], 5, Item.DATE, R.string.end_date, endDate::prettyPrint, this::setEndDate),
+            Item.text(holder[6], 6, Item.TEXT, R.string.notes, Item.nullToEmpty(notes), this::setNotes)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =

@@ -74,12 +74,12 @@ class BlockedUser private constructor(
         get() = user.imageUrl
 
     override val headerItem: Item<BlockedUser>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.imageUrl), CharSequence::noOp, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.imageUrl), CharSequence::noOp)
 
     override fun asItems(): List<Item<BlockedUser>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
-            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder[2], 2, Item.ROLE, R.string.team_role, reason::code, CharSequence::noOp, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName),
+            Item.text(holder[2], 2, Item.ROLE, R.string.team_role, reason::code, CharSequence::noOp)
                     .textTransformer { value -> Config.reasonFromCode(value.toString()).getName() })
 
     override fun update(updated: BlockedUser) {

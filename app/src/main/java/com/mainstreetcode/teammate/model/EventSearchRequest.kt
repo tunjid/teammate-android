@@ -101,12 +101,12 @@ class EventSearchRequest private constructor(
     private fun getEndDate(): CharSequence = endDate.prettyPrint()
 
     private fun buildItems(): List<Item<EventSearchRequest>> = listOf(
-            Item.text(holder[0], 0, Item.LOCATION, R.string.location, this::getAddress, CharSequence::noOp, this),
-            Item.text(holder[1], 1, Item.INFO, R.string.event_distance, this::getDistance, CharSequence::noOp, this),
-            Item.text(holder[2], 2, Item.SPORT, R.string.team_sport, this::sportName, this::setSport, this)
+            Item.text(holder[0], 0, Item.LOCATION, R.string.location, this::getAddress, CharSequence::noOp),
+            Item.text(holder[1], 1, Item.INFO, R.string.event_distance, this::getDistance, CharSequence::noOp),
+            Item.text(holder[2], 2, Item.SPORT, R.string.team_sport, this::sportName, this::setSport)
                     .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
-            Item.text(holder[3], 3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),
-            Item.text(holder[4], 4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate, this)
+            Item.text(holder[3], 3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate),
+            Item.text(holder[4], 4, Item.DATE, R.string.end_date, this::getEndDate, this::setEndDate)
     )
 
     override fun asItems(): List<Item<EventSearchRequest>> = items

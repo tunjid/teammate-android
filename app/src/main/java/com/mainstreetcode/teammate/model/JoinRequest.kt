@@ -79,26 +79,26 @@ class JoinRequest : JoinRequestEntity,
     override val headerItem: Item<JoinRequest>
         get() {
             val image: RemoteImage = if (isUserApproved) team else user
-            return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, { image.imageUrl }, CharSequence::noOp, this)
+            return Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, { image.imageUrl }, CharSequence::noOp)
         }
 
     override fun asItems(): List<Item<JoinRequest>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
-            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder[2], 2, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp, this),
-            Item.email(holder[3], 3, Item.INPUT, R.string.email, user::primaryEmail, { user.primaryEmail = it }, this),
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName),
+            Item.text(holder[2], 2, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp),
+            Item.email(holder[3], 3, Item.INPUT, R.string.email, user::primaryEmail, { user.primaryEmail = it }),
             // END USER ITEMS
-            Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
+            Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() },
             // START TEAM ITEMS
-            Item.text(holder[5], 5, Item.INPUT, R.string.team_name, team::name, CharSequence::noOp, this),
-            Item.text(holder[6], 6, Item.SPORT, R.string.team_sport, team.sport::code, CharSequence::noOp, this).textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
-            Item.text(holder[7], 7, Item.CITY, R.string.city, team::city, CharSequence::noOp, this),
-            Item.text(holder[8], 8, Item.STATE, R.string.state, team::state, CharSequence::noOp, this),
-            Item.text(holder[9], 9, Item.ZIP, R.string.zip, team::zip, CharSequence::noOp, this),
-            Item.text(holder[10], 10, Item.DESCRIPTION, R.string.team_description, team::description, CharSequence::noOp, this),
-            Item.number(holder[11], 11, Item.NUMBER, R.string.team_min_age, team.minAge::toString, CharSequence::noOp, this),
-            Item.number(holder[12], 12, Item.NUMBER, R.string.team_max_age, team.maxAge::toString, CharSequence::noOp, this)
+            Item.text(holder[5], 5, Item.INPUT, R.string.team_name, team::name, CharSequence::noOp),
+            Item.text(holder[6], 6, Item.SPORT, R.string.team_sport, team.sport::code, CharSequence::noOp).textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
+            Item.text(holder[7], 7, Item.CITY, R.string.city, team::city, CharSequence::noOp),
+            Item.text(holder[8], 8, Item.STATE, R.string.state, team::state, CharSequence::noOp),
+            Item.text(holder[9], 9, Item.ZIP, R.string.zip, team::zip, CharSequence::noOp),
+            Item.text(holder[10], 10, Item.DESCRIPTION, R.string.team_description, team::description, CharSequence::noOp),
+            Item.number(holder[11], 11, Item.NUMBER, R.string.team_min_age, team.minAge::toString, CharSequence::noOp),
+            Item.number(holder[12], 12, Item.NUMBER, R.string.team_max_age, team.maxAge::toString, CharSequence::noOp)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =

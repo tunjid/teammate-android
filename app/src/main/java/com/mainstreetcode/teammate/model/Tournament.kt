@@ -89,17 +89,17 @@ class Tournament : TournamentEntity,
         get() = id.isBlank()
 
     override val headerItem: Item<Tournament>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
     override fun asItems(): List<Item<Tournament>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.tournament_name, Item.nullToEmpty(name), this::setName, this),
-            Item.text(holder[1], 1, Item.DESCRIPTION, R.string.tournament_description, Item.nullToEmpty(description), this::setDescription, this),
-            Item.text(holder[2], 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::code, this::setType, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.tournament_name, Item.nullToEmpty(name), this::setName),
+            Item.text(holder[1], 1, Item.DESCRIPTION, R.string.tournament_description, Item.nullToEmpty(description), this::setDescription),
+            Item.text(holder[2], 2, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::code, this::setType)
                     .textTransformer { value -> Config.tournamentTypeFromCode(value.toString()).getName() },
-            Item.text(holder[3], 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::code, this::setStyle, this)
+            Item.text(holder[3], 3, Item.TOURNAMENT_STYLE, R.string.tournament_style, style::code, this::setStyle)
                     .textTransformer { value -> Config.tournamentStyleFromCode(value.toString()).getName() },
-            Item.number(holder[4], 4, Item.NUMBER, R.string.tournament_legs, numLegs::toString, this::setNumLegs, this),
-            Item.number(holder[5], 5, Item.INFO, R.string.tournament_single_final, { App.instance.getString(if (isSingleFinal) R.string.yes else R.string.no) }, this::setSingleFinal, this)
+            Item.number(holder[4], 4, Item.NUMBER, R.string.tournament_legs, numLegs::toString, this::setNumLegs),
+            Item.number(holder[5], 5, Item.INFO, R.string.tournament_single_final, { App.instance.getString(if (isSingleFinal) R.string.yes else R.string.no) }, this::setSingleFinal)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {

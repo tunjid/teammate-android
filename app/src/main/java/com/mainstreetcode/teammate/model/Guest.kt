@@ -65,12 +65,12 @@ class Guest : GuestEntity,
         get() = id.isBlank()
 
     override val headerItem: Item<Guest>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::imageUrl, CharSequence::noOp, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, user::imageUrl, CharSequence::noOp)
 
     override fun asItems(): List<Item<Guest>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, CharSequence::noOp, this),
-            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, CharSequence::noOp, this),
-            Item.email(holder[2], 2, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, CharSequence::noOp),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, CharSequence::noOp),
+            Item.email(holder[2], 2, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp)
     )
 
     override fun hasMajorFields(): Boolean = user.hasMajorFields()

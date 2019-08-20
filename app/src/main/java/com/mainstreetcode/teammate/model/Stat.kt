@@ -79,13 +79,13 @@ class Stat : StatEntity,
         get() = id.isBlank()
 
     override fun asItems(): List<Item<Stat>> = listOf(
-            Item.number(holder[0], 0, Item.NUMBER, R.string.stat_time, time::toString, this::setTime, this),
-            Item.text(holder[1], 1, Item.STAT_TYPE, R.string.stat_type, statType::code, this::setStatType, this)
+            Item.number(holder[0], 0, Item.NUMBER, R.string.stat_time, time::toString, this::setTime),
+            Item.text(holder[1], 1, Item.STAT_TYPE, R.string.stat_type, statType::code, this::setStatType)
                     .textTransformer { value -> sport.statTypeFromCode(value.toString()).getName() }
     )
 
     override val headerItem: Item<Stat>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, CharSequence::noOp, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, CharSequence::noOp)
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
         !is Stat -> id == other.id

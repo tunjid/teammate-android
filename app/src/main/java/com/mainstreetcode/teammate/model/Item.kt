@@ -46,8 +46,7 @@ class Item<T> internal constructor(
         @field:ItemType val itemType: Int,
         @field:StringRes val stringRes: Int,
         private var value: CharSequence,
-        private val changeCallBack: ValueChangeCallBack?,
-        val itemizedObject: T) : Differentiable, Comparable<Item<*>> {
+        private val changeCallBack: ValueChangeCallBack?) : Differentiable, Comparable<Item<*>> {
     private var textTransformer: ((CharSequence?) -> CharSequence)? = null
 
     val rawValue: String
@@ -124,9 +123,8 @@ class Item<T> internal constructor(
                 itemType: Int,
                 stringRes: Int,
                 supplier: () -> CharSequence,
-                changeCallBack: ValueChangeCallBack?,
-                itemizedObject: T
-        ): Item<T> = Item(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.invoke(), changeCallBack, itemizedObject)
+                changeCallBack: ValueChangeCallBack?
+        ): Item<T> = Item(id, sortPosition, InputType.TYPE_CLASS_NUMBER, itemType, stringRes, supplier.invoke(), changeCallBack)
 
         fun <T> text(
                 id: String,
@@ -134,9 +132,8 @@ class Item<T> internal constructor(
                 itemType: Int,
                 stringRes: Int,
                 supplier: () -> CharSequence,
-                changeCallBack: ValueChangeCallBack?,
-                itemizedObject: T
-        ): Item<T> = Item(id, sortPosition, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.invoke(), changeCallBack, itemizedObject)
+                changeCallBack: ValueChangeCallBack?
+        ): Item<T> = Item(id, sortPosition, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, itemType, stringRes, supplier.invoke(), changeCallBack)
 
         fun <T> email(
                 id: String,
@@ -144,9 +141,8 @@ class Item<T> internal constructor(
                 itemType: Int,
                 stringRes: Int,
                 supplier: () -> CharSequence,
-                changeCallBack: ValueChangeCallBack?,
-                itemizedObject: T
-        ): Item<T> = Item(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.invoke(), changeCallBack, itemizedObject)
+                changeCallBack: ValueChangeCallBack?
+        ): Item<T> = Item(id, sortPosition, InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, itemType, stringRes, supplier.invoke(), changeCallBack)
 
         fun nullToEmpty(source: CharSequence?): () -> CharSequence = { source ?: "" }
     }

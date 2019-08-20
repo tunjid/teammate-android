@@ -77,14 +77,14 @@ class User : UserEntity,
         get() = id.isBlank()
 
     override val headerItem: Item<User>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it }, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(imageUrl), { this.imageUrl = it })
 
     override fun asItems(): List<Item<User>> = listOf(
-            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName, this),
-            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName, this),
-            Item.text(holder[2], 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), { this.screenName = it }, this),
-            Item.email(holder[3], 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), { this.primaryEmail = it }, this),
-            Item.text(holder[4], 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout, this)
+            Item.text(holder[0], 0, Item.INPUT, R.string.first_name, Item.nullToEmpty(firstName), this::setFirstName),
+            Item.text(holder[1], 1, Item.INPUT, R.string.last_name, Item.nullToEmpty(lastName), this::setLastName),
+            Item.text(holder[2], 2, Item.INFO, R.string.screen_name, Item.nullToEmpty(screenName), { this.screenName = it }),
+            Item.email(holder[3], 3, Item.INPUT, R.string.email, Item.nullToEmpty(primaryEmail), { this.primaryEmail = it }),
+            Item.text(holder[4], 4, Item.ABOUT, R.string.user_about, Item.nullToEmpty(about), this::setAbout)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
