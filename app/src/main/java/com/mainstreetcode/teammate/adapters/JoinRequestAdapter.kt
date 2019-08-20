@@ -35,7 +35,6 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.never
@@ -105,7 +104,7 @@ class JoinRequestAdapter(
                         Item.NO_CLICK,
                         Item.NO_CLICK,
                         or<(Item<*>) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item<*>::never),
-                        ALL_INPUT_VALID,
+                        Item<*>::noInputValidation,
                         Item<*>::noIcon)
             }
         }

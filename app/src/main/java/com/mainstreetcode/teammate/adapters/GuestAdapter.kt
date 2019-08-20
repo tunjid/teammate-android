@@ -37,6 +37,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.never
 import com.mainstreetcode.teammate.model.noIcon
+import com.mainstreetcode.teammate.model.noInputValidation
 
 import com.mainstreetcode.teammate.util.ITEM
 
@@ -79,7 +80,7 @@ class GuestAdapter(
                 Item.NO_CLICK,
                 Item.NO_CLICK,
                 Item<*>::never,
-                Item.ALL_INPUT_VALID,
+                Item<*>::noInputValidation,
                 Item<*>::noIcon
         )
     }

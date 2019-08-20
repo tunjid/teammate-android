@@ -118,8 +118,6 @@ class Item<T> internal constructor(
         val NO_CLICK: (() -> Unit)? = null
         val EMPTY_CLICK = { }
 
-        val ALL_INPUT_VALID = { _: Item<*> -> "" }
-
         fun <T> number(
                 id: String,
                 sortPosition: Int,

@@ -32,6 +32,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Item
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.prettyPrint
 import java.util.Calendar.DATE
 import java.util.Calendar.HOUR_OF_DAY
@@ -47,7 +48,7 @@ class DateTextInputStyle(enabler: (Item<*>) -> Boolean) : TextInputStyle(
         Item.EMPTY_CLICK,
         Item.EMPTY_CLICK,
         enabler,
-        Item.ALL_INPUT_VALID,
+        Item<*>::noInputValidation,
         { R.drawable.ic_access_time_white_24dp }
 ), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 

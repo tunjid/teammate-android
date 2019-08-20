@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.never
 import com.mainstreetcode.teammate.model.noIcon
+import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -74,7 +75,7 @@ class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdap
                 Item.NO_CLICK,
                 Item.NO_CLICK,
                 Item<*>::never,
-                Item.ALL_INPUT_VALID,
+                Item<*>::noInputValidation,
                 Item<*>::noIcon
         )
     }
