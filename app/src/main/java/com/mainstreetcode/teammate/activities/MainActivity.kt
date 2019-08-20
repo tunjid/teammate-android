@@ -326,75 +326,57 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
         if (current != null) updated.startTransition(HIDER_DURATION)
     }
 
-    private fun onNavItemSelected(@IdRes id: Int): Boolean {
-        when (id) {
-            R.id.action_home -> {
-                showFragment(FeedFragment.newInstance())
-                return true
-            }
-            R.id.action_events -> {
-                TeamPickerFragment.pick(this, R.id.request_event_team_pick)
-                return true
-            }
-            R.id.action_messages -> {
-                TeamPickerFragment.pick(this, R.id.request_chat_team_pick)
-                return true
-            }
-            R.id.action_media -> {
-                TeamPickerFragment.pick(this, R.id.request_media_team_pick)
-                return true
-            }
-            R.id.action_tournaments -> {
-                TeamPickerFragment.pick(this, R.id.request_tournament_team_pick)
-                return true
-            }
-            R.id.action_games -> {
-                TeamPickerFragment.pick(this, R.id.request_game_team_pick)
-                return true
-            }
-            R.id.action_find_teams -> {
-                showFragment(TeamSearchFragment.newInstance())
-                return true
-            }
-            R.id.action_team -> {
-                showFragment(TeamsFragment.newInstance())
-                return true
-            }
-            R.id.action_expand_home_nav -> {
-                showNavOverflow()
-                return true
-            }
-            R.id.action_settings -> {
-                showFragment(SettingsFragment.newInstance())
-                return true
-            }
-            R.id.action_rsvp_list -> {
-                showFragment(MyEventsFragment.newInstance())
-                return true
-            }
-            R.id.action_public_events -> {
-                showFragment(EventSearchFragment.newInstance())
-                return true
-            }
-            R.id.action_head_to_head -> {
-                showFragment(HeadToHeadFragment.newInstance())
-                return true
-            }
-            R.id.action_stats_aggregate -> {
-                showFragment(StatAggregateFragment.newInstance())
-                return true
-            }
-            R.id.action_declined_competitions -> {
-                showFragment(DeclinedCompetitionsFragment.newInstance())
-                return true
-            }
-            R.id.action_my_profile -> {
-                showFragment(UserEditFragment.newInstance(userViewModel.currentUser))
-                return true
-            }
-            else -> return false
-        }
-    }
+    private fun onNavItemSelected(@IdRes id: Int): Boolean = when (id) {
+         R.id.action_home -> {
+             showFragment(FeedFragment.newInstance())
+         }
+         R.id.action_events -> {
+             TeamPickerFragment.pick(this, R.id.request_event_team_pick).let { true }
+         }
+         R.id.action_messages -> {
+             TeamPickerFragment.pick(this, R.id.request_chat_team_pick).let { true }
+         }
+         R.id.action_media -> {
+             TeamPickerFragment.pick(this, R.id.request_media_team_pick).let { true }
+         }
+         R.id.action_tournaments -> {
+             TeamPickerFragment.pick(this, R.id.request_tournament_team_pick).let { true }
+         }
+         R.id.action_games -> {
+             TeamPickerFragment.pick(this, R.id.request_game_team_pick).let { true }
+         }
+         R.id.action_find_teams -> {
+             showFragment(TeamSearchFragment.newInstance())
+         }
+         R.id.action_team -> {
+             showFragment(TeamsFragment.newInstance())
+         }
+         R.id.action_expand_home_nav -> {
+             showNavOverflow().let { true }
+         }
+         R.id.action_settings -> {
+             showFragment(SettingsFragment.newInstance())
+         }
+         R.id.action_rsvp_list -> {
+             showFragment(MyEventsFragment.newInstance())
+         }
+         R.id.action_public_events -> {
+             showFragment(EventSearchFragment.newInstance())
+         }
+         R.id.action_head_to_head -> {
+             showFragment(HeadToHeadFragment.newInstance())
+         }
+         R.id.action_stats_aggregate -> {
+             showFragment(StatAggregateFragment.newInstance())
+         }
+         R.id.action_declined_competitions -> {
+             showFragment(DeclinedCompetitionsFragment.newInstance())
+         }
+         R.id.action_my_profile -> {
+             showFragment(UserEditFragment.newInstance(userViewModel.currentUser))
+         }
+         else ->  false
+     }
 
     private fun route(savedInstanceState: Bundle?, intent: Intent) {
         val model = intent.getParcelableExtra<Model<*>>(FEED_DEEP_LINK)
