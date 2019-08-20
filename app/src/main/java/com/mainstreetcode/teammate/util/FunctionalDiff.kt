@@ -100,16 +100,16 @@ object FunctionalDiff {
             else -> identifiable
         }
 
-        return when {
-            it.javaClass == Item::class.java -> 0
-            it.javaClass == JoinRequest::class.java -> 5
-            it.javaClass == Competitor::class.java -> 10
-            it.javaClass == Role::class.java -> 15
-            it.javaClass == Event::class.java -> 20
-            it.javaClass == Media::class.java -> 25
-            it.javaClass == Team::class.java -> 30
-            it.javaClass == User::class.java -> 35
-            it.javaClass == Guest::class.java -> 40
+        return when (it.javaClass) {
+            Item::class.java -> 0
+            JoinRequest::class.java -> 5
+            Competitor::class.java -> 10
+            Role::class.java -> 15
+            Event::class.java -> 20
+            Media::class.java -> 25
+            Team::class.java -> 30
+            User::class.java -> 35
+            Guest::class.java -> 40
             else -> 0
         }
     }
