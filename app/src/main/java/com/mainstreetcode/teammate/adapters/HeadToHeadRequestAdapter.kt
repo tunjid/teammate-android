@@ -40,7 +40,9 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.HeadToHead
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
+import com.mainstreetcode.teammate.model.always
 import com.mainstreetcode.teammate.model.enums.Sport
+import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.HOME
 import com.mainstreetcode.teammate.util.ITEM
@@ -65,9 +67,9 @@ class HeadToHeadRequestAdapter(
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when (viewType) {
             ITEM -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-            HOME -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM { adapterListener.onHomeClicked(it) })
+            HOME -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM(adapterListener::onHomeClicked))
                     .hideSubtitle().withTitle(R.string.pick_home_competitor)
-            AWAY -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM { adapterListener.onAwayClicked(it) })
+            AWAY -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked))
                     .hideSubtitle().withTitle(R.string.pick_away_competitor)
             else -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
         }
@@ -76,8 +78,8 @@ class HeadToHeadRequestAdapter(
     @Suppress("UNCHECKED_CAST")
     override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S {
         return when {
-            viewHolder.itemViewType == HOME -> CompetitorAdapter.AdapterListener.asSAM { adapterListener.onHomeClicked(it) } as S
-            viewHolder.itemViewType == AWAY -> CompetitorAdapter.AdapterListener.asSAM { adapterListener.onAwayClicked(it) } as S
+            viewHolder.itemViewType == HOME -> CompetitorAdapter.AdapterListener.asSAM(adapterListener::onHomeClicked) as S
+            viewHolder.itemViewType == AWAY -> CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked) as S
             else -> adapterListener as S
         }
     }
@@ -120,24 +122,24 @@ class HeadToHeadRequestAdapter(
             Item.SPORT -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
-                    { it.name },
-                    { it.code },
-                    Item.TRUE,
+                    Sport::name,
+                    Sport::code,
+                    Item<*>::always,
                     ALL_INPUT_VALID)
-            Item.DATE -> DateTextInputStyle(Item.TRUE)
+            Item.DATE -> DateTextInputStyle(Item<*>::always)
             Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
                     R.string.tournament_type,
                     Config.getTournamentTypes { true },
-                    { it.name },
-                    { it.code },
-                    Item.TRUE,
+                    TournamentType::name,
+                    TournamentType::code,
+                    Item<*>::always,
                     ALL_INPUT_VALID)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
-                    { it.name },
-                    { it.code },
-                    Item.TRUE,
+                    Sport::name,
+                    Sport::code,
+                    Item<*>::always,
                     ALL_INPUT_VALID)
         }
     }

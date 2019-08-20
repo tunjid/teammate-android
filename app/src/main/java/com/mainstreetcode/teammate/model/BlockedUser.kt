@@ -39,6 +39,7 @@ import com.mainstreetcode.teammate.model.enums.BlockReason
 import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.noOp
 import com.mainstreetcode.teammate.util.parseISO8601Date
 import java.lang.reflect.Type
 import java.util.*
@@ -73,12 +74,12 @@ class BlockedUser private constructor(
         get() = user.imageUrl
 
     override val headerItem: Item<BlockedUser>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.imageUrl), { Item.ignore(it) }, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.profile_picture, Item.nullToEmpty(user.imageUrl), CharSequence::noOp, this)
 
     override fun asItems(): List<Item<BlockedUser>> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
             Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
-            Item.text(holder[2], 2, Item.ROLE, R.string.team_role, reason::code, { Item.ignore(it) }, this)
+            Item.text(holder[2], 2, Item.ROLE, R.string.team_role, reason::code, CharSequence::noOp, this)
                     .textTransformer { value -> Config.reasonFromCode(value.toString()).getName() })
 
     override fun update(updated: BlockedUser) {

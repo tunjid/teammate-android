@@ -122,14 +122,9 @@ class Item<T> internal constructor(
 
         val NO_ICON = { _: Item<*> -> 0 }
 
-        val TRUE = { _: Item<*> -> true }
-        val FALSE = { _: Item<*> -> false }
-
         val ALL_INPUT_VALID = { _: Item<*> -> "" }
         val NON_EMPTY = { input: Item<*> -> if (input.getValue().isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else "" }
         val ALLOWS_SPECIAL_CHARACTERS = { input: Item<*> -> if (input.getValue().isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters) }
-
-        fun <T> ignore(ignored: T) {}
 
         fun <T> number(id: String, sortPosition: Int, itemType: Int, stringRes: Int,
                        supplier: () -> CharSequence, changeCallBack: ValueChangeCallBack?,
@@ -152,3 +147,7 @@ class Item<T> internal constructor(
         }
     }
 }
+
+val Item<*>.always get() = true
+
+val Item<*>.never get() = false

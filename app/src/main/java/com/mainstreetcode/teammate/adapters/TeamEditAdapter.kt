@@ -37,6 +37,7 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ZIP
 import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.never
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -87,9 +88,9 @@ class TeamEditAdapter(
         }
 
         override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
-            Item.ABOUT -> Item.FALSE.invoke(item)
+            Item.ABOUT -> item.never
             ZIP, Item.CITY, Item.INFO, Item.STATE, Item.INPUT, Item.SPORT, Item.NUMBER, Item.DESCRIPTION -> adapterListener.canEditFields()
-            else -> Item.FALSE.invoke(item)
+            else -> item.never
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {

@@ -35,6 +35,7 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Guest
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
+import com.mainstreetcode.teammate.model.never
 
 import com.mainstreetcode.teammate.util.ITEM
 
@@ -73,7 +74,12 @@ class GuestAdapter(
     override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
 
     internal class Chooser : TextInputStyle.InputChooser() {
-        override fun invoke(input: Item<*>): TextInputStyle =
-                TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, Item.FALSE, Item.ALL_INPUT_VALID, Item.NO_ICON)
+        override fun invoke(input: Item<*>): TextInputStyle = TextInputStyle(
+                Item.NO_CLICK,
+                Item.NO_CLICK,
+                Item<*>::never,
+                Item.ALL_INPUT_VALID,
+                Item.NO_ICON
+        )
     }
 }

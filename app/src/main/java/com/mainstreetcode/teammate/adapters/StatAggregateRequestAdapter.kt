@@ -42,6 +42,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.StatAggregate
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.model.always
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
@@ -116,15 +117,15 @@ class StatAggregateRequestAdapter(
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item.TRUE,
+                    Item<*>::always,
                     ALL_INPUT_VALID)
-            Item.DATE -> DateTextInputStyle(Item.TRUE)
+            Item.DATE -> DateTextInputStyle(Item<*>::always)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item.TRUE,
+                    Item<*>::always,
                     ALL_INPUT_VALID)
         }
     }

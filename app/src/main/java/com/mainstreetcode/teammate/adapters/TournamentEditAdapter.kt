@@ -41,6 +41,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
+import com.mainstreetcode.teammate.model.never
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TOURNAMENT
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
@@ -107,14 +108,14 @@ class TournamentEditAdapter(
         }
 
         override fun enabler(item: Item<*>): Boolean = when (item.itemType) {
-            Item.ABOUT -> Item.FALSE.invoke(item)
+            Item.ABOUT -> item.never
             Item.INFO,
             Item.INPUT,
             Item.NUMBER,
             Item.TOURNAMENT_TYPE,
             Item.TOURNAMENT_STYLE -> adapterListener.canEditBeforeCreation()
             Item.DESCRIPTION -> adapterListener.canEditAfterCreation()
-            else -> Item.FALSE.invoke(item)
+            else -> item.never
         }
 
         override fun textChecker(item: Item<*>): CharSequence? = when (item.itemType) {

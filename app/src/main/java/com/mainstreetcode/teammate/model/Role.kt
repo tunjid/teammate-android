@@ -40,6 +40,7 @@ import com.mainstreetcode.teammate.persistence.entity.RoleEntity
 import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.noOp
 import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -90,7 +91,7 @@ class Role : RoleEntity,
             Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName, this),
             Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName, this),
             Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }, this),
-            Item.text(holder[3], 3, Item.ABOUT, R.string.user_about, user::about, Item.IGNORE_SET, this),
+            Item.text(holder[3], 3, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp, this),
             Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition, this)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() }
     )

@@ -41,6 +41,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.STAT_TYPE
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.model.always
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
@@ -116,7 +117,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
                 Item.INPUT, Item.NUMBER -> return TextInputStyle(
                         Item.NO_CLICK,
                         Item.NO_CLICK,
-                        Item.TRUE,
+                        Item<*>::always,
                         Item.NON_EMPTY,
                         Item.NO_ICON)
                 STAT_TYPE -> {
@@ -129,7 +130,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
                             { adapterListener.canChangeStat() },
                             ALL_INPUT_VALID)
                 }
-                else -> return TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, Item.TRUE, Item.NON_EMPTY, Item.NO_ICON)
+                else -> return TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, Item<*>::always, Item.NON_EMPTY, Item.NO_ICON)
             }
         }
     }

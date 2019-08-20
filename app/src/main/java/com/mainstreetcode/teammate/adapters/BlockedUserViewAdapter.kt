@@ -25,18 +25,17 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.BlockedUser
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-
+import com.mainstreetcode.teammate.model.never
 import com.mainstreetcode.teammate.util.ITEM
+import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
  * Adapter for [BlockedUser]
@@ -70,6 +69,12 @@ class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdap
     override fun getItemViewType(position: Int): Int = ITEM
 
     private class Chooser : TextInputStyle.InputChooser() {
-        override fun invoke(input: Item<*>): TextInputStyle = TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, Item.FALSE, Item.ALL_INPUT_VALID, Item.NO_ICON)
+        override fun invoke(input: Item<*>): TextInputStyle = TextInputStyle(
+                Item.NO_CLICK,
+                Item.NO_CLICK,
+                Item<*>::never,
+                Item.ALL_INPUT_VALID,
+                Item.NO_ICON
+        )
     }
 }

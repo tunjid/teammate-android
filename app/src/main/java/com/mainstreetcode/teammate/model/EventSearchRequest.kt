@@ -38,6 +38,7 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.ISO8601Print
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asIntOrZero
+import com.mainstreetcode.teammate.util.noOp
 import com.mainstreetcode.teammate.util.parsePrettyDate
 import com.mainstreetcode.teammate.util.prettyPrint
 import java.lang.reflect.Type
@@ -100,8 +101,8 @@ class EventSearchRequest private constructor(
     private fun getEndDate(): CharSequence = endDate.prettyPrint()
 
     private fun buildItems(): List<Item<EventSearchRequest>> = listOf(
-            Item.text(holder[0], 0, Item.LOCATION, R.string.location, this::getAddress, Item.IGNORE_SET, this),
-            Item.text(holder[1], 1, Item.INFO, R.string.event_distance, this::getDistance, Item.IGNORE_SET, this),
+            Item.text(holder[0], 0, Item.LOCATION, R.string.location, this::getAddress, CharSequence::noOp, this),
+            Item.text(holder[1], 1, Item.INFO, R.string.event_distance, this::getDistance, CharSequence::noOp, this),
             Item.text(holder[2], 2, Item.SPORT, R.string.team_sport, this::sportName, this::setSport, this)
                     .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
             Item.text(holder[3], 3, Item.DATE, R.string.start_date, this::getStartDate, this::setStartDate, this),

@@ -36,6 +36,8 @@ const val EMPTY_STRING = ""
 
 private val screenName = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE)
 
+fun CharSequence.noOp(): Unit = Unit
+
 fun CharSequence.isValidScreenName(): Boolean = !screenName.matcher(this).find()
 
 fun CharSequence?.isNotNullOrBlank(): Boolean = !isNullOrBlank()

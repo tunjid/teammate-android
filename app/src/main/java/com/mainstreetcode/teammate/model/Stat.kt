@@ -45,6 +45,7 @@ import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.noOp
 import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -84,7 +85,7 @@ class Stat : StatEntity,
     )
 
     override val headerItem: Item<Stat>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, CharSequence::noOp, this)
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
         !is Stat -> id == other.id

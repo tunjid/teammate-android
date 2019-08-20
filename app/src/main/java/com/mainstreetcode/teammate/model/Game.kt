@@ -44,6 +44,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asBooleanOrFalse
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.noOp
 import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -95,14 +96,14 @@ class Game : GameEntity,
         get() = TextUtils.isEmpty(id)
 
     override val headerItem: Item<Game>
-        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, Item.IGNORE_SET, this)
+        get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, CharSequence::noOp, this)
 
     override fun asItems(): List<Item<Game>> = listOf(
-            Item.text(holder[0], 0, Item.NUMBER, R.string.game_competitors, this::name, Item.IGNORE_SET, this),
+            Item.text(holder[0], 0, Item.NUMBER, R.string.game_competitors, this::name, CharSequence::noOp, this),
             Item.number(holder[1], 1, Item.INPUT, R.string.game_home_score, homeScore::toString, this::setHomeScore, this),
             Item.number(holder[2], 2, Item.INPUT, R.string.game_away_score, awayScore::toString, this::setAwayScore, this),
-            Item.number(holder[3], 3, Item.NUMBER, R.string.game_round, round::toString, Item.IGNORE_SET, this),
-            Item.number(holder[4], 4, Item.NUMBER, R.string.game_leg, leg::toString, Item.IGNORE_SET, this)
+            Item.number(holder[3], 3, Item.NUMBER, R.string.game_round, round::toString, CharSequence::noOp, this),
+            Item.number(holder[4], 4, Item.NUMBER, R.string.game_leg, leg::toString, CharSequence::noOp, this)
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
