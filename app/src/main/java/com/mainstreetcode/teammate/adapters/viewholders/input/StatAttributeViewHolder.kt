@@ -80,14 +80,13 @@ class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder<Noth
 
     override fun bind(inputStyle: TextInputStyle) {
         super.bind(inputStyle)
-        statType.update(statTypes.fromCodeOrFirst(inputStyle.item.rawValue))
+        statType.update(statTypes.fromCodeOrFirst(inputStyle.item.rawValue.toString()))
         adapter.notifyDataSetChanged()
     }
 
     override fun updateText(text: CharSequence) {
         super.updateText(text)
-        if (textInputStyle == null) return
-        val value = textInputStyle!!.item.rawValue
+        val value = textInputStyle?.item?.rawValue ?: return
         var current: StatType? = null
 
         for (type in statTypes)

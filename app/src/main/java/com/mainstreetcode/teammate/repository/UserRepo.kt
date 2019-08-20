@@ -76,7 +76,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
         }
 
-        val body = getBody(model.headerItem.getValue(), User.PHOTO_UPLOAD_KEY)
+        val body = getBody(model.headerItem.rawValue, User.PHOTO_UPLOAD_KEY)
         if (body != null) remote = remote
                 .flatMap { api.uploadUserPhoto(model.id, body).map(getLocalUpdateFunction(model)) }
 

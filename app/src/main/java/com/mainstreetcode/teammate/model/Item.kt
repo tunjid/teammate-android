@@ -49,24 +49,21 @@ class Item internal constructor(
         private val changeCallBack: ValueChangeCallBack?) : Differentiable, Comparable<Item> {
     private var textTransformer: ((CharSequence?) -> CharSequence)? = null
 
-    val rawValue: String
+    var rawValue: CharSequence
         get() = value.toString()
+        set(newValue) {
+            this.value = newValue
+            changeCallBack?.invoke(newValue.toString())
+        }
+
+    val formattedValue: CharSequence
+        get() = textTransformer?.run { invoke(value) } ?: value
 
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(INPUT, IMAGE, ROLE, DATE, CITY, LOCATION, INFO, TEXT, NUMBER, SPORT, VISIBILITY)
     internal annotation class ItemType
 
-    fun setValue(value: CharSequence) {
-        this.value = value
-        changeCallBack?.invoke(value.toString())
-    }
-
-    fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item {
-        this.textTransformer = textTransformer
-        return this
-    }
-
-    fun getValue(): CharSequence = textTransformer?.run { invoke(value) } ?: value
+    fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item = apply { this.textTransformer = textTransformer }
 
     override fun getId(): String? = id
 
@@ -83,7 +80,7 @@ class Item internal constructor(
 
         val item = other as Item?
 
-        return id == item!!.id
+        return id == item?.id
     }
 
     override fun hashCode(): Int = id.hashCode()
@@ -164,6 +161,6 @@ val Item.noIcon
 val Item.noInputValidation
     get() = ""
 
-val Item.noBlankFields get() = if (getValue().isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else ""
+val Item.noBlankFields get() = if (formattedValue.isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else ""
 
-val Item.noSpecialCharacters get() = if (getValue().isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters)
+val Item.noSpecialCharacters get() = if (formattedValue.isValidScreenName()) "" else App.instance.resources.getString(R.string.no_special_characters)

@@ -92,7 +92,7 @@ class DateTextInputStyle(enabler: (Item) -> Boolean) : TextInputStyle(
 
     private fun updateTime() {
         val updatedDate =  calendar.time.prettyPrint()
-        item.setValue(updatedDate)
+        item.rawValue = updatedDate
         viewHolder?.updateText(updatedDate)
     }
 }

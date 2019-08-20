@@ -59,7 +59,7 @@ class RoleRepo internal constructor() : ModelRepo<Role>() {
                 .map(getLocalUpdateFunction(model))
                 .doOnError { throwable -> deleteInvalidModel(model, throwable) }
 
-        val body = getBody(model.headerItem.getValue(), Role.PHOTO_UPLOAD_KEY)
+        val body = getBody(model.headerItem.formattedValue, Role.PHOTO_UPLOAD_KEY)
         if (body != null) roleSingle = roleSingle
                 .flatMap { api.uploadRolePhoto(model.id, body).map(getLocalUpdateFunction(model)) }
 

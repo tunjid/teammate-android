@@ -70,12 +70,12 @@ class EventSearchRequest private constructor(
 
     fun setAddress(address: Address) {
         this.address = address
-        items[0].setValue(getAddress())
+        items[0].rawValue = getAddress()
     }
 
     fun setDistance(distance: String) {
         this.distance = distance.asIntOrZero()
-        items[1].setValue(getDistance())
+        items[1].rawValue = getDistance()
     }
 
     private fun setSport(sport: String) {

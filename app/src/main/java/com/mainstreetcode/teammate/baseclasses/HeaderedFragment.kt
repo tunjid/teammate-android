@@ -107,7 +107,7 @@ abstract class HeaderedFragment<T> :
 
     override fun onImageCropped(uri: Uri) {
         val item = headeredModel.headerItem
-        uri.path?.apply { item.setValue(this) }
+        uri.path?.apply { item.rawValue = this }
         viewHolder.bind(headeredModel)
         imageJustCropped = true
     }

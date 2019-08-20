@@ -80,7 +80,7 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
     }
 
     private fun onItemSelected(sequences: List<CharSequence>, position: Int, type: T) {
-        item.setValue(valueFunction.invoke(type))
+        item.rawValue = valueFunction.invoke(type)
         viewHolder?.updateText(sequences[position])
     }
 }

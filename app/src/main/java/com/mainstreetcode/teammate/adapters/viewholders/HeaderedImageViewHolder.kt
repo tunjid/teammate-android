@@ -63,7 +63,7 @@ class HeaderedImageViewHolder(
     }
 
     fun bind(model: HeaderedModel<*>) {
-        val url = model.headerItem.getValue()
+        val url = model.headerItem.rawValue
         if (url.isBlank()) return
 
         diff.push(url.toString())

@@ -66,7 +66,7 @@ class TeamRepo internal constructor() : ModelRepo<Team>() {
                     .doOnError { throwable -> deleteInvalidModel(model, throwable) }
         }
 
-        val body = getBody(model.headerItem.getValue(), Team.PHOTO_UPLOAD_KEY)
+        val body = getBody(model.headerItem.rawValue, Team.PHOTO_UPLOAD_KEY)
         if (body != null) teamSingle = teamSingle
                 .flatMap { api.uploadTeamLogo(model.id, body).map(getLocalUpdateFunction(model)) }
 

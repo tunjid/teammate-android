@@ -107,7 +107,7 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
         val isFocusable = text.isFocusable
         val isFocusableInTouchMode = text.isFocusableInTouchMode
 
-        val newValue = item.getValue().toString()
+        val newValue = item.formattedValue.toString()
         val oldValue = text.text.toString()
 
         val oldHint = hint.text
@@ -146,7 +146,7 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
         lastLineCount = currentLineCount
 
         if (textInputStyle == null || textInputStyle!!.isSelector) return
-        textInputStyle?.item?.setValue(editable.toString())
+        textInputStyle?.item?.rawValue = editable.toString()
         checkForErrors()
     }
 
