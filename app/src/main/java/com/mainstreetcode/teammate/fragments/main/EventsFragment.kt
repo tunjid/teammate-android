@@ -103,7 +103,7 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
     override fun onResume() {
         super.onResume()
         fetchEvents(true)
-        watchForRoleChanges(team) { this.togglePersistentUi() }
+        watchForRoleChanges(team, this::togglePersistentUi)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

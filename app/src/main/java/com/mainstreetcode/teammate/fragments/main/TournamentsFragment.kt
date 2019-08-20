@@ -106,7 +106,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     override fun onResume() {
         super.onResume()
         fetchTournaments(true)
-        watchForRoleChanges(team) { this.togglePersistentUi() }
+        watchForRoleChanges(team, this::togglePersistentUi)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

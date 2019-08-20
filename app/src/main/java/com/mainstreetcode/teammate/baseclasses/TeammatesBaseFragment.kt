@@ -184,11 +184,9 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         if (showsFab && abs(dy) > 3) toggleFab(dy < 0)
     }
 
-    open fun onKeyBoardChanged(appeared: Boolean) {}
+    open fun onKeyBoardChanged(appeared: Boolean) = Unit
 
-    open fun togglePersistentUi() {
-        persistentUiController.update(fromThis())
-    }
+    open fun togglePersistentUi() = persistentUiController.update(fromThis())
 
     @SuppressLint("CommitTransaction")
     protected fun beginTransaction(): FragmentTransaction = fragmentManager!!.beginTransaction()
@@ -200,29 +198,25 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         imm?.hideSoftInputFromWindow(root.windowToken, 0)
     }
 
-    private fun toggleFab(show: Boolean) {
-        persistentUiController.toggleFab(show)
-    }
+    private fun toggleFab(show: Boolean) = persistentUiController.toggleFab(show)
 
-    private fun fromThis(): UiState {
-        return UiState(
-                this.fabIconResource,
-                this.fabStringResource,
-                this.toolbarMenu,
-                this.altToolbarMenu,
-                this.navBarColor,
-                this.showsFab,
-                this.showsToolBar,
-                this.showsAltToolBar,
-                this.showsBottomNav,
-                this.showsSystemUI,
-                this.hasLightNavBar,
-                this.insetFlags,
-                this.toolbarTitle,
-                this.altToolbarTitle,
-                if (view == null) null else this
-        )
-    }
+    private fun fromThis(): UiState = UiState(
+            this.fabIconResource,
+            this.fabStringResource,
+            this.toolbarMenu,
+            this.altToolbarMenu,
+            this.navBarColor,
+            this.showsFab,
+            this.showsToolBar,
+            this.showsAltToolBar,
+            this.showsBottomNav,
+            this.showsSystemUI,
+            this.hasLightNavBar,
+            this.insetFlags,
+            this.toolbarTitle,
+            this.altToolbarTitle,
+            if (view == null) null else this
+    )
 
     companion object {
 

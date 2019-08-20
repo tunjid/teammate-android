@@ -106,7 +106,7 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     override fun onResume() {
         super.onResume()
         fetchGames(true)
-        watchForRoleChanges(team) { this.togglePersistentUi() }
+        watchForRoleChanges(team, this::togglePersistentUi)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

@@ -128,7 +128,7 @@ class TournamentDetailFragment : MainActivityFragment() {
     override fun onResume() {
         super.onResume()
         checkCompetitor()
-        watchForRoleChanges(tournament.host) { this.togglePersistentUi() }
+        watchForRoleChanges(tournament.host, this::togglePersistentUi)
 
         val rounds = tournament.numRounds
         disposables.add(tournamentViewModel.checkForWinner(tournament)

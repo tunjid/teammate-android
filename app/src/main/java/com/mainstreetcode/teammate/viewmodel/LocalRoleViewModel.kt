@@ -63,7 +63,7 @@ class LocalRoleViewModel : ViewModel() {
                 .cast(Role::class.java)
                 .filter { role -> user == role.user && team == role.team }
 
-        val fromIo = repository.getRoleInTeam(user.getId(), team.getId())
+        val fromIo = repository.getRoleInTeam(user.id, team.id)
 
         return Flowable.concatDelayError(listOf(inMemory, fromIo))
     }

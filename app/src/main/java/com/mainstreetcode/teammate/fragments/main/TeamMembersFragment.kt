@@ -105,7 +105,7 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     override fun onResume() {
         super.onResume()
         fetchTeamMembers(true)
-        watchForRoleChanges(team) { this.togglePersistentUi() }
+        watchForRoleChanges(team, this::togglePersistentUi)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
