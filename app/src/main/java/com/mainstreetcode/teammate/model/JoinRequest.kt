@@ -129,9 +129,7 @@ class JoinRequest : JoinRequestEntity,
 
     override fun describeContents(): Int = 0
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        super.writeToParcel(dest, flags)
-    }
+    override fun writeToParcel(dest: Parcel, flags: Int) = super.writeToParcel(dest, flags)
 
     class GsonAdapter : JsonSerializer<JoinRequest>, JsonDeserializer<JoinRequest> {
 
