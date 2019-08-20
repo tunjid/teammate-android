@@ -39,6 +39,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.ALL_INPUT_VALID
 import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.util.ITEM
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -104,7 +105,7 @@ class JoinRequestAdapter(
                         Item.NO_CLICK,
                         or<(Item<*>) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item<*>::never),
                         ALL_INPUT_VALID,
-                        Item.NO_ICON)
+                        Item<*>::noIcon)
             }
         }
     }

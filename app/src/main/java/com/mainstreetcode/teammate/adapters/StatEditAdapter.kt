@@ -43,6 +43,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.always
 import com.mainstreetcode.teammate.model.enums.StatType
+import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
@@ -112,26 +113,27 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
 
     internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
 
-        override fun invoke(item: Item<*>): TextInputStyle {
-            when (item.itemType) {
-                Item.INPUT, Item.NUMBER -> return TextInputStyle(
-                        Item.NO_CLICK,
-                        Item.NO_CLICK,
-                        Item<*>::always,
-                        Item.NON_EMPTY,
-                        Item.NO_ICON)
-                STAT_TYPE -> {
-                    val stat = adapterListener.stat
-                    return SpinnerTextInputStyle(
-                            R.string.choose_stat,
-                            stat.sport.stats,
-                            StatType::emojiAndName,
-                            StatType::code,
-                            { adapterListener.canChangeStat() },
-                            ALL_INPUT_VALID)
-                }
-                else -> return TextInputStyle(Item.NO_CLICK, Item.NO_CLICK, Item<*>::always, Item.NON_EMPTY, Item.NO_ICON)
-            }
+        override fun invoke(item: Item<*>): TextInputStyle = when (item.itemType) {
+            Item.INPUT, Item.NUMBER -> TextInputStyle(
+                    Item.NO_CLICK,
+                    Item.NO_CLICK,
+                    Item<*>::always,
+                    Item.NON_EMPTY,
+                    Item<*>::noIcon)
+            STAT_TYPE -> SpinnerTextInputStyle(
+                    R.string.choose_stat,
+                    adapterListener.stat.sport.stats,
+                    StatType::emojiAndName,
+                    StatType::code,
+                    { adapterListener.canChangeStat() },
+                    ALL_INPUT_VALID)
+            else -> TextInputStyle(
+                    Item.NO_CLICK,
+                    Item.NO_CLICK,
+                    Item<*>::always,
+                    Item.NON_EMPTY,
+                    Item<*>::noIcon
+            )
         }
     }
 }

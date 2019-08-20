@@ -115,12 +115,8 @@ class Item<T> internal constructor(
         const val TOURNAMENT_STYLE = 20
         const val COMPETITOR = 21
 
-        val IGNORE_SET: (String) -> Unit = {}
-
         val NO_CLICK: (() -> Unit)? = null
         val EMPTY_CLICK = { }
-
-        val NO_ICON = { _: Item<*> -> 0 }
 
         val ALL_INPUT_VALID = { _: Item<*> -> "" }
         val NON_EMPTY = { input: Item<*> -> if (input.getValue().isBlank()) App.instance.getString(R.string.team_invalid_empty_field) else "" }
@@ -151,3 +147,5 @@ class Item<T> internal constructor(
 val Item<*>.always get() = true
 
 val Item<*>.never get() = false
+
+val Item<*>.noIcon get() = 0
