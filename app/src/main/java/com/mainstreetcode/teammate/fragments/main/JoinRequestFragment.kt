@@ -43,7 +43,6 @@ import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.yes
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.ACCEPTING
@@ -117,19 +116,17 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
         deleteItem?.isVisible = !isEmpty && canDeleteRequest
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_kick -> yes
-            R.id.action_block -> yes
-            else -> super.onOptionsItemSelected(item)
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_kick -> showDeletePrompt().let { true }
+        R.id.action_block -> blockUser(headeredModel.user, headeredModel.team).let { true }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun insetFlags(): InsetFlags = NO_TOP
 
     override fun showsFab(): Boolean = gofer.showsFab()
 
-    override fun onImageClick() {}
+    override fun onImageClick() = Unit
 
     override fun gofer(): TeamHostingGofer<JoinRequest> = gofer
 

@@ -28,8 +28,6 @@ import com.tunjid.androidbootstrap.functions.collections.Lists
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.*
 
-val yes: Boolean get() = true
-
 fun asDifferentiables(subTypeList: List<Differentiable>): List<Differentiable> =
         ArrayList(subTypeList)
 

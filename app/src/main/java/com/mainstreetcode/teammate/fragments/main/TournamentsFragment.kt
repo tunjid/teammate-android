@@ -39,13 +39,13 @@ import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.getTransitionName
-import com.mainstreetcode.teammate.util.yes
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -114,7 +114,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> yes
+        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_tournament_team_pick).let { true }
         else -> super.onOptionsItemSelected(item)
     }
 

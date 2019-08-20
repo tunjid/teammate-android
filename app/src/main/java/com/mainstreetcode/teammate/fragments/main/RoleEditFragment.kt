@@ -30,7 +30,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.RoleEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
@@ -41,13 +45,6 @@ import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
 import com.tunjid.androidbootstrap.view.util.InsetFlags
-
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
-import androidx.recyclerview.widget.DiffUtil
-import com.mainstreetcode.teammate.util.yes
 
 /**
  * Edits a Team member
@@ -135,8 +132,8 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_kick -> yes
-        R.id.action_block -> yes
+        R.id.action_kick -> showDropRolePrompt().let { true }
+        R.id.action_block -> blockUser(headeredModel.user, headeredModel.team).let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
