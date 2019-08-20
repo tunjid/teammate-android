@@ -62,19 +62,13 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.game_add
+    override val fabStringResource: Int @StringRes get() = R.string.game_add
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_tournaments
+    override val toolbarMenu: Int get() = R.menu.fragment_tournaments
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.games)
+    override val toolbarTitle: CharSequence get() = getString(R.string.games)
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -120,28 +114,28 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun showsFab(): Boolean {
-        val sport = team.sport
-        val supportsTournaments = sport.supportsCompetitions()
-        return if (sport.betweenUsers()) supportsTournaments else supportsTournaments && localRoleViewModel.hasPrivilegedRole()
-    }
+    override val showsFab: Boolean
+        get() {
+            val sport = team.sport
+            val supportsTournaments = sport.supportsCompetitions()
+            return if (sport.betweenUsers()) supportsTournaments else supportsTournaments && localRoleViewModel.hasPrivilegedRole()
+        }
 
     override fun onGameClicked(game: Game) {
         showFragment(GameFragment.newInstance(game))
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> {
-                val game = Game.empty(team)
-                val entity: Competitive =
-                        if (User.COMPETITOR_TYPE == game.refPath) userViewModel.currentUser
-                        else teamViewModel.defaultTeam
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> {
+            val game = Game.empty(team)
+            val entity: Competitive =
+                    if (User.COMPETITOR_TYPE == game.refPath) userViewModel.currentUser
+                    else teamViewModel.defaultTeam
 
-                game.home.updateEntity(entity)
-                showFragment(GameEditFragment.newInstance(game))
-            }
+            game.home.updateEntity(entity)
+            showFragment(GameEditFragment.newInstance(game)).let { Unit }
         }
+        else -> Unit
     }
 
     override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {

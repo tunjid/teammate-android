@@ -69,23 +69,18 @@ class TournamentDetailFragment : MainActivityFragment() {
     internal var gamesRecycledViewPool: RecyclerView.RecycledViewPool? = null
         private set
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.add_tournament_competitors
+    override val fabStringResource: Int @StringRes get() = R.string.add_tournament_competitors
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_group_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_group_add_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_tournament_detail
+    override val toolbarMenu: Int get() = R.menu.fragment_tournament_detail
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.tournament_fixtures)
+    override val toolbarTitle: CharSequence get() = getString(R.string.tournament_fixtures)
 
-    internal fun pending(competitor: Competitor): TournamentDetailFragment {
+    override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors()
+
+    internal fun pending(competitor: Competitor): TournamentDetailFragment = apply {
         arguments!!.putParcelable(ARG_COMPETITOR, competitor)
-        return this
     }
 
     override fun getStableTag(): String =
@@ -146,9 +141,6 @@ class TournamentDetailFragment : MainActivityFragment() {
         viewHolder = null
         super.onDestroyView()
     }
-
-    override fun showsFab(): Boolean =
-            localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors()
 
     override fun onClick(view: View) {
         if (view.id == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament))

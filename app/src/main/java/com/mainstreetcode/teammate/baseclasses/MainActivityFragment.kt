@@ -197,7 +197,7 @@ open class MainActivityFragment : TeammatesBaseFragment() {
         is Team -> JoinRequestFragment.joinInstance(entity, userViewModel.currentUser)
         is User -> UserEditFragment.newInstance(entity)
         else -> null
-    }?.let { showFragment(it) }
+    }?.let { showFragment(it) }.run { Unit }
 
     protected fun pickPlace() {
         val picker = AddressPickerFragment.newInstance()
@@ -213,6 +213,6 @@ open class MainActivityFragment : TeammatesBaseFragment() {
     protected fun watchForRoleChanges(team: Team, onChanged: () -> Unit) {
         if (team.isEmpty) return
         val user = userViewModel.currentUser
-        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe( { onChanged.invoke() }, emptyErrorHandler::invoke))
+        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe({ onChanged.invoke() }, emptyErrorHandler::invoke))
     }
 }

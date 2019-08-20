@@ -61,22 +61,21 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
 
     private lateinit var gofer: TournamentGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = if (headeredModel.isEmpty) R.string.tournament_create else R.string.tournament_update
+    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.tournament_create else R.string.tournament_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_tournament_edit
+    override val toolbarMenu: Int get() = R.menu.fragment_tournament_edit
 
-    override val toolbarTitle: CharSequence
-        get() = gofer.getToolbarTitle(this)
+    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
 
-    override val sport: Sport
-        get() = headeredModel.sport
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = gofer.canEditAfterCreation()
+
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
+
+    override val sport: Sport get() = headeredModel.sport
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
@@ -89,10 +88,10 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+        val root = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.model_list))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(TournamentEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -100,9 +99,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
                 .build()
+                .apply { recyclerView.requestFocus() }
 
-        scrollManager.recyclerView.requestFocus()
-        return rootView
+        return root
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -119,12 +118,6 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         super.onResume()
         tournamentViewModel.clearNotifications(headeredModel)
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = gofer.canEditAfterCreation()
-
-    override fun staticViews(): IntArray = EXCLUDED_VIEWS
 
     override fun gofer(): Gofer<Tournament> = gofer
 

@@ -92,9 +92,10 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         passwordInput = null
     }
 
-    override fun showsFab(): Boolean {
-        return true
-    }
+    override val showsFab: Boolean
+        get() {
+            return true
+        }
 
     @SuppressLint("CommitTransaction")
     override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {

@@ -56,6 +56,10 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
 
     private lateinit var items: List<Differentiable>
 
+    override val showsToolBar: Boolean get() = false
+
+    override val showsFab: Boolean get() = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         request = StatAggregate.Request.empty()
@@ -96,10 +100,6 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
         searchScrollManager.clear()
         super.onDestroyView()
     }
-
-    override fun showsToolBar(): Boolean = false
-
-    override fun showsFab(): Boolean = false
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)

@@ -50,6 +50,8 @@ class StatRankFragment : MainActivityFragment() {
     private lateinit var tournament: Tournament
     private lateinit var statRanks: List<Differentiable>
 
+    override val showsFab: Boolean get() = false
+
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
@@ -101,9 +103,7 @@ class StatRankFragment : MainActivityFragment() {
         fetchStandings()
     }
 
-    override fun togglePersistentUi() = Unit/* Do nothing */
-
-    override fun showsFab(): Boolean = false
+    override fun togglePersistentUi() = Unit /* Do nothing */
 
     private fun fetchStandings() {
         toggleProgress(true)

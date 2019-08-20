@@ -55,16 +55,15 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
 
     private lateinit var gofer: TeamGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = if (headeredModel.isEmpty) R.string.team_create else R.string.team_update
+    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.team_create else R.string.team_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = gofer.getToolbarTitle(this)
+    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = gofer.canEditTeam()
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TEAM)!!)
@@ -77,10 +76,10 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+        val root = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(TeamEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -89,12 +88,8 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
                 .build()
 
         scrollManager.recyclerView.requestFocus()
-        return rootView
+        return root
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = gofer.canEditTeam()
 
     override fun onClick(view: View) {
         if (view.id != R.id.fab) return

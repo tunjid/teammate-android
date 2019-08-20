@@ -56,13 +56,17 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     private var mapView: MapView? = null
     private var expandingToolbar: ExpandingToolbar? = null
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.event_my_location
+    override val fabStringResource: Int @StringRes get() = R.string.event_my_location
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_crosshairs_gps_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_crosshairs_gps_white_24dp
+
+    override val showsToolBar: Boolean get() = false
+
+    override val showsBottomNav: Boolean get() = false
+
+    override val showsFab: Boolean get() = locationViewModel.hasPermission(this)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_public_event, container, false)
@@ -131,14 +135,6 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
         super.onLowMemory()
     }
 
-    override fun showsToolBar(): Boolean = false
-
-    override fun showsBottomNav(): Boolean = false
-
-    override fun showsFab(): Boolean = locationViewModel.hasPermission(this)
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
     override fun onClick(view: View) {
         if (view.id == R.id.fab)
             disposables.add(locationViewModel.getLastLocation(this)
@@ -150,9 +146,8 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
         if (permissionGranted && requestCode == PERMISSIONS_REQUEST_LOCATION) requestLocation()
     }
 
-    override fun onAddressPicked(address: Address) {
-        onLocationFound(LatLng(address.latitude, address.longitude), true)
-    }
+    override fun onAddressPicked(address: Address) =
+            onLocationFound(LatLng(address.latitude, address.longitude), true)
 
     private fun fetchPublicEvents(map: GoogleMap) {
         disposables.add(eventViewModel.getPublicEvents(map).subscribe({ events -> populateMap(map, events) }, defaultErrorHandler::invoke))

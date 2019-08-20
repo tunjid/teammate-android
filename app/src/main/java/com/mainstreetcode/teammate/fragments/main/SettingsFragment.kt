@@ -40,11 +40,11 @@ import com.mainstreetcode.teammate.util.ScrollManager
 
 class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapterListener {
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_settings
+    override val toolbarMenu: Int get() = R.menu.fragment_settings
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.settings)
+    override val toolbarTitle: CharSequence get() = getString(R.string.settings)
+
+    override val showsFab: Boolean get() = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_settings, container, false)
@@ -58,21 +58,13 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
         return rootView
     }
 
-    override fun showsFab(): Boolean {
-        return false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId != R.id.action_delete_account)
-            return super.onOptionsItemSelected(item)
-
-        AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_user_prompt))
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when {
+        item.itemId != R.id.action_delete_account -> super.onOptionsItemSelected(item)
+        else -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_user_prompt))
                 .setMessage(R.string.delete_user_prompt_body)
                 .setPositiveButton(R.string.yes) { _, _ -> deleteAccount() }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-                .show()
-
-        return true
+                .show().let { true }
     }
 
     private fun deleteAccount() {

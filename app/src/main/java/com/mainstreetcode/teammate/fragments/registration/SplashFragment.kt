@@ -101,11 +101,14 @@ class SplashFragment : RegistrationActivityFragment(), View.OnClickListener {
         LoginManager.getInstance().unregisterCallback(faceBookResultCallback)
     }
 
-    override fun insetFlags(): InsetFlags = NO_TOP
+    override val insetFlags: InsetFlags
+        get() = NO_TOP
 
-    override fun showsFab(): Boolean = false
+    override val showsFab: Boolean
+        get() = false
 
-    override fun showsToolBar(): Boolean = false
+    override val showsToolBar: Boolean
+        get() = false
 
     @SuppressLint("CommitTransaction")
     override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {

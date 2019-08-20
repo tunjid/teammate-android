@@ -56,8 +56,9 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
     private lateinit var items: List<Differentiable>
     private lateinit var myEventsViewModel: MyEventsViewModel
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.attending_events)
+    override val toolbarTitle: CharSequence get() = getString(R.string.attending_events)
+
+    override val showsFab: Boolean get() = false
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -70,13 +71,13 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+        val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
         val refreshAction = Runnable{ disposables.add(myEventsViewModel.refresh(Event::class.java).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke)) }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -84,15 +85,13 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
                 .withLinearLayoutManager()
                 .build()
 
-        return rootView
+        return root
     }
 
     override fun onResume() {
         super.onResume()
         fetchEvents(true)
     }
-
-    override fun showsFab(): Boolean = false
 
     override fun onEventClicked(item: Event) {
         showFragment(EventEditFragment.newInstance(item))
@@ -118,10 +117,8 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
     }
 
     private fun fetchEvents(fetchLatest: Boolean) {
-        if (fetchLatest)
-            scrollManager.setRefreshing()
-        else
-            toggleProgress(true)
+        if (fetchLatest) scrollManager.setRefreshing()
+        else toggleProgress(true)
 
         disposables.add(myEventsViewModel.getMany(Event::class.java, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke))
     }

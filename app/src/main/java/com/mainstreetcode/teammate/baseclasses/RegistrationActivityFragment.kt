@@ -49,7 +49,8 @@ abstract class RegistrationActivityFragment : TeammatesBaseFragment() {
         viewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
     }
 
-    override fun hasLightNavBar(): Boolean = false
+    override val hasLightNavBar: Boolean
+        get() = false
 
     companion object {
         private const val GRASS_COLOR = -0x6c44af

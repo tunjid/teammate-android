@@ -50,11 +50,13 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
 
     private lateinit var gofer: GuestGofer
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_guest_view
+    override val toolbarMenu: Int get() = R.menu.fragment_guest_view
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.event_guest)
+    override val toolbarTitle: CharSequence get() = getString(R.string.event_guest)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = false
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_GUEST)!!)
@@ -66,10 +68,10 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+        val root = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(GuestAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -79,7 +81,7 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
 
         scrollManager.recyclerView.requestFocus()
 
-        return rootView
+        return root
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -87,21 +89,12 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
         menu.findItem(R.id.action_block)?.isVisible = gofer.canBlockUser()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item!!.itemId == R.id.action_block) {
-            blockUser(headeredModel.user, headeredModel.event.team)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when {
+        item.itemId == R.id.action_block -> blockUser(headeredModel.user, headeredModel.event.team).let { true }
+        else -> super.onOptionsItemSelected(item)
     }
 
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = false
-
-    override fun onImageClick() {
-        showSnackbar(getString(R.string.no_permission))
-    }
+    override fun onImageClick() = showSnackbar(getString(R.string.no_permission))
 
     override fun gofer(): Gofer<Guest> = gofer
 

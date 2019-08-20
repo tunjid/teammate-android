@@ -66,32 +66,28 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
     private lateinit var gofer: EventGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
+    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_event_edit
+    override val toolbarMenu: Int get() = R.menu.fragment_event_edit
 
-    override val toolbarTitle: CharSequence
-        get() = gofer.getToolbarTitle(this)
+    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = !isBottomSheetShowing && gofer.hasPrivilegedRole()
 
     private val eventUri: Uri?
-        get() {
-            val latLng = headeredModel.location ?: return null
-
-            return Uri.Builder()
+        get() = headeredModel.location?.run {
+            Uri.Builder()
                     .scheme("https")
                     .authority("www.google.com")
                     .appendPath("maps")
                     .appendPath("dir")
                     .appendPath("")
                     .appendQueryParameter("api", "1")
-                    .appendQueryParameter("destination", latLng.latitude.toString() + "," + latLng.longitude)
+                    .appendQueryParameter("destination", "$latitude,$longitude")
                     .build()
         }
 
@@ -137,43 +133,25 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         disposables.add(gofer.rsvpStatus.subscribe({ item.setIcon(it) }, emptyErrorHandler::invoke))
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_navigate -> {
-                val uri = eventUri
-                if (uri == null) {
-                    showSnackbar(getString(R.string.event_no_location))
-                    return true
-                }
-
-                val maps = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(maps)
-                return true
-            }
-            R.id.action_rsvp -> {
-                rsvpToEvent()
-                return true
-            }
-            R.id.action_delete -> {
-                val context = context ?: return true
-                AlertDialog.Builder(context).setTitle(getString(R.string.delete_event_prompt))
-                        .setPositiveButton(R.string.yes) { _, _ -> deleteEvent() }
-                        .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                return true
-            }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_navigate -> {
+            val uri = eventUri
+            if (uri == null) showSnackbar(getString(R.string.event_no_location))
+            else startActivity(Intent(Intent.ACTION_VIEW, uri))
+            true
         }
-        return super.onOptionsItemSelected(item)
+        R.id.action_rsvp -> rsvpToEvent().let { true }
+        R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_event_prompt))
+                .setPositiveButton(R.string.yes) { _, _ -> deleteEvent() }
+                .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                .show().let { true }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
         super.onResume()
         eventViewModel.clearNotifications(headeredModel)
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = !isBottomSheetShowing && gofer.hasPrivilegedRole()
 
     override fun gofer(): Gofer<Event> = gofer
 
@@ -204,7 +182,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
     }
 
     override fun onImageClick() {
-        if (showsFab()) onLocationClicked()
+        if (showsFab) onLocationClicked()
     }
 
     override fun onTeamClicked(item: Team) {
@@ -215,12 +193,11 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         if (index > -1) scrollManager.notifyItemChanged(index)
     }
 
-    override fun selectTeam() {
-        when {
-            headeredModel.gameId.isNotBlank() -> showSnackbar(getString(R.string.game_event_team_change))
-            gofer.hasPrivilegedRole() -> chooseTeam()
-            !gofer.hasRole() -> showFragment(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser))
-        }
+    override fun selectTeam() = when {
+        headeredModel.gameId.isNotBlank() -> showSnackbar(getString(R.string.game_event_team_change))
+        gofer.hasPrivilegedRole() -> chooseTeam()
+        !gofer.hasRole() -> showFragment(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser)).let { Unit }
+        else -> Unit
     }
 
     override fun onGuestClicked(guest: Guest) {

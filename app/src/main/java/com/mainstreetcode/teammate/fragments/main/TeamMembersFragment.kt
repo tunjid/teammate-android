@@ -61,19 +61,15 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     private lateinit var team: Team
     private lateinit var teamModels: List<Differentiable>
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.invite_user
+    override val fabStringResource: Int @StringRes get() = R.string.invite_user
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_group_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_group_add_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_team_detail
+    override val toolbarMenu: Int get() = R.menu.fragment_team_detail
 
-    override val toolbarTitle: CharSequence
-        get() = if (targetFragment != null) "" else getString(R.string.team_name_prefix, team.name)
+    override val toolbarTitle: CharSequence get() = if (targetFragment != null) "" else getString(R.string.team_name_prefix, team.name)
+
+    override val showsFab: Boolean get() = targetRequestCode == 0 && localRoleViewModel.hasPrivilegedRole()
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -114,7 +110,7 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val visible = showsFab()
+        val visible = showsFab
 
         val editItem = menu.findItem(R.id.action_edit)
         val deleteItem = menu.findItem(R.id.action_delete)
@@ -127,27 +123,21 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
         tournamentItem?.isVisible = team.sport.supportsCompetitions()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean =
-         when (item.itemId) {
-            R.id.action_edit -> showFragment(TeamEditFragment.newEditInstance(team))
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_edit -> showFragment(TeamEditFragment.newEditInstance(team))
 
-            R.id.action_team_tournaments -> showFragment(TournamentsFragment.newInstance(team))
+        R.id.action_team_tournaments -> showFragment(TournamentsFragment.newInstance(team))
 
-            R.id.action_blocked -> showFragment(BlockedUsersFragment.newInstance(team))
+        R.id.action_blocked -> showFragment(BlockedUsersFragment.newInstance(team))
 
-            R.id.action_delete -> {
-                AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_team_prompt, team.name))
-                        .setMessage(R.string.delete_team_prompt_body)
-                        .setPositiveButton(R.string.yes) { _, _ -> deleteTeam() }
-                        .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-                        .show()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+        R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_team_prompt, team.name))
+                .setMessage(R.string.delete_team_prompt_body)
+                .setPositiveButton(R.string.yes) { _, _ -> deleteTeam() }
+                .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                .show().let { true }
 
-    override fun showsFab(): Boolean =
-            targetRequestCode == 0 && localRoleViewModel.hasPrivilegedRole()
+        else -> super.onOptionsItemSelected(item)
+    }
 
     override fun onRoleClicked(role: Role) {
         val target = targetFragment

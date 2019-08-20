@@ -60,19 +60,15 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_tournaments
+    override val toolbarMenu: Int get() = R.menu.fragment_tournaments
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.tournament_add
+    override val fabStringResource: Int @StringRes get() = R.string.tournament_add
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.tournaments)
+    override val toolbarTitle: CharSequence get() = getString(R.string.tournaments)
+
+    override val showsFab: Boolean get() = team.sport.supportsCompetitions() && localRoleViewModel.hasPrivilegedRole()
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -118,18 +114,12 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun showsFab(): Boolean =
-            team.sport.supportsCompetitions() && localRoleViewModel.hasPrivilegedRole()
+    override fun onTournamentClicked(tournament: Tournament) =
+            showFragment(TournamentDetailFragment.newInstance(tournament)).let { Unit }
 
-    override fun onTournamentClicked(tournament: Tournament) {
-        showFragment(TournamentDetailFragment.newInstance(tournament))
-    }
-
-    override fun onClick(view: View) {
-        if (view.id == R.id.fab) {
-            val tournament = Tournament.empty(team)
-            showFragment(TournamentEditFragment.newInstance(tournament))
-        }
+    override fun onClick(view: View) = when {
+        view.id == R.id.fab -> showFragment(TournamentEditFragment.newInstance(Tournament.empty(team))).let { Unit }
+        else -> Unit
     }
 
     override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
@@ -163,10 +153,10 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
         toggleProgress(false)
         val supportsTournaments = team.sport.supportsCompetitions()
         scrollManager.onDiff(result)
-        scrollManager.updateForEmptyList(ListState(R.drawable.ic_trophy_white_24dp, if (supportsTournaments)
-            R.string.no_tournaments
-        else
-            R.string.no_tournament_support))
+        scrollManager.updateForEmptyList(ListState(
+                R.drawable.ic_trophy_white_24dp,
+                if (supportsTournaments) R.string.no_tournaments
+                else R.string.no_tournament_support))
     }
 
     companion object {

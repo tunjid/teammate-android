@@ -70,16 +70,15 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
     private var isOnBoarding: Boolean = false
     private lateinit var bottomBarState: AtomicBoolean
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.team_search_create
+    override val fabStringResource: Int @StringRes get() = R.string.team_search_create
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_search_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_search_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName)
+    override val toolbarTitle: CharSequence get() = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName)
+
+    override val showsFab: Boolean get() = !teamViewModel.isOnATeam
+
+    override val showsBottomNav: Boolean get() = bottomBarState.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,24 +170,18 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
         }
     }
 
-    override fun showsFab(): Boolean = !teamViewModel.isOnATeam
-
-    override fun showsBottomNav(): Boolean = bottomBarState.get()
-
     @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        return when {
-            fragmentTo.stableTag.contains(MediaDetailFragment::class.java.simpleName) ->
-                fragmentTo.transition(MediaDetailFragment.ARG_MEDIA, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
+        fragmentTo.stableTag.contains(MediaDetailFragment::class.java.simpleName) ->
+            fragmentTo.transition(MediaDetailFragment.ARG_MEDIA, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
 
-            fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName) ->
-                fragmentTo.transition(JoinRequestFragment.ARG_JOIN_REQUEST)
+        fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName) ->
+            fragmentTo.transition(JoinRequestFragment.ARG_JOIN_REQUEST)
 
-            fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
-                fragmentTo.transition(EventEditFragment.ARG_EVENT)
+        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
+            fragmentTo.transition(EventEditFragment.ARG_EVENT)
 
-            else -> super.provideFragmentTransaction(fragmentTo)
-        }
+        else -> super.provideFragmentTransaction(fragmentTo)
     }
 
     private fun onFeedItemAction(diffResultSingle: Single<DiffUtil.DiffResult>) {
@@ -214,15 +207,15 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
 
         isOnBoarding = true
         val iterator = prompts.iterator()
-        val ref = AtomicReference<Runnable>()
+        val ref = AtomicReference<() -> Unit>()
 
-        ref.set(Runnable {
+        ref.set {
             showChoices { choiceBar ->
                 choiceBar.setText(iterator.next())
                         .setPositiveText(getString(if (iterator.hasNext()) R.string.next else R.string.finish))
                         .setPositiveClickListener(View.OnClickListener {
                             onBoardingIndex++
-                            if (iterator.hasNext()) ref.get().run()
+                            if (iterator.hasNext()) ref.get().invoke()
                             else choiceBar.dismiss()
                         })
                         .addCallback(object : BaseTransientBottomBar.BaseCallback<ChoiceBar>() {
@@ -230,8 +223,8 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
                                     onBoardDismissed(event)
                         })
             }
-        })
-        ref.get().run()
+        }
+        ref.get().invoke()
     }
 
     private fun onBoardDismissed(event: Int) {

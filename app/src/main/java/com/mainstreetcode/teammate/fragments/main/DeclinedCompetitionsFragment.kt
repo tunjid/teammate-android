@@ -51,8 +51,9 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
 
     private lateinit var items: List<Differentiable>
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.competitors_declined)
+    override val toolbarTitle: CharSequence get() = getString(R.string.competitors_declined)
+
+    override val showsFab: Boolean get() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,10 +86,6 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
     override fun onResume() {
         super.onResume()
         fetchCompetitions(true)
-    }
-
-    override fun showsFab(): Boolean {
-        return false
     }
 
     override fun onCompetitorClicked(competitor: Competitor) {

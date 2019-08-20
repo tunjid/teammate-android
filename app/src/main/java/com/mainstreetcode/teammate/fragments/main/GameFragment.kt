@@ -82,19 +82,15 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     private lateinit var gofer: GameGofer
     private var refereeChip: Chip? = null
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.stat_add
+    override val fabStringResource: Int @StringRes get() = R.string.stat_add
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_game
+    override val toolbarMenu: Int get() = R.menu.fragment_game
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.game_stats)
+    override val toolbarTitle: CharSequence get() = getString(R.string.game_stats)
+
+    override val showsFab: Boolean get() = !isBottomSheetShowing && editableStatus.get() && !game.isEnded
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -150,7 +146,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.action_delete_game)?.isVisible = gofer.canDelete(userViewModel.currentUser)
-        menu.findItem(R.id.action_end_game)?.isVisible = showsFab()
+        menu.findItem(R.id.action_end_game)?.isVisible = showsFab
         menu.findItem(R.id.action_event)?.isVisible = true
     }
 
@@ -180,10 +176,6 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
         if (!appeared && isBottomSheetShowing) hideBottomSheet()
-    }
-
-    override fun showsFab(): Boolean {
-        return !isBottomSheetShowing && editableStatus.get() && !game.isEnded
     }
 
     override fun onClick(view: View) {

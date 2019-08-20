@@ -44,12 +44,12 @@ class StatDetailFragment : MainActivityFragment() {
 
     private lateinit var tournament: Tournament
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.tournament_stats)
+    override val toolbarTitle: CharSequence get() = getString(R.string.tournament_stats)
 
-    override fun getStableTag(): String {
-        return Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
-    }
+    override val showsFab: Boolean get() = false
+
+    override fun getStableTag(): String =
+            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,8 +67,6 @@ class StatDetailFragment : MainActivityFragment() {
 
         return root
     }
-
-    override fun showsFab(): Boolean = false
 
     companion object {
 

@@ -54,6 +54,8 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
     private var viewHolder: StandingRowViewHolder? = null
     private val syncedScrollManager = SyncedScrollManager()
 
+    override val showsFab: Boolean get() = false
+
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
@@ -103,18 +105,14 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
         syncedScrollManager.clearClients()
     }
 
-    override fun togglePersistentUi() = Unit/* Do nothing */
 
+    override fun togglePersistentUi() = Unit /* Do nothing */
 
-    override fun showsFab(): Boolean = false
+    override fun addScrollNotifier(notifier: SyncedScrollView) =
+            syncedScrollManager.addScrollClient(notifier)
 
-    override fun addScrollNotifier(notifier: SyncedScrollView) {
-        syncedScrollManager.addScrollClient(notifier)
-    }
-
-    override fun onCompetitorClicked(competitor: Competitor) {
+    override fun onCompetitorClicked(competitor: Competitor) =
         showCompetitor(competitor)
-    }
 
     private fun fetchStandings(isRefreshing: Boolean) {
         if (isRefreshing) scrollManager.setRefreshing()

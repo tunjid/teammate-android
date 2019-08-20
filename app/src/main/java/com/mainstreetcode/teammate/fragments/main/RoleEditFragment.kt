@@ -57,19 +57,17 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
 
     private lateinit var gofer: RoleGofer
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_user_edit
+    override val toolbarMenu: Int get() = R.menu.fragment_user_edit
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.role_update
+    override val fabStringResource: Int @StringRes get() = R.string.role_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.role_edit)
+    override val toolbarTitle: CharSequence get() = getString(R.string.role_edit)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = gofer.canChangeRoleFields()
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_ROLE)!!)
@@ -104,10 +102,6 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
         kickItem?.isVisible = gofer.canChangeRoleFields()
         blockItem?.isVisible = canChangeRolePosition()
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = gofer.canChangeRoleFields()
 
     override fun gofer(): TeamHostingGofer<Role> = gofer
 

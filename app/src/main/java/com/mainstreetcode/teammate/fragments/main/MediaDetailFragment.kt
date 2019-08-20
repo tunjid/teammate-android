@@ -50,14 +50,23 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
     private var mediaViewHolder: MediaViewHolder<*>? = null
     private val systemUiStatus: AtomicBoolean = AtomicBoolean()
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_media_detail
+    override val toolbarMenu: Int get() = R.menu.fragment_media_detail
 
-    override val navBarColor: Int
-        get() = Color.TRANSPARENT
+    override val navBarColor: Int get() = Color.TRANSPARENT
 
-    override val isFullScreen: Boolean
-        get() = true
+    override val isFullScreen: Boolean get() = true
+
+    override val insetFlags: InsetFlags get() = NONE
+
+    override val showsFab: Boolean get() = false
+
+    override val showsBottomNav: Boolean get() = false
+
+    override val showsToolBar: Boolean get() = true
+
+    override val showsSystemUI: Boolean get() = systemUiStatus.get()
+
+    override val hasLightNavBar: Boolean get() = false
 
     override fun getStableTag(): String =
             super.getStableTag() + "-" + arguments!!.getParcelable(ARG_MEDIA)
@@ -110,18 +119,6 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
         super.onDestroyView()
     }
 
-    override fun insetFlags(): InsetFlags = NONE
-
-    override fun showsFab(): Boolean = false
-
-    override fun showsBottomNav(): Boolean = false
-
-    override fun showsToolBar(): Boolean = true
-
-    override fun showsSystemUI(): Boolean = systemUiStatus.get()
-
-    override fun hasLightNavBar(): Boolean = false
-
     override fun onMediaClicked(item: Media) {
         val activity = activity ?: return
 
@@ -133,9 +130,7 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     override fun isSelected(media: Media): Boolean = false
 
-    override fun onFillLoaded() {
-        togglePersistentUi()
-    }
+    override fun onFillLoaded() = togglePersistentUi()
 
     private fun checkMediaFlagged(media: Media) {
         if (!media.isFlagged) return

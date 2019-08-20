@@ -77,21 +77,17 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
     private var dateHider: ViewHider? = null
     private var newMessageHider: ViewHider? = null
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_chat
+    override val toolbarMenu: Int get() = R.menu.fragment_chat
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.team_chat_title, team.name)
+    override val toolbarTitle: CharSequence get() = getString(R.string.team_chat_title, team.name)
 
-    private val isSubscribedToChat: Boolean
-        get() = ::chatDisposable.isInitialized && !chatDisposable.isDisposed
+    private val isSubscribedToChat: Boolean get() = ::chatDisposable.isInitialized && !chatDisposable.isDisposed
 
-    private val isNearBottomOfChat: Boolean
-        get() {
-            val lastVisibleItemPosition = scrollManager.lastVisiblePosition
+    override val showsFab: Boolean get() = false
 
-            return abs(items.size - lastVisibleItemPosition) < 4
-        }
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
+
+    private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -108,19 +104,19 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_chat, container, false)
-        val refresh = rootView.findViewById<SwipeRefreshLayout>(R.id.refresh_layout)
-        val input = rootView.findViewById<EditText>(R.id.input)
-        val send = rootView.findViewById<View>(R.id.send)
-        dateView = rootView.findViewById(R.id.date)
-        newMessages = rootView.findViewById(R.id.new_messages)
+        val root = inflater.inflate(R.layout.fragment_chat, container, false)
+        val refresh = root.findViewById<SwipeRefreshLayout>(R.id.refresh_layout)
+        val input = root.findViewById<EditText>(R.id.input)
+        val send = root.findViewById<View>(R.id.send)
+        dateView = root.findViewById(R.id.date)
+        newMessages = root.findViewById(R.id.new_messages)
 
         dateHider = ViewHider.of(dateView).setDirection(TOP).build()
         newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build()
         deferrer = Deferrer(2000) { dateHider?.hide() }
 
-        scrollManager = ScrollManager.with<TeamChatViewHolder>(rootView.findViewById(R.id.chat))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_message_black_24dp, R.string.no_chats))
+        scrollManager = ScrollManager.with<TeamChatViewHolder>(root.findViewById(R.id.chat))
+                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_message_black_24dp, R.string.no_chats))
                 .onLayoutManager { layoutManager -> (layoutManager as LinearLayoutManager).stackFromEnd = true }
                 .withAdapter(TeamChatAdapter(items, userViewModel.currentUser, this))
                 .withEndlessScroll { fetchChatsBefore(false) }
@@ -148,7 +144,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
 
         newMessageHider?.hide()
         dateHider?.hide()
-        return rootView
+        return root
     }
 
     override fun onResume() {
@@ -157,14 +153,9 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         fetchChatsBefore(true)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_pick_team -> {
-                TeamPickerFragment.change(requireActivity(), R.id.request_chat_team_pick)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_chat_team_pick).let { true }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView() {
@@ -175,14 +166,6 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         dateHider = null
         dateView = null
         deferrer = null
-    }
-
-    override fun showsFab(): Boolean {
-        return false
-    }
-
-    override fun staticViews(): IntArray {
-        return EXCLUDED_VIEWS
     }
 
     override fun onChatClicked(chat: Chat) {
@@ -197,12 +180,9 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         postChat(chat)
     }
 
-    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-            sendChat(textView)
-            return true
-        }
-        return false
+    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean = when {
+        actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN -> sendChat(textView).let { true }
+        else -> false
     }
 
     private fun fetchChatsBefore(fetchLatest: Boolean) {

@@ -29,7 +29,11 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
@@ -39,17 +43,10 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.DiffUtil
-
-import com.mainstreetcode.teammate.util.getTransitionName
 
 /**
  * Lists [events][com.mainstreetcode.teammate.model.Event]
@@ -60,19 +57,15 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_events
+    override val toolbarMenu: Int get() = R.menu.fragment_events
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.event_add
+    override val fabStringResource: Int @StringRes get() = R.string.event_add
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.events_title, team.name)
+    override val toolbarTitle: CharSequence get() = getString(R.string.events_title, team.name)
+
+    override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole()
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -91,7 +84,7 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable{ disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = Runnable { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
@@ -113,18 +106,9 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
         watchForRoleChanges(team) { this.togglePersistentUi() }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_pick_team -> {
-                TeamPickerFragment.change(requireActivity(), R.id.request_event_team_pick)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun showsFab(): Boolean {
-        return localRoleViewModel.hasPrivilegedRole()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_event_team_pick).let { true }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onEventClicked(item: Event) {

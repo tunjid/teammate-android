@@ -49,43 +49,39 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
 
     private lateinit var roles: List<Differentiable>
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.team_search_create
+    override val fabStringResource: Int @StringRes get() = R.string.team_search_create
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_search_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_search_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.my_teams)
+    override val toolbarTitle: CharSequence get() = getString(R.string.my_teams)
 
-    private val isTeamPicker: Boolean
-        get() = targetRequestCode != 0
+    private val isTeamPicker: Boolean get() = targetRequestCode != 0
+
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
+
+    override val showsBottomNav: Boolean get() = true
+
+    override val showsFab: Boolean get() = !isTeamPicker || roles.isEmpty()
 
     private val emptyDrawable: Int
         @DrawableRes
-        get() {
-            return when (targetRequestCode) {
-                R.id.request_chat_team_pick -> R.drawable.ic_message_black_24dp
-                R.id.request_game_team_pick -> R.drawable.ic_score_white_24dp
-                R.id.request_event_team_pick -> R.drawable.ic_event_white_24dp
-                R.id.request_media_team_pick -> R.drawable.ic_video_library_black_24dp
-                R.id.request_tournament_team_pick -> R.drawable.ic_trophy_white_24dp
-                else -> R.drawable.ic_group_black_24dp
-            }
+        get() = when (targetRequestCode) {
+            R.id.request_chat_team_pick -> R.drawable.ic_message_black_24dp
+            R.id.request_game_team_pick -> R.drawable.ic_score_white_24dp
+            R.id.request_event_team_pick -> R.drawable.ic_event_white_24dp
+            R.id.request_media_team_pick -> R.drawable.ic_video_library_black_24dp
+            R.id.request_tournament_team_pick -> R.drawable.ic_trophy_white_24dp
+            else -> R.drawable.ic_group_black_24dp
         }
 
     private val emptyText: Int
         @StringRes
-        get() {
-            return when (targetRequestCode) {
-                R.id.request_event_team_pick -> R.string.no_team_event
-                R.id.request_chat_team_pick -> R.string.no_team_chat
-                R.id.request_media_team_pick -> R.string.no_team_media
-                R.id.request_tournament_team_pick -> R.string.no_team_tournament
-                else -> R.string.no_team
-            }
+        get() = when (targetRequestCode) {
+            R.id.request_event_team_pick -> R.string.no_team_event
+            R.id.request_chat_team_pick -> R.string.no_team_chat
+            R.id.request_media_team_pick -> R.string.no_team_media
+            R.id.request_tournament_team_pick -> R.string.no_team_tournament
+            else -> R.string.no_team
         }
 
     override fun getStableTag(): String {
@@ -101,13 +97,13 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+        val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable{ disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = Runnable { disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)) }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, emptyDrawable, emptyText))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(root, emptyDrawable, emptyText))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -115,19 +111,13 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
                 .withStaggeredGridLayoutManager(2)
                 .build()
 
-        return rootView
+        return root
     }
 
     override fun onResume() {
         super.onResume()
         fetchTeams()
     }
-
-    override fun staticViews(): IntArray = EXCLUDED_VIEWS
-
-    override fun showsBottomNav(): Boolean = true
-
-    override fun showsFab(): Boolean = !isTeamPicker || roles.isEmpty()
 
     override fun onTeamClicked(item: Team) {
         val target = targetFragment
@@ -140,13 +130,12 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
         }
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> {
-                hideBottomSheet()
-                showFragment(TeamSearchFragment.newInstance())
-            }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> {
+            hideBottomSheet()
+            showFragment(TeamSearchFragment.newInstance()).let { Unit }
         }
+        else -> Unit
     }
 
     private fun fetchTeams() {

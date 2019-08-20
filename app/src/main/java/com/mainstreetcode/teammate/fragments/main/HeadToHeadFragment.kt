@@ -52,7 +52,10 @@ import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-class HeadToHeadFragment : MainActivityFragment(), UserAdapter.AdapterListener, TeamAdapter.AdapterListener, HeadToHeadRequestAdapter.AdapterListener {
+class HeadToHeadFragment : MainActivityFragment(),
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener,
+        HeadToHeadRequestAdapter.AdapterListener {
 
     private var isHome = true
     private lateinit var request: HeadToHead.Request
@@ -65,6 +68,10 @@ class HeadToHeadFragment : MainActivityFragment(), UserAdapter.AdapterListener, 
     private var losses: TextView? = null
 
     private lateinit var matchUps: List<Differentiable>
+
+    override val showsToolBar: Boolean get() = false
+
+    override val showsFab: Boolean get() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,10 +121,6 @@ class HeadToHeadFragment : MainActivityFragment(), UserAdapter.AdapterListener, 
         wins = null
         super.onDestroyView()
     }
-
-    override fun showsToolBar(): Boolean = false
-
-    override fun showsFab(): Boolean = false
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
@@ -180,12 +183,14 @@ class HeadToHeadFragment : MainActivityFragment(), UserAdapter.AdapterListener, 
                 .build())
     }
 
-    private fun getText(@StringRes stringRes: Int, count: Int): CharSequence {
-        return SpanBuilder.of(count.toString()).resize(1.4f).bold()
-                .append(SpanBuilder.of(getString(stringRes))
-                        .prependNewLine()
-                        .build()).build()
-    }
+    private fun getText(@StringRes stringRes: Int, count: Int): CharSequence =
+            SpanBuilder.of(count.toString())
+                    .resize(1.4f)
+                    .bold()
+                    .append(SpanBuilder.of(getString(stringRes))
+                            .prependNewLine()
+                            .build())
+                    .build()
 
     companion object {
 

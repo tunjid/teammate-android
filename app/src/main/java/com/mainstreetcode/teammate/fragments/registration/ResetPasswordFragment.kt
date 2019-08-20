@@ -88,9 +88,10 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
         emailInput = null
     }
 
-    override fun showsFab(): Boolean {
-        return true
-    }
+    override val showsFab: Boolean
+        get() {
+            return true
+        }
 
     override fun onClick(view: View) {
         when (view.id) {

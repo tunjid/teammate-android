@@ -289,7 +289,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
 
     fun onDialogDismissed() {
         val fragment = currentFragment
-        val showFab = fragment != null && fragment.showsFab()
+        val showFab = fragment != null && fragment.showsFab
 
         if (showFab) toggleFab(true)
     }
@@ -313,7 +313,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         transition.duration = 200
 
         val view = currentFragment
-        if (view != null) for (id in view.staticViews()) transition.excludeTarget(id, true)
+        if (view != null) for (id in view.staticViews) transition.excludeTarget(id, true)
         transition.excludeTarget(RecyclerView::class.java, true)
         transition.excludeTarget(toolbar, true)
 
@@ -375,7 +375,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
 
     private fun adjustSystemInsets(fragment: Fragment?) {
         if (fragment !is TeammatesBaseFragment) return
-        val insetFlags = fragment.insetFlags()
+        val insetFlags = fragment.insetFlags
 
         ViewUtil.getLayoutParams(toolbar).topMargin = if (insetFlags.hasTopInset()) 0 else topInset
         bottomInsetView.visibility = if (insetFlags.hasBottomInset()) VISIBLE else GONE

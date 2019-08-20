@@ -60,13 +60,15 @@ class AddressPickerFragment : MainActivityFragment() {
     private lateinit var instantSearch: InstantSearch<String, AutocompletePrediction>
     private val currentAddress = AtomicReference<Address>()
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.place_picker_pick
+    override val fabStringResource: Int @StringRes get() = R.string.place_picker_pick
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
+
+    override val showsToolBar: Boolean get() = false
+
+    override val showsBottomNav: Boolean get() = true
+
+    override val showsFab: Boolean get() = currentAddress.get() != null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,12 +160,6 @@ class AddressPickerFragment : MainActivityFragment() {
         mapView.onLowMemory()
         super.onLowMemory()
     }
-
-    override fun showsToolBar(): Boolean = false
-
-    override fun showsBottomNav(): Boolean = true
-
-    override fun showsFab(): Boolean = currentAddress.get() != null
 
     override fun onClick(view: View) {
         if (view.id == R.id.fab) {

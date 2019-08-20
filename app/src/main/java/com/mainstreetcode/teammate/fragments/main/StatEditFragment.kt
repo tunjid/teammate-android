@@ -61,19 +61,19 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
 
     override val stat: Stat get() = headeredModel
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = if (headeredModel.isEmpty) R.string.stat_create else R.string.stat_update
+    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.stat_create else R.string.stat_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_stat_edit
+    override val toolbarMenu: Int get() = R.menu.fragment_stat_edit
 
-    override val toolbarTitle: CharSequence
-        get() = getString(if (headeredModel.isEmpty) R.string.stat_add else R.string.stat_edit)
+    override val toolbarTitle: CharSequence get() = getString(if (headeredModel.isEmpty) R.string.stat_add else R.string.stat_edit)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = !isBottomSheetShowing && gofer.canEdit()
+
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_STAT)!!)
@@ -123,12 +123,6 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
         super.onResume()
         statViewModel.clearNotifications(headeredModel)
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = !isBottomSheetShowing && gofer.canEdit()
-
-    override fun staticViews(): IntArray = EXCLUDED_VIEWS
 
     override fun gofer(): Gofer<Stat> = gofer
 

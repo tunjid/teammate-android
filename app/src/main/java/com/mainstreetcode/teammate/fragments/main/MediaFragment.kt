@@ -60,28 +60,25 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
     private val bottomBarState: AtomicBoolean = AtomicBoolean()
     private val altToolBarState: AtomicBoolean = AtomicBoolean()
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.media_add
+    override val fabStringResource: Int @StringRes get() = R.string.media_add
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_add_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
 
-    override val altToolbarMenu: Int
-        get() = R.menu.fragment_media_context
+    override val altToolbarMenu: Int get() = R.menu.fragment_media_context
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.media_title, team.name)
+    override val toolbarTitle: CharSequence get() = getString(R.string.media_title, team.name)
 
-    override val altToolbarTitle: CharSequence
-        get() = getString(R.string.multi_select, mediaViewModel.getNumSelected(team))
+    override val altToolbarTitle: CharSequence get() = getString(R.string.multi_select, mediaViewModel.getNumSelected(team))
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_media
+    override val toolbarMenu: Int get() = R.menu.fragment_media
 
-    override val isFullScreen: Boolean
-        get() = false
+    override val isFullScreen: Boolean get() = false
+
+    override val showsFab: Boolean get() = true
+
+    override val showsAltToolBar: Boolean get() = altToolBarState.get()
+
+    override val showsBottomNav: Boolean get() = bottomBarState.get()
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -100,13 +97,13 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_media, container, false)
+        val root = inflater.inflate(R.layout.fragment_media, container, false)
 
         val refreshAction = Runnable { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)) }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.team_media))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_video_library_black_24dp, R.string.no_media))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.team_media))
+                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_video_library_black_24dp, R.string.no_media))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchMedia(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -116,7 +113,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
 
         bottomBarState.set(true)
 
-        return rootView
+        return root
     }
 
     override fun onResume() {
@@ -127,10 +124,8 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
     }
 
     private fun fetchMedia(fetchLatest: Boolean) {
-        if (fetchLatest)
-            scrollManager.setRefreshing()
-        else
-            toggleProgress(true)
+        if (fetchLatest) scrollManager.setRefreshing()
+        else toggleProgress(true)
 
         disposables.add(mediaViewModel.getMany(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke))
     }
@@ -139,12 +134,12 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_media_team_pick).let { true }
 
         R.id.action_delete -> disposables.add(mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
-                .subscribe(this::onMediaDeleted, defaultErrorHandler::invoke))
+                .subscribe(this::onMediaDeleted, defaultErrorHandler::invoke)).let { true }
 
-        R.id.action_download -> {
-            if (ImageWorkerFragment.requestDownload(this, team)) scrollManager.notifyDataSetChanged()
-            true
-        }
+        R.id.action_download ->
+            if (ImageWorkerFragment.requestDownload(this, team)) scrollManager.notifyDataSetChanged().let { true }
+            else true
+
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -155,12 +150,6 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         toggleContextMenu(false)
         return true
     }
-
-    override fun showsFab(): Boolean = true
-
-    override fun showsAltToolBar(): Boolean = altToolBarState.get()
-
-    override fun showsBottomNav(): Boolean = bottomBarState.get()
 
     override fun onClick(view: View) {
         when (view.id) {
@@ -205,9 +194,8 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
 
     override fun isSelected(media: Media): Boolean = mediaViewModel.isSelected(media)
 
-    override fun onFilesSelected(uris: List<Uri>) {
-        MediaTransferIntentService.startActionUpload(requireContext(), userViewModel.currentUser, team, uris)
-    }
+    override fun onFilesSelected(uris: List<Uri>) =
+            MediaTransferIntentService.startActionUpload(requireContext(), userViewModel.currentUser, team, uris)
 
     override fun requestedTeam(): Team = team
 

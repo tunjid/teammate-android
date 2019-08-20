@@ -64,31 +64,35 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
     protected var emptyErrorHandler: (Throwable) -> Unit = ErrorHandler.EMPTY
     protected lateinit var defaultErrorHandler: ErrorHandler
 
-    protected open val fabStringResource: Int
-        @StringRes
-        get() = R.string.empty_string
+    protected open val fabStringResource: Int @StringRes get() = R.string.empty_string
 
-    protected open val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_add_white_24dp
+    protected open val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
 
-    protected open val toolbarMenu: Int
-        @MenuRes
-        get() = 0
+    protected open val toolbarMenu: Int @MenuRes get() = 0
 
-    protected open val altToolbarMenu: Int
-        @MenuRes
-        get() = 0
+    protected open val altToolbarMenu: Int @MenuRes get() = 0
 
-    protected open val navBarColor: Int
-        @ColorInt
-        get() = if (SDK_INT >= O) LIGHT_NAV_BAR_COLOR else Color.BLACK
+    protected open val navBarColor: Int @ColorInt get() = if (SDK_INT >= O) LIGHT_NAV_BAR_COLOR else Color.BLACK
 
-    protected open val toolbarTitle: CharSequence
-        get() = ""
+    protected open val toolbarTitle: CharSequence get() = ""
 
-    protected open val altToolbarTitle: CharSequence
-        get() = ""
+    protected open val altToolbarTitle: CharSequence get() = ""
+
+    open val insetFlags: InsetFlags get() = InsetFlags.ALL
+
+    open val staticViews: IntArray get() = intArrayOf()
+
+    open val showsFab: Boolean get() = false
+
+    open val showsToolBar: Boolean get() = true
+
+    open val showsAltToolBar: Boolean get() = false
+
+    open val showsBottomNav: Boolean get() = true
+
+    protected open val showsSystemUI: Boolean get() = true
+
+    protected open val hasLightNavBar: Boolean get() = SDK_INT >= O
 
     protected val persistentUiController: PersistentUiController
         get() {
@@ -119,22 +123,6 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         persistentUiController.setFabClickListener(null)
         super.onDestroyView()
     }
-
-    open fun insetFlags(): InsetFlags = InsetFlags.ALL
-
-    open fun staticViews(): IntArray = intArrayOf()
-
-    open fun showsFab(): Boolean = false
-
-    open fun showsToolBar(): Boolean = true
-
-    open fun showsAltToolBar(): Boolean = false
-
-    open fun showsBottomNav(): Boolean = true
-
-    protected open fun showsSystemUI(): Boolean = true
-
-    protected open fun hasLightNavBar(): Boolean = SDK_INT >= O
 
     override fun onClick(view: View) {}
 
@@ -193,7 +181,7 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
     }
 
     protected fun updateFabOnScroll(dx: Int, dy: Int) {
-        if (showsFab() && abs(dy) > 3) toggleFab(dy < 0)
+        if (showsFab && abs(dy) > 3) toggleFab(dy < 0)
     }
 
     open fun onKeyBoardChanged(appeared: Boolean) {}
@@ -223,13 +211,13 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
                 this.toolbarMenu,
                 this.altToolbarMenu,
                 this.navBarColor,
-                this.showsFab(),
-                this.showsToolBar(),
-                this.showsAltToolBar(),
-                this.showsBottomNav(),
-                this.showsSystemUI(),
-                this.hasLightNavBar(),
-                this.insetFlags(),
+                this.showsFab,
+                this.showsToolBar,
+                this.showsAltToolBar,
+                this.showsBottomNav,
+                this.showsSystemUI,
+                this.hasLightNavBar,
+                this.insetFlags,
                 this.toolbarTitle,
                 this.altToolbarTitle,
                 if (view == null) null else this

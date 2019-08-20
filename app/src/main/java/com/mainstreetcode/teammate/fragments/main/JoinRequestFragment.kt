@@ -64,19 +64,17 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
 
     private lateinit var gofer: JoinRequestGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = gofer.fabTitle
+    override val fabStringResource: Int @StringRes get() = gofer.fabTitle
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_user_edit
+    override val toolbarMenu: Int get() = R.menu.fragment_user_edit
 
-    override val toolbarTitle: CharSequence
-        get() = gofer.getToolbarTitle(this)
+    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = gofer.showsFab()
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_JOIN_REQUEST)!!)
@@ -121,10 +119,6 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
         R.id.action_block -> blockUser(headeredModel.user, headeredModel.team).let { true }
         else -> super.onOptionsItemSelected(item)
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = gofer.showsFab()
 
     override fun onImageClick() = Unit
 

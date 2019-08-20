@@ -53,11 +53,11 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
 
-    override val toolbarMenu: Int
-        get() = R.menu.fragment_events
+    override val toolbarMenu: Int get() = R.menu.fragment_events
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.blocked_users_title, team.name)
+    override val toolbarTitle: CharSequence get() = getString(R.string.blocked_users_title, team.name)
+
+    override val showsFab: Boolean get() = false
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
@@ -98,8 +98,6 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
         super.onResume()
         fetchBlockedUsers(true)
     }
-
-    override fun showsFab(): Boolean = false
 
     override fun onBlockedUserClicked(blockedUser: BlockedUser) {
         showFragment(BlockedUserViewFragment.newInstance(blockedUser))

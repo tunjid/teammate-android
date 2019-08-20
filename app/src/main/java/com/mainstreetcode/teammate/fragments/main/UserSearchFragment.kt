@@ -37,7 +37,6 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
  * Searches for users
@@ -47,6 +46,12 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
     private var searchView: SearchView? = null
     private lateinit var instantSearch: InstantSearch<String, User>
+
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
+
+    override val showsFab: Boolean get() = false
+
+    override val showsToolBar: Boolean get() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,12 +94,6 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         searchView?.clearFocus()
         searchView = null
     }
-
-    override fun staticViews(): IntArray = EXCLUDED_VIEWS
-
-    override fun showsFab(): Boolean = false
-
-    override fun showsToolBar(): Boolean = false
 
     override fun onUserClicked(item: User) {
         val target = targetFragment

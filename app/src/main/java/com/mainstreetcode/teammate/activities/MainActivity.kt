@@ -199,14 +199,14 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
                 .setDirection(BOTTOM)
                 .addStartRunnable {
                     val view = currentFragment
-                    if (view == null || view.showsBottomNav()) return@addStartRunnable
+                    if (view == null || view.showsBottomNav) return@addStartRunnable
 
                     bottomBarSnapshot.setImageBitmap(bottomNav.drawToBitmap(Bitmap.Config.ARGB_8888))
                     bottomNav.visibility = GONE
                 }
                 .addEndRunnable {
                     val view = currentFragment
-                    if (view == null || !view.showsBottomNav()) return@addEndRunnable
+                    if (view == null || !view.showsBottomNav) return@addEndRunnable
 
                     bottomNav.visibility = View.VISIBLE
                     initTransition()
@@ -262,7 +262,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
     override fun toggleAltToolbar(show: Boolean) {
         val current = currentFragment
         if (show) toggleToolbar(false)
-        else if (current != null) toggleToolbar(current.showsToolBar())
+        else if (current != null) toggleToolbar(current.showsToolBar)
 
         altToolbar.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }

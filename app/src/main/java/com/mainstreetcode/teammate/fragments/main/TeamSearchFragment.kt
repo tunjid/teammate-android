@@ -54,6 +54,12 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
     private var createTeam: View? = null
     private var searchView: SearchView? = null
 
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
+
+    override val showsFab: Boolean get() = false
+
+    override val showsToolBar: Boolean get() = false
+
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
         val sportCode = arguments!!.getString(ARG_SPORT)
@@ -105,12 +111,6 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         searchView = null
         createTeam = null
     }
-
-    override fun staticViews(): IntArray = EXCLUDED_VIEWS
-
-    override fun showsFab(): Boolean = false
-
-    override fun showsToolBar(): Boolean = false
 
     override fun onTeamClicked(item: Team) {
         val target = targetFragment

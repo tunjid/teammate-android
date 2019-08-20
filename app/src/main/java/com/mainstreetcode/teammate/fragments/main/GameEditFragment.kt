@@ -62,16 +62,17 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
 
     private lateinit var gofer: GameGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = if (headeredModel.isEmpty) R.string.game_create else R.string.game_update
+    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.game_create else R.string.game_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(if (headeredModel.isEmpty) R.string.game_add else R.string.game_edit)
+    override val toolbarTitle: CharSequence get() = getString(if (headeredModel.isEmpty) R.string.game_add else R.string.game_edit)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = gofer.canEdit() && !isBottomSheetShowing
+
+    override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_GAME)!!)
@@ -101,12 +102,6 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
         super.onResume()
         statViewModel.clearNotifications(headeredModel)
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = gofer.canEdit() && !isBottomSheetShowing
-
-    override fun staticViews(): IntArray = EXCLUDED_VIEWS
 
     override fun gofer(): Gofer<Game> = gofer
 

@@ -60,25 +60,20 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
     private lateinit var competitors: List<Competitor>
     private lateinit var competitorDifferentiables: MutableList<Differentiable>
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.save_tournament_competitors
+    override val fabStringResource: Int @StringRes get() = R.string.save_tournament_competitors
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.add_tournament_competitors)
+    override val toolbarTitle: CharSequence get() = getString(R.string.add_tournament_competitors)
+
+    override val showsFab: Boolean get() = !isBottomSheetShowing && competitors.isNotEmpty()
 
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
-        return if (tempTournament != null)
-            superResult + "-" + tempTournament.hashCode()
-        else
-            superResult
+        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
+        else superResult
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,8 +89,7 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
         scrollManager = ScrollManager.with<CompetitorViewHolder>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
                 .withAdapter(object : CompetitorAdapter(competitorDifferentiables, AdapterListener.asSAM {}) {
-                    override fun getItemId(position: Int): Long =
-                            entities[position].hashCode().toLong()
+                    override fun getItemId(position: Int): Long = entities[position].hashCode().toLong()
 
                     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder {
                         val holder = super.onCreateViewHolder(viewGroup, viewType)
@@ -130,22 +124,17 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
         if (!appeared && isBottomSheetShowing) hideBottomSheet()
     }
 
-    override fun showsFab(): Boolean = !isBottomSheetShowing && competitors.isNotEmpty()
+    override fun onUserClicked(item: User) =
+            if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
+            else addCompetitor(item)
 
-    override fun onUserClicked(item: User) {
-        if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
-        else addCompetitor(item)
-    }
+    override fun onTeamClicked(item: Team) =
+            if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
+            else addCompetitor(item)
 
-    override fun onTeamClicked(item: Team) {
-        if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
-        else addCompetitor(item)
-    }
-
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> addCompetitors()
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> addCompetitors()
+        else -> Unit
     }
 
     private fun findCompetitor() {

@@ -51,16 +51,15 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
 
     private lateinit var gofer: BlockedUserGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.unblock_user
+    override val fabStringResource: Int @StringRes get() = R.string.unblock_user
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_unlock_white
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_unlock_white
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.blocked_user)
+    override val toolbarTitle: CharSequence get() = getString(R.string.blocked_user)
+
+    override val showsFab: Boolean get() = gofer.hasPrivilegedRole()
+
+    override val insetFlags: InsetFlags get() = NO_TOP
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_BLOCKED_USER)!!)
@@ -91,19 +90,11 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
             disposables.add(gofer.delete().subscribe(this::onUserUnblocked, defaultErrorHandler::invoke))
     }
 
-    override fun showsFab(): Boolean = gofer.hasPrivilegedRole()
-
-    override fun onImageClick() {
-        showSnackbar(getString(R.string.no_permission))
-    }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
+    override fun onImageClick() = showSnackbar(getString(R.string.no_permission))
 
     override fun gofer(): Gofer<BlockedUser> = gofer
 
-    override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        scrollManager.onDiff(result)
-    }
+    override fun onModelUpdated(result: DiffUtil.DiffResult) = scrollManager.onDiff(result)
 
     override fun onPrepComplete() {
         requireActivity().invalidateOptionsMenu()

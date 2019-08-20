@@ -53,16 +53,15 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
 
     private lateinit var gofer: UserGofer
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.user_update
+    override val fabStringResource: Int @StringRes get() = R.string.user_update
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
 
-    override val toolbarTitle: CharSequence
-        get() = getString(if (canEdit()) R.string.user_edit else R.string.user_info)
+    override val toolbarTitle: CharSequence get() = getString(if (canEdit()) R.string.user_edit else R.string.user_info)
+
+    override val insetFlags: InsetFlags get() = NO_TOP
+
+    override val showsFab: Boolean get() = canEdit()
 
     override fun getStableTag(): String =
             Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_USER)!!)
@@ -89,10 +88,6 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
 
         return root
     }
-
-    override fun insetFlags(): InsetFlags = NO_TOP
-
-    override fun showsFab(): Boolean = canEdit()
 
     override fun gofer(): Gofer<User> = gofer
 

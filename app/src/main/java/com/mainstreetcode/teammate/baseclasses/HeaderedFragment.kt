@@ -132,7 +132,7 @@ abstract class HeaderedFragment<T> :
         super.onKeyBoardChanged(appeared)
         if (!appeared) return
         if (appBarLayout != null) appBarLayout!!.setExpanded(false)
-        if (showsFab() && !isBottomSheetShowing)
+        if (showsFab && !isBottomSheetShowing)
             disposables.add(timer(FAB_DELAY.toLong(), MILLISECONDS)
                     .observeOn(mainThread())
                     .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY::invoke))

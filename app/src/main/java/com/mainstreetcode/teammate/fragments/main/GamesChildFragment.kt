@@ -53,15 +53,15 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     private lateinit var tournament: Tournament
     private lateinit var items: List<Differentiable>
 
+    override val showsFab: Boolean get() = false
+
     override fun getStableTag(): String {
         val superResult = super.getStableTag()
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
         val round = arguments!!.getInt(ARG_ROUND)
 
-        return if (tempTournament != null)
-            superResult + "-" + tempTournament.hashCode() + "-" + round
-        else
-            superResult
+        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode() + "-" + round
+        else superResult
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,16 +72,16 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_games_child, container, false)
+        val root = inflater.inflate(R.layout.fragment_games_child, container, false)
         val fragment = parentFragment
         val recycledViewPool = if (fragment is TournamentDetailFragment)
             fragment.gamesRecycledViewPool
         else
             RecyclerView.RecycledViewPool()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.onRefresh() }
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
+                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.onRefresh() }
                 .withEndlessScroll { fetchTournaments(false) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(GameAdapter(items, this))
@@ -91,7 +91,7 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
 
         scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint)
 
-        return rootView
+        return root
     }
 
     private fun onRefresh() {
@@ -109,8 +109,6 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     }
 
     override fun togglePersistentUi() = Unit /* Do nothing */
-
-    override fun showsFab(): Boolean = false
 
     override fun onGameClicked(game: Game) {
         showFragment(GameFragment.newInstance(game))
