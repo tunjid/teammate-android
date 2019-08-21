@@ -88,13 +88,17 @@ class GameRepo internal constructor() : TeamQueryRepo<Game>() {
 
         for (game in models) {
             val user = game.referee
-            val team = game.team
+            val team = game.host
             val event = game.event
             val home = game.home
             val away = game.away
             val tournament = game.tournament
 
             if (!tournament.isEmpty && !team.isEmpty) tournament.updateHost(team)
+
+            if (event.team.isEmpty)
+                if (game.betweenUsers()) event.team.update(team)
+                else event.team.update(home.entity)
 
             users.add(user)
             teams.add(team)

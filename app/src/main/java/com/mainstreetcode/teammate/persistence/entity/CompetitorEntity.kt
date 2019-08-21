@@ -81,10 +81,17 @@ open class CompetitorEntity : Parcelable {
     val seedText: String
         get() = if (seed > -1) (seed + 1).toString() else ""
 
-    constructor(id: String, refPath: String,
-                tournamentId: String?, gameId: String?,
-                entity: Competitive, created: Date,
-                seed: Int, accepted: Boolean, declined: Boolean) {
+    constructor(
+            id: String,
+            refPath: String,
+            tournamentId: String?,
+            gameId: String?,
+            entity: Competitive,
+            created: Date,
+            seed: Int,
+            accepted: Boolean,
+            declined: Boolean
+    ) {
         this.id = id
         this.refPath = refPath
         this.tournamentId = tournamentId
