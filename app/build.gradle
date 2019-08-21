@@ -120,7 +120,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
 
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
 
     implementation 'com.google.android:flexbox:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
