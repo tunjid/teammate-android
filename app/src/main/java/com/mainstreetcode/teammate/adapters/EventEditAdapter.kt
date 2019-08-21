@@ -128,7 +128,7 @@ class EventEditAdapter(
 
         override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.TEXT, Item.NUMBER, Item.LOCATION -> TextInputStyle(
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
                     adapterListener::onLocationClicked,
                     { adapterListener.canEditEvent() },
                     this::textChecker,
@@ -141,7 +141,7 @@ class EventEditAdapter(
             ) { adapterListener.canEditEvent() }
             Item.DATE -> DateTextInputStyle { adapterListener.canEditEvent() }
             else -> TextInputStyle(
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
                     adapterListener::onLocationClicked,
                     { adapterListener.canEditEvent() },
                     this::textChecker,

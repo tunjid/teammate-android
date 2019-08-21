@@ -111,7 +111,7 @@ class Item internal constructor(
         const val TOURNAMENT_STYLE = 20
         const val COMPETITOR = 21
 
-        val NO_CLICK: (() -> Unit)? = null
+        val ignoreClicks: (() -> Unit)? = null
 
         fun number(
                 id: String,

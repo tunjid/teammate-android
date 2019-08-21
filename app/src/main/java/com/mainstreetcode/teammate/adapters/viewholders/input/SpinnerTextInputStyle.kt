@@ -44,7 +44,7 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
             displayFunction: (T) -> CharSequence,
             valueFunction: (T) -> String,
             enabler: (Item) -> Boolean
-    ) : super(Item.NO_CLICK, Item.NO_CLICK, enabler, Item::noBlankFields, Item::noIcon) {
+    ) : super(Item.ignoreClicks, Item.ignoreClicks, enabler, Item::noBlankFields, Item::noIcon) {
         this.titleRes = titleRes
         this.items = items
         this.displayFunction = displayFunction
@@ -56,7 +56,7 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
                 valueFunction: (T) -> String,
                 enabler: (Item) -> Boolean,
                 errorChecker: (Item) -> CharSequence?
-    ) : super(Item.NO_CLICK, Item.NO_CLICK, enabler, errorChecker, Item::noIcon) {
+    ) : super(Item.ignoreClicks, Item.ignoreClicks, enabler, errorChecker, Item::noIcon) {
         this.titleRes = titleRes
         this.items = items
         this.displayFunction = displayFunction

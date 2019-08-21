@@ -119,7 +119,7 @@ class TeamEditAdapter(
             Item.DESCRIPTION -> TextInputStyle(
                     or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
                             adapterListener::onAddressClicked,
-                            Item.NO_CLICK),
+                            Item.ignoreClicks),
                     or(itemType == Item.INPUT,
                             adapterListener::onImageClick,
                             adapterListener::onAddressClicked),
@@ -135,7 +135,7 @@ class TeamEditAdapter(
             else -> TextInputStyle(
                     or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
                             adapterListener::onAddressClicked,
-                            Item.NO_CLICK),
+                            Item.ignoreClicks),
                     or(itemType == Item.INPUT,
                             adapterListener::onImageClick,
                             adapterListener::onAddressClicked),

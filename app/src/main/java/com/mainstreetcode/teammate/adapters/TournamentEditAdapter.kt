@@ -133,7 +133,7 @@ class TournamentEditAdapter(
             Item.INPUT,
             Item.NUMBER,
             Item.DESCRIPTION -> TextInputStyle(
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
                     adapterListener::onImageClick,
                     this::enabler,
                     this::textChecker,
@@ -163,7 +163,7 @@ class TournamentEditAdapter(
                         Item::noInputValidation)
             }
             else -> TextInputStyle(
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
                     adapterListener::onImageClick,
                     this::enabler,
                     this::textChecker,

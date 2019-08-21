@@ -101,15 +101,15 @@ class GameEditAdapter(
         override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT,
             Item.NUMBER -> TextInputStyle(
-                    Item.NO_CLICK,
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
+                    Item.ignoreClicks,
                     this::enabler,
                     Item::noBlankFields,
                     Item::noIcon
             )
             else -> TextInputStyle(
-                    Item.NO_CLICK,
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
+                    Item.ignoreClicks,
                     this::enabler,
                     Item::noBlankFields,
                     Item::noIcon

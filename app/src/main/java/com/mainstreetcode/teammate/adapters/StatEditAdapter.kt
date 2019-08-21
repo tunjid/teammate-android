@@ -116,8 +116,8 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
 
         override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.NUMBER -> TextInputStyle(
-                    Item.NO_CLICK,
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
+                    Item.ignoreClicks,
                     Item::always,
                     Item::noBlankFields,
                     Item::noIcon)
@@ -129,8 +129,8 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
                     { adapterListener.canChangeStat() },
                     Item::noInputValidation)
             else -> TextInputStyle(
-                    Item.NO_CLICK,
-                    Item.NO_CLICK,
+                    Item.ignoreClicks,
+                    Item.ignoreClicks,
                     Item::always,
                     Item::noBlankFields,
                     Item::noIcon
