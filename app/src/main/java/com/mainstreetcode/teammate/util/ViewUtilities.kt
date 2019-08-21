@@ -146,11 +146,11 @@ fun fetchRoundedDrawable(context: Context, url: String, size: Int, placeholder: 
                     if (!emitter.isDisposed) emitter.onSuccess(bitmap)
                 }
 
-                override fun onBitmapFailed(e: Exception, errorDrawable: Drawable) {
+                override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
                     if (!emitter.isDisposed) emitter.onError(e)
                 }
 
-                override fun onPrepareLoad(placeHolderDrawable: Drawable) {}
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
             })
 }
         .onErrorResumeNext { throwable: Throwable ->
