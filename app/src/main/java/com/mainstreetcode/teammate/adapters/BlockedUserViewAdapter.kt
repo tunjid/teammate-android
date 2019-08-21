@@ -32,7 +32,7 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
@@ -74,7 +74,7 @@ class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdap
         override fun invoke(input: Item): TextInputStyle = TextInputStyle(
                 Item.ignoreClicks,
                 Item.ignoreClicks,
-                Item::never,
+                Item::neverEnabled,
                 Item::noInputValidation,
                 Item::noIcon
         )

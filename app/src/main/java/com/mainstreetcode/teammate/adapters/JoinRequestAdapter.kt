@@ -37,7 +37,7 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
@@ -91,7 +91,7 @@ class JoinRequestAdapter(
                         Config.getSports(),
                         Sport::name,
                         Sport::code,
-                        Item::never,
+                        Item::neverEnabled,
                         Item::noInputValidation)
                 Item.ROLE -> return SpinnerTextInputStyle(
                         R.string.choose_role,
@@ -103,7 +103,7 @@ class JoinRequestAdapter(
                 else -> return TextInputStyle(
                         Item.ignoreClicks,
                         Item.ignoreClicks,
-                        or<(Item) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item::never),
+                        or<(Item) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item::neverEnabled),
                         Item::noInputValidation,
                         Item::noIcon)
             }

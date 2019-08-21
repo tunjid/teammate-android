@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.STAT_TYPE
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.model.always
+import com.mainstreetcode.teammate.model.alwaysEnabled
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noIcon
@@ -118,7 +118,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
             Item.INPUT, Item.NUMBER -> TextInputStyle(
                     Item.ignoreClicks,
                     Item.ignoreClicks,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noBlankFields,
                     Item::noIcon)
             STAT_TYPE -> SpinnerTextInputStyle(
@@ -131,7 +131,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
             else -> TextInputStyle(
                     Item.ignoreClicks,
                     Item.ignoreClicks,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noBlankFields,
                     Item::noIcon
             )

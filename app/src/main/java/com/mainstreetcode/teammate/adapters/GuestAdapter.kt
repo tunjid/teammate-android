@@ -35,7 +35,7 @@ import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Guest
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 
@@ -79,7 +79,7 @@ class GuestAdapter(
         override fun invoke(input: Item): TextInputStyle = TextInputStyle(
                 Item.ignoreClicks,
                 Item.ignoreClicks,
-                Item::never,
+                Item::neverEnabled,
                 Item::noInputValidation,
                 Item::noIcon
         )

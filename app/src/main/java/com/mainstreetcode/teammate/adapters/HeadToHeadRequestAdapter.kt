@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.HeadToHead
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.always
+import com.mainstreetcode.teammate.model.alwaysEnabled
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.model.noInputValidation
@@ -124,22 +124,22 @@ class HeadToHeadRequestAdapter(
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noInputValidation)
-            Item.DATE -> DateTextInputStyle(Item::always)
+            Item.DATE -> DateTextInputStyle(Item::alwaysEnabled)
             Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
                     R.string.tournament_type,
                     Config.getTournamentTypes { true },
                     TournamentType::name,
                     TournamentType::code,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noInputValidation)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noInputValidation)
         }
     }

@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
-import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
@@ -109,14 +109,14 @@ class TournamentEditAdapter(
         }
 
         override fun enabler(item: Item): Boolean = when (item.itemType) {
-            Item.ABOUT -> item.never
+            Item.ABOUT -> item.neverEnabled
             Item.INFO,
             Item.INPUT,
             Item.NUMBER,
             Item.TOURNAMENT_TYPE,
             Item.TOURNAMENT_STYLE -> adapterListener.canEditBeforeCreation()
             Item.DESCRIPTION -> adapterListener.canEditAfterCreation()
-            else -> item.never
+            else -> item.neverEnabled
         }
 
         override fun textChecker(item: Item): CharSequence? = when (item.itemType) {

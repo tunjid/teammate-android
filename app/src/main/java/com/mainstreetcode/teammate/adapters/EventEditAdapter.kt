@@ -113,9 +113,7 @@ class EventEditAdapter(
         override fun iconGetter(item: Item): Int =
                 if (item.itemType == Item.LOCATION) R.drawable.ic_location_on_white_24dp else 0
 
-        override fun enabler(item: Item): Boolean {
-            return adapterListener.canEditEvent()
-        }
+        override fun enabler(item: Item): Boolean = adapterListener.canEditEvent()
 
         override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT,

@@ -145,11 +145,11 @@ class Item internal constructor(
 }
 
 @Suppress("unused")
-val Item.always
+val Item.alwaysEnabled
     get() = true
 
 @Suppress("unused")
-val Item.never
+val Item.neverEnabled
     get() = false
 
 @Suppress("unused")

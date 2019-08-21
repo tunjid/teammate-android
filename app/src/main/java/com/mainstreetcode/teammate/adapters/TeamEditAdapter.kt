@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.ZIP
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.Sport
-import com.mainstreetcode.teammate.model.never
+import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.model.noSpecialCharacters
@@ -92,9 +92,9 @@ class TeamEditAdapter(
         }
 
         override fun enabler(item: Item): Boolean = when (item.itemType) {
-            Item.ABOUT -> item.never
+            Item.ABOUT -> item.neverEnabled
             ZIP, Item.CITY, Item.INFO, Item.STATE, Item.INPUT, Item.SPORT, Item.NUMBER, Item.DESCRIPTION -> adapterListener.canEditFields()
-            else -> item.never
+            else -> item.neverEnabled
         }
 
         override fun textChecker(item: Item): CharSequence? = when (item.itemType) {

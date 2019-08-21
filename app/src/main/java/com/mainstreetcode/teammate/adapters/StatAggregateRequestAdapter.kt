@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.StatAggregate
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.model.always
+import com.mainstreetcode.teammate.model.alwaysEnabled
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
@@ -117,15 +117,15 @@ class StatAggregateRequestAdapter(
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noInputValidation)
-            Item.DATE -> DateTextInputStyle(Item::always)
+            Item.DATE -> DateTextInputStyle(Item::alwaysEnabled)
             else -> SpinnerTextInputStyle(
                     R.string.choose_sport,
                     sports,
                     Sport::name,
                     Sport::code,
-                    Item::always,
+                    Item::alwaysEnabled,
                     Item::noInputValidation)
         }
     }
