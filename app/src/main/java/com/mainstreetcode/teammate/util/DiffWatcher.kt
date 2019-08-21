@@ -24,12 +24,9 @@
 
 package com.mainstreetcode.teammate.util
 
-import com.tunjid.androidbootstrap.functions.Consumer
-
-import java.util.concurrent.atomic.AtomicReference
-
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
+import java.util.concurrent.atomic.AtomicReference
 
 class DiffWatcher<T>(private val consumer: (T) -> Unit) {
 
