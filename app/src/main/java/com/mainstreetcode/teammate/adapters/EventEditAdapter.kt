@@ -58,9 +58,7 @@ class EventEditAdapter(
 
     private val chooser = Chooser(adapterListener)
 
-    private val teamListener = object :TeamAdapter.AdapterListener{
-        override fun onTeamClicked(item: Team) = adapterListener.selectTeam()
-    }
+    private val teamListener = TeamAdapter.AdapterListener.asSAM { adapterListener.selectTeam() }
 
     init {
         setHasStableIds(true)
