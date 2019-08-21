@@ -172,24 +172,19 @@ abstract class AppDatabase : RoomDatabase() {
         private const val TAG = "AppDatabase"
         private const val PROD_DB = "database-name"
         private const val DEV_DB = "teammate-dev-db"
-        private lateinit var INSTANCE: AppDatabase
 
-        val instance: AppDatabase
-            get() {
-                if (!::INSTANCE.isInitialized) {
-                    INSTANCE = Room.databaseBuilder(
-                            App.instance,
-                            AppDatabase::class.java,
-                            if (BuildConfig.DEV) DEV_DB else PROD_DB
-                    )
-                            .addMigrations(Migration1To2())
-                            .addMigrations(Migration2To3())
-                            .addMigrations(Migration3To4())
-                            .addMigrations(Migration4To5())
-                            .fallbackToDestructiveMigration()
-                            .build()
-                }
-                return INSTANCE
-            }
+        val instance: AppDatabase by lazy {
+            Room.databaseBuilder(
+                    App.instance,
+                    AppDatabase::class.java,
+                    if (BuildConfig.DEV) DEV_DB else PROD_DB
+            )
+                    .addMigrations(Migration1To2())
+                    .addMigrations(Migration2To3())
+                    .addMigrations(Migration3To4())
+                    .addMigrations(Migration4To5())
+                    .fallbackToDestructiveMigration()
+                    .build()
+        }
     }
 }

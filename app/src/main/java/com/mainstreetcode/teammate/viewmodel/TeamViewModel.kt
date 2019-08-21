@@ -32,6 +32,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.repository.TeamRepo
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.InstantSearch
+import com.mainstreetcode.teammate.util.replaceList
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer
@@ -42,7 +43,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import io.reactivex.processors.PublishProcessor
 import java.util.concurrent.atomic.AtomicReference
-import com.mainstreetcode.teammate.util.replaceList
 
 
 /**

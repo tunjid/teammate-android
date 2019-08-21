@@ -65,7 +65,7 @@ class UserRepo internal constructor() : ModelRepo<User>() {
         }
 
     val isSignedIn: Boolean
-        get() = userId.isNotBlank()
+        get() = !currentUser.isEmpty
 
     override fun dao(): EntityDao<in User> = userDao
 

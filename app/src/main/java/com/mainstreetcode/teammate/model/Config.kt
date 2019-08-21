@@ -45,10 +45,14 @@ import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.model.enums.TournamentStyle
 import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.model.enums.Visibility
+import com.mainstreetcode.teammate.persistence.AppDatabase
 import com.mainstreetcode.teammate.repository.ConfigRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.*
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.deserializeList
+import com.mainstreetcode.teammate.util.replaceList
+import com.mainstreetcode.teammate.util.replaceStringList
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.lang.reflect.Type
 
@@ -193,7 +197,7 @@ class Config internal constructor(
     companion object {
 
         private const val EMPTY_STRING = ""
-        private val cached = empty()
+        private val cached by lazy { AppDatabase.instance.configDao().current }
 
         fun empty(): Config = Config(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING)
 

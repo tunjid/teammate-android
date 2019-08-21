@@ -35,6 +35,7 @@ import androidx.core.provider.FontRequest
 import androidx.emoji.text.EmojiCompat
 import androidx.emoji.text.FontRequestEmojiCompatConfig
 import com.google.android.libraries.places.api.Places
+import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.repository.ConfigRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.repository.RoleRepo

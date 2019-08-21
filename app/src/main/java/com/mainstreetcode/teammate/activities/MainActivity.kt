@@ -170,7 +170,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
 
         bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation))
                 .setSwipeRunnable(this::showNavOverflow)
-                .setListener (View.OnClickListener { view -> onNavItemSelected(view.id) })
+                .setListener(View.OnClickListener { view -> onNavItemSelected(view.id) })
                 .setNavItems(NavItem.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
                         NavItem.create(R.id.action_events, R.string.events, R.drawable.ic_event_white_24dp),
                         NavItem.create(R.id.action_messages, R.string.chats, R.drawable.ic_message_black_24dp),
@@ -223,13 +223,11 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
         super.onResume()
         val teamViewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
 
-        disposables.add(teamViewModel.teamChangeFlowable
-                .flatMapMaybe { team ->
-                    fetchRoundedDrawable(this,
-                            team.imageUrl,
-                            resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
-                }
-                .subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY::invoke))
+        disposables.add(teamViewModel.teamChangeFlowable.flatMapMaybe { team ->
+            fetchRoundedDrawable(this,
+                    team.imageUrl,
+                    resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
+        }.subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY::invoke))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = onNavItemSelected(item.itemId)
@@ -327,56 +325,56 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
     }
 
     private fun onNavItemSelected(@IdRes id: Int): Boolean = when (id) {
-         R.id.action_home -> {
-             showFragment(FeedFragment.newInstance())
-         }
-         R.id.action_events -> {
-             TeamPickerFragment.pick(this, R.id.request_event_team_pick).let { true }
-         }
-         R.id.action_messages -> {
-             TeamPickerFragment.pick(this, R.id.request_chat_team_pick).let { true }
-         }
-         R.id.action_media -> {
-             TeamPickerFragment.pick(this, R.id.request_media_team_pick).let { true }
-         }
-         R.id.action_tournaments -> {
-             TeamPickerFragment.pick(this, R.id.request_tournament_team_pick).let { true }
-         }
-         R.id.action_games -> {
-             TeamPickerFragment.pick(this, R.id.request_game_team_pick).let { true }
-         }
-         R.id.action_find_teams -> {
-             showFragment(TeamSearchFragment.newInstance())
-         }
-         R.id.action_team -> {
-             showFragment(TeamsFragment.newInstance())
-         }
-         R.id.action_expand_home_nav -> {
-             showNavOverflow().let { true }
-         }
-         R.id.action_settings -> {
-             showFragment(SettingsFragment.newInstance())
-         }
-         R.id.action_rsvp_list -> {
-             showFragment(MyEventsFragment.newInstance())
-         }
-         R.id.action_public_events -> {
-             showFragment(EventSearchFragment.newInstance())
-         }
-         R.id.action_head_to_head -> {
-             showFragment(HeadToHeadFragment.newInstance())
-         }
-         R.id.action_stats_aggregate -> {
-             showFragment(StatAggregateFragment.newInstance())
-         }
-         R.id.action_declined_competitions -> {
-             showFragment(DeclinedCompetitionsFragment.newInstance())
-         }
-         R.id.action_my_profile -> {
-             showFragment(UserEditFragment.newInstance(userViewModel.currentUser))
-         }
-         else ->  false
-     }
+        R.id.action_home -> {
+            showFragment(FeedFragment.newInstance())
+        }
+        R.id.action_events -> {
+            TeamPickerFragment.pick(this, R.id.request_event_team_pick).let { true }
+        }
+        R.id.action_messages -> {
+            TeamPickerFragment.pick(this, R.id.request_chat_team_pick).let { true }
+        }
+        R.id.action_media -> {
+            TeamPickerFragment.pick(this, R.id.request_media_team_pick).let { true }
+        }
+        R.id.action_tournaments -> {
+            TeamPickerFragment.pick(this, R.id.request_tournament_team_pick).let { true }
+        }
+        R.id.action_games -> {
+            TeamPickerFragment.pick(this, R.id.request_game_team_pick).let { true }
+        }
+        R.id.action_find_teams -> {
+            showFragment(TeamSearchFragment.newInstance())
+        }
+        R.id.action_team -> {
+            showFragment(TeamsFragment.newInstance())
+        }
+        R.id.action_expand_home_nav -> {
+            showNavOverflow().let { true }
+        }
+        R.id.action_settings -> {
+            showFragment(SettingsFragment.newInstance())
+        }
+        R.id.action_rsvp_list -> {
+            showFragment(MyEventsFragment.newInstance())
+        }
+        R.id.action_public_events -> {
+            showFragment(EventSearchFragment.newInstance())
+        }
+        R.id.action_head_to_head -> {
+            showFragment(HeadToHeadFragment.newInstance())
+        }
+        R.id.action_stats_aggregate -> {
+            showFragment(StatAggregateFragment.newInstance())
+        }
+        R.id.action_declined_competitions -> {
+            showFragment(DeclinedCompetitionsFragment.newInstance())
+        }
+        R.id.action_my_profile -> {
+            showFragment(UserEditFragment.newInstance(userViewModel.currentUser))
+        }
+        else -> false
+    }
 
     private fun route(savedInstanceState: Bundle?, intent: Intent) {
         val model = intent.getParcelableExtra<Model<*>>(FEED_DEEP_LINK)
