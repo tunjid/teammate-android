@@ -30,7 +30,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.LinearLayout.HORIZONTAL
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -55,10 +57,12 @@ class NavDialogFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.AppTheme_NavDialogTheme)
+
         disposables = CompositeDisposable()
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         teamViewModel = ViewModelProviders.of(requireActivity()).get(TeamViewModel::class.java)
     }
@@ -75,19 +79,20 @@ class NavDialogFragment : BottomSheetDialogFragment() {
         val list = mutableListOf<Team>()
 
         val scrollManager = ScrollManager.with<RemoteImageViewHolder<Team>>(root.findViewById(R.id.horizontal_list))
+                .withCustomLayoutManager(LinearLayoutManager(root.context, HORIZONTAL, false))
                 .withAdapter(RemoteImageAdapter(list, object : RemoteImageAdapter.AdapterListener<Team> {
                     override fun onImageClicked(item: Team) {
                         teamViewModel.updateDefaultTeam(item)
                         viewTeam(item)
                     }
                 }))
-                .withCustomLayoutManager(LinearLayoutManager(root.context, HORIZONTAL, false))
                 .build()
 
         itemView.elevation = 0f
+        navigationView.elevation = 0f
         navigationView.setNavigationItemSelectedListener(this::onOptionsItemSelected)
         root.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View) {}
+            override fun onViewAttachedToWindow(v: View) = Unit
 
             override fun onViewDetachedFromWindow(v: View) = disposables.clear()
         })
@@ -98,17 +103,9 @@ class NavDialogFragment : BottomSheetDialogFragment() {
         return root
     }
 
-    override fun onResume() {
-        super.onResume()
-        var root = view
-        if (root == null || root.parent !is View) return
-        root = root.parent as View
-        root.setBackgroundResource(R.drawable.bg_nav_dialog)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         dismiss()
-        return requireActivity().onOptionsItemSelected(item!!)
+        return requireActivity().onOptionsItemSelected(item)
     }
 
     private fun viewTeam(team: Team) {
@@ -118,12 +115,6 @@ class NavDialogFragment : BottomSheetDialogFragment() {
 
     companion object {
 
-        fun newInstance(): NavDialogFragment {
-            val fragment = NavDialogFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(): NavDialogFragment = NavDialogFragment().apply { arguments = Bundle() }
     }
 }

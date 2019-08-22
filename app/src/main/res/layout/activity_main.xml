@@ -85,8 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
-            android:elevation="@dimen/half_margin"
-            app:layout_behavior="@string/bottom_transient_bar_behavior" />
+            android:elevation="@dimen/half_margin" />
 
         <FrameLayout
             android:id="@+id/bottom_sheet"

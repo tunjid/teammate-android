@@ -34,7 +34,6 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
-import com.mainstreetcode.teammate.util.updateForegroundDrawable
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlin.math.min
@@ -61,7 +60,6 @@ class GameViewHolder(
 
     init {
         itemView.setOnClickListener { adapterListener.onGameClicked(model) }
-        itemView.updateForegroundDrawable()
     }
 
     fun bind(model: Game) {

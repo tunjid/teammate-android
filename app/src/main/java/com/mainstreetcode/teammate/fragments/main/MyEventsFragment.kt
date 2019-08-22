@@ -60,7 +60,7 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
 
     override val showsFab: Boolean get() = false
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         myEventsViewModel = ViewModelProviders.of(requireActivity()).get(MyEventsViewModel::class.java)
     }

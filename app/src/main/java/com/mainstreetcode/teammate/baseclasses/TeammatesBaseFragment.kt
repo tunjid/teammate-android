@@ -100,7 +100,7 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
             return if (ref == null) PersistentUiController.DUMMY else ref as PersistentUiController
         }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         defaultErrorHandler = ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
@@ -124,7 +124,7 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         super.onDestroyView()
     }
 
-    override fun onClick(view: View) {}
+    override fun onClick(view: View) = Unit
 
     protected open fun toggleProgress(show: Boolean) = persistentUiController.toggleProgress(show)
 

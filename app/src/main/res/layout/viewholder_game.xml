@@ -75,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_chat_box"
-            android:backgroundTint="?colorAccent"
+            android:backgroundTint="?colorSecondary"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"

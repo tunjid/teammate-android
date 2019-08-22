@@ -96,9 +96,9 @@ open class MainActivityFragment : TeammatesBaseFragment() {
         localRoleViewModel = ViewModelProviders.of(this).get(LocalRoleViewModel::class.java)
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
-        val provider = ViewModelProviders.of(activity!!)
+        val provider = ViewModelProviders.of(requireActivity())
         feedViewModel = provider.get(FeedViewModel::class.java)
         roleViewModel = provider.get(RoleViewModel::class.java)
         userViewModel = provider.get(UserViewModel::class.java)

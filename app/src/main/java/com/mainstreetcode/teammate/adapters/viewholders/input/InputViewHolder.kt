@@ -200,7 +200,7 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
 
     private fun tintHint(hasFocus: Boolean) {
         val start = hint.currentTextColor
-        val end = hint.context.resolveThemeColor(if (hasFocus) R.attr.colorAccent else R.attr.input_text_color)
+        val end = hint.context.resolveThemeColor(if (hasFocus) R.attr.colorSecondary else R.attr.input_text_color)
         val animator = ValueAnimator.ofObject(ArgbEvaluator(), start, end)
 
         animator.duration = HINT_ANIMATION_DURATION.toLong()

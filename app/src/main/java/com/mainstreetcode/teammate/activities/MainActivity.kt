@@ -281,8 +281,6 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
     }
 
     override fun showBottomSheet(args: BottomSheetController.Args) {
-        val fragmentManager = supportFragmentManager ?: return
-
         clearTransientBars()
 
         val topPadding = topInset + resources.getDimensionPixelSize(R.dimen.single_margin)
@@ -292,7 +290,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
         toShow.enterTransition = bottomSheetTransition
         toShow.exitTransition = bottomSheetTransition
 
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
                 .replace(R.id.bottom_sheet_view, toShow, toShow.stableTag)
                 .runOnCommit {
                     bottomToolbarState = args.toolbarState
@@ -405,10 +403,8 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
             if (post != null && post.view != null) post.togglePersistentUi()
         }
 
-        val fragmentManager = supportFragmentManager ?: return
-
         val fragment = BlankBottomSheetFragment.newInstance()
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
                 .replace(R.id.bottom_sheet_view, fragment, fragment.stableTag)
                 .runOnCommit(onCommit)
                 .commit()

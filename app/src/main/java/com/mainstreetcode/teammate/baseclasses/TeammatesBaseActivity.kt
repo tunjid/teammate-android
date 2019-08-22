@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.baseclasses
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
@@ -52,6 +53,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
@@ -69,6 +72,7 @@ import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.FabInteractor
 import com.mainstreetcode.teammate.util.TOOLBAR_ANIM_DELAY
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.mainstreetcode.teammate.util.updateToolBar
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
 import com.tunjid.androidbootstrap.view.animator.ViewHider
@@ -95,6 +99,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     private lateinit var coordinatorLayout: CoordinatorLayout
     private lateinit var constraintLayout: ConstraintLayout
     private lateinit var fragmentContainer: FrameLayout
+    private lateinit var fab: MaterialButton
     private lateinit var padding: View
 
     protected lateinit var toolbar: Toolbar
@@ -146,7 +151,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     override fun setContentView(@LayoutRes layoutResID: Int) {
         super.setContentView(layoutResID)
 
-        val fab = findViewById<MaterialButton>(R.id.fab)
+        fab = findViewById(R.id.fab)
         fragmentContainer = findViewById(R.id.main_fragment_container)
         coordinatorLayout = findViewById(R.id.coordinator)
         constraintLayout = findViewById(R.id.content_view)
@@ -157,6 +162,8 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         toolbarHider = ViewHider.of(toolbar).setDuration(HIDER_DURATION.toLong()).setDirection(TOP).build()
         fabHider = ViewHider.of(fab).setDuration(HIDER_DURATION.toLong()).setDirection(BOTTOM).build()
         fabInteractor = FabInteractor(fab)
+
+        fab.backgroundTintList = ColorStateList.valueOf(resolveThemeColor(R.attr.colorSecondary))
 
         padding.setOnTouchListener { _, event ->
             if (event.action == ACTION_UP) setKeyboardPadding(bottomInset)
@@ -197,20 +204,16 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     override fun getCurrentFragment(): TeammatesBaseFragment? =
             super.getCurrentFragment() as? TeammatesBaseFragment
 
-    override fun update(state: UiState) {
-        updateUI(false, state)
-    }
+    override fun update(state: UiState) = updateUI(false, state)
 
-    override fun updateMainToolBar(menu: Int, title: CharSequence) {
-        toolbar.updateToolBar(menu, title)
-    }
+    override fun updateMainToolBar(menu: Int, title: CharSequence) =
+            toolbar.updateToolBar(menu, title)
 
     override fun updateAltToolbar(menu: Int, title: CharSequence) {}
 
-    override fun toggleToolbar(show: Boolean) {
-        if (show) toolbarHider.show()
-        else toolbarHider.hide()
-    }
+    override fun toggleToolbar(show: Boolean) =
+            if (show) toolbarHider.show()
+            else toolbarHider.hide()
 
     override fun toggleAltToolbar(show: Boolean) {}
 
@@ -263,7 +266,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
 
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
-        snackbar.show()
+        snackbar.fabDependentShow()
     }
 
     override fun showSnackBar(consumer: (Snackbar) -> Unit) {
@@ -272,19 +275,23 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         // Necessary to remove snackbar padding for keyboard on older versions of Android
         setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         consumer.invoke(snackbar)
-        transientBottomBars.add(snackbar)
-        snackbar.show()
+        snackbar.fabDependentShow()
     }
 
     override fun showChoices(consumer: (ChoiceBar) -> Unit) {
         val bar = ChoiceBar.make(coordinatorLayout, LENGTH_INDEFINITE).withCallback(callback)
         consumer.invoke(bar)
-        transientBottomBars.add(bar)
-        bar.show()
+        bar.fabDependentShow()
     }
 
-    override fun setFabClickListener(clickListener: View.OnClickListener?) {
-        fabInteractor.setOnClickListener(clickListener)
+    override fun setFabClickListener(clickListener: View.OnClickListener?) =
+            fabInteractor.setOnClickListener(clickListener)
+
+    private fun BaseTransientBottomBar<*>.fabDependentShow() = fab.postDelayed(HIDER_DURATION.toLong()) {
+        transientBottomBars.add(this)
+        @Suppress("UsePropertyAccessSyntax")
+        if (fab.isVisible) setAnchorView(fab)
+        show()
     }
 
     fun onDialogDismissed() {

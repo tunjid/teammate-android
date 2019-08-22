@@ -46,6 +46,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/email_wrapper"
+        style="@style/Widget.Design.TextInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/single_margin"
@@ -66,6 +67,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/password_wrapper"
+        style="@style/Widget.Design.TextInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/single_margin"

@@ -27,17 +27,10 @@ package com.mainstreetcode.teammate.util
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.RippleDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.StateListDrawable
-import android.graphics.drawable.shapes.RoundRectShape
 import android.util.TypedValue
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -53,8 +46,6 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.ripple.RippleUtils
 import com.mainstreetcode.teammate.R
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -62,7 +53,6 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 const val ITEM = 283
 const val USER = 284
@@ -86,7 +76,6 @@ const val BLOCKED_USER = 301
 const val THUMBNAIL_SIZE = 250
 const val FULL_RES_LOAD_DELAY = 200
 const val TOOLBAR_ANIM_DELAY = 200
-private const val DEFAULT_STROKE_VALUE = -1
 
 fun View.isDisplayingSystemUI(): Boolean =
         systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN != 0
@@ -174,46 +163,4 @@ fun extractPalette(imageView: ImageView): Single<Palette> {
             ?: return Single.error(TeammateException("Not a BitmapDrawable"))
 
     return Single.fromCallable { Palette.from(drawable.bitmap).generate() }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-}
-
-fun View.updateForegroundDrawable() {
-    if (this !is MaterialCardView) return
-
-    val rippleColor = getRippleColor(context)
-    val strokeWidth = strokeWidth
-    val strokeColor = strokeColor
-    val radius = radius
-
-    val fgDrawable = GradientDrawable()
-    fgDrawable.cornerRadius = radius
-    // In order to set a stroke, a size and color both need to be set. We default to a zero-width
-    // width size, but won't set a default color. This prevents drawing a stroke that blends in with
-    // the card but that could affect card spacing.
-    if (strokeColor != DEFAULT_STROKE_VALUE) fgDrawable.setStroke(strokeWidth, strokeColor)
-
-    if (!isClickable) return
-
-    val rippleDrawable: Drawable
-    if (RippleUtils.USE_FRAMEWORK_RIPPLE) {
-        rippleDrawable = RippleDrawable(ColorStateList.valueOf(rippleColor), null, createForegroundShape(radius))
-    } else {
-        rippleDrawable = StateListDrawable()
-        val foregroundShape = createForegroundShape(radius)
-        DrawableCompat.setTint(foregroundShape, rippleColor)
-        rippleDrawable.addState(intArrayOf(android.R.attr.state_pressed), foregroundShape)
-    }
-    foreground = LayerDrawable(arrayOf(rippleDrawable, fgDrawable))
-}
-
-private fun getRippleColor(context: Context): Int {
-    val value = TypedValue()
-    context.theme.resolveAttribute(R.attr.colorControlHighlight, value, true)
-    return value.data
-}
-
-private fun createForegroundShape(radius: Float): Drawable {
-    val radii = FloatArray(8)
-    Arrays.fill(radii, radius)
-    val shape = RoundRectShape(radii, null, null)
-    return ShapeDrawable(shape)
 }
