@@ -112,6 +112,7 @@ class Item internal constructor(
         const val COMPETITOR = 21
 
         val ignoreClicks: (() -> Unit)? = null
+        val emptyClicks: () -> Unit = {}
 
         fun number(
                 id: String,

@@ -119,7 +119,7 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
                     this::textChecker)
             Item.DATE -> DateTextInputStyle(this::enabler)
             else -> TextInputStyle(
-                    Item.ignoreClicks,
+                    Item.emptyClicks,
                     or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.ignoreClicks),
                     this::enabler,
                     this::textChecker,

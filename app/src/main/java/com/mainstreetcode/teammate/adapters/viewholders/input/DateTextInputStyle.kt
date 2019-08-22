@@ -45,8 +45,8 @@ import java.util.Calendar.getInstance
  * ViewHolder for selecting [com.mainstreetcode.teammate.model.Role]
  */
 class DateTextInputStyle(enabler: (Item) -> Boolean) : TextInputStyle(
-        Item.ignoreClicks,
-        Item.ignoreClicks,
+        Item.emptyClicks,
+        Item.emptyClicks,
         enabler,
         Item::noInputValidation,
         { R.drawable.ic_access_time_white_24dp }
