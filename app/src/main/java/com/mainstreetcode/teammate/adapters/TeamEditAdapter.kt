@@ -35,7 +35,6 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.Item.Companion.ZIP
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.neverEnabled
@@ -93,7 +92,14 @@ class TeamEditAdapter(
 
         override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.ABOUT -> item.neverEnabled
-            ZIP, Item.CITY, Item.INFO, Item.STATE, Item.INPUT, Item.SPORT, Item.NUMBER, Item.DESCRIPTION -> adapterListener.canEditFields()
+            Item.ZIP,
+            Item.CITY,
+            Item.INFO,
+            Item.STATE,
+            Item.INPUT,
+            Item.SPORT,
+            Item.NUMBER,
+            Item.DESCRIPTION -> adapterListener.canEditFields()
             else -> item.neverEnabled
         }
 
@@ -103,13 +109,13 @@ class TeamEditAdapter(
             Item.INPUT,
             Item.NUMBER -> item.noBlankFields
             Item.INFO -> item.noSpecialCharacters
-            ZIP,
+            Item.ZIP,
             Item.DESCRIPTION -> item.noInputValidation
             else -> item.noBlankFields
         }
 
         override fun invoke(item: Item): TextInputStyle = when (val itemType = item.itemType) {
-            ZIP,
+            Item.ZIP,
             Item.CITY,
             Item.INFO,
             Item.STATE,
@@ -117,7 +123,7 @@ class TeamEditAdapter(
             Item.INPUT,
             Item.NUMBER,
             Item.DESCRIPTION -> TextInputStyle(
-                    or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
+                    or((itemType == Item.CITY || itemType == Item.STATE || itemType == Item.ZIP),
                             adapterListener::onAddressClicked,
                             Item.noClicks),
                     or(itemType == Item.INPUT,
@@ -133,7 +139,7 @@ class TeamEditAdapter(
                     Sport::code,
                     this::enabler)
             else -> TextInputStyle(
-                    or((itemType == Item.CITY || itemType == Item.STATE || itemType == ZIP),
+                    or((itemType == Item.CITY || itemType == Item.STATE || itemType == Item.ZIP),
                             adapterListener::onAddressClicked,
                             Item.noClicks),
                     or(itemType == Item.INPUT,
