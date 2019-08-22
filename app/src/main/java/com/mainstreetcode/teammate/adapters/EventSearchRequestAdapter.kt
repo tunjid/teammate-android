@@ -106,7 +106,7 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
             Item.INFO,
             Item.LOCATION -> TextInputStyle(
                     adapterListener::onLocationClicked,
-                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.ignoreClicks),
+                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.noClicks),
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)
@@ -119,8 +119,8 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
                     this::textChecker)
             Item.DATE -> DateTextInputStyle(this::enabler)
             else -> TextInputStyle(
-                    Item.emptyClicks,
-                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.ignoreClicks),
+                    Item.proxyClicks,
+                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.noClicks),
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)

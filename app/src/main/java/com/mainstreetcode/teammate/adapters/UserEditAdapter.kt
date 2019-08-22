@@ -94,12 +94,12 @@ class UserEditAdapter(
             Item.INFO,
             Item.INPUT,
             Item.ABOUT -> TextInputStyle(
-                    Item.ignoreClicks,
+                    Item.noClicks,
                     adapterListener::onImageClick,
                     { adapterListener.canEdit() },
                     this::textChecker,
                     this::iconGetter)
-            else -> TextInputStyle(Item.ignoreClicks,
+            else -> TextInputStyle(Item.noClicks,
                     adapterListener::onImageClick,
                     { adapterListener.canEdit() },
                     this::textChecker,

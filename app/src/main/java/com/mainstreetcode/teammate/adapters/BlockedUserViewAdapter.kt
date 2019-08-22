@@ -72,8 +72,8 @@ class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdap
 
     private class Chooser : TextInputStyle.InputChooser() {
         override fun invoke(input: Item): TextInputStyle = TextInputStyle(
-                Item.ignoreClicks,
-                Item.ignoreClicks,
+                Item.noClicks,
+                Item.noClicks,
                 Item::neverEnabled,
                 Item::noInputValidation,
                 Item::noIcon

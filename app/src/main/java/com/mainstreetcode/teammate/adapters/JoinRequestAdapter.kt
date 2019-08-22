@@ -101,8 +101,8 @@ class JoinRequestAdapter(
                         { adapterListener.canEditRole() },
                         Item::noInputValidation)
                 else -> return TextInputStyle(
-                        Item.ignoreClicks,
-                        Item.ignoreClicks,
+                        Item.noClicks,
+                        Item.noClicks,
                         or<(Item) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item::neverEnabled),
                         Item::noInputValidation,
                         Item::noIcon)

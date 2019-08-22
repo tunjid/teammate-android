@@ -109,7 +109,7 @@ class RoleEditAdapter(
             Item.INPUT,
             Item.ABOUT,
             Item.NICKNAME -> TextInputStyle(
-                    Item.ignoreClicks,
+                    Item.noClicks,
                     adapterListener::onImageClick,
                     this::enabler,
                     this::textChecker,
@@ -121,7 +121,7 @@ class RoleEditAdapter(
                     Position::code
             ) { adapterListener.canChangeRolePosition() }
             else -> TextInputStyle(
-                    Item.ignoreClicks,
+                    Item.noClicks,
                     adapterListener::onImageClick,
                     this::enabler,
                     this::textChecker,

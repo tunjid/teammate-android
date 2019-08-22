@@ -111,8 +111,8 @@ class Item internal constructor(
         const val TOURNAMENT_STYLE = 20
         const val COMPETITOR = 21
 
-        val ignoreClicks: (() -> Unit)? = null
-        val emptyClicks: () -> Unit = {}
+        val noClicks: (() -> Unit)? = null // Not clickable
+        val proxyClicks: () -> Unit = {} // Proxies clicks for so the click triggers something else
 
         fun number(
                 id: String,

@@ -55,7 +55,7 @@ open class TextInputStyle(
             enabler: (Item) -> Boolean,
             errorChecker: (Item) -> CharSequence,
             iconVisibilityFunction: (Item) -> Int
-    ) : this(Item.ignoreClicks, Item.ignoreClicks, enabler, errorChecker, iconVisibilityFunction)
+    ) : this(Item.noClicks, Item.noClicks, enabler, errorChecker, iconVisibilityFunction)
 
     internal fun errorText(): CharSequence? = errorChecker.invoke(item)
 
