@@ -105,12 +105,12 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/home"
+            style="@style/TextAppearance.AppTheme.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
             android:maxLines="1"
-            android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/home_thumbnail"
@@ -119,12 +119,12 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/away"
+            style="@style/TextAppearance.AppTheme.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="end|center_vertical"
             android:maxLines="1"
-            android:textSize="@dimen/small_text"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/away_thumbnail"
@@ -134,10 +134,10 @@
 
         <TextView
             android:id="@+id/ended"
+            style="@style/TextAppearance.AppTheme.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/game_ended"
-            android:textSize="12sp"
             app:layout_constraintLeft_toLeftOf="@+id/home"
             app:layout_constraintRight_toRightOf="@+id/away"
             app:layout_constraintTop_toBottomOf="@+id/score"
@@ -145,6 +145,7 @@
 
         <TextView
             android:id="@+id/date"
+            style="@style/TextAppearance.AppTheme.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ MIT License
   ~
   ~ Copyright (c) 2019 Adetunji Dahunsi
@@ -29,6 +28,14 @@
     android:layout_height="match_parent">
 
     <View
+        android:id="@+id/top_padding"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/half_margin"
+        app:layout_constraintBottom_toTopOf="@+id/input"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <View
         android:id="@+id/spacer_toolbar"
         android:layout_width="0dp"
         android:layout_height="@dimen/action_bar_height"
@@ -38,6 +45,49 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/footer_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?alt_background"
+        android:elevation="@dimen/half_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/top_padding" />
+
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/single_margin"
+        android:layout_marginBottom="@dimen/half_margin"
+        android:background="@drawable/bg_chat_box"
+        android:elevation="@dimen/half_margin"
+        android:gravity="start"
+        android:hint="@string/message_hint"
+        android:paddingLeft="@dimen/single_margin"
+        android:paddingTop="@dimen/half_margin"
+        android:paddingRight="@dimen/single_margin"
+        android:paddingBottom="@dimen/half_margin"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/send" />
+
+    <ImageView
+        android:id="@+id/send"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:elevation="@dimen/half_margin"
+        android:padding="@dimen/single_margin"
+        android:tint="?icon_tint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/input"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/footer_background"
+        app:srcCompat="@drawable/ic_send_black_24dp" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refresh_layout"
@@ -77,54 +127,6 @@
         app:layout_constraintBottom_toTopOf="@+id/footer_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
-
-    <View
-        android:id="@+id/footer_background"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?alt_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/top_padding" />
-
-    <View
-        android:id="@+id/top_padding"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/half_margin"
-        app:layout_constraintBottom_toTopOf="@+id/input"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-
-    <EditText
-        android:id="@+id/input"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/single_margin"
-        android:layout_marginBottom="@dimen/half_margin"
-        android:background="@drawable/bg_chat_box"
-        android:gravity="start"
-        android:hint="@string/message_hint"
-        android:paddingLeft="@dimen/single_margin"
-        android:paddingTop="@dimen/half_margin"
-        android:paddingRight="@dimen/single_margin"
-        android:paddingBottom="@dimen/half_margin"
-        android:textSize="@dimen/small_text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/send" />
-
-    <ImageView
-        android:id="@+id/send"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:padding="@dimen/single_margin"
-        android:tint="?icon_tint"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/input"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/footer_background"
-        app:srcCompat="@drawable/ic_send_black_24dp" />
 
     <include
         layout="@layout/viewholder_empty"

@@ -23,16 +23,16 @@
   ~ SOFTWARE.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/item_container"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/half_margin"
     android:layout_marginLeft="@dimen/single_margin"
+    android:layout_marginTop="@dimen/half_margin"
     android:layout_marginRight="@dimen/single_margin"
-    android:layout_marginTop="@dimen/half_margin">
+    android:layout_marginBottom="@dimen/half_margin">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/thumbnail"
@@ -59,6 +59,7 @@
 
     <TextView
         android:id="@+id/item_title"
+        style="@style/TextAppearance.AppTheme.Headline6"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -66,7 +67,6 @@
         android:maxLines="2"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
-        android:textSize="@dimen/regular_text"
         app:layout_constraintBottom_toTopOf="@+id/item_subtitle"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintLeft_toRightOf="@+id/inset"
@@ -84,6 +84,7 @@
         android:maxLines="1"
         android:paddingLeft="@dimen/single_margin"
         android:paddingRight="@dimen/single_margin"
+        android:textColor="?input_text_color"
         app:autoSizeMinTextSize="@dimen/tiny_text"
         app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
         app:layout_constraintLeft_toRightOf="@+id/inset"
@@ -96,8 +97,9 @@
         android:layout_width="@dimen/double_margin"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingBottom="@dimen/quarter_margin"
         android:paddingTop="@dimen/half_margin"
+        android:paddingBottom="@dimen/quarter_margin"
+        android:textColor="?input_text_color"
         android:textSize="@dimen/regular_text"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

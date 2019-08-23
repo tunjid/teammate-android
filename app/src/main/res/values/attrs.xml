@@ -29,6 +29,9 @@
     <attr name="bottom_nav_selected" format="reference" />
     <attr name="bottom_nav_unselected" format="reference" />
 
+    <attr name="nav_bar_color" format="reference" />
+    <attr name="toolbar_text_color" format="reference" />
+
     <attr name="icon_tint" format="reference" />
     <attr name="alt_icon_tint" format="reference" />
     <attr name="alt_background" format="reference" />

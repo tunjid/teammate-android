@@ -25,17 +25,17 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/quarter_margin"
     android:layout_marginLeft="@dimen/single_margin"
-    android:layout_marginRight="@dimen/single_margin"
     android:layout_marginTop="@dimen/quarter_margin"
+    android:layout_marginRight="@dimen/single_margin"
+    android:layout_marginBottom="@dimen/quarter_margin"
     android:padding="@dimen/half_margin">
 
     <TextView
         android:id="@+id/home_stat_time"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/half_margin"
@@ -45,6 +45,7 @@
 
     <TextView
         android:id="@+id/home_stat_emoji"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/half_margin"
@@ -54,6 +55,7 @@
 
     <TextView
         android:id="@+id/home_stat_user"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/home_stat_name"
@@ -62,6 +64,7 @@
 
     <TextView
         android:id="@+id/home_stat_name"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/home_stat_time"
@@ -70,6 +73,7 @@
 
     <TextView
         android:id="@+id/away_stat_time"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/half_margin"
@@ -79,6 +83,7 @@
 
     <TextView
         android:id="@+id/away_stat_emoji"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/half_margin"
@@ -88,6 +93,7 @@
 
     <TextView
         android:id="@+id/away_stat_user"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/away_stat_name"
@@ -96,6 +102,7 @@
 
     <TextView
         android:id="@+id/away_stat_name"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/away_stat_time"

@@ -45,6 +45,7 @@
 
     <TextView
         android:id="@+id/hint"
+        style="@style/TextAppearance.AppTheme.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/quarter_margin"

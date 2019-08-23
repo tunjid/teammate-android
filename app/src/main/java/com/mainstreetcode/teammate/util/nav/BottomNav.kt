@@ -28,7 +28,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.IdRes
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.util.setMaterialOverlay
 import kotlin.math.min
 
 class BottomNav constructor(
@@ -50,6 +52,7 @@ class BottomNav constructor(
                     .setOnClickListener(onClick)
         }.toTypedArray()
 
+        container.setMaterialOverlay()
     }
 
     fun highlight(@IdRes highlighted: Int) {

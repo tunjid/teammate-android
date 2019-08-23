@@ -27,6 +27,8 @@ package com.mainstreetcode.teammate.util
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
@@ -46,6 +48,9 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.mainstreetcode.teammate.R
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -98,6 +103,29 @@ fun Context.getActivity(): Activity? {
         else unwrapped = unwrapped.baseContext
 
     return null
+}
+
+val Context.isInDarkMode: Boolean
+    get() = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+        Configuration.UI_MODE_NIGHT_NO,
+        Configuration.UI_MODE_NIGHT_UNDEFINED -> false
+        else -> true
+    }
+
+fun GoogleMap.updateTheme(context: Context) {
+    try {
+        setMapStyle(MapStyleOptions.loadRawResourceStyle(context, when {
+            context.isInDarkMode -> R.raw.map_dark
+            else -> R.raw.map_light
+        }))
+    } catch (e: Resources.NotFoundException) {
+    }
+}
+
+fun View.setMaterialOverlay(elevationOverride: Float = -1F) {
+    background = MaterialShapeDrawable.createWithElevationOverlay(context,
+            if (elevationOverride < 0) elevation
+            else elevationOverride)
 }
 
 fun Toolbar.updateToolBar(menu: Int, title: CharSequence) {

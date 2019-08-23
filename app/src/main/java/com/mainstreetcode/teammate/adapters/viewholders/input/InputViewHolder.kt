@@ -29,7 +29,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.text.Editable
-import android.text.TextUtils.isEmpty
 import android.text.TextWatcher
 import android.view.View
 import android.view.View.GONE
@@ -38,7 +37,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat.getDrawable
-import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnLayout
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
@@ -53,7 +52,7 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
     private var lastLineCount = 1
 
     protected val hint: TextView = itemView.findViewById(R.id.hint)
-    protected val text: EditText = itemView.findViewById(R.id.input)
+    protected val textField: EditText = itemView.findViewById(R.id.input)
     private val button: ImageButton = itemView.findViewById(R.id.button)
 
     internal var textInputStyle: TextInputStyle? = null
@@ -68,16 +67,16 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
         get() = -((itemView.height - hint.height) * HALF)
 
     init {
-        text.setOnFocusChangeListener { _, hasFocus ->
+        textField.setOnFocusChangeListener { _, hasFocus ->
             tintHint(hasFocus)
-            scaleHint(!hasFocus && isEmpty(text.text))
+            scaleHint(!hasFocus && textField.text.isBlank())
         }
     }
 
     override fun clear() {
         button.setOnClickListener(null)
-        text.setOnClickListener(null)
-        text.removeTextChangedListener(this)
+        textField.setOnClickListener(null)
+        textField.removeTextChangedListener(this)
 
         textInputStyle?.viewHolder = null
         textInputStyle = null
@@ -97,52 +96,50 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
         val item = inputStyle.item
 
         val newInputType = item.inputType
-        val oldInputType = text.inputType
+        val oldInputType = textField.inputType
 
         val isEditable = inputStyle.isEditable
         val isSelector = inputStyle.isSelector
 
-        val isEnabled = text.isEnabled
-        val isClickable = text.isClickable
-        val isFocusable = text.isFocusable
-        val isFocusableInTouchMode = text.isFocusableInTouchMode
+        val isEnabled = textField.isEnabled
+        val isClickable = textField.isClickable
+        val isFocusable = textField.isFocusable
+        val isFocusableInTouchMode = textField.isFocusableInTouchMode
 
         val newValue = item.formattedValue.toString()
-        val oldValue = text.text.toString()
+        val oldValue = textField.text.toString()
 
         val oldHint = hint.text
         val newHint = itemView.context.getString(item.stringRes)
 
-        if (isEnabled != isEditable) text.isEnabled = isEditable
-        if (isClickable != isSelector) text.isClickable = isSelector
-        if (isFocusable == isSelector) text.isFocusable = !isSelector
-        if (isFocusableInTouchMode == isSelector) text.isFocusableInTouchMode = !isSelector
+        if (isEnabled != isEditable) textField.isEnabled = isEditable
+        if (isClickable != isSelector) textField.isClickable = isSelector
+        if (isFocusable == isSelector) textField.isFocusable = !isSelector
+        if (isFocusableInTouchMode == isSelector) textField.isFocusableInTouchMode = !isSelector
 
         if (oldHint != newHint) hint.text = newHint
-        if (oldValue != newValue) text.setText(newValue)
-        if (oldInputType != newInputType) text.inputType = newInputType
+        if (oldValue != newValue) textField.setText(newValue)
+        if (oldInputType != newInputType) textField.inputType = newInputType
 
-        text.setOnClickListener(inputStyle.textClickListener())
+        textField.setOnClickListener(inputStyle.textClickListener())
         button.setOnClickListener(inputStyle.buttonClickListener())
 
-        text.removeTextChangedListener(this)
-        if (!isSelector) text.addTextChangedListener(this)
+        textField.removeTextChangedListener(this)
+        if (!isSelector) textField.addTextChangedListener(this)
 
         updateButton()
         checkForErrors()
-        setTintAlpha(text.hasFocus())
-        hint.doOnNextLayout { scaleHint(isEmpty(text.text)) }
+        setTintAlpha(textField.hasFocus())
+        hint.doOnLayout { scaleHint(textField.text.isBlank()) }
     }
 
-    override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {/* Nothing */
-    }
+    override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) = Unit /* Nothing */
 
-    override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {/* Nothing */
-    }
+    override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) = Unit /* Nothing */
 
     override fun afterTextChanged(editable: Editable) {
-        val currentLineCount = text.lineCount
-        if (lastLineCount != currentLineCount) hint.doOnNextLayout { scaleHint(false) }
+        val currentLineCount = textField.lineCount
+        if (lastLineCount != currentLineCount) hint.doOnLayout { scaleHint(false) }
         lastLineCount = currentLineCount
 
         if (textInputStyle == null || textInputStyle!!.isSelector) return
@@ -151,21 +148,16 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
     }
 
     internal open fun updateText(text: CharSequence) {
-        this.text.setText(text)
+        this.textField.setText(text)
         checkForErrors()
-        hint.doOnNextLayout { scaleHint(isEmpty(text)) }
+        hint.doOnLayout { scaleHint(text.isBlank()) }
     }
 
     private fun checkForErrors() {
-        if (textInputStyle == null) return
+        val errorMessage = textInputStyle?.errorText()
+        if (errorMessage == textField.error) return
 
-        val errorMessage = textInputStyle!!.errorText()
-        if (errorMessage == text.error) return
-
-        if (isEmpty(errorMessage))
-            text.error = null
-        else
-            text.error = errorMessage
+        textField.error = if (errorMessage.isNullOrBlank()) null else errorMessage
     }
 
     private fun updateButton() {
@@ -178,7 +170,7 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
 
         if (oldVisibility != newVisibility) button.visibility = newVisibility
         if (newIcon != 0)
-            disposables.add(Single.fromCallable { getDrawable(text.context, newIcon) }
+            disposables.add(Single.fromCallable { getDrawable(textField.context, newIcon) }
                     .subscribeOn(Schedulers.io())
                     .observeOn(mainThread())
                     .subscribe(button::setImageDrawable, ErrorHandler.EMPTY::invoke))
@@ -201,18 +193,20 @@ open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView
     private fun tintHint(hasFocus: Boolean) {
         val start = hint.currentTextColor
         val end = hint.context.resolveThemeColor(if (hasFocus) R.attr.colorSecondary else R.attr.input_text_color)
-        val animator = ValueAnimator.ofObject(ArgbEvaluator(), start, end)
 
-        animator.duration = HINT_ANIMATION_DURATION.toLong()
-        animator.addUpdateListener { animation -> hint.setTextColor(animation.animatedValue as Int) }
-        animator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) = setTintAlpha(hasFocus)
-        })
-        animator.start()
+        ValueAnimator.ofObject(ArgbEvaluator(), start, end).apply {
+            duration = HINT_ANIMATION_DURATION.toLong()
+            addUpdateListener { animation -> hint.setTextColor(animation.animatedValue as Int) }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) = setTintAlpha(hasFocus)
+            })
+            start()
+        }
     }
 
     private fun setTintAlpha(hasFocus: Boolean) {
-        hint.alpha = if (textInputStyle != null && !textInputStyle!!.isEditable && !hasFocus) 0.38f else 1f
+        val notEditable = textInputStyle?.isEditable?.not() ?: false
+        hint.alpha = if (notEditable && !hasFocus) 0.38f else 1f
     }
 
     companion object {

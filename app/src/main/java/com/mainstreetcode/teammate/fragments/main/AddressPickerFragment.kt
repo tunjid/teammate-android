@@ -48,6 +48,8 @@ import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.fullName
+import com.mainstreetcode.teammate.util.setMaterialOverlay
+import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import java.util.concurrent.atomic.AtomicReference
 
@@ -81,6 +83,7 @@ class AddressPickerFragment : MainActivityFragment() {
         val searchView = root.findViewById<SearchView>(R.id.search_field)
         val recyclerView = root.findViewById<RecyclerView>(R.id.search_predictions)
         location = root.findViewById(R.id.location)
+        mapView = root.findViewById(R.id.map_view)
 
         scrollManager = ScrollManager.with<BaseViewHolder<*>>(recyclerView)
                 .withAdapter(AutoCompleteAdapter(instantSearch.currentItems, object : AutoCompleteAdapter.AdapterListener {
@@ -112,7 +115,7 @@ class AddressPickerFragment : MainActivityFragment() {
             }
         })
 
-        mapView = root.findViewById(R.id.map_view)
+        location.setMaterialOverlay(resources.getDimensionPixelSize(R.dimen.half_margin).toFloat())
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this::onMapReady)
 
@@ -185,6 +188,7 @@ class AddressPickerFragment : MainActivityFragment() {
             mapView.getMapAsync { map -> map.animateCamera(newLatLngZoom(location, MAP_ZOOM.toFloat())) }
 
     private fun onMapReady(map: GoogleMap) {
+        map.updateTheme(requireContext())
         map.setOnCameraIdleListener { onMapIdle(map) }
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted)
     }

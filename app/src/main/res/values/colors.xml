@@ -24,12 +24,18 @@
   -->
 
 <resources>
-    <color name="teammate_green">#009754</color>
-    <color name="teammate_blue">#52D6FF</color>
+    <color name="app_primary">#009754</color>
+    <color name="app_secondary">#52D6FF</color>
     <color name="ad_yellow">#FFB507</color>
     <color name="black_50">#80000000</color>
     <color name="black_75">#C0000000</color>
-    <color name="light_grey">#E0E0E0</color>
     <color name="disabled_text">#C2C2C2</color>
     <color name="tournament_gold">#DAA520</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="grey_500">#9E9E9E</color>
+
+    <color name="dark_background">#292929</color>
+    <color name="dark_chat_background">#424242</color>
+    <color name="app_dark_secondary">#81D4FA</color>
+
 </resources>

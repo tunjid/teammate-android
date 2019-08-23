@@ -25,18 +25,21 @@
 package com.mainstreetcode.teammate.util.nav
 
 import android.content.Context
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.LinearLayout.HORIZONTAL
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.RemoteImageAdapter
 import com.mainstreetcode.teammate.adapters.TeamAdapter
@@ -46,6 +49,7 @@ import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
 import io.reactivex.disposables.CompositeDisposable
@@ -96,6 +100,17 @@ class NavDialogFragment : BottomSheetDialogFragment() {
 
             override fun onViewDetachedFromWindow(v: View) = disposables.clear()
         })
+
+        val cornerSize = resources.getDimensionPixelSize(R.dimen.single_and_half_margin)
+        val shapePathModel = ShapeAppearanceModel().apply {
+            setTopLeftCorner(CornerFamily.ROUNDED, cornerSize)
+            setTopRightCorner(CornerFamily.ROUNDED, cornerSize)
+        }
+
+        root.background = MaterialShapeDrawable(shapePathModel).apply {
+            setTint(inflater.context.resolveThemeColor(R.attr.alt_background))
+            paintStyle = Paint.Style.FILL
+        }
 
         disposables.add(teamViewModel.nonDefaultTeams(list).subscribe(scrollManager::onDiff, ErrorHandler.EMPTY::invoke))
         disposables.add(teamViewModel.gofer(current).get().subscribe({ teamViewHolder.bind(teamViewModel.defaultTeam) }, Throwable::printStackTrace))

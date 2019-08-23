@@ -49,6 +49,7 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.ErrorHandler
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
@@ -72,7 +73,7 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
 
     protected open val altToolbarMenu: Int @MenuRes get() = 0
 
-    protected open val navBarColor: Int @ColorInt get() = if (SDK_INT >= O) LIGHT_NAV_BAR_COLOR else Color.BLACK
+    protected open val navBarColor: Int @ColorInt get() = if (SDK_INT >= O) requireActivity().resolveThemeColor(R.attr.nav_bar_color) else Color.BLACK
 
     protected open val toolbarTitle: CharSequence get() = ""
 
@@ -147,32 +148,28 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
     }
 
     protected fun setEnterExitTransitions() {
-        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val baseTransition = Fade()
+        val baseTransition = Fade()
 
-            enterTransition = baseTransition
-            exitTransition = baseTransition
+        enterTransition = baseTransition
+        exitTransition = baseTransition
 
-            if (Config.isStaticVariant) return
+        if (Config.isStaticVariant) return
 
-            val baseSharedTransition = TransitionSet()
-                    .addTransition(ChangeBounds())
-                    .addTransition(ChangeTransform())
-                    .addTransition(ChangeImageTransform())
-                    .setOrdering(TransitionSet.ORDERING_TOGETHER)
+        val baseSharedTransition = TransitionSet()
+                .addTransition(ChangeBounds())
+                .addTransition(ChangeTransform())
+                .addTransition(ChangeImageTransform())
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
 
-            sharedElementEnterTransition = baseSharedTransition
-            sharedElementReturnTransition = baseSharedTransition
-        }
+        sharedElementEnterTransition = baseSharedTransition
+        sharedElementReturnTransition = baseSharedTransition
     }
 
     protected fun removeEnterExitTransitions() {
-        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            enterTransition = Fade()
-            exitTransition = Fade()
-            sharedElementEnterTransition = null
-            sharedElementReturnTransition = null
-        }
+        enterTransition = Fade()
+        exitTransition = Fade()
+        sharedElementEnterTransition = null
+        sharedElementReturnTransition = null
     }
 
     protected open fun handleErrorMessage(message: Message) {
@@ -222,8 +219,6 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
 
         val NO_TOP: InsetFlags = InsetFlags.NO_TOP
         val NONE: InsetFlags = InsetFlags.NONE
-        private const val LIGHT_NAV_BAR_COLOR = -0x1f1f20 // Same as R.color.light_grey
-
     }
 
 }

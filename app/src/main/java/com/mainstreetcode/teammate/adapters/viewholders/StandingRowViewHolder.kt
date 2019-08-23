@@ -34,6 +34,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StandingsAdapter
 import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.squareup.picasso.Picasso
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
@@ -88,6 +89,7 @@ class StandingRowViewHolder(
         if (position <= max) return columns.getChildAt(position) as TextView
 
         val textView = TextView(itemView.context)
+        textView.setTextColor(itemView.context.resolveThemeColor(R.attr.input_text_color))
         textView.gravity = CENTER
 
         val params = LinearLayout.LayoutParams(margin, MATCH_PARENT)

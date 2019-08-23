@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.baseclasses
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import android.os.Bundle
@@ -72,7 +71,9 @@ import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.FabInteractor
 import com.mainstreetcode.teammate.util.TOOLBAR_ANIM_DELAY
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
+import com.mainstreetcode.teammate.util.isInDarkMode
 import com.mainstreetcode.teammate.util.resolveThemeColor
+import com.mainstreetcode.teammate.util.setMaterialOverlay
 import com.mainstreetcode.teammate.util.updateToolBar
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
 import com.tunjid.androidbootstrap.view.animator.ViewHider
@@ -134,10 +135,17 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         get() = window.decorView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(when {
+            isInDarkMode -> R.style.AppDarkTheme
+            else -> R.style.AppTheme
+        })
+
         super.onCreate(savedInstanceState)
         supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false)
-        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
+
+        val color = ContextCompat.getColor(this, R.color.transparent)
+        window.statusBarColor = color
+        window.navigationBarColor = color
 
         uiState = if (savedInstanceState == null) UiState.freshState() else savedInstanceState.getParcelable(UI_STATE)!!
     }
@@ -164,6 +172,7 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         fabInteractor = FabInteractor(fab)
 
         fab.backgroundTintList = ColorStateList.valueOf(resolveThemeColor(R.attr.colorSecondary))
+        bottomInsetView.setMaterialOverlay()
 
         padding.setOnTouchListener { _, event ->
             if (event.action == ACTION_UP) setKeyboardPadding(bottomInset)
@@ -176,9 +185,9 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
             selected || onOptionsItemSelected(item)
         }
 
-        val decorView = decorView
         decorView.systemUiVisibility = DEFAULT_SYSTEM_UI_FLAGS
         decorView.setOnSystemUiVisibilityChangeListener { toggleToolbar(!decorView.isDisplayingSystemUI()) }
+
         setOnApplyWindowInsetsListener(constraintLayout) { _, insets -> consumeSystemInsets(insets) }
         showSystemUI()
     }
@@ -209,20 +218,19 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     override fun updateMainToolBar(menu: Int, title: CharSequence) =
             toolbar.updateToolBar(menu, title)
 
-    override fun updateAltToolbar(menu: Int, title: CharSequence) {}
+    override fun updateAltToolbar(menu: Int, title: CharSequence) = Unit
 
     override fun toggleToolbar(show: Boolean) =
             if (show) toolbarHider.show()
             else toolbarHider.hide()
 
-    override fun toggleAltToolbar(show: Boolean) {}
+    override fun toggleAltToolbar(show: Boolean) = Unit
 
-    override fun toggleBottombar(show: Boolean) {}
+    override fun toggleBottombar(show: Boolean) = Unit
 
-    override fun toggleFab(show: Boolean) {
-        if (show) fabHider.show()
-        else fabHider.hide()
-    }
+    override fun toggleFab(show: Boolean) =
+            if (show) fabHider.show()
+            else fabHider.hide()
 
     @SuppressLint("Range", "WrongConstant")
     override fun toggleProgress(show: Boolean) {
@@ -249,8 +257,8 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         decorView.systemUiVisibility = visibility
     }
 
-    override fun setFabIcon(@DrawableRes icon: Int, @StringRes textRes: Int) {
-        runOnUiThread { if (icon != 0 && textRes != 0) fabInteractor.update(icon, textRes) }
+    override fun setFabIcon(@DrawableRes icon: Int, @StringRes textRes: Int) = runOnUiThread {
+        if (icon != 0 && textRes != 0) fabInteractor.update(icon, textRes)
     }
 
     override fun setNavBarColor(color: Int) {

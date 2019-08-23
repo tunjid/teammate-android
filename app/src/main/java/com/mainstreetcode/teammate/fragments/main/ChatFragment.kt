@@ -55,6 +55,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.Deferrer
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.util.setMaterialOverlay
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.tunjid.androidbootstrap.view.animator.ViewHider
 import com.tunjid.androidbootstrap.view.animator.ViewHider.TOP
@@ -110,6 +111,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         val send = root.findViewById<View>(R.id.send)
         dateView = root.findViewById(R.id.date)
         newMessages = root.findViewById(R.id.new_messages)
+        root.findViewById<View>(R.id.footer_background)?.setMaterialOverlay()
 
         dateHider = ViewHider.of(dateView).setDirection(TOP).build()
         newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build()

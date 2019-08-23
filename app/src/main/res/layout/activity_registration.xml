@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ MIT License
   ~
   ~ Copyright (c) 2019 Adetunji Dahunsi
@@ -81,7 +82,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
-            android:elevation="@dimen/half_margin" />
+            android:elevation="@dimen/half_margin"
+            android:textColor="?button_text_color"
+            app:iconTint="?button_text_color" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <View

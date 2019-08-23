@@ -46,6 +46,7 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
@@ -169,6 +170,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     }
 
     private fun onMapReady(map: GoogleMap) {
+        map.updateTheme(requireContext())
         map.setOnCameraIdleListener { onMapIdle(map) }
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted)
         map.setOnInfoWindowClickListener(this::onMarkerInfoWindowClicked)
