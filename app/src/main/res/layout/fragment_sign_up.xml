@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ MIT License
   ~
@@ -83,6 +82,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/last_name_wrapper"
+            style="@style/Widget.Design.TextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/single_margin"

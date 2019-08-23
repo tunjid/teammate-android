@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ MIT License
   ~
@@ -33,7 +32,7 @@
         android:id="@+id/border"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="?colorSecondary"
+        android:background="?splash_header_color"
         app:layout_constraintBottom_toBottomOf="@+id/sub_title"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -47,7 +46,6 @@
         android:gravity="center"
         android:paddingTop="@dimen/quadruple_margin"
         android:text="@string/app_name"
-
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="@+id/border"
         app:layout_constraintRight_toRightOf="@+id/border"
@@ -65,8 +63,6 @@
         android:gravity="center"
         android:paddingBottom="@dimen/single_margin"
         android:text="@string/splash_subtitle"
-
-
         app:layout_constraintLeft_toLeftOf="@+id/border"
         app:layout_constraintRight_toRightOf="@+id/border"
         app:layout_constraintTop_toBottomOf="@+id/title" />
@@ -87,8 +83,7 @@
         android:text="@string/login_facebook"
         android:textAllCaps="false"
         app:icon="@drawable/ic_facebook_box_24dp"
-
-
+        app:iconTint="@color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sub_title"
@@ -100,7 +95,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/single_and_half_margin"
-        android:backgroundTint="?colorSecondary"
+        android:backgroundTint="?splash_header_color"
         android:drawablePadding="@dimen/single_margin"
         android:gravity="center"
         android:paddingLeft="@dimen/single_margin"
@@ -108,6 +103,7 @@
         android:text="@string/login_email"
         android:textAllCaps="false"
         app:icon="@drawable/ic_email_white_24dp"
+        app:iconTint="@color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/facebook_login"

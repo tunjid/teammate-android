@@ -25,6 +25,7 @@
 
 <resources>
     <attr name="headline_font" format="reference" />
+    <attr name="splash_header_color" format="reference" />
 
     <attr name="bottom_nav_selected" format="reference" />
     <attr name="bottom_nav_unselected" format="reference" />

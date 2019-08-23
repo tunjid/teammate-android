@@ -27,6 +27,8 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="headline_font">@font/roboto</item>
 
+        <item name="splash_header_color">@color/app_secondary</item>
+
         <item name="nav_bar_color">@color/grey_300</item>
         <item name="toolbar_text_color">@color/white</item>
 
