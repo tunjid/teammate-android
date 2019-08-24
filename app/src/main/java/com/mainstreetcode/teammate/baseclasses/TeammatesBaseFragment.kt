@@ -147,21 +147,13 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
     }
 
     protected fun setEnterExitTransitions() {
-        val baseTransition = Fade()
-
-        enterTransition = baseTransition
-        exitTransition = baseTransition
-
         if (Config.isStaticVariant) return
 
-        val baseSharedTransition = TransitionSet()
-                .addTransition(ChangeBounds())
-                .addTransition(ChangeTransform())
-                .addTransition(ChangeImageTransform())
-                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+        enterTransition = Fade()
+        exitTransition = Fade()
 
-        sharedElementEnterTransition = baseSharedTransition
-        sharedElementReturnTransition = baseSharedTransition
+        sharedElementEnterTransition = cardTransition()
+        sharedElementReturnTransition = cardTransition()
     }
 
     protected fun removeEnterExitTransitions() {
@@ -213,6 +205,12 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
             this.altToolbarTitle,
             if (view == null) null else this
     )
+
+    private fun cardTransition(): TransitionSet = TransitionSet()
+            .addTransition(ChangeBounds())
+            .addTransition(ChangeTransform())
+            .addTransition(ChangeImageTransform())
+            .setOrdering(TransitionSet.ORDERING_TOGETHER)
 
     companion object {
 
