@@ -37,6 +37,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
@@ -57,6 +58,7 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.processEmoji
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 
 class TournamentDetailFragment : MainActivityFragment() {
 
@@ -151,6 +153,10 @@ class TournamentDetailFragment : MainActivityFragment() {
         activity?.invalidateOptionsMenu()
     }
 
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
+        return super.provideFragmentTransaction(fragmentTo)
+    }
+
     private fun checkCompetitor() {
         if (competitor.isEmpty || competitor.isAccepted) return
         if (restoredFromBackStack())
@@ -214,8 +220,8 @@ class TournamentDetailFragment : MainActivityFragment() {
         if (winner.isEmpty) return
 
         when (val competitive = winner.entity) {
-            is User -> UserViewHolder(winnerView, UserAdapter.AdapterListener.asSAM { }).apply { bind(competitive) }
-            is Team -> TeamViewHolder(winnerView, TeamAdapter.AdapterListener.asSAM { }).apply { bind(competitive) }
+            is User -> UserViewHolder(winnerView, UserAdapter.AdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
+            is Team -> TeamViewHolder(winnerView, TeamAdapter.AdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
             else -> return
         }
 
