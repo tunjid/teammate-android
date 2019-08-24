@@ -49,7 +49,7 @@
         <item name="alt_text_color">@color/white</item>
         <item name="light_text_color">@color/grey_300</item>
         <item name="editTextColor">@color/dark_grey</item>
-        <item name="input_text_color">@color/dark_grey</item>
+        <item name="main_text_color">@color/dark_grey</item>
         <item name="button_text_color">@color/white</item>
 
         <item name="card_elevation">@dimen/eigth_margin</item>
@@ -68,7 +68,7 @@
 
         <item name="colorControlNormal">@color/black</item>
         <item name="colorSurface">?alt_background</item>
-        <item name="colorOnSurface">?input_text_color</item>
+        <item name="colorOnSurface">?main_text_color</item>
         <item name="android:colorBackground">?alt_background</item>
         <item name="android:windowBackground">@color/app_primary</item>
 
@@ -93,26 +93,26 @@
     <style name="TextAppearance.AppTheme.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">?input_text_color</item>
+        <item name="android:textColor">?main_text_color</item>
     </style>
 
     <style name="TextAppearance.AppTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">?input_text_color</item>
+        <item name="android:textColor">?main_text_color</item>
     </style>
 
     <style name="TextAppearance.AppTheme.Body2" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">?input_text_color</item>
+        <item name="android:textColor">?main_text_color</item>
     </style>
 
     <style name="TextAppearance.AppTheme.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="fontFamily">?headline_font</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">?input_text_color</item>
+        <item name="android:textColor">?main_text_color</item>
     </style>
 
     <style name="AppTheme.NavBottomSheetStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">

@@ -89,7 +89,7 @@ class StandingRowViewHolder(
         if (position <= max) return columns.getChildAt(position) as TextView
 
         val textView = TextView(itemView.context)
-        textView.setTextColor(itemView.context.resolveThemeColor(R.attr.input_text_color))
+        textView.setTextColor(itemView.context.resolveThemeColor(R.attr.main_text_color))
         textView.gravity = CENTER
 
         val params = LinearLayout.LayoutParams(margin, MATCH_PARENT)

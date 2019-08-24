@@ -42,7 +42,7 @@
 
     <attr name="alt_text_color" format="reference" />
     <attr name="light_text_color" format="reference" />
-    <attr name="input_text_color" format="reference" />
+    <attr name="main_text_color" format="reference" />
     <attr name="button_text_color" format="reference" />
 
     <attr name="card_elevation" format="reference" />

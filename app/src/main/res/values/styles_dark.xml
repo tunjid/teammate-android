@@ -50,7 +50,7 @@
         <item name="alt_text_color">@color/grey_300</item>
         <item name="light_text_color">@color/grey_300</item>
         <item name="editTextColor">@color/dark_grey</item>
-        <item name="input_text_color">@color/grey_300</item>
+        <item name="main_text_color">@color/grey_300</item>
         <item name="button_text_color">@color/black</item>
 
         <item name="chat_background_color">@color/grey_800</item>
