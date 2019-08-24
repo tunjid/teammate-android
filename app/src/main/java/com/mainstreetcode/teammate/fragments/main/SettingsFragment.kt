@@ -78,11 +78,16 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
     override fun onSettingsItemClicked(item: SettingsItem) {
         when (item.stringRes) {
             R.string.sign_out -> signOut()
+            R.string.settings_set_theme -> AlertDialog.Builder(requireContext())
+                    .setSingleChoiceItems(prefsViewModel.themeOptions, prefsViewModel.checkedIndex) { dialog, index ->
+                        prefsViewModel.onThemeSelected(index)
+                        dialog.dismiss()
+                    }
+                    .show()
             R.string.show_on_boarding -> {
                 prefsViewModel.isOnBoarded = false
                 showFragment(FeedFragment.newInstance())
             }
-            R.string.my_profile -> showFragment(UserEditFragment.newInstance(userViewModel.currentUser))
         }
     }
 
@@ -90,6 +95,7 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
 
         private val items = listOf(
                 SettingsItem(R.string.show_on_boarding, R.drawable.ic_teach_24dp),
+                SettingsItem(R.string.settings_set_theme, R.drawable.ic_theme_24dp),
                 SettingsItem(R.string.sign_out, R.drawable.ic_logout_white_24dp)
         )
 

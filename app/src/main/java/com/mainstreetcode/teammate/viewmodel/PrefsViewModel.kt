@@ -24,6 +24,15 @@
 
 package com.mainstreetcode.teammate.viewmodel
 
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import com.mainstreetcode.teammate.App
+import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Prefs
 import com.mainstreetcode.teammate.repository.PrefsRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
@@ -33,11 +42,40 @@ class PrefsViewModel : BaseViewModel() {
     private val prefsRepository = RepoProvider.forRepo(PrefsRepo::class.java)
     private val prefs: Prefs = prefsRepository.current
 
+    private val nightModes = intArrayOf(MODE_NIGHT_NO, MODE_NIGHT_YES, if (SDK_INT >= Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY)
+
+    val nightUiMode: Int
+        get() = prefs.nightUiMode
+
+    val checkedIndex: Int
+        get() = nightModes.indexOf(nightUiMode)
+
     var isOnBoarded: Boolean
         get() = prefs.isOnBoarded
-        set(isOnBoarded) {
-            prefs.isOnBoarded = isOnBoarded
-            prefsRepository.createOrUpdate(prefs)
+        set(value) = updatePrefs { isOnBoarded = value }
+
+    val themeOptions: Array<CharSequence>
+        get() = App.instance.run {
+            nightModes.map {
+                getString(when (it) {
+                    MODE_NIGHT_NO -> R.string.settings_light_theme
+                    MODE_NIGHT_YES -> R.string.settings_dark_theme
+                    MODE_NIGHT_FOLLOW_SYSTEM -> R.string.settings_system_theme
+                    MODE_NIGHT_AUTO_BATTERY -> R.string.settings_battery_saver_theme
+                    else -> R.string.empty_string
+                })
+            }.toTypedArray()
         }
 
+    fun onThemeSelected(index: Int) = updateNightMode(nightModes[index])
+
+    private fun updatePrefs(updater: Prefs.() -> Unit) {
+        updater.invoke(prefs)
+        prefsRepository.createOrUpdate(prefs)
+    }
+
+    private fun updateNightMode(nightUiMode: Int) {
+        AppCompatDelegate.setDefaultNightMode(nightUiMode)
+        updatePrefs { this.nightUiMode = nightUiMode }
+    }
 }

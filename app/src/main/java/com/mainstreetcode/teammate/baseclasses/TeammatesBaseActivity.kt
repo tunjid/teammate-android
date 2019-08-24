@@ -48,6 +48,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -59,6 +60,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -78,6 +80,7 @@ import com.mainstreetcode.teammate.util.isInDarkMode
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.mainstreetcode.teammate.util.setMaterialOverlay
 import com.mainstreetcode.teammate.util.updateToolBar
+import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
 import com.tunjid.androidbootstrap.view.animator.ViewHider
 import com.tunjid.androidbootstrap.view.animator.ViewHider.BOTTOM
@@ -138,10 +141,9 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         get() = window.decorView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(when {
-            isInDarkMode -> R.style.AppDarkTheme
-            else -> R.style.AppTheme
-        })
+        AppCompatDelegate.setDefaultNightMode(ViewModelProviders.of(this).get(PrefsViewModel::class.java).nightUiMode)
+
+        setTheme(if (isInDarkMode) R.style.AppDarkTheme else R.style.AppTheme)
 
         super.onCreate(savedInstanceState)
         supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentViewCreatedCallback, false)

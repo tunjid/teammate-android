@@ -40,15 +40,10 @@ class PrefsDao : SharedPreferencesDao<Prefs>() {
     override val empty: Prefs
         get() = Prefs.empty()
 
-    override fun preferenceName(): String {
-        return "device-prefs"
-    }
+    override fun preferenceName(): String = "device-prefs"
 
-    override fun to(device: Prefs): String {
-        return TeammateService.getGson().toJson(device)
-    }
+    override fun to(item: Prefs): String = TeammateService.getGson().toJson(item)
 
-    override fun from(json: String): Prefs {
-        return TeammateService.getGson().fromJson(json, Prefs::class.java)
-    }
+    override fun from(serialized: String): Prefs =
+            TeammateService.getGson().fromJson(serialized, Prefs::class.java)
 }

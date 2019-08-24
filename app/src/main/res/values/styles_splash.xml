@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ MIT License
   ~
@@ -24,20 +23,12 @@
   -->
 
 <resources>
-    <color name="app_primary">#009754</color>
-    <color name="app_secondary">#52D6FF</color>
-    <color name="ad_yellow">#FFB507</color>
-    <color name="black_50">#80000000</color>
-    <color name="black_75">#C0000000</color>
-    <color name="disabled_text">#C2C2C2</color>
-    <color name="tournament_gold">#DAA520</color>
-    <color name="grey_300">#E0E0E0</color>
-    <color name="grey_500">#9E9E9E</color>
-    <color name="grey_800">#424242</color>
-
-    <color name="dark_background">#292929</color>
-    <color name="app_dark_secondary">#81D4FA</color>
-    <color name="app_dark_secondary_variant">#0277BD</color>
-
-    <color name="splash_background">#009754</color>
+    <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/splash_background</item>
+        <item name="colorPrimaryDark">@color/splash_background</item>
+        <item name="colorPrimaryVariant">@color/splash_background</item>
+        <item name="colorSecondary">@color/splash_background</item>
+        <item name="colorSecondaryVariant">@color/splash_background</item>
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
 </resources>

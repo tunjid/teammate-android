@@ -26,19 +26,22 @@ package com.mainstreetcode.teammate.model
 
 
 import android.annotation.SuppressLint
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
 import android.os.Parcel
-
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-
 import java.lang.reflect.Type
 
 @SuppressLint("ParcelCreator")
 class Prefs private constructor() : Model<Prefs> {
 
     var isOnBoarded: Boolean = false
+    var nightUiMode: Int = if (SDK_INT >= Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY
 
     override val isEmpty: Boolean
         get() = false
@@ -48,6 +51,7 @@ class Prefs private constructor() : Model<Prefs> {
 
     override fun update(updated: Prefs) {
         this.isOnBoarded = updated.isOnBoarded
+        this.nightUiMode = updated.nightUiMode
     }
 
     override fun compareTo(other: Prefs): Int = 0
@@ -56,7 +60,7 @@ class Prefs private constructor() : Model<Prefs> {
 
     override fun describeContents(): Int = 0
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {}
+    override fun writeToParcel(dest: Parcel, flags: Int) = Unit
 
     class GsonAdapter : JsonSerializer<Prefs> {
 
@@ -64,6 +68,7 @@ class Prefs private constructor() : Model<Prefs> {
             val serialized = JsonObject()
 
             serialized.addProperty(ON_BOARDED, src.isOnBoarded)
+            serialized.addProperty(NIGHT_UI_MODE, src.nightUiMode)
 
             return serialized
         }
@@ -71,6 +76,7 @@ class Prefs private constructor() : Model<Prefs> {
         companion object {
 
             private const val ON_BOARDED = "onBoarded"
+            private const val NIGHT_UI_MODE = "nightUiMode"
         }
     }
 
