@@ -88,7 +88,7 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(teamMemberViewModel.refresh(team).subscribe(this::onTeamUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = Runnable { disposables.add(teamMemberViewModel.refresh(team).subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke)) }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
@@ -190,19 +190,17 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     }
 
     private fun fetchTeamMembers(fetchLatest: Boolean) {
-        if (fetchLatest)
-            scrollManager.setRefreshing()
-        else
-            toggleProgress(true)
+        if (fetchLatest) scrollManager.setRefreshing()
+        else toggleProgress(true)
 
-        disposables.add(teamMemberViewModel.getMany(team, fetchLatest).subscribe(this::onTeamUpdated, defaultErrorHandler::invoke))
+        disposables.add(teamMemberViewModel.getMany(team, fetchLatest).subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke))
     }
 
     private fun deleteTeam() {
         disposables.add(teamViewModel.deleteTeam(team).subscribe({ onTeamDeleted() }, defaultErrorHandler::invoke))
     }
 
-    private fun onTeamUpdated(diffResult: DiffUtil.DiffResult) {
+    private fun onTeamMembersUpdated(diffResult: DiffUtil.DiffResult) {
         scrollManager.onDiff(diffResult)
         requireActivity().invalidateOptionsMenu()
     }

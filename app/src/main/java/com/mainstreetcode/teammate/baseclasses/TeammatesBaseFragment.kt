@@ -27,7 +27,6 @@ package com.mainstreetcode.teammate.baseclasses
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import android.transition.ChangeBounds

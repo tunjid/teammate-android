@@ -146,6 +146,11 @@ class TournamentDetailFragment : MainActivityFragment() {
         if (view.id == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament))
     }
 
+    override fun togglePersistentUi() {
+        super.togglePersistentUi()
+        activity?.invalidateOptionsMenu()
+    }
+
     private fun checkCompetitor() {
         if (competitor.isEmpty || competitor.isAccepted) return
         if (restoredFromBackStack())
