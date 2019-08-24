@@ -89,7 +89,6 @@ abstract class ModelRepo<T : Model<T>> {
         models
     }
 
-
     internal fun fetchThenGetModel(localSource: Maybe<T>, remoteSource: Maybe<T>): Flowable<T> {
         var local = localSource
         var remote = remoteSource
