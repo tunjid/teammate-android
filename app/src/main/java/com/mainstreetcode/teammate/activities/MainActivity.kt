@@ -70,6 +70,7 @@ import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
 import com.mainstreetcode.teammate.fragments.main.TeamSearchFragment
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment
+import com.mainstreetcode.teammate.fragments.main.TournamentsFragment
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Event
@@ -125,6 +126,7 @@ class MainActivity : TeammatesBaseActivity(), BottomSheetController {
                 t.contains(ChatFragment::class.java.simpleName) -> id = R.id.action_messages
                 t.contains(MediaFragment::class.java.simpleName) -> id = R.id.action_media
                 t.contains(TeamsFragment::class.java.simpleName) -> id = R.id.action_team
+                t.contains(TournamentsFragment::class.java.simpleName) -> id = R.id.action_tournaments
             }
 
             bottomNav.highlight(id)

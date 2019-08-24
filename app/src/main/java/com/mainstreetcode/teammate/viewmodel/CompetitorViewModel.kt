@@ -42,7 +42,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 
 /**
- * View model for User and Auth
+ * View model for Competitors
  */
 
 class CompetitorViewModel : MappedViewModel<Class<User>, Competitor>() {
@@ -50,23 +50,19 @@ class CompetitorViewModel : MappedViewModel<Class<User>, Competitor>() {
     private val repository: CompetitorRepo = RepoProvider.forRepo(CompetitorRepo::class.java)
     private val declined = ArrayList<Differentiable>()
 
-    override fun valueClass(): Class<Competitor> {
-        return Competitor::class.java
-    }
+    override fun valueClass(): Class<Competitor> = Competitor::class.java
 
-    override fun getModelList(key: Class<User>): MutableList<Differentiable> {
-        return declined
-    }
+    override fun getModelList(key: Class<User>): MutableList<Differentiable> = declined
 
-    fun updateCompetitor(competitor: Competitor): Completable {
-        return if (competitor.isEmpty) Completable.complete() else repository[competitor].ignoreElements().observeOn(mainThread())
-    }
+    fun updateCompetitor(competitor: Competitor): Completable =
+            if (competitor.isEmpty) Completable.complete()
+            else repository[competitor].ignoreElements().observeOn(mainThread())
 
     fun respond(competitor: Competitor, accept: Boolean): Single<DiffUtil.DiffResult> {
         if (accept) competitor.accept()
         else competitor.decline()
 
-        val single = repository.createOrUpdate(competitor).map<List<Differentiable>>({ listOf(it) })
+        val single = repository.createOrUpdate(competitor).map<List<Differentiable>> { listOf(it) }
 
         return FunctionalDiff.of(single, declined) biFunction@{ sourceCopy, fetched ->
             if (accept) sourceCopy.removeAll(fetched)
@@ -83,7 +79,6 @@ class CompetitorViewModel : MappedViewModel<Class<User>, Competitor>() {
         }
     }
 
-    override fun fetch(key: Class<User>, fetchLatest: Boolean): Flowable<List<Competitor>> {
-        return repository.getDeclined(getQueryDate(fetchLatest, key, { it.created })!!).toFlowable()
-    }
+    override fun fetch(key: Class<User>, fetchLatest: Boolean): Flowable<List<Competitor>> =
+            repository.getDeclined(getQueryDate(fetchLatest, key, Competitor::created)).toFlowable()
 }

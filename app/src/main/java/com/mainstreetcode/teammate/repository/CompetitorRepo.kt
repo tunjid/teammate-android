@@ -66,7 +66,7 @@ class CompetitorRepo internal constructor() : QueryRepo<Competitor, Tournament, 
     override fun delete(model: Competitor): Single<Competitor> =
             Single.error(TeammateException(""))
 
-    fun getDeclined(date: Date): Single<List<Competitor>> =
+    fun getDeclined(date: Date?): Single<List<Competitor>> =
             api.getDeclinedCompetitors(date, DEF_QUERY_LIMIT).map(saveManyFunction)
 
     override fun localModelsBefore(key: Tournament, pagination: Int?): Maybe<List<Competitor>> =
