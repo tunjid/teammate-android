@@ -26,11 +26,14 @@ package com.mainstreetcode.teammate.baseclasses
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.MainActivity
+import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder
 import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment
@@ -40,6 +43,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.util.getTransitionName
 import com.mainstreetcode.teammate.viewmodel.BlockedUserViewModel
 import com.mainstreetcode.teammate.viewmodel.ChatViewModel
 import com.mainstreetcode.teammate.viewmodel.CompetitorViewModel
@@ -56,6 +60,7 @@ import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
+import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import kotlin.math.abs
 
@@ -215,4 +220,25 @@ open class MainActivityFragment : TeammatesBaseFragment() {
         val user = userViewModel.currentUser
         disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe({ onChanged.invoke() }, emptyErrorHandler::invoke))
     }
+
+    protected fun BaseFragment.listDetailTransition(
+            key: String,
+            itemViewId: Int = R.id.fragment_header_background,
+            thumbnailId: Int = R.id.fragment_header_thumbnail
+
+    ): FragmentTransaction? {
+        val fallBack = super.provideFragmentTransaction(this)
+
+        val args = arguments ?: return fallBack
+
+        val model = args.getParcelable<Parcelable>(key) ?: return fallBack
+
+        val holder = scrollManager.findViewHolderForItemId(model.hashCode().toLong()) as? ModelCardViewHolder<*, *>
+                ?: return fallBack
+
+        return beginTransaction()
+                .addSharedElement(holder.itemView, model.getTransitionName(itemViewId))
+                .addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
+    }
+
 }

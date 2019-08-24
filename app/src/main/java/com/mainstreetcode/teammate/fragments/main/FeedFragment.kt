@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +41,6 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.FeedAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.FeedItemViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
@@ -52,7 +50,6 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import io.reactivex.Single
@@ -173,13 +170,13 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
     @SuppressLint("CommitTransaction")
     override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
         fragmentTo.stableTag.contains(MediaDetailFragment::class.java.simpleName) ->
-            fragmentTo.transition(MediaDetailFragment.ARG_MEDIA, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
+            fragmentTo.listDetailTransition(MediaDetailFragment.ARG_MEDIA, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
 
         fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName) ->
-            fragmentTo.transition(JoinRequestFragment.ARG_JOIN_REQUEST)
+            fragmentTo.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST)
 
         fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
-            fragmentTo.transition(EventEditFragment.ARG_EVENT)
+            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
 
         else -> super.provideFragmentTransaction(fragmentTo)
     }
@@ -232,26 +229,6 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
         if (event != DISMISS_EVENT_SWIPE && event != DISMISS_EVENT_MANUAL) return
         onBoardingIndex = 0
         prefsViewModel.isOnBoarded = true
-    }
-
-    private fun BaseFragment.transition(
-            key: String,
-            itemViewId: Int = R.id.fragment_header_background,
-            thumbnailId: Int = R.id.fragment_header_thumbnail
-
-    ): FragmentTransaction? {
-        val fallBack = super@FeedFragment.provideFragmentTransaction(this)
-
-        val args = arguments ?: return fallBack
-
-        val model = args.getParcelable<Parcelable>(key) ?: return fallBack
-
-        val holder = scrollManager.findViewHolderForItemId(model.hashCode().toLong()) as? FeedItemViewHolder
-                ?: return fallBack
-
-        return beginTransaction()
-                .addSharedElement(holder.itemView, model.getTransitionName(itemViewId))
-                .addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
     }
 
     companion object {

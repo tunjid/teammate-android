@@ -37,13 +37,11 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -124,23 +122,11 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
         }
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        val superResult = super.provideFragmentTransaction(fragmentTo)
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
+        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
+            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
 
-        if (fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName)) {
-            val args = fragmentTo.arguments ?: return superResult
-
-            val event = args.getParcelable<Event>(EventEditFragment.ARG_EVENT) ?: return superResult
-
-            val viewHolder = scrollManager.findViewHolderForItemId(event.hashCode().toLong()) as? EventViewHolder
-                    ?: return superResult
-
-            return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, event.getTransitionName(R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.image, event.getTransitionName(R.id.fragment_header_thumbnail))
-
-        }
-        return superResult
+        else -> super.provideFragmentTransaction(fragmentTo)
     }
 
     private fun fetchEvents(fetchLatest: Boolean) {

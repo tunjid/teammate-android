@@ -90,7 +90,7 @@ class Role : RoleEntity,
     override fun asItems(): List<Item> = listOf(
             Item.text(holder[0], 0, Item.INPUT, R.string.first_name, user::firstName, user::setFirstName),
             Item.text(holder[1], 1, Item.INPUT, R.string.last_name, user::lastName, user::setLastName),
-            Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname, { this.nickname = it }),
+            Item.text(holder[2], 2, Item.NICKNAME, R.string.nickname, this::nickname) { this.nickname = it },
             Item.text(holder[3], 3, Item.ABOUT, R.string.user_about, user::about, CharSequence::noOp),
             Item.text(holder[4], 4, Item.ROLE, R.string.team_role, position::code, this::setPosition)
                     .textTransformer { value -> Config.positionFromCode(value.toString()).getName() }

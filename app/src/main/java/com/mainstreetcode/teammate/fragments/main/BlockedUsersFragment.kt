@@ -33,13 +33,11 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.BlockedUserAdapter
-import com.mainstreetcode.teammate.adapters.viewholders.BlockedUserViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -103,23 +101,11 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
         showFragment(BlockedUserViewFragment.newInstance(blockedUser))
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        val superResult = super.provideFragmentTransaction(fragmentTo)
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
+        fragmentTo.stableTag.contains(BlockedUserViewFragment::class.java.simpleName) ->
+            fragmentTo.listDetailTransition(BlockedUserViewFragment.ARG_BLOCKED_USER)
 
-        if (fragmentTo.stableTag.contains(BlockedUserViewFragment::class.java.simpleName)) {
-            val args = fragmentTo.arguments ?: return superResult
-
-            val event = args.getParcelable<BlockedUser>(BlockedUserViewFragment.ARG_BLOCKED_USER)
-                    ?: return superResult
-
-            val viewHolder = scrollManager.findViewHolderForItemId(event.hashCode().toLong()) as? BlockedUserViewHolder
-                    ?: return superResult
-
-            return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, event.getTransitionName(R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.thumbnail, event.getTransitionName(R.id.fragment_header_thumbnail))
-        }
-        return superResult
+        else -> super.provideFragmentTransaction(fragmentTo)
     }
 
     private fun fetchBlockedUsers(fetchLatest: Boolean) {

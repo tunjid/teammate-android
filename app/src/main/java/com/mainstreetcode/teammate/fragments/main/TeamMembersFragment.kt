@@ -40,14 +40,12 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
-import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -163,31 +161,15 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     }
 
     @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        if (fragmentTo.stableTag.contains(RoleEditFragment::class.java.simpleName)) {
-            val role = fragmentTo.arguments!!.getParcelable<Role>(RoleEditFragment.ARG_ROLE)
-                    ?: return null
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
+          fragmentTo.stableTag.contains(RoleEditFragment::class.java.simpleName) ->
+              fragmentTo.listDetailTransition(RoleEditFragment.ARG_ROLE)
 
-            val holder = scrollManager.findViewHolderForItemId(role.hashCode().toLong()) as? ModelCardViewHolder<*, *>
-                    ?: return null
+          fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName) ->
+              fragmentTo.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST)
 
-            return beginTransaction()
-                    .addSharedElement(holder.itemView, role.getTransitionName(R.id.fragment_header_background))
-                    .addSharedElement(holder.thumbnail, role.getTransitionName(R.id.fragment_header_thumbnail))
-        }
-        if (fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName)) {
-            val request = fragmentTo.arguments!!.getParcelable<JoinRequest>(JoinRequestFragment.ARG_JOIN_REQUEST)
-                    ?: return null
-
-            val holder = scrollManager.findViewHolderForItemId(request.hashCode().toLong()) as? ModelCardViewHolder<*, *>
-                    ?: return null
-
-            return beginTransaction()
-                    .addSharedElement(holder.itemView, request.getTransitionName(R.id.fragment_header_background))
-                    .addSharedElement(holder.thumbnail, request.getTransitionName(R.id.fragment_header_thumbnail))
-        }
-        return super.provideFragmentTransaction(fragmentTo)
-    }
+          else ->  super.provideFragmentTransaction(fragmentTo)
+      }
 
     private fun fetchTeamMembers(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()

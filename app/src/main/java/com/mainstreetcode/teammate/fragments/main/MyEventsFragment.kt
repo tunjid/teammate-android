@@ -29,23 +29,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Event
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.MyEventsViewModel
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DiffUtil
-
-import com.mainstreetcode.teammate.util.getTransitionName
+import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 /**
  * Lists [events][Event]
@@ -97,23 +93,11 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
         showFragment(EventEditFragment.newInstance(item))
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        val superResult = super.provideFragmentTransaction(fragmentTo)
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
+        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
+            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
 
-        if (fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName)) {
-            val args = fragmentTo.arguments ?: return superResult
-
-            val event = args.getParcelable<Event>(EventEditFragment.ARG_EVENT) ?: return superResult
-
-            val viewHolder = scrollManager.findViewHolderForItemId(event.hashCode().toLong()) as? EventViewHolder
-                    ?: return superResult
-
-            return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, event.getTransitionName(R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.image, event.getTransitionName(R.id.fragment_header_thumbnail))
-
-        }
-        return superResult
+        else -> super.provideFragmentTransaction(fragmentTo)
     }
 
     private fun fetchEvents(fetchLatest: Boolean) {

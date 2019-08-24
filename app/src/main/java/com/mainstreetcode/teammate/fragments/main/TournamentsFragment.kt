@@ -37,7 +37,6 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.TournamentViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
@@ -45,7 +44,6 @@ import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -122,24 +120,11 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
         else -> Unit
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        val superResult = super.provideFragmentTransaction(fragmentTo)
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
+        fragmentTo.stableTag.contains(TournamentEditFragment::class.java.simpleName) ->
+            fragmentTo.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT)
 
-        if (fragmentTo.stableTag.contains(TournamentEditFragment::class.java.simpleName)) {
-            val args = fragmentTo.arguments ?: return superResult
-
-            val tournament = args.getParcelable<Tournament>(TournamentEditFragment.ARG_TOURNAMENT)
-                    ?: return superResult
-
-            val viewHolder = scrollManager.findViewHolderForItemId(tournament.hashCode().toLong()) as? TournamentViewHolder
-                    ?: return superResult
-
-            return beginTransaction()
-                    .addSharedElement(viewHolder.itemView, tournament.getTransitionName(R.id.fragment_header_background))
-                    .addSharedElement(viewHolder.image, tournament.getTransitionName(R.id.fragment_header_thumbnail))
-
-        }
-        return superResult
+        else -> super.provideFragmentTransaction(fragmentTo)
     }
 
     private fun fetchTournaments(fetchLatest: Boolean) {
