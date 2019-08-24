@@ -25,16 +25,15 @@
 package com.mainstreetcode.teammate.util.nav
 
 import android.content.Context
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout.HORIZONTAL
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.shape.CornerFamily
@@ -49,7 +48,6 @@ import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
 import io.reactivex.disposables.CompositeDisposable
@@ -83,7 +81,7 @@ class NavDialogFragment : BottomSheetDialogFragment() {
         val list = mutableListOf<Team>()
 
         val scrollManager = ScrollManager.with<RemoteImageViewHolder<Team>>(root.findViewById(R.id.horizontal_list))
-                .withCustomLayoutManager(LinearLayoutManager(root.context, HORIZONTAL, false))
+                .withCustomLayoutManager(LinearLayoutManager(root.context, RecyclerView.HORIZONTAL, false))
                 .withAdapter(RemoteImageAdapter(list, object : RemoteImageAdapter.AdapterListener<Team> {
                     override fun onImageClicked(item: Team) {
                         teamViewModel.updateDefaultTeam(item)
@@ -95,22 +93,22 @@ class NavDialogFragment : BottomSheetDialogFragment() {
         itemView.elevation = 0f
         navigationView.elevation = 0f
         navigationView.setNavigationItemSelectedListener(this::onOptionsItemSelected)
+
+        val cornerSize = resources.getDimensionPixelSize(R.dimen.single_and_half_margin)
+        val elevation = resources.getDimensionPixelSize(R.dimen.single_margin).toFloat()
+
+        root.background = MaterialShapeDrawable.createWithElevationOverlay(itemView.context, elevation).apply {
+            shapeAppearanceModel = ShapeAppearanceModel().apply {
+                setTopLeftCorner(CornerFamily.ROUNDED, cornerSize)
+                setTopRightCorner(CornerFamily.ROUNDED, cornerSize)
+            }
+        }
+
         root.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) = Unit
 
             override fun onViewDetachedFromWindow(v: View) = disposables.clear()
         })
-
-        val cornerSize = resources.getDimensionPixelSize(R.dimen.single_and_half_margin)
-        val shapePathModel = ShapeAppearanceModel().apply {
-            setTopLeftCorner(CornerFamily.ROUNDED, cornerSize)
-            setTopRightCorner(CornerFamily.ROUNDED, cornerSize)
-        }
-
-        root.background = MaterialShapeDrawable(shapePathModel).apply {
-            setTint(inflater.context.resolveThemeColor(R.attr.alt_background))
-            paintStyle = Paint.Style.FILL
-        }
 
         disposables.add(teamViewModel.nonDefaultTeams(list).subscribe(scrollManager::onDiff, ErrorHandler.EMPTY::invoke))
         disposables.add(teamViewModel.gofer(current).get().subscribe({ teamViewHolder.bind(teamViewModel.defaultTeam) }, Throwable::printStackTrace))
@@ -125,7 +123,7 @@ class NavDialogFragment : BottomSheetDialogFragment() {
 
     private fun viewTeam(team: Team) {
         dismiss()
-        (requireActivity() as BaseActivity).showFragment(TeamMembersFragment.newInstance(team))
+        (activity as? BaseActivity)?.showFragment(TeamMembersFragment.newInstance(team))
     }
 
     companion object {

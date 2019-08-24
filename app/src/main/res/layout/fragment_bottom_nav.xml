@@ -63,8 +63,6 @@
         android:id="@+id/bottom_nav_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="1px"
-        android:layout_marginRight="1px"
         app:itemIconTint="?input_text_color"
         app:itemTextColor="?input_text_color"
         app:layout_constraintLeft_toLeftOf="parent"
