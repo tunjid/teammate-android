@@ -142,7 +142,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
                             !model.game.isEmpty -> GameFragment.newInstance(model.game)
                             !model.tournament.isEmpty -> TournamentDetailFragment.newInstance(model.tournament).pending(model)
                             else -> null
-                        }?.apply { showFragment(this) }
+                        }?.let { showFragment(it) }
                     }
                     .show()
             return
