@@ -30,6 +30,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
+import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
@@ -57,6 +58,13 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
             else -> Date()
         }
 
+    private val teamRole: Position
+        get() = when (wrappedModel) {
+            is Role -> wrappedModel.position
+            is JoinRequest -> wrappedModel.position
+            else -> Position.empty()
+        }
+
     override fun getId(): String = wrappedModel.id
 
     override fun compareTo(other: TeamMember): Int =
@@ -65,7 +73,7 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
     override fun update(updated: TeamMember) {}
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
-        is TeamMember -> wrappedModel.areContentsTheSame(other.wrappedModel as Differentiable)
+        is TeamMember -> user.areContentsTheSame(other.user) && teamRole == other.teamRole
         else -> id == other.id
     }
 
