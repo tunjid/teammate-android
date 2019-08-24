@@ -71,6 +71,9 @@
         <item name="colorOnSurface">?input_text_color</item>
         <item name="android:colorBackground">?alt_background</item>
         <item name="android:windowBackground">@color/app_primary</item>
+
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+
     </style>
 
     <style name="AppToolBarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">

@@ -24,6 +24,7 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders.input
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -34,6 +35,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.prettyPrint
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import java.util.Calendar.DATE
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -78,16 +80,21 @@ class DateTextInputStyle(enabler: (Item) -> Boolean) : TextInputStyle(
 
     private fun showDate(context: Context) {
         if (!isEditable) return
-        val dialog = DatePickerDialog(context, this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE))
-        dialog.setOnDismissListener { onDialogDismissed(context) }
-        dialog.show()
+        DatePickerDialog(context, this, calendar.get(YEAR), calendar.get(MONTH), calendar.get(DATE)).showWithTextColor()
     }
 
     private fun showTime(context: Context) {
         if (!isEditable) return
-        val dialog = TimePickerDialog(context, this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true)
-        dialog.setOnDismissListener { onDialogDismissed(context) }
-        dialog.show()
+        TimePickerDialog(context, this, calendar.get(HOUR_OF_DAY), calendar.get(MINUTE), true).showWithTextColor()
+    }
+
+    private fun AlertDialog.showWithTextColor() {
+        val buttonColor = context.resolveThemeColor(R.attr.colorSecondary)
+        setOnDismissListener { onDialogDismissed(context) }
+        show()
+        getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(buttonColor)
+        getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(buttonColor)
+        getButton(DatePickerDialog.BUTTON_NEUTRAL).setTextColor(buttonColor)
     }
 
     private fun updateTime() {
