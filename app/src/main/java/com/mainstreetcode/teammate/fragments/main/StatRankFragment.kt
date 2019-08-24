@@ -64,7 +64,7 @@ class StatRankFragment : MainActivityFragment() {
         super.onCreate(savedInstanceState)
         tournament = arguments!!.getParcelable(ARG_TOURNAMENT)!!
         statRanks = tournamentViewModel.getStatRanks(tournament)
-        type = tournament.sport.statTypeFromCode("")
+        type = StatType.empty().apply { update(tournament.sport.statTypeFromCode("")) }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
