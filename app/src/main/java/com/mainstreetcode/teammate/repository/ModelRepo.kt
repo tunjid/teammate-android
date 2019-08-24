@@ -81,10 +81,10 @@ abstract class ModelRepo<T : Model<T>> {
     internal fun saveAsNested(): (List<T>) -> List<T> = inner@{ models ->
         if (models.isEmpty()) return@inner models
 
-        val parted = models.partition { it.hasMajorFields() }
+        val parted = models.partition { it.isEmpty || it.hasMajorFields() }
 
-        saveManyFunction.invoke(parted.first)
-        dao().insert(parted.second)
+        saveManyFunction.invoke(parted.first) // Nested save empty models or complete ones with upsert
+        dao().insert(parted.second) // For non empty models with incomplete data, insert, if a copy exists, it will be rejected
 
         models
     }

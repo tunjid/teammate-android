@@ -42,7 +42,12 @@ import java.util.Date
 
 import androidx.room.ForeignKey.CASCADE
 
-@Entity(tableName = "competitors", foreignKeys = [ForeignKey(entity = TournamentEntity::class, parentColumns = ["tournament_id"], childColumns = ["competitor_tournament"], onDelete = CASCADE), ForeignKey(entity = GameEntity::class, parentColumns = ["game_id"], childColumns = ["competitor_game"], onDelete = CASCADE)])
+@Entity(
+        tableName = "competitors",
+        foreignKeys = [
+            ForeignKey(entity = TournamentEntity::class, parentColumns = ["tournament_id"], childColumns = ["competitor_tournament"], onDelete = CASCADE),
+            ForeignKey(entity = GameEntity::class, parentColumns = ["game_id"], childColumns = ["competitor_game"], onDelete = CASCADE)
+        ])
 open class CompetitorEntity : Parcelable {
 
     @NonNull
