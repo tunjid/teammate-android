@@ -115,7 +115,7 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
 
     companion object {
 
-        private const val ARG_USER = "user"
+        const val ARG_USER = "user"
 
         fun newInstance(user: User): UserEditFragment = UserEditFragment().apply { arguments = bundleOf(ARG_USER to user) }
     }

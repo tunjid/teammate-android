@@ -37,7 +37,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
@@ -58,7 +57,6 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.processEmoji
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 
 class TournamentDetailFragment : MainActivityFragment() {
 
@@ -151,10 +149,6 @@ class TournamentDetailFragment : MainActivityFragment() {
     override fun togglePersistentUi() {
         super.togglePersistentUi()
         activity?.invalidateOptionsMenu()
-    }
-
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        return super.provideFragmentTransaction(fragmentTo)
     }
 
     private fun checkCompetitor() {
