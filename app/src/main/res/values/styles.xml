@@ -35,6 +35,7 @@
         <item name="colorPrimary">@color/app_primary</item>
         <item name="colorPrimaryDark">@color/app_primary</item>
         <item name="colorSecondary">@color/app_secondary</item>
+        <item name="colorSecondaryVariant">@color/app_secondary</item>
 
         <item name="bottom_nav_selected">@color/app_primary</item>
         <item name="bottom_nav_unselected">@color/dark_grey</item>

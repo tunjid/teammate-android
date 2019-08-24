@@ -37,5 +37,6 @@
 
     <color name="dark_background">#292929</color>
     <color name="app_dark_secondary">#81D4FA</color>
+    <color name="app_dark_secondary_variant">#0277BD</color>
 
 </resources>

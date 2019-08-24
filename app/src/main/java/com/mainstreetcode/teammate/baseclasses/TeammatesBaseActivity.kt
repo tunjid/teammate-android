@@ -42,7 +42,9 @@ import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
@@ -52,6 +54,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.forEach
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
@@ -295,13 +298,6 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     override fun setFabClickListener(clickListener: View.OnClickListener?) =
             fabInteractor.setOnClickListener(clickListener)
 
-    private fun BaseTransientBottomBar<*>.fabDependentShow() = fab.postDelayed(HIDER_DURATION.toLong()) {
-        transientBottomBars.add(this)
-        @Suppress("UsePropertyAccessSyntax")
-        if (fab.isVisible) setAnchorView(fab)
-        show()
-    }
-
     fun onDialogDismissed() {
         val fragment = currentFragment
         val showFab = fragment != null && fragment.showsFab
@@ -333,6 +329,30 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
         transition.excludeTarget(toolbar, true)
 
         TransitionManager.beginDelayedTransition(toolbar.parent as ViewGroup, transition)
+    }
+
+
+    @Suppress("UsePropertyAccessSyntax")
+    private fun BaseTransientBottomBar<*>.fabDependentShow() = fab.postDelayed(HIDER_DURATION.toLong()) {
+        transientBottomBars.add(this)
+        (getView() as? ViewGroup)?.apply {
+            backgroundTintList = ColorStateList.valueOf(resolveThemeColor(R.attr.colorOnSurface))
+            recursiveTextStyle()
+        }
+        if (fab.isVisible) setAnchorView(fab)
+        show()
+    }
+
+    private fun ViewGroup.recursiveTextStyle() {
+        val buttonColor = resolveThemeColor(R.attr.colorSecondaryVariant)
+        val textColor = resolveThemeColor(R.attr.colorSurface)
+
+        forEach {
+            @Suppress("CascadeIf")
+            if (it is ViewGroup) it.recursiveTextStyle()
+            else if (it is Button) it.setTextColor(buttonColor)
+            else if (it is TextView) it.setTextColor(textColor)
+        }
     }
 
     private fun updateUI(force: Boolean, state: UiState) {
