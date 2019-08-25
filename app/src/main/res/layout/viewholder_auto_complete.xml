@@ -33,9 +33,9 @@
 
     <TextView
         android:id="@+id/title"
+        style="@style/TextAppearance.AppTheme.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/small_text"
         app:layout_constrainedWidth="true"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,9 +43,9 @@
 
     <TextView
         android:id="@+id/sub_title"
+        style="@style/TextAppearance.AppTheme.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/tiny_text"
         app:layout_constrainedWidth="true"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"

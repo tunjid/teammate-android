@@ -90,10 +90,11 @@
 
         <TextView
             android:id="@+id/location"
+            style="@style/TextAppearance.AppTheme.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
-            android:background="@color/white"
+            android:background="?alt_background"
             android:paddingStart="@dimen/single_margin"
             android:paddingTop="@dimen/single_margin"
             android:paddingEnd="@dimen/triple_and_half_margin"
