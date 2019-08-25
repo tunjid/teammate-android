@@ -54,6 +54,7 @@
 
         <TextView
             android:id="@+id/item_title"
+            style="@style/TextAppearance.AppTheme.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -63,7 +64,6 @@
             android:paddingTop="@dimen/half_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingBottom="@dimen/quarter_margin"
-            android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toTopOf="@+id/item_subtitle"
             app:layout_constraintLeft_toRightOf="@+id/thumbnail"
             app:layout_constraintRight_toRightOf="parent"
@@ -72,6 +72,7 @@
 
         <TextView
             android:id="@+id/item_subtitle"
+            style="@style/TextAppearance.AppTheme.Body2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -81,7 +82,6 @@
             android:paddingTop="@dimen/quarter_margin"
             android:paddingRight="@dimen/single_margin"
             android:paddingBottom="@dimen/half_margin"
-            android:textSize="@dimen/tiny_text"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0"

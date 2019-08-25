@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ MIT License
   ~
   ~ Copyright (c) 2019 Adetunji Dahunsi
@@ -40,16 +39,16 @@
 
     <TextView
         android:id="@+id/create_team_prompt"
+        style="@style/TextAppearance.AppDarkTheme.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/half_margin"
         android:layout_marginRight="@dimen/half_margin"
         android:gravity="center"
-        android:paddingBottom="@dimen/eigth_margin"
         android:paddingTop="@dimen/eigth_margin"
+        android:paddingBottom="@dimen/eigth_margin"
         android:text="@string/create_team_prompt"
         android:textAllCaps="false"
-        style="@style/TextAppearance.AppDarkTheme.Body1"
         app:layout_constraintBottom_toBottomOf="@+id/create_team"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -62,6 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/quarter_margin"
         android:layout_marginRight="@dimen/quarter_margin"
+        android:backgroundTint="?colorSecondary"
         android:fontFamily="@font/roboto"
         android:gravity="center"
         android:text="@string/create_team"

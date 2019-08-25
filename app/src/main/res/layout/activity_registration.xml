@@ -83,7 +83,8 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
             android:elevation="@dimen/half_margin"
-            app:layout_behavior="@string/bottom_transient_bar_behavior" />
+            android:textColor="?button_text_color"
+            app:iconTint="?button_text_color" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <View

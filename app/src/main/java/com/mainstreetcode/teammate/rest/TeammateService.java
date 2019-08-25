@@ -195,7 +195,7 @@ public class TeammateService {
     private static void assignSSLSocketFactory(OkHttpClient.Builder builder) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            InputStream stream = App.getInstance().getResources().openRawResource(BuildConfig.DEV ? R.raw.dev : R.raw.prod);
+            InputStream stream = App.Companion.getInstance().getResources().openRawResource(BuildConfig.DEV ? R.raw.dev : R.raw.prod);
 
             Certificate certificate = certificateFactory.generateCertificate(stream);
             stream.close();
@@ -223,7 +223,7 @@ public class TeammateService {
             builder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         }
         catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException | IllegalStateException e) {
-            Logger.log(TAG, "Unable to parse SSL cert", e);
+            Logger.INSTANCE.log(TAG, "Unable to parse SSL cert", e);
         }
     }
 
@@ -231,7 +231,7 @@ public class TeammateService {
         private static final String SIGN_IN_PATH = "/api/signIn";
         private static final String SIGN_UP_PATH = "/api/signUp";
 
-        App app = App.getInstance();
+        App app = App.Companion.getInstance();
 
         @Override
         public void saveFromResponse(@NonNull HttpUrl url, @NonNull List<Cookie> cookies) {

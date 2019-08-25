@@ -24,22 +24,23 @@
 
 package com.mainstreetcode.teammate;
 
-import androidx.sqlite.db.SupportSQLiteDatabase;
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
-import androidx.room.testing.MigrationTestHelper;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
-
 import com.mainstreetcode.teammate.persistence.AppDatabase;
 import com.mainstreetcode.teammate.persistence.migrations.Migration1To2;
 import com.mainstreetcode.teammate.persistence.migrations.Migration2To3;
 import com.mainstreetcode.teammate.persistence.migrations.Migration3To4;
+import com.mainstreetcode.teammate.persistence.migrations.Migration4To5;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+
+import androidx.room.testing.MigrationTestHelper;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 
 @RunWith(AndroidJUnit4.class)
 public class MigrationTest {
@@ -86,6 +87,13 @@ public class MigrationTest {
         SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 3);
         db.close();
         helper.runMigrationsAndValidate(TEST_DB, 4, true, new Migration3To4());
+    }
+
+    @Test
+    public void migrate4To5() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 4);
+        db.close();
+        helper.runMigrationsAndValidate(TEST_DB, 5, true, new Migration4To5());
     }
 
 

@@ -92,6 +92,11 @@
 
     <!--SettingsFragment-->
     <string name="sign_out">Sign Out</string>
+    <string name="settings_set_theme">Set Theme</string>
+    <string name="settings_light_theme">Light Theme</string>
+    <string name="settings_dark_theme">Dark Theme</string>
+    <string name="settings_system_theme">Follow System Theme</string>
+    <string name="settings_battery_saver_theme">Follow Battery Saver</string>
     <string name="join_team">Join Team</string>
     <string name="my_profile">My Profile</string>
     <string name="delete_user">Delete account</string>
