@@ -91,7 +91,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
                     .getOrPut(round) { mutableListOf() }
 
     fun fetchGamesInRound(tournament: Tournament, round: Int): Flowable<DiffUtil.DiffResult> {
-        val flowable = gameRoundRepository.modelsBefore(tournament, round).map( ::asDifferentiables)
+        val flowable = gameRoundRepository.modelsBefore(tournament, round).map(::asDifferentiables)
         return FunctionalDiff.of(flowable, getGamesForRound(tournament, round), this::preserveList)
     }
 
@@ -100,8 +100,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
 
     fun getMatchUps(request: HeadToHead.Request): Single<DiffUtil.DiffResult> {
         val sourceSingle = api.matchUps(request).map<List<Differentiable>> { games ->
-            Collections.sort(games, FunctionalDiff.COMPARATOR)
-            ArrayList<Differentiable>(games)
+            asDifferentiables(games.apply { sortWith(FunctionalDiff.COMPARATOR) })
         }
         return FunctionalDiff.of(sourceSingle, headToHeadMatchUps, ::replaceList).observeOn(mainThread())
     }

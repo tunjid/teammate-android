@@ -116,10 +116,7 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         passwordInput = null
     }
 
-    override val showsFab: Boolean
-        get() {
-            return true
-        }
+    override val showsFab: Boolean get() = true
 
     override fun onClick(view: View) {
         when (view.id) {
@@ -127,12 +124,9 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         }
     }
 
-    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-            signUp()
-            return true
-        }
-        return false
+    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean = when {
+        actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN -> signUp().let { true }
+        else -> false
     }
 
     private fun signUp() {
