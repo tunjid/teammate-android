@@ -141,11 +141,8 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
             persistentUiController.showChoices(consumer)
 
     @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        return beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-                        android.R.anim.fade_in, android.R.anim.fade_out)
-    }
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = beginTransaction()
+            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
 
     protected fun setEnterExitTransitions() {
         if (Config.isStaticVariant) return
@@ -166,9 +163,8 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         toggleProgress(false)
     }
 
-    protected fun updateFabOnScroll(dx: Int, dy: Int) {
-        if (showsFab && abs(dy) > 3) toggleFab(dy < 0)
-    }
+    protected fun updateFabOnScroll(dx: Int, dy: Int) =
+            if (showsFab && abs(dy) > 3) toggleFab(dy < 0) else Unit
 
     open fun onKeyBoardChanged(appeared: Boolean) = Unit
 
