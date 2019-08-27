@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ MIT License
   ~
   ~ Copyright (c) 2019 Adetunji Dahunsi
@@ -30,7 +30,8 @@
     android:layout_marginTop="@dimen/half_margin"
     android:layout_marginBottom="@dimen/double_margin"
     android:nestedScrollingEnabled="true"
-    android:paddingHorizontal="@dimen/single_margin">
+    android:paddingLeft="@dimen/single_margin"
+    android:paddingRight="@dimen/single_margin">
 
 
     <com.google.android.material.card.MaterialCardView

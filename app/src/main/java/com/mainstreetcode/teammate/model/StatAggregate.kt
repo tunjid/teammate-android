@@ -70,7 +70,7 @@ class StatAggregate {
             this.sport = Config.sportFromCode(sport)
         }
 
-        private fun buildItems(): List<Differentiable> = listOf<Differentiable>(
+        private fun buildItems(): List<Differentiable> = listOf(
                 Item.text(holder[0], 0, Item.SPORT, R.string.team_sport, sport::getName, this::setSport)
                         .textTransformer { value -> Config.sportFromCode(value.toString()).getName() },
                 user,
