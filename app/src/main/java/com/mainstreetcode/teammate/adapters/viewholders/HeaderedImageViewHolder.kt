@@ -30,6 +30,7 @@ import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnNextLayout
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.HeaderedModel
@@ -54,8 +55,7 @@ class HeaderedImageViewHolder(
 
     init {
         thumbnail.setOnClickListener(this)
-        diff = DiffWatcher(this::getImage)
-        animateHeader()
+        diff = DiffWatcher(this::loadImage)
     }
 
     override fun onClick(view: View) {
@@ -69,11 +69,9 @@ class HeaderedImageViewHolder(
         diff.push(url.toString())
     }
 
-    fun unBind() {
-        diff.stop()
-    }
+    fun unBind() = diff.stop()
 
-    private fun getImage(url: String) {
+    private fun loadImage(url: String) {
         val creator = getCreator(url) ?: return
 
         creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(thumbnail)
@@ -106,13 +104,18 @@ class HeaderedImageViewHolder(
 
         override fun run() {
             val delayed = getCreator(url)
-            delayed?.fit()?.centerCrop()?.into(fullRes, this)
+            fullRes.visibility = View.VISIBLE
+            fullRes.doOnNextLayout { delayed?.fit()?.centerCrop()?.into(fullRes, this) }
         }
 
         override fun onSuccess() {
             fullRes.visibility = View.VISIBLE
+            animateHeader()
         }
 
-        override fun onError(e: Exception) = diff.restart()
+        override fun onError(e: Exception) {
+            diff.restart()
+            animateHeader()
+        }
     }
 }

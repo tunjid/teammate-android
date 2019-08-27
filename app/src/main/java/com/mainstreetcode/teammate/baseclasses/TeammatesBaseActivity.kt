@@ -401,13 +401,13 @@ abstract class TeammatesBaseActivity : BaseActivity(), PersistentUiController {
     }
 
     private fun setKeyboardPadding(padding: Int) {
-        var ref = padding
-        initTransition()
-        ref = adjustKeyboardPadding(ref)
-        ref = max(ref, 0)
+        val old = fragmentContainer.paddingBottom
+        val new = max(adjustKeyboardPadding(padding), 0)
 
-        fragmentContainer.setPadding(0, 0, 0, ref)
-        ViewUtil.getLayoutParams(this.padding).height = if (ref == 0) 1 else ref // 0 breaks animations
+        if (old != new) initTransition()
+
+        fragmentContainer.setPadding(0, 0, 0, new)
+        ViewUtil.getLayoutParams(this.padding).height = if (new == 0) 1 else new // 0 breaks animations
     }
 
     private fun adjustSystemInsets(fragment: Fragment?) {
