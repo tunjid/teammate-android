@@ -48,6 +48,7 @@ import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.ErrorHandler
+import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.view.util.InsetFlags
@@ -140,17 +141,11 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
             persistentUiController.showChoices(consumer)
 
     @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        return beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-                        android.R.anim.fade_in, android.R.anim.fade_out)
-    }
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = beginTransaction()
+            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
 
     protected fun setEnterExitTransitions() {
         if (Config.isStaticVariant) return
-
-        enterTransition = Fade()
-        exitTransition = Fade()
 
         sharedElementEnterTransition = cardTransition()
         sharedElementReturnTransition = cardTransition()
@@ -168,9 +163,8 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         toggleProgress(false)
     }
 
-    protected fun updateFabOnScroll(dx: Int, dy: Int) {
-        if (showsFab && abs(dy) > 3) toggleFab(dy < 0)
-    }
+    protected fun updateFabOnScroll(dx: Int, dy: Int) =
+            if (showsFab && abs(dy) > 3) toggleFab(dy < 0) else Unit
 
     open fun onKeyBoardChanged(appeared: Boolean) = Unit
 
@@ -206,11 +200,14 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
             if (view == null) null else this
     )
 
+    protected fun sharedFadeTransition() = Fade().apply { duration = FULL_RES_LOAD_DELAY.toLong() }
+
     private fun cardTransition(): TransitionSet = TransitionSet()
             .addTransition(ChangeBounds())
             .addTransition(ChangeTransform())
             .addTransition(ChangeImageTransform())
             .setOrdering(TransitionSet.ORDERING_TOGETHER)
+            .apply { startDelay = 25; duration = FULL_RES_LOAD_DELAY.toLong() }
 
     companion object {
 

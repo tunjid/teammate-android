@@ -38,15 +38,9 @@ class DeviceDao : SharedPreferencesDao<Device>() {
     override val empty: Device
         get() = Device.empty()
 
-    override fun preferenceName(): String {
-        return "user_devices"
-    }
+    override fun preferenceName(): String = "user_devices"
 
-    override fun to(device: Device): String {
-        return device.id
-    }
+    override fun to(item: Device): String = item.id
 
-    override fun from(id: String): Device {
-        return Device(id)
-    }
+    override fun from(serialized: String): Device = Device(serialized)
 }

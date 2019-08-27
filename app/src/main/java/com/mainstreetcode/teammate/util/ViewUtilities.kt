@@ -79,7 +79,7 @@ const val MEDIA_VIDEO = 299
 const val JOIN_REQUEST = 300
 const val BLOCKED_USER = 301
 const val THUMBNAIL_SIZE = 250
-const val FULL_RES_LOAD_DELAY = 200
+const val FULL_RES_LOAD_DELAY = 375
 const val TOOLBAR_ANIM_DELAY = 200
 
 fun View.isDisplayingSystemUI(): Boolean =

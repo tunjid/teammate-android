@@ -51,8 +51,8 @@ class MediaTransferIntentService : IntentService("MediaUploadIntentService") {
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) when (intent.action ?: "") {
             ACTION_UPLOAD -> handleActionUpload(
-                    intent.getParcelableExtra<User>(EXTRA_USER),
-                    intent.getParcelableExtra<Team>(EXTRA_TEAM),
+                    intent.getParcelableExtra(EXTRA_USER),
+                    intent.getParcelableExtra(EXTRA_TEAM),
                     intent.getParcelableArrayListExtra(EXTRA_URIS)
             )
             ACTION_DOWNLOAD -> handleActionDownload(intent.getParcelableArrayListExtra(EXTRA_MEDIA))

@@ -72,27 +72,22 @@ class HeadToHead {
 
         fun hasInvalidType(): Boolean = type.isInvalid
 
-        fun setSport(sport: String) {
+        private fun setSport(sport: String) {
             this.sport = Config.sportFromCode(sport)
         }
 
-        fun setType(type: String) {
+        private fun setType(type: String) {
             this.type = Config.tournamentTypeFromCode(type)
         }
 
-        fun updateHome(entity: Competitive) {
-            update(home, entity)
-        }
+        fun updateHome(entity: Competitive) = update(home, entity)
 
-        fun updateAway(entity: Competitive) {
-            update(away, entity)
-        }
+        fun updateAway(entity: Competitive) = update(away, entity)
 
-        private fun update(competitor: Competitor, entity: Competitive) {
-            competitor.updateEntity(entity)
-        }
+        private fun update(competitor: Competitor, entity: Competitive) =
+                competitor.updateEntity(entity)
 
-        private fun buildItems(): List<Differentiable> = listOf<Differentiable>(
+        private fun buildItems(): List<Differentiable> = listOf(
                 Item.text(holder[0], 0, Item.TOURNAMENT_TYPE, R.string.tournament_type, type::code, this::setType)
                         .textTransformer { value -> Config.tournamentTypeFromCode(value.toString()).getName() },
                 Item.text(holder[1], 1, Item.SPORT, R.string.team_sport, sport::getName, this::setSport)
@@ -142,12 +137,10 @@ class HeadToHead {
             val awayId = request.awayId
             val summary = Summary()
 
-            for (aggregate in aggregates) {
-                when {
-                    isEmpty(aggregate.id) -> summary.draws = aggregate.count
-                    aggregate.id == homeId -> summary.wins = aggregate.count
-                    aggregate.id == awayId -> summary.losses = aggregate.count
-                }
+            for (aggregate in aggregates) when {
+                isEmpty(aggregate.id) -> summary.draws = aggregate.count
+                aggregate.id == homeId -> summary.wins = aggregate.count
+                aggregate.id == awayId -> summary.losses = aggregate.count
             }
 
             return summary

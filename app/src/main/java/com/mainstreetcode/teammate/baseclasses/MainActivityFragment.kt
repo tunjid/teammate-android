@@ -233,8 +233,11 @@ open class MainActivityFragment : TeammatesBaseFragment() {
 
         val model = args.getParcelable<Parcelable>(key) ?: return fallBack
 
-        val holder = scrollManager.findViewHolderForItemId(model.hashCode().toLong()) as? ModelCardViewHolder<*, *>
+        val holder = this@MainActivityFragment.scrollManager
+                .findViewHolderForItemId(model.hashCode().toLong()) as? ModelCardViewHolder<*, *>
                 ?: return fallBack
+
+        this@MainActivityFragment.exitTransition = sharedFadeTransition()
 
         return beginTransaction()
                 .addSharedElement(holder.itemView, model.getTransitionName(itemViewId))

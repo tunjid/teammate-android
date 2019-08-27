@@ -64,7 +64,7 @@ open class CompetitorAdapter(
         fun onCompetitorClicked(competitor: Competitor)
 
         companion object {
-            fun asSAM(function: (Competitor) -> Unit) = object : CompetitorAdapter.AdapterListener {
+            fun asSAM(function: (Competitor) -> Unit) = object : AdapterListener {
                 override fun onCompetitorClicked(competitor: Competitor) = function.invoke(competitor)
             }
         }

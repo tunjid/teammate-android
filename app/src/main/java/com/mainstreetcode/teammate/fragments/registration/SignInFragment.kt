@@ -98,13 +98,11 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         }
 
     @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        return if (view != null && fragmentTo.stableTag.contains(ForgotPasswordFragment::class.java.simpleName)) {
-            beginTransaction()
+    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? =
+            if (view != null && fragmentTo.stableTag.contains(ForgotPasswordFragment::class.java.simpleName)) beginTransaction()
                     .addSharedElement(emailInput!!, SplashFragment.TRANSITION_TITLE)
                     .addSharedElement(view!!.findViewById(R.id.card_view_wrapper), SplashFragment.TRANSITION_BACKGROUND)
-        } else super.provideFragmentTransaction(fragmentTo)
-    }
+            else super.provideFragmentTransaction(fragmentTo)
 
     override fun onClick(view: View) {
         when (view.id) {
@@ -113,12 +111,9 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         }
     }
 
-    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-            signIn()
-            return true
-        }
-        return false
+    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean = when {
+        actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN -> signIn().let { true }
+        else -> false
     }
 
     private fun signIn() {
@@ -142,13 +137,9 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
 
     companion object {
 
-        fun newInstance(): SignInFragment {
-            val fragment = SignInFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): SignInFragment = SignInFragment().apply {
+            arguments = Bundle()
+            setEnterExitTransitions()
         }
     }
 }
