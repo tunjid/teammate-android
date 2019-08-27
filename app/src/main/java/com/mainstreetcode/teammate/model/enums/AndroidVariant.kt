@@ -40,20 +40,15 @@ class AndroidVariant internal constructor(code: String, name: String) : MetaData
         return code == variant!!.code && name == variant.name
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(code, name)
-    }
+    override fun hashCode(): Int = Objects.hash(code, name)
 
     class GsonAdapter : MetaData.GsonAdapter<AndroidVariant>() {
-        internal override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): AndroidVariant {
-            return AndroidVariant(code, name)
-        }
+        override fun fromJson(code: String, name: String, body: JsonObject, context: JsonDeserializationContext): AndroidVariant =
+                AndroidVariant(code, name)
     }
 
     companion object {
 
-        fun empty(): AndroidVariant {
-            return AndroidVariant(Build.VERSION.SDK_INT.toString(), Build.MODEL)
-        }
+        fun empty(): AndroidVariant = AndroidVariant(Build.VERSION.SDK_INT.toString(), Build.MODEL)
     }
 }
