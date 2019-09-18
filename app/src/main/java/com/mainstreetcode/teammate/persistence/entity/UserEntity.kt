@@ -40,7 +40,7 @@ open class UserEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "user_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "user_image_url")
     var imageUrl: String
@@ -108,12 +108,6 @@ open class UserEntity : Parcelable {
         firstName = `in`.readString()!!
         lastName = `in`.readString()!!
         about = `in`.readString()!!
-    }
-
-    fun getId(): String = id
-
-    protected fun setId(id: String) {
-        this.id = id
     }
 
     override fun describeContents(): Int = 0

@@ -29,6 +29,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
@@ -39,7 +40,6 @@ import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.MyEventsViewModel
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -69,7 +69,10 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable{ disposables.add(myEventsViewModel.refresh(Event::class.java).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = {
+            disposables.add(myEventsViewModel.refresh(Event::class.java)
+                    .subscribe(this::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit }
+        }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
@@ -90,26 +93,26 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
     }
 
     override fun onEventClicked(item: Event) {
-        showFragment(EventEditFragment.newInstance(item))
+        navigator.show(EventEditFragment.newInstance(item))
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is EventEditFragment ->
+            transaction.listDetailTransition(EventEditFragment.ARG_EVENT, incomingFragment)
 
-        else -> super.provideFragmentTransaction(fragmentTo)
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun fetchEvents(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(myEventsViewModel.getMany(Event::class.java, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onEventsUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {

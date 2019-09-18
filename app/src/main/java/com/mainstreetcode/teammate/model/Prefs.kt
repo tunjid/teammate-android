@@ -43,6 +43,8 @@ class Prefs private constructor() : Model<Prefs> {
     var isOnBoarded: Boolean = false
     var nightUiMode: Int = if (SDK_INT >= Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY
 
+    override val id: String = "1"
+
     override val isEmpty: Boolean
         get() = false
 
@@ -55,8 +57,6 @@ class Prefs private constructor() : Model<Prefs> {
     }
 
     override fun compareTo(other: Prefs): Int = 0
-
-    override fun getId(): String = "1"
 
     override fun describeContents(): Int = 0
 

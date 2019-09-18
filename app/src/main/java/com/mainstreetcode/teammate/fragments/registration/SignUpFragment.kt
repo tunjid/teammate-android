@@ -136,7 +136,7 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
         val hasPassword = passwordInput.hasValidPassword
         val acceptedTerms = terms!!.isChecked
 
-        if (!acceptedTerms) showSnackbar(getString(R.string.sign_up_terms_accept))
+        if (!acceptedTerms) transientBarDriver.showSnackBar(getString(R.string.sign_up_terms_accept))
 
         if (hasFirstName && hasLastName && hasEmail && hasPassword && acceptedTerms) {
             val firstName = firstNameInput!!.text.toString()
@@ -144,7 +144,7 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
             val email = emailInput!!.text.toString()
             val password = passwordInput!!.text.toString()
 
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
 
             disposables.add(viewModel.signUp(firstName, lastName, email, password)
                     .subscribe({ onSignUp() }, defaultErrorHandler::invoke)
@@ -153,7 +153,7 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun onSignUp() {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         hideKeyboard()
         RegistrationActivity.startMainActivity(activity)
     }

@@ -94,8 +94,8 @@ class GameGofer(
         return FunctionalDiff.of(source, items, this::preserveItems)
     }
 
-    override fun preserveItems(old: MutableList<Differentiable>, fetched: MutableList<Differentiable>): MutableList<Differentiable> {
-        val result = super.preserveItems(old, fetched)
+    override fun preserveItems(old: List<Differentiable>, fetched: List<Differentiable>): List<Differentiable> {
+        val result = super.preserveItems(old, fetched).toMutableList()
         val iterator = result.iterator()
         val filter = { item: Differentiable -> item is Competitor && item.isEmpty }
 

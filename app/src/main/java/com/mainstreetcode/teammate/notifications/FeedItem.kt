@@ -60,13 +60,16 @@ inline fun <reified T> FeedItem<*>.isOf() where T : Any, T : Model<T> =
         else null
 
 class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*>> {
-
     private val action: String
+
     val title: String
     val body: String
     val type: String
     val model: T
     val itemClass: Class<T>
+
+    override val diffId: String
+        get() = model.diffId
 
     val imageUrl: String
         get() = model.imageUrl
@@ -92,8 +95,6 @@ class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*
         itemClass = forType(type)
         model = `in`.readValue(itemClass.classLoader) as T
     }
-
-    override fun getId(): String = model.id
 
     override fun compareTo(other: FeedItem<*>): Int = FunctionalDiff.COMPARATOR.compare(model, other.model)
 
@@ -167,8 +168,8 @@ class FeedItem<T : Model<T>> : Parcelable, Differentiable, Comparable<FeedItem<*
 
         private val gson = TeammateService.getGson()
 
-        fun <T : Model<T>> fromNotification(message: RemoteMessage): FeedItem<T>? {
-            val data = message.data
+        fun <T : Model<T>> fromNotification(message: RemoteMessage?): FeedItem<T>? {
+            val data = message?.data
             if (data == null || data.isEmpty()) return null
 
             return try {

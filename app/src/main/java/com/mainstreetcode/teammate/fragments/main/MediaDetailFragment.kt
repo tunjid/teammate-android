@@ -68,8 +68,8 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     override val hasLightNavBar: Boolean get() = false
 
-    override fun getStableTag(): String =
-            super.getStableTag() + "-" + arguments!!.getParcelable(ARG_MEDIA)
+    override val stableTag
+          get() = "${super.stableTag}-${arguments!!.getParcelable<Media>(ARG_MEDIA)}"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,7 +134,7 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     private fun checkMediaFlagged(media: Media) {
         if (!media.isFlagged) return
-        showSnackbar(getString(R.string.media_flagged))
+        transientBarDriver.showSnackBar(getString(R.string.media_flagged))
 
         val activity = activity
         activity?.onBackPressed()

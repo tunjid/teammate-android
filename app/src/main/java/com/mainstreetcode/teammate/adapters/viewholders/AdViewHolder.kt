@@ -44,8 +44,8 @@ import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
  */
 abstract class AdViewHolder<T : Ad<*>> internal constructor(
         itemView: View,
-        adapterListener: InteractiveAdapter.AdapterListener
-) : InteractiveViewHolder<InteractiveAdapter.AdapterListener>(itemView, adapterListener) {
+        delegate: Any
+) : InteractiveViewHolder<Any>(itemView, delegate) {
 
     internal lateinit var ad: T
 

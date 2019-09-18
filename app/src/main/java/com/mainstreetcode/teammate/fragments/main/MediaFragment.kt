@@ -24,16 +24,17 @@
 
 package com.mainstreetcode.teammate.fragments.main
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.MediaTransferIntentService
@@ -48,7 +49,6 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.getTransitionName
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.concurrent.atomic.AtomicBoolean
@@ -80,13 +80,14 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
 
     override val showsBottomNav: Boolean get() = bottomBarState.get()
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
 
-        return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-        else superResult
-    }
+            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,12 +95,23 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         items = mediaViewModel.getModelList(team)
 
         ImageWorkerFragment.attach(this)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            if (!mediaViewModel.hasSelections(team)) {
+                isEnabled = false
+                activity?.onBackPressed()
+                return@addCallback
+            }
+            mediaViewModel.clearSelections(team)
+            scrollManager.notifyDataSetChanged()
+            toggleContextMenu(false)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_media, container, false)
 
-        val refreshAction = Runnable { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.team_media))
                 .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_video_library_black_24dp, R.string.no_media))
@@ -125,7 +137,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
 
     private fun fetchMedia(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(mediaViewModel.getMany(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke))
     }
@@ -143,35 +155,25 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun handledBackPress(): Boolean {
-        if (!mediaViewModel.hasSelections(team)) return false
-        mediaViewModel.clearSelections(team)
-        scrollManager.notifyDataSetChanged()
-        toggleContextMenu(false)
-        return true
-    }
-
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> ImageWorkerFragment.requestMultipleMedia(this)
         }
     }
 
-    @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        if (fragmentTo.stableTag.contains(MediaDetailFragment::class.java.simpleName)) {
-            val media = fragmentTo.arguments!!.getParcelable<Media>(MediaDetailFragment.ARG_MEDIA)
-                    ?: return null
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
+        if (incomingFragment is MediaDetailFragment) {
+            val media = incomingFragment.arguments!!.getParcelable<Media>(MediaDetailFragment.ARG_MEDIA)
+                    ?: return
 
             val holder = scrollManager.findViewHolderForItemId(media.hashCode().toLong()) as? MediaViewHolder<*>
-                    ?: return null
+                    ?: return
 
             holder.bind(media) // Rebind, to make sure transition names remain.
-            return beginTransaction()
+            transaction
                     .addSharedElement(holder.itemView, media.getTransitionName(R.id.fragment_media_background))
                     .addSharedElement(holder.thumbnailView, media.getTransitionName(R.id.fragment_media_thumbnail))
         }
-        return null
     }
 
     override fun onMediaClicked(item: Media) {
@@ -180,7 +182,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         else {
             bottomBarState.set(false)
             togglePersistentUi()
-            showFragment(MediaDetailFragment.newInstance(item))
+            navigator.show(MediaDetailFragment.newInstance(item))
         }
     }
 
@@ -206,7 +208,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
 
     private fun onMediaUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     private fun toggleContextMenu(show: Boolean) {
@@ -230,7 +232,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         if (!partialDelete) return
 
         scrollManager.notifyDataSetChanged()
-        scrollManager.recyclerView.postDelayed({ showSnackbar(getString(R.string.partial_delete_message)) }, MEDIA_DELETE_SNACKBAR_DELAY.toLong())
+        scrollManager.recyclerView?.postDelayed({ transientBarDriver.showSnackBar(getString(R.string.partial_delete_message)) }, MEDIA_DELETE_SNACKBAR_DELAY.toLong())
     }
 
     companion object {

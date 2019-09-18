@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.HOME
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidbootstrap.view.util.inflate
 import java.util.*
 
 /**
@@ -66,28 +66,28 @@ class HeadToHeadRequestAdapter(
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when (viewType) {
-            ITEM -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-            HOME -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM(adapterListener::onHomeClicked))
+            ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+            HOME -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), CompetitorAdapter.AdapterListener.asSAM(delegate::onHomeClicked))
                     .hideSubtitle().withTitle(R.string.pick_home_competitor)
-            AWAY -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked))
+            AWAY -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), CompetitorAdapter.AdapterListener.asSAM(delegate::onAwayClicked))
                     .hideSubtitle().withTitle(R.string.pick_away_competitor)
-            else -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+            else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S {
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S {
         return when {
-            viewHolder.itemViewType == HOME -> CompetitorAdapter.AdapterListener.asSAM(adapterListener::onHomeClicked) as S
-            viewHolder.itemViewType == AWAY -> CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked) as S
-            else -> adapterListener as S
+            viewHolder.itemViewType == HOME -> CompetitorAdapter.AdapterListener.asSAM(delegate::onHomeClicked) as S
+            viewHolder.itemViewType == AWAY -> CompetitorAdapter.AdapterListener.asSAM(delegate::onAwayClicked) as S
+            else -> delegate as S
         }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val identifiable = request.items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
+            is Item -> (holder as InputViewHolder).bind(chooser[identifiable])
             is Competitor -> (holder as CompetitorViewHolder).bind(identifiable)
         }
     }
@@ -103,7 +103,7 @@ class HeadToHeadRequestAdapter(
         }
     }
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun onHomeClicked(home: Competitor)
 
         fun onAwayClicked(away: Competitor)

@@ -45,13 +45,13 @@ import com.mainstreetcode.teammate.util.getTransitionName
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.view.util.ViewUtil
+import com.tunjid.androidbootstrap.view.util.marginLayoutParams
 
 
 abstract class MediaViewHolder<T : View> internal constructor(
         itemView: View,
-        adapterListener: MediaAdapter.MediaAdapterListener
-) : InteractiveViewHolder<MediaAdapter.MediaAdapterListener>(itemView, adapterListener), Callback {
+        delegate: MediaAdapter.MediaAdapterListener
+) : InteractiveViewHolder<MediaAdapter.MediaAdapterListener>(itemView, delegate), Callback {
 
     lateinit var media: Media
 
@@ -82,18 +82,18 @@ abstract class MediaViewHolder<T : View> internal constructor(
         @Suppress("LeakingThis")
         thumbnailView = itemView.findViewById(thumbnailId)
 
-        val clickListener = View.OnClickListener { adapterListener.onMediaClicked(media) }
+        val clickListener = View.OnClickListener { delegate.onMediaClicked(media) }
 
         itemView.setOnClickListener(clickListener)
         fullResView.setOnClickListener(clickListener)
 
-        if (!adapterListener.isFullScreen) {
+        if (!delegate.isFullScreen) {
             itemView.setOnLongClickListener { performLongClick() }
             thumbnailView.scaleType = ImageView.ScaleType.CENTER_CROP
             setUnityAspectRatio()
         } else {
-            ViewUtil.getLayoutParams(container).height = MATCH_PARENT
-            val params = ViewUtil.getLayoutParams(itemView)
+            container.layoutParams.height = MATCH_PARENT
+            val params = itemView.marginLayoutParams
             params.height = MATCH_PARENT
             params.bottomMargin = 0
             params.rightMargin = params.bottomMargin
@@ -104,11 +104,13 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     fun bind(media: Media) {
         this.media = media
+        val delegate = this.delegate ?: return
+
         setTransitionName(itemView, media.getTransitionName(R.id.fragment_media_background))
         setTransitionName(thumbnailView, media.getTransitionName(R.id.fragment_media_thumbnail))
 
         loadImage(media.thumbnail, false, thumbnailView)
-        if (!adapterListener.isFullScreen) highlightViewHolder(adapterListener::isSelected)
+        if (!delegate.isFullScreen) highlightViewHolder(delegate::isSelected)
     }
 
     open fun fullBind(media: Media) = bind(media)
@@ -116,12 +118,13 @@ abstract class MediaViewHolder<T : View> internal constructor(
     open fun unBind() {}
 
     fun performLongClick(): Boolean {
-        highlightViewHolder(adapterListener::onMediaLongClicked)
+        val delegate = this.delegate ?: return true
+        highlightViewHolder(delegate::onMediaLongClicked)
         return true
     }
 
     internal fun loadImage(url: String, fitToSize: Boolean, destination: ImageView) {
-        val isFullScreen = adapterListener.isFullScreen
+        val isFullScreen = delegate?.isFullScreen ?: return
         if (url.isBlank()) return
 
         var creator = Picasso.get().load(url)
@@ -165,7 +168,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     private fun onFillExtracted(@ColorInt colorFill: Int, destination: View) {
         destination.setBackgroundColor(colorFill)
-        adapterListener.onFillLoaded()
+        delegate?.onFillLoaded()
     }
 
     private fun animateProperty(property: String, start: Float, end: Float): ObjectAnimator =

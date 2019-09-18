@@ -30,8 +30,9 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
 abstract class Ad<T> : Differentiable {
 
+    override val diffId: String = ObjectId().toHexString()
+
     private val nativeAd: T? = null
-    private val id = ObjectId().toHexString()
 
     //    Ad(T nativeAd) {
     //        this.nativeAd = nativeAd;
@@ -54,9 +55,6 @@ abstract class Ad<T> : Differentiable {
     val imageAspectRatio: String?
         get() = "H,1:1"
 
-    override fun getId(): String {
-        return id
-    }
     //
     //    @Nullable
     //    public NativeAd.Image getImage() {

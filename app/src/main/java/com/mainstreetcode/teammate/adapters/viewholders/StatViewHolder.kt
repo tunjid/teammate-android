@@ -34,8 +34,8 @@ import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
 class StatViewHolder(
         itemView: View,
-        adapterListener: SimpleAdapterListener<Stat>
-) : InteractiveViewHolder<SimpleAdapterListener<Stat>>(itemView, adapterListener) {
+        delegate: SimpleAdapterListener<Stat>
+) : InteractiveViewHolder<SimpleAdapterListener<Stat>>(itemView, delegate) {
 
     private lateinit var model: Stat
 
@@ -45,7 +45,7 @@ class StatViewHolder(
     private val statEmoji: Array<TextView> = arrayOf(itemView.findViewById(R.id.home_stat_emoji), itemView.findViewById(R.id.away_stat_emoji))
 
     init {
-        itemView.setOnClickListener { adapterListener.onItemClicked(model) }
+        itemView.setOnClickListener { delegate.onItemClicked(model) }
     }
 
     fun bind(model: Stat) {

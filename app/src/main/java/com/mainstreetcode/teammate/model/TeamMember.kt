@@ -39,6 +39,9 @@ import java.util.*
 @SuppressLint("ParcelCreator")
 class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : UserHost, TeamHost, Model<TeamMember> {
 
+    override val id: String
+        get() = wrappedModel.diffId
+
     override val user: User
         get() = wrappedModel.user
 
@@ -65,8 +68,6 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
             else -> Position.empty()
         }
 
-    override fun getId(): String = wrappedModel.id
-
     override fun compareTo(other: TeamMember): Int =
             FunctionalDiff.COMPARATOR.compare(wrappedModel, other)
 
@@ -74,7 +75,7 @@ class TeamMember internal constructor(val wrappedModel: TeamMemberModel<*>) : Us
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
         is TeamMember -> user.areContentsTheSame(other.user) && teamRole == other.teamRole
-        else -> id == other.id
+        else -> diffId == other.diffId
     }
 
     override fun equals(other: Any?): Boolean = when {

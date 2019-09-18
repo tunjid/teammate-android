@@ -61,8 +61,8 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_BLOCKED_USER)!!)
+    override val stableTag
+        get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_BLOCKED_USER)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,14 +73,14 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(rootView.findViewById(R.id.model_list))
                 .withAdapter(BlockedUserViewAdapter(gofer.items))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
 
         return rootView
     }
@@ -90,7 +90,7 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
             disposables.add(gofer.delete().subscribe(this::onUserUnblocked, defaultErrorHandler::invoke))
     }
 
-    override fun onImageClick() = showSnackbar(getString(R.string.no_permission))
+    override fun onImageClick() = transientBarDriver.showSnackBar(getString(R.string.no_permission))
 
     override fun gofer(): Gofer<BlockedUser> = gofer
 
@@ -102,7 +102,7 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
     }
 
     private fun onUserUnblocked() {
-        showSnackbar(getString(R.string.unblocked_user, headeredModel.user.firstName))
+        transientBarDriver.showSnackBar(getString(R.string.unblocked_user, headeredModel.user.firstName))
         requireActivity().onBackPressed()
     }
 

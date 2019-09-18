@@ -37,8 +37,8 @@ import com.mainstreetcode.teammate.util.getTransitionName
 
 class TournamentViewHolder(
         itemView: View,
-        adapterListener: TournamentAdapter.TournamentAdapterListener
-) : ModelCardViewHolder<Tournament, TournamentAdapter.TournamentAdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: TournamentAdapter.TournamentAdapterListener
+) : ModelCardViewHolder<Tournament, TournamentAdapter.TournamentAdapterListener>(itemView, delegate), View.OnClickListener {
 
     val image: ImageView
         get() = thumbnail
@@ -57,6 +57,6 @@ class TournamentViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onTournamentClicked(model)
+        delegate?.onTournamentClicked(model)
     }
 }

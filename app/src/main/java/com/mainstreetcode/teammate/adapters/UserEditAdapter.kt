@@ -37,8 +37,8 @@ import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.model.noSpecialCharacters
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [User]
@@ -47,22 +47,22 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 class UserEditAdapter(
         private val items: List<Differentiable>,
         listener: AdapterListener
-) : BaseAdapter<InputViewHolder<UserEditAdapter.AdapterListener>, UserEditAdapter.AdapterListener>(listener) {
+) : BaseAdapter<InputViewHolder, UserEditAdapter.AdapterListener>(listener) {
 
     private val chooser: TextInputStyle.InputChooser
 
     init {
-        chooser = Chooser(adapterListener)
+        chooser = Chooser(delegate)
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<AdapterListener> =
-            InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder =
+            InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            delegate as S
 
-    override fun onBindViewHolder(holder: InputViewHolder<AdapterListener>, position: Int) {
+    override fun onBindViewHolder(holder: InputViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
         if (item is Item) holder.bind(chooser[item])
@@ -78,10 +78,10 @@ class UserEditAdapter(
         fun canEdit(): Boolean
     }
 
-    private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
+    private class Chooser internal constructor(private val delegate: AdapterListener) : TextInputStyle.InputChooser() {
 
         override fun iconGetter(item: Item): Int =
-                if (adapterListener.canEdit() && item.stringRes == R.string.first_name) R.drawable.ic_picture_white_24dp else 0
+                if (delegate.canEdit() && item.stringRes == R.string.first_name) R.drawable.ic_picture_white_24dp else 0
 
         override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT -> item.noBlankFields
@@ -95,13 +95,13 @@ class UserEditAdapter(
             Item.INPUT,
             Item.ABOUT -> TextInputStyle(
                     Item.noClicks,
-                    adapterListener::onImageClick,
-                    { adapterListener.canEdit() },
+                    delegate::onImageClick,
+                    { delegate.canEdit() },
                     this::textChecker,
                     this::iconGetter)
             else -> TextInputStyle(Item.noClicks,
-                    adapterListener::onImageClick,
-                    { adapterListener.canEdit() },
+                    delegate::onImageClick,
+                    { delegate.canEdit() },
                     this::textChecker,
                     this::iconGetter)
         }

@@ -51,8 +51,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.deserializeList
-import com.mainstreetcode.teammate.util.replaceList
-import com.mainstreetcode.teammate.util.replaceStringList
+import com.mainstreetcode.teammate.util.replace
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.lang.reflect.Type
 
@@ -84,22 +83,22 @@ class Config internal constructor(
         this.defaultTeamLogo = updated.defaultTeamLogo
         this.defaultEventLogo = updated.defaultEventLogo
         this.defaultUserAvatar = updated.defaultUserAvatar
-        replaceStringList(privileged, updated.privileged)
+        privileged.replace(updated.privileged)
 
-        replaceList(sports, updated.sports)
-        replaceList(positions, updated.positions)
-        replaceList(statTypes, updated.statTypes)
-        replaceList(visibilities, updated.visibilities)
-        replaceList(blockReasons, updated.blockReasons)
-        replaceList(staticVariants, updated.staticVariants)
-        replaceList(staticVariants, updated.staticVariants)
-        replaceList(tournamentTypes, updated.tournamentTypes)
-        replaceList(tournamentStyles, updated.tournamentStyles)
+        sports.replace(updated.sports)
+        positions.replace(updated.positions)
+        statTypes.replace(updated.statTypes)
+        visibilities.replace(updated.visibilities)
+        blockReasons.replace(updated.blockReasons)
+        staticVariants.replace(updated.staticVariants)
+        staticVariants.replace(updated.staticVariants)
+        tournamentTypes.replace(updated.tournamentTypes)
+        tournamentStyles.replace(updated.tournamentStyles)
     }
 
-    override fun compareTo(other: Config): Int = 0
+    override val id: String = "0"
 
-    override fun getId(): String = "0"
+    override fun compareTo(other: Config): Int = 0
 
     override fun describeContents(): Int = 0
 

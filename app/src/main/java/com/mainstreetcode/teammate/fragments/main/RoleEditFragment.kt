@@ -69,8 +69,9 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
 
     override val showsFab: Boolean get() = gofer.canChangeRoleFields()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_ROLE)!!)
+    override val stableTag: String 
+        get() = 
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_ROLE)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +82,7 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(RoleEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -90,7 +91,7 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
         return rootView
     }
 
@@ -113,13 +114,13 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         viewHolder.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> if (headeredModel.position.isInvalid)
-                showSnackbar(getString(R.string.select_role))
+                transientBarDriver.showSnackBar(getString(R.string.select_role))
             else
                 updateRole()
         }
@@ -143,7 +144,7 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     }
 
     private fun updateRole() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe(this::onRoleUpdated, defaultErrorHandler::invoke))
     }
 
@@ -151,13 +152,13 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
         viewHolder.bind(headeredModel)
         scrollManager.onDiff(result)
         togglePersistentUi()
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         requireActivity().invalidateOptionsMenu()
-        showSnackbar(getString(R.string.updated_user, headeredModel.user.firstName))
+        transientBarDriver.showSnackBar(getString(R.string.updated_user, headeredModel.user.firstName))
     }
 
     private fun onRoleDropped() {
-        showSnackbar(getString(R.string.dropped_user, headeredModel.user.firstName))
+        transientBarDriver.showSnackBar(getString(R.string.dropped_user, headeredModel.user.firstName))
         removeEnterExitTransitions()
         requireActivity().onBackPressed()
     }

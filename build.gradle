@@ -8,12 +8,13 @@ buildscript {
         maven { url 'https://maven.google.com' }
         maven { url 'https://oss.jfrog.info/artifactory/oss-snapshot-local' }
 
+        mavenLocal()
         jcenter()
         google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
-        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.gms:google-services:4.3.2'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
@@ -27,6 +28,7 @@ allprojects {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' }
         maven { url 'https://oss.jfrog.info/artifactory/oss-snapshot-local' }
+        mavenLocal()
         jcenter()
     }
 }

@@ -32,6 +32,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -44,7 +45,6 @@ import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -68,13 +68,14 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
 
     override val showsFab: Boolean get() = team.sport.supportsCompetitions() && localRoleViewModel.hasPrivilegedRole()
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
 
-        return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-        else superResult
-    }
+            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,7 +86,7 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(tournamentViewModel.refresh(team).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = { disposables.add(tournamentViewModel.refresh(team).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
@@ -113,29 +114,28 @@ class TournamentsFragment : MainActivityFragment(), TournamentAdapter.Tournament
     }
 
     override fun onTournamentClicked(tournament: Tournament) =
-            showFragment(TournamentDetailFragment.newInstance(tournament)).let { Unit }
+            navigator.show(TournamentDetailFragment.newInstance(tournament)).let { Unit }
 
     override fun onClick(view: View) = when {
-        view.id == R.id.fab -> showFragment(TournamentEditFragment.newInstance(Tournament.empty(team))).let { Unit }
+        view.id == R.id.fab -> navigator.show(TournamentEditFragment.newInstance(Tournament.empty(team))).let { Unit }
         else -> Unit
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(TournamentEditFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT)
-
-        else -> super.provideFragmentTransaction(fragmentTo)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is TournamentEditFragment ->
+            transaction.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT, incomingFragment)
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun fetchTournaments(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(tournamentViewModel.getMany(team, fetchLatest).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onTournamentsUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         val supportsTournaments = team.sport.supportsCompetitions()
         scrollManager.onDiff(result)
         scrollManager.updateForEmptyList(ListState(

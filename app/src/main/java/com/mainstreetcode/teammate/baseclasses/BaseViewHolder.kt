@@ -25,27 +25,22 @@
 package com.mainstreetcode.teammate.baseclasses
 
 import android.view.View
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import io.reactivex.disposables.CompositeDisposable
 
-open class BaseViewHolder<T : InteractiveAdapter.AdapterListener> : InteractiveViewHolder<T> {
+open class BaseViewHolder<T : Any>(itemView: View, adapterListener: T) : InteractiveViewHolder<T>(itemView, adapterListener) {
 
     protected var disposables = CompositeDisposable()
 
-    constructor(itemView: View) : super(itemView)
-
-    constructor(itemView: View, adapterListener: T) : super(itemView, adapterListener)
-
     open fun clear() {
         disposables.clear()
-        adapterListener = null
+        delegate = null
     }
 
     open fun onDetached() {}
 
     @Suppress("UNCHECKED_CAST")
     internal inline fun <reified R>  updateAdapterListener(adapterListener: R) {
-        this.adapterListener = adapterListener as T
+        this.delegate = adapterListener as T
     }
 }

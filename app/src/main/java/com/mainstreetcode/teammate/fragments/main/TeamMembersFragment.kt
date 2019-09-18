@@ -35,6 +35,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -46,7 +47,6 @@ import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -69,12 +69,13 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
 
     override val showsFab: Boolean get() = targetRequestCode == 0 && localRoleViewModel.hasPrivilegedRole()
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
 
-        return if (tempTeam == null) superResult else superResult + "-" + tempTeam.hashCode()
-    }
+            return if (tempTeam == null) superResult else superResult + "-" + tempTeam.hashCode()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +87,10 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(teamMemberViewModel.refresh(team).subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = {
+            disposables.add(teamMemberViewModel.refresh(team)
+                    .subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke)).let { Unit }
+        }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
@@ -122,11 +126,11 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_edit -> showFragment(TeamEditFragment.newEditInstance(team))
+        R.id.action_edit -> navigator.show(TeamEditFragment.newEditInstance(team))
 
-        R.id.action_team_tournaments -> showFragment(TournamentsFragment.newInstance(team))
+        R.id.action_team_tournaments -> navigator.show(TournamentsFragment.newInstance(team))
 
-        R.id.action_blocked -> showFragment(BlockedUsersFragment.newInstance(team))
+        R.id.action_blocked -> navigator.show(BlockedUsersFragment.newInstance(team))
 
         R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_team_prompt, team.name))
                 .setMessage(R.string.delete_team_prompt_body)
@@ -142,38 +146,38 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
         val canPick = target is UserAdapter.AdapterListener
 
         if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(role.user)
-        else showFragment(RoleEditFragment.newInstance(role))
+        else navigator.show(RoleEditFragment.newInstance(role))
     }
 
     override fun onJoinRequestClicked(request: JoinRequest) {
         val target = targetFragment
         val canPick = target is UserAdapter.AdapterListener
 
-        if (canPick) showSnackbar(getString(R.string.stat_user_not_on_team))
-        else showFragment(JoinRequestFragment.viewInstance(request))
+        if (canPick) transientBarDriver.showSnackBar(getString(R.string.stat_user_not_on_team))
+        else navigator.show(JoinRequestFragment.viewInstance(request))
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> if (localRoleViewModel.hasPrivilegedRole())
-                showFragment(JoinRequestFragment.inviteInstance(team))
+                navigator.show(JoinRequestFragment.inviteInstance(team))
         }
     }
 
     @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-          fragmentTo.stableTag.contains(RoleEditFragment::class.java.simpleName) ->
-              fragmentTo.listDetailTransition(RoleEditFragment.ARG_ROLE)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is RoleEditFragment ->
+            transaction.listDetailTransition(RoleEditFragment.ARG_ROLE, incomingFragment)
 
-          fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName) ->
-              fragmentTo.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST)
+        is JoinRequestFragment ->
+            transaction.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST, incomingFragment)
 
-          else ->  super.provideFragmentTransaction(fragmentTo)
-      }
+        else -> super.augmentTransaction(transaction, incomingFragment)
+    }
 
     private fun fetchTeamMembers(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(teamMemberViewModel.getMany(team, fetchLatest).subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke))
     }
@@ -188,7 +192,7 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
     }
 
     private fun onTeamDeleted() {
-        showSnackbar(getString(R.string.deleted_team, team.name))
+        transientBarDriver.showSnackBar(getString(R.string.deleted_team, team.name))
         removeEnterExitTransitions()
 
         val activity = activity

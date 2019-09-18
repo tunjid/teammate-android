@@ -37,7 +37,6 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
@@ -47,7 +46,6 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
@@ -95,7 +93,7 @@ class HeadToHeadFragment : MainActivityFragment(),
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
-                .withAdapter(GameAdapter(matchUps, GameAdapter.AdapterListener.asSAM { game -> showFragment(GameFragment.newInstance(game)) }))
+                .withAdapter(GameAdapter(matchUps, GameAdapter.AdapterListener.asSAM { game -> navigator.show(GameFragment.newInstance(game)) }))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.fetchMatchUps() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
@@ -108,7 +106,7 @@ class HeadToHeadFragment : MainActivityFragment(),
         scrollManager.notifyDataSetChanged()
 
         updateHeadToHead(0, 0, 0)
-        if (!restoredFromBackStack()) expandingToolbar?.changeVisibility(false)
+        if (!restoredFromBackStack) expandingToolbar?.changeVisibility(false)
 
         return root
     }
@@ -124,7 +122,7 @@ class HeadToHeadFragment : MainActivityFragment(),
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
-        if (!appeared && isBottomSheetShowing) hideBottomSheet()
+        if (!appeared && bottomSheetDriver.isBottomSheetShowing) bottomSheetDriver.hideBottomSheet()
     }
 
     override fun onUserClicked(item: User) = updateCompetitor(item)
@@ -142,10 +140,10 @@ class HeadToHeadFragment : MainActivityFragment(),
     }
 
     private fun fetchMatchUps() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gameViewModel.headToHead(request).subscribe({ summary -> updateHeadToHead(summary.wins, summary.draws, summary.losses) }, ErrorHandler.EMPTY::invoke))
         disposables.add(gameViewModel.getMatchUps(request).subscribe({ diffResult ->
-            toggleProgress(false)
+            transientBarDriver.toggleProgress(false)
             scrollManager.onDiff(diffResult)
         }, defaultErrorHandler::invoke))
     }
@@ -163,24 +161,17 @@ class HeadToHeadFragment : MainActivityFragment(),
         hideKeyboard()
     }
 
-    private fun findCompetitor() {
-        if (request.hasInvalidType()) return showSnackbar(getString(R.string.game_select_tournament_type))
+    private fun findCompetitor() = bottomSheetDriver.showBottomSheet  {
+        if (request.hasInvalidType()) return@showBottomSheet transientBarDriver.showSnackBar(getString(R.string.game_select_tournament_type))
 
         val refPath = request.refPath
         val isBetweenUsers = User.COMPETITOR_TYPE == refPath
 
-        var fragment: BaseFragment? = null
 
         if (isBetweenUsers) fragment = UserSearchFragment.newInstance()
         else if (Team.COMPETITOR_TYPE == refPath) fragment = TeamSearchFragment.newInstance(request.sport)
 
-        fragment ?: return
-        fragment.setTargetFragment(this, R.id.request_competitor_pick)
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setFragment(fragment)
-                .build())
+        fragment?.setTargetFragment(this@HeadToHeadFragment, R.id.request_competitor_pick)
     }
 
     private fun getText(@StringRes stringRes: Int, count: Int): CharSequence =

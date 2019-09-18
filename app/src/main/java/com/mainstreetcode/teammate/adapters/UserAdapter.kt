@@ -42,6 +42,7 @@ import com.mainstreetcode.teammate.util.USER
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -54,9 +55,9 @@ class UserAdapter(private val items: List<Differentiable>, listener: AdapterList
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-        INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-        else -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener)
+        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+        else -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), delegate)
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
@@ -76,7 +77,7 @@ class UserAdapter(private val items: List<Differentiable>, listener: AdapterList
         return if (item is User) USER else (item as Ad<*>).type
     }
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun onUserClicked(item: User)
 
         companion object {

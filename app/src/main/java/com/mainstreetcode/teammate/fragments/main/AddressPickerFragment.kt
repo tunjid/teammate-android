@@ -170,7 +170,7 @@ class AddressPickerFragment : MainActivityFragment() {
             val current = currentAddress.get()
 
             if (current != null) (targetFragment as AddressPicker).onAddressPicked(current)
-            hideBottomSheet()
+            bottomSheetDriver.hideBottomSheet()
         }
     }
 
@@ -207,7 +207,7 @@ class AddressPickerFragment : MainActivityFragment() {
     }
 
     private fun onAddressFound(address: Address) {
-        scrollManager.recyclerView.visibility = View.GONE
+        scrollManager.recyclerView?.visibility = View.GONE
         location.text = address.fullName
         location.visibility = View.VISIBLE
         currentAddress.set(address)

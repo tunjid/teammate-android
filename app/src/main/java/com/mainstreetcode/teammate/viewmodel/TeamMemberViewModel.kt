@@ -62,15 +62,11 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember>() {
         alert.matches(Alert.of(Alert.Creation::class.java, BlockedUser::class.java, this::removeBlockedUser))
     }
 
-    override fun afterPullToRefreshDiff(source: MutableList<Differentiable>) {
-        super.afterPullToRefreshDiff(source)
-        filterJoinedMembers(source)
-    }
+    override fun afterPullToRefreshDiff(source: List<Differentiable>): List<Differentiable> =
+            filterJoinedMembers(super.afterPullToRefreshDiff(source))
 
-    override fun afterPreserveListDiff(source: MutableList<Differentiable>) {
-        super.afterPreserveListDiff(source)
-        filterJoinedMembers(source)
-    }
+    override fun afterPreserveListDiff(source: List<Differentiable>): List<Differentiable> =
+            filterJoinedMembers(super.afterPreserveListDiff(source))
 
     override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<TeamMember>> =
             repo.modelsBefore(key, getQueryDate(fetchLatest, key, TeamMember::created))
@@ -121,17 +117,18 @@ class TeamMemberViewModel : TeamMappedViewModel<TeamMember>() {
         }
     }
 
-    private fun filterJoinedMembers(source: MutableList<Differentiable>) {
+    private fun filterJoinedMembers(source: List<Differentiable>): List<Differentiable> {
         val userIds = mutableSetOf<String>()
-        val iterator = source.listIterator(source.size)
 
-        while (iterator.hasPrevious()) {
-            val member: TeamMember = iterator.previous() as? TeamMember ?: continue
+        return source.filter filter@{
+            val member: TeamMember = it as? TeamMember ?: return@filter false
 
             val item = member.wrappedModel as Differentiable
 
-            if (item is Role) userIds.add(member.user.id)
-            else if (item is JoinRequest) if (userIds.contains(member.user.id)) iterator.remove()
+            if (item is Role) {
+                userIds.add(member.user.id)
+                true
+            } else !(item is JoinRequest && userIds.contains(member.user.id))
         }
     }
 }

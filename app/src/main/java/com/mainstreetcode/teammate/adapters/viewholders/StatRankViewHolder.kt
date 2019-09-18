@@ -33,8 +33,8 @@ import com.mainstreetcode.teammate.util.SimpleAdapterListener
 
 class StatRankViewHolder(
         itemView: View,
-        adapterListener: SimpleAdapterListener<StatRank>
-) : ModelCardViewHolder<StatRank, SimpleAdapterListener<StatRank>>(itemView, adapterListener), View.OnClickListener {
+        delegate: SimpleAdapterListener<StatRank>
+) : ModelCardViewHolder<StatRank, SimpleAdapterListener<StatRank>>(itemView, delegate), View.OnClickListener {
 
     private val count: TextView
     private val inset: ImageView
@@ -61,6 +61,6 @@ class StatRankViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onItemClicked(model)
+        delegate?.onItemClicked(model)
     }
 }

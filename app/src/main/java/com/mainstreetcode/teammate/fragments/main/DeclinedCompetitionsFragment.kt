@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.model.Item.Companion.COMPETITOR
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.ViewUtil
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Lists [tournaments][Event]
@@ -63,7 +63,10 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(competitorViewModel.refresh(User::class.java).subscribe(this@DeclinedCompetitionsFragment::onCompetitorsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = {
+            disposables.add(competitorViewModel.refresh(User::class.java)
+                    .subscribe(this@DeclinedCompetitionsFragment::onCompetitorsUpdated, defaultErrorHandler::invoke)).let { Unit }
+        }
 
         scrollManager = ScrollManager.with<CompetitorViewHolder>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
@@ -75,7 +78,7 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
                 .withAdapter(object : CompetitorAdapter(items, this) {
                     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder =
                             if (viewType != COMPETITOR) super.onCreateViewHolder(viewGroup, viewType)
-                            else CompetitorViewHolder(ViewUtil.getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener)
+                            else CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), delegate)
                 })
                 .withLinearLayoutManager()
                 .build()
@@ -99,29 +102,29 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
                         TournamentDetailFragment.newInstance(competitor.tournament).pending(competitor)
                     else
                         null
-                    if (fragment != null) showFragment(fragment)
+                    if (fragment != null) navigator.show(fragment)
                 }
                 .show()
     }
 
     private fun accept(competitor: Competitor) {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(competitorViewModel.respond(competitor, true)
                 .subscribe({ diffResult ->
-                    toggleProgress(false)
+                    transientBarDriver.toggleProgress(false)
                     scrollManager.onDiff(diffResult)
                 }, defaultErrorHandler::invoke))
     }
 
     private fun fetchCompetitions(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(competitorViewModel.getMany(User::class.java, fetchLatest).subscribe(this::onCompetitorsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onCompetitorsUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
     }
 

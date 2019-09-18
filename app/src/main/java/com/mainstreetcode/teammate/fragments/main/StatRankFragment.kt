@@ -52,8 +52,8 @@ class StatRankFragment : MainActivityFragment() {
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
+    override val stableTag: String 
+        get() {val superResult = super.stableTag
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
         return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
@@ -76,7 +76,7 @@ class StatRankFragment : MainActivityFragment() {
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatRankAdapter(
                         statRanks,
-                        simpleAdapterListener { statRank -> showFragment(UserEditFragment.newInstance(statRank.user)) }))
+                        simpleAdapterListener { statRank -> navigator.show(UserEditFragment.newInstance(statRank.user)) }))
                 .withLinearLayoutManager()
                 .build()
 
@@ -106,13 +106,13 @@ class StatRankFragment : MainActivityFragment() {
     override fun togglePersistentUi() = Unit /* Do nothing */
 
     private fun fetchStandings() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(tournamentViewModel.getStatRank(tournament, type).subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onTournamentsUpdated(diff: DiffUtil.DiffResult) {
         scrollManager.onDiff(diff)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {

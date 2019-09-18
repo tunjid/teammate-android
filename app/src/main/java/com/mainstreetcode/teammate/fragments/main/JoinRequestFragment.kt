@@ -76,8 +76,9 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
 
     override val showsFab: Boolean get() = gofer.showsFab()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_JOIN_REQUEST)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_JOIN_REQUEST)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +89,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(rootView.findViewById(R.id.model_list))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(JoinRequestAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -97,7 +98,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
         return rootView
     }
 
@@ -132,7 +133,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         viewHolder.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun canEditFields(): Boolean = gofer.canEditFields()
@@ -149,45 +150,45 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
 
         when {
             state == APPROVING || state == ACCEPTING -> saveRequest()
-            headeredModel.position.isInvalid -> showSnackbar(getString(R.string.select_role))
+            headeredModel.position.isInvalid -> transientBarDriver.showSnackBar(getString(R.string.select_role))
             state == JOINING || state == INVITING -> createJoinRequest()
         }
     }
 
     private fun createJoinRequest() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe(this::onJoinRequestSent, defaultErrorHandler::invoke))
     }
 
     private fun saveRequest() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe({ onRequestSaved() }, defaultErrorHandler::invoke))
     }
 
     private fun deleteRequest() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.remove().subscribe(this::onRequestDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onJoinRequestSent(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        hideBottomSheet()
-        toggleProgress(false)
+        bottomSheetDriver.hideBottomSheet()
+        transientBarDriver.toggleProgress(false)
         togglePersistentUi()
-        showSnackbar(getString(
+        transientBarDriver.showSnackBar(getString(
                 if (headeredModel.isTeamApproved) R.string.user_invite_sent
                 else R.string.team_submitted_join_request))
     }
 
     private fun onRequestDeleted() {
         val name = headeredModel.user.firstName
-        if (!gofer.isRequestOwner) showSnackbar(getString(R.string.removed_user, name))
+        if (!gofer.isRequestOwner) transientBarDriver.showSnackBar(getString(R.string.removed_user, name))
         requireActivity().onBackPressed()
     }
 
     private fun onRequestSaved() {
         val name = headeredModel.user.firstName
-        if (!gofer.isRequestOwner) showSnackbar(getString(R.string.added_user, name))
+        if (!gofer.isRequestOwner) transientBarDriver.showSnackBar(getString(R.string.added_user, name))
         requireActivity().onBackPressed()
     }
 

@@ -66,7 +66,7 @@ class TournamentDetailFragment : MainActivityFragment() {
     private var viewPager: ViewPager? = null
     private var tabLayout: TabLayout? = null
     private var viewHolder: EmptyViewHolder? = null
-    internal var gamesRecycledViewPool: RecyclerView.RecycledViewPool? = null
+    internal var gamesRecycledViewPool: RecyclerView.RecycledViewPool = RecyclerView.RecycledViewPool()
         private set
 
     override val fabStringResource: Int @StringRes get() = R.string.add_tournament_competitors
@@ -83,15 +83,15 @@ class TournamentDetailFragment : MainActivityFragment() {
         arguments!!.putParcelable(ARG_COMPETITOR, competitor)
     }
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args = arguments
         tournament = args!!.getParcelable(ARG_TOURNAMENT)!!
         competitor = args.getParcelable(ARG_COMPETITOR) ?: Competitor.empty()
-        gamesRecycledViewPool = RecyclerView.RecycledViewPool()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -116,8 +116,8 @@ class TournamentDetailFragment : MainActivityFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_edit -> showFragment(TournamentEditFragment.newInstance(tournament))
-        R.id.action_standings -> showFragment(StatDetailFragment.newInstance(tournament))
+        R.id.action_edit -> navigator.show(TournamentEditFragment.newInstance(tournament))
+        R.id.action_standings -> navigator.show(StatDetailFragment.newInstance(tournament))
         R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_tournament_prompt))
                 .setPositiveButton(R.string.yes) { _, _ -> deleteTournament() }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
@@ -143,7 +143,7 @@ class TournamentDetailFragment : MainActivityFragment() {
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament))
+        if (view.id == R.id.fab) navigator.show(CompetitorsFragment.newInstance(tournament))
     }
 
     override fun togglePersistentUi() {
@@ -153,7 +153,7 @@ class TournamentDetailFragment : MainActivityFragment() {
 
     private fun checkCompetitor() {
         if (competitor.isEmpty || competitor.isAccepted) return
-        if (restoredFromBackStack())
+        if (restoredFromBackStack)
         // Don't prompt for the same competitor multiple times.
             disposables.add(competitorViewModel.updateCompetitor(competitor).subscribe(this::promptForCompetitor, ErrorHandler.EMPTY::invoke))
         else
@@ -162,7 +162,7 @@ class TournamentDetailFragment : MainActivityFragment() {
 
     private fun promptForCompetitor() {
         if (competitor.isEmpty || competitor.isAccepted) return
-        showChoices { choiceBar ->
+        transientBarDriver.showChoices { choiceBar ->
             choiceBar.setText(getString(R.string.tournament_accept))
                     .setPositiveText(getText(R.string.accept))
                     .setNegativeText(getText(R.string.decline))
@@ -172,9 +172,9 @@ class TournamentDetailFragment : MainActivityFragment() {
     }
 
     private fun respond(accept: Boolean) {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(competitorViewModel.respond(competitor, accept)
-                .subscribe({ toggleProgress(false) }, defaultErrorHandler::invoke))
+                .subscribe({ transientBarDriver.toggleProgress(false) }, defaultErrorHandler::invoke))
     }
 
     private fun deleteTournament() {
@@ -182,7 +182,7 @@ class TournamentDetailFragment : MainActivityFragment() {
     }
 
     private fun onTournamentDeleted(deleted: Tournament) {
-        showSnackbar(getString(R.string.deleted_team, deleted.name))
+        transientBarDriver.showSnackBar(getString(R.string.deleted_team, deleted.name))
         removeEnterExitTransitions()
         requireActivity().onBackPressed()
     }

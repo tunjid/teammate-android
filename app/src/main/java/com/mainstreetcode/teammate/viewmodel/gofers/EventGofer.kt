@@ -107,9 +107,7 @@ constructor(
         val single: Single<List<Differentiable>> = rsvpFunction.invoke(Guest.forEvent(model, attending)).map { listOf(it) }
 
         return FunctionalDiff.of(single, items) { staleCopy, singletonGuestList ->
-            staleCopy.removeAll(singletonGuestList)
-            staleCopy.addAll(singletonGuestList)
-            staleCopy
+            (staleCopy - singletonGuestList) + singletonGuestList
         }
     }
 

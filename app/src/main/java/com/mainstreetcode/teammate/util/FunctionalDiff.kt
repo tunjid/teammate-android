@@ -73,7 +73,7 @@ object FunctionalDiff {
 
     fun <T : Differentiable> of(sourceFlowable: Flowable<out List<T>>,
                                 original: List<T>,
-                                accumulator: (MutableList<T>, MutableList<T>) -> List<T>): Flowable<DiffUtil.DiffResult> =
+                                accumulator: (List<T>, List<T>) -> List<T>): Flowable<DiffUtil.DiffResult> =
             sourceFlowable.concatMapDelayError { list ->
                 Flowable.fromCallable { Diff.calculate(original, list, accumulator) }
                         .subscribeOn(AndroidSchedulers.from(diffThread.looper))
@@ -84,7 +84,7 @@ object FunctionalDiff {
 
     fun <T : Differentiable> of(sourceSingle: Single<out List<T>>,
                                 original: List<T>,
-                                accumulator: (MutableList<T>, MutableList<T>) -> List<T>): Single<DiffUtil.DiffResult> =
+                                accumulator: (List<T>, List<T>) -> List<T>): Single<DiffUtil.DiffResult> =
             sourceSingle.flatMap { list ->
                 Single.fromCallable { Diff.calculate(original, list, accumulator) }
                         .subscribeOn(AndroidSchedulers.from(diffThread.looper))

@@ -58,7 +58,6 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.tunjid.androidbootstrap.view.animator.ViewHider
-import com.tunjid.androidbootstrap.view.animator.ViewHider.TOP
 import io.reactivex.disposables.Disposable
 import kotlin.math.abs
 
@@ -71,12 +70,9 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
     private lateinit var items: MutableList<Differentiable>
     private lateinit var chatDisposable: Disposable
 
-    private var dateView: TextView? = null
-    private var newMessages: TextView? = null
-
     private var deferrer: Deferrer? = null
-    private var dateHider: ViewHider? = null
-    private var newMessageHider: ViewHider? = null
+    private var dateHider: ViewHider<TextView>? = null
+    private var newMessageHider: ViewHider<TextView>? = null
 
     override val toolbarMenu: Int get() = R.menu.fragment_chat
 
@@ -90,8 +86,8 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
 
     private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
+    override val stableTag: String 
+        get() {val superResult = super.stableTag
         val team = arguments?.getParcelable<Team>(ARG_TEAM)
 
         return if (team != null) superResult + "-" + team.hashCode()
@@ -109,12 +105,11 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         val refresh = root.findViewById<SwipeRefreshLayout>(R.id.refresh_layout)
         val input = root.findViewById<EditText>(R.id.input)
         val send = root.findViewById<View>(R.id.send)
-        dateView = root.findViewById(R.id.date)
-        newMessages = root.findViewById(R.id.new_messages)
         root.findViewById<View>(R.id.footer_background)?.setMaterialOverlay()
 
-        dateHider = ViewHider.of(dateView).setDirection(TOP).build()
-        newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build()
+        dateHider = ViewHider.of(root.findViewById<TextView>(R.id.date)).setDirection(ViewHider.TOP).build()
+        newMessageHider = ViewHider.of(root.findViewById<TextView>(R.id.new_messages)).setDirection(ViewHider.BOTTOM).build()
+
         deferrer = Deferrer(2000) { dateHider?.hide() }
 
         scrollManager = ScrollManager.with<TeamChatViewHolder>(root.findViewById(R.id.chat))
@@ -130,8 +125,8 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
                 .withLinearLayoutManager()
                 .build()
 
-        newMessages?.setOnClickListener { scrollManager.withRecyclerView { rv -> rv.smoothScrollToPosition(items.size - 1) } }
-        dateView?.setOnClickListener { dateHider?.hide() }
+        newMessageHider?.view?.setOnClickListener { scrollManager.withRecyclerView { rv -> rv.smoothScrollToPosition(items.size - 1) } }
+        dateHider?.view?.setOnClickListener { dateHider?.hide() }
         send.setOnClickListener { sendChat(input) }
         input.setOnEditorActionListener(this)
         input.addTextChangedListener(object : TextWatcher {
@@ -164,9 +159,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         super.onDestroyView()
         chatViewModel.updateLastSeen(team)
         newMessageHider = null
-        newMessages = null
         dateHider = null
-        dateView = null
         deferrer = null
     }
 
@@ -201,7 +194,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
             updateUnreadCount()
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
-                .add { message -> showSnackbar(message.message) }
+                .add { message -> transientBarDriver.showSnackBar(message.message) }
                 .build()::invoke)
 
         disposables.add(chatDisposable)
@@ -247,7 +240,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
     }
 
     private fun onChatsUpdated(result: DiffUtil.DiffResult?) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         chatViewModel.updateLastSeen(team)
         if (result != null) scrollManager.onDiff(result)
     }
@@ -261,7 +254,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         if (date.isBlank()) dateHider?.hide()
         else dateHider?.show()
 
-        val ref = dateView ?: return
+        val ref = dateHider?.view ?: return
         if (date == ref.text.toString()) return
 
         TransitionManager.beginDelayedTransition(
@@ -284,7 +277,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         if (unreadCount == 0)
             newMessageHider?.hide()
         else {
-            newMessages?.text = if (unreadCount == 1) getString(R.string.chat_new_message) else getString(R.string.chat_new_messages, unreadCount)
+            newMessageHider?.view?.text = if (unreadCount == 1) getString(R.string.chat_new_message) else getString(R.string.chat_new_messages, unreadCount)
             newMessageHider?.show()
         }
     }

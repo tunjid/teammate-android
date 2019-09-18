@@ -37,8 +37,9 @@ import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.persistence.entity.ChatEntity
-import com.mainstreetcode.teammate.util.*
 import com.mainstreetcode.teammate.util.ObjectId
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
@@ -53,13 +54,11 @@ class Chat : ChatEntity, TeamHost, Parcelable, Model<Chat> {
     val createdDate: String
         get() = CHAT_DATE_FORMAT.format(created)
 
-    constructor(hiddenId: String, kind: String,
+    constructor(id: String, kind: String,
                 content: CharSequence,
-                user: User, hiddenTeam: Team, created: Date) : super(hiddenId, kind, content, user, hiddenTeam, created)
+                user: User, hiddenTeam: Team, created: Date) : super(id, kind, content, user, hiddenTeam, created)
 
     private constructor(`in`: Parcel) : super(`in`)
-
-    override fun getId(): String = hiddenId
 
     override val team: Team
         get() = hiddenTeam
@@ -71,12 +70,12 @@ class Chat : ChatEntity, TeamHost, Parcelable, Model<Chat> {
         get() = !isSuccessful
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is Chat) id == other.id else content == other.content && user.areContentsTheSame(other.user)
+            if (other !is Chat) diffId == other.diffId else content == other.content && user.areContentsTheSame(other.user)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Chat) {
-        hiddenId = updated.hiddenId
+        id = updated.id
         kind = updated.kind
         content = updated.content
         created = updated.created

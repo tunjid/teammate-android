@@ -61,20 +61,23 @@ abstract class BaseViewModel : ViewModel() {
         super.onCleared()
     }
 
-    fun preserveList(source: MutableList<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
-        if (sortsAscending()) preserveAscending(source, additions)
-        else preserveDescending(source, additions)
+    fun preserveList(source: List<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
+        var output =
+                if (sortsAscending()) preserveAscending(source, additions)
+                else preserveDescending(source, additions)
 
-        afterPreserveListDiff(source)
-        if (hasNativeAds()) distributeAds(source)
-        return source
+        output = afterPreserveListDiff(output)
+        if (hasNativeAds()) output = distributeAds(output)
+
+        return output
     }
 
-    internal open fun afterPreserveListDiff(source: MutableList<Differentiable>) {}
+    internal open fun afterPreserveListDiff(source: List<Differentiable>): List<Differentiable> = source
 
-    private fun distributeAds(source: MutableList<Differentiable>) {
+    private fun distributeAds(source: List<Differentiable>): List<Differentiable> {
         //filterAds(source);
-        if (source.isEmpty() || ads.isEmpty()) return
+        if (source.isEmpty() || ads.isEmpty()) return source
+        val mutableList = source.toMutableList()
 
         var numToShuffle = 0
         val adSize = ads.size
@@ -82,20 +85,23 @@ abstract class BaseViewModel : ViewModel() {
         var count = 0
 
         if (sourceSize <= AD_THRESH) {
-            source.add(ads[0])
+            mutableList.add(ads[0])
             shuffleAds(++numToShuffle)
-            return
+            return mutableList
         }
 
         var i = AD_THRESH
         while (i < sourceSize) {
             if (count >= adSize) break
-            source.add(i, ads[count])
+            mutableList.add(i, ads[count])
             numToShuffle++
             count++
             i += AD_THRESH
         }
+
         shuffleAds(numToShuffle)
+
+        return mutableList
     }
 
     private fun fetchAds() {

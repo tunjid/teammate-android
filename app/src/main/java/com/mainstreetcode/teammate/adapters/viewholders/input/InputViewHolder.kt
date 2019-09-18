@@ -47,7 +47,9 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import io.reactivex.schedulers.Schedulers
 
-open class InputViewHolder<T : ImageWorkerFragment.ImagePickerListener>(itemView: View) : BaseViewHolder<T>(itemView), TextWatcher {
+open class InputViewHolder(
+        itemView: View
+) : BaseViewHolder<Unit>(itemView, Unit), TextWatcher {
 
     private var lastLineCount = 1
 

@@ -37,19 +37,18 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.persistence.entity.MediaEntity
-import com.mainstreetcode.teammate.util.*
 import com.mainstreetcode.teammate.util.ObjectId
+import com.mainstreetcode.teammate.util.asBooleanOrFalse
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 
 class Media : MediaEntity, TeamHost, Parcelable, Model<Media> {
 
-    val isImage: Boolean
-        get() = mimeType.startsWith(IMAGE)
-
     constructor(
-            hiddenId: String,
+            id: String,
             url: String,
             mimeType: String,
             thumbnail: String,
@@ -57,7 +56,9 @@ class Media : MediaEntity, TeamHost, Parcelable, Model<Media> {
             hiddenTeam: Team,
             created: Date,
             flagged: Boolean
-    ) : super(hiddenId, url, mimeType, thumbnail, user, hiddenTeam, created, flagged)
+    ) : super(id, url, mimeType, thumbnail, user, hiddenTeam, created, flagged)
+
+    constructor(`in`: Parcel) : super(`in`)
 
     override val team: Team
         get() = hiddenTeam
@@ -65,20 +66,19 @@ class Media : MediaEntity, TeamHost, Parcelable, Model<Media> {
     override val imageUrl: String
         get() = thumbnail
 
-    constructor(`in`: Parcel) : super(`in`)
-
-    override fun getId(): String = hiddenId
+    val isImage: Boolean
+        get() = mimeType.startsWith(IMAGE)
 
     override val isEmpty: Boolean
         get() = TextUtils.isEmpty(id)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is Media) id == other.id else thumbnail == other.thumbnail && url == other.url
+            if (other !is Media) diffId == other.diffId else thumbnail == other.thumbnail && url == other.url
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Media) {
-        hiddenId = updated.hiddenId
+        id = updated.id
         url = updated.url
         thumbnail = updated.thumbnail
         mimeType = updated.mimeType

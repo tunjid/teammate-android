@@ -41,8 +41,8 @@ import kotlin.math.min
 
 class GameViewHolder(
         itemView: View,
-        adapterListener: GameAdapter.AdapterListener
-) : BaseViewHolder<GameAdapter.AdapterListener>(itemView, adapterListener) {
+        delegate: GameAdapter.AdapterListener
+) : BaseViewHolder<GameAdapter.AdapterListener>(itemView, delegate) {
 
 
     private lateinit var model: Game
@@ -59,7 +59,7 @@ class GameViewHolder(
     private val awayThumbnail: CircleImageView = itemView.findViewById(R.id.away_thumbnail)
 
     init {
-        itemView.setOnClickListener { adapterListener.onGameClicked(model) }
+        itemView.setOnClickListener { delegate.onGameClicked(model) }
     }
 
     fun bind(model: Game) {

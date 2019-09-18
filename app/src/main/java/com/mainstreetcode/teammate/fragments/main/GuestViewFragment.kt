@@ -58,8 +58,9 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_GUEST)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_GUEST)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +71,7 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(root.findViewById(R.id.model_list))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(GuestAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -79,7 +80,7 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
 
         return root
     }
@@ -94,14 +95,14 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onImageClick() = showSnackbar(getString(R.string.no_permission))
+    override fun onImageClick() = transientBarDriver.showSnackBar(getString(R.string.no_permission))
 
     override fun gofer(): Gofer<Guest> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         viewHolder.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onPrepComplete() {

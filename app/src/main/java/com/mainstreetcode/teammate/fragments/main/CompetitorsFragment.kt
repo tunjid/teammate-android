@@ -38,7 +38,6 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
@@ -46,9 +45,9 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.functions.collections.Lists
 import com.tunjid.androidbootstrap.recyclerview.ListManager
+import com.tunjid.androidbootstrap.recyclerview.SwipeDragOptions
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.*
 import kotlin.math.min
@@ -66,15 +65,16 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
 
     override val toolbarTitle: CharSequence get() = getString(R.string.add_tournament_competitors)
 
-    override val showsFab: Boolean get() = !isBottomSheetShowing && competitors.isNotEmpty()
+    override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && competitors.isNotEmpty()
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
-        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
-        else superResult
-    }
+            return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,14 +99,14 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
                 })
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
-                .withSwipeDragOptions(ListManager.swipeDragOptionsBuilder<CompetitorViewHolder>()
-                        .setMovementFlagsFunction { ListManager.SWIPE_DRAG_ALL_DIRECTIONS }
-                        .setSwipeConsumer { holder, _ -> removeCompetitor(holder) }
-                        .setDragHandleFunction(CompetitorViewHolder::dragHandle)
-                        .setLongPressDragEnabledSupplier { false }
-                        .setItemViewSwipeSupplier { true }
-                        .setDragConsumer(this::moveCompetitor)
-                        .build())
+                .withSwipeDragOptions(SwipeDragOptions(
+                        movementFlagFunction = { ListManager.SWIPE_DRAG_ALL_DIRECTIONS },
+                        swipeConsumer = { holder, _ -> removeCompetitor(holder) },
+                        dragHandleFunction = CompetitorViewHolder::dragHandle,
+                        longPressDragSupplier = { false },
+                        itemViewSwipeSupplier = { true },
+                        dragConsumer = this::moveCompetitor
+                ))
                 .build()
 
         rootView.findViewById<View>(R.id.add_competitor).setOnClickListener { findCompetitor() }
@@ -121,15 +121,15 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
-        if (!appeared && isBottomSheetShowing) hideBottomSheet()
+        if (!appeared && bottomSheetDriver.isBottomSheetShowing) bottomSheetDriver.hideBottomSheet()
     }
 
     override fun onUserClicked(item: User) =
-            if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
+            if (entities.contains(item)) transientBarDriver.showSnackBar(getString(R.string.competitor_exists))
             else addCompetitor(item)
 
     override fun onTeamClicked(item: Team) =
-            if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
+            if (entities.contains(item)) transientBarDriver.showSnackBar(getString(R.string.competitor_exists))
             else addCompetitor(item)
 
     override fun onClick(view: View) = when (view.id) {
@@ -137,22 +137,16 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
         else -> Unit
     }
 
-    private fun findCompetitor() {
+    private fun findCompetitor() = bottomSheetDriver.showBottomSheet {
         val isBetweenUsers = User.COMPETITOR_TYPE == tournament.refPath
-        var fragment: BaseFragment? = null
+
+        menuRes = R.menu.empty
+        if (isBetweenUsers) title = getString(R.string.add_competitor)
 
         if (isBetweenUsers) fragment = TeamMembersFragment.newInstance(tournament.host)
         else if (Team.COMPETITOR_TYPE == tournament.refPath) fragment = TeamSearchFragment.newInstance(tournament.sport)
 
-        fragment ?: return
-        fragment.setTargetFragment(this, R.id.request_competitor_pick)
-
-        val builder = BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setFragment(fragment)
-
-        if (isBetweenUsers) builder.setTitle(getString(R.string.add_competitor))
-        showBottomSheet(builder.build())
+        fragment?.setTargetFragment(this@CompetitorsFragment, R.id.request_competitor_pick)
     }
 
     private fun addCompetitor(item: Competitive) {

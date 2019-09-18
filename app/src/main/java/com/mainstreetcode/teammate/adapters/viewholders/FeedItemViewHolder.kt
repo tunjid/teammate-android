@@ -70,6 +70,6 @@ class FeedItemViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onFeedItemClicked(item)
+        delegate?.onFeedItemClicked(item)
     }
 }

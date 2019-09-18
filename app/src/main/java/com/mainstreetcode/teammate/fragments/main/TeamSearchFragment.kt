@@ -60,8 +60,8 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
     override val showsToolBar: Boolean get() = false
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
+    override val stableTag: String 
+        get() {val superResult = super.stableTag
         val sportCode = arguments!!.getString(ARG_SPORT)
 
         return if (sportCode == null) superResult else "$superResult-$sportCode"
@@ -117,11 +117,11 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         val canPick = target is TeamAdapter.AdapterListener
 
         if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
-        else showFragment(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
+        else navigator.show(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.create_team) showFragment(TeamEditFragment.newCreateInstance())
+        if (view.id == R.id.create_team) navigator.show(TeamEditFragment.newCreateInstance())
     }
 
     override fun onQueryTextSubmit(s: String): Boolean = false

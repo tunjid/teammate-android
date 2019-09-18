@@ -32,6 +32,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -42,7 +43,6 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -65,13 +65,14 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
 
     override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole()
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
 
-        return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-        else superResult
-    }
+            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +83,7 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
@@ -110,35 +111,35 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
     }
 
     override fun onEventClicked(item: Event) {
-        showFragment(EventEditFragment.newInstance(item))
+        navigator.show(EventEditFragment.newInstance(item))
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> {
                 val event = Event.empty().apply { updateTeam(teamViewModel.defaultTeam) }
-                showFragment(EventEditFragment.newInstance(event))
+                navigator.show(EventEditFragment.newInstance(event))
             }
         }
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is EventEditFragment ->
+            transaction.listDetailTransition(EventEditFragment.ARG_EVENT, incomingFragment)
 
-        else -> super.provideFragmentTransaction(fragmentTo)
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun fetchEvents(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(eventViewModel.getMany(team, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onEventsUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {

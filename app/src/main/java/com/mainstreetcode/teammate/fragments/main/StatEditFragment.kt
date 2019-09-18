@@ -39,7 +39,6 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatEditAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.User
@@ -71,12 +70,13 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
-    override val showsFab: Boolean get() = !isBottomSheetShowing && gofer.canEdit()
+    override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && gofer.canEdit()
 
     override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_STAT)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_STAT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +96,7 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
         return rootView
     }
 
@@ -129,7 +129,7 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
     override fun canExpandAppBar(): Boolean = false
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
         viewHolder.bind(headeredModel)
         activity?.invalidateOptionsMenu()
@@ -137,21 +137,21 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
 
     override fun onUserClicked(item: User) {
         disposables.add(gofer.chooseUser(item).subscribe(this::onModelUpdated, defaultErrorHandler::invoke))
-        hideBottomSheet()
+        bottomSheetDriver.hideBottomSheet()
     }
 
     override fun onUserClicked() {
         when {
-            headeredModel.game.isEnded -> showSnackbar(getString(R.string.stat_game_ended))
-            !headeredModel.isEmpty -> showSnackbar(getString(R.string.stat_already_added))
+            headeredModel.game.isEnded -> transientBarDriver.showSnackBar(getString(R.string.stat_game_ended))
+            !headeredModel.isEmpty -> transientBarDriver.showSnackBar(getString(R.string.stat_already_added))
             else -> pickStatUser()
         }
     }
 
     override fun onTeamClicked() {
         when {
-            headeredModel.game.isEnded -> showSnackbar(getString(R.string.stat_game_ended))
-            !headeredModel.isEmpty -> showSnackbar(getString(R.string.stat_already_added))
+            headeredModel.game.isEnded -> transientBarDriver.showSnackBar(getString(R.string.stat_game_ended))
+            !headeredModel.isEmpty -> transientBarDriver.showSnackBar(getString(R.string.stat_already_added))
             else -> switchStatTeam()
         }
     }
@@ -167,7 +167,7 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
     override fun onClick(view: View) {
         if (view.id != R.id.fab) return
 
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::invoke))
     }
 
@@ -176,21 +176,19 @@ class StatEditFragment : HeaderedFragment<Stat>(), UserAdapter.AdapterListener, 
     }
 
     private fun onStatDeleted() {
-        showSnackbar(getString(R.string.deleted_team, headeredModel.statType))
+        transientBarDriver.showSnackBar(getString(R.string.deleted_team, headeredModel.statType))
         removeEnterExitTransitions()
 
         activity?.onBackPressed()
     }
 
-    private fun pickStatUser() {
-        val fragment = TeamMembersFragment.newInstance(headeredModel.team)
-        fragment.setTargetFragment(this, R.id.request_stat_edit_pick)
+    private fun pickStatUser() = bottomSheetDriver.showBottomSheet {
+        val caller = TeamMembersFragment.newInstance(headeredModel.team)
+        caller.setTargetFragment(this@StatEditFragment, R.id.request_stat_edit_pick)
 
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setTitle(getString(R.string.pick_user))
-                .setFragment(fragment)
-                .build())
+        menuRes = R.menu.empty
+        title = getString(R.string.pick_user)
+        fragment = caller
     }
 
     private fun switchStatTeam() {

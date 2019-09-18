@@ -37,9 +37,11 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.persistence.entity.GuestEntity
+import com.mainstreetcode.teammate.util.EMPTY_STRING
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.*
-import com.mainstreetcode.teammate.util. EMPTY_STRING
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.noOp
+import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -76,9 +78,9 @@ class Guest : GuestEntity,
     override fun hasMajorFields(): Boolean = user.hasMajorFields()
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is Guest) id == other.id else isAttending == other.isAttending
+            if (other !is Guest) diffId == other.diffId else isAttending == other.isAttending
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Guest) {
         id = updated.id

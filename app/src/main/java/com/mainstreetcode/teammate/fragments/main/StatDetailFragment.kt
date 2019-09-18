@@ -48,8 +48,9 @@ class StatDetailFragment : MainActivityFragment() {
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
+    override val stableTag: String 
+        get() = 
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

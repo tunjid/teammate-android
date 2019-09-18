@@ -42,12 +42,15 @@ import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.GAME
 import com.mainstreetcode.teammate.util.INSTALL_AD
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Team]
  */
 
-class StatAggregateAdapter(private val items: List<Differentiable>) : InteractiveAdapter<InteractiveViewHolder<*>, InteractiveAdapter.AdapterListener>() {
+class StatAggregateAdapter(
+        private val items: List<Differentiable>
+) : InteractiveAdapter<InteractiveViewHolder<*>, Unit>(Unit) {
 
     init {
         setHasStableIds(true)
@@ -55,9 +58,9 @@ class StatAggregateAdapter(private val items: List<Differentiable>) : Interactiv
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> {
         return when (viewType) {
-            CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-            INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-            else -> StatAggregateViewHolder(getItemView(R.layout.viewholder_stat_aggregate, viewGroup))
+            CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+            INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+            else -> StatAggregateViewHolder(viewGroup.inflate(R.layout.viewholder_stat_aggregate))
         }
     }
 

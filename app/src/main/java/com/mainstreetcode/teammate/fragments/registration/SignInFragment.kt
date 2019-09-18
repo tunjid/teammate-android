@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.fragments.registration
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -36,6 +35,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.RegistrationActivity
@@ -43,7 +43,6 @@ import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.hasValidPassword
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
@@ -97,17 +96,17 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
             return true
         }
 
-    @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? =
-            if (view != null && fragmentTo.stableTag.contains(ForgotPasswordFragment::class.java.simpleName)) beginTransaction()
-                    .addSharedElement(emailInput!!, SplashFragment.TRANSITION_TITLE)
-                    .addSharedElement(view!!.findViewById(R.id.card_view_wrapper), SplashFragment.TRANSITION_BACKGROUND)
-            else super.provideFragmentTransaction(fragmentTo)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
+        if (view != null && incomingFragment is ForgotPasswordFragment) transaction
+                .addSharedElement(emailInput!!, SplashFragment.TRANSITION_TITLE)
+                .addSharedElement(view!!.findViewById(R.id.card_view_wrapper), SplashFragment.TRANSITION_BACKGROUND)
+        else super.augmentTransaction(transaction, incomingFragment)
+    }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> signIn()
-            R.id.forgot_password -> showFragment(ForgotPasswordFragment.newInstance(emailInput!!.text))
+            R.id.forgot_password -> navigator.show(ForgotPasswordFragment.newInstance(emailInput!!.text))
         }
     }
 
@@ -118,7 +117,7 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
 
     private fun signIn() {
         if (emailInput.hasValidEmail && passwordInput.hasValidPassword) {
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
 
             val email = emailInput!!.text.toString()
             val password = passwordInput!!.text.toString()
@@ -130,7 +129,7 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun onSignIn() {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         hideKeyboard()
         RegistrationActivity.startMainActivity(activity)
     }

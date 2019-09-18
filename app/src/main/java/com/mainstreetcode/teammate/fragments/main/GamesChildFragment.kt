@@ -55,8 +55,8 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
+    override val stableTag: String 
+        get() {val superResult = super.stableTag
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
         val round = arguments!!.getInt(ARG_ROUND)
 
@@ -111,19 +111,19 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     override fun togglePersistentUi() = Unit /* Do nothing */
 
     override fun onGameClicked(game: Game) {
-        showFragment(GameFragment.newInstance(game))
+        navigator.show(GameFragment.newInstance(game))
     }
 
     private fun fetchTournaments(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         onRefresh()
     }
 
     private fun onGamesUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {

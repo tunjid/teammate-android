@@ -102,9 +102,9 @@ class JoinRequest : JoinRequestEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is JoinRequest) id == other.id else position == other.position && user.areContentsTheSame(other.user)
+            if (other !is JoinRequest) diffId == other.diffId else position == other.position && user.areContentsTheSame(other.user)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: JoinRequest) {
         this.isTeamApproved = updated.isTeamApproved
@@ -117,7 +117,7 @@ class JoinRequest : JoinRequestEntity,
     }
 
     override fun compareTo(other: JoinRequest): Int =
-            compareValuesBy(this, other, { it.position.code }, JoinRequest::user, JoinRequest::getId)
+            compareValuesBy(this, other, { it.position.code }, JoinRequest::user, JoinRequest::id)
 
     override fun describeContents(): Int = 0
 

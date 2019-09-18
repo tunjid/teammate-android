@@ -30,7 +30,6 @@ import androidx.annotation.IdRes
 import androidx.fragment.app.FragmentActivity
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.fragments.main.ChatFragment
 import com.mainstreetcode.teammate.fragments.main.EventsFragment
@@ -47,7 +46,8 @@ class TeamPickerFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
     private var requestCode: Int = 0
     private var isChanging: Boolean = false
 
-    override fun getStableTag(): String = TAG
+    override val stableTag: String
+        get() = TAG
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,14 +58,14 @@ class TeamPickerFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
     override fun onTeamClicked(item: Team) {
         teamViewModel.updateDefaultTeam(item)
         when (requestCode) {
-            R.id.request_game_team_pick -> showFragment(GamesFragment.newInstance(item))
-            R.id.request_chat_team_pick -> showFragment(ChatFragment.newInstance(item))
-            R.id.request_event_team_pick -> showFragment(EventsFragment.newInstance(item))
-            R.id.request_media_team_pick -> showFragment(MediaFragment.newInstance(item))
-            R.id.request_tournament_team_pick -> showFragment(TournamentsFragment.newInstance(item))
-            R.id.request_default_team_pick -> showFragment(TeamMembersFragment.newInstance(item))
+            R.id.request_game_team_pick -> navigator.show(GamesFragment.newInstance(item))
+            R.id.request_chat_team_pick -> navigator.show(ChatFragment.newInstance(item))
+            R.id.request_event_team_pick -> navigator.show(EventsFragment.newInstance(item))
+            R.id.request_media_team_pick -> navigator.show(MediaFragment.newInstance(item))
+            R.id.request_tournament_team_pick -> navigator.show(TournamentsFragment.newInstance(item))
+            R.id.request_default_team_pick -> navigator.show(TeamMembersFragment.newInstance(item))
         }
-        hideBottomSheet()
+        bottomSheetDriver.hideBottomSheet()
     }
 
     private fun pick() {
@@ -74,19 +74,12 @@ class TeamPickerFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
         else showPicker()
     }
 
-    private fun showPicker() {
-        val teamsFragment = TeamsFragment.newInstance()
-        teamsFragment.setTargetFragment(this, requestCode)
-
-        val menuRes =
+    private fun showPicker() = bottomSheetDriver.showBottomSheet {
+        this.menuRes =
                 if (requestCode != R.id.request_event_team_pick || teamViewModel.isOnATeam) R.menu.empty
                 else R.menu.fragment_events_team_pick
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(menuRes)
-                .setTitle(getString(R.string.pick_team))
-                .setFragment(teamsFragment)
-                .build())
+        this.title = getString(R.string.pick_team)
+        this.fragment = TeamsFragment.newInstance().apply { setTargetFragment(this@TeamPickerFragment, requestCode) }
     }
 
     companion object {

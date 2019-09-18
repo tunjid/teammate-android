@@ -30,19 +30,20 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.ChipViewHolder
 import com.mainstreetcode.teammate.model.enums.StatAttribute
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidbootstrap.view.util.inflate
 
-class StatTypeAdapter(adapterListener: AdapterListener) : InteractiveAdapter<ChipViewHolder, StatTypeAdapter.AdapterListener>(adapterListener) {
+class StatTypeAdapter(delegate: AdapterListener) : InteractiveAdapter<ChipViewHolder, StatTypeAdapter.AdapterListener>(delegate) {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ChipViewHolder =
-            ChipViewHolder(getItemView(R.layout.viewholder_stat_attribute, viewGroup), adapterListener)
+            ChipViewHolder(viewGroup.inflate(R.layout.viewholder_stat_attribute), delegate)
 
     override fun onBindViewHolder(chipViewHolder: ChipViewHolder, i: Int) {
-        chipViewHolder.bind(adapterListener.attributes[i])
+        chipViewHolder.bind(delegate.attributes[i])
     }
 
-    override fun getItemCount(): Int = adapterListener.attributes.size
+    override fun getItemCount(): Int = delegate.attributes.size
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
 
         val attributes: List<StatAttribute>
 

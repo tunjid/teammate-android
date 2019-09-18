@@ -97,11 +97,11 @@ class Role : RoleEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is Role) id == other.id else position == other.position
+            if (other !is Role) diffId == other.diffId else position == other.position
                     && user.areContentsTheSame(other.user)
                     && team.areContentsTheSame(other.team)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Role) {
         this.id = updated.id
@@ -113,7 +113,7 @@ class Role : RoleEntity,
     }
 
     override fun compareTo(other: Role): Int =
-            compareValuesBy(this, other, { it.position.code }, Role::user, Role::team, Role::getId)
+            compareValuesBy(this, other, { it.position.code }, Role::user, Role::team, Role::id)
 
     override fun describeContents(): Int = 0
 

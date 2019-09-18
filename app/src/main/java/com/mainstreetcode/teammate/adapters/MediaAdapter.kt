@@ -44,6 +44,7 @@ import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.MEDIA_IMAGE
 import com.mainstreetcode.teammate.util.MEDIA_VIDEO
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Media]
@@ -59,10 +60,10 @@ class MediaAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-                CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-                INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                MEDIA_IMAGE -> ImageMediaViewHolder(getItemView(R.layout.viewholder_image, viewGroup), adapterListener)
-                else -> VideoMediaViewHolder(getItemView(R.layout.viewholder_video, viewGroup), adapterListener)
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+                MEDIA_IMAGE -> ImageMediaViewHolder(viewGroup.inflate(R.layout.viewholder_image), delegate)
+                else -> VideoMediaViewHolder(viewGroup.inflate(R.layout.viewholder_video), delegate)
             }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
@@ -81,7 +82,7 @@ class MediaAdapter(
 
     override fun getItemId(position: Int): Long = mediaList[position].hashCode().toLong()
 
-    interface MediaAdapterListener : AdapterListener {
+    interface MediaAdapterListener {
 
         val isFullScreen: Boolean
 

@@ -38,7 +38,6 @@ import com.mainstreetcode.teammate.adapters.GameEditAdapter
 import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
@@ -48,7 +47,6 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
 /**
@@ -70,12 +68,13 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
-    override val showsFab: Boolean get() = gofer.canEdit() && !isBottomSheetShowing
+    override val showsFab: Boolean get() = gofer.canEdit() && !bottomSheetDriver.isBottomSheetShowing
 
     override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_GAME)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_GAME)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +93,7 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
         return rootView
     }
 
@@ -111,7 +110,7 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
         scrollManager.onDiff(result)
         viewHolder.bind(headeredModel)
 
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         requireActivity().invalidateOptionsMenu()
     }
 
@@ -123,7 +122,7 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
 
     override fun onAwayClicked(away: Competitor) {
         if (!headeredModel.isEmpty) return
-        if (headeredModel.home === away) showSnackbar(getString(R.string.game_create_prompt))
+        if (headeredModel.home === away) transientBarDriver.showSnackBar(getString(R.string.game_create_prompt))
         else pickAwaySide()
     }
 
@@ -141,8 +140,8 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
                 .setTitle(R.string.game_manual_score_request)
                 .setMessage(R.string.game_end_prompt)
                 .setPositiveButton(R.string.yes) { _, _ ->
-                    toggleProgress(true)
-                    toggleProgress(true)
+                    transientBarDriver.toggleProgress(true)
+                    transientBarDriver.toggleProgress(true)
                     disposables.add(gameViewModel.endGame(headeredModel).subscribe({ requireActivity().onBackPressed() }, defaultErrorHandler::invoke))
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
@@ -150,33 +149,27 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
     }
 
     private fun createGame() {
-        toggleProgress(true)
-        disposables.add(gofer.save().subscribe({ showFragment(GameFragment.newInstance(headeredModel)) }, defaultErrorHandler::invoke))
+        transientBarDriver.toggleProgress(true)
+        disposables.add(gofer.save().subscribe({ navigator.show(GameFragment.newInstance(headeredModel)) }, defaultErrorHandler::invoke))
     }
 
     private fun updateCompetitor(item: Competitive) {
         headeredModel.away.updateEntity(item)
         scrollManager.notifyDataSetChanged()
-        hideBottomSheet()
+        bottomSheetDriver.hideBottomSheet()
         hideKeyboard()
     }
 
-    private fun pickAwaySide() {
+    private fun pickAwaySide() = bottomSheetDriver.showBottomSheet {
         val refPath = headeredModel.refPath
         val isBetweenUsers = User.COMPETITOR_TYPE == refPath
 
-        var fragment: BaseFragment? = null
+        menuRes = R.menu.empty
 
         if (isBetweenUsers) fragment = UserSearchFragment.newInstance()
         else if (Team.COMPETITOR_TYPE == refPath) fragment = TeamSearchFragment.newInstance(headeredModel.sport)
 
-        fragment ?: return
-        fragment.setTargetFragment(this, R.id.request_competitor_pick)
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setFragment(fragment)
-                .build())
+        fragment?.setTargetFragment(this@GameEditFragment, R.id.request_competitor_pick)
     }
 
     companion object {

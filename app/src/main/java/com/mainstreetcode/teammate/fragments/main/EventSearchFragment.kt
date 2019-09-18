@@ -40,8 +40,8 @@ import com.google.android.gms.maps.model.Marker
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.Logger
@@ -71,7 +71,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_public_event, container, false)
-        root.findViewById<View>(R.id.status_bar_dimmer).layoutParams.height = TeammatesBaseActivity.topInset
+        root.findViewById<View>(R.id.status_bar_dimmer).layoutParams.height = WindowInsetsDriver.topInset
 
         scrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.search_options))
                 .withAdapter(EventSearchRequestAdapter(eventViewModel.eventRequest, object : EventSearchRequestAdapter.EventSearchAdapterListener {
@@ -189,7 +189,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     }
 
     private fun onCameraMoveStarted(reason: Int) {
-        if (scrollManager.recyclerView.visibility == View.VISIBLE)
+        if (scrollManager.recyclerView?.visibility == View.VISIBLE)
             expandingToolbar?.changeVisibility(true)
 
         when (reason) {
@@ -201,7 +201,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
     private fun onMarkerInfoWindowClicked(marker: Marker) {
         val tag = marker.tag as? Event ?: return
-        showFragment(EventEditFragment.newInstance(tag))
+        navigator.show(EventEditFragment.newInstance(tag))
     }
 
     private fun onAddressFound(address: Address) {

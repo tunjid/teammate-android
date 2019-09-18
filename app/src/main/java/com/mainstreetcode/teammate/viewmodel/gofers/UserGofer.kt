@@ -62,17 +62,18 @@ class UserGofer(
     public override fun delete(): Completable =
             Completable.error(TeammateException("Cannot delete"))
 
-    private fun filter(list: MutableList<Differentiable>): List<Differentiable> {
+    private fun filter(list: List<Differentiable>): List<Differentiable> {
         val isAuthUser = authUserFunction.invoke(model)
         if (isAuthUser) return list
 
-        val it = list.iterator()
+        val mutable = list.toMutableList()
+        val it = mutable.iterator()
 
         while (it.hasNext()) {
             val next = it.next() as? Item ?: continue
             if (next.stringRes == R.string.email) it.remove()
         }
 
-        return list
+        return mutable
     }
 }

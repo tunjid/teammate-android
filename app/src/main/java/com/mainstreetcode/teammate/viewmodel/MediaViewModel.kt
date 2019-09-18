@@ -100,8 +100,7 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
 
         return FunctionalDiff.of(sourceFlowable, source) { sourceCopy, deleted ->
             partialDelete.set(deleted.size != toDelete.size)
-            sourceCopy.removeAll(deleted)
-            sourceCopy
+            sourceCopy - deleted
         }
                 .map { diffResult -> partialDelete.get() to diffResult }
                 .firstElement()

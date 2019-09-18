@@ -65,17 +65,19 @@ class CompetitorViewModel : MappedViewModel<Class<User>, Competitor>() {
         val single = repository.createOrUpdate(competitor).map<List<Differentiable>> { listOf(it) }
 
         return FunctionalDiff.of(single, declined) biFunction@{ sourceCopy, fetched ->
-            if (accept) sourceCopy.removeAll(fetched)
-            else sourceCopy.addAll(fetched)
+            val mutated = sourceCopy.toMutableList().apply {
+                if (accept) sourceCopy - fetched
+                else sourceCopy + fetched
+            }
 
-            if (accept) return@biFunction sourceCopy
+            if (accept) return@biFunction mutated
 
             pushModelAlert(when {
                 competitor.isOneOffGame() -> Alert.deletion(competitor.game)
                 else -> Alert.deletion(competitor.tournament)
             })
 
-            return@biFunction sourceCopy
+            return@biFunction mutated
         }
     }
 

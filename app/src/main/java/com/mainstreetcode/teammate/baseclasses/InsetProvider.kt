@@ -22,27 +22,12 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.adapters.viewholders
+package com.mainstreetcode.teammate.baseclasses
 
-import com.google.android.material.chip.Chip
-import android.view.View
+import com.tunjid.androidbootstrap.view.util.InsetFlags
 
-import com.mainstreetcode.teammate.adapters.StatTypeAdapter
-import com.mainstreetcode.teammate.model.enums.StatAttribute
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+interface InsetProvider {
+    val insetFlags: InsetFlags
 
-class ChipViewHolder(itemView: View, listener: StatTypeAdapter.AdapterListener) : InteractiveViewHolder<StatTypeAdapter.AdapterListener>(itemView, listener) {
-    private val chip: Chip = itemView as Chip
-    private lateinit var attribute: StatAttribute
-
-    init {
-        chip.setOnClickListener { delegate?.onAttributeTapped(attribute) }
-    }
-
-    fun bind(attribute: StatAttribute) {
-        this.attribute = attribute
-        chip.text = attribute.name
-        chip.isEnabled = delegate?.isEnabled == true
-        chip.isChecked = delegate?.isSelected(attribute) == true
-    }
+    fun onKeyBoardChanged(appeared: Boolean)
 }

@@ -103,7 +103,7 @@ class Tournament : TournamentEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
-        !is Tournament -> id == other.id
+        !is Tournament -> diffId == other.diffId
         else -> name == other.name
                 && description == other.description && currentRound == other.currentRound
                 && imageUrl == other.imageUrl
@@ -111,7 +111,7 @@ class Tournament : TournamentEntity,
 
     override fun hasMajorFields(): Boolean = areNotEmpty(id, name)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     fun updateHost(team: Team) = host.update(team)
 
@@ -138,7 +138,7 @@ class Tournament : TournamentEntity,
     }
 
     override fun compareTo(other: Tournament): Int =
-            compareValuesBy(this, other, Tournament::created, Tournament::getId)
+            compareValuesBy(this, other, Tournament::created, Tournament::id)
 
     override fun describeContents(): Int = 0
 

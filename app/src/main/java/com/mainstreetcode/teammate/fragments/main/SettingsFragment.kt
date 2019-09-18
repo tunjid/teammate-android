@@ -86,7 +86,7 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
                     .show()
             R.string.show_on_boarding -> {
                 prefsViewModel.isOnBoarded = false
-                showFragment(FeedFragment.newInstance())
+                navigator.show(FeedFragment.newInstance())
             }
         }
     }

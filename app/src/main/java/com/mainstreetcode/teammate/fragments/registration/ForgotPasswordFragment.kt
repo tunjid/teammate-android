@@ -100,12 +100,12 @@ class ForgotPasswordFragment : RegistrationActivityFragment(), TextView.OnEditor
 
     private fun sendForgotEmail() {
         if (emailInput.hasValidEmail) {
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
 
             val email = emailInput!!.text.toString()
 
             disposables.add(viewModel.forgotPassword(email)
-                    .subscribe({ showSnackbar(it.message) }, defaultErrorHandler::invoke))
+                    .subscribe({ transientBarDriver.showSnackBar(it.message) }, defaultErrorHandler::invoke))
         }
     }
 

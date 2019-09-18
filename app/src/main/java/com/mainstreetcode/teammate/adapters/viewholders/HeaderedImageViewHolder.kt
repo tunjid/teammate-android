@@ -59,7 +59,7 @@ class HeaderedImageViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onImageClick()
+        delegate?.onImageClick()
     }
 
     fun bind(model: HeaderedModel<*>) {

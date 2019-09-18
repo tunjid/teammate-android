@@ -85,7 +85,7 @@ abstract class HeaderedFragment<T> :
         setTransitionName(viewHolder.thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
 
         view.findViewById<View>(R.id.header).visibility = if (canExpandAppBar()) View.VISIBLE else View.GONE
-        view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += TeammatesBaseActivity.topInset
+        view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += WindowInsetsDriver.topInset
 
         appBarLayout = view.findViewById<AppBarLayout>(R.id.app_bar)
                 .apply { AppBarListener(this, this@HeaderedFragment::onAppBarOffset) }
@@ -102,7 +102,7 @@ abstract class HeaderedFragment<T> :
         val errorMessage = gofer().getImageClickMessage(this)
 
         if (errorMessage == null) ImageWorkerFragment.requestCrop(this)
-        else showSnackbar(errorMessage)
+        else transientBarDriver.showSnackBar(errorMessage)
     }
 
     override fun onImageCropped(uri: Uri) {
@@ -132,7 +132,7 @@ abstract class HeaderedFragment<T> :
         super.onKeyBoardChanged(appeared)
         if (!appeared) return
         if (appBarLayout != null) appBarLayout!!.setExpanded(false)
-        if (showsFab && !isBottomSheetShowing)
+        if (showsFab && !bottomSheetDriver.isBottomSheetShowing)
             disposables.add(timer(FAB_DELAY.toLong(), MILLISECONDS)
                     .observeOn(mainThread())
                     .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY::invoke))
@@ -180,15 +180,15 @@ abstract class HeaderedFragment<T> :
                     val request = BlockedUser.block(user, team, reason)
 
                     disposables.add(blockedUserViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler::invoke))
-                    toggleProgress(true)
+                    transientBarDriver.toggleProgress(true)
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .show()
     }
 
     private fun onUserBlocked(blockedUser: BlockedUser) {
-        showSnackbar(getString(R.string.user_blocked, blockedUser.user.firstName))
-        toggleProgress(false)
+        transientBarDriver.showSnackBar(getString(R.string.user_blocked, blockedUser.user.firstName))
+        transientBarDriver.toggleProgress(false)
         activity?.onBackPressed()
     }
 

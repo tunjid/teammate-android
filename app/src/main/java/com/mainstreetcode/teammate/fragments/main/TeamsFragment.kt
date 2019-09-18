@@ -84,8 +84,8 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
             else -> R.string.no_team
         }
 
-    override fun getStableTag(): String {
-        var superResult = super.getStableTag()
+    override val stableTag: String 
+        get() {var superResult = super.stableTag
         val target = targetFragment
         if (target != null) superResult += "-" + target.tag + "-" + targetRequestCode
         return superResult
@@ -99,7 +99,7 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = { disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(root, emptyDrawable, emptyText))
@@ -126,14 +126,14 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
         if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
         else {
             teamViewModel.updateDefaultTeam(item)
-            showFragment(TeamMembersFragment.newInstance(item))
+            navigator.show(TeamMembersFragment.newInstance(item))
         }
     }
 
     override fun onClick(view: View) = when (view.id) {
         R.id.fab -> {
-            hideBottomSheet()
-            showFragment(TeamSearchFragment.newInstance()).let { Unit }
+            bottomSheetDriver.hideBottomSheet()
+            navigator.show(TeamSearchFragment.newInstance()).let { Unit }
         }
         else -> Unit
     }

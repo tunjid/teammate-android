@@ -35,7 +35,7 @@ import com.mainstreetcode.teammate.adapters.AutoCompleteAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 
 class AutoCompleteViewHolder @SuppressLint("ClickableViewAccessibility")
-constructor(itemView: View, adapterListener: AutoCompleteAdapter.AdapterListener) : BaseViewHolder<AutoCompleteAdapter.AdapterListener>(itemView, adapterListener) {
+constructor(itemView: View, delegate: AutoCompleteAdapter.AdapterListener) : BaseViewHolder<AutoCompleteAdapter.AdapterListener>(itemView, delegate) {
 
     private lateinit var prediction: AutocompletePrediction
 
@@ -43,7 +43,7 @@ constructor(itemView: View, adapterListener: AutoCompleteAdapter.AdapterListener
     private val subTitle: TextView = itemView.findViewById(R.id.sub_title)
 
     init {
-        itemView.setOnClickListener { adapterListener.onPredictionClicked(prediction) }
+        itemView.setOnClickListener { delegate.onPredictionClicked(prediction) }
     }
 
     fun bind(prediction: AutocompletePrediction) {

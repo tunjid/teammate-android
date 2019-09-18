@@ -32,6 +32,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
@@ -46,7 +47,6 @@ import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
@@ -67,13 +67,14 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
 
     override val toolbarTitle: CharSequence get() = getString(R.string.games)
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
 
-        return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-        else superResult
-    }
+            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +85,7 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
 
-        val refreshAction = Runnable { disposables.add(gameViewModel.refresh(team).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke)) }
+        val refreshAction = { disposables.add(gameViewModel.refresh(team).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_score_white_24dp, R.string.no_games))
@@ -119,7 +120,7 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         }
 
     override fun onGameClicked(game: Game) {
-        showFragment(GameFragment.newInstance(game))
+        navigator.show(GameFragment.newInstance(game))
     }
 
     override fun onClick(view: View) = when (view.id) {
@@ -130,27 +131,25 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
                     else teamViewModel.defaultTeam
 
             game.home.updateEntity(entity)
-            showFragment(GameEditFragment.newInstance(game)).let { Unit }
+            navigator.show(GameEditFragment.newInstance(game)).let { Unit }
         }
         else -> Unit
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(TournamentEditFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT)
-
-        else -> super.provideFragmentTransaction(fragmentTo)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is TournamentEditFragment -> transaction.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT, incomingFragment)
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun fetchGames(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(gameViewModel.getMany(team, fetchLatest).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onGamesUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         val supportsTournaments = team.sport.supportsCompetitions()
         scrollManager.onDiff(result)
         scrollManager.updateForEmptyList(ListState(R.drawable.ic_score_white_24dp,

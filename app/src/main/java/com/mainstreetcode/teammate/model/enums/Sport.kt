@@ -34,8 +34,7 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.deserializeList
 import com.mainstreetcode.teammate.util.processEmoji
-import com.mainstreetcode.teammate.util.replaceList
-import com.mainstreetcode.teammate.util.replaceStringList
+import com.mainstreetcode.teammate.util.replace
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 
 class Sport private constructor(
@@ -90,9 +89,9 @@ class Sport private constructor(
 
         super.update(source)
         this.emoji = source.emoji
-        replaceList(this.stats, source.stats)
-        replaceStringList(this.tournamentTypes, source.tournamentTypes)
-        replaceStringList(this.tournamentStyles, source.tournamentStyles)
+        this.stats.replace(source.stats)
+        this.tournamentTypes.replace(source.tournamentTypes)
+        this.tournamentStyles.replace(source.tournamentStyles)
     }
 
     class GsonAdapter : MetaData.GsonAdapter<Sport>() {

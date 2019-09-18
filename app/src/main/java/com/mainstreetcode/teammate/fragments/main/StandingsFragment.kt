@@ -56,8 +56,8 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
+    override val stableTag: String 
+        get() {val superResult = super.stableTag
         val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
         return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
@@ -116,7 +116,7 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
 
     private fun fetchStandings(isRefreshing: Boolean) {
         if (isRefreshing) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(tournamentViewModel.fetchStandings(tournament)
                 .subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
@@ -125,8 +125,8 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
     private fun onTournamentsUpdated() {
         scrollManager.notifyDataSetChanged()
         viewHolder?.bindColumns(standings.columnNames)
-        toggleProgress(false)
-        if (!restoredFromBackStack()) syncedScrollManager.jog()
+        transientBarDriver.toggleProgress(false)
+        if (!restoredFromBackStack) syncedScrollManager.jog()
     }
 
     companion object {

@@ -88,14 +88,14 @@ class Stat : StatEntity,
         get() = Item.text(EMPTY_STRING, 0, Item.IMAGE, R.string.team_logo, { "" }, CharSequence::noOp)
 
     override fun areContentsTheSame(other: Differentiable): Boolean = when (other) {
-        !is Stat -> id == other.id
+        !is Stat -> diffId == other.diffId
         else -> statType.areContentsTheSame(other.statType) && user.areContentsTheSame(other.user)
                 && value == other.value && time == other.time
     }
 
     override fun hasMajorFields(): Boolean = areNotEmpty(id)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Stat) {
         this.id = updated.id
@@ -110,7 +110,7 @@ class Stat : StatEntity,
     }
 
     override fun compareTo(other: Stat): Int =
-        compareValuesBy(this, other, { -it.time }, { -it.created.time })
+            compareValuesBy(this, other, { -it.time }, { -it.created.time })
 
     override fun describeContents(): Int = 0
 

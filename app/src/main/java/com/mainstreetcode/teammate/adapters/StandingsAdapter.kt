@@ -33,6 +33,7 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Event]
@@ -48,7 +49,7 @@ class StandingsAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): StandingRowViewHolder =
-            StandingRowViewHolder(getItemView(R.layout.viewholder_standings_row, viewGroup), adapterListener)
+            StandingRowViewHolder(viewGroup.inflate(R.layout.viewholder_standings_row), delegate)
 
     override fun onBindViewHolder(viewHolder: StandingRowViewHolder, position: Int) {
         val row = items[position]
@@ -60,7 +61,7 @@ class StandingsAdapter(
 
     override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun addScrollNotifier(notifier: SyncedScrollView)
 
         fun onCompetitorClicked(competitor: Competitor)

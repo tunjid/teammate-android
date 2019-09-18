@@ -39,8 +39,6 @@ class BlankBottomSheetFragment : MainActivityFragment() {
 
     override fun togglePersistentUi() = Unit
 
-    override fun toggleProgress(show: Boolean) = Unit
-
     companion object {
 
         fun newInstance(): BlankBottomSheetFragment = BlankBottomSheetFragment().apply { arguments = Bundle() }

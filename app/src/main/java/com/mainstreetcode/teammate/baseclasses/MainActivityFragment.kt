@@ -28,8 +28,10 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.MainActivity
@@ -60,7 +62,6 @@ import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import kotlin.math.abs
 
@@ -68,58 +69,34 @@ import kotlin.math.abs
  * Class for Fragments in [com.mainstreetcode.teammate.activities.MainActivity]
  */
 
-open class MainActivityFragment : TeammatesBaseFragment() {
+open class MainActivityFragment : TeammatesBaseFragment(), BottomSheetController {
 
-    protected lateinit var feedViewModel: FeedViewModel
-    protected lateinit var roleViewModel: RoleViewModel
-    protected lateinit var userViewModel: UserViewModel
-    protected lateinit var teamViewModel: TeamViewModel
-    protected lateinit var chatViewModel: ChatViewModel
-    protected lateinit var gameViewModel: GameViewModel
-    protected lateinit var statViewModel: StatViewModel
-    protected lateinit var prefsViewModel: PrefsViewModel
-    protected lateinit var eventViewModel: EventViewModel
-    protected lateinit var mediaViewModel: MediaViewModel
-    protected lateinit var locationViewModel: LocationViewModel
-    protected lateinit var localRoleViewModel: LocalRoleViewModel
-    protected lateinit var teamMemberViewModel: TeamMemberViewModel
-    protected lateinit var competitorViewModel: CompetitorViewModel
-    protected lateinit var tournamentViewModel: TournamentViewModel
-    protected lateinit var blockedUserViewModel: BlockedUserViewModel
+    protected val feedViewModel by activityViewModels<FeedViewModel>()
+    protected val roleViewModel by activityViewModels<RoleViewModel>()
+    protected val userViewModel by activityViewModels<UserViewModel>()
+    protected val teamViewModel by activityViewModels<TeamViewModel>()
+    protected val chatViewModel by activityViewModels<ChatViewModel>()
+    protected val gameViewModel by activityViewModels<GameViewModel>()
+    protected val statViewModel by activityViewModels<StatViewModel>()
+    protected val prefsViewModel by activityViewModels<PrefsViewModel>()
+    protected val eventViewModel by activityViewModels<EventViewModel>()
+    protected val mediaViewModel by activityViewModels<MediaViewModel>()
+    protected val locationViewModel by activityViewModels<LocationViewModel>()
+    protected val teamMemberViewModel by activityViewModels<TeamMemberViewModel>()
+    protected val competitorViewModel by activityViewModels<CompetitorViewModel>()
+    protected val tournamentViewModel by activityViewModels<TournamentViewModel>()
+    protected val blockedUserViewModel by activityViewModels<BlockedUserViewModel>()
+
+    protected val localRoleViewModel by viewModels<LocalRoleViewModel>()
 
     private var spacer: View? = null
     protected lateinit var scrollManager: ScrollManager<out InteractiveViewHolder<*>>
 
-    protected val isBottomSheetShowing: Boolean
-        get() {
-            val controller = persistentUiController
-            return if (controller is BottomSheetController) (controller as BottomSheetController).isBottomSheetShowing else false
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        localRoleViewModel = ViewModelProviders.of(this).get(LocalRoleViewModel::class.java)
-    }
+    override val bottomSheetDriver: BottomSheetDriver
+        get() = requireActivity().run { (this as BottomSheetController).bottomSheetDriver }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val provider = ViewModelProviders.of(requireActivity())
-        feedViewModel = provider.get(FeedViewModel::class.java)
-        roleViewModel = provider.get(RoleViewModel::class.java)
-        userViewModel = provider.get(UserViewModel::class.java)
-        teamViewModel = provider.get(TeamViewModel::class.java)
-        chatViewModel = provider.get(ChatViewModel::class.java)
-        gameViewModel = provider.get(GameViewModel::class.java)
-        statViewModel = provider.get(StatViewModel::class.java)
-        prefsViewModel = provider.get(PrefsViewModel::class.java)
-        eventViewModel = provider.get(EventViewModel::class.java)
-        mediaViewModel = provider.get(MediaViewModel::class.java)
-        locationViewModel = provider.get(LocationViewModel::class.java)
-        teamMemberViewModel = provider.get(TeamMemberViewModel::class.java)
-        competitorViewModel = provider.get(CompetitorViewModel::class.java)
-        tournamentViewModel = provider.get(TournamentViewModel::class.java)
-        blockedUserViewModel = provider.get(BlockedUserViewModel::class.java)
-
         defaultErrorHandler.addAction { if (::scrollManager.isInitialized) scrollManager.reset() }
     }
 
@@ -135,7 +112,7 @@ open class MainActivityFragment : TeammatesBaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (!restoredFromBackStack() && ::scrollManager.isInitialized) setFabExtended(true)
+        if (!restoredFromBackStack && ::scrollManager.isInitialized) uiState = uiState.copy(fabExtended = true)
     }
 
     override fun onDestroyView() {
@@ -159,20 +136,8 @@ open class MainActivityFragment : TeammatesBaseFragment() {
         if (shouldGoBack) activity.onBackPressed()
     }
 
-    protected fun inputRecycledViewPool(): RecyclerView.RecycledViewPool? =
+    protected fun inputRecycledViewPool(): RecyclerView.RecycledViewPool =
             (requireActivity() as MainActivity).inputRecycledPool
-
-    protected fun hideBottomSheet() {
-        val controller = persistentUiController
-        if (controller is BottomSheetController)
-            (controller as BottomSheetController).hideBottomSheet()
-    }
-
-    protected fun showBottomSheet(args: BottomSheetController.Args) {
-        val controller = persistentUiController
-        if (controller is BottomSheetController)
-            (controller as BottomSheetController).showBottomSheet(args)
-    }
 
     protected fun onInconsistencyDetected(exception: IndexOutOfBoundsException) {
         Logger.log(stableTag, "Inconsistent Recyclerview", exception)
@@ -182,12 +147,12 @@ open class MainActivityFragment : TeammatesBaseFragment() {
 
     protected fun updateFabForScrollState(dy: Int) {
         if (abs(dy) < 9) return
-        setFabExtended(dy < 0)
+        uiState = uiState.copy(fabExtended = dy < 0)
     }
 
     protected fun updateTopSpacerElevation() {
         if (spacer == null || !::scrollManager.isInitialized) return
-        spacer?.isSelected = scrollManager.recyclerView.canScrollVertically(-1)
+        spacer?.isSelected = scrollManager.recyclerView?.canScrollVertically(-1) ?: false
     }
 
     protected fun signOut() {
@@ -202,17 +167,14 @@ open class MainActivityFragment : TeammatesBaseFragment() {
         is Team -> JoinRequestFragment.joinInstance(entity, userViewModel.currentUser)
         is User -> UserEditFragment.newInstance(entity)
         else -> null
-    }?.let { showFragment(it) }.run { Unit }
+    }?.let { navigator.show(it) }.run { Unit }
 
-    protected fun pickPlace() {
+    protected fun pickPlace() = bottomSheetDriver.showBottomSheet {
         val picker = AddressPickerFragment.newInstance()
-        picker.setTargetFragment(this, R.id.request_place_pick)
+        picker.setTargetFragment(this@MainActivityFragment, R.id.request_place_pick)
 
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setFragment(picker)
-                .setTitle("")
-                .build())
+        menuRes = R.menu.empty
+        fragment = picker
     }
 
     protected fun watchForRoleChanges(team: Team, onChanged: () -> Unit) {
@@ -221,27 +183,25 @@ open class MainActivityFragment : TeammatesBaseFragment() {
         disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe({ onChanged.invoke() }, emptyErrorHandler::invoke))
     }
 
-    protected fun BaseFragment.listDetailTransition(
+    protected fun FragmentTransaction.listDetailTransition(
             key: String,
+            incomingFragment: Fragment,
             itemViewId: Int = R.id.fragment_header_background,
             thumbnailId: Int = R.id.fragment_header_thumbnail
 
-    ): FragmentTransaction? {
-        val fallBack = super.provideFragmentTransaction(this)
+    ) {
+        val args = incomingFragment.arguments ?: return
 
-        val args = arguments ?: return fallBack
-
-        val model = args.getParcelable<Parcelable>(key) ?: return fallBack
+        val model = args.getParcelable<Parcelable>(key) ?: return
 
         val holder = this@MainActivityFragment.scrollManager
                 .findViewHolderForItemId(model.hashCode().toLong()) as? ModelCardViewHolder<*, *>
-                ?: return fallBack
+                ?: return
 
         this@MainActivityFragment.exitTransition = sharedFadeTransition()
 
-        return beginTransaction()
-                .addSharedElement(holder.itemView, model.getTransitionName(itemViewId))
-                .addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
+        addSharedElement(holder.itemView, model.getTransitionName(itemViewId))
+        addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
     }
 
 }

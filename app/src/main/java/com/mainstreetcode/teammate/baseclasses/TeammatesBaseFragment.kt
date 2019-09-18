@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.baseclasses
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
@@ -40,17 +39,17 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import com.google.android.material.snackbar.Snackbar
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 import com.mainstreetcode.teammate.util.resolveThemeColor
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
+import com.tunjid.androidbootstrap.core.components.StackNavigator
+import com.tunjid.androidbootstrap.core.components.activityStackNavigator
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
@@ -59,10 +58,31 @@ import kotlin.math.abs
  * Base Fragment for this app
  */
 
-open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
+open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
+        InsetProvider,
+        GlobalUiController,
+        View.OnClickListener,
+        TransientBarController,
+        StackNavigator.TagProvider,
+        StackNavigator.TransactionModifier,
+        StackNavigator.NavigationController {
+
+    override var uiState: UiState by activityGlobalUiController()
+
+    override val navigator: StackNavigator by activityStackNavigator()
+
+    override val transientBarDriver: TransientBarDriver
+        get() = requireActivity().run { (this as TransientBarController).transientBarDriver }
+
+    override val stableTag: String
+        get() = javaClass.simpleName
+
+    protected var restoredFromBackStack: Boolean = false
 
     protected var disposables = CompositeDisposable()
+
     protected var emptyErrorHandler: (Throwable) -> Unit = ErrorHandler.EMPTY
+
     protected lateinit var defaultErrorHandler: ErrorHandler
 
     protected open val fabStringResource: Int @StringRes get() = R.string.empty_string
@@ -79,7 +99,7 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
 
     protected open val altToolbarTitle: CharSequence get() = ""
 
-    open val insetFlags: InsetFlags get() = InsetFlags.ALL
+    override val insetFlags: InsetFlags get() = InsetFlags.ALL
 
     open val staticViews: IntArray get() = intArrayOf()
 
@@ -94,12 +114,6 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
     protected open val showsSystemUI: Boolean get() = true
 
     protected open val hasLightNavBar: Boolean get() = SDK_INT >= O
-
-    protected val persistentUiController: PersistentUiController
-        get() {
-            val ref = activity
-            return if (ref == null) PersistentUiController.DUMMY else ref as PersistentUiController
-        }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -121,28 +135,21 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
 
     override fun onDestroyView() {
         disposables.clear()
-        persistentUiController.setFabClickListener(null)
+        restoredFromBackStack = true
+        if (uiState.fabClickListener == this) uiState = uiState.copy(fabClickListener = null)
         super.onDestroyView()
     }
 
     override fun onClick(view: View) = Unit
 
-    protected open fun toggleProgress(show: Boolean) = persistentUiController.toggleProgress(show)
-
-    protected fun setFabExtended(extended: Boolean) =
-            persistentUiController.setFabExtended(extended)
-
-    protected fun showSnackbar(message: CharSequence) = persistentUiController.showSnackBar(message)
-
-    protected fun showSnackbar(consumer: (Snackbar) -> Unit) =
-            persistentUiController.showSnackBar(consumer)
-
-    protected fun showChoices(consumer: (ChoiceBar) -> Unit) =
-            persistentUiController.showChoices(consumer)
-
-    @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = beginTransaction()
-            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
+        transaction.setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+        )
+    }
 
     protected fun setEnterExitTransitions() {
         if (Config.isStaticVariant) return
@@ -159,19 +166,33 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
     }
 
     protected open fun handleErrorMessage(message: Message) {
-        showSnackbar(message.message)
-        toggleProgress(false)
+        transientBarDriver.showSnackBar(message.message)
+        transientBarDriver.toggleProgress(false)
     }
 
     protected fun updateFabOnScroll(dx: Int, dy: Int) =
-            if (showsFab && abs(dy) > 3) toggleFab(dy < 0) else Unit
+            if (showsFab && abs(dy) > 3) uiState = uiState.copy(fabShows = dy < 0) else Unit
 
-    open fun onKeyBoardChanged(appeared: Boolean) = Unit
+    override fun onKeyBoardChanged(appeared: Boolean) = Unit
 
-    open fun togglePersistentUi() = persistentUiController.update(fromThis())
-
-    @SuppressLint("CommitTransaction")
-    protected fun beginTransaction(): FragmentTransaction = fragmentManager!!.beginTransaction()
+    open fun togglePersistentUi() {
+        uiState = uiState.copy(
+                toolBarMenu = toolbarMenu,
+                toolbarShows = showsToolBar,
+                toolbarTitle = toolbarTitle,
+                altToolBarMenu = altToolbarMenu,
+                altToolBarShows = showsAltToolBar,
+                altToolbarTitle = altToolbarTitle,
+                fabIcon = fabIconResource,
+                fabShows = showsFab,
+                fabText = fabStringResource,
+                bottomNavShows = showsBottomNav,
+                systemUiShows = showsSystemUI,
+                navBarColor = navBarColor,
+                hasLightNavBar = hasLightNavBar,
+                fabClickListener = this
+        )
+    }
 
     protected fun hideKeyboard() {
         val root = view ?: return
@@ -179,26 +200,6 @@ open class TeammatesBaseFragment : BaseFragment(), View.OnClickListener {
         val imm = root.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.hideSoftInputFromWindow(root.windowToken, 0)
     }
-
-    private fun toggleFab(show: Boolean) = persistentUiController.toggleFab(show)
-
-    private fun fromThis(): UiState = UiState(
-            this.fabIconResource,
-            this.fabStringResource,
-            this.toolbarMenu,
-            this.altToolbarMenu,
-            this.navBarColor,
-            this.showsFab,
-            this.showsToolBar,
-            this.showsAltToolBar,
-            this.showsBottomNav,
-            this.showsSystemUI,
-            this.hasLightNavBar,
-            this.insetFlags,
-            this.toolbarTitle,
-            this.altToolbarTitle,
-            if (view == null) null else this
-    )
 
     protected fun sharedFadeTransition() = Fade().apply { duration = FULL_RES_LOAD_DELAY.toLong() }
 

@@ -43,6 +43,9 @@ class Row private constructor(
 
     private val tableValues = mutableListOf<String>()
 
+    override val diffId: String
+        get() = id
+
     val imageUrl: String
         get() = competitor.imageUrl
 
@@ -60,8 +63,6 @@ class Row private constructor(
         tableValues.clear()
         tableValues.addAll(updated.tableValues)
     }
-
-    override fun getId(): String = id
 
     class GsonAdapter : JsonDeserializer<Row> {
 

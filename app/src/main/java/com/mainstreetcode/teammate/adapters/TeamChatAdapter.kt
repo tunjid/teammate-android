@@ -56,7 +56,7 @@ class TeamChatAdapter(
         @LayoutRes val layoutRes = R.layout.viewholder_chat
         val itemView = LayoutInflater.from(context).inflate(layoutRes, viewGroup, false)
 
-        return TeamChatViewHolder(itemView, adapterListener)
+        return TeamChatViewHolder(itemView, delegate)
     }
 
     override fun onBindViewHolder(viewHolder: TeamChatViewHolder, i: Int) {
@@ -83,7 +83,7 @@ class TeamChatAdapter(
     override fun getItemViewType(position: Int): Int =
             if (items[position] is Chat) CHAT else CONTENT_AD
 
-    interface ChatAdapterListener : AdapterListener {
+    interface ChatAdapterListener {
         fun onChatClicked(chat: Chat)
     }
 

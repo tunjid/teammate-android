@@ -123,9 +123,9 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
         return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(leaveUnchanged))
     }
 
-    private fun onFeedItemProcessed(leaveUnchanged: Boolean): (MutableList<Differentiable>, MutableList<Differentiable>) -> MutableList<Differentiable> = when {
+    private fun onFeedItemProcessed(leaveUnchanged: Boolean): (List<Differentiable>, List<Differentiable>) -> List<Differentiable> = when {
         leaveUnchanged -> { feedItems, _ -> feedItems }
-        else -> { feedItems, processed -> feedItems.removeAll(processed); feedItems }
+        else -> { feedItems, processed -> feedItems - processed }
     }
 
     private fun removedProcessedRequest(request: JoinRequest) {

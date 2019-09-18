@@ -24,7 +24,6 @@
 
 package com.mainstreetcode.teammate.fragments.registration
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -32,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -41,7 +41,6 @@ import com.facebook.login.LoginResult
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.RegistrationActivity
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
@@ -54,19 +53,19 @@ class SplashFragment : RegistrationActivityFragment(), View.OnClickListener {
     private val faceBookResultCallback = CallbackManager.Factory.create()
     private val facebookCallback = object : FacebookCallback<LoginResult> {
         override fun onSuccess(loginResult: LoginResult) {
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
             disposables.add(viewModel.signIn(loginResult)
                     .subscribe({ RegistrationActivity.startMainActivity(activity) }, defaultErrorHandler::invoke))
         }
 
         override fun onCancel() {
-            toggleProgress(false)
-            showSnackbar(getString(R.string.cancelled))
+            transientBarDriver.toggleProgress(false)
+            transientBarDriver.showSnackBar(getString(R.string.cancelled))
         }
 
         override fun onError(error: FacebookException) {
-            toggleProgress(false)
-            showSnackbar(getString(R.string.error_default))
+            transientBarDriver.toggleProgress(false)
+            transientBarDriver.showSnackBar(getString(R.string.error_default))
         }
     }
 
@@ -110,28 +109,26 @@ class SplashFragment : RegistrationActivityFragment(), View.OnClickListener {
     override val showsToolBar: Boolean
         get() = false
 
-    @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? {
-        val rootView = view
-        if (rootView != null) {
-            if (fragmentTo.stableTag.contains(SignInFragment::class.java.simpleName)) {
-                return beginTransaction()
-                        .addSharedElement(rootView.findViewById(R.id.border), TRANSITION_BACKGROUND)
-                        .addSharedElement(rootView.findViewById(R.id.title), TRANSITION_TITLE)
-                        .addSharedElement(rootView.findViewById(R.id.sub_title), TRANSITION_SUBTITLE)
-            } else if (fragmentTo.stableTag.contains(SignUpFragment::class.java.simpleName)) {
-                return beginTransaction()
-                        .addSharedElement(rootView.findViewById(R.id.border), TRANSITION_BACKGROUND)
-                        .addSharedElement(rootView.findViewById(R.id.title), TRANSITION_TITLE)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
+        val root = view
+        if (root != null) {
+            if (incomingFragment is SignInFragment) {
+                transaction
+                        .addSharedElement(root.findViewById(R.id.border), TRANSITION_BACKGROUND)
+                        .addSharedElement(root.findViewById(R.id.title), TRANSITION_TITLE)
+                        .addSharedElement(root.findViewById(R.id.sub_title), TRANSITION_SUBTITLE)
+            } else if (incomingFragment is SignUpFragment) {
+                transaction
+                        .addSharedElement(root.findViewById(R.id.border), TRANSITION_BACKGROUND)
+                        .addSharedElement(root.findViewById(R.id.title), TRANSITION_TITLE)
             }
         }
-        return super.provideFragmentTransaction(fragmentTo)
     }
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.email_sign_up -> showFragment(SignUpFragment.newInstance())
-            R.id.login -> showFragment(SignInFragment.newInstance())
+            R.id.email_sign_up -> navigator.show(SignUpFragment.newInstance())
+            R.id.login -> navigator.show(SignInFragment.newInstance())
             R.id.facebook_login -> {
                 val loginManager = LoginManager.getInstance()
                 loginManager.registerCallback(faceBookResultCallback, facebookCallback)

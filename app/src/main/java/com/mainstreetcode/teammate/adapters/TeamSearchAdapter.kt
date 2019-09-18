@@ -33,22 +33,23 @@ import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.ViewUtil
+import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidbootstrap.view.util.marginLayoutParams
 
 class TeamSearchAdapter(items: List<Differentiable>, listener: AdapterListener) : TeamAdapter(items, listener) {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-        INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
+        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
         else -> getTeamViewHolder(viewGroup)
     }
 
     private fun getTeamViewHolder(viewGroup: ViewGroup): TeamViewHolder {
-        val itemView = getItemView(R.layout.viewholder_list_item, viewGroup)
+        val itemView = viewGroup.inflate(R.layout.viewholder_list_item)
         val resources = itemView.resources
-        val params = ViewUtil.getLayoutParams(itemView)
+        val params = itemView.marginLayoutParams
         params.rightMargin = resources.getDimensionPixelSize(R.dimen.half_margin)
         params.leftMargin = params.rightMargin
-        return TeamViewHolder(itemView, adapterListener)
+        return TeamViewHolder(itemView, delegate)
     }
 }

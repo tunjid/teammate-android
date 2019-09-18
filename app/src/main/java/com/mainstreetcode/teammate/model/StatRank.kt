@@ -28,9 +28,8 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
-import com.mainstreetcode.teammate.util.*
+import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-
 import java.lang.reflect.Type
 
 /**
@@ -43,8 +42,11 @@ class StatRank internal constructor(
         override val user: User
 ) : UserHost, TeamHost, RemoteImage, Differentiable, Comparable<StatRank> {
 
-    val rank:String
-    get() = count.toString()
+    override val diffId: String
+        get() = user.id + "-" + team.id
+
+    val rank: String
+        get() = count.toString()
 
     val inset: String
         get() = team.imageUrl
@@ -58,12 +60,10 @@ class StatRank internal constructor(
     override val imageUrl: String
         get() = user.imageUrl
 
-    override fun getId(): String = user.id + "-" + team.id
-
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is StatRank) id == other.id else user.areContentsTheSame(other.user) && team.areContentsTheSame(other.team)
+            if (other !is StatRank) diffId == other.diffId else user.areContentsTheSame(other.user) && team.areContentsTheSame(other.team)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun compareTo(other: StatRank): Int = -count.compareTo(other.count)
 

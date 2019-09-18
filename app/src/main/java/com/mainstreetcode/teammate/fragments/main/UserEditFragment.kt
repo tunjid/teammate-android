@@ -63,8 +63,9 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
 
     override val showsFab: Boolean get() = canEdit()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_USER)!!)
+    override val stableTag: String 
+        get() = 
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_USER)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +76,7 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(root.findViewById(R.id.model_list))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(UserEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -84,7 +85,7 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
 
         return root
     }
@@ -96,16 +97,16 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         viewHolder.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> {
-                toggleProgress(true)
+                transientBarDriver.toggleProgress(true)
                 disposables.add(gofer.save().subscribe({ result ->
-                    showSnackbar(getString(R.string.updated_user, headeredModel.firstName))
-                    toggleProgress(false)
+                    transientBarDriver.showSnackBar(getString(R.string.updated_user, headeredModel.firstName))
+                    transientBarDriver.toggleProgress(false)
                     viewHolder.bind(headeredModel)
                     scrollManager.onDiff(result)
                 }, defaultErrorHandler::invoke))

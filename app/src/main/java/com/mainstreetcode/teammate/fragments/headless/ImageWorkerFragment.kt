@@ -35,12 +35,11 @@ import android.os.Build.VERSION_CODES.M
 import androidx.core.content.ContextCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.Logger.log
 import com.theartofdev.edmodo.cropper.CropImage
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 import io.reactivex.MaybeOnSubscribe
@@ -77,7 +76,7 @@ class ImageWorkerFragment : MainActivityFragment() {
                     val started = mediaViewModel.downloadMedia(team)
 
                     requester.startedDownLoad(started)
-                    if (started) showSnackbar(getString(R.string.media_download_started))
+                    if (started) transientBarDriver.showSnackBar(getString(R.string.media_download_started))
                 }
             }
         }
@@ -154,7 +153,7 @@ class ImageWorkerFragment : MainActivityFragment() {
         fun startedDownLoad(started: Boolean)
     }
 
-    interface ImagePickerListener : InteractiveAdapter.AdapterListener {
+    interface ImagePickerListener {
         fun onImageClick()
     }
 
@@ -195,7 +194,7 @@ class ImageWorkerFragment : MainActivityFragment() {
 
         fun newInstance(): ImageWorkerFragment = ImageWorkerFragment()
 
-        fun attach(host: BaseFragment) {
+        fun attach(host: TeammatesBaseFragment) {
             if (getInstance(host) != null) return
 
             val instance = newInstance()
@@ -205,7 +204,7 @@ class ImageWorkerFragment : MainActivityFragment() {
                     .commit()
         }
 
-        fun requestCrop(host: BaseFragment) {
+        fun requestCrop(host: TeammatesBaseFragment) {
             requireInstanceWithActivity(host) { instance, activity ->
                 val noPermit = noStoragePermission(activity)
 
@@ -214,13 +213,13 @@ class ImageWorkerFragment : MainActivityFragment() {
             }
         }
 
-        fun isPicking(host: BaseFragment): Boolean {
+        fun isPicking(host: TeammatesBaseFragment): Boolean {
             val instance = getInstance(host)
 
             return instance != null && instance.isPicking
         }
 
-        fun requestMultipleMedia(host: BaseFragment) {
+        fun requestMultipleMedia(host: TeammatesBaseFragment) {
             requireInstanceWithActivity(host) { instance, activity ->
                 val noPermit = noStoragePermission(activity)
 
@@ -231,7 +230,7 @@ class ImageWorkerFragment : MainActivityFragment() {
             }
         }
 
-        fun requestDownload(host: BaseFragment, team: Team): Boolean {
+        fun requestDownload(host: TeammatesBaseFragment, team: Team): Boolean {
             return requireInstanceWithActivity(host, { instance, activity ->
                 val noPermit = noStoragePermission(activity)
                 var started = false
@@ -241,7 +240,7 @@ class ImageWorkerFragment : MainActivityFragment() {
                 else
                     started = instance.mediaViewModel.downloadMedia(team)
 
-                if (started) instance.showSnackbar(activity.getString(R.string.media_download_started))
+                if (started) instance.transientBarDriver.showSnackBar(activity.getString(R.string.media_download_started))
 
                 started
             }, false)
@@ -252,12 +251,12 @@ class ImageWorkerFragment : MainActivityFragment() {
                     WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
         }
 
-        private fun makeTag(host: BaseFragment): String = TAG + "-" + host.stableTag
+        private fun makeTag(host: TeammatesBaseFragment): String = TAG + "-" + host.stableTag
 
-        private fun getInstance(host: BaseFragment): ImageWorkerFragment? =
+        private fun getInstance(host: TeammatesBaseFragment): ImageWorkerFragment? =
                 host.childFragmentManager.findFragmentByTag(makeTag(host)) as ImageWorkerFragment?
 
-        private fun requireInstanceWithActivity(host: BaseFragment, biConsumer: (ImageWorkerFragment, Activity) -> Unit) {
+        private fun requireInstanceWithActivity(host: TeammatesBaseFragment, biConsumer: (ImageWorkerFragment, Activity) -> Unit) {
             requireInstanceWithActivity(host, { instance, activity ->
                 try {
                     biConsumer.invoke(instance, activity)
@@ -267,7 +266,7 @@ class ImageWorkerFragment : MainActivityFragment() {
             }, Unit)
         }
 
-        private fun <T> requireInstanceWithActivity(host: BaseFragment, biFunction: (ImageWorkerFragment, Activity) -> T, defaultValue: T): T {
+        private fun <T> requireInstanceWithActivity(host: TeammatesBaseFragment, biFunction: (ImageWorkerFragment, Activity) -> T, defaultValue: T): T {
             val instance = getInstance(host)
 
             if (instance == null) {

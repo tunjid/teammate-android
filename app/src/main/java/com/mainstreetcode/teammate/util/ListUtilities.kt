@@ -31,31 +31,16 @@ import java.util.*
 fun asDifferentiables(subTypeList: List<Differentiable>): List<Differentiable> =
         ArrayList(subTypeList)
 
-fun replaceStringList(sourceList: List<String>, updatedList: List<String>) {
-    val source = Lists.transform<String, Differentiable>(sourceList, { s -> Differentiable.fromCharSequence { s } }, { it.id })
-    val updated = Lists.transform<String, Differentiable>(updatedList, { s -> Differentiable.fromCharSequence { s } }, { it.id })
-    replaceList(source, updated)
-}
+fun <T> MutableList<T>.replace(other: List<T>) = Lists.replace(this, other)
 
-fun <T : Differentiable> preserveAscending(source: MutableList<T>, additions: List<T>) {
-    concatenateList(source, additions)
-    source.sortWith(FunctionalDiff.COMPARATOR)
-}
+fun <T : Differentiable> preserveAscending(source: List<T>, additions: List<T>): List<T> =
+        concatenateList(source, additions).sortedWith(FunctionalDiff.COMPARATOR)
 
-fun <T : Differentiable> preserveDescending(source: MutableList<T>, additions: List<T>) {
-    concatenateList(source, additions)
-    source.sortWith(FunctionalDiff.DESCENDING_COMPARATOR)
-}
+fun <T : Differentiable> preserveDescending(source: List<T>, additions: List<T>): List<T> =
+        concatenateList(source, additions).sortedWith(FunctionalDiff.DESCENDING_COMPARATOR)
 
-fun <T : Differentiable> replaceList(source: MutableList<T>, additions: MutableList<T>): MutableList<T> {
-    Lists.replace(source, additions)
-    source.sortWith(FunctionalDiff.COMPARATOR)
-    return source
-}
+fun <T : Differentiable> replaceList(@Suppress("UNUSED_PARAMETER") source: List<T>, additions: List<T>): List<T> =
+        additions.sortedWith(FunctionalDiff.COMPARATOR)
 
-private fun <T : Differentiable> concatenateList(source: MutableList<T>, additions: List<T>) {
-    val set = HashSet(additions)
-    set.addAll(source)
-    source.clear()
-    source.addAll(set)
-}
+private fun <T : Differentiable> concatenateList(source: List<T>, additions: List<T>): List<T> =
+        HashSet(additions).run { addAll(source); toList() }

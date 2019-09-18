@@ -115,13 +115,13 @@ class Event : EventEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is Event) id == other.id else name == other.name
+            if (other !is Event) diffId == other.diffId else name == other.name
                     && startDate == other.startDate && endDate == other.endDate
                     && locationName == other.locationName && imageUrl == other.imageUrl
 
     override fun hasMajorFields(): Boolean = areNotEmpty(id, name)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Event) {
         this.id = updated.id
@@ -139,7 +139,7 @@ class Event : EventEntity,
     }
 
     override fun compareTo(other: Event): Int =
-            compareValuesBy(this, other, Event::startDate, Event::endDate, Event::getId)
+            compareValuesBy(this, other, Event::startDate, Event::endDate, Event::id)
 
     fun updateTeam(team: Team) = this.team.update(team)
 

@@ -36,31 +36,31 @@ import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [BlockedUser]
  */
 
-class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdapter<InputViewHolder<*>, InteractiveAdapter.AdapterListener>(object : AdapterListener {
-
-}) {
+class BlockedUserViewAdapter(
+        private val items: List<Differentiable>
+) : BaseAdapter<InputViewHolder, Unit>(Unit) {
     private val chooser: Chooser
 
     init {
         chooser = Chooser()
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<*> =
-            InputViewHolder<Nothing>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder =
+            InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S {
-        return adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S {
+        return delegate as S
     }
 
-    override fun onBindViewHolder(holder: InputViewHolder<*>, position: Int) {
+    override fun onBindViewHolder(holder: InputViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
         if (item is Item) holder.bind(chooser[item])

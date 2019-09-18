@@ -40,6 +40,7 @@ import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 
 import com.mainstreetcode.teammate.util.ITEM
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Guest]
@@ -48,7 +49,7 @@ import com.mainstreetcode.teammate.util.ITEM
 class GuestAdapter(
         private val items: List<Differentiable>,
         listener: ImageWorkerFragment.ImagePickerListener
-) : BaseAdapter<InputViewHolder<*>, ImageWorkerFragment.ImagePickerListener>(listener) {
+) : BaseAdapter<InputViewHolder, ImageWorkerFragment.ImagePickerListener>(listener) {
 
     private val chooser: Chooser
 
@@ -56,18 +57,18 @@ class GuestAdapter(
         this.chooser = Chooser()
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<*> =
-            InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder =
+            InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
 
-    override fun onBindViewHolder(holder: InputViewHolder<*>, position: Int) {
+    override fun onBindViewHolder(holder: InputViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
         if (item is Item) holder.bind(chooser[item])
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            delegate as S
 
     override fun getItemCount(): Int = items.size
 

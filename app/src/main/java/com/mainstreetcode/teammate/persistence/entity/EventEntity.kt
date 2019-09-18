@@ -56,7 +56,7 @@ open class EventEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "event_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "event_game_id")
     var gameId: String
@@ -137,11 +137,9 @@ open class EventEntity : Parcelable {
         spots = `in`.readInt()
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun setName(name: String) {
         this.name = name

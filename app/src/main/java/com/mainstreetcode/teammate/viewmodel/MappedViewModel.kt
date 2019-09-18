@@ -94,15 +94,13 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     fun clearNotifications(key: K) =
             getModelList(key).mapNotNull(this::itemToModel).forEach(this::clearNotification)
 
-    private fun pullToRefresh(source: MutableList<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
-        if (pullToRefreshCount.getAndIncrement() == 0) source.clear()
+    private fun pullToRefresh(source: List<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
+      val next =  if (pullToRefreshCount.getAndIncrement() == 0) listOf() else source
 
-        preserveList(source, additions)
-        afterPullToRefreshDiff(source)
-        return source
+        return afterPullToRefreshDiff(preserveList(next, additions))
     }
 
-    internal open fun afterPullToRefreshDiff(source: MutableList<Differentiable>) {}
+    internal open fun afterPullToRefreshDiff(source: List<Differentiable>): List<Differentiable> = source
 
     internal open fun onInvalidKey(key: K) {}
 

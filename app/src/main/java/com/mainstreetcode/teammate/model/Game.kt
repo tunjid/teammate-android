@@ -107,14 +107,14 @@ class Game : GameEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is Game) id == other.id else score == other.score
+            if (other !is Game) diffId == other.diffId else score == other.score
                     && home.areContentsTheSame(other.home)
                     && away.areContentsTheSame(other.away)
 
     override fun hasMajorFields(): Boolean =
             areNotEmpty(id, refPath, score) && home.hasMajorFields() && away.hasMajorFields()
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Game) {
         this.id = updated.id
@@ -154,7 +154,7 @@ class Game : GameEntity,
     }
 
     override fun compareTo(other: Game): Int =
-            compareValuesBy(this, other, Game::created, Game::getId)
+            compareValuesBy(this, other, Game::created, Game::id)
 
     override fun describeContents(): Int = 0
 
@@ -166,8 +166,8 @@ class Game : GameEntity,
             body.addProperty(REF_PATH, src.refPath)
             body.addProperty(HOME_SCORE, src.homeScore)
             body.addProperty(AWAY_SCORE, src.awayScore)
-            body.addProperty(HOME, src.home.entity.getId())
-            body.addProperty(AWAY, src.away.entity.getId())
+            body.addProperty(HOME, src.home.entity.id)
+            body.addProperty(AWAY, src.away.entity.id)
             body.addProperty(REFEREE, if (src.referee.isEmpty) null else src.referee.id)
             return body
         }

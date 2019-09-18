@@ -41,6 +41,7 @@ import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -57,9 +58,9 @@ class StatRankAdapter(
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> {
         return when (viewType) {
-            CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-            INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-            else -> StatRankViewHolder(getItemView(R.layout.viewholder_stat_rank, viewGroup), adapterListener)
+            CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+            INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+            else -> StatRankViewHolder(viewGroup.inflate(R.layout.viewholder_stat_rank), delegate)
         }
     }
 

@@ -77,8 +77,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
 
     override val sport: Sport get() = headeredModel.sport
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
+    override val stableTag: String 
+        get() = 
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,7 +100,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
                 .build()
-                .apply { recyclerView.requestFocus() }
+                .apply { recyclerView?.requestFocus() }
 
         return root
     }
@@ -110,7 +111,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_rounds -> showFragment(TournamentDetailFragment.newInstance(headeredModel))
+        R.id.action_rounds -> navigator.show(TournamentDetailFragment.newInstance(headeredModel))
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -122,7 +123,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     override fun gofer(): Gofer<Tournament> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
         viewHolder.bind(headeredModel)
         activity?.invalidateOptionsMenu()
@@ -139,13 +140,13 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         when (view.id) {
             R.id.fab -> {
                 val wasEmpty = headeredModel.isEmpty
-                toggleProgress(true)
+                transientBarDriver.toggleProgress(true)
                 disposables.add(gofer.save().subscribe({ diffResult ->
                     val stringRes = if (wasEmpty) R.string.added_user else R.string.updated_user
-                    showSnackbar(getString(stringRes, headeredModel.name))
+                    transientBarDriver.showSnackBar(getString(stringRes, headeredModel.name))
 
                     if (wasEmpty)
-                        showFragment(TournamentDetailFragment.newInstance(headeredModel))
+                        navigator.show(TournamentDetailFragment.newInstance(headeredModel))
                     else
                         onModelUpdated(diffResult)
                 }, defaultErrorHandler::invoke))
@@ -161,14 +162,14 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         if (showingPrompt) return
 
         showingPrompt = true
-        showSnackbar { snackbar ->
+        transientBarDriver.showSnackBar { snackbar ->
             snackbar.setText(getString(R.string.add_tournament_competitors_prompt))
                     .addCallback(object : Snackbar.Callback() {
                         override fun onDismissed(bar: Snackbar?, event: Int) {
                             showingPrompt = false
                         }
                     })
-                    .setAction(R.string.okay) { showFragment(CompetitorsFragment.newInstance(headeredModel)) }
+                    .setAction(R.string.okay) { navigator.show(CompetitorsFragment.newInstance(headeredModel)) }
         }
     }
 

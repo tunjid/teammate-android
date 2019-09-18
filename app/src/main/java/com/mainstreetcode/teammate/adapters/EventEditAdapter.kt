@@ -46,6 +46,7 @@ import com.mainstreetcode.teammate.util.GUEST
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [com.mainstreetcode.teammate.model.Event]
@@ -56,9 +57,9 @@ class EventEditAdapter(
         listener: EventEditAdapterListener
 ) : BaseAdapter<BaseViewHolder<*>, EventEditAdapter.EventEditAdapterListener>(listener) {
 
-    private val chooser = Chooser(adapterListener)
+    private val chooser = Chooser(delegate)
 
-    private val teamListener = TeamAdapter.AdapterListener.asSAM { adapterListener.selectTeam() }
+    private val teamListener = TeamAdapter.AdapterListener.asSAM { delegate.selectTeam() }
 
     init {
         setHasStableIds(true)
@@ -66,20 +67,20 @@ class EventEditAdapter(
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> =
             when (viewType) {
-                ITEM -> InputViewHolder<EventEditAdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-                GUEST -> GuestViewHolder(getItemView(R.layout.viewholder_event_guest, viewGroup), adapterListener)
-                TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), teamListener)
-                else -> InputViewHolder<EventEditAdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+                ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                GUEST -> GuestViewHolder(viewGroup.inflate(R.layout.viewholder_event_guest), delegate)
+                TEAM -> TeamViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), teamListener)
+                else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
             }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            if (viewHolder is TeamViewHolder) teamListener as S else adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            if (viewHolder is TeamViewHolder) teamListener as S else delegate as S
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val item = identifiables[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder).bind(chooser[item])
             is Team -> (holder as TeamViewHolder).bind(item)
             is Guest -> (holder as GuestViewHolder).bind(item)
         }
@@ -87,7 +88,7 @@ class EventEditAdapter(
 
     override fun getItemCount(): Int = identifiables.size
 
-    override fun getItemId(position: Int): Long = identifiables[position].id.hashCode().toLong()
+    override fun getItemId(position: Int): Long = identifiables[position].diffId.hashCode().toLong()
 
     override fun getItemViewType(position: Int): Int = when (identifiables[position]) {
         is Item -> ITEM
@@ -106,12 +107,12 @@ class EventEditAdapter(
         fun canEditEvent(): Boolean
     }
 
-    internal class Chooser internal constructor(private val adapterListener: EventEditAdapterListener) : TextInputStyle.InputChooser() {
+    internal class Chooser internal constructor(private val delegate: EventEditAdapterListener) : TextInputStyle.InputChooser() {
 
         override fun iconGetter(item: Item): Int =
                 if (item.itemType == Item.LOCATION) R.drawable.ic_location_on_white_24dp else 0
 
-        override fun enabler(item: Item): Boolean = adapterListener.canEditEvent()
+        override fun enabler(item: Item): Boolean = delegate.canEditEvent()
 
         override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
             Item.INPUT,
@@ -125,8 +126,8 @@ class EventEditAdapter(
         override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.TEXT, Item.NUMBER, Item.LOCATION -> TextInputStyle(
                     Item.noClicks,
-                    adapterListener::onLocationClicked,
-                    { adapterListener.canEditEvent() },
+                    delegate::onLocationClicked,
+                    { delegate.canEditEvent() },
                     this::textChecker,
                     this::iconGetter)
             Item.VISIBILITY -> SpinnerTextInputStyle(
@@ -134,12 +135,12 @@ class EventEditAdapter(
                     Config.getVisibilities(),
                     Visibility::name,
                     Visibility::code
-            ) { adapterListener.canEditEvent() }
-            Item.DATE -> DateTextInputStyle { adapterListener.canEditEvent() }
+            ) { delegate.canEditEvent() }
+            Item.DATE -> DateTextInputStyle { delegate.canEditEvent() }
             else -> TextInputStyle(
                     Item.noClicks,
-                    adapterListener::onLocationClicked,
-                    { adapterListener.canEditEvent() },
+                    delegate::onLocationClicked,
+                    { delegate.canEditEvent() },
                     this::textChecker,
                     this::iconGetter
             )

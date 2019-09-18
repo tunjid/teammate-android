@@ -38,8 +38,8 @@ import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [com.mainstreetcode.teammate.model.Tournament]
@@ -50,30 +50,30 @@ class GameEditAdapter(
         listener: AdapterListener
 ) : BaseAdapter<BaseViewHolder<*>, GameEditAdapter.AdapterListener>(listener) {
     private val chooser: TextInputStyle.InputChooser
-    private val competitorPicker = CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked)
+    private val competitorPicker = CompetitorAdapter.AdapterListener.asSAM(delegate::onAwayClicked)
 
     init {
-        this.chooser = Chooser(adapterListener)
+        this.chooser = Chooser(delegate)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when (viewType) {
-            ITEM -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-            AWAY -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), competitorPicker)
+            ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+            AWAY -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), competitorPicker)
                     .hideSubtitle().withTitle(R.string.pick_away_competitor)
-            else -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+            else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
             if (viewHolder is CompetitorViewHolder) competitorPicker as S
-            else adapterListener as S
+            else delegate as S
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val item = items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder).bind(chooser[item])
             is Competitor -> (holder as CompetitorViewHolder).bind(item)
         }
     }
@@ -91,10 +91,10 @@ class GameEditAdapter(
         fun onAwayClicked(away: Competitor)
     }
 
-    private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
+    private class Chooser internal constructor(private val delegate: AdapterListener) : TextInputStyle.InputChooser() {
 
         override fun enabler(item: Item): Boolean = when (item.itemType) {
-            Item.INPUT -> adapterListener.canEditGame()
+            Item.INPUT -> delegate.canEditGame()
             else -> false
         }
 

@@ -32,6 +32,7 @@ import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Team
 import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -47,7 +48,7 @@ open class CompetitorAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder =
-            CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener)
+            CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), delegate)
 
     override fun onBindViewHolder(viewHolder: CompetitorViewHolder, position: Int) {
         val identifiable = items[position]
@@ -60,7 +61,7 @@ open class CompetitorAdapter(
 
     override fun getItemViewType(position: Int): Int = Item.COMPETITOR
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun onCompetitorClicked(competitor: Competitor)
 
         companion object {

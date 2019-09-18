@@ -100,7 +100,7 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         val canPick = target is UserAdapter.AdapterListener
 
         if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(item)
-        else showFragment(UserEditFragment.newInstance(item))
+        else navigator.show(UserEditFragment.newInstance(item))
     }
 
     override fun onQueryTextSubmit(s: String): Boolean = false

@@ -37,7 +37,7 @@ import com.mainstreetcode.teammate.model.enums.StatAttribute
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.model.enums.StatTypes
 
-class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder<Nothing>(itemView) {
+class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder(itemView) {
 
     private lateinit var adapter: StatTypeAdapter
     private val statType = StatType.empty()

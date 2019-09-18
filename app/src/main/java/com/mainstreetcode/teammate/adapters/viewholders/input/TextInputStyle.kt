@@ -40,7 +40,7 @@ open class TextInputStyle(
         private val iconVisibilityFunction: (Item) -> Int) {
 
     lateinit var item: Item
-    var viewHolder: InputViewHolder<*>? = null
+    var viewHolder: InputViewHolder? = null
 
     internal open val isSelector: Boolean
         get() = textRunnable != null

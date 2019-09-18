@@ -60,8 +60,8 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
     override val toolbarTitle: CharSequence
         get() = getString(R.string.sign_in_forgot_password)
 
-    override fun getStableTag(): String {
-        return arguments!!.getCharSequence(ARG_TOKEN, "").toString()
+    override val stableTag: String 
+        get() {return arguments!!.getCharSequence(ARG_TOKEN, "").toString()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -109,7 +109,7 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
 
     private fun resetPassword() {
         if (emailInput.hasValidEmail) {
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
 
             val email = emailInput!!.text.toString()
             val token = tokenInput!!.text.toString()
@@ -117,9 +117,9 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
 
             disposables.add(viewModel.resetPassword(email, token, password)
                     .subscribe({
-                        showSnackbar { snackbar ->
+                        transientBarDriver.showSnackBar { snackbar ->
                             snackbar.setText(it.message)
-                                    .setAction(R.string.sign_in) { showFragment(SignInFragment.newInstance()) }
+                                    .setAction(R.string.sign_in) { navigator.show(SignInFragment.newInstance()) }
                         }
                     }, defaultErrorHandler::invoke))
         }

@@ -34,8 +34,6 @@ import androidx.room.ForeignKey.CASCADE
 import androidx.room.PrimaryKey
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.persistence.entity.TeamEntity
-import com.mainstreetcode.teammate.persistence.entity.UserEntity
 import java.util.*
 
 @Entity(
@@ -50,7 +48,7 @@ open class MediaEntity : Parcelable {
 
     @PrimaryKey
     @ColumnInfo(name = "media_id")
-    var hiddenId: String
+    var id: String
         protected set
 
     @ColumnInfo(name = "media_url")
@@ -81,9 +79,9 @@ open class MediaEntity : Parcelable {
     var isFlagged: Boolean = false
         protected set
 
-    constructor(hiddenId: String, url: String, mimeType: String, thumbnail: String,
+    constructor(id: String, url: String, mimeType: String, thumbnail: String,
                 user: User, hiddenTeam: Team, created: Date, flagged: Boolean) {
-        this.hiddenId = hiddenId
+        this.id = id
         this.url = url
         this.mimeType = mimeType
         this.thumbnail = thumbnail
@@ -94,7 +92,7 @@ open class MediaEntity : Parcelable {
     }
 
     constructor(`in`: Parcel) {
-        hiddenId = `in`.readString()!!
+        id = `in`.readString()!!
         url = `in`.readString()!!
         mimeType = `in`.readString()!!
         thumbnail = `in`.readString()!!
@@ -111,15 +109,15 @@ open class MediaEntity : Parcelable {
 
         val chat = other as MediaEntity?
 
-        return hiddenId == chat?.hiddenId
+        return id == chat?.id
     }
 
-    override fun hashCode(): Int = hiddenId.hashCode()
+    override fun hashCode(): Int = id.hashCode()
 
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(hiddenId)
+        dest.writeString(id)
         dest.writeString(url)
         dest.writeString(mimeType)
         dest.writeString(thumbnail)

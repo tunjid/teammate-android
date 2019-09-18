@@ -65,8 +65,9 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
 
     override val showsFab: Boolean get() = gofer.canEditTeam()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TEAM)!!)
+    override val stableTag: String 
+        get() = 
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TEAM)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +79,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_headered, container, false)
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(root.findViewById(R.id.model_list))
                 .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(TeamEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -87,7 +88,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
+        scrollManager.recyclerView?.requestFocus()
         return root
     }
 
@@ -95,12 +96,12 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
         if (view.id != R.id.fab) return
 
         val wasEmpty = headeredModel.isEmpty
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save()
                 .subscribe({ result ->
                     val message = if (wasEmpty) getString(R.string.created_team, headeredModel.name) else getString(R.string.updated_team)
                     onModelUpdated(result)
-                    showSnackbar(message)
+                    transientBarDriver.showSnackBar(message)
                 }, defaultErrorHandler::invoke))
     }
 
@@ -109,7 +110,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         viewHolder.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onPrepComplete() {
@@ -128,7 +129,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
     override fun onAddressPicked(address: Address) {
         gofer.isSettingAddress = false
         disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler::invoke))
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun canEditFields(): Boolean = gofer.canEditTeam()

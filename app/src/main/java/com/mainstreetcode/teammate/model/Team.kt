@@ -64,18 +64,6 @@ class Team : TeamEntity,
         HeaderedModel<Team>,
         ListableModel<Team> {
 
-    override val refType: String
-        get() = COMPETITOR_TYPE
-
-    override val isEmpty: Boolean
-        get() = this == empty()
-
-    override var imageUrl: String
-        get() = if (super.imageUrl.isBlank()) Config.getDefaultTeamLogo() else super.imageUrl
-        set(value) {
-            super.imageUrl = value
-        }
-
     constructor(
             id: String,
             imageUrl: String,
@@ -93,6 +81,18 @@ class Team : TeamEntity,
             minAge: Int,
             maxAge: Int
     ) : super(id, imageUrl, screenName, city, state, zip, name, description, created, location, sport, storageUsed, maxStorage, minAge, maxAge)
+
+    override val refType: String
+        get() = COMPETITOR_TYPE
+
+    override val isEmpty: Boolean
+        get() = this == empty()
+
+    override var imageUrl: String
+        get() = if (super.imageUrl.isBlank()) Config.getDefaultTeamLogo() else super.imageUrl
+        set(value) {
+            super.imageUrl = value
+        }
 
     private constructor(`in`: Parcel) : super(`in`)
 
@@ -117,7 +117,7 @@ class Team : TeamEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean {
-        if (other !is Team) return id == other.id
+        if (other !is Team) return diffId == other.diffId
         val same = (name == other.name && city == other.city
                 && imageUrl == other.imageUrl)
 
@@ -126,7 +126,7 @@ class Team : TeamEntity,
         return sport == other.sport
     }
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: Team) {
         this.id = updated.id
@@ -158,7 +158,7 @@ class Team : TeamEntity,
     }
 
     override fun compareTo(other: Team): Int =
-            compareValuesBy(this, other, { it.name.toString() }, Team::getId)
+            compareValuesBy(this, other, { it.name.toString() }, Team::id)
 
     override fun hasMajorFields(): Boolean = areNotEmpty(id, name, city, state)
 

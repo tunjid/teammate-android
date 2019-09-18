@@ -41,8 +41,8 @@ import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidbootstrap.view.util.inflate
 
 /**
  * Adapter for [JoinRequestAdapter]
@@ -51,22 +51,22 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 class JoinRequestAdapter(
         private val items: List<Differentiable>,
         listener: AdapterListener
-) : BaseAdapter<InputViewHolder<JoinRequestAdapter.AdapterListener>, JoinRequestAdapter.AdapterListener>(listener) {
+) : BaseAdapter<InputViewHolder, JoinRequestAdapter.AdapterListener>(listener) {
 
     private val chooser: TextInputStyle.InputChooser
 
     init {
-        chooser = Chooser(adapterListener)
+        chooser = Chooser(delegate)
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<AdapterListener> =
-            InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder =
+            InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            delegate as S
 
-    override fun onBindViewHolder(holder: InputViewHolder<AdapterListener>, position: Int) {
+    override fun onBindViewHolder(holder: InputViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
         if (item is Item) holder.bind(chooser[item])
@@ -82,7 +82,7 @@ class JoinRequestAdapter(
         fun canEditRole(): Boolean
     }
 
-    internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
+    internal class Chooser internal constructor(private val delegate: AdapterListener) : TextInputStyle.InputChooser() {
 
         override fun invoke(item: Item): TextInputStyle {
             when (val itemType = item.itemType) {
@@ -98,12 +98,12 @@ class JoinRequestAdapter(
                         Config.getPositions(),
                         Position::name,
                         Position::code,
-                        { adapterListener.canEditRole() },
+                        { delegate.canEditRole() },
                         Item::noInputValidation)
                 else -> return TextInputStyle(
                         Item.noClicks,
                         Item.noClicks,
-                        or<(Item) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item::neverEnabled),
+                        or<(Item) -> Boolean>(itemType == Item.INPUT, { delegate.canEditFields() }, Item::neverEnabled),
                         Item::noInputValidation,
                         Item::noIcon)
             }

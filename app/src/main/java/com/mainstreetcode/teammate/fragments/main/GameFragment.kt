@@ -47,7 +47,6 @@ import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
@@ -90,17 +89,18 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
     override val toolbarTitle: CharSequence get() = getString(R.string.game_stats)
 
-    override val showsFab: Boolean get() = !isBottomSheetShowing && editableStatus.get() && !game.isEnded
+    override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && editableStatus.get() && !game.isEnded
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempGame = arguments!!.getParcelable<Game>(ARG_GAME)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempGame = arguments!!.getParcelable<Game>(ARG_GAME)
 
-        return if (tempGame != null)
-            superResult + "-" + tempGame.hashCode()
-        else
-            superResult
-    }
+            return if (tempGame != null)
+                superResult + "-" + tempGame.hashCode()
+            else
+                superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +120,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.model_list))
                 .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
-                .withAdapter(StatAdapter(items, simpleAdapterListener { showFragment(StatEditFragment.newInstance(it)) }))
+                .withAdapter(StatAdapter(items, simpleAdapterListener { navigator.show(StatEditFragment.newInstance(it)) }))
                 .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withEndlessScroll { fetchStats(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -136,8 +136,8 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
         rootView.findViewById<View>(R.id.home_thumbnail).setOnClickListener { showCompetitor(game.home) }
         rootView.findViewById<View>(R.id.away_thumbnail).setOnClickListener { showCompetitor(game.away) }
-        rootView.findViewById<View>(R.id.score).setOnClickListener { showFragment(GameEditFragment.newInstance(game)) }
-        rootView.findViewById<View>(R.id.date).setOnClickListener { showFragment(EventEditFragment.newInstance(game)) }
+        rootView.findViewById<View>(R.id.score).setOnClickListener { navigator.show(GameEditFragment.newInstance(game)) }
+        rootView.findViewById<View>(R.id.date).setOnClickListener { navigator.show(EventEditFragment.newInstance(game)) }
         rootView.findViewById<AppBarLayout>(R.id.app_bar).apply { AppBarListener(this) { gameViewHolder?.animate(it) } }
 
         return rootView
@@ -152,7 +152,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_end_game -> endGameRequest().let { true }
-        R.id.action_event -> showFragment(EventEditFragment.newInstance(game))
+        R.id.action_event -> navigator.show(EventEditFragment.newInstance(game))
         R.id.action_delete_game -> AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.game_delete_prompt))
                 .setPositiveButton(R.string.yes) { _, _ -> deleteGame() }
@@ -175,17 +175,17 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
-        if (!appeared && isBottomSheetShowing) hideBottomSheet()
+        if (!appeared && bottomSheetDriver.isBottomSheetShowing) bottomSheetDriver.hideBottomSheet()
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.fab) showFragment(StatEditFragment.newInstance(Stat.empty(game)))
+        if (view.id == R.id.fab) navigator.show(StatEditFragment.newInstance(Stat.empty(game)))
     }
 
     override fun onUserClicked(item: User) {
         hideKeyboard()
         refereeChip?.postDelayed({
-            hideBottomSheet()
+            bottomSheetDriver.hideBottomSheet()
             refereeChip?.postDelayed({ addRefereeRequest(item) }, 150)
         }, 200)
     }
@@ -220,7 +220,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     private fun onRemoveRefereeClicked() {
         if (!privilegeStatus.get()) return
         game.referee.update(User.empty())
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         updateGame()
     }
 
@@ -228,14 +228,10 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         val referee = game.referee
         val hasReferee = !referee.isEmpty
 
-        if (hasReferee) showFragment(UserEditFragment.newInstance(referee))
-        else if (privilegeStatus.get()) {
-            val fragment = UserSearchFragment.newInstance()
-            fragment.setTargetFragment(this, R.id.request_user_pick)
-            showBottomSheet(BottomSheetController.Args.builder()
-                    .setMenuRes(R.menu.empty)
-                    .setFragment(fragment)
-                    .build())
+        if (hasReferee) navigator.show(UserEditFragment.newInstance(referee))
+        else if (privilegeStatus.get()) bottomSheetDriver.showBottomSheet {
+            menuRes = R.menu.empty
+            fragment = UserSearchFragment.newInstance().apply { setTargetFragment(this@GameFragment, R.id.request_user_pick) }
         }
     }
 
@@ -245,7 +241,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .setMessage(R.string.game_end_prompt)
                 .setPositiveButton(R.string.yes) { _, _ ->
                     game.isEnded = true
-                    toggleProgress(true)
+                    transientBarDriver.toggleProgress(true)
                     disposables.add(gofer.save().subscribe({ onGameUpdated() }, defaultErrorHandler::invoke))
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
@@ -258,7 +254,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .setMessage(R.string.game_add_referee_prompt)
                 .setPositiveButton(R.string.yes) { _, _ ->
                     game.referee.update(user)
-                    toggleProgress(true)
+                    transientBarDriver.toggleProgress(true)
                     updateGame()
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
@@ -267,32 +263,32 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
     private fun fetchStats(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(statViewModel.getMany(game, fetchLatest).subscribe(this::onStatsFetched, defaultErrorHandler::invoke))
         updateStatuses()
     }
 
     private fun onStatsFetched(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
     }
 
     private fun onGameUpdated() {
         disposables.add(gofer.watchForChange().subscribe({ requireActivity().invalidateOptionsMenu() }, ErrorHandler.EMPTY::invoke))
         gameViewHolder?.bind(game)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         checkCompetitor()
         updateStatuses()
         bindReferee()
     }
 
     private fun respond(accept: Boolean, competitor: Competitor) {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(competitorViewModel.respond(competitor, accept)
                 .subscribe({
                     if (accept) fetchGame()
-                    else toggleProgress(false)
+                    else transientBarDriver.toggleProgress(false)
                 }, defaultErrorHandler::invoke))
     }
 
@@ -301,7 +297,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     }
 
     private fun onGameDeleted() {
-        showSnackbar(getString(R.string.game_deleted))
+        transientBarDriver.showSnackBar(getString(R.string.game_deleted))
         removeEnterExitTransitions()
         requireActivity().onBackPressed()
     }
@@ -310,7 +306,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         if (hasChoiceBar) return
         disposables.add(roleViewModel.hasPendingCompetitor(game).subscribe({ competitor ->
             hasChoiceBar = true
-            showChoices { choiceBar ->
+            transientBarDriver.showChoices { choiceBar ->
                 choiceBar.setText(getString(R.string.game_accept))
                         .setPositiveText(getText(R.string.accept))
                         .setNegativeText(getText(R.string.decline))

@@ -48,6 +48,6 @@ class GuestViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onGuestClicked(model)
+        delegate?.onGuestClicked(model)
     }
 }

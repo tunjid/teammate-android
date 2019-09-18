@@ -52,7 +52,7 @@ open class GuestEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "guest_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "guest_user")
     var user: User
@@ -87,11 +87,9 @@ open class GuestEntity : Parcelable {
         isAttending = `in`.readByte().toInt() != 0x00
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

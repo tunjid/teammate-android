@@ -28,27 +28,30 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-
+import androidx.lifecycle.ViewModelProviders
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
 import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment
 import com.mainstreetcode.teammate.fragments.registration.SplashFragment
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
-import androidx.lifecycle.ViewModelProviders
+import com.tunjid.androidbootstrap.core.components.StackNavigator
+import com.tunjid.androidbootstrap.core.components.stackNavigator
 
-class RegistrationActivity : TeammatesBaseActivity() {
+class RegistrationActivity : TeammatesBaseActivity(R.layout.activity_registration), StackNavigator.NavigationController {
+
+    override val navigator: StackNavigator by stackNavigator(R.id.main_fragment_container)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_registration)
-        toggleToolbar(false)
+
+        uiState = uiState.copy(toolbarShows = false, bottomNavShows = false)
 
         if (savedInstanceState == null) {
             val userViewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
 
             if (userViewModel.isSignedIn)
                 startMainActivity(this)
-            else if (hasNoDeepLink()) showFragment(SplashFragment.newInstance())
+            else if (hasNoDeepLink()) navigator.show(SplashFragment.newInstance())
         }
     }
 
@@ -58,7 +61,7 @@ class RegistrationActivity : TeammatesBaseActivity() {
 
         if (isForgotPasswordDeepLink(data)) {
             val token = data.getQueryParameter(TOKEN)
-            showFragment(ResetPasswordFragment.newInstance(token ?: ""))
+            navigator.show(ResetPasswordFragment.newInstance(token ?: ""))
             return false
         }
         return true
@@ -73,14 +76,9 @@ class RegistrationActivity : TeammatesBaseActivity() {
         return domainMatches && path.contains("forgotPassword")
     }
 
-    override fun toggleToolbar(show: Boolean) {
-        super.toggleToolbar(false)
-    }
-
     companion object {
 
-
-        private val TOKEN = "token"
+        private const val TOKEN = "token"
 
         fun startMainActivity(activity: Activity?) {
             if (activity == null) return
