@@ -8,7 +8,6 @@ buildscript {
         maven { url 'https://maven.google.com' }
         maven { url 'https://oss.jfrog.info/artifactory/oss-snapshot-local' }
 
-        mavenLocal()
         jcenter()
         google()
     }
@@ -28,7 +27,6 @@ allprojects {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' }
         maven { url 'https://oss.jfrog.info/artifactory/oss-snapshot-local' }
-        mavenLocal()
         jcenter()
     }
 }

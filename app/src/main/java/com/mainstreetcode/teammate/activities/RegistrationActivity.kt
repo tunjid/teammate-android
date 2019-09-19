@@ -35,11 +35,11 @@ import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment
 import com.mainstreetcode.teammate.fragments.registration.SplashFragment
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidbootstrap.core.components.StackNavigator
-import com.tunjid.androidbootstrap.core.components.stackNavigator
+import com.tunjid.androidbootstrap.core.components.stackNavigationController
 
 class RegistrationActivity : TeammatesBaseActivity(R.layout.activity_registration), StackNavigator.NavigationController {
 
-    override val navigator: StackNavigator by stackNavigator(R.id.main_fragment_container)
+    override val navigator: StackNavigator by stackNavigationController(R.id.main_fragment_container)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
