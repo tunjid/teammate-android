@@ -49,7 +49,7 @@ import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.tunjid.androidbootstrap.core.components.StackNavigator
-import com.tunjid.androidbootstrap.core.components.activityStackNavigator
+import com.tunjid.androidbootstrap.core.components.activityNavigationController
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
@@ -69,7 +69,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
 
     override var uiState: UiState by activityGlobalUiController()
 
-    override val navigator: StackNavigator by activityStackNavigator()
+    override val navigator: StackNavigator by activityNavigationController()
 
     override val transientBarDriver: TransientBarDriver
         get() = requireActivity().run { (this as TransientBarController).transientBarDriver }
