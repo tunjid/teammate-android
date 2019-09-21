@@ -69,7 +69,7 @@ import kotlin.math.abs
  * Class for Fragments in [com.mainstreetcode.teammate.activities.MainActivity]
  */
 
-open class MainActivityFragment : TeammatesBaseFragment(), BottomSheetController {
+open class MainActivityFragment(layoutRes: Int = 0) : TeammatesBaseFragment(layoutRes), BottomSheetController {
 
     protected val feedViewModel by activityViewModels<FeedViewModel>()
     protected val roleViewModel by activityViewModels<RoleViewModel>()

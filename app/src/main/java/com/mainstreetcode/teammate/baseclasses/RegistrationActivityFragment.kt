@@ -36,7 +36,7 @@ import com.mainstreetcode.teammate.viewmodel.UserViewModel
  * Created by Shemanigans on 6/3/17.
  */
 
-abstract class RegistrationActivityFragment : TeammatesBaseFragment() {
+abstract class RegistrationActivityFragment(layoutRes: Int = 0) : TeammatesBaseFragment(layoutRes) {
 
     protected lateinit var viewModel: UserViewModel
 
