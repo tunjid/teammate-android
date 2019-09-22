@@ -25,12 +25,8 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -50,18 +46,10 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [events][com.mainstreetcode.teammate.model.Event]
  */
 
-class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener {
+class EventsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), EventAdapter.EventAdapterListener {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
-
-    override val toolbarMenu: Int get() = R.menu.fragment_events
-
-    override val fabStringResource: Int @StringRes get() = R.string.event_add
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.events_title, team.name)
 
     override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole()
 
@@ -80,14 +68,20 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
         items = eventViewModel.getModelList(team)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolBarMenu = R.menu.fragment_events,
+                toolbarTitle = getString(R.string.events_title, team.name),
+                fabText = R.string.event_add,
+                fabIcon = R.drawable.ic_add_white_24dp,
+                fabShows = showsFab
+        )
 
         val refreshAction = { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_event_white_24dp, R.string.no_events))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
@@ -95,14 +89,12 @@ class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener
                 .withAdapter(EventAdapter(items, this))
                 .withLinearLayoutManager()
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {
         super.onResume()
         fetchEvents(true)
-        watchForRoleChanges(team, this::togglePersistentUi)
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

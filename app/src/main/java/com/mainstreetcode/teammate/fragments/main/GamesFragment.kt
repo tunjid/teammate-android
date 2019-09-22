@@ -25,12 +25,8 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -54,18 +50,10 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [tournaments][Event]
  */
 
-class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
+class GamesFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), GameAdapter.AdapterListener {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
-
-    override val fabStringResource: Int @StringRes get() = R.string.game_add
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_tournaments
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.games)
 
     override val stableTag: String
         get() {
@@ -82,14 +70,19 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         items = gameViewModel.getModelList(team)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.games),
+                toolBarMenu = R.menu.fragment_tournaments,
+                fabText = R.string.game_add,
+                fabIcon = R.drawable.ic_add_white_24dp
+        )
 
         val refreshAction = { disposables.add(gameViewModel.refresh(team).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_score_white_24dp, R.string.no_games))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_score_white_24dp, R.string.no_games))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchGames(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
@@ -97,14 +90,12 @@ class GamesFragment : MainActivityFragment(), GameAdapter.AdapterListener {
                 .withAdapter(GameAdapter(items, this))
                 .withLinearLayoutManager()
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {
         super.onResume()
         fetchGames(true)
-        watchForRoleChanges(team, this::togglePersistentUi)
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {

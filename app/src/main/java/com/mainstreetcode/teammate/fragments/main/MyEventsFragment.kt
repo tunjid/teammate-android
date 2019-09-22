@@ -26,9 +26,7 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
@@ -47,14 +45,11 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [events][Event]
  */
 
-class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener {
+class MyEventsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+        EventAdapter.EventAdapterListener {
 
     private lateinit var items: List<Differentiable>
     private lateinit var myEventsViewModel: MyEventsViewModel
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.attending_events)
-
-    override val showsFab: Boolean get() = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -66,25 +61,25 @@ class MyEventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListen
         items = myEventsViewModel.getModelList(Event::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.attending_events)
+        )
 
         val refreshAction = {
             disposables.add(myEventsViewModel.refresh(Event::class.java)
                     .subscribe(this::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(EventAdapter(items, this))
                 .withLinearLayoutManager()
                 .build()
-
-        return root
     }
 
     override fun onResume() {

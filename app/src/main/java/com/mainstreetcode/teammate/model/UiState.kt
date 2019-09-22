@@ -28,13 +28,12 @@ import android.graphics.Color
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 
 
 data class UiState(
-        @param:IdRes @field:DrawableRes @get:DrawableRes val fabIcon: Int,
+        @param:DrawableRes @field:DrawableRes @get:DrawableRes val fabIcon: Int,
         @param:StringRes @field:StringRes @get:StringRes val fabText: Int,
         val fabShows: Boolean,
         val fabExtended: Boolean,

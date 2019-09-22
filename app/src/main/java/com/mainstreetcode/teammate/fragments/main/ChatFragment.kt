@@ -29,26 +29,25 @@ import android.text.Editable
 import android.text.TextUtils.isEmpty
 import android.text.TextWatcher
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING
+import com.google.android.material.chip.Chip
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamChatAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.databinding.FragmentChatBinding
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Team
@@ -61,7 +60,9 @@ import com.tunjid.androidbootstrap.view.animator.ViewHider
 import io.reactivex.disposables.Disposable
 import kotlin.math.abs
 
-class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, TeamChatAdapter.ChatAdapterListener {
+class ChatFragment : MainActivityFragment(R.layout.fragment_chat),
+        TextView.OnEditorActionListener,
+        TeamChatAdapter.ChatAdapterListener {
 
     private var wasScrolling: Boolean = false
     private var unreadCount: Int = 0
@@ -71,28 +72,23 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
     private lateinit var chatDisposable: Disposable
 
     private var deferrer: Deferrer? = null
-    private var dateHider: ViewHider<TextView>? = null
-    private var newMessageHider: ViewHider<TextView>? = null
-
-    override val toolbarMenu: Int get() = R.menu.fragment_chat
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.team_chat_title, team.name)
+    private var dateHider: ViewHider<Chip>? = null
+    private var newMessageHider: ViewHider<Chip>? = null
 
     private val isSubscribedToChat: Boolean get() = ::chatDisposable.isInitialized && !chatDisposable.isDisposed
-
-    override val showsFab: Boolean get() = false
 
     override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
 
-    override val stableTag: String 
-        get() {val superResult = super.stableTag
-        val team = arguments?.getParcelable<Team>(ARG_TEAM)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val team = arguments?.getParcelable<Team>(ARG_TEAM)
 
-        return if (team != null) superResult + "-" + team.hashCode()
-        else superResult
-    }
+            return if (team != null) superResult + "-" + team.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,35 +96,38 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         items = chatViewModel.getModelList(team)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_chat, container, false)
-        val refresh = root.findViewById<SwipeRefreshLayout>(R.id.refresh_layout)
-        val input = root.findViewById<EditText>(R.id.input)
-        val send = root.findViewById<View>(R.id.send)
-        root.findViewById<View>(R.id.footer_background)?.setMaterialOverlay()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentChatBinding.bind(view).run {
 
-        dateHider = ViewHider.of(root.findViewById<TextView>(R.id.date)).setDirection(ViewHider.TOP).build()
-        newMessageHider = ViewHider.of(root.findViewById<TextView>(R.id.new_messages)).setDirection(ViewHider.BOTTOM).build()
+        defaultUi(
+                toolbarTitle = getString(R.string.team_chat_title, team.name),
+                toolBarMenu = R.menu.fragment_chat,
+                fabShows = false
+        )
+
+        footerBackground.setMaterialOverlay()
+
+        dateHider = ViewHider.of(date).setDirection(ViewHider.TOP).build()
+        newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build()
 
         deferrer = Deferrer(2000) { dateHider?.hide() }
 
-        scrollManager = ScrollManager.with<TeamChatViewHolder>(root.findViewById(R.id.chat))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_message_black_24dp, R.string.no_chats))
+        scrollManager = ScrollManager.with<TeamChatViewHolder>(view.findViewById(R.id.chat))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_message_black_24dp, R.string.no_chats))
                 .onLayoutManager { layoutManager -> (layoutManager as LinearLayoutManager).stackFromEnd = true }
-                .withAdapter(TeamChatAdapter(items, userViewModel.currentUser, this))
+                .withAdapter(TeamChatAdapter(items, userViewModel.currentUser, this@ChatFragment))
                 .withEndlessScroll { fetchChatsBefore(false) }
-                .withRefreshLayout(refresh) { refresh.isRefreshing = false }
+                .withRefreshLayout(refreshLayout) { refreshLayout.isRefreshing = false }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
-                .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addStateListener(this::onScrollStateChanged)
-                .addScrollListener(this::onScroll)
+                .withInconsistencyHandler(this@ChatFragment::onInconsistencyDetected)
+                .addStateListener(this@ChatFragment::onScrollStateChanged)
+                .addScrollListener(this@ChatFragment::onScroll)
                 .withLinearLayoutManager()
                 .build()
 
         newMessageHider?.view?.setOnClickListener { scrollManager.withRecyclerView { rv -> rv.smoothScrollToPosition(items.size - 1) } }
         dateHider?.view?.setOnClickListener { dateHider?.hide() }
         send.setOnClickListener { sendChat(input) }
-        input.setOnEditorActionListener(this)
+        input.setOnEditorActionListener(this@ChatFragment)
         input.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
@@ -141,7 +140,8 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
 
         newMessageHider?.hide()
         dateHider?.hide()
-        return root
+
+        Unit
     }
 
     override fun onResume() {

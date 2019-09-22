@@ -25,11 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -53,18 +49,15 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
  * Edits a Team member
  */
 
-class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, TeamAdapter.AdapterListener, GameEditAdapter.AdapterListener {
+class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener,
+        GameEditAdapter.AdapterListener {
 
     override lateinit var headeredModel: Game
         private set
 
     private lateinit var gofer: GameGofer
-
-    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.game_create else R.string.game_update
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(if (headeredModel.isEmpty) R.string.game_add else R.string.game_edit)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
@@ -72,9 +65,7 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
 
     override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
-    override val stableTag: String
-        get() =
-            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_GAME)!!)
+    override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_GAME)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,11 +73,16 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
         gofer = gameViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(if (headeredModel.isEmpty) R.string.game_add else R.string.game_edit),
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = if (headeredModel.isEmpty) R.string.game_create else R.string.game_update,
+                fabShows = showsFab
+        )
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(GameEditAdapter(gofer.items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
@@ -94,7 +90,6 @@ class GameEditFragment : HeaderedFragment<Game>(), UserAdapter.AdapterListener, 
                 .build()
 
         scrollManager.recyclerView?.requestFocus()
-        return rootView
     }
 
     override fun onResume() {

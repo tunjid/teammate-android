@@ -28,13 +28,9 @@ import android.content.Intent
 import android.location.Address
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -58,20 +54,14 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
  * Edits a Team member
  */
 
-class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditAdapterListener, AddressPickerFragment.AddressPicker {
+class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
+        EventEditAdapter.EventEditAdapterListener,
+        AddressPickerFragment.AddressPicker {
 
     override lateinit var headeredModel: Event
         private set
 
     private lateinit var gofer: EventGofer
-
-    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_event_edit
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
@@ -107,11 +97,17 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         gofer = eventViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle =  gofer.getToolbarTitle(this),
+                toolBarMenu = R.menu.fragment_event_edit,
+                fabShows = false,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
+        )
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(EventEditAdapter(gofer.items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
@@ -121,7 +117,6 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
                 .build()
 
         scrollManager.recyclerView?.requestFocus()
-        return rootView
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -175,6 +170,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
             transientBarDriver.toggleProgress(true)
             disposables.add(gofer.save().subscribe({ diffResult ->
                 val stringRes = if (wasEmpty) R.string.added_user else R.string.updated_user
+                updateUi(fabText = R.string.event_update)
                 onModelUpdated(diffResult)
                 transientBarDriver.showSnackBar(getString(stringRes, headeredModel.name))
             }, defaultErrorHandler::invoke))

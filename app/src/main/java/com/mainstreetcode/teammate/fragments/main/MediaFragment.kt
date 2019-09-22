@@ -26,13 +26,9 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -51,34 +47,18 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import java.util.concurrent.atomic.AtomicBoolean
 
-class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener, ImageWorkerFragment.MediaListener, ImageWorkerFragment.DownloadRequester {
+class MediaFragment : MainActivityFragment(R.layout.fragment_media),
+        MediaAdapter.MediaAdapterListener,
+        ImageWorkerFragment.MediaListener,
+        ImageWorkerFragment.DownloadRequester {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
-    private val bottomBarState: AtomicBoolean = AtomicBoolean()
-    private val altToolBarState: AtomicBoolean = AtomicBoolean()
-
-    override val fabStringResource: Int @StringRes get() = R.string.media_add
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
-
-    override val altToolbarMenu: Int get() = R.menu.fragment_media_context
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.media_title, team.name)
-
-    override val altToolbarTitle: CharSequence get() = getString(R.string.multi_select, mediaViewModel.getNumSelected(team))
-
-    override val toolbarMenu: Int get() = R.menu.fragment_media
 
     override val isFullScreen: Boolean get() = false
 
     override val showsFab: Boolean get() = true
-
-    override val showsAltToolBar: Boolean get() = altToolBarState.get()
-
-    override val showsBottomNav: Boolean get() = bottomBarState.get()
 
     override val stableTag: String
         get() {
@@ -108,24 +88,28 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_media, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.media_title, team.name),
+                toolBarMenu = R.menu.fragment_media,
+                altToolbarTitle = getString(R.string.multi_select, mediaViewModel.getNumSelected(team)),
+                altToolBarMenu = R.menu.fragment_media_context,
+                fabText = R.string.media_add,
+                fabIcon = R.drawable.ic_add_white_24dp,
+                fabShows = showsFab
+        )
 
         val refreshAction = { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.team_media))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_video_library_black_24dp, R.string.no_media))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.team_media))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_video_library_black_24dp, R.string.no_media))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchMedia(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(MediaAdapter(items, this))
                 .withGridLayoutManager(4)
                 .build()
-
-        bottomBarState.set(true)
-
-        return root
     }
 
     override fun onResume() {
@@ -180,8 +164,7 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         if (mediaViewModel.hasSelections(team))
             longClickMedia(item)
         else {
-            bottomBarState.set(false)
-            togglePersistentUi()
+            updateUi(bottomNavShows = false)
             navigator.show(MediaDetailFragment.newInstance(item))
         }
     }
@@ -211,10 +194,10 @@ class MediaFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener,
         transientBarDriver.toggleProgress(false)
     }
 
-    private fun toggleContextMenu(show: Boolean) {
-        altToolBarState.set(show)
-        togglePersistentUi()
-    }
+    private fun toggleContextMenu(show: Boolean) = updateUi(
+            altToolBarShows = show,
+            altToolbarTitle = getString(R.string.multi_select, mediaViewModel.getNumSelected(team))
+    )
 
     private fun longClickMedia(media: Media) {
         val holder = scrollManager.findViewHolderForItemId(media.hashCode().toLong()) as? MediaViewHolder<*>

@@ -26,87 +26,74 @@ package com.mainstreetcode.teammate.fragments.registration
 
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.RegistrationActivity
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.databinding.FragmentSignInBinding
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.hasValidPassword
+import com.mainstreetcode.teammate.util.input
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionListener {
+class SignInFragment : RegistrationActivityFragment(R.layout.fragment_sign_in), TextView.OnEditorActionListener {
 
-    private var emailInput: EditText? = null
-    private var passwordInput: EditText? = null
+    private var binding: FragmentSignInBinding? = null
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.submit
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+        defaultUi(
+                fabText = R.string.submit,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = true,
+                toolbarShows = false,
+                bottomNavShows = false,
+                navBarColor = GRASS_COLOR
+        )
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.sign_in)
+        binding = FragmentSignInBinding.bind(view).apply {
+            cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
+            password.transitionName = SplashFragment.TRANSITION_SUBTITLE
+            email.transitionName = SplashFragment.TRANSITION_TITLE
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_sign_in, container, false)
-        val border = rootView.findViewById<View>(R.id.card_view_wrapper)
-        emailInput = rootView.findViewById(R.id.email)
-        passwordInput = rootView.findViewById(R.id.password)
+            password.setOnEditorActionListener(this@SignInFragment)
+            forgotPassword.setOnClickListener(this@SignInFragment)
 
-        rootView.findViewById<View>(R.id.forgot_password).setOnClickListener(this)
-        passwordInput!!.setOnEditorActionListener(this)
-
-        ViewCompat.setTransitionName(emailInput!!, SplashFragment.TRANSITION_TITLE)
-        ViewCompat.setTransitionName(passwordInput!!, SplashFragment.TRANSITION_SUBTITLE)
-        ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND)
-
-        disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
-            rootView.findViewById<View>(R.id.email_wrapper).visibility = View.VISIBLE
-            rootView.findViewById<View>(R.id.password_wrapper).visibility = View.VISIBLE
-        }, ErrorHandler.EMPTY::invoke))
-
-        return rootView
+            disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
+                emailWrapper.visibility = View.VISIBLE
+                passwordWrapper.visibility = View.VISIBLE
+            }, ErrorHandler.EMPTY::invoke))
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        emailInput = null
-        passwordInput = null
+        binding = null
     }
 
-    override val showsFab: Boolean
-        get() {
-            return true
-        }
-
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
+        val binding = this.binding ?: return
+
         if (view != null && incomingFragment is ForgotPasswordFragment) transaction
-                .addSharedElement(emailInput!!, SplashFragment.TRANSITION_TITLE)
-                .addSharedElement(view!!.findViewById(R.id.card_view_wrapper), SplashFragment.TRANSITION_BACKGROUND)
+                .addSharedElement(binding.email, SplashFragment.TRANSITION_TITLE)
+                .addSharedElement(binding.cardViewWrapper, SplashFragment.TRANSITION_BACKGROUND)
         else super.augmentTransaction(transaction, incomingFragment)
     }
 
     override fun onClick(view: View) {
+        val binding = this.binding ?: return
         when (view.id) {
             R.id.fab -> signIn()
-            R.id.forgot_password -> navigator.show(ForgotPasswordFragment.newInstance(emailInput!!.text))
+            R.id.forgot_password -> navigator.show(ForgotPasswordFragment.newInstance(binding.email.input))
         }
     }
 
@@ -116,11 +103,13 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun signIn() {
-        if (emailInput.hasValidEmail && passwordInput.hasValidPassword) {
+        val binding = this.binding ?: return
+
+        if (binding.email.hasValidEmail && binding.password.hasValidPassword) {
             transientBarDriver.toggleProgress(true)
 
-            val email = emailInput!!.text.toString()
-            val password = passwordInput!!.text.toString()
+            val email = binding.email.input.toString()
+            val password = binding.password.input.toString()
 
             disposables.add(viewModel.signIn(email, password)
                     .subscribe({ onSignIn() }, defaultErrorHandler::invoke)

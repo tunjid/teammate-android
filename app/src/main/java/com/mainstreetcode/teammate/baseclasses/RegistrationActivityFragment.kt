@@ -40,19 +40,11 @@ abstract class RegistrationActivityFragment(layoutRes: Int = 0) : TeammatesBaseF
 
     protected lateinit var viewModel: UserViewModel
 
-    override val navBarColor: Int
-        get() = GRASS_COLOR
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
     }
 
-    override val hasLightNavBar: Boolean
-        get() = false
 
-    companion object {
-        private const val GRASS_COLOR = -0x6c44af
-    }
 }

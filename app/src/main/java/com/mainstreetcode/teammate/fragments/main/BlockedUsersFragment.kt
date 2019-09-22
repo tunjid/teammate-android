@@ -25,9 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -46,16 +44,10 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [events][BlockedUser]
  */
 
-class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdapterListener {
+class BlockedUsersFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), BlockedUserAdapter.UserAdapterListener {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
-
-    override val toolbarMenu: Int get() = R.menu.fragment_events
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.blocked_users_title, team.name)
-
-    override val showsFab: Boolean get() = false
 
     override val stableTag: String
         get() {
@@ -72,25 +64,27 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
         items = blockedUserViewModel.getModelList(team)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.blocked_users_title, team.name),
+                toolBarMenu = R.menu.fragment_events,
+                fabShows = showsFab
+        )
 
         val refreshAction = {
             disposables.add(blockedUserViewModel.refresh(team)
                     .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchBlockedUsers(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withAdapter(BlockedUserAdapter(items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withGridLayoutManager(2)
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {

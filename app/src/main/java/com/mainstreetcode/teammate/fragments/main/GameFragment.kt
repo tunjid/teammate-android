@@ -27,18 +27,12 @@ package com.mainstreetcode.teammate.fragments.main
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.TransitionManager
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameAdapter
@@ -48,6 +42,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.databinding.FragmentGameBinding
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
@@ -68,7 +63,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Lists [games][Event]
  */
 
-class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
+class GameFragment : MainActivityFragment(R.layout.fragment_game), UserAdapter.AdapterListener {
 
     private lateinit var game: Game
     private lateinit var items: List<Differentiable>
@@ -77,17 +72,9 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     private val editableStatus: AtomicBoolean = AtomicBoolean()
     private val privilegeStatus: AtomicBoolean = AtomicBoolean()
     private var gameViewHolder: GameViewHolder? = null
+    private var binding: FragmentGameBinding? = null
 
     private lateinit var gofer: GameGofer
-    private var refereeChip: Chip? = null
-
-    override val fabStringResource: Int @StringRes get() = R.string.stat_add
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_game
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.game_stats)
 
     override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && editableStatus.get() && !game.isEnded
 
@@ -96,10 +83,8 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
             val superResult = super.stableTag
             val tempGame = arguments!!.getParcelable<Game>(ARG_GAME)
 
-            return if (tempGame != null)
-                superResult + "-" + tempGame.hashCode()
-            else
-                superResult
+            return if (tempGame != null) superResult + "-" + tempGame.hashCode()
+            else superResult
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,36 +96,40 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         gofer = gameViewModel.gofer(game)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_game, container, false)
-        val appBar = rootView.findViewById<View>(R.id.app_bar)
-        refereeChip = rootView.findViewById(R.id.referee_chip)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentGameBinding.bind(view).run {
+        defaultUi(
+                toolbarTitle = getString(R.string.game_stats),
+                toolBarMenu = R.menu.fragment_game,
+                fabText = R.string.stat_add,
+                fabIcon = R.drawable.ic_add_white_24dp
+        )
+
         gameViewHolder = GameViewHolder(appBar, GameAdapter.AdapterListener.asSAM { })
         gameViewHolder?.bind(game)
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_stat_white_24dp, R.string.no_stats))
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.model_list))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_stat_white_24dp, R.string.no_stats))
                 .withAdapter(StatAdapter(items, simpleAdapterListener { navigator.show(StatEditFragment.newInstance(it)) }))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this@GameFragment.refresh() }
                 .withEndlessScroll { fetchStats(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withInconsistencyHandler(this@GameFragment::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()
 
         scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint)
 
-        refereeChip?.setCloseIconResource(R.drawable.ic_close_24dp)
-        refereeChip?.setOnCloseIconClickListener { onRemoveRefereeClicked() }
-        refereeChip?.setOnClickListener { onRefereeClicked() }
+        refereeChip.setCloseIconResource(R.drawable.ic_close_24dp)
+        refereeChip.setOnCloseIconClickListener { onRemoveRefereeClicked() }
+        refereeChip.setOnClickListener { onRefereeClicked() }
 
-        rootView.findViewById<View>(R.id.home_thumbnail).setOnClickListener { showCompetitor(game.home) }
-        rootView.findViewById<View>(R.id.away_thumbnail).setOnClickListener { showCompetitor(game.away) }
-        rootView.findViewById<View>(R.id.score).setOnClickListener { navigator.show(GameEditFragment.newInstance(game)) }
-        rootView.findViewById<View>(R.id.date).setOnClickListener { navigator.show(EventEditFragment.newInstance(game)) }
-        rootView.findViewById<AppBarLayout>(R.id.app_bar).apply { AppBarListener(this) { gameViewHolder?.animate(it) } }
+        homeThumbnail.setOnClickListener { showCompetitor(game.home) }
+        awayThumbnail.setOnClickListener { showCompetitor(game.away) }
+        score.setOnClickListener { navigator.show(GameEditFragment.newInstance(game)) }
+        date.setOnClickListener { navigator.show(EventEditFragment.newInstance(game)) }
+        appBar.apply { AppBarListener(this) { gameViewHolder?.animate(it) } }
 
-        return rootView
+        binding = this
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -170,7 +159,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
     override fun onDestroyView() {
         super.onDestroyView()
         gameViewHolder = null
-        refereeChip = null
+        binding = null
     }
 
     override fun onKeyBoardChanged(appeared: Boolean) {
@@ -184,9 +173,9 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
 
     override fun onUserClicked(item: User) {
         hideKeyboard()
-        refereeChip?.postDelayed({
+        binding?.refereeChip?.postDelayed({
             bottomSheetDriver.hideBottomSheet()
-            refereeChip?.postDelayed({ addRefereeRequest(item) }, 150)
+            binding?.refereeChip?.postDelayed({ addRefereeRequest(item) }, 150)
         }, 200)
     }
 
@@ -208,7 +197,7 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
                 .subscribe(privilegeStatus::set, defaultErrorHandler::invoke))
 
         disposables.add(statViewModel.canEditGameStats(game).doOnSuccess(editableStatus::set)
-                .subscribe({ togglePersistentUi() }, defaultErrorHandler::invoke))
+                .subscribe({ updateUi(fabShows = showsFab) }, defaultErrorHandler::invoke))
 
         when {
             game.competitorsDeclined() -> scrollManager.updateForEmptyList(ListState(R.drawable.ic_stat_white_24dp, R.string.no_competitor_declined))
@@ -321,15 +310,13 @@ class GameFragment : MainActivityFragment(), UserAdapter.AdapterListener {
         }, ErrorHandler.EMPTY::invoke))
     }
 
-    private fun bindReferee() {
-        val root = view as? ViewGroup ?: return
-
+    private fun bindReferee() = binding?.apply {
         val size = resources.getDimensionPixelSize(R.dimen.double_margin)
         val referee = game.referee
-        TransitionManager.beginDelayedTransition(root, AutoTransition().addTarget(refereeChip))
+        TransitionManager.beginDelayedTransition(innerCoordinator, AutoTransition().addTarget(refereeChip))
 
-        refereeChip?.isCloseIconVisible = !referee.isEmpty && privilegeStatus.get()
-        refereeChip?.text = when {
+        refereeChip.isCloseIconVisible = !referee.isEmpty && privilegeStatus.get()
+        refereeChip.text = when {
             referee.isEmpty -> getString(when {
                 privilegeStatus.get() && !game.isEnded -> R.string.game_choose_referee
                 else -> R.string.game_no_referee

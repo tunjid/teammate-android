@@ -25,9 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
@@ -45,21 +43,14 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Searches for teams
  */
 
-class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
+class TeamsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+        TeamAdapter.AdapterListener {
 
     private lateinit var roles: List<Differentiable>
-
-    override val fabStringResource: Int @StringRes get() = R.string.team_search_create
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_search_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.my_teams)
 
     private val isTeamPicker: Boolean get() = targetRequestCode != 0
 
     override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
-    override val showsBottomNav: Boolean get() = true
 
     override val showsFab: Boolean get() = !isTeamPicker || roles.isEmpty()
 
@@ -84,34 +75,40 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
             else -> R.string.no_team
         }
 
-    override val stableTag: String 
-        get() {var superResult = super.stableTag
-        val target = targetFragment
-        if (target != null) superResult += "-" + target.tag + "-" + targetRequestCode
-        return superResult
-    }
+    override val stableTag: String
+        get() {
+            var superResult = super.stableTag
+            val target = targetFragment
+            if (target != null) superResult += "-" + target.tag + "-" + targetRequestCode
+            return superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         roles = roleViewModel.getModelList(Role::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.my_teams),
+                fabIcon = R.drawable.ic_search_white_24dp,
+                fabText = R.string.team_search_create,
+                fabShows = showsFab
+        )
+        val refreshAction = {
+            disposables.add(roleViewModel.refresh(Role::class.java)
+                    .subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)).let { Unit }
+        }
 
-        val refreshAction = { disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)).let { Unit } }
-
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, emptyDrawable, emptyText))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, emptyDrawable, emptyText))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(TeamAdapter(roles, this))
                 .withStaggeredGridLayoutManager(2)
                 .build()
-
-        return root
     }
 
     override fun onResume() {
@@ -145,7 +142,7 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
 
     private fun onTeamsUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        togglePersistentUi()
+        updateUi(fabShows = showsFab)
     }
 
     companion object {

@@ -25,10 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.annotation.StringRes
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameAdapter
@@ -38,6 +35,7 @@ import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.databinding.FragmentHeadToHeadBinding
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.HeadToHead
@@ -50,7 +48,7 @@ import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-class HeadToHeadFragment : MainActivityFragment(),
+class HeadToHeadFragment : MainActivityFragment(R.layout.fragment_head_to_head),
         UserAdapter.AdapterListener,
         TeamAdapter.AdapterListener,
         HeadToHeadRequestAdapter.AdapterListener {
@@ -60,14 +58,9 @@ class HeadToHeadFragment : MainActivityFragment(),
 
     private var expandingToolbar: ExpandingToolbar? = null
     private var searchScrollManager: ScrollManager<*>? = null
-
-    private var wins: TextView? = null
-    private var draws: TextView? = null
-    private var losses: TextView? = null
+    private var binding: FragmentHeadToHeadBinding? = null
 
     private lateinit var matchUps: List<Differentiable>
-
-    override val showsToolBar: Boolean get() = false
 
     override val showsFab: Boolean get() = false
 
@@ -77,29 +70,28 @@ class HeadToHeadFragment : MainActivityFragment(),
         matchUps = gameViewModel.headToHeadMatchUps
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_head_to_head, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentHeadToHeadBinding.bind(view).run {
+        defaultUi(
+                toolbarShows = false,
+                fabShows = showsFab
+        )
 
-        wins = root.findViewById(R.id.wins)
-        draws = root.findViewById(R.id.draws)
-        losses = root.findViewById(R.id.losses)
-
-        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.search_options))
-                .withAdapter(HeadToHeadRequestAdapter(request, this))
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
+                .withAdapter(HeadToHeadRequestAdapter(request, this@HeadToHeadFragment))
+                .withInconsistencyHandler(this@HeadToHeadFragment::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
                 .withAdapter(GameAdapter(matchUps, GameAdapter.AdapterListener.asSAM { game -> navigator.show(GameFragment.newInstance(game)) }))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.fetchMatchUps() }
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this@HeadToHeadFragment.fetchMatchUps() }
+                .withInconsistencyHandler(this@HeadToHeadFragment::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()
 
-        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper)) { this.fetchMatchUps() }
+        expandingToolbar = ExpandingToolbar.create(cardViewWrapper.cardViewWrapper) { this@HeadToHeadFragment.fetchMatchUps() }
         expandingToolbar?.setTitleIcon(false)
         expandingToolbar?.setTitle(R.string.game_head_to_head_params)
 
@@ -108,15 +100,13 @@ class HeadToHeadFragment : MainActivityFragment(),
         updateHeadToHead(0, 0, 0)
         if (!restoredFromBackStack) expandingToolbar?.changeVisibility(false)
 
-        return root
+        binding = this
     }
 
     override fun onDestroyView() {
         expandingToolbar = null
         searchScrollManager = null
-        losses = null
-        draws = null
-        wins = null
+        binding = null
         super.onDestroyView()
     }
 
@@ -148,10 +138,10 @@ class HeadToHeadFragment : MainActivityFragment(),
         }, defaultErrorHandler::invoke))
     }
 
-    private fun updateHeadToHead(numWins: Int, numDraws: Int, numLosses: Int) {
-        wins?.text = getText(R.string.game_wins, numWins)
-        draws?.text = getText(R.string.game_draws, numDraws)
-        losses?.text = getText(R.string.game_losses, numLosses)
+    private fun updateHeadToHead(numWins: Int, numDraws: Int, numLosses: Int) = binding?.apply {
+        wins.text = getText(R.string.game_wins, numWins)
+        draws.text = getText(R.string.game_draws, numDraws)
+        losses.text = getText(R.string.game_losses, numLosses)
     }
 
     private fun updateCompetitor(item: Competitive) {
@@ -161,7 +151,7 @@ class HeadToHeadFragment : MainActivityFragment(),
         hideKeyboard()
     }
 
-    private fun findCompetitor() = bottomSheetDriver.showBottomSheet  {
+    private fun findCompetitor() = bottomSheetDriver.showBottomSheet {
         if (request.hasInvalidType()) return@showBottomSheet transientBarDriver.showSnackBar(getString(R.string.game_select_tournament_type))
 
         val refPath = request.refPath

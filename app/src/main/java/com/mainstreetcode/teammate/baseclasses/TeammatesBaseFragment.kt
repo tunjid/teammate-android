@@ -28,6 +28,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
+import android.os.Bundle
 import android.transition.ChangeBounds
 import android.transition.ChangeImageTransform
 import android.transition.ChangeTransform
@@ -52,6 +53,7 @@ import com.tunjid.androidbootstrap.core.components.StackNavigator
 import com.tunjid.androidbootstrap.core.components.activityNavigationController
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.abs
 
 /**
@@ -67,7 +69,16 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         StackNavigator.TransactionModifier,
         StackNavigator.NavigationController {
 
-    override var uiState: UiState by activityGlobalUiController()
+    private var lastSetUiState: AtomicReference<UiState> = AtomicReference()
+
+    private var activityUiState by activityGlobalUiController()
+
+    override var uiState: UiState
+        get() = activityUiState
+        set(value) {
+            activityUiState = value
+            lastSetUiState.set(value)
+        }
 
     override val navigator: StackNavigator by activityNavigationController()
 
@@ -85,36 +96,6 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
 
     protected lateinit var defaultErrorHandler: ErrorHandler
 
-    protected open val fabStringResource: Int @StringRes get() = R.string.empty_string
-
-    protected open val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
-
-    protected open val toolbarMenu: Int @MenuRes get() = 0
-
-    protected open val altToolbarMenu: Int @MenuRes get() = 0
-
-    protected open val navBarColor: Int @ColorInt get() = if (SDK_INT >= O) requireActivity().resolveThemeColor(R.attr.nav_bar_color) else Color.BLACK
-
-    protected open val toolbarTitle: CharSequence get() = ""
-
-    protected open val altToolbarTitle: CharSequence get() = ""
-
-    override val insetFlags: InsetFlags get() = InsetFlags.ALL
-
-    open val staticViews: IntArray get() = intArrayOf()
-
-    open val showsFab: Boolean get() = false
-
-    open val showsToolBar: Boolean get() = true
-
-    open val showsAltToolBar: Boolean get() = false
-
-    open val showsBottomNav: Boolean get() = true
-
-    protected open val showsSystemUI: Boolean get() = true
-
-    protected open val hasLightNavBar: Boolean get() = SDK_INT >= O
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         defaultErrorHandler = ErrorHandler.builder()
@@ -125,7 +106,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
 
     override fun onResume() {
         super.onResume()
-        if (view != null) togglePersistentUi()
+        if (view != null) updateUi(fabShows = showsFab)
     }
 
     override fun onPause() {
@@ -133,10 +114,15 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         super.onPause()
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        updateUi(fabClickListener = this)
+    }
+
     override fun onDestroyView() {
         disposables.clear()
         restoredFromBackStack = true
-        if (uiState.fabClickListener == this) uiState = uiState.copy(fabClickListener = null)
+        if (uiState.fabClickListener === this) updateUi(fabClickListener = null)
         super.onDestroyView()
     }
 
@@ -176,21 +162,94 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     override fun onKeyBoardChanged(appeared: Boolean) = Unit
 
     open fun togglePersistentUi() {
+        lastSetUiState.get()?.apply { uiState = this }
+    }
+
+    protected open val altToolbarTitle: CharSequence get() = ""
+
+    override val insetFlags: InsetFlags get() = InsetFlags.ALL
+
+    open val staticViews: IntArray get() = intArrayOf()
+
+    open val showsFab: Boolean get() = false
+
+    protected fun defaultUi(
+            @DrawableRes fabIcon: Int = uiState.fabIcon,
+            @StringRes fabText: Int = uiState.fabText,
+            fabShows: Boolean = false,
+            fabExtended: Boolean = uiState.fabExtended,
+            @MenuRes toolBarMenu: Int = 0,
+            toolbarShows: Boolean = true,
+            toolbarInvalidated: Boolean = false,
+            toolbarTitle: CharSequence = "",
+            @MenuRes altToolBarMenu: Int = 0,
+            altToolBarShows: Boolean = false,
+            altToolbarInvalidated: Boolean = false,
+            altToolbarTitle: CharSequence = "",
+            @ColorInt navBarColor: Int = if (SDK_INT >= O) requireActivity().resolveThemeColor(R.attr.nav_bar_color) else Color.BLACK,
+            bottomNavShows: Boolean = true,
+            systemUiShows: Boolean = true,
+            hasLightNavBar: Boolean = SDK_INT >= O,
+            fabClickListener: View.OnClickListener? = this
+    ) = updateUi(
+            fabIcon,
+            fabText,
+            fabShows,
+            fabExtended,
+            toolBarMenu,
+            toolbarShows,
+            toolbarInvalidated,
+            toolbarTitle,
+            altToolBarMenu,
+            altToolBarShows,
+            altToolbarInvalidated,
+            altToolbarTitle,
+            navBarColor,
+            bottomNavShows,
+            systemUiShows,
+            hasLightNavBar,
+            fabClickListener
+    )
+
+    protected fun updateUi(
+            @DrawableRes fabIcon: Int = uiState.fabIcon,
+            @StringRes fabText: Int = uiState.fabText,
+            fabShows: Boolean = uiState.fabShows,
+            fabExtended: Boolean = uiState.fabExtended,
+            @MenuRes toolBarMenu: Int = uiState.toolBarMenu,
+            toolbarShows: Boolean = uiState.toolbarShows,
+            toolbarInvalidated: Boolean = uiState.toolbarInvalidated,
+            toolbarTitle: CharSequence = uiState.toolbarTitle,
+            @MenuRes altToolBarMenu: Int = uiState.altToolBarMenu,
+            altToolBarShows: Boolean = uiState.altToolBarShows,
+            altToolbarInvalidated: Boolean = uiState.altToolbarInvalidated,
+            altToolbarTitle: CharSequence = uiState.altToolbarTitle,
+            @ColorInt navBarColor: Int = uiState.navBarColor,
+            bottomNavShows: Boolean = uiState.bottomNavShows,
+            systemUiShows: Boolean = uiState.systemUiShows,
+            hasLightNavBar: Boolean = uiState.hasLightNavBar,
+            fabClickListener: View.OnClickListener? = uiState.fabClickListener
+    ) {
+        if (navigator.currentFragment !== this) return
+
         uiState = uiState.copy(
-                toolBarMenu = toolbarMenu,
-                toolbarShows = showsToolBar,
+                fabIcon = fabIcon,
+                fabText = fabText,
+                fabShows = fabShows,
+                fabExtended = fabExtended,
+                toolBarMenu = toolBarMenu,
+                toolbarShows = toolbarShows,
+                toolbarInvalidated = toolbarInvalidated,
                 toolbarTitle = toolbarTitle,
-                altToolBarMenu = altToolbarMenu,
-                altToolBarShows = showsAltToolBar,
+                altToolBarMenu = altToolBarMenu,
+                altToolBarShows = altToolBarShows,
+                altToolbarInvalidated = altToolbarInvalidated,
                 altToolbarTitle = altToolbarTitle,
-                fabIcon = fabIconResource,
-                fabShows = showsFab,
-                fabText = fabStringResource,
-                bottomNavShows = showsBottomNav,
-                systemUiShows = showsSystemUI,
                 navBarColor = navBarColor,
+                bottomNavShows = bottomNavShows,
+                systemUiShows = systemUiShows,
                 hasLightNavBar = hasLightNavBar,
-                fabClickListener = this
+                fabClickListener = fabClickListener
         )
     }
 
@@ -211,6 +270,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
             .apply { startDelay = 25; duration = FULL_RES_LOAD_DELAY.toLong() }
 
     companion object {
+        const val GRASS_COLOR = -0x6c44af
 
         val NO_TOP: InsetFlags = InsetFlags.NO_TOP
         val NONE: InsetFlags = InsetFlags.NONE

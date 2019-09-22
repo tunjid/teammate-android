@@ -25,28 +25,20 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
-
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.MODE_FIXED
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentStatAdapter
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 
-import com.google.android.material.tabs.TabLayout.MODE_FIXED
-
-class StatDetailFragment : MainActivityFragment() {
+class StatDetailFragment : MainActivityFragment(R.layout.fragment_games_parent) {
 
     private lateinit var tournament: Tournament
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.tournament_stats)
-
-    override val showsFab: Boolean get() = false
 
     override val stableTag: String 
         get() = 
@@ -57,16 +49,15 @@ class StatDetailFragment : MainActivityFragment() {
         tournament = arguments!!.getParcelable(ARG_TOURNAMENT)!!
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_games_parent, container, false)
-        val viewPager = root.findViewById<ViewPager>(R.id.view_pager)
-        val tabLayout = root.findViewById<TabLayout>(R.id.tab_layout)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(toolbarTitle = getString(R.string.tournament_stats))
+
+        val viewPager = view.findViewById<ViewPager>(R.id.view_pager)
+        val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
 
         viewPager.adapter = TournamentStatAdapter(tournament, childFragmentManager)
         tabLayout.tabMode = MODE_FIXED
         tabLayout.setupWithViewPager(viewPager)
-
-        return root
     }
 
     companion object {

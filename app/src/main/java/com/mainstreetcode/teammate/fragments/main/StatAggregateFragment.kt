@@ -25,9 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatAggregateAdapter
 import com.mainstreetcode.teammate.adapters.StatAggregateRequestAdapter
@@ -52,12 +50,10 @@ class StatAggregateFragment : MainActivityFragment(),
         StatAggregateRequestAdapter.AdapterListener {
 
     private lateinit var request: StatAggregate.Request
-    private lateinit var searchScrollManager: ScrollManager<*>
     private var expandingToolbar: ExpandingToolbar? = null
+    private var searchScrollManager: ScrollManager<*>? = null
 
     private lateinit var items: List<Differentiable>
-
-    override val showsToolBar: Boolean get() = false
 
     override val showsFab: Boolean get() = false
 
@@ -67,38 +63,36 @@ class StatAggregateFragment : MainActivityFragment(),
         items = statViewModel.statAggregates
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_stat_aggregate, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(toolbarShows = false)
 
-        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.search_options))
+        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
                 .withAdapter(StatAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.fetchAggregates() }
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.fetchAggregates() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatAggregateAdapter(items))
                 .withLinearLayoutManager()
                 .build()
 
-        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper)) { this.fetchAggregates() }
+        expandingToolbar = ExpandingToolbar.create(view.findViewById(R.id.card_view_wrapper)) { this.fetchAggregates() }
         expandingToolbar?.setTitleIcon(false)
         expandingToolbar?.setTitle(R.string.stat_aggregate_get)
 
         scrollManager.notifyDataSetChanged()
 
         if (!restoredFromBackStack) expandingToolbar?.changeVisibility(false)
-
-        return root
     }
 
     override fun onDestroyView() {
         expandingToolbar = null
-        searchScrollManager.clear()
+        searchScrollManager = null
         super.onDestroyView()
     }
 
@@ -130,7 +124,7 @@ class StatAggregateFragment : MainActivityFragment(),
             else -> return
         }
 
-        searchScrollManager.notifyDataSetChanged()
+        searchScrollManager?.notifyDataSetChanged()
         hideKeyboard()
     }
 

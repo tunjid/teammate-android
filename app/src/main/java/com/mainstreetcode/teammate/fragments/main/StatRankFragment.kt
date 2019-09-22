@@ -25,9 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
@@ -44,21 +42,20 @@ import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-class StatRankFragment : MainActivityFragment() {
+class StatRankFragment : MainActivityFragment(R.layout.fragment_stat_rank) {
 
     private lateinit var type: StatType
     private lateinit var tournament: Tournament
     private lateinit var statRanks: List<Differentiable>
 
-    override val showsFab: Boolean get() = false
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
-    override val stableTag: String 
-        get() {val superResult = super.stableTag
-        val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
-
-        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
-        else superResult
-    }
+            return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,12 +64,11 @@ class StatRankFragment : MainActivityFragment() {
         type = StatType.empty().apply { update(tournament.sport.statTypeFromCode("")) }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_stat_rank, container, false)
-        val spinner = root.findViewById<Spinner>(R.id.spinner)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val spinner = view.findViewById<Spinner>(R.id.spinner)
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_medal_24dp, R.string.no_stat_ranks))
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_medal_24dp, R.string.no_stat_ranks))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatRankAdapter(
                         statRanks,
@@ -94,8 +90,6 @@ class StatRankFragment : MainActivityFragment() {
 
             override fun onNothingSelected(parent: AdapterView<*>) = Unit
         }
-
-        return root
     }
 
     override fun onResume() {

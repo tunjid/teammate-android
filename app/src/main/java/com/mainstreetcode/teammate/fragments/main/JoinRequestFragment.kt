@@ -25,13 +25,9 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -57,20 +53,13 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
  * Invites a Team member
  */
 
-class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.AdapterListener {
+class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_headered),
+        JoinRequestAdapter.AdapterListener {
 
     override lateinit var headeredModel: JoinRequest
         private set
 
     private lateinit var gofer: JoinRequestGofer
-
-    override val fabStringResource: Int @StringRes get() = gofer.fabTitle
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_user_edit
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
@@ -86,20 +75,23 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
         gofer = teamMemberViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = gofer.getToolbarTitle(this),
+                toolBarMenu =R.menu.fragment_user_edit,
+                fabText = gofer.fabTitle,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = showsFab
+        )
 
-        scrollManager = ScrollManager.with<InputViewHolder>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(JoinRequestAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
-                .build()
-
-        scrollManager.recyclerView?.requestFocus()
-        return rootView
+                .build().apply { recyclerView?.requestFocus() }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -171,10 +163,10 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
     }
 
     private fun onJoinRequestSent(result: DiffUtil.DiffResult) {
+        updateUi(fabShows = showsFab)
         scrollManager.onDiff(result)
         bottomSheetDriver.hideBottomSheet()
         transientBarDriver.toggleProgress(false)
-        togglePersistentUi()
         transientBarDriver.showSnackBar(getString(
                 if (headeredModel.isTeamApproved) R.string.user_invite_sent
                 else R.string.team_submitted_join_request))

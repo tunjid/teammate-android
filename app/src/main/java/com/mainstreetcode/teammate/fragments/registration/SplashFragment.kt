@@ -26,11 +26,7 @@ package com.mainstreetcode.teammate.fragments.registration
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.facebook.CallbackManager
@@ -41,6 +37,7 @@ import com.facebook.login.LoginResult
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.RegistrationActivity
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.databinding.FragmentSplashBinding
 import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
@@ -48,9 +45,13 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
  * Splash screen
  */
 
-class SplashFragment : RegistrationActivityFragment(), View.OnClickListener {
+class SplashFragment : RegistrationActivityFragment(R.layout.fragment_splash), View.OnClickListener {
+
+    override val insetFlags: InsetFlags
+        get() = NO_TOP
 
     private val faceBookResultCallback = CallbackManager.Factory.create()
+
     private val facebookCallback = object : FacebookCallback<LoginResult> {
         override fun onSuccess(loginResult: LoginResult) {
             transientBarDriver.toggleProgress(true)
@@ -69,45 +70,41 @@ class SplashFragment : RegistrationActivityFragment(), View.OnClickListener {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_splash, container, false)
-        val facebookSignUp = rootView.findViewById<TextView>(R.id.facebook_login)
-        val emailSignUp = rootView.findViewById<TextView>(R.id.email_sign_up)
-        val login = rootView.findViewById<TextView>(R.id.login)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val context = rootView.context
+        defaultUi(
+                fabShows = false,
+                toolbarShows = false,
+                bottomNavShows = false,
+                navBarColor = GRASS_COLOR
+        )
 
-        login.text = SpanBuilder.of(getString(R.string.login_have_account))
-                .appendNewLine()
-                .append(SpanBuilder.of(getString(R.string.login_sign_in))
-                        .color(context, R.color.white)
-                        .underline()
-                        .build())
-                .build()
+        FragmentSplashBinding.bind(view).apply {
+            login.apply {
+                setOnClickListener(this@SplashFragment)
+                text = SpanBuilder.of(getString(R.string.login_have_account))
+                        .appendNewLine()
+                        .append(SpanBuilder.of(getString(R.string.login_sign_in))
+                                .color(context, R.color.white)
+                                .underline()
+                                .build())
+                        .build()
+            }
 
-        facebookSignUp.setOnClickListener(this)
-        emailSignUp.setOnClickListener(this)
-        login.setOnClickListener(this)
+            facebookLogin.apply { setOnClickListener(this@SplashFragment) }
+            emailSignUp.apply { setOnClickListener(this@SplashFragment) }
 
-        ViewCompat.setTransitionName(rootView.findViewById(R.id.title), TRANSITION_TITLE)
-        ViewCompat.setTransitionName(rootView.findViewById(R.id.sub_title), TRANSITION_SUBTITLE)
-        ViewCompat.setTransitionName(rootView.findViewById(R.id.border), TRANSITION_BACKGROUND)
-        return rootView
+            title.transitionName = TRANSITION_TITLE
+            subTitle.transitionName = TRANSITION_SUBTITLE
+            border.transitionName = TRANSITION_BACKGROUND
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         LoginManager.getInstance().unregisterCallback(faceBookResultCallback)
     }
-
-    override val insetFlags: InsetFlags
-        get() = NO_TOP
-
-    override val showsFab: Boolean
-        get() = false
-
-    override val showsToolBar: Boolean
-        get() = false
 
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
         val root = view

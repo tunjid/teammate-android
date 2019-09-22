@@ -25,11 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -53,50 +49,38 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import io.reactivex.Single
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Home screen
  */
 
-class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener {
+class FeedFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), FeedAdapter.FeedItemAdapterListener {
 
     private var onBoardingIndex: Int = 0
     private var isOnBoarding: Boolean = false
-    private lateinit var bottomBarState: AtomicBoolean
-
-    override val fabStringResource: Int @StringRes get() = R.string.team_search_create
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_search_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName)
 
     override val showsFab: Boolean get() = !teamViewModel.isOnATeam
 
-    override val showsBottomNav: Boolean get() = bottomBarState.get()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        bottomBarState = AtomicBoolean(true)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName),
+                fabText = R.string.team_search_create,
+                fabIcon = R.drawable.ic_search_white_24dp,
+                fabShows = showsFab,
+                bottomNavShows = true
+        )
 
         val refreshAction = { disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(FeedAdapter(feedViewModel.getModelList(FeedItem::class.java), this))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()
-
-        bottomBarState.set(true)
-        return rootView
     }
 
     override fun onResume() {
@@ -160,8 +144,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
         }
 
         item.isOf<Media>()?.apply {
-            bottomBarState.set(false)
-            togglePersistentUi()
+            updateUi(bottomNavShows = false)
             navigator.show(MediaDetailFragment.newInstance(model))
         }
     }

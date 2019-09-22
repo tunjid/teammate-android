@@ -26,13 +26,9 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -54,20 +50,15 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Displays a [team&#39;s][Team] [members][User].
  */
 
-class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapterListener {
+class TeamMembersFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+        TeamMemberAdapter.UserAdapterListener {
 
     private lateinit var team: Team
     private lateinit var teamModels: List<Differentiable>
 
-    override val fabStringResource: Int @StringRes get() = R.string.invite_user
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_group_add_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_team_detail
-
-    override val toolbarTitle: CharSequence get() = if (targetFragment != null) "" else getString(R.string.team_name_prefix, team.name)
-
     override val showsFab: Boolean get() = targetRequestCode == 0 && localRoleViewModel.hasPrivilegedRole()
+
+    private val toolbarTitle: CharSequence get() = if (targetFragment != null) "" else getString(R.string.team_name_prefix, team.name)
 
     override val stableTag: String
         get() {
@@ -84,30 +75,33 @@ class TeamMembersFragment : MainActivityFragment(), TeamMemberAdapter.UserAdapte
         teamModels = teamMemberViewModel.getModelList(team)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = toolbarTitle,
+                toolBarMenu = R.menu.fragment_team_detail,
+                fabIcon = R.drawable.ic_group_add_white_24dp,
+                fabText = R.string.invite_user,
+                fabShows = showsFab
+        )
         val refreshAction = {
             disposables.add(teamMemberViewModel.refresh(team)
                     .subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withAdapter(TeamMemberAdapter(teamModels, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withStaggeredGridLayoutManager(2)
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {
         super.onResume()
         fetchTeamMembers(true)
-        watchForRoleChanges(team, this::togglePersistentUi)
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

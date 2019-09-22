@@ -26,68 +26,55 @@ package com.mainstreetcode.teammate.fragments.registration
 
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
+import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.databinding.FragmentForgotPasswordBinding
 import com.mainstreetcode.teammate.util.hasValidEmail
+import com.mainstreetcode.teammate.util.input
 
 /**
  * Forgot password screen
  */
 
-class ForgotPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorActionListener {
+class ForgotPasswordFragment : RegistrationActivityFragment(R.layout.fragment_forgot_password), TextView.OnEditorActionListener {
 
-    private var emailInput: EditText? = null
+    private var binding: FragmentForgotPasswordBinding? = null
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.submit
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+        defaultUi(
+                fabText = R.string.submit,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = true,
+                toolbarShows = false,
+                bottomNavShows = false,
+                navBarColor = GRASS_COLOR
+        )
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.sign_in_forgot_password)
+        binding = FragmentForgotPasswordBinding.bind(view).apply {
+            val args = arguments
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_forgot_password, container, false)
-        val border = rootView.findViewById<View>(R.id.card_view_wrapper)
-        emailInput = rootView.findViewById(R.id.email)
+            if (args != null) email.setText(args.getCharSequence(ARG_EMAIL, ""))
+            email.setOnEditorActionListener(this@ForgotPasswordFragment)
 
-        val args = arguments
-
-        if (args != null) emailInput!!.setText(args.getCharSequence(ARG_EMAIL, ""))
-        emailInput!!.setOnEditorActionListener(this)
-
-        ViewCompat.setTransitionName(emailInput!!, SplashFragment.TRANSITION_TITLE)
-        ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND)
-
-        return rootView
+            email.transitionName = SplashFragment.TRANSITION_TITLE
+            cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        emailInput = null
+        binding = null
     }
 
-    override val showsFab: Boolean
-        get() {
-            return true
-        }
-
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> sendForgotEmail()
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> sendForgotEmail()
+        else -> Unit
     }
 
     override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean {
@@ -99,10 +86,11 @@ class ForgotPasswordFragment : RegistrationActivityFragment(), TextView.OnEditor
     }
 
     private fun sendForgotEmail() {
-        if (emailInput.hasValidEmail) {
+        val binding = this.binding ?: return
+        if (binding.email.hasValidEmail) {
             transientBarDriver.toggleProgress(true)
 
-            val email = emailInput!!.text.toString()
+            val email = binding.email.input.toString()
 
             disposables.add(viewModel.forgotPassword(email)
                     .subscribe({ transientBarDriver.showSnackBar(it.message) }, defaultErrorHandler::invoke))
@@ -113,14 +101,9 @@ class ForgotPasswordFragment : RegistrationActivityFragment(), TextView.OnEditor
 
         private const val ARG_EMAIL = "email"
 
-        fun newInstance(email: CharSequence): ForgotPasswordFragment {
-            val fragment = ForgotPasswordFragment()
-            val args = Bundle()
-
-            args.putCharSequence(ARG_EMAIL, email)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(email: CharSequence): ForgotPasswordFragment = ForgotPasswordFragment().apply {
+            arguments = bundleOf(ARG_EMAIL to email)
+            setEnterExitTransitions()
         }
     }
 }

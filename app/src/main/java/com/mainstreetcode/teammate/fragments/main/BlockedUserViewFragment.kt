@@ -25,10 +25,9 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-
+import androidx.core.os.bundleOf
+import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.BlockedUserViewAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
@@ -39,27 +38,16 @@ import com.mainstreetcode.teammate.viewmodel.gofers.BlockedUserGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
-import androidx.recyclerview.widget.DiffUtil
-
-class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
+class BlockedUserViewFragment : HeaderedFragment<BlockedUser>(R.layout.fragment_headered) {
 
     override lateinit var headeredModel: BlockedUser
         private set
 
     private lateinit var gofer: BlockedUserGofer
 
-    override val fabStringResource: Int @StringRes get() = R.string.unblock_user
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_unlock_white
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.blocked_user)
+    override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = gofer.hasPrivilegedRole()
-
-    override val insetFlags: InsetFlags get() = NO_TOP
 
     override val stableTag
         get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_BLOCKED_USER)!!)
@@ -70,10 +58,15 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
         gofer = blockedUserViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = getString(R.string.blocked_user),
+                fabShows = showsFab,
+                fabIcon = R.drawable.ic_unlock_white,
+                fabText = R.string.unblock_user
+        )
 
-        scrollManager = ScrollManager.with<InputViewHolder>(rootView.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
                 .withAdapter(BlockedUserViewAdapter(gofer.items))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -81,8 +74,6 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>() {
                 .build()
 
         scrollManager.recyclerView?.requestFocus()
-
-        return rootView
     }
 
     override fun onClick(view: View) {

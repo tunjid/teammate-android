@@ -25,12 +25,9 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -53,7 +50,8 @@ import com.tunjid.androidbootstrap.view.util.InsetFlags
  * Edits a Team member
  */
 
-class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAdapter.AdapterListener {
+class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_headered),
+        TournamentEditAdapter.AdapterListener {
 
     private var showingPrompt: Boolean = false
     override lateinit var headeredModel: Tournament
@@ -61,13 +59,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
 
     private lateinit var gofer: TournamentGofer
 
-    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.tournament_create else R.string.tournament_update
+    private val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.tournament_create else R.string.tournament_update
 
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_tournament_edit
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
+    private val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
@@ -77,9 +71,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
 
     override val sport: Sport get() = headeredModel.sport
 
-    override val stableTag: String 
-        get() = 
-            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
+    override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,11 +80,16 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         gofer = tournamentViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_headered, container, false)
-
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.model_list))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle = toolbarTitle,
+                toolBarMenu = R.menu.fragment_tournament_edit,
+                fabText = fabStringResource,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = showsFab
+        )
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(TournamentEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -101,8 +98,6 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
                 .withGridLayoutManager(2)
                 .build()
                 .apply { recyclerView?.requestFocus() }
-
-        return root
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

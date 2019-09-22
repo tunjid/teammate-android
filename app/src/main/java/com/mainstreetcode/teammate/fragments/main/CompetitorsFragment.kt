@@ -26,11 +26,8 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
 import android.util.Pair
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter
@@ -52,18 +49,14 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.*
 import kotlin.math.min
 
-class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener, TeamAdapter.AdapterListener {
+class CompetitorsFragment : MainActivityFragment(R.layout.fragment_competitors),
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener {
 
     private lateinit var tournament: Tournament
     private lateinit var entities: MutableList<Competitive>
     private lateinit var competitors: List<Competitor>
     private lateinit var competitorDifferentiables: MutableList<Differentiable>
-
-    override val fabStringResource: Int @StringRes get() = R.string.save_tournament_competitors
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.add_tournament_competitors)
 
     override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && competitors.isNotEmpty()
 
@@ -84,10 +77,16 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
         competitorDifferentiables = Lists.transform(competitors, { identity -> identity as Differentiable }, { i -> i as Competitor })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_competitors, container, false)
-        scrollManager = ScrollManager.with<CompetitorViewHolder>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle =  getString(R.string.add_tournament_competitors),
+                fabShows = showsFab,
+                fabIcon =  R.drawable.ic_check_white_24dp,
+                fabText = R.string.save_tournament_competitors
+        )
+
+        scrollManager = ScrollManager.with<CompetitorViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
                 .withAdapter(object : CompetitorAdapter(competitorDifferentiables, AdapterListener.asSAM {}) {
                     override fun getItemId(position: Int): Long = entities[position].hashCode().toLong()
 
@@ -109,9 +108,7 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
                 ))
                 .build()
 
-        rootView.findViewById<View>(R.id.add_competitor).setOnClickListener { findCompetitor() }
-
-        return rootView
+        view.findViewById<View>(R.id.add_competitor).setOnClickListener { findCompetitor() }
     }
 
     override fun onResume() {

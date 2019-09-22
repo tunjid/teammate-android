@@ -51,8 +51,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.*
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-abstract class HeaderedFragment<T> :
-        MainActivityFragment(),
+abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
+        MainActivityFragment(layoutRes),
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener where T : HeaderedModel<T>, T : ListableModel<T> {
 
@@ -118,7 +118,7 @@ abstract class HeaderedFragment<T> :
         super.onDestroyView()
     }
 
-    protected open fun onPrepComplete() = togglePersistentUi()
+    protected open fun onPrepComplete() = updateUi(fabShows = showsFab)
 
     protected open fun canExpandAppBar(): Boolean = true
 
@@ -135,16 +135,12 @@ abstract class HeaderedFragment<T> :
         if (showsFab && !bottomSheetDriver.isBottomSheetShowing)
             disposables.add(timer(FAB_DELAY.toLong(), MILLISECONDS)
                     .observeOn(mainThread())
-                    .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY::invoke))
+                    .subscribe({ updateUi(fabShows = showsFab) }, ErrorHandler.EMPTY::invoke))
     }
 
-    protected fun fetch() {
-        getData(false)
-    }
+    protected fun fetch() = getData(false)
 
-    protected fun refresh() {
-        getData(true)
-    }
+    protected fun refresh() = getData(true)
 
     private fun getData(refresh: Boolean) {
         checkIfChanged()

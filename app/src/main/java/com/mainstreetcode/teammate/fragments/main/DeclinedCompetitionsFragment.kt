@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
@@ -47,30 +46,30 @@ import com.tunjid.androidbootstrap.view.util.inflate
  * Lists [tournaments][Event]
  */
 
-class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.AdapterListener {
+class DeclinedCompetitionsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+        CompetitorAdapter.AdapterListener {
 
     private lateinit var items: List<Differentiable>
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.competitors_declined)
-
-    override val showsFab: Boolean get() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         items = competitorViewModel.getModelList(User::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        defaultUi(
+                toolbarTitle =  getString(R.string.competitors_declined),
+                fabShows = false
+        )
 
         val refreshAction = {
             disposables.add(competitorViewModel.refresh(User::class.java)
                     .subscribe(this@DeclinedCompetitionsFragment::onCompetitorsUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<CompetitorViewHolder>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<CompetitorViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchCompetitions(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
@@ -82,8 +81,6 @@ class DeclinedCompetitionsFragment : MainActivityFragment(), CompetitorAdapter.A
                 })
                 .withLinearLayoutManager()
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {
