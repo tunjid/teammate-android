@@ -120,11 +120,10 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
     override fun canExpandAppBar(): Boolean = false
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        updateUi(toolbarTitle = toolbarTitle, fabText = fabText)
+        updateUi(toolbarTitle = toolbarTitle, fabText = fabText, toolbarInvalidated = true)
         transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
         viewHolder.bind(headeredModel)
-        activity?.invalidateOptionsMenu()
     }
 
     override fun onUserClicked(item: User) {
@@ -148,7 +147,7 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
 
     override fun onPrepComplete() {
         scrollManager.notifyDataSetChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

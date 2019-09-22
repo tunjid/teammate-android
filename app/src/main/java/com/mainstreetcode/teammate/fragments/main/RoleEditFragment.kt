@@ -97,7 +97,7 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
     override fun gofer(): TeamHostingGofer<Role> = gofer
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

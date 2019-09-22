@@ -182,7 +182,7 @@ class TeamMembersFragment : MainActivityFragment(R.layout.fragment_list_with_ref
 
     private fun onTeamMembersUpdated(diffResult: DiffUtil.DiffResult) {
         scrollManager.onDiff(diffResult)
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
     }
 
     private fun onTeamDeleted() {

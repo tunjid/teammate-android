@@ -88,7 +88,7 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>(R.layout.fragment_
     override fun onModelUpdated(result: DiffUtil.DiffResult) = scrollManager.onDiff(result)
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

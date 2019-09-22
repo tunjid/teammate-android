@@ -106,7 +106,7 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
         viewHolder.bind(headeredModel)
 
         transientBarDriver.toggleProgress(false)
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
     }
 
     override fun canEditGame(): Boolean = gofer.canEdit()
@@ -123,7 +123,7 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
 
     override fun onPrepComplete() {
         scrollManager.notifyDataSetChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

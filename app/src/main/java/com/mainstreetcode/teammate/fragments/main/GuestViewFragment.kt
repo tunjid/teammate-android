@@ -99,7 +99,7 @@ class GuestViewFragment : HeaderedFragment<Guest>(R.layout.fragment_headered) {
     }
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

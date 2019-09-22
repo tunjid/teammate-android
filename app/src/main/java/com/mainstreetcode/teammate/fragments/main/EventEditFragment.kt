@@ -158,7 +158,7 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
 
     override fun onPrepComplete() {
         scrollManager.notifyDataSetChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

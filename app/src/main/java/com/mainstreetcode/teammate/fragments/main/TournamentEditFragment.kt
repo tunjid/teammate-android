@@ -118,16 +118,16 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
     override fun gofer(): Gofer<Tournament> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
+        updateUi(toolbarInvalidated = true)
         transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
         viewHolder.bind(headeredModel)
-        activity?.invalidateOptionsMenu()
         if (!headeredModel.isEmpty && headeredModel.numCompetitors == 0) promptForCompetitors()
     }
 
     override fun onPrepComplete() {
         scrollManager.notifyDataSetChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

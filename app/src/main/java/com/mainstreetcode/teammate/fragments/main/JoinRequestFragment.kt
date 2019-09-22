@@ -118,7 +118,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_head
     override fun gofer(): TeamHostingGofer<JoinRequest> = gofer
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

@@ -264,7 +264,7 @@ class GameFragment : MainActivityFragment(R.layout.fragment_game), UserAdapter.A
     }
 
     private fun onGameUpdated() {
-        disposables.add(gofer.watchForChange().subscribe({ requireActivity().invalidateOptionsMenu() }, ErrorHandler.EMPTY::invoke))
+        disposables.add(gofer.watchForChange().subscribe({ updateUi(toolbarInvalidated = true) }, ErrorHandler.EMPTY::invoke))
         gameViewHolder?.bind(game)
         transientBarDriver.toggleProgress(false)
         checkCompetitor()
