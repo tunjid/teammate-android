@@ -60,7 +60,7 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
 
     private var appBarLayout: AppBarLayout? = null
 
-    protected lateinit var viewHolder: HeaderedImageViewHolder
+    protected var viewHolder: HeaderedImageViewHolder? = null
 
     protected abstract val headeredModel: T
 
@@ -78,11 +78,12 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
 
         val model = headeredModel
 
-        viewHolder = HeaderedImageViewHolder(view, this)
-        viewHolder.bind(model)
+        viewHolder = HeaderedImageViewHolder(view, this).apply {
+            bind(model)
+            setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
+        }
 
         setTransitionName(view, model.getTransitionName(R.id.fragment_header_background))
-        setTransitionName(viewHolder.thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
 
         view.findViewById<View>(R.id.header).visibility = if (canExpandAppBar()) View.VISIBLE else View.GONE
         view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += WindowInsetsDriver.topInset
@@ -97,7 +98,7 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
     }
 
     override fun onImageClick() {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
 
         val errorMessage = gofer().getImageClickMessage(this)
 
@@ -108,13 +109,13 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
     override fun onImageCropped(uri: Uri) {
         val item = headeredModel.headerItem
         uri.path?.apply { item.rawValue = this }
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         imageJustCropped = true
     }
 
     override fun onDestroyView() {
         gofer().clear()
-        viewHolder.unBind()
+        viewHolder?.unBind()
         super.onDestroyView()
     }
 
