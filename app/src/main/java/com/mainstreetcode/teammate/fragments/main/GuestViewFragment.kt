@@ -93,7 +93,7 @@ class GuestViewFragment : HeaderedFragment<Guest>(R.layout.fragment_headered) {
     override fun gofer(): Gofer<Guest> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
         transientBarDriver.toggleProgress(false)
     }

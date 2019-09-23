@@ -87,7 +87,7 @@ class UserEditFragment : HeaderedFragment<User>(R.layout.fragment_headered),
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         updateUi(toolbarTitle = toolbarTitle)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
         transientBarDriver.toggleProgress(false)
     }
@@ -99,7 +99,7 @@ class UserEditFragment : HeaderedFragment<User>(R.layout.fragment_headered),
                 disposables.add(gofer.save().subscribe({ result ->
                     transientBarDriver.showSnackBar(getString(R.string.updated_user, headeredModel.firstName))
                     transientBarDriver.toggleProgress(false)
-                    viewHolder.bind(headeredModel)
+                    viewHolder?.bind(headeredModel)
                     scrollManager.onDiff(result)
                 }, defaultErrorHandler::invoke))
             }

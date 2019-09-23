@@ -102,7 +102,7 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
     }
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
         transientBarDriver.toggleProgress(false)
     }
@@ -141,7 +141,7 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
     private fun onRoleUpdated(result: DiffUtil.DiffResult) {
         updateUi(fabShows = showsFab, toolbarInvalidated = true)
 
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
         transientBarDriver.toggleProgress(false)
         transientBarDriver.showSnackBar(getString(R.string.updated_user, headeredModel.user.firstName))

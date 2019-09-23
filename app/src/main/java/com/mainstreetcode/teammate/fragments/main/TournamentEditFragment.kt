@@ -121,7 +121,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
         updateUi(toolbarInvalidated = true)
         transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         if (!headeredModel.isEmpty && headeredModel.numCompetitors == 0) promptForCompetitors()
     }
 

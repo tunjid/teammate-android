@@ -103,7 +103,7 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
 
         transientBarDriver.toggleProgress(false)
         updateUi(toolbarInvalidated = true)

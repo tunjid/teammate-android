@@ -123,7 +123,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_head
     }
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
         transientBarDriver.toggleProgress(false)
     }

@@ -123,7 +123,7 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
         updateUi(toolbarTitle = toolbarTitle, fabText = fabText, toolbarInvalidated = true)
         transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
     }
 
     override fun onUserClicked(item: User) {

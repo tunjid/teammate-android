@@ -153,7 +153,7 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
     }
 
     override fun onPrepComplete() {

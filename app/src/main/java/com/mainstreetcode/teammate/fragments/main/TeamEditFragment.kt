@@ -105,7 +105,7 @@ class TeamEditFragment : HeaderedFragment<Team>(R.layout.fragment_headered),
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
         updateUi(toolbarTitle = toolbarTitle, fabText = fabText)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
         transientBarDriver.toggleProgress(false)
     }
