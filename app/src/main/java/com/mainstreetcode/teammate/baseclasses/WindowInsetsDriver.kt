@@ -42,13 +42,13 @@ import androidx.fragment.app.FragmentManager
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
-import com.tunjid.androidbootstrap.core.components.StackNavigator
+import com.tunjid.androidbootstrap.core.components.Navigator
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import com.tunjid.androidbootstrap.view.util.marginLayoutParams
 import kotlin.math.max
 
 class WindowInsetsDriver(
-        private val stackNavigatorSource: () -> StackNavigator?,
+        private val stackNavigatorSource: () -> Navigator?,
         private val parentContainer: ViewGroup,
         private val contentContainer: FragmentContainerView,
         private val coordinatorLayout: CoordinatorLayout,
@@ -112,7 +112,7 @@ class WindowInsetsDriver(
         setKeyboardPadding(bottomSystemInset)
 
         stackNavigatorSource()?.currentFragment?.run {
-            if(this is InsetProvider) onKeyBoardChanged(bottomSystemInset != bottomInset)
+            if (this is InsetProvider) onKeyBoardChanged(bottomSystemInset != bottomInset)
         }
 
         return insets

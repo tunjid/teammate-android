@@ -37,6 +37,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.isInDarkMode
 import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
+import com.tunjid.androidbootstrap.core.components.Navigator
 import com.tunjid.androidbootstrap.core.components.StackNavigator
 
 /**
@@ -46,7 +47,7 @@ import com.tunjid.androidbootstrap.core.components.StackNavigator
 abstract class TeammatesBaseActivity(layoutRes: Int = 0) : AppCompatActivity(layoutRes),
         GlobalUiController,
         TransientBarController,
-        StackNavigator.NavigationController {
+        Navigator.NavigationController {
 
     override var uiState: UiState by globalUiDriver { navigator.currentFragment }
 
@@ -82,15 +83,17 @@ abstract class TeammatesBaseActivity(layoutRes: Int = 0) : AppCompatActivity(lay
                     }
                 }, true)
 
-        navigator.transactionModifier = { incomingFragment ->
-            val current = navigator.currentFragment
-            if (current is StackNavigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
-            else setCustomAnimations(
-                    android.R.anim.fade_in,
-                    android.R.anim.fade_out,
-                    android.R.anim.fade_in,
-                    android.R.anim.fade_out
-            )
+        (navigator as? StackNavigator)?.apply {
+            transactionModifier = { incomingFragment ->
+                val current = navigator.currentFragment
+                if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
+                else setCustomAnimations(
+                        android.R.anim.fade_in,
+                        android.R.anim.fade_out,
+                        android.R.anim.fade_in,
+                        android.R.anim.fade_out
+                )
+            }
         }
 
         onBackPressedDispatcher.addCallback(this) { navigator.pop() }

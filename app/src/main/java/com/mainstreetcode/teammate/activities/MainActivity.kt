@@ -77,16 +77,17 @@ import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
+import com.tunjid.androidbootstrap.core.components.Navigator
 import com.tunjid.androidbootstrap.core.components.StackNavigator
 import com.tunjid.androidbootstrap.core.components.savedStateFor
-import com.tunjid.androidbootstrap.core.components.stackNavigationController
+import com.tunjid.androidbootstrap.core.components.stackNavigator
 import io.reactivex.disposables.CompositeDisposable
 
 class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
         BottomSheetController,
-        StackNavigator.NavigationController {
+        Navigator.NavigationController {
 
-    override val navigator: StackNavigator by stackNavigationController(R.id.main_fragment_container)
+    override val navigator: StackNavigator by stackNavigator(R.id.main_fragment_container)
 
     private var bottomNavHeight: Int = 0
 

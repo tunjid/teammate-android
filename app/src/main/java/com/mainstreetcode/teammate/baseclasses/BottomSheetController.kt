@@ -38,7 +38,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment
 import com.tunjid.androidbootstrap.core.components.LifecycleSavedStateContainer
-import com.tunjid.androidbootstrap.core.components.StackNavigator
+import com.tunjid.androidbootstrap.core.components.Navigator
 
 interface BottomSheetController {
     val bottomSheetDriver: BottomSheetDriver
@@ -115,7 +115,7 @@ class BottomSheetDriver(
     }
 
     private fun restoreHiddenViewState() {
-        val navigator = (host as? StackNavigator.NavigationController)?.navigator ?: return
+        val navigator = (host as? Navigator.NavigationController)?.navigator ?: return
         val onCommit = {
             val post = navigator.currentFragment as? TeammatesBaseFragment
             if (post != null && post.view != null) post.togglePersistentUi()

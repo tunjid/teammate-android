@@ -49,13 +49,13 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
-import com.tunjid.androidbootstrap.core.components.StackNavigator
+import com.tunjid.androidbootstrap.core.components.Navigator
 import com.tunjid.androidbootstrap.core.components.activityNavigationController
 import io.reactivex.disposables.CompositeDisposable
 
 class NavDialogFragment : BottomSheetDialogFragment() {
 
-    private val navigator: StackNavigator by activityNavigationController()
+    private val navigator: Navigator by activityNavigationController()
 
     private lateinit var teamViewModel: TeamViewModel
     private lateinit var disposables: CompositeDisposable

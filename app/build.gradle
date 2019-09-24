@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-apply plugin: 'kotlin-kapt'
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
@@ -142,11 +142,11 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.3'
 
-    implementation 'com.tunjid.android-bootstrap:recyclerview:6.0.0-alpha02'
+    implementation 'com.tunjid.android-bootstrap:recyclerview:6.0.0-alpha03'
+    implementation 'com.tunjid.android-bootstrap:material:6.0.0-alpha03'
+    implementation 'com.tunjid.android-bootstrap:core:6.0.0-alpha03'
+    implementation 'com.tunjid.android-bootstrap:view:6.0.0-alpha03'
     implementation 'com.tunjid.android-bootstrap:functions:1.0.4'
-    implementation 'com.tunjid.android-bootstrap:material:6.0.0-alpha02'
-    implementation 'com.tunjid.android-bootstrap:core:6.0.0-alpha02'
-    implementation 'com.tunjid.android-bootstrap:view:6.0.0-alpha02'
 
     implementation 'de.hdodenhof:circleimageview:3.0.0'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'

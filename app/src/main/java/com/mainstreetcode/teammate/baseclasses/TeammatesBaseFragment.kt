@@ -49,7 +49,7 @@ import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 import com.mainstreetcode.teammate.util.resolveThemeColor
-import com.tunjid.androidbootstrap.core.components.StackNavigator
+import com.tunjid.androidbootstrap.core.components.Navigator
 import com.tunjid.androidbootstrap.core.components.activityNavigationController
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
@@ -65,9 +65,9 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         GlobalUiController,
         View.OnClickListener,
         TransientBarController,
-        StackNavigator.TagProvider,
-        StackNavigator.TransactionModifier,
-        StackNavigator.NavigationController {
+        Navigator.TagProvider,
+        Navigator.TransactionModifier,
+        Navigator.NavigationController {
 
     private var lastSetUiState: AtomicReference<UiState> = AtomicReference()
 
@@ -80,7 +80,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
             lastSetUiState.set(value)
         }
 
-    override val navigator: StackNavigator by activityNavigationController()
+    override val navigator: Navigator by activityNavigationController()
 
     override val transientBarDriver: TransientBarDriver
         get() = requireActivity().run { (this as TransientBarController).transientBarDriver }
