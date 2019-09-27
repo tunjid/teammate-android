@@ -40,7 +40,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.App
@@ -239,7 +238,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     private fun adjustKeyboardPadding(suggestion: Int): Int {
         var padding = suggestion
-        if (padding != WindowInsetsDriver.bottomInset) padding -= bottomNavHeight
+        if (padding != WindowInsetsDriver.bottomInset && uiState.bottomNavShows) padding -= bottomNavHeight
         return padding
     }
 
