@@ -149,6 +149,7 @@ class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head)
         if (isHome) request.updateHome(item)
         else request.updateAway(item)
         searchScrollManager?.notifyDataSetChanged()
+        bottomSheetDriver.hideBottomSheet()
         hideKeyboard()
     }
 

@@ -64,7 +64,8 @@ class WindowInsetsDriver(
     private var leftInset: Int = 0
     private var rightInset: Int = 0
     private var insetsApplied: Boolean = false
-    private var lastInsetDispatch: InsetDispatch? = InsetDispatch()
+    private var lastFragmentBottomInset: Int = Int.MIN_VALUE
+    private var lastSystemInsetDispatch: InsetDispatch? = InsetDispatch()
 
     init {
         ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> consumeSystemInsets(insets) }
@@ -111,11 +112,15 @@ class WindowInsetsDriver(
     private fun consumeFragmentInsets(insets: WindowInsetsCompat): WindowInsetsCompat {
         val bottomSystemInset = insets.systemWindowInsetBottom
 
+        if (lastFragmentBottomInset == bottomSystemInset) return insets
+
         setKeyboardPadding(bottomSystemInset)
 
         stackNavigatorSource()?.currentFragment?.run {
-            if (this is InsetProvider) onKeyBoardChanged(bottomSystemInset != bottomInset)
+            if (this is InsetProvider) onKeyBoardChanged(bottomSystemInset > bottomInset)
         }
+
+        lastFragmentBottomInset = bottomSystemInset
 
         return insets
     }
@@ -141,7 +146,7 @@ class WindowInsetsDriver(
         if (fragment !is InsetProvider || isNotInCurrentFragmentContainer(fragment)) return
 
         fragment.insetFlags.dispatch {
-            if (insetFlags == null || lastInsetDispatch == this) return
+            if (insetFlags == null || lastSystemInsetDispatch == this) return
 
             toolbar.marginLayoutParams.topMargin = if (insetFlags.hasTopInset) 0 else topInset
             coordinatorLayout.marginLayoutParams.bottomMargin = if (insetFlags.hasBottomInset) 0 else bottomInset
@@ -162,7 +167,7 @@ class WindowInsetsDriver(
                     if (insetFlags.hasRightInset) this.rightInset else 0,
                     0)
 
-            lastInsetDispatch = this
+            lastSystemInsetDispatch = this
         }
     }
 

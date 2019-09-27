@@ -152,6 +152,7 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
 
         entities.add(item)
         scrollManager.notifyDataSetChanged()
+        bottomSheetDriver.hideBottomSheet()
         hideKeyboard()
     }
 

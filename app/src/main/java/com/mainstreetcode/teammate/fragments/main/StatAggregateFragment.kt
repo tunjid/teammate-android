@@ -125,6 +125,7 @@ class StatAggregateFragment : TeammatesBaseFragment(),
         }
 
         searchScrollManager?.notifyDataSetChanged()
+        bottomSheetDriver.hideBottomSheet()
         hideKeyboard()
     }
 
