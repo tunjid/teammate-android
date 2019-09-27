@@ -38,8 +38,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.RegistrationActivity
-import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.activities.completeSignIn
+import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.databinding.FragmentSignUpBinding
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.ErrorHandler
@@ -53,7 +53,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignUpFragment : RegistrationActivityFragment(R.layout.fragment_sign_up), TextView.OnEditorActionListener {
+class SignUpFragment : MainActivityFragment(R.layout.fragment_sign_up), TextView.OnEditorActionListener {
 
     private var binding: FragmentSignUpBinding? = null
 
@@ -62,9 +62,11 @@ class SignUpFragment : RegistrationActivityFragment(R.layout.fragment_sign_up), 
                 clickableSpan(getString(R.string.sign_up_terms)) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "terms"))) },
                 clickableSpan(getString(R.string.sign_up_privacy_policy)) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "privacy"))) })
 
+    override val showsFab: Boolean = true
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentSignUpBinding.bind(view).run {
         super.onViewCreated(view, savedInstanceState)
+        binding = this
 
         defaultUi(
                 fabText = R.string.submit,
@@ -72,25 +74,24 @@ class SignUpFragment : RegistrationActivityFragment(R.layout.fragment_sign_up), 
                 fabShows = true,
                 toolbarShows = false,
                 bottomNavShows = false,
+                grassShows = true,
                 navBarColor = GRASS_COLOR
         )
 
-        binding = FragmentSignUpBinding.bind(view).apply {
-            terms.text = termsCharSequence
-            terms.movementMethod = LinkMovementMethod.getInstance()
+        disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
+            firstNameWrapper.visibility = View.VISIBLE
+            lastNameWrapper.visibility = View.VISIBLE
+            emailWrapper.visibility = View.VISIBLE
+            passwordWrapper.visibility = View.VISIBLE
+        }, ErrorHandler.EMPTY::invoke))
 
-            memberInfo.transitionName = SplashFragment.TRANSITION_TITLE
-            cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
+        terms.text = termsCharSequence
+        terms.movementMethod = LinkMovementMethod.getInstance()
 
-            password.setOnEditorActionListener(this@SignUpFragment)
+        memberInfo.transitionName = SplashFragment.TRANSITION_TITLE
+        cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
 
-            disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
-                firstNameWrapper.visibility = View.VISIBLE
-                lastNameWrapper.visibility = View.VISIBLE
-                emailWrapper.visibility = View.VISIBLE
-                passwordWrapper.visibility = View.VISIBLE
-            }, ErrorHandler.EMPTY::invoke))
-        }
+        password.setOnEditorActionListener(this@SignUpFragment)
     }
 
     override fun onDestroyView() {
@@ -126,7 +127,7 @@ class SignUpFragment : RegistrationActivityFragment(R.layout.fragment_sign_up), 
 
             transientBarDriver.toggleProgress(true)
 
-            disposables.add(viewModel.signUp(firstName, lastName, email, password)
+            disposables.add(userViewModel.signUp(firstName, lastName, email, password)
                     .subscribe({ onSignUp() }, defaultErrorHandler::invoke)
             )
         }
@@ -135,7 +136,7 @@ class SignUpFragment : RegistrationActivityFragment(R.layout.fragment_sign_up), 
     private fun onSignUp() {
         transientBarDriver.toggleProgress(false)
         hideKeyboard()
-        RegistrationActivity.startMainActivity(activity)
+        navigator.completeSignIn()
     }
 
     private fun clickableSpan(text: CharSequence, clickAction: () -> Unit): CharSequence {
@@ -155,13 +156,9 @@ class SignUpFragment : RegistrationActivityFragment(R.layout.fragment_sign_up), 
 
     companion object {
 
-        fun newInstance(): SignUpFragment {
-            val fragment = SignUpFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): SignUpFragment = SignUpFragment().apply {
+            arguments = Bundle()
+            setEnterExitTransitions()
         }
     }
 }

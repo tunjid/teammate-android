@@ -58,6 +58,7 @@ class EventSearchFragment : MainActivityFragment(R.layout.fragment_public_event)
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarShows = false,
                 fabShows = locationViewModel.hasPermission(this),

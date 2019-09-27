@@ -76,6 +76,7 @@ class TeamMembersFragment : MainActivityFragment(R.layout.fragment_list_with_ref
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = toolbarTitle,
                 toolBarMenu = R.menu.fragment_team_detail,

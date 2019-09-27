@@ -32,8 +32,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.RegistrationActivity
-import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.activities.completeSignIn
+import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.databinding.FragmentSignInBinding
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.hasValidEmail
@@ -44,9 +44,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignInFragment : RegistrationActivityFragment(R.layout.fragment_sign_in), TextView.OnEditorActionListener {
+class SignInFragment : MainActivityFragment(R.layout.fragment_sign_in), TextView.OnEditorActionListener {
 
     private var binding: FragmentSignInBinding? = null
+
+    override val showsFab: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,6 +59,7 @@ class SignInFragment : RegistrationActivityFragment(R.layout.fragment_sign_in), 
                 fabShows = true,
                 toolbarShows = false,
                 bottomNavShows = false,
+                grassShows = true,
                 navBarColor = GRASS_COLOR
         )
 
@@ -111,7 +114,7 @@ class SignInFragment : RegistrationActivityFragment(R.layout.fragment_sign_in), 
             val email = binding.email.input.toString()
             val password = binding.password.input.toString()
 
-            disposables.add(viewModel.signIn(email, password)
+            disposables.add(userViewModel.signIn(email, password)
                     .subscribe({ onSignIn() }, defaultErrorHandler::invoke)
             )
         }
@@ -120,7 +123,7 @@ class SignInFragment : RegistrationActivityFragment(R.layout.fragment_sign_in), 
     private fun onSignIn() {
         transientBarDriver.toggleProgress(false)
         hideKeyboard()
-        RegistrationActivity.startMainActivity(activity)
+        navigator.completeSignIn()
     }
 
     companion object {

@@ -98,10 +98,11 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle =  gofer.getToolbarTitle(this),
                 toolBarMenu = R.menu.fragment_event_edit,
-                fabShows = false,
+                fabShows = showsFab,
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabText = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
         )

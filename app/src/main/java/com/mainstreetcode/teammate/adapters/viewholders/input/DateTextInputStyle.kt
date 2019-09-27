@@ -90,7 +90,6 @@ class DateTextInputStyle(enabler: (Item) -> Boolean) : TextInputStyle(
 
     private fun AlertDialog.showWithTextColor() {
         val buttonColor = context.resolveThemeColor(R.attr.colorSecondary)
-        setOnDismissListener { onDialogDismissed(context) }
         show()
         getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(buttonColor)
         getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(buttonColor)

@@ -35,6 +35,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -143,13 +144,14 @@ class WindowInsetsDriver(
             toolbar.marginLayoutParams.topMargin = if (insetFlags.hasTopInset) 0 else topInset
             coordinatorLayout.marginLayoutParams.bottomMargin = if (insetFlags.hasBottomInset) 0 else bottomInset
 
-            TransitionManager.beginDelayedTransition(parentContainer, AutoTransition()
-                    .setDuration(ANIMATION_DURATION.toLong())
-                    .addTarget(contentContainer) // Animate inset change
-            )
+            TransitionManager.beginDelayedTransition(parentContainer, AutoTransition().apply {
+                duration = ANIMATION_DURATION.toLong()
+                contentContainer.forEach { addTarget(it) }
+                addTarget(contentContainer)
+            })
 
-            topInsetView.visibility = if (insetFlags.hasTopInset) View.VISIBLE else View.GONE
-            bottomInsetView.visibility = if (insetFlags.hasBottomInset) View.VISIBLE else View.GONE
+            topInsetView.isVisible = insetFlags.hasTopInset
+            bottomInsetView.isVisible = insetFlags.hasBottomInset
 
             parentContainer.setPadding(
                     if (insetFlags.hasLeftInset) this.leftInset else 0,

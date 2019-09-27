@@ -65,6 +65,7 @@ class BlockedUsersFragment : MainActivityFragment(R.layout.fragment_list_with_re
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.blocked_users_title, team.name),
                 toolBarMenu = R.menu.fragment_events,

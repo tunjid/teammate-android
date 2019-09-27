@@ -48,11 +48,11 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
     private lateinit var media: Media
     private var mediaViewHolder: MediaViewHolder<*>? = null
 
-    override val isFullScreen: Boolean get() = true
+    override val isFullScreen = true
 
-    override val insetFlags: InsetFlags get() = NONE
+    override val insetFlags = InsetFlags.NONE
 
-    override val showsFab: Boolean get() = false
+    override val showsFab = false
 
     override val stableTag
           get() = "${super.stableTag}-${arguments!!.getParcelable<Media>(ARG_MEDIA)}"
@@ -71,7 +71,6 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         defaultUi(
                 toolBarMenu = R.menu.fragment_media_detail,
                 toolbarShows = true,
@@ -120,7 +119,7 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     override fun onMediaClicked(item: Media) {
         val activity = activity ?: return
-        updateUi(systemUiShows = !activity.window.decorView.isDisplayingSystemUI())
+        updateUi(systemUiShows = activity.window.decorView.isDisplayingSystemUI())
     }
 
     override fun onMediaLongClicked(media: Media): Boolean = false
@@ -140,7 +139,6 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
         else VideoMediaViewHolder(root, this)
 
         mediaViewHolder?.fullBind(media)
-        onMediaClicked(media)
     }
 
     companion object {

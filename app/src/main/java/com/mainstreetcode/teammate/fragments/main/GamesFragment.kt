@@ -71,6 +71,7 @@ class GamesFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.games),
                 toolBarMenu = R.menu.fragment_tournaments,

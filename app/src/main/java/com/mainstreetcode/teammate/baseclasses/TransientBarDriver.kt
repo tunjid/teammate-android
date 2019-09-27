@@ -108,7 +108,7 @@ class TransientBarDriver(
         transientBottomBars.clear()
     }
 
-    private fun BaseTransientBottomBar<*>.fabDependentShow() = anchorView.postDelayed(TeammatesBaseActivity.HIDER_DURATION.toLong()) {
+    private fun BaseTransientBottomBar<*>.fabDependentShow() = anchorView.postDelayed(HIDER_DURATION.toLong()) {
         transientBottomBars.add(this)
         (getView() as? ViewGroup)?.apply {
             backgroundTintList = ColorStateList.valueOf(context.resolveThemeColor(R.attr.colorOnSurface))
@@ -131,6 +131,7 @@ class TransientBarDriver(
     }
 }
 
+const val HIDER_DURATION = 300
 
 @Suppress("UNCHECKED_CAST")
 fun <T : BaseTransientBottomBar<T>> BaseTransientBottomBar<T>.withCallback(callback: BaseTransientBottomBar.BaseCallback<BaseTransientBottomBar<*>>): T =

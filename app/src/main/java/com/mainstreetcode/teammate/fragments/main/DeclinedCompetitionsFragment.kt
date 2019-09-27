@@ -57,9 +57,10 @@ class DeclinedCompetitionsFragment : MainActivityFragment(R.layout.fragment_list
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle =  getString(R.string.competitors_declined),
-                fabShows = false
+                fabShows = showsFab
         )
 
         val refreshAction = {

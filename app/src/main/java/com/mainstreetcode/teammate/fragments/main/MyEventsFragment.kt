@@ -62,6 +62,7 @@ class MyEventsFragment : MainActivityFragment(R.layout.fragment_list_with_refres
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.attending_events)
         )

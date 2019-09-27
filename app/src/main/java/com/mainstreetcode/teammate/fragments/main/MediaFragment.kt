@@ -89,6 +89,7 @@ class MediaFragment : MainActivityFragment(R.layout.fragment_media),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.media_title, team.name),
                 toolBarMenu = R.menu.fragment_media,

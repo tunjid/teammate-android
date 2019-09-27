@@ -55,6 +55,7 @@ class UserSearchFragment : MainActivityFragment(R.layout.fragment_user_search),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarShows = false
         )

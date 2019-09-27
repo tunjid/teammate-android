@@ -63,11 +63,12 @@ class FeedFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), 
     override val showsFab: Boolean get() = !teamViewModel.isOnATeam
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName),
                 fabText = R.string.team_search_create,
                 fabIcon = R.drawable.ic_search_white_24dp,
-                fabShows = showsFab,
+                fabShows = false,
                 bottomNavShows = true
         )
 
@@ -85,6 +86,7 @@ class FeedFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), 
 
     override fun onResume() {
         super.onResume()
+        updateUi(fabShows = showsFab)
         scrollManager.setRefreshing()
         disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke))
     }
@@ -94,10 +96,9 @@ class FeedFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), 
         onBoard()
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> navigator.show(TeamSearchFragment.newInstance())
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> navigator.show(TeamSearchFragment.newInstance()).let { Unit }
+        else -> Unit
     }
 
     override fun onFeedItemClicked(item: FeedItem<*>) {

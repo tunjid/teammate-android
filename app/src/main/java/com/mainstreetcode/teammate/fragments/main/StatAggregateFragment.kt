@@ -64,6 +64,7 @@ class StatAggregateFragment : MainActivityFragment(),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(toolbarShows = false)
 
         searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))

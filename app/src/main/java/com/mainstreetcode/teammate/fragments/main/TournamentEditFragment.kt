@@ -81,6 +81,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = toolbarTitle,
                 toolBarMenu = R.menu.fragment_tournament_edit,

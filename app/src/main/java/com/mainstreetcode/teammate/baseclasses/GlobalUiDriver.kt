@@ -24,6 +24,7 @@
 
 package com.mainstreetcode.teammate.baseclasses
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.os.Build
@@ -73,6 +74,7 @@ fun FragmentActivity.globalUiDriver(
         altToolbarId: Int = R.id.alt_toolbar,
         fabId: Int = R.id.fab,
         bottomNavId: Int = R.id.bottom_navigation,
+        grassId: Int = R.id.grass_background,
         currentFragmentSource: () -> Fragment?
 ) = object : ReadWriteProperty<FragmentActivity, UiState> {
 
@@ -83,6 +85,7 @@ fun FragmentActivity.globalUiDriver(
                 altToolbarId,
                 fabId,
                 bottomNavId,
+                grassId,
                 currentFragmentSource
         )
     }
@@ -124,23 +127,17 @@ class GlobalUiDriver(
         altToolbarId: Int,
         fabId: Int,
         bottomNavId: Int,
+        grassId: Int = R.id.grass_background,
         private val getCurrentFragment: () -> Fragment?
 ) : GlobalUiController {
 
-    private val fabHider: ViewHider<MaterialButton> = host.findViewById<MaterialButton>(fabId).run {
-        ViewHider.of(this).setDirection(ViewHider.BOTTOM)
-                .addEndAction { isVisible = true }
-                .build()
-    }
-
     init {
-        host.window.statusBarColor = ContextCompat.getColor(host, R.color.transparent)
+        val color = ContextCompat.getColor(host, R.color.transparent)
+        host.window.statusBarColor = color
+        host.window.navigationBarColor = color
         host.window.decorView.systemUiVisibility = DEFAULT_SYSTEM_UI_FLAGS
-        host.window.decorView.setOnSystemUiVisibilityChangeListener { uiState = uiState.copy(toolbarShows = !decorView.isDisplayingSystemUI()) }
-        fabHider.view.backgroundTintList = ColorStateList.valueOf(host.resolveThemeColor(R.attr.colorSecondary))
+        host.window.decorView.setOnSystemUiVisibilityChangeListener { uiState = uiState.copy(toolbarShows = !host.window.decorView.isDisplayingSystemUI()) }
     }
-
-    private val decorView = host.window.decorView
 
     private val altToolbar: Toolbar = host.findViewById<Toolbar>(altToolbarId).apply {
         setOnMenuItemClickListener(this@GlobalUiDriver::onMenuItemClicked)
@@ -152,6 +149,11 @@ class GlobalUiDriver(
                 .setDirection(ViewHider.TOP)
                 .addStartAction { altToolbar.visibility = View.INVISIBLE }
                 .build()
+    }
+
+    private val fabHider: ViewHider<MaterialButton> = host.findViewById<MaterialButton>(fabId).run {
+        backgroundTintList = ColorStateList.valueOf(host.resolveThemeColor(R.attr.colorSecondary))
+        ViewHider.of(this).setDirection(ViewHider.BOTTOM).build()
     }
 
     private val bottomNavHider: ViewHider<ImageView> = host.findViewById<View>(bottomNavId).run {
@@ -175,24 +177,29 @@ class GlobalUiDriver(
                 .build()
     }
 
-    private val fabExtensionAnimator: FabInteractor by lazy {
-        FabInteractor(fabHider.view).apply { isExtended = true }
+    private val grassHider: ViewHider<ImageView> = host.findViewById<ImageView>(grassId).run {
+        ViewHider.of(this).setDirection(ViewHider.BOTTOM).build()
     }
+
+    private val fabExtensionAnimator: FabInteractor = FabInteractor(fabHider.view).apply { isExtended = true }
 
     private var state: UiState = UiState.freshState()
 
     override var uiState: UiState
         get() = state
+        @SuppressLint("InlinedApi")
         set(value) {
             val previous = state.copy()
             state = value.copy(toolbarInvalidated = false) // Reset after firing once
 
             previous.diff(
+                    previous.copy(fabClickListener = null) == UiState.freshState(),
                     newState = value,
                     showsFabConsumer = fabHider::set,
                     showsToolbarConsumer = toolbarHider::set,
                     showsAltToolbarConsumer = this::toggleAltToolbar,
                     showsBottomNavConsumer = bottomNavHider::set,
+                    grassShowsConsumer = grassHider::set,
                     showsSystemUIConsumer = this::toggleSystemUI,
                     hasLightNavBarConsumer = this::toggleLightNavBar,
                     navBarColorConsumer = this::setNavBarColor,
@@ -205,11 +212,13 @@ class GlobalUiDriver(
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
+            val decorView = host.window.decorView
+            val visibility = decorView.systemUiVisibility
             val isLight = ColorUtils.calculateLuminance(value.navBarColor) > 0.5
-            val systemUiVisibility = if (isLight) DEFAULT_SYSTEM_UI_FLAGS or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            else DEFAULT_SYSTEM_UI_FLAGS
+            val systemUiVisibility = if (isLight) visibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            else visibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
 
-            host.window.decorView.systemUiVisibility = systemUiVisibility
+            decorView.systemUiVisibility = systemUiVisibility
             host.window.navigationBarColor = value.navBarColor
         }
 
@@ -229,9 +238,6 @@ class GlobalUiDriver(
 
     private fun setNavBarColor(color: Int) {
         host.window.navigationBarColor = color
-//        navBackgroundView.background = GradientDrawable(
-//                GradientDrawable.Orientation.BOTTOM_TOP,
-//                intArrayOf(color, Color.TRANSPARENT))
     }
 
     private fun updateMainToolBar(menu: Int, invalidatedAlone: Boolean, title: CharSequence) = toolbarHider.view.run {
@@ -247,7 +253,7 @@ class GlobalUiDriver(
     }
 
     private fun setFabState(@DrawableRes icon: Int, @StringRes title: Int) = host.runOnUiThread {
-        val titleSequence = host.getString(title)
+        val titleSequence = if (title == 0) "" else host.getString(title)
         if (icon != 0 && titleSequence.isNotBlank()) fabExtensionAnimator.updateGlyphs(FabExtensionAnimator.newState(
                 titleSequence,
                 ContextCompat.getDrawable(host, icon)))
@@ -261,16 +267,17 @@ class GlobalUiDriver(
             else hideSystemUI()
 
     private fun hideSystemUI() {
-        val decorView = decorView
+        val decorView = host.window.decorView
         val visibility = (decorView.systemUiVisibility
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
         decorView.systemUiVisibility = visibility
     }
 
     private fun showSystemUI() {
-        val decorView = decorView
+        val decorView = host.window.decorView
         var visibility = decorView.systemUiVisibility
         visibility = visibility and View.SYSTEM_UI_FLAG_FULLSCREEN.inv()
         visibility = visibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION.inv()
@@ -282,7 +289,7 @@ class GlobalUiDriver(
     private fun toggleLightNavBar(isLight: Boolean) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        val decorView = decorView
+        val decorView = host.window.decorView
         var visibility = decorView.systemUiVisibility
 
         visibility = if (isLight) visibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR

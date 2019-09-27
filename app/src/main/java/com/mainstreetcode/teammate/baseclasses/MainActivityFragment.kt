@@ -35,6 +35,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.MainActivity
+import com.mainstreetcode.teammate.activities.signOut
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder
 import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment
@@ -97,6 +98,9 @@ open class MainActivityFragment(layoutRes: Int = 0) : TeammatesBaseFragment(layo
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        userViewModel
+        roleViewModel.apply {  }
+        teamViewModel
         defaultErrorHandler.addAction { if (::scrollManager.isInitialized) scrollManager.reset() }
     }
 
@@ -104,7 +108,7 @@ open class MainActivityFragment(layoutRes: Int = 0) : TeammatesBaseFragment(layo
         super.onViewCreated(view, savedInstanceState)
 
         spacer = view.findViewById(R.id.spacer_toolbar)
-        if (spacer == null || (view.parent as View).id != R.id.bottom_sheet_view) return
+        if (spacer == null || (view.parent as? View)?.id != R.id.bottom_sheet_view) return
 
         spacer?.setBackgroundResource(R.drawable.bg_round_top_toolbar)
         spacer?.clipToOutline = true
@@ -158,8 +162,8 @@ open class MainActivityFragment(layoutRes: Int = 0) : TeammatesBaseFragment(layo
     protected fun signOut() {
         teamViewModel.updateDefaultTeam(Team.empty())
         disposables.add(userViewModel.signOut().subscribe(
-                { MainActivity.startRegistrationActivity(requireActivity()) },
-                { MainActivity.startRegistrationActivity(requireActivity()) }
+                { navigator.signOut() },
+                { navigator.signOut() }
         ))
     }
 

@@ -69,7 +69,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         Navigator.TransactionModifier,
         Navigator.NavigationController {
 
-    private var lastSetUiState: AtomicReference<UiState> = AtomicReference()
+    private val lastSetUiState: AtomicReference<UiState> = AtomicReference()
 
     private var activityUiState by activityGlobalUiController()
 
@@ -151,9 +151,9 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         sharedElementReturnTransition = null
     }
 
-    protected open fun handleErrorMessage(message: Message) {
-        transientBarDriver.showSnackBar(message.message)
-        transientBarDriver.toggleProgress(false)
+    protected open fun handleErrorMessage(message: Message) = transientBarDriver.run {
+        toggleProgress(false)
+        showSnackBar(message.message)
     }
 
     protected fun updateFabOnScroll(dx: Int, dy: Int) =
@@ -188,6 +188,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
             altToolbarTitle: CharSequence = "",
             @ColorInt navBarColor: Int = if (SDK_INT >= O) requireActivity().resolveThemeColor(R.attr.nav_bar_color) else Color.BLACK,
             bottomNavShows: Boolean = true,
+            grassShows: Boolean = false,
             systemUiShows: Boolean = true,
             hasLightNavBar: Boolean = SDK_INT >= O,
             fabClickListener: View.OnClickListener? = this
@@ -206,6 +207,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
             altToolbarTitle,
             navBarColor,
             bottomNavShows,
+            grassShows,
             systemUiShows,
             hasLightNavBar,
             fabClickListener
@@ -226,6 +228,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
             altToolbarTitle: CharSequence = uiState.altToolbarTitle,
             @ColorInt navBarColor: Int = uiState.navBarColor,
             bottomNavShows: Boolean = uiState.bottomNavShows,
+            grassShows: Boolean = uiState.grassShows,
             systemUiShows: Boolean = uiState.systemUiShows,
             hasLightNavBar: Boolean = uiState.hasLightNavBar,
             fabClickListener: View.OnClickListener? = uiState.fabClickListener
@@ -247,6 +250,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
                 altToolbarTitle = altToolbarTitle,
                 navBarColor = navBarColor,
                 bottomNavShows = bottomNavShows,
+                grassShows = grassShows,
                 systemUiShows = systemUiShows,
                 hasLightNavBar = hasLightNavBar,
                 fabClickListener = fabClickListener

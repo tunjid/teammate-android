@@ -47,17 +47,20 @@ data class UiState(
         val altToolbarTitle: CharSequence,
         @param:ColorInt @field:ColorInt @get:ColorInt val navBarColor: Int,
         val bottomNavShows: Boolean,
+        val grassShows: Boolean,
         val systemUiShows: Boolean,
         val hasLightNavBar: Boolean,
         val fabClickListener: View.OnClickListener?
 ) {
 
     fun diff(
+            force: Boolean,
             newState: UiState,
             showsFabConsumer: (Boolean) -> Unit,
             showsToolbarConsumer: (Boolean) -> Unit,
             showsAltToolbarConsumer: (Boolean) -> Unit,
             showsBottomNavConsumer: (Boolean) -> Unit,
+            grassShowsConsumer: (Boolean) -> Unit,
             showsSystemUIConsumer: (Boolean) -> Unit,
             hasLightNavBarConsumer: (Boolean) -> Unit,
             navBarColorConsumer: (Int) -> Unit,
@@ -67,32 +70,33 @@ data class UiState(
             altToolbarStateConsumer: (Int, Boolean, CharSequence) -> Unit,
             fabClickListenerConsumer: (View.OnClickListener?) -> Unit
     ) {
-        onChanged(newState, UiState::toolBarMenu, UiState::toolbarInvalidated, UiState::toolbarTitle) {
+        onChanged(force, newState, UiState::toolBarMenu, UiState::toolbarInvalidated, UiState::toolbarTitle) {
             toolbarStateConsumer(toolBarMenu, toolbarInvalidated, toolbarTitle)
         }
 
-        onChanged(newState, UiState::toolbarShows) { showsToolbarConsumer(toolbarShows) }
+        onChanged(force, newState, UiState::toolbarShows) { showsToolbarConsumer(toolbarShows) }
 
-        onChanged(newState, UiState::altToolBarMenu, UiState::altToolbarInvalidated, UiState::altToolBarMenu) {
+        onChanged(force, newState, UiState::altToolBarMenu, UiState::altToolbarInvalidated, UiState::altToolBarMenu) {
             altToolbarStateConsumer(altToolBarMenu, altToolbarInvalidated, altToolbarTitle)
         }
 
-        onChanged(newState, UiState::altToolBarShows) { showsAltToolbarConsumer(altToolBarShows) }
+        onChanged(force, newState, UiState::altToolBarShows) { showsAltToolbarConsumer(altToolBarShows) }
 
-        onChanged(newState, UiState::fabShows) { showsFabConsumer(fabShows) }
-        onChanged(newState, UiState::fabExtended) { fabExtendedConsumer(fabExtended) }
-        onChanged(newState, UiState::fabIcon, UiState::fabText) { fabStateConsumer(fabIcon, fabText) }
+        onChanged(force, newState, UiState::fabShows) { showsFabConsumer(fabShows) }
+        onChanged(force, newState, UiState::fabExtended) { fabExtendedConsumer(fabExtended) }
+        onChanged(force, newState, UiState::fabIcon, UiState::fabText) { fabStateConsumer(fabIcon, fabText) }
 
-        onChanged(newState, UiState::navBarColor) { navBarColorConsumer(navBarColor) }
-        onChanged(newState, UiState::systemUiShows) { showsSystemUIConsumer(systemUiShows) }
-        onChanged(newState, UiState::bottomNavShows) { showsBottomNavConsumer(bottomNavShows) }
-        onChanged(newState, UiState::hasLightNavBar) { hasLightNavBarConsumer(hasLightNavBar) }
+        onChanged(force, newState, UiState::navBarColor) { navBarColorConsumer(navBarColor) }
+        onChanged(force, newState, UiState::bottomNavShows) { showsBottomNavConsumer(bottomNavShows) }
+        onChanged(force, newState, UiState::grassShows) { grassShowsConsumer(grassShows) }
+        onChanged(force, newState, UiState::hasLightNavBar) { hasLightNavBarConsumer(hasLightNavBar) }
 
+        showsSystemUIConsumer(newState.systemUiShows)
         fabClickListenerConsumer.invoke(newState.fabClickListener)
     }
 
-    private inline fun onChanged(that: UiState, vararg selectors: (UiState) -> Any?, invocation: UiState.() -> Unit) {
-        if (selectors.any { it(this) != it(that) }) invocation.invoke(that)
+    private inline fun onChanged(force:Boolean, that: UiState, vararg selectors: (UiState) -> Any?, invocation: UiState.() -> Unit) {
+        if (force || selectors.any { it(this) != it(that) }) invocation(that)
     }
 
     companion object {
@@ -111,6 +115,7 @@ data class UiState(
                 fabExtended = true,
                 navBarColor = Color.BLACK,
                 bottomNavShows = true,
+                grassShows = true,
                 systemUiShows = true,
                 hasLightNavBar = false,
                 fabClickListener = null

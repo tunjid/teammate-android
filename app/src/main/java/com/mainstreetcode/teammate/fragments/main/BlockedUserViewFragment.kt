@@ -59,6 +59,7 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>(R.layout.fragment_
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.blocked_user),
                 fabShows = showsFab,

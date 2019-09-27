@@ -74,6 +74,7 @@ class TeamSearchFragment : MainActivityFragment(R.layout.fragment_team_search),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentTeamSearchBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarShows = false
         )

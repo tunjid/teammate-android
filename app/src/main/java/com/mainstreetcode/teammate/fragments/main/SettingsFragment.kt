@@ -29,7 +29,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.MainActivity
+import com.mainstreetcode.teammate.activities.signOut
 import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
 import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
@@ -40,6 +40,7 @@ class SettingsFragment : MainActivityFragment(R.layout.fragment_settings),
         SettingsAdapter.SettingsAdapterListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.settings),
                 toolBarMenu = R.menu.fragment_settings
@@ -62,9 +63,7 @@ class SettingsFragment : MainActivityFragment(R.layout.fragment_settings),
 
     private fun deleteAccount() {
         disposables.add(userViewModel.deleteAccount().subscribe({
-            val activity = requireActivity()
-            MainActivity.startRegistrationActivity(activity)
-            activity.finish()
+            navigator.signOut()
         }, defaultErrorHandler::invoke))
     }
 

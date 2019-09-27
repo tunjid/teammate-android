@@ -33,6 +33,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mainstreetcode.teammate.R
@@ -60,6 +61,12 @@ class BottomSheetDriver(
 
     val isBottomSheetShowing: Boolean
         get() = bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
+
+    val currentFragment: Fragment?
+        get() = if (!isEnabled) null
+        else host.supportFragmentManager.findFragmentById(R.id.bottom_sheet_view).run {
+            if (this is BlankBottomSheetFragment) null else this
+        }
 
     init {
         bottomSheetToolbar.setOnMenuItemClickListener(host::onOptionsItemSelected)

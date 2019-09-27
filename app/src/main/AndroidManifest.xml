@@ -72,8 +72,9 @@
         </service>
 
         <activity
-            android:name="com.mainstreetcode.teammate.activities.RegistrationActivity"
-            android:windowSoftInputMode="adjustResize">
+            android:name="com.mainstreetcode.teammate.activities.MainActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN" />
@@ -99,10 +100,6 @@
                     android:scheme="@string/deep_link_scheme" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.mainstreetcode.teammate.activities.MainActivity"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

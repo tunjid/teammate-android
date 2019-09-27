@@ -71,6 +71,7 @@ class HeadToHeadFragment : MainActivityFragment(R.layout.fragment_head_to_head),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentHeadToHeadBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarShows = false,
                 fabShows = showsFab

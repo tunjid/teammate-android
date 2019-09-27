@@ -97,6 +97,7 @@ class GameFragment : MainActivityFragment(R.layout.fragment_game), UserAdapter.A
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentGameBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.game_stats),
                 toolBarMenu = R.menu.fragment_game,

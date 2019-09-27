@@ -74,6 +74,7 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(if (headeredModel.isEmpty) R.string.game_add else R.string.game_edit),
                 fabIcon = R.drawable.ic_check_white_24dp,

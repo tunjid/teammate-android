@@ -72,6 +72,7 @@ class TeamEditFragment : HeaderedFragment<Team>(R.layout.fragment_headered),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = toolbarTitle,
                 fabIcon = R.drawable.ic_check_white_24dp,

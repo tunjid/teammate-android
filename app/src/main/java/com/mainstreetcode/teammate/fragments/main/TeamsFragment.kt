@@ -89,6 +89,7 @@ class TeamsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.my_teams),
                 fabIcon = R.drawable.ic_search_white_24dp,

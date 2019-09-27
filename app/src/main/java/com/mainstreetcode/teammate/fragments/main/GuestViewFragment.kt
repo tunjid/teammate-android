@@ -60,6 +60,7 @@ class GuestViewFragment : HeaderedFragment<Guest>(R.layout.fragment_headered) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.event_guest),
                 toolBarMenu = R.menu.fragment_guest_view,

@@ -31,7 +31,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.databinding.FragmentResetPasswordBinding
 import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.input
@@ -40,15 +40,18 @@ import com.mainstreetcode.teammate.util.input
  * Forgot password screen
  */
 
-class ResetPasswordFragment : RegistrationActivityFragment(R.layout.fragment_reset_password), TextView.OnEditorActionListener {
+class ResetPasswordFragment : MainActivityFragment(R.layout.fragment_reset_password), TextView.OnEditorActionListener {
 
     private var binding: FragmentResetPasswordBinding? = null
 
     override val stableTag: String
         get() = arguments!!.getCharSequence(ARG_TOKEN, "").toString()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override val showsFab: Boolean = true
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentResetPasswordBinding.bind(view).run {
         super.onViewCreated(view, savedInstanceState)
+        binding = this
 
         defaultUi(
                 fabText = R.string.submit,
@@ -56,18 +59,17 @@ class ResetPasswordFragment : RegistrationActivityFragment(R.layout.fragment_res
                 fabShows = true,
                 toolbarShows = false,
                 bottomNavShows = false,
+                grassShows = true,
                 navBarColor = GRASS_COLOR
         )
 
-        FragmentResetPasswordBinding.bind(view).apply {
-            val args = arguments
+        val args = arguments
 
-            if (args != null) token.setText(args.getCharSequence(ARG_TOKEN, ""))
-            email.setOnEditorActionListener(this@ResetPasswordFragment)
+        if (args != null) token.setText(args.getCharSequence(ARG_TOKEN, ""))
+        email.setOnEditorActionListener(this@ResetPasswordFragment)
 
-            email.transitionName = SplashFragment.TRANSITION_TITLE
-            cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
-        }
+        email.transitionName = SplashFragment.TRANSITION_TITLE
+        cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
     }
 
     override fun onDestroyView() {
@@ -97,7 +99,7 @@ class ResetPasswordFragment : RegistrationActivityFragment(R.layout.fragment_res
             val token = binding.token.input.toString()
             val password = binding.password.input.toString()
 
-            disposables.add(viewModel.resetPassword(email, token, password)
+            disposables.add(userViewModel.resetPassword(email, token, password)
                     .subscribe({
                         transientBarDriver.showSnackBar { snackbar ->
                             snackbar.setText(it.message)

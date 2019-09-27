@@ -97,11 +97,11 @@ class ChatFragment : MainActivityFragment(R.layout.fragment_chat),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentChatBinding.bind(view).run {
-
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.team_chat_title, team.name),
                 toolBarMenu = R.menu.fragment_chat,
-                fabShows = false
+                fabShows = showsFab
         )
 
         footerBackground.setMaterialOverlay()

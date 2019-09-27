@@ -78,6 +78,7 @@ class CompetitorsFragment : MainActivityFragment(R.layout.fragment_competitors),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle =  getString(R.string.add_tournament_competitors),
                 fabShows = showsFab,

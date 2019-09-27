@@ -69,6 +69,7 @@ class EventsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolBarMenu = R.menu.fragment_events,
                 toolbarTitle = getString(R.string.events_title, team.name),

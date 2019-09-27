@@ -76,6 +76,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_head
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = gofer.getToolbarTitle(this),
                 toolBarMenu =R.menu.fragment_user_edit,

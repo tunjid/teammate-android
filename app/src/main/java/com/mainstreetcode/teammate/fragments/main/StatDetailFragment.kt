@@ -50,6 +50,7 @@ class StatDetailFragment : MainActivityFragment(R.layout.fragment_games_parent) 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(toolbarTitle = getString(R.string.tournament_stats))
 
         val viewPager = view.findViewById<ViewPager>(R.id.view_pager)

@@ -24,26 +24,35 @@
 
 package com.mainstreetcode.teammate.activities
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.LinearLayout
+import androidx.activity.addCallback
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.BottomSheetDriver
-import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
+import com.mainstreetcode.teammate.baseclasses.GlobalUiController
+import com.mainstreetcode.teammate.baseclasses.HIDER_DURATION
+import com.mainstreetcode.teammate.baseclasses.TransientBarController
+import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
+import com.mainstreetcode.teammate.baseclasses.globalUiDriver
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.fragments.main.ChatFragment
 import com.mainstreetcode.teammate.fragments.main.DeclinedCompetitionsFragment
@@ -63,6 +72,8 @@ import com.mainstreetcode.teammate.fragments.main.TeamsFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentsFragment
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment
+import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment
+import com.mainstreetcode.teammate.fragments.registration.SplashFragment
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
@@ -70,11 +81,14 @@ import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Tournament
+import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.fetchRoundedDrawable
+import com.mainstreetcode.teammate.util.isInDarkMode
 import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
+import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidbootstrap.core.components.Navigator
@@ -83,11 +97,11 @@ import com.tunjid.androidbootstrap.core.components.savedStateFor
 import com.tunjid.androidbootstrap.core.components.stackNavigator
 import io.reactivex.disposables.CompositeDisposable
 
-class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
+class MainActivity : AppCompatActivity(R.layout.activity_main),
+        GlobalUiController,
         BottomSheetController,
+        TransientBarController,
         Navigator.NavigationController {
-
-    override val navigator: StackNavigator by stackNavigator(R.id.main_fragment_container)
 
     private var bottomNavHeight: Int = 0
 
@@ -98,9 +112,19 @@ class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
 
     private lateinit var toolbar: Toolbar
 
-    private lateinit var userViewModel: UserViewModel
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
-    private lateinit var disposables: CompositeDisposable
+    private val userViewModel by viewModels<UserViewModel>()
+
+    private val teamViewModel by viewModels<TeamViewModel>()
+
+    private val stackNavigator: StackNavigator by stackNavigator(R.id.main_fragment_container)
+
+    override var uiState: UiState by globalUiDriver { navigator.currentFragment }
+
+    override val transientBarDriver: TransientBarDriver by lazy {
+        TransientBarDriver(findViewById(R.id.coordinator), findViewById(R.id.fab))
+    }
 
     override val bottomSheetDriver: BottomSheetDriver by lazy {
         BottomSheetDriver(
@@ -112,49 +136,69 @@ class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
         )
     }
 
-    private val lifecycleCallbacks: FragmentManager.FragmentLifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
-
-        override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) {
-            if (f.id == navigator.containerId) bottomSheetDriver.hideBottomSheet()
-        }
-
-        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-            if (f.id != navigator.containerId) return
-            val t = f.tag ?: return
-
-            var id = 0
-
-            when {
-                t.contains(FeedFragment::class.java.simpleName) -> id = R.id.action_home
-                t.contains(EventsFragment::class.java.simpleName) -> id = R.id.action_events
-                t.contains(ChatFragment::class.java.simpleName) -> id = R.id.action_messages
-                t.contains(MediaFragment::class.java.simpleName) -> id = R.id.action_media
-                t.contains(TeamsFragment::class.java.simpleName) -> id = R.id.action_team
-                t.contains(TournamentsFragment::class.java.simpleName) -> id = R.id.action_tournaments
-            }
-
-            bottomNav.highlight(id)
-        }
+    private val insetDriver by lazy {
+        WindowInsetsDriver(
+                stackNavigatorSource = this::navigator,
+                parentContainer = findViewById(R.id.content_view),
+                contentContainer = findViewById(R.id.main_fragment_container),
+                coordinatorLayout = findViewById(R.id.coordinator),
+                toolbar = findViewById(R.id.toolbar),
+                topInsetView = findViewById(R.id.top_inset),
+                bottomInsetView = findViewById(R.id.bottom_inset),
+                keyboardPadding = findViewById(R.id.padding),
+                insetAdjuster = this::adjustKeyboardPadding
+        )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        supportFragmentManager.registerFragmentLifecycleCallbacks(lifecycleCallbacks, false)
+    override val navigator: Navigator by lazy { BottomSheetAwareNavigator(stackNavigator, bottomSheetDriver) }
 
-        userViewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(ViewModelProviders.of(this).get(PrefsViewModel::class.java).nightUiMode)
+        setTheme(if (isInDarkMode) R.style.AppDarkTheme else R.style.AppTheme)
+
+        super.onCreate(savedInstanceState)
+
+//        supportFragmentManager.registerFragmentLifecycleCallbacks(WindowInsetsDriver(
+//                stackNavigatorSource = this::navigator,
+//                parentContainer = findViewById(R.id.content_view),
+//                contentContainer = findViewById(R.id.main_fragment_container),
+//                coordinatorLayout = findViewById(R.id.coordinator),
+//                toolbar = findViewById(R.id.toolbar),
+//                topInsetView = findViewById(R.id.top_inset),
+//                bottomInsetView = findViewById(R.id.bottom_inset),
+//                keyboardPadding = findViewById(R.id.padding),
+//                insetAdjuster = this::adjustKeyboardPadding
+//        ), true)
+
+        supportFragmentManager.registerFragmentLifecycleCallbacks(insetDriver, true)
+
+        supportFragmentManager.registerFragmentLifecycleCallbacks(TransientBarCallback(), true)
+        supportFragmentManager.registerFragmentLifecycleCallbacks(NavHighlightCallback(), false)
+
+        stackNavigator.transactionModifier = { incomingFragment ->
+            val current = navigator.currentFragment
+            if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
+            else setCustomAnimations(
+                    android.R.anim.fade_in,
+                    android.R.anim.fade_out,
+                    android.R.anim.fade_in,
+                    android.R.anim.fade_out
+            )
+        }
+
+        onBackPressedDispatcher.addCallback(this) { navigator.pop() }
+
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
-
-        if (!userViewModel.isSignedIn) return startRegistrationActivity(this)
-
-        disposables = CompositeDisposable()
 
         toolbar = findViewById(R.id.toolbar)
         toolbar.setNavigationContentDescription(R.string.expand_nav)
         toolbar.setNavigationIcon(R.drawable.ic_supervisor_white_24dp)
         toolbar.setNavigationOnClickListener { showNavOverflow() }
 
-        bottomNav = BottomNav.builder().setContainer(findViewById(R.id.bottom_navigation))
+        bottomNav = BottomNav.builder().setContainer(findViewById<LinearLayout>(R.id.bottom_navigation)
+                .apply { doOnLayout { bottomNavHeight = height } })
                 .setSwipeRunnable(this::showNavOverflow)
                 .setListener(View.OnClickListener { view -> onNavItemSelected(view.id) })
                 .setNavItems(NavItem.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
@@ -166,8 +210,10 @@ class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
 
         onBackPressedDispatcher.addCallback(this, bottomSheetDriver)
 
-        route(savedInstanceState, intent)
         App.prime()
+
+        if (!userViewModel.isSignedIn) navigator.signOut(intent)
+        else route(savedInstanceState, intent)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -177,8 +223,6 @@ class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
 
     override fun onResume() {
         super.onResume()
-        val teamViewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
-
         disposables.add(teamViewModel.teamChangeFlowable.flatMapMaybe { team ->
             fetchRoundedDrawable(this,
                     team.imageUrl,
@@ -193,15 +237,13 @@ class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
         super.onStop()
     }
 
-    override fun adjustKeyboardPadding(suggestion: Int): Int {
-        var padding = super.adjustKeyboardPadding(suggestion)
+    private fun adjustKeyboardPadding(suggestion: Int): Int {
+        var padding = suggestion
         if (padding != WindowInsetsDriver.bottomInset) padding -= bottomNavHeight
         return padding
     }
 
-    private fun showNavOverflow() {
-        NavDialogFragment.newInstance().show(supportFragmentManager, "")
-    }
+    private fun showNavOverflow() = NavDialogFragment.newInstance().show(supportFragmentManager, "")
 
     private fun updateToolbarIcon(drawable: Drawable) {
         val current = toolbar.navigationIcon
@@ -278,15 +320,76 @@ class MainActivity : TeammatesBaseActivity(R.layout.activity_main),
                 ?: if (savedInstanceState == null) navigator.show(FeedFragment.newInstance())
     }
 
-    companion object {
-
-        const val FEED_DEEP_LINK = "feed-deep-link"
-
-        fun startRegistrationActivity(activity: Activity) {
-            val main = Intent(activity, RegistrationActivity::class.java)
-            activity.startActivity(main)
-            activity.finish()
+    inner class TransientBarCallback : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+            if (f.id == navigator.containerId) transientBarDriver.clearTransientBars()
         }
     }
 
+    inner class NavHighlightCallback : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+            if (f.id != navigator.containerId) return
+            val t = f.tag ?: return
+
+            var id = 0
+
+            when {
+                t.contains(FeedFragment::class.java.simpleName) -> id = R.id.action_home
+                t.contains(EventsFragment::class.java.simpleName) -> id = R.id.action_events
+                t.contains(ChatFragment::class.java.simpleName) -> id = R.id.action_messages
+                t.contains(MediaFragment::class.java.simpleName) -> id = R.id.action_media
+                t.contains(TeamsFragment::class.java.simpleName) -> id = R.id.action_team
+                t.contains(TournamentsFragment::class.java.simpleName) -> id = R.id.action_tournaments
+            }
+
+            bottomNav.highlight(id)
+        }
+    }
+}
+
+class BottomSheetAwareNavigator(
+        val delegate: Navigator,
+        val bottomSheetDriver: BottomSheetDriver
+) : Navigator by delegate {
+
+    override val currentFragment: Fragment?
+        get() = bottomSheetDriver.currentFragment ?: delegate.currentFragment
+
+    override fun show(fragment: Fragment, tag: String): Boolean {
+        bottomSheetDriver.hideBottomSheet()
+        return delegate.show(fragment, tag)
+    }
+
+    override fun <T> show(fragment: T): Boolean where T : Fragment, T : Navigator.TagProvider =
+            show(fragment, fragment.stableTag)
+}
+
+private const val TOKEN = "token"
+const val FEED_DEEP_LINK = "feed-deep-link"
+
+fun Navigator.completeSignIn() {
+    clear(upToTag = "", includeMatch = true)
+    show(FeedFragment.newInstance())
+}
+
+fun Navigator.signOut(intent: Intent? = null) {
+    clear(upToTag = "", includeMatch = true)
+
+    val token: String? = intent?.resetToken()
+
+    if (token == null) show(SplashFragment.newInstance())
+    else show(ResetPasswordFragment.newInstance(token))
+}
+
+private fun Intent.resetToken(): String? {
+    val uri = data ?: return null
+
+    val domain1 = App.instance.getString(R.string.domain_1)
+    val domain2 = App.instance.getString(R.string.domain_2)
+
+    val path = uri.path ?: return null
+    val domainMatches = domain1 == uri.host || domain2 == uri.host
+
+    return if (domainMatches && path.contains("forgotPassword")) uri.getQueryParameter(TOKEN)
+    else null
 }

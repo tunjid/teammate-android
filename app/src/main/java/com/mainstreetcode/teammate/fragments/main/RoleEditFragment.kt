@@ -68,6 +68,7 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.role_edit),
                 toolBarMenu = R.menu.fragment_user_edit,

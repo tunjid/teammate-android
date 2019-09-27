@@ -84,6 +84,7 @@ class TournamentDetailFragment : MainActivityFragment(R.layout.fragment_games_pa
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentGamesParentBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = getString(R.string.tournament_fixtures),
                 toolBarMenu = R.menu.fragment_tournament_detail,
