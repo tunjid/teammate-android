@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
@@ -45,7 +45,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [tournaments][Event]
  */
 
-class GamesChildFragment : MainActivityFragment(R.layout.fragment_games_child),
+class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
         GameAdapter.AdapterListener {
 
     private var round: Int = 0

@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatRankAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -42,7 +42,7 @@ import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-class StatRankFragment : MainActivityFragment(R.layout.fragment_stat_rank) {
+class StatRankFragment : TeammatesBaseFragment(R.layout.fragment_stat_rank) {
 
     private lateinit var type: StatType
     private lateinit var tournament: Tournament

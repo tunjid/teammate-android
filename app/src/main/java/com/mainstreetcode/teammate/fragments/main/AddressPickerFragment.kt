@@ -38,7 +38,7 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.AutoCompleteAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentPlacePickerBinding
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.Logger
@@ -49,7 +49,7 @@ import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import java.util.concurrent.atomic.AtomicReference
 
-class AddressPickerFragment : MainActivityFragment(R.layout.fragment_place_picker) {
+class AddressPickerFragment : TeammatesBaseFragment(R.layout.fragment_place_picker) {
 
     private var canQueryMap: Boolean = false
 

@@ -62,8 +62,6 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
 
     override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && gofer.canEdit()
 
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
     override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_STAT)!!)
 
     private val toolbarTitle get() = getString(if (headeredModel.isEmpty) R.string.stat_add else R.string.stat_edit)
@@ -186,7 +184,6 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
     companion object {
 
         private const val ARG_STAT = "stat"
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
         fun newInstance(stat: Stat): StatEditFragment = StatEditFragment().apply {
             arguments = bundleOf(ARG_STAT to stat)

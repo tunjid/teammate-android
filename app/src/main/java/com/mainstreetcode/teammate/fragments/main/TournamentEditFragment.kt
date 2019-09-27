@@ -67,8 +67,6 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
 
     override val showsFab: Boolean get() = gofer.canEditAfterCreation()
 
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
     override val sport: Sport get() = headeredModel.sport
 
     override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
@@ -179,7 +177,6 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
     companion object {
 
         internal const val ARG_TOURNAMENT = "tournament"
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
         fun newInstance(tournament: Tournament): TournamentEditFragment = TournamentEditFragment().apply {
             arguments = bundleOf(ARG_TOURNAMENT to tournament)

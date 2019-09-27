@@ -39,7 +39,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.completeSignIn
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentSignUpBinding
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.ErrorHandler
@@ -53,7 +53,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignUpFragment : MainActivityFragment(R.layout.fragment_sign_up), TextView.OnEditorActionListener {
+class SignUpFragment : TeammatesBaseFragment(R.layout.fragment_sign_up), TextView.OnEditorActionListener {
 
     private var binding: FragmentSignUpBinding? = null
 

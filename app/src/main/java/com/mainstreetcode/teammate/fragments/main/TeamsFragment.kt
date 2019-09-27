@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -43,14 +43,12 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Searches for teams
  */
 
-class TeamsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+class TeamsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         TeamAdapter.AdapterListener {
 
     private lateinit var roles: List<Differentiable>
 
     private val isTeamPicker: Boolean get() = targetRequestCode != 0
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     override val showsFab: Boolean get() = !isTeamPicker || roles.isEmpty()
 
@@ -147,8 +145,6 @@ class TeamsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
     }
 
     companion object {
-
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
 
         fun newInstance(): TeamsFragment = TeamsFragment().apply { arguments = Bundle() }
     }

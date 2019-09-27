@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamChatAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentChatBinding
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Chat
@@ -60,7 +60,7 @@ import com.tunjid.androidbootstrap.view.animator.ViewHider
 import io.reactivex.disposables.Disposable
 import kotlin.math.abs
 
-class ChatFragment : MainActivityFragment(R.layout.fragment_chat),
+class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         TextView.OnEditorActionListener,
         TeamChatAdapter.ChatAdapterListener {
 
@@ -76,8 +76,6 @@ class ChatFragment : MainActivityFragment(R.layout.fragment_chat),
     private var newMessageHider: ViewHider<Chip>? = null
 
     private val isSubscribedToChat: Boolean get() = ::chatDisposable.isInitialized && !chatDisposable.isDisposed
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
 
@@ -285,7 +283,6 @@ class ChatFragment : MainActivityFragment(R.layout.fragment_chat),
     companion object {
 
         private const val ARG_TEAM = "team"
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.chat)
 
         fun newInstance(team: Team): ChatFragment = ChatFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
     }

@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.ListState
@@ -49,7 +49,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  */
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-class TournamentsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         TournamentAdapter.TournamentAdapterListener {
 
     private lateinit var team: Team

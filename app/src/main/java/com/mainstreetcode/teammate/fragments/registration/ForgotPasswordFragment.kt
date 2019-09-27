@@ -31,7 +31,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentForgotPasswordBinding
 import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.input
@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.util.input
  * Forgot password screen
  */
 
-class ForgotPasswordFragment : MainActivityFragment(R.layout.fragment_forgot_password), TextView.OnEditorActionListener {
+class ForgotPasswordFragment : TeammatesBaseFragment(R.layout.fragment_forgot_password), TextView.OnEditorActionListener {
 
     private var binding: FragmentForgotPasswordBinding? = null
 

@@ -40,6 +40,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
@@ -127,6 +128,7 @@ class WindowInsetsDriver(
             duration = ANIMATION_DURATION.toLong()
             coordinatorLayout.forEach { addTarget(it) }
             addTarget(coordinatorLayout) // Animate coordinator and its children, mainly the FAB
+            excludeTarget(RecyclerView::class.java, true)
         })
 
         contentContainer.updatePadding(bottom = new)
@@ -148,6 +150,7 @@ class WindowInsetsDriver(
                 duration = ANIMATION_DURATION.toLong()
                 contentContainer.forEach { addTarget(it) }
                 addTarget(contentContainer)
+                excludeTarget(RecyclerView::class.java, true)
             })
 
             topInsetView.isVisible = insetFlags.hasTopInset

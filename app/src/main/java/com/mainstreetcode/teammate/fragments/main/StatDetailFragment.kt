@@ -32,11 +32,11 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.MODE_FIXED
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TournamentStatAdapter
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 
-class StatDetailFragment : MainActivityFragment(R.layout.fragment_games_parent) {
+class StatDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_parent) {
 
     private lateinit var tournament: Tournament
 

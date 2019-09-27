@@ -52,7 +52,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
-        MainActivityFragment(layoutRes),
+        TeammatesBaseFragment(layoutRes),
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener where T : HeaderedModel<T>, T : ListableModel<T> {
 

@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentHeadToHeadBinding
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
@@ -48,7 +48,7 @@ import com.tunjid.androidbootstrap.core.text.SpanBuilder
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-class HeadToHeadFragment : MainActivityFragment(R.layout.fragment_head_to_head),
+class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head),
         UserAdapter.AdapterListener,
         TeamAdapter.AdapterListener,
         HeadToHeadRequestAdapter.AdapterListener {

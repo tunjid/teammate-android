@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentGameBinding
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
@@ -63,7 +63,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Lists [games][Event]
  */
 
-class GameFragment : MainActivityFragment(R.layout.fragment_game), UserAdapter.AdapterListener {
+class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.AdapterListener {
 
     private lateinit var game: Game
     private lateinit var items: List<Differentiable>

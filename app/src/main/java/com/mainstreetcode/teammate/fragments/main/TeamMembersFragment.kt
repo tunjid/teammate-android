@@ -37,7 +37,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
@@ -50,7 +50,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Displays a [team&#39;s][Team] [members][User].
  */
 
-class TeamMembersFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         TeamMemberAdapter.UserAdapterListener {
 
     private lateinit var team: Team

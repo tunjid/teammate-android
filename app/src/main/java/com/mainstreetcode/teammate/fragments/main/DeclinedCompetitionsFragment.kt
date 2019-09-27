@@ -33,7 +33,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Item.Companion.COMPETITOR
@@ -46,7 +46,7 @@ import com.tunjid.androidbootstrap.view.util.inflate
  * Lists [tournaments][Event]
  */
 
-class DeclinedCompetitionsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         CompetitorAdapter.AdapterListener {
 
     private lateinit var items: List<Differentiable>

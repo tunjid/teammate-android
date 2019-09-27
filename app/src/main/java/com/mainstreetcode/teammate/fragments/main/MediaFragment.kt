@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Media
@@ -48,7 +48,7 @@ import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 
-class MediaFragment : MainActivityFragment(R.layout.fragment_media),
+class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
         MediaAdapter.MediaAdapterListener,
         ImageWorkerFragment.MediaListener,
         ImageWorkerFragment.DownloadRequester {

@@ -32,11 +32,11 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.signOut
 import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.SettingsItem
 import com.mainstreetcode.teammate.util.ScrollManager
 
-class SettingsFragment : MainActivityFragment(R.layout.fragment_settings),
+class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings),
         SettingsAdapter.SettingsAdapterListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

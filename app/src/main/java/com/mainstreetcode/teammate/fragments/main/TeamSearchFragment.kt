@@ -31,7 +31,7 @@ import androidx.appcompat.widget.SearchView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.TeamSearchAdapter
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentTeamSearchBinding
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamSearchRequest
@@ -45,7 +45,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Searches for teams
  */
 
-class TeamSearchFragment : MainActivityFragment(R.layout.fragment_team_search),
+class TeamSearchFragment : TeammatesBaseFragment(R.layout.fragment_team_search),
         SearchView.OnQueryTextListener,
         TeamAdapter.AdapterListener {
 
@@ -54,8 +54,6 @@ class TeamSearchFragment : MainActivityFragment(R.layout.fragment_team_search),
 
     private var createTeam: View? = null
     private var searchView: SearchView? = null
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     override val showsFab: Boolean get() = false
 
@@ -142,7 +140,6 @@ class TeamSearchFragment : MainActivityFragment(R.layout.fragment_team_search),
 
     companion object {
 
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
         private const val ARG_SPORT = "sport-code"
 
         fun newInstance(): TeamSearchFragment = TeamSearchFragment().apply { arguments = Bundle() }

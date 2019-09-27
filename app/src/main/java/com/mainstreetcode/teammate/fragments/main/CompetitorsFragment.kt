@@ -35,7 +35,7 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Team
@@ -49,7 +49,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import java.util.*
 import kotlin.math.min
 
-class CompetitorsFragment : MainActivityFragment(R.layout.fragment_competitors),
+class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors),
         UserAdapter.AdapterListener,
         TeamAdapter.AdapterListener {
 

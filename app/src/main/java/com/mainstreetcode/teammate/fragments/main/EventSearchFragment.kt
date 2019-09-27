@@ -36,7 +36,7 @@ import com.google.android.gms.maps.model.Marker
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ExpandingToolbar
@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
-class EventSearchFragment : MainActivityFragment(R.layout.fragment_public_event), AddressPickerFragment.AddressPicker {
+class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event), AddressPickerFragment.AddressPicker {
 
     private var leaveMap: Boolean = false
 

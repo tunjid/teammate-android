@@ -30,7 +30,7 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.UserAdapter
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -40,14 +40,12 @@ import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
  * Searches for users
  */
 
-class UserSearchFragment : MainActivityFragment(R.layout.fragment_user_search),
+class UserSearchFragment : TeammatesBaseFragment(R.layout.fragment_user_search),
         SearchView.OnQueryTextListener,
         UserAdapter.AdapterListener {
 
     private var searchView: SearchView? = null
     private lateinit var instantSearch: InstantSearch<String, User>
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,9 +112,6 @@ class UserSearchFragment : MainActivityFragment(R.layout.fragment_user_search),
     }
 
     companion object {
-
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
-
         fun newInstance(): UserSearchFragment = UserSearchFragment().apply { arguments = Bundle() }
     }
 }

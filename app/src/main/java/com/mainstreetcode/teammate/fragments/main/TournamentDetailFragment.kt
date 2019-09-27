@@ -45,7 +45,7 @@ import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentGamesParentBinding
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Team
@@ -55,7 +55,7 @@ import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.processEmoji
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 
-class TournamentDetailFragment : MainActivityFragment(R.layout.fragment_games_parent) {
+class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_parent) {
 
     private lateinit var tournament: Tournament
     private lateinit var competitor: Competitor

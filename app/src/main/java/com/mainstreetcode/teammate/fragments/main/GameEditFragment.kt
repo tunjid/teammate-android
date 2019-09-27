@@ -63,8 +63,6 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
 
     override val showsFab: Boolean get() = gofer.canEdit() && !bottomSheetDriver.isBottomSheetShowing
 
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
     override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_GAME)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -171,7 +169,6 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
     companion object {
 
         private const val ARG_GAME = "game"
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
         fun newInstance(game: Game): GameEditFragment = GameEditFragment().apply {
             arguments = bundleOf(ARG_GAME to game)

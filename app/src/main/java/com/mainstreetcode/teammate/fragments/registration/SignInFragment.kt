@@ -33,7 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.completeSignIn
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentSignInBinding
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.hasValidEmail
@@ -44,7 +44,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignInFragment : MainActivityFragment(R.layout.fragment_sign_in), TextView.OnEditorActionListener {
+class SignInFragment : TeammatesBaseFragment(R.layout.fragment_sign_in), TextView.OnEditorActionListener {
 
     private var binding: FragmentSignInBinding? = null
 

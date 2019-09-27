@@ -37,13 +37,13 @@ import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ImageMediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
 import com.tunjid.androidbootstrap.view.util.InsetFlags
 
 
-class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener {
+class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapter.MediaAdapterListener {
 
     private lateinit var media: Media
     private var mediaViewHolder: MediaViewHolder<*>? = null

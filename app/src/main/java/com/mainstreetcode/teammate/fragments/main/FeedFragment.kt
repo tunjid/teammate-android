@@ -37,7 +37,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.FeedAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.JoinRequest
@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Home screen
  */
 
-class FeedFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), FeedAdapter.FeedItemAdapterListener {
+class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), FeedAdapter.FeedItemAdapterListener {
 
     private var onBoardingIndex: Int = 0
     private var isOnBoarding: Boolean = false

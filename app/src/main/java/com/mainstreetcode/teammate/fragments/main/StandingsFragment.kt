@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StandingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Standings
@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.util.SyncedScrollView
  * Lists [tournaments][Event]
  */
 
-class StandingsFragment : MainActivityFragment(R.layout.fragment_standings),
+class StandingsFragment : TeammatesBaseFragment(R.layout.fragment_standings),
         StandingsAdapter.AdapterListener {
 
     private lateinit var tournament: Tournament

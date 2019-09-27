@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.MyEventsViewModel
@@ -45,7 +45,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [events][Event]
  */
 
-class MyEventsFragment : MainActivityFragment(R.layout.fragment_list_with_refresh),
+class MyEventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         EventAdapter.EventAdapterListener {
 
     private lateinit var items: List<Differentiable>

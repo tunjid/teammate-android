@@ -34,7 +34,6 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
 import androidx.core.content.ContextCompat
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
@@ -51,7 +50,7 @@ import java.util.*
  * Inner fragment hosting code for interacting with image and cropping APIs
  */
 
-class ImageWorkerFragment : MainActivityFragment() {
+class ImageWorkerFragment : TeammatesBaseFragment() {
 
     private var isPicking: Boolean = false
 

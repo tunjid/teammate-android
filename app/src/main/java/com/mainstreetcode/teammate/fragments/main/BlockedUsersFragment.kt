@@ -33,7 +33,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.BlockedUserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -44,7 +44,7 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
  * Lists [events][BlockedUser]
  */
 
-class BlockedUsersFragment : MainActivityFragment(R.layout.fragment_list_with_refresh), BlockedUserAdapter.UserAdapterListener {
+class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), BlockedUserAdapter.UserAdapterListener {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
