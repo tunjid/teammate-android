@@ -39,8 +39,8 @@ class RoleGofer(
         model: Role,
         onError: (Throwable) -> Unit,
         private val getFunction: (Role) -> Flowable<Role>,
-        private val deleteFunction: (Role) -> Single<Role>,
-        private val updateFunction: (Role) -> Single<Role>
+        private val updateFunction: (Role) -> Single<Role>,
+        private val deleteFunction: (Role) -> Single<Role>
 ) : TeamHostingGofer<Role>(model, onError) {
 
     init {

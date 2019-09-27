@@ -108,13 +108,11 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
         transientBarDriver.toggleProgress(false)
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> if (headeredModel.position.isInvalid)
-                transientBarDriver.showSnackBar(getString(R.string.select_role))
-            else
-                updateRole()
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab ->
+            if (headeredModel.position.isInvalid) transientBarDriver.showSnackBar(getString(R.string.select_role))
+            else updateRole()
+        else -> Unit
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
