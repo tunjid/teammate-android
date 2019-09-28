@@ -111,20 +111,17 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             if (identifiable is Model<*>) identifiable
             else null
 
-    private fun clearNotification(model: Model<*>?) {
-        if (model == null) return
-
-        when (model) {
-            is User -> NotifierProvider.forModel(User::class.java).clearNotifications(model)
-            is Team -> NotifierProvider.forModel(Team::class.java).clearNotifications(model)
-            is Role -> NotifierProvider.forModel(Role::class.java).clearNotifications(model)
-            is Chat -> NotifierProvider.forModel(Chat::class.java).clearNotifications(model)
-            is Game -> NotifierProvider.forModel(Game::class.java).clearNotifications(model)
-            is Media -> NotifierProvider.forModel(Media::class.java).clearNotifications(model)
-            is Event -> NotifierProvider.forModel(Event::class.java).clearNotifications(model)
-            is Tournament -> NotifierProvider.forModel(Tournament::class.java).clearNotifications(model)
-            is JoinRequest -> NotifierProvider.forModel(JoinRequest::class.java).clearNotifications(model)
-        }
+    private fun clearNotification(model: Model<*>?) = when (model) {
+        is User -> NotifierProvider.forModel(User::class.java).clearNotifications(model)
+        is Team -> NotifierProvider.forModel(Team::class.java).clearNotifications(model)
+        is Role -> NotifierProvider.forModel(Role::class.java).clearNotifications(model)
+        is Chat -> NotifierProvider.forModel(Chat::class.java).clearNotifications(model)
+        is Game -> NotifierProvider.forModel(Game::class.java).clearNotifications(model)
+        is Media -> NotifierProvider.forModel(Media::class.java).clearNotifications(model)
+        is Event -> NotifierProvider.forModel(Event::class.java).clearNotifications(model)
+        is Tournament -> NotifierProvider.forModel(Tournament::class.java).clearNotifications(model)
+        is JoinRequest -> NotifierProvider.forModel(JoinRequest::class.java).clearNotifications(model)
+        else -> Unit
     }
 
     internal fun checkForInvalidObject(throwable: Throwable, model: V, key: K) {
