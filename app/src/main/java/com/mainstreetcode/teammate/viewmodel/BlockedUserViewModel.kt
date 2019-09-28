@@ -48,10 +48,9 @@ class BlockedUserViewModel : TeamMappedViewModel<BlockedUser>() {
     override fun fetch(key: Team, fetchLatest: Boolean): Flowable<List<BlockedUser>> =
             repository.modelsBefore(key, getQueryDate(fetchLatest, key, BlockedUser::created))
 
-    fun blockUser(blockedUser: BlockedUser): Single<BlockedUser> {
-        return RepoProvider.forRepo(BlockedUserRepo::class.java).createOrUpdate(blockedUser)
-                .doOnSuccess { pushModelAlert(Alert.creation(blockedUser)) }
-    }
+    fun blockUser(blockedUser: BlockedUser): Single<BlockedUser> =
+            RepoProvider.forRepo(BlockedUserRepo::class.java).createOrUpdate(blockedUser)
+                    .doOnSuccess { pushModelAlert(Alert.creation(blockedUser)) }
 
     private fun unblockUser(blockedUser: BlockedUser): Single<BlockedUser> =
             repository.delete(blockedUser).doOnSuccess { getModelList(blockedUser.team).remove(it) }

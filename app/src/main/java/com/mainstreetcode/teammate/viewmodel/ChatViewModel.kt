@@ -82,13 +82,11 @@ class ChatViewModel : TeamMappedViewModel<Chat>() {
         }
     }
 
-    fun listenForChat(team: Team): Flowable<Chat> {
-        return repository.listenForChat(team)
-                .onErrorResumeNext(listenRetryFunction(team)::invoke)
-                .doOnSubscribe { notifier.setChatVisibility(team, true) }
-                .doFinally { notifier.setChatVisibility(team, false) }
-                .observeOn(mainThread())
-    }
+    fun listenForChat(team: Team): Flowable<Chat> = repository.listenForChat(team)
+            .onErrorResumeNext(listenRetryFunction(team)::invoke)
+            .doOnSubscribe { notifier.setChatVisibility(team, true) }
+            .doFinally { notifier.setChatVisibility(team, false) }
+            .observeOn(mainThread())
 
     fun post(chat: Chat): Single<Chat> = repository.createOrUpdate(chat).observeOn(mainThread())
 
