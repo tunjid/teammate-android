@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 
 /**

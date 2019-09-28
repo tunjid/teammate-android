@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.hasValidName
 import com.mainstreetcode.teammate.util.hasValidPassword
 import com.mainstreetcode.teammate.util.input
-import com.tunjid.androidbootstrap.core.text.SpanBuilder
+import com.tunjid.androidx.core.text.SpanBuilder
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit

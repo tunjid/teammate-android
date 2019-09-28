@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.model.Guest
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 class GuestViewFragment : HeaderedFragment<Guest>(R.layout.fragment_headered) {
 

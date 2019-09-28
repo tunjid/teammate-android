@@ -31,10 +31,10 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.inflate
-import com.tunjid.androidbootstrap.view.util.marginLayoutParams
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
+import com.tunjid.androidx.view.util.marginLayoutParams
 
 class TeamSearchAdapter(items: List<Differentiable>, listener: AdapterListener) : TeamAdapter(items, listener) {
 

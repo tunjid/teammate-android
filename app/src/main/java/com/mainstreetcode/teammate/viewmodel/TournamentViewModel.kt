@@ -41,7 +41,7 @@ import com.mainstreetcode.teammate.util.asDifferentiables
 import com.mainstreetcode.teammate.util.replaceList
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -57,7 +57,7 @@ class TournamentViewModel : TeamMappedViewModel<Tournament>() {
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val repository: TournamentRepo = RepoProvider.forRepo(TournamentRepo::class.java)
     private val standingsMap = HashMap<Tournament, Standings>()
-    private val ranksMap = HashMap<Tournament, List<Differentiable>>()
+    private val ranksMap = HashMap<Tournament, MutableList<Differentiable>>()
 
     fun gofer(tournament: Tournament): TournamentGofer {
         return TournamentGofer(
@@ -86,7 +86,7 @@ class TournamentViewModel : TeamMappedViewModel<Tournament>() {
     fun getStandings(tournament: Tournament): Standings =
             standingsMap.getOrPut(tournament) { Standings.forTournament(tournament) }
 
-    fun getStatRanks(tournament: Tournament): List<Differentiable> =
+    fun getStatRanks(tournament: Tournament): MutableList<Differentiable> =
             ranksMap.getOrPut(tournament) { mutableListOf() }
 
     fun fetchStandings(tournament: Tournament): Completable = api.getStandings(tournament.id)

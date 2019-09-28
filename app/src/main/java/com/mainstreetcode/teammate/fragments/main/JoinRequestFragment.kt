@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.I
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.JOINING
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.WAITING
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Invites a Team member

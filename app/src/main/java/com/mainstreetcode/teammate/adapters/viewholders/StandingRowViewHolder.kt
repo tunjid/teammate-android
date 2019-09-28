@@ -36,7 +36,7 @@ import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 
 class StandingRowViewHolder(

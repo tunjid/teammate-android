@@ -29,7 +29,7 @@ import android.view.View
 
 import com.mainstreetcode.teammate.adapters.StatTypeAdapter
 import com.mainstreetcode.teammate.model.enums.StatAttribute
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 class ChipViewHolder(itemView: View, listener: StatTypeAdapter.AdapterListener) : InteractiveViewHolder<StatTypeAdapter.AdapterListener>(itemView, listener) {
     private val chip: Chip = itemView as Chip

@@ -38,8 +38,8 @@ import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [com.mainstreetcode.teammate.model.Tournament]

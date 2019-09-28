@@ -55,8 +55,8 @@ import com.mainstreetcode.teammate.util.Deferrer
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.animator.ViewHider
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.animator.ViewHider
 import io.reactivex.disposables.Disposable
 import kotlin.math.abs
 

@@ -36,7 +36,7 @@ import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.BlockedUserGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 class BlockedUserViewFragment : HeaderedFragment<BlockedUser>(R.layout.fragment_headered) {
 

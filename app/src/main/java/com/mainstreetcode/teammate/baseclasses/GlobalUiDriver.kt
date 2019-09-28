@@ -52,8 +52,8 @@ import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.FabInteractor
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
 import com.mainstreetcode.teammate.util.resolveThemeColor
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator
-import com.tunjid.androidbootstrap.view.animator.ViewHider
+import com.tunjid.androidx.material.animator.FabExtensionAnimator
+import com.tunjid.androidx.view.animator.ViewHider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

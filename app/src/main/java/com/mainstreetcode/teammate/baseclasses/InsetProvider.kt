@@ -24,7 +24,7 @@
 
 package com.mainstreetcode.teammate.baseclasses
 
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 interface InsetProvider {
     val insetFlags: InsetFlags

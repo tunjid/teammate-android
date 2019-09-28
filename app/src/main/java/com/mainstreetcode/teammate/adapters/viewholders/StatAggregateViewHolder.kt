@@ -28,7 +28,7 @@ import android.view.View
 import android.widget.TextView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.StatAggregate
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 class StatAggregateViewHolder(itemView: View) : InteractiveViewHolder<Unit>(itemView, Unit) {
 

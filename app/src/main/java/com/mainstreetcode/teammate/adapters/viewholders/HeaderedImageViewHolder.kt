@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import java.io.File
 
 class HeaderedImageViewHolder(

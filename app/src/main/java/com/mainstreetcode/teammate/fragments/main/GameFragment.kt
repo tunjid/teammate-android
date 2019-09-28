@@ -55,8 +55,8 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**

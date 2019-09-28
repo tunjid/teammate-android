@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 
 class EventSearchRequestAdapter(private val request: EventSearchRequest,

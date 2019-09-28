@@ -49,8 +49,8 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
-import com.tunjid.androidbootstrap.core.components.Navigator
-import com.tunjid.androidbootstrap.core.components.activityNavigationController
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.navigation.activityNavigationController
 import io.reactivex.disposables.CompositeDisposable
 
 class NavDialogFragment : BottomSheetDialogFragment() {

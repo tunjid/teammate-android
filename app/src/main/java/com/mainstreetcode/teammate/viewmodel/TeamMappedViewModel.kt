@@ -30,7 +30,7 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamHost
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.*
 
 abstract class TeamMappedViewModel<V> : MappedViewModel<Team, V>() where V : Differentiable, V : TeamHost {

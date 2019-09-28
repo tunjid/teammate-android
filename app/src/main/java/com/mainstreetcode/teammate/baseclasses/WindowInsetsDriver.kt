@@ -44,9 +44,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
-import com.tunjid.androidbootstrap.core.components.Navigator
-import com.tunjid.androidbootstrap.view.util.InsetFlags
-import com.tunjid.androidbootstrap.view.util.marginLayoutParams
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.view.util.InsetFlags
+import com.tunjid.androidx.view.util.marginLayoutParams
 import kotlin.math.max
 
 class WindowInsetsDriver(

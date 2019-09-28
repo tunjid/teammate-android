@@ -29,7 +29,7 @@ import android.view.ViewGroup
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
 import com.mainstreetcode.teammate.model.SettingsItem
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
 
 class SettingsAdapter(

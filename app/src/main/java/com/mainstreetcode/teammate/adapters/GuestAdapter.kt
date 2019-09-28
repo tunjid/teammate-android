@@ -33,14 +33,14 @@ import com.mainstreetcode.teammate.baseclasses.BaseAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Guest
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Guest]

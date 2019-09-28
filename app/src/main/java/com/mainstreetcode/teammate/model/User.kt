@@ -42,7 +42,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.isNotNullOrBlank
 import com.mainstreetcode.teammate.util.processEmoji
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 
 class User : UserEntity,

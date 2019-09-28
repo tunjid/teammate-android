@@ -34,8 +34,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamChatAdapter
 import com.mainstreetcode.teammate.model.Chat
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.view.util.marginLayoutParams
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.view.util.marginLayoutParams
 
 /**
  * Viewholder for a [Chat]

@@ -24,14 +24,11 @@
 
 package com.mainstreetcode.teammate.util
 
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.*
 
 fun asDifferentiables(subTypeList: List<Differentiable>): List<Differentiable> =
         ArrayList(subTypeList)
-
-fun <T> MutableList<T>.replace(other: List<T>) = Lists.replace(this, other)
 
 fun <T : Differentiable> preserveAscending(source: List<T>, additions: List<T>): List<T> =
         concatenateList(source, additions).sortedWith(FunctionalDiff.COMPARATOR)

@@ -51,7 +51,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.deserializeList
-import com.mainstreetcode.teammate.util.replace
+import com.tunjid.androidx.functions.collections.replace
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.lang.reflect.Type
 

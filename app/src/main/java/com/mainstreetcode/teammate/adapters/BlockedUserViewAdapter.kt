@@ -36,8 +36,8 @@ import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [BlockedUser]

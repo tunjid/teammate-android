@@ -30,7 +30,7 @@ import com.mainstreetcode.teammate.repository.CompetitorRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.viewmodel.events.Alert
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 import java.util.ArrayList
 

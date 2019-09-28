@@ -28,7 +28,7 @@ package com.mainstreetcode.teammate.adapters.viewholders
 import android.view.View
 
 import com.mainstreetcode.teammate.model.ContentAd
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
 class ContentAdViewHolder(
         itemView: View,

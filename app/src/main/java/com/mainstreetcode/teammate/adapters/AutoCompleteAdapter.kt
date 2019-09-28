@@ -31,10 +31,10 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AutoCompleteViewHolder
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.view.util.inflate
 
 class AutoCompleteAdapter(
         private val predictions: List<AutocompletePrediction>,

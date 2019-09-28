@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event), AddressPickerFragment.AddressPicker {
 

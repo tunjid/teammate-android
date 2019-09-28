@@ -49,7 +49,7 @@ import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.parseCoordinates
 import com.mainstreetcode.teammate.util.parseISO8601Date
 import com.mainstreetcode.teammate.util.processEmoji
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 

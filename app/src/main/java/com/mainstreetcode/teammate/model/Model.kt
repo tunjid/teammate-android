@@ -26,7 +26,7 @@ package com.mainstreetcode.teammate.model
 
 
 import android.os.Parcelable
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Base interface for model interactions

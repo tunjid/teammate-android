@@ -45,8 +45,8 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.getTransitionName
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
         MediaAdapter.MediaAdapterListener,

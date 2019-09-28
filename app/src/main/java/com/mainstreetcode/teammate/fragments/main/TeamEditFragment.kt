@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Creates, edits or lets a [com.mainstreetcode.teammate.model.User] join a [Team]

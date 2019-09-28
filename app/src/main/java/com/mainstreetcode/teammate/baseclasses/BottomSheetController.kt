@@ -38,8 +38,8 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment
-import com.tunjid.androidbootstrap.core.components.LifecycleSavedStateContainer
-import com.tunjid.androidbootstrap.core.components.Navigator
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.savedstate.LifecycleSavedStateContainer
 
 interface BottomSheetController {
     val bottomSheetDriver: BottomSheetDriver

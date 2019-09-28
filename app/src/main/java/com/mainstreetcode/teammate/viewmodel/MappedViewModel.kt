@@ -41,8 +41,7 @@ import com.mainstreetcode.teammate.model.toMessage
 import com.mainstreetcode.teammate.notifications.NotifierProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.asDifferentiables
-import com.tunjid.androidbootstrap.functions.collections.Lists.findLast
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.util.*
@@ -136,7 +135,7 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     internal open fun getQueryDate(fetchLatest: Boolean, key: K, dateFunction: (V) -> Date): Date? {
         if (fetchLatest) return null
 
-        val value = findLast(getModelList(key), valueClass())
+        val value = getModelList(key).filterIsInstance(valueClass()).lastOrNull()
         return if (value == null) null else dateFunction.invoke(value)
     }
 

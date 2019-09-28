@@ -42,10 +42,10 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.ListManager
-import com.tunjid.androidbootstrap.recyclerview.SwipeDragOptions
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.transform
+import com.tunjid.androidx.recyclerview.ListManager
+import com.tunjid.androidx.recyclerview.SwipeDragOptions
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.*
 import kotlin.math.min
 
@@ -55,7 +55,7 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
 
     private lateinit var tournament: Tournament
     private lateinit var entities: MutableList<Competitive>
-    private lateinit var competitors: List<Competitor>
+    private lateinit var competitors: MutableList<Competitor>
     private lateinit var competitorDifferentiables: MutableList<Differentiable>
 
     override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && competitors.isNotEmpty()
@@ -73,16 +73,16 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
         super.onCreate(savedInstanceState)
         tournament = arguments!!.getParcelable(ARG_TOURNAMENT)!!
         entities = ArrayList()
-        competitors = Lists.transform(entities, Competitor.Companion::empty, Competitor::entity)
-        competitorDifferentiables = Lists.transform(competitors, { identity -> identity as Differentiable }, { i -> i as Competitor })
+        competitors = entities.transform(Competitor.Companion::empty, Competitor::entity)
+        competitorDifferentiables = competitors.transform({ it as Differentiable }, { it as Competitor })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
-                toolbarTitle =  getString(R.string.add_tournament_competitors),
+                toolbarTitle = getString(R.string.add_tournament_competitors),
                 fabShows = showsFab,
-                fabIcon =  R.drawable.ic_check_white_24dp,
+                fabIcon = R.drawable.ic_check_white_24dp,
                 fabText = R.string.save_tournament_competitors
         )
 

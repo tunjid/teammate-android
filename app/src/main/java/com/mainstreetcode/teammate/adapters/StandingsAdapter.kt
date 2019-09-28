@@ -32,8 +32,8 @@ import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Event]

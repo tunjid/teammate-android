@@ -39,7 +39,7 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.util.resolveThemeColor
-import com.tunjid.androidbootstrap.recyclerview.ListPlaceholder
+import com.tunjid.androidx.recyclerview.ListPlaceholder
 
 class EmptyViewHolder(itemView: View, @DrawableRes iconRes: Int, @StringRes stringRes: Int) : ListPlaceholder<ListState> {
 

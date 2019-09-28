@@ -33,10 +33,10 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.model.ListState
-import com.tunjid.androidbootstrap.recyclerview.AbstractListManagerBuilder
-import com.tunjid.androidbootstrap.recyclerview.EndlessScroller
-import com.tunjid.androidbootstrap.recyclerview.ListManager
-import com.tunjid.androidbootstrap.recyclerview.SwipeDragOptions
+import com.tunjid.androidx.recyclerview.AbstractListManagerBuilder
+import com.tunjid.androidx.recyclerview.EndlessScroller
+import com.tunjid.androidx.recyclerview.ListManager
+import com.tunjid.androidx.recyclerview.SwipeDragOptions
 import java.lang.IllegalArgumentException
 
 class ScrollManager<VH : RecyclerView.ViewHolder> constructor(

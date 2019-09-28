@@ -35,7 +35,6 @@ import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.areDifferentDays
 import com.mainstreetcode.teammate.util.calendarPrint
-import com.tunjid.androidbootstrap.functions.collections.Lists.findFirst
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -58,7 +57,7 @@ class ChatViewModel : TeamMappedViewModel<Chat>() {
     fun updateLastSeen(team: Team) {
         repository.updateLastSeen(team)
 
-        val chat = findFirst(getModelList(team), Chat::class.java)
+        val chat = getModelList(team).filterIsInstance<Chat>().firstOrNull()
         if (chat != null) clearNotifications(chat)
     }
 

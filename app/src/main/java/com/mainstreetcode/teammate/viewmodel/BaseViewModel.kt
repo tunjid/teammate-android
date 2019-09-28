@@ -30,7 +30,7 @@ import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.preserveAscending
 import com.mainstreetcode.teammate.util.preserveDescending
 import com.mainstreetcode.teammate.viewmodel.events.Alert
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.*
 

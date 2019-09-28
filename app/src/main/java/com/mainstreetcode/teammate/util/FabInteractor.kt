@@ -28,7 +28,7 @@ import android.graphics.drawable.Drawable
 import android.view.View
 
 import com.google.android.material.button.MaterialButton
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator
+import com.tunjid.androidx.material.animator.FabExtensionAnimator
 
 import java.util.Objects
 import java.util.concurrent.atomic.AtomicBoolean

@@ -26,7 +26,7 @@ package com.mainstreetcode.teammate.model
 
 
 import com.mainstreetcode.teammate.util.ObjectId
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 abstract class Ad<T> : Differentiable {
 

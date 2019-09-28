@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asFloatOrZero
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 

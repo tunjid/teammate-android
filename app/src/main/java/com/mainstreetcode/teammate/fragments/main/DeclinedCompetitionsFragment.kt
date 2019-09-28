@@ -39,8 +39,8 @@ import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Item.Companion.COMPETITOR
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Lists [tournaments][Event]

@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.persistence.entity.ChatEntity
 import com.mainstreetcode.teammate.util.ObjectId
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.parseISO8601Date
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*

@@ -32,7 +32,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 

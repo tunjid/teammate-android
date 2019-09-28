@@ -30,8 +30,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.RemoteImageViewHolder
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.RemoteImage
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Event]

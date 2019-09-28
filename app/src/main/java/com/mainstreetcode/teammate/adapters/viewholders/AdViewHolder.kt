@@ -36,8 +36,8 @@ import com.mainstreetcode.teammate.model.ContentAd
 import com.mainstreetcode.teammate.model.InstallAd
 import com.mainstreetcode.teammate.model.Team
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 /**
  * Viewholder for a [Team]

@@ -39,7 +39,7 @@ import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 

@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.model.ListableModel
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.preserveAscending
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

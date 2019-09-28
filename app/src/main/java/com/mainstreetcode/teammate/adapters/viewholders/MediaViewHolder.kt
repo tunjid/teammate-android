@@ -44,8 +44,8 @@ import com.mainstreetcode.teammate.util.extractPalette
 import com.mainstreetcode.teammate.util.getTransitionName
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.view.util.marginLayoutParams
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.view.util.marginLayoutParams
 
 
 abstract class MediaViewHolder<T : View> internal constructor(

@@ -46,7 +46,7 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import io.reactivex.Single
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference

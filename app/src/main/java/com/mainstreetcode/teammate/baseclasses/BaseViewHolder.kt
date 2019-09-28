@@ -25,7 +25,7 @@
 package com.mainstreetcode.teammate.baseclasses
 
 import android.view.View
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import io.reactivex.disposables.CompositeDisposable
 
 open class BaseViewHolder<T : Any>(itemView: View, adapterListener: T) : InteractiveViewHolder<T>(itemView, adapterListener) {

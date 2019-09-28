@@ -80,10 +80,10 @@ import com.mainstreetcode.teammate.viewmodel.TeamMemberViewModel
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
-import com.tunjid.androidbootstrap.core.components.Navigator
-import com.tunjid.androidbootstrap.core.components.activityNavigationController
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.navigation.activityNavigationController
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.abs

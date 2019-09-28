@@ -36,8 +36,8 @@ import com.mainstreetcode.teammate.util.replaceList
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.transform
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -94,7 +94,7 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
     fun deleteTeam(team: Team): Single<Team> =
             repository.delete(team).doOnSuccess { deleted -> pushModelAlert(Alert.deletion(deleted)) }
 
-    fun nonDefaultTeams(sink: List<Team>): Single<DiffUtil.DiffResult> = FunctionalDiff.of(
+    fun nonDefaultTeams(sink: MutableList<Team>): Single<DiffUtil.DiffResult> = FunctionalDiff.of(
             Flowable.fromIterable(teams)
                     .filter { item -> item is Team && item != defaultTeamRef }
                     .cast(Team::class.java)
@@ -122,6 +122,9 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
     })
 
     companion object {
-        internal val teams: MutableList<Differentiable> = Lists.transform(RoleViewModel.roles) { role -> if (role is Role) role.team else role }
+        internal val teams: MutableList<Differentiable> = RoleViewModel.roles.transform(
+                { item -> if (item is Role) item.team else item },
+                { if (it is Team) RoleViewModel.roles.first { item -> item is Role && item.team == it } else it }
+        )
     }
 }

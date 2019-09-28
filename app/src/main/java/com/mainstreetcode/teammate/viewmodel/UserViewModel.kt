@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.repository.UserRepo
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.TeammateException
 import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 import io.reactivex.Flowable
 import io.reactivex.Single

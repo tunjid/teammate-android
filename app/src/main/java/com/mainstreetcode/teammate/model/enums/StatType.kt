@@ -30,9 +30,9 @@ import com.google.gson.JsonSerializationContext
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.deserializeList
 import com.mainstreetcode.teammate.util.processEmoji
-import com.mainstreetcode.teammate.util.replace
-import com.tunjid.androidbootstrap.core.text.SpanBuilder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.replace
+import com.tunjid.androidx.core.text.SpanBuilder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.*
 
 class StatType private constructor(

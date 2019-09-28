@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 /**
  * Searches for users

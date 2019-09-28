@@ -30,9 +30,9 @@ import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Team
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Team]

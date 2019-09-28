@@ -33,7 +33,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.model.SettingsItem
 import com.mainstreetcode.teammate.util.resolveThemeColor
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 class SettingsViewHolder(
         itemView: View,

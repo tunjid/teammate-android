@@ -90,10 +90,10 @@ import com.mainstreetcode.teammate.util.nav.NavItem
 import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
-import com.tunjid.androidbootstrap.core.components.Navigator
-import com.tunjid.androidbootstrap.core.components.StackNavigator
-import com.tunjid.androidbootstrap.core.components.savedStateFor
-import com.tunjid.androidbootstrap.core.components.stackNavigator
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.navigation.StackNavigator
+import com.tunjid.androidx.navigation.stackNavigator
+import com.tunjid.androidx.savedstate.savedStateFor
 import io.reactivex.disposables.CompositeDisposable
 
 class MainActivity : AppCompatActivity(R.layout.activity_main),

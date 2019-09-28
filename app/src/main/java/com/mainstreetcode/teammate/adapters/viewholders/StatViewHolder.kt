@@ -29,7 +29,7 @@ import android.widget.TextView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.util.SimpleAdapterListener
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 
 class StatViewHolder(

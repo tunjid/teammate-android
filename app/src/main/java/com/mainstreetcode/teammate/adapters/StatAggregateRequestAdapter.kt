@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
-import com.tunjid.androidbootstrap.view.util.inflate
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 
 /**

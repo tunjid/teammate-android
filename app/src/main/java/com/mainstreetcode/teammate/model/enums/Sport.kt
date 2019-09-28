@@ -34,8 +34,8 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.deserializeList
 import com.mainstreetcode.teammate.util.processEmoji
-import com.mainstreetcode.teammate.util.replace
-import com.tunjid.androidbootstrap.core.text.SpanBuilder
+import com.tunjid.androidx.functions.collections.replace
+import com.tunjid.androidx.core.text.SpanBuilder
 
 class Sport private constructor(
         code: String,

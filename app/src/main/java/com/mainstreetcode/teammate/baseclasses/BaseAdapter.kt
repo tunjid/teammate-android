@@ -24,7 +24,7 @@
 
 package com.mainstreetcode.teammate.baseclasses
 
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
 abstract class BaseAdapter<VH : BaseViewHolder<*>, T : Any>(adapterListener: T) : InteractiveAdapter<VH, T>(adapterListener) {
 

@@ -38,8 +38,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.completeSignIn
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentSplashBinding
-import com.tunjid.androidbootstrap.core.text.SpanBuilder
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.core.text.SpanBuilder
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Splash screen

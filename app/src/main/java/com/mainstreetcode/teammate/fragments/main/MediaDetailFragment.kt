@@ -40,7 +40,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 
 class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapter.MediaAdapterListener {
