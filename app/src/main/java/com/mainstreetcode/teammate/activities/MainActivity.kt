@@ -92,7 +92,7 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.StackNavigator
-import com.tunjid.androidx.navigation.stackNavigator
+import com.tunjid.androidx.navigation.stackNavigationController
 import com.tunjid.androidx.savedstate.savedStateFor
 import io.reactivex.disposables.CompositeDisposable
 
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     private val teamViewModel by viewModels<TeamViewModel>()
 
-    private val stackNavigator: StackNavigator by stackNavigator(R.id.main_fragment_container)
+    private val stackNavigator: StackNavigator by stackNavigationController(R.id.main_fragment_container)
 
     override var uiState: UiState by globalUiDriver { navigator.currentFragment }
 
