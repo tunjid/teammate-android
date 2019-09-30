@@ -135,22 +135,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         )
     }
 
-    private val insetDriver by lazy {
-        WindowInsetsDriver(
-                stackNavigatorSource = this::navigator,
-                parentContainer = findViewById(R.id.content_view),
-                contentContainer = findViewById(R.id.main_fragment_container),
-                coordinatorLayout = findViewById(R.id.coordinator),
-                toolbar = findViewById(R.id.toolbar),
-                topInsetView = findViewById(R.id.top_inset),
-                bottomInsetView = findViewById(R.id.bottom_inset),
-                keyboardPadding = findViewById(R.id.padding),
-                insetAdjuster = this::adjustKeyboardPadding
-        )
-    }
-
     override val navigator: Navigator by lazy { BottomSheetAwareNavigator(stackNavigator, bottomSheetDriver) }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(ViewModelProviders.of(this).get(PrefsViewModel::class.java).nightUiMode)
@@ -158,20 +143,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
         super.onCreate(savedInstanceState)
 
-//        supportFragmentManager.registerFragmentLifecycleCallbacks(WindowInsetsDriver(
-//                stackNavigatorSource = this::navigator,
-//                parentContainer = findViewById(R.id.content_view),
-//                contentContainer = findViewById(R.id.main_fragment_container),
-//                coordinatorLayout = findViewById(R.id.coordinator),
-//                toolbar = findViewById(R.id.toolbar),
-//                topInsetView = findViewById(R.id.top_inset),
-//                bottomInsetView = findViewById(R.id.bottom_inset),
-//                keyboardPadding = findViewById(R.id.padding),
-//                insetAdjuster = this::adjustKeyboardPadding
-//        ), true)
-
-        supportFragmentManager.registerFragmentLifecycleCallbacks(insetDriver, true)
-
+        supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(), true)
         supportFragmentManager.registerFragmentLifecycleCallbacks(TransientBarCallback(), true)
         supportFragmentManager.registerFragmentLifecycleCallbacks(NavHighlightCallback(), false)
 
@@ -185,8 +157,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                     android.R.anim.fade_out
             )
         }
-
-        onBackPressedDispatcher.addCallback(this) { navigator.pop() }
 
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
@@ -207,6 +177,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                         NavItem.create(R.id.action_tournaments, R.string.tourneys, R.drawable.ic_trophy_white_24dp))
                 .createBottomNav()
 
+        onBackPressedDispatcher.addCallback(this) { navigator.pop() }
         onBackPressedDispatcher.addCallback(this, bottomSheetDriver)
 
         App.prime()
@@ -319,13 +290,25 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                 ?: if (savedInstanceState == null) navigator.show(FeedFragment.newInstance())
     }
 
-    inner class TransientBarCallback : FragmentManager.FragmentLifecycleCallbacks() {
+    private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
+            stackNavigatorSource = this::navigator,
+            parentContainer = findViewById(R.id.content_view),
+            contentContainer = findViewById(R.id.main_fragment_container),
+            coordinatorLayout = findViewById(R.id.coordinator),
+            toolbar = findViewById(R.id.toolbar),
+            topInsetView = findViewById(R.id.top_inset),
+            bottomInsetView = findViewById(R.id.bottom_inset),
+            keyboardPadding = findViewById(R.id.padding),
+            insetAdjuster = this::adjustKeyboardPadding
+    )
+
+    private inner class TransientBarCallback : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
             if (f.id == navigator.containerId) transientBarDriver.clearTransientBars()
         }
     }
 
-    inner class NavHighlightCallback : FragmentManager.FragmentLifecycleCallbacks() {
+    private inner class NavHighlightCallback : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
             if (f.id != navigator.containerId) return
             val t = f.tag ?: return
