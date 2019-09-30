@@ -276,19 +276,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         else -> false
     }
 
-    private fun route(savedInstanceState: Bundle?, intent: Intent) {
-        val model = intent.getParcelableExtra<Model<*>>(FEED_DEEP_LINK)
-
-        when (model) {
-            is Game -> GameFragment.newInstance(model)
-            is Chat -> ChatFragment.newInstance(model.team)
-            is Event -> EventEditFragment.newInstance(model)
-            is JoinRequest -> TeamMembersFragment.newInstance(model.team)
-            is Tournament -> TournamentDetailFragment.newInstance(model)
-            else -> null
-        }?.let { this@MainActivity.navigator.show(it) }
-                ?: if (savedInstanceState == null) navigator.show(FeedFragment.newInstance())
-    }
+    private fun route(savedInstanceState: Bundle?, intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
+        is Game -> GameFragment.newInstance(model)
+        is Chat -> ChatFragment.newInstance(model.team)
+        is Event -> EventEditFragment.newInstance(model)
+        is Tournament -> TournamentDetailFragment.newInstance(model)
+        is JoinRequest -> TeamMembersFragment.newInstance(model.team)
+        else -> if (savedInstanceState == null) FeedFragment.newInstance() else null
+    }?.let(navigator::show)
 
     private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
             stackNavigatorSource = this::navigator,
