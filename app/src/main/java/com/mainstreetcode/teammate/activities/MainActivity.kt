@@ -164,7 +164,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
         supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(), true)
         supportFragmentManager.registerFragmentLifecycleCallbacks(TransientBarCallback(), true)
-        supportFragmentManager.registerFragmentLifecycleCallbacks(NavHighlightCallback(), false)
 
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
@@ -314,26 +313,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
     private inner class TransientBarCallback : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
             if (f.id == navigator.containerId) transientBarDriver.clearTransientBars()
-        }
-    }
-
-    private inner class NavHighlightCallback : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-            if (f.id != navigator.containerId) return
-            val t = f.tag ?: return
-
-            var id = 0
-
-            when {
-                t.contains(FeedFragment::class.java.simpleName) -> id = R.id.action_home
-                t.contains(EventsFragment::class.java.simpleName) -> id = R.id.action_events
-                t.contains(ChatFragment::class.java.simpleName) -> id = R.id.action_messages
-                t.contains(MediaFragment::class.java.simpleName) -> id = R.id.action_media
-                t.contains(TeamsFragment::class.java.simpleName) -> id = R.id.action_team
-                t.contains(TournamentsFragment::class.java.simpleName) -> id = R.id.action_tournaments
-            }
-
-            bottomNav.highlight(id)
         }
     }
 }
