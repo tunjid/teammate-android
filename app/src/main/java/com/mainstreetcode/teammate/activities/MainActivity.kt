@@ -40,6 +40,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.App
@@ -90,9 +91,9 @@ import com.mainstreetcode.teammate.util.nav.NavItem
 import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
+import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
-import com.tunjid.androidx.navigation.StackNavigator
-import com.tunjid.androidx.navigation.stackNavigationController
+import com.tunjid.androidx.navigation.multiStackNavigationController
 import com.tunjid.androidx.savedstate.savedStateFor
 import io.reactivex.disposables.CompositeDisposable
 
@@ -117,7 +118,25 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     private val teamViewModel by viewModels<TeamViewModel>()
 
-    private val stackNavigator: StackNavigator by stackNavigationController(R.id.main_fragment_container)
+    private val multiStackNavigator: MultiStackNavigator by multiStackNavigationController(
+            R.id.main_fragment_container,
+            intArrayOf(
+                    R.id.action_home,
+                    R.id.action_events,
+                    R.id.action_messages,
+                    R.id.action_media,
+                    R.id.action_tournaments
+            )
+    ) {
+        when (it) {
+            R.id.action_home -> FeedFragment.newInstance().run { this to stableTag }
+            R.id.action_events -> EventsFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
+            R.id.action_messages -> ChatFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
+            R.id.action_media -> MediaFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
+            R.id.action_tournaments -> TournamentsFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
+            else -> FeedFragment.newInstance().run { this to stableTag }
+        }
+    }
 
     override var uiState: UiState by globalUiDriver { navigator.currentFragment }
 
@@ -135,7 +154,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         )
     }
 
-    override val navigator: Navigator by lazy { BottomSheetAwareNavigator(stackNavigator, bottomSheetDriver) }
+    override val navigator: Navigator by lazy { BottomSheetAwareNavigator(multiStackNavigator, bottomSheetDriver) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(ViewModelProviders.of(this).get(PrefsViewModel::class.java).nightUiMode)
@@ -146,17 +165,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(), true)
         supportFragmentManager.registerFragmentLifecycleCallbacks(TransientBarCallback(), true)
         supportFragmentManager.registerFragmentLifecycleCallbacks(NavHighlightCallback(), false)
-
-        stackNavigator.transactionModifier = { incomingFragment ->
-            val current = navigator.currentFragment
-            if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
-            else setCustomAnimations(
-                    android.R.anim.fade_in,
-                    android.R.anim.fade_out,
-                    android.R.anim.fade_in,
-                    android.R.anim.fade_out
-            )
-        }
 
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
@@ -177,6 +185,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                         NavItem.create(R.id.action_tournaments, R.string.tourneys, R.drawable.ic_trophy_white_24dp))
                 .createBottomNav()
 
+        multiStackNavigator.stackSelectedListener = bottomNav::highlight
+        multiStackNavigator.stackTransactionModifier = { crossFade() }
+        multiStackNavigator.transactionModifier = { incomingFragment ->
+            val current = navigator.currentFragment
+            if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
+            else crossFade()
+        }
+
         onBackPressedDispatcher.addCallback(this) { navigator.pop() }
         onBackPressedDispatcher.addCallback(this, bottomSheetDriver)
 
@@ -185,6 +201,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         if (!userViewModel.isSignedIn) navigator.signOut(intent)
         else route(savedInstanceState, intent)
     }
+
+    private fun FragmentTransaction.crossFade() = setCustomAnimations(
+            android.R.anim.fade_in,
+            android.R.anim.fade_out,
+            android.R.anim.fade_in,
+            android.R.anim.fade_out
+    )
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -225,21 +248,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
     }
 
     private fun onNavItemSelected(@IdRes id: Int): Boolean = when (id) {
-        R.id.action_home -> {
-            navigator.show(FeedFragment.newInstance())
-        }
-        R.id.action_events -> {
-            TeamPickerFragment.pick(this, R.id.request_event_team_pick).let { true }
-        }
-        R.id.action_messages -> {
-            TeamPickerFragment.pick(this, R.id.request_chat_team_pick).let { true }
-        }
-        R.id.action_media -> {
-            TeamPickerFragment.pick(this, R.id.request_media_team_pick).let { true }
-        }
-        R.id.action_tournaments -> {
-            TeamPickerFragment.pick(this, R.id.request_tournament_team_pick).let { true }
-        }
+        R.id.action_home,
+        R.id.action_events,
+        R.id.action_messages,
+        R.id.action_media,
+        R.id.action_tournaments -> multiStackNavigator.show(id).let { true }
+
         R.id.action_games -> {
             TeamPickerFragment.pick(this, R.id.request_game_team_pick).let { true }
         }
@@ -286,7 +300,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
     }?.let(navigator::show)
 
     private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
-            stackNavigatorSource = this::navigator,
+            stackNavigatorSource = this.multiStackNavigator::activeNavigator,
             parentContainer = findViewById(R.id.content_view),
             contentContainer = findViewById(R.id.main_fragment_container),
             coordinatorLayout = findViewById(R.id.coordinator),

@@ -35,6 +35,8 @@ import androidx.core.provider.FontRequest
 import androidx.emoji.text.EmojiCompat
 import androidx.emoji.text.FontRequestEmojiCompatConfig
 import com.google.android.libraries.places.api.Places
+import com.mainstreetcode.teammate.model.Config
+import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.repository.ConfigRepo
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.repository.RoleRepo
@@ -119,9 +121,9 @@ class App : Application() {
             if (!userRepository.isSignedIn) return
 
             userRepository.me
-                    .lastOrError()
-                    .flatMap { RepoProvider.forRepo(ConfigRepo::class.java)[""].lastOrError() }
-                    .flatMap { RepoProvider.forRepo(RoleRepo::class.java).myRoles.lastOrError() }
+                    .lastOrError().onErrorReturnItem(User.empty())
+                    .flatMap { RepoProvider.forRepo(ConfigRepo::class.java)[""].lastOrError().onErrorReturnItem(Config.empty()) }
+                    .flatMap { RepoProvider.forRepo(RoleRepo::class.java).myRoles.lastOrError().onErrorReturnItem(listOf()) }
                     .subscribe({ }, ErrorHandler.EMPTY::invoke)
         }
     }

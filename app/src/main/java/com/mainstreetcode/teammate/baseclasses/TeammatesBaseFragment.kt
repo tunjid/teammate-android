@@ -151,8 +151,8 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     override var uiState: UiState
         get() = activityUiState
         set(value) {
-            activityUiState = value
             lastSetUiState.set(value)
+            if (navigator.currentFragment === this) activityUiState = value
         }
 
     override val stableTag: String = javaClass.simpleName
@@ -374,8 +374,6 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
             hasLightNavBar: Boolean = uiState.hasLightNavBar,
             fabClickListener: View.OnClickListener? = uiState.fabClickListener
     ) {
-        if (navigator.currentFragment !== this) return
-
         uiState = uiState.copy(
                 fabIcon = fabIcon,
                 fabText = fabText,

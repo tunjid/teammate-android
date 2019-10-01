@@ -50,16 +50,11 @@ abstract class BaseViewModel : ViewModel() {
 
     internal open fun sortsAscending(): Boolean = false
 
-    fun pushModelAlert(alert: Alert<*>) {
-        App.instance.pushAlert(alert)
-    }
+    fun pushModelAlert(alert: Alert<*>) = App.instance.pushAlert(alert)
 
-    internal open fun onModelAlert(alert: Alert<*>) {}
+    internal open fun onModelAlert(alert: Alert<*>) = Unit
 
-    override fun onCleared() {
-        disposable.clear()
-        super.onCleared()
-    }
+    override fun onCleared() = disposable.clear().run { super.onCleared() }
 
     fun preserveList(source: List<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
         var output =

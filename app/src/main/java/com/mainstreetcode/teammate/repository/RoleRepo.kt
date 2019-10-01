@@ -98,7 +98,8 @@ class RoleRepo internal constructor() : ModelRepo<Role>() {
     }
 
     fun getRoleInTeam(userId: String, teamId: String): Flowable<Role> =
-            roleDao.getRoleInTeam(userId, teamId).subscribeOn(io())
+            if (teamId == Team.empty().id) Flowable.empty()
+            else roleDao.getRoleInTeam(userId, teamId).subscribeOn(io())
                     .flatMapPublisher { role: Role ->
                         Maybe.concatDelayError(listOf(Maybe.just(role), api.getRole(role.id).toMaybe()))
                     }
