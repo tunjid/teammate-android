@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         super.onCreate(savedInstanceState)
 
         supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(), true)
-        supportFragmentManager.registerFragmentLifecycleCallbacks(TransientBarCallback(), true)
+        supportFragmentManager.registerFragmentLifecycleCallbacks(transientBarCallback(), true)
 
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
@@ -200,13 +200,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         if (!userViewModel.isSignedIn) navigator.signOut(intent)
         else route(savedInstanceState, intent)
     }
-
-    private fun FragmentTransaction.crossFade() = setCustomAnimations(
-            android.R.anim.fade_in,
-            android.R.anim.fade_out,
-            android.R.anim.fade_in,
-            android.R.anim.fade_out
-    )
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -310,7 +303,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
             insetAdjuster = this::adjustKeyboardPadding
     )
 
-    private inner class TransientBarCallback : FragmentManager.FragmentLifecycleCallbacks() {
+    private fun transientBarCallback() = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
             if (f.id == navigator.containerId) transientBarDriver.clearTransientBars()
         }
@@ -363,3 +356,10 @@ private fun Intent.resetToken(): String? {
     return if (domainMatches && path.contains("forgotPassword")) uri.getQueryParameter(TOKEN)
     else null
 }
+
+private fun FragmentTransaction.crossFade() = setCustomAnimations(
+        android.R.anim.fade_in,
+        android.R.anim.fade_out,
+        android.R.anim.fade_in,
+        android.R.anim.fade_out
+)
