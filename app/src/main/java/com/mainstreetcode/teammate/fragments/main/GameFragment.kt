@@ -110,7 +110,7 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.model_list))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_stat_white_24dp, R.string.no_stats))
-                .withAdapter(StatAdapter(items, simpleAdapterListener { navigator.show(StatEditFragment.newInstance(it)) }))
+                .withAdapter(StatAdapter(items, simpleAdapterListener { navigator.push(StatEditFragment.newInstance(it)) }))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this@GameFragment.refresh() }
                 .withEndlessScroll { fetchStats(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
@@ -126,8 +126,8 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
 
         homeThumbnail.setOnClickListener { showCompetitor(game.home) }
         awayThumbnail.setOnClickListener { showCompetitor(game.away) }
-        score.setOnClickListener { navigator.show(GameEditFragment.newInstance(game)) }
-        date.setOnClickListener { navigator.show(EventEditFragment.newInstance(game)) }
+        score.setOnClickListener { navigator.push(GameEditFragment.newInstance(game)) }
+        date.setOnClickListener { navigator.push(EventEditFragment.newInstance(game)) }
         appBar.apply { AppBarListener(this) { gameViewHolder?.animate(it) } }
 
         binding = this
@@ -142,7 +142,7 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_end_game -> endGameRequest().let { true }
-        R.id.action_event -> navigator.show(EventEditFragment.newInstance(game))
+        R.id.action_event -> navigator.push(EventEditFragment.newInstance(game))
         R.id.action_delete_game -> AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.game_delete_prompt))
                 .setPositiveButton(R.string.yes) { _, _ -> deleteGame() }
@@ -169,7 +169,7 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.fab) navigator.show(StatEditFragment.newInstance(Stat.empty(game)))
+        if (view.id == R.id.fab) navigator.push(StatEditFragment.newInstance(Stat.empty(game)))
     }
 
     override fun onUserClicked(item: User) {
@@ -218,7 +218,7 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
         val referee = game.referee
         val hasReferee = !referee.isEmpty
 
-        if (hasReferee) navigator.show(UserEditFragment.newInstance(referee))
+        if (hasReferee) navigator.push(UserEditFragment.newInstance(referee))
         else if (privilegeStatus.get()) bottomSheetDriver.showBottomSheet {
             menuRes = R.menu.empty
             fragment = UserSearchFragment.newInstance().apply { setTargetFragment(this@GameFragment, R.id.request_user_pick) }

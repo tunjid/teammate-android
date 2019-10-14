@@ -104,14 +104,14 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
     }
 
     override fun onEventClicked(item: Event) {
-        navigator.show(EventEditFragment.newInstance(item))
+        navigator.push(EventEditFragment.newInstance(item))
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> {
                 val event = Event.empty().apply { updateTeam(teamViewModel.defaultTeam) }
-                navigator.show(EventEditFragment.newInstance(event))
+                navigator.push(EventEditFragment.newInstance(event))
             }
         }
     }

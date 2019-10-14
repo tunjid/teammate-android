@@ -193,14 +193,14 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
     override fun selectTeam() = when {
         headeredModel.gameId.isNotBlank() -> transientBarDriver.showSnackBar(getString(R.string.game_event_team_change))
         gofer.hasPrivilegedRole() -> chooseTeam()
-        !gofer.hasRole() -> navigator.show(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser)).let { Unit }
+        !gofer.hasRole() -> navigator.push(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser)).let { Unit }
         else -> Unit
     }
 
     override fun onGuestClicked(guest: Guest) {
         val current = userViewModel.currentUser
         if (current == guest.user) rsvpToEvent()
-        else navigator.show(GuestViewFragment.newInstance(guest))
+        else navigator.push(GuestViewFragment.newInstance(guest))
     }
 
     override fun canEditEvent(): Boolean = headeredModel.isEmpty || gofer.hasPrivilegedRole()

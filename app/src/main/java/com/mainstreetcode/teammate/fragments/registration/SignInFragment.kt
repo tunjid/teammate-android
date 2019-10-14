@@ -32,7 +32,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.completeSignIn
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentSignInBinding
 import com.mainstreetcode.teammate.util.ErrorHandler
@@ -96,7 +95,7 @@ class SignInFragment : TeammatesBaseFragment(R.layout.fragment_sign_in), TextVie
         val binding = this.binding ?: return
         when (view.id) {
             R.id.fab -> signIn()
-            R.id.forgot_password -> navigator.show(ForgotPasswordFragment.newInstance(binding.email.input))
+            R.id.forgot_password -> navigator.push(ForgotPasswordFragment.newInstance(binding.email.input))
         }
     }
 

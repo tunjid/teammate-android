@@ -39,6 +39,7 @@ import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentsFragment
 import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.navigation.requestIdToNavIndex
 
 class TeamPickerFragment : TeammatesBaseFragment(), TeamAdapter.AdapterListener {
 
@@ -57,15 +58,18 @@ class TeamPickerFragment : TeammatesBaseFragment(), TeamAdapter.AdapterListener 
 
     override fun onTeamClicked(item: Team) {
         teamViewModel.updateDefaultTeam(item)
-        when (requestCode) {
-            R.id.request_game_team_pick -> navigator.show(GamesFragment.newInstance(item))
-            R.id.request_chat_team_pick -> navigator.show(ChatFragment.newInstance(item))
-            R.id.request_event_team_pick -> navigator.show(EventsFragment.newInstance(item))
-            R.id.request_media_team_pick -> navigator.show(MediaFragment.newInstance(item))
-            R.id.request_tournament_team_pick -> navigator.show(TournamentsFragment.newInstance(item))
-            R.id.request_default_team_pick -> navigator.show(TeamMembersFragment.newInstance(item))
-        }
         bottomSheetDriver.hideBottomSheet()
+
+        if (!isChanging) return navigator.show(requestCode.requestIdToNavIndex)
+
+        when (requestCode) {
+            R.id.request_game_team_pick -> navigator.push(GamesFragment.newInstance(item))
+            R.id.request_chat_team_pick -> navigator.push(ChatFragment.newInstance(item))
+            R.id.request_event_team_pick -> navigator.push(EventsFragment.newInstance(item))
+            R.id.request_media_team_pick -> navigator.push(MediaFragment.newInstance(item))
+            R.id.request_tournament_team_pick -> navigator.push(TournamentsFragment.newInstance(item))
+            R.id.request_default_team_pick -> navigator.push(TeamMembersFragment.newInstance(item))
+        }
     }
 
     private fun pick() {

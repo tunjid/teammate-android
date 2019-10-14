@@ -105,7 +105,7 @@ class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
     override fun togglePersistentUi() = Unit /* Do nothing */
 
     override fun onGameClicked(game: Game) {
-        navigator.show(GameFragment.newInstance(game))
+        navigator.push(GameFragment.newInstance(game))
     }
 
     private fun fetchTournaments(fetchLatest: Boolean) {

@@ -95,7 +95,7 @@ class UserSearchFragment : TeammatesBaseFragment(R.layout.fragment_user_search),
         val canPick = target is UserAdapter.AdapterListener
 
         if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(item)
-        else navigator.show(UserEditFragment.newInstance(item))
+        else navigator.push(UserEditFragment.newInstance(item))
     }
 
     override fun onQueryTextSubmit(s: String): Boolean = false

@@ -166,7 +166,7 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
             longClickMedia(item)
         else {
             updateUi(bottomNavShows = false)
-            navigator.show(MediaDetailFragment.newInstance(item))
+            navigator.push(MediaDetailFragment.newInstance(item))
         }
     }
 

@@ -46,8 +46,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.navigation.AppNavigator
 import com.mainstreetcode.teammate.activities.MainActivity
-import com.mainstreetcode.teammate.activities.signOut
 import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder
 import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment
@@ -81,7 +81,7 @@ import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.TournamentViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidx.navigation.Navigator
-import com.tunjid.androidx.navigation.activityNavigationController
+import com.tunjid.androidx.navigation.activityNavigatorController
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
@@ -100,7 +100,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         TransientBarController,
         Navigator.TagProvider,
         Navigator.TransactionModifier,
-        Navigator.NavigationController {
+        Navigator.Controller {
 
     protected val feedViewModel by activityViewModels<FeedViewModel>()
     protected val roleViewModel by activityViewModels<RoleViewModel>()
@@ -140,7 +140,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
 
     override val insetFlags = InsetFlags.ALL
 
-    override val navigator: Navigator by activityNavigationController()
+    override val navigator: AppNavigator by activityNavigatorController()
 
     override val bottomSheetDriver: BottomSheetDriver
         get() = requireActivity().run { (this as BottomSheetController).bottomSheetDriver }
@@ -277,7 +277,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         is Team -> JoinRequestFragment.joinInstance(entity, userViewModel.currentUser)
         is User -> UserEditFragment.newInstance(entity)
         else -> null
-    }?.let { navigator.show(it) }.run { Unit }
+    }?.let { navigator.push(it) }.run { Unit }
 
     protected fun pickPlace() = bottomSheetDriver.showBottomSheet {
         val picker = AddressPickerFragment.newInstance()

@@ -110,10 +110,10 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
     }
 
     override fun onTournamentClicked(tournament: Tournament) =
-            navigator.show(TournamentDetailFragment.newInstance(tournament)).let { Unit }
+            navigator.push(TournamentDetailFragment.newInstance(tournament)).let { Unit }
 
     override fun onClick(view: View) = when {
-        view.id == R.id.fab -> navigator.show(TournamentEditFragment.newInstance(Tournament.empty(team))).let { Unit }
+        view.id == R.id.fab -> navigator.push(TournamentEditFragment.newInstance(Tournament.empty(team))).let { Unit }
         else -> Unit
     }
 

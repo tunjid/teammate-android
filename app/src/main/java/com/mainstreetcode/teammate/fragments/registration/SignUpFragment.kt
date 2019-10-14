@@ -38,7 +38,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.completeSignIn
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentSignUpBinding
 import com.mainstreetcode.teammate.rest.TeammateService

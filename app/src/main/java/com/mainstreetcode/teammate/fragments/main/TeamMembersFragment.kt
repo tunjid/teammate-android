@@ -121,11 +121,11 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_edit -> navigator.show(TeamEditFragment.newEditInstance(team))
+        R.id.action_edit -> navigator.push(TeamEditFragment.newEditInstance(team))
 
-        R.id.action_team_tournaments -> navigator.show(TournamentsFragment.newInstance(team))
+        R.id.action_team_tournaments -> navigator.push(TournamentsFragment.newInstance(team))
 
-        R.id.action_blocked -> navigator.show(BlockedUsersFragment.newInstance(team))
+        R.id.action_blocked -> navigator.push(BlockedUsersFragment.newInstance(team))
 
         R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_team_prompt, team.name))
                 .setMessage(R.string.delete_team_prompt_body)
@@ -141,7 +141,7 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
         val canPick = target is UserAdapter.AdapterListener
 
         if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(role.user)
-        else navigator.show(RoleEditFragment.newInstance(role))
+        else navigator.push(RoleEditFragment.newInstance(role))
     }
 
     override fun onJoinRequestClicked(request: JoinRequest) {
@@ -149,13 +149,13 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
         val canPick = target is UserAdapter.AdapterListener
 
         if (canPick) transientBarDriver.showSnackBar(getString(R.string.stat_user_not_on_team))
-        else navigator.show(JoinRequestFragment.viewInstance(request))
+        else navigator.push(JoinRequestFragment.viewInstance(request))
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> if (localRoleViewModel.hasPrivilegedRole())
-                navigator.show(JoinRequestFragment.inviteInstance(team))
+                navigator.push(JoinRequestFragment.inviteInstance(team))
         }
     }
 

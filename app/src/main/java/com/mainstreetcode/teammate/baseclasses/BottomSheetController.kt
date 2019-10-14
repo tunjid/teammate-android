@@ -70,14 +70,14 @@ class BottomSheetDriver(
 
     init {
         bottomSheetToolbar.setOnMenuItemClickListener(host::onOptionsItemSelected)
-        bottomSheetBehavior.bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) restoreHiddenViewState()
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
-        }
+        })
 
         bottomToolbarState = stateContainer.savedState.getParcelable(BOTTOM_TOOLBAR_STATE)
         refreshBottomToolbar()
@@ -122,7 +122,7 @@ class BottomSheetDriver(
     }
 
     private fun restoreHiddenViewState() {
-        val navigator = (host as? Navigator.NavigationController)?.navigator ?: return
+        val navigator = (host as? Navigator.Controller)?.navigator ?: return
         val onCommit = {
             val post = navigator.currentFragment as? TeammatesBaseFragment
             if (post != null && post.view != null) post.togglePersistentUi()

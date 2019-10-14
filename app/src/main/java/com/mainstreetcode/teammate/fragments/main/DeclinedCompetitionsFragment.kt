@@ -100,7 +100,7 @@ class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_lis
                         TournamentDetailFragment.newInstance(competitor.tournament).pending(competitor)
                     else
                         null
-                    if (fragment != null) navigator.show(fragment)
+                    if (fragment != null) navigator.push(fragment)
                 }
                 .show()
     }

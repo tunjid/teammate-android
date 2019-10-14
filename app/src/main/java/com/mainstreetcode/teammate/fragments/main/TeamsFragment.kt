@@ -122,14 +122,14 @@ class TeamsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
         if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
         else {
             teamViewModel.updateDefaultTeam(item)
-            navigator.show(TeamMembersFragment.newInstance(item))
+            navigator.push(TeamMembersFragment.newInstance(item))
         }
     }
 
     override fun onClick(view: View) = when (view.id) {
         R.id.fab -> {
             bottomSheetDriver.hideBottomSheet()
-            navigator.show(TeamSearchFragment.newInstance()).let { Unit }
+            navigator.push(TeamSearchFragment.newInstance()).let { Unit }
         }
         else -> Unit
     }

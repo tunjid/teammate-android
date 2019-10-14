@@ -110,8 +110,8 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_edit -> navigator.show(TournamentEditFragment.newInstance(tournament))
-        R.id.action_standings -> navigator.show(StatDetailFragment.newInstance(tournament))
+        R.id.action_edit -> navigator.push(TournamentEditFragment.newInstance(tournament))
+        R.id.action_standings -> navigator.push(StatDetailFragment.newInstance(tournament))
         R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_tournament_prompt))
                 .setPositiveButton(R.string.yes) { _, _ -> deleteTournament() }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
@@ -136,7 +136,7 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.fab) navigator.show(CompetitorsFragment.newInstance(tournament))
+        if (view.id == R.id.fab) navigator.push(CompetitorsFragment.newInstance(tournament))
     }
 
     private fun checkCompetitor() {

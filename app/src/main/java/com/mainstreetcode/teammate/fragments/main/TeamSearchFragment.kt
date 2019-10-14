@@ -115,11 +115,11 @@ class TeamSearchFragment : TeammatesBaseFragment(R.layout.fragment_team_search),
         val canPick = target is TeamAdapter.AdapterListener
 
         if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
-        else navigator.show(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
+        else navigator.push(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.create_team) navigator.show(TeamEditFragment.newCreateInstance())
+        if (view.id == R.id.create_team) navigator.push(TeamEditFragment.newCreateInstance())
     }
 
     override fun onQueryTextSubmit(s: String): Boolean = false

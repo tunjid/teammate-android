@@ -197,7 +197,7 @@ class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event
 
     private fun onMarkerInfoWindowClicked(marker: Marker) {
         val tag = marker.tag as? Event ?: return
-        navigator.show(EventEditFragment.newInstance(tag))
+        navigator.push(EventEditFragment.newInstance(tag))
     }
 
     private fun onAddressFound(address: Address) {

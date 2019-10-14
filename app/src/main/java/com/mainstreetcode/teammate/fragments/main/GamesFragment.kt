@@ -112,7 +112,7 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
         }
 
     override fun onGameClicked(game: Game) {
-        navigator.show(GameFragment.newInstance(game))
+        navigator.push(GameFragment.newInstance(game))
     }
 
     override fun onClick(view: View) = when (view.id) {
@@ -123,7 +123,7 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
                     else teamViewModel.defaultTeam
 
             game.home.updateEntity(entity)
-            navigator.show(GameEditFragment.newInstance(game)).let { Unit }
+            navigator.push(GameEditFragment.newInstance(game)).let { Unit }
         }
         else -> Unit
     }

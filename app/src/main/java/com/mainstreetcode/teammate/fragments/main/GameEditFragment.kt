@@ -144,7 +144,7 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
 
     private fun createGame() {
         transientBarDriver.toggleProgress(true)
-        disposables.add(gofer.save().subscribe({ navigator.show(GameFragment.newInstance(headeredModel)) }, defaultErrorHandler::invoke))
+        disposables.add(gofer.save().subscribe({ navigator.push(GameFragment.newInstance(headeredModel)) }, defaultErrorHandler::invoke))
     }
 
     private fun updateCompetitor(item: Competitive) {

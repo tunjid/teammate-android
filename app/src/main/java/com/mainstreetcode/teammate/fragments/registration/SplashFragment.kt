@@ -35,7 +35,6 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.completeSignIn
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentSplashBinding
 import com.tunjid.androidx.core.text.SpanBuilder
@@ -125,8 +124,8 @@ class SplashFragment : TeammatesBaseFragment(R.layout.fragment_splash), View.OnC
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.email_sign_up -> navigator.show(SignUpFragment.newInstance())
-            R.id.login -> navigator.show(SignInFragment.newInstance())
+            R.id.email_sign_up -> navigator.push(SignUpFragment.newInstance())
+            R.id.login -> navigator.push(SignInFragment.newInstance())
             R.id.facebook_login -> {
                 val loginManager = LoginManager.getInstance()
                 loginManager.registerCallback(faceBookResultCallback, facebookCallback)

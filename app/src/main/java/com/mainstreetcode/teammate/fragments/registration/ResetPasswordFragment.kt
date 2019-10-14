@@ -103,7 +103,7 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
                     .subscribe({
                         transientBarDriver.showSnackBar { snackbar ->
                             snackbar.setText(it.message)
-                                    .setAction(R.string.sign_in) { navigator.show(SignInFragment.newInstance()) }
+                                    .setAction(R.string.sign_in) { navigator.push(SignInFragment.newInstance()) }
                         }
                     }, defaultErrorHandler::invoke))
         }

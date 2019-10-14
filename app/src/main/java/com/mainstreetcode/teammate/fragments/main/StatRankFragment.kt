@@ -72,7 +72,7 @@ class StatRankFragment : TeammatesBaseFragment(R.layout.fragment_stat_rank) {
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatRankAdapter(
                         statRanks,
-                        simpleAdapterListener { statRank -> navigator.show(UserEditFragment.newInstance(statRank.user)) }))
+                        simpleAdapterListener { statRank -> navigator.push(UserEditFragment.newInstance(statRank.user)) }))
                 .withLinearLayoutManager()
                 .build()
 

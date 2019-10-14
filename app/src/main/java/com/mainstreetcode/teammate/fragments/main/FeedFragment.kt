@@ -97,7 +97,7 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
     }
 
     override fun onClick(view: View) = when (view.id) {
-        R.id.fab -> navigator.show(TeamSearchFragment.newInstance()).let { Unit }
+        R.id.fab -> navigator.push(TeamSearchFragment.newInstance()).let { Unit }
         else -> Unit
     }
 
@@ -109,7 +109,7 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
             builder.setTitle(getString(R.string.attend_event))
                     .setPositiveButton(R.string.yes) { _, _ -> onFeedItemAction(feedViewModel.rsvpEvent(this, true)) }
                     .setNegativeButton(R.string.no) { _, _ -> onFeedItemAction(feedViewModel.rsvpEvent(this, false)) }
-                    .setNeutralButton(R.string.event_details) { _, _ -> navigator.show(EventEditFragment.newInstance(model)) }
+                    .setNeutralButton(R.string.event_details) { _, _ -> navigator.push(EventEditFragment.newInstance(model)) }
                     .show()
             return
         }
@@ -123,7 +123,7 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
                             !model.game.isEmpty -> GameFragment.newInstance(model.game)
                             !model.tournament.isEmpty -> TournamentDetailFragment.newInstance(model.tournament).pending(model)
                             else -> null
-                        }?.let { navigator.show(it) }
+                        }?.let { navigator.push(it) }
                     }
                     .show()
             return
@@ -139,14 +139,14 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
             builder.setTitle(title)
                     .setPositiveButton(R.string.yes) { _, _ -> onFeedItemAction(feedViewModel.processJoinRequest(this, true)) }
                     .setNegativeButton(R.string.no) { _, _ -> onFeedItemAction(feedViewModel.processJoinRequest(this, false)) }
-                    .setNeutralButton(R.string.event_details) { _, _ -> navigator.show(JoinRequestFragment.viewInstance(model)) }
+                    .setNeutralButton(R.string.event_details) { _, _ -> navigator.push(JoinRequestFragment.viewInstance(model)) }
                     .show()
             return
         }
 
         item.isOf<Media>()?.apply {
             updateUi(bottomNavShows = false)
-            navigator.show(MediaDetailFragment.newInstance(model))
+            navigator.push(MediaDetailFragment.newInstance(model))
         }
     }
 

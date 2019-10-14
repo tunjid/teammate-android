@@ -89,7 +89,7 @@ class MyEventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refre
     }
 
     override fun onEventClicked(item: Event) {
-        navigator.show(EventEditFragment.newInstance(item))
+        navigator.push(EventEditFragment.newInstance(item))
     }
 
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {

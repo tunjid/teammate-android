@@ -29,7 +29,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.signOut
 import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
@@ -78,7 +77,7 @@ class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings),
                     .show()
             R.string.show_on_boarding -> {
                 prefsViewModel.isOnBoarded = false
-                navigator.show(FeedFragment.newInstance())
+                navigator.push(FeedFragment.newInstance())
             }
         }
     }

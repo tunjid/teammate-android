@@ -94,7 +94,7 @@ class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_r
     }
 
     override fun onBlockedUserClicked(blockedUser: BlockedUser) {
-        navigator.show(BlockedUserViewFragment.newInstance(blockedUser))
+        navigator.push(BlockedUserViewFragment.newInstance(blockedUser))
     }
 
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {

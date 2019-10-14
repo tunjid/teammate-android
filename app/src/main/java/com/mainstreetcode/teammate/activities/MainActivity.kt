@@ -72,8 +72,6 @@ import com.mainstreetcode.teammate.fragments.main.TeamsFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentsFragment
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment
-import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment
-import com.mainstreetcode.teammate.fragments.registration.SplashFragment
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
@@ -82,6 +80,10 @@ import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.UiState
+import com.mainstreetcode.teammate.navigation.AppNavigator
+import com.mainstreetcode.teammate.navigation.TAB_COUNT
+import com.mainstreetcode.teammate.navigation.toNavId
+import com.mainstreetcode.teammate.navigation.toRequestId
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.isInDarkMode
@@ -101,7 +103,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         GlobalUiController,
         BottomSheetController,
         TransientBarController,
-        Navigator.NavigationController {
+        Navigator.Controller {
 
     private var bottomNavHeight: Int = 0
 
@@ -119,16 +121,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
     private val teamViewModel by viewModels<TeamViewModel>()
 
     private val multiStackNavigator: MultiStackNavigator by multiStackNavigationController(
-            R.id.main_fragment_container,
-            intArrayOf(
-                    R.id.action_home,
-                    R.id.action_events,
-                    R.id.action_messages,
-                    R.id.action_media,
-                    R.id.action_tournaments
-            )
+            TAB_COUNT,
+            R.id.main_fragment_container
     ) {
-        when (it) {
+        when (it.toNavId) {
             R.id.action_home -> FeedFragment.newInstance().run { this to stableTag }
             R.id.action_events -> EventsFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
             R.id.action_messages -> ChatFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
@@ -154,7 +150,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         )
     }
 
-    override val navigator: Navigator by lazy { BottomSheetAwareNavigator(multiStackNavigator, bottomSheetDriver) }
+    override val navigator: AppNavigator by lazy { AppNavigator(multiStackNavigator, bottomSheetDriver) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(ViewModelProviders.of(this).get(PrefsViewModel::class.java).nightUiMode)
@@ -184,7 +180,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                         NavItem.create(R.id.action_tournaments, R.string.tourneys, R.drawable.ic_trophy_white_24dp))
                 .createBottomNav()
 
-        multiStackNavigator.stackSelectedListener = bottomNav::highlight
+        multiStackNavigator.stackSelectedListener = { bottomNav.highlight(it.toNavId) }
         multiStackNavigator.stackTransactionModifier = { crossFade() }
         multiStackNavigator.transactionModifier = { incomingFragment ->
             val current = navigator.currentFragment
@@ -240,46 +236,24 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
     }
 
     private fun onNavItemSelected(@IdRes id: Int): Boolean = when (id) {
-        R.id.action_home,
+        R.id.action_expand_home_nav -> showNavOverflow().let { true }
+        R.id.action_home -> multiStackNavigator.show(0).let { true }
         R.id.action_events,
         R.id.action_messages,
         R.id.action_media,
-        R.id.action_tournaments -> multiStackNavigator.show(id).let { true }
-
-        R.id.action_games -> {
-            TeamPickerFragment.pick(this, R.id.request_game_team_pick).let { true }
-        }
-        R.id.action_find_teams -> {
-            navigator.show(TeamSearchFragment.newInstance())
-        }
-        R.id.action_team -> {
-            navigator.show(TeamsFragment.newInstance())
-        }
-        R.id.action_expand_home_nav -> {
-            showNavOverflow().let { true }
-        }
-        R.id.action_settings -> {
-            navigator.show(SettingsFragment.newInstance())
-        }
-        R.id.action_rsvp_list -> {
-            navigator.show(MyEventsFragment.newInstance())
-        }
-        R.id.action_public_events -> {
-            navigator.show(EventSearchFragment.newInstance())
-        }
-        R.id.action_head_to_head -> {
-            navigator.show(HeadToHeadFragment.newInstance())
-        }
-        R.id.action_stats_aggregate -> {
-            navigator.show(StatAggregateFragment.newInstance())
-        }
-        R.id.action_declined_competitions -> {
-            navigator.show(DeclinedCompetitionsFragment.newInstance())
-        }
-        R.id.action_my_profile -> {
-            navigator.show(UserEditFragment.newInstance(userViewModel.currentUser))
-        }
-        else -> false
+        R.id.action_tournaments -> TeamPickerFragment.pick(this, id.toRequestId).let { true }
+        else -> navigator.push(when (id) {
+            R.id.action_find_teams -> TeamSearchFragment.newInstance()
+            R.id.action_team -> TeamsFragment.newInstance()
+            R.id.action_settings -> SettingsFragment.newInstance()
+            R.id.action_rsvp_list -> MyEventsFragment.newInstance()
+            R.id.action_public_events -> EventSearchFragment.newInstance()
+            R.id.action_head_to_head -> HeadToHeadFragment.newInstance()
+            R.id.action_stats_aggregate -> StatAggregateFragment.newInstance()
+            R.id.action_declined_competitions -> DeclinedCompetitionsFragment.newInstance()
+            R.id.action_my_profile -> UserEditFragment.newInstance(userViewModel.currentUser)
+            else -> TeamSearchFragment.newInstance()
+        }).let { true }
     }
 
     private fun route(savedInstanceState: Bundle?, intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
@@ -289,7 +263,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         is Tournament -> TournamentDetailFragment.newInstance(model)
         is JoinRequest -> TeamMembersFragment.newInstance(model.team)
         else -> if (savedInstanceState == null) FeedFragment.newInstance() else null
-    }?.let(navigator::show)
+    }?.let(navigator::push)
 
     private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
             stackNavigatorSource = this.multiStackNavigator::activeNavigator,
@@ -310,52 +284,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
     }
 }
 
-class BottomSheetAwareNavigator(
-        val delegate: Navigator,
-        val bottomSheetDriver: BottomSheetDriver
-) : Navigator by delegate {
-
-    override val currentFragment: Fragment?
-        get() = bottomSheetDriver.currentFragment ?: delegate.currentFragment
-
-    override fun show(fragment: Fragment, tag: String): Boolean {
-        bottomSheetDriver.hideBottomSheet()
-        return delegate.show(fragment, tag)
-    }
-
-    override fun <T> show(fragment: T): Boolean where T : Fragment, T : Navigator.TagProvider =
-            show(fragment, fragment.stableTag)
-}
-
-private const val TOKEN = "token"
 const val FEED_DEEP_LINK = "feed-deep-link"
-
-fun Navigator.completeSignIn() {
-    clear(upToTag = "", includeMatch = true)
-    show(FeedFragment.newInstance())
-}
-
-fun Navigator.signOut(intent: Intent? = null) {
-    clear(upToTag = "", includeMatch = true)
-
-    val token: String? = intent?.resetToken()
-
-    if (token == null) show(SplashFragment.newInstance())
-    else show(ResetPasswordFragment.newInstance(token))
-}
-
-private fun Intent.resetToken(): String? {
-    val uri = data ?: return null
-
-    val domain1 = App.instance.getString(R.string.domain_1)
-    val domain2 = App.instance.getString(R.string.domain_2)
-
-    val path = uri.path ?: return null
-    val domainMatches = domain1 == uri.host || domain2 == uri.host
-
-    return if (domainMatches && path.contains("forgotPassword")) uri.getQueryParameter(TOKEN)
-    else null
-}
 
 private fun FragmentTransaction.crossFade() = setCustomAnimations(
         android.R.anim.fade_in,

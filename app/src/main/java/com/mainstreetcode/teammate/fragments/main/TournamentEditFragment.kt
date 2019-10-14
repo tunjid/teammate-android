@@ -105,7 +105,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_rounds -> navigator.show(TournamentDetailFragment.newInstance(headeredModel))
+        R.id.action_rounds -> navigator.push(TournamentDetailFragment.newInstance(headeredModel))
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -140,7 +140,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
                     transientBarDriver.showSnackBar(getString(stringRes, headeredModel.name))
 
                     if (wasEmpty)
-                        navigator.show(TournamentDetailFragment.newInstance(headeredModel))
+                        navigator.push(TournamentDetailFragment.newInstance(headeredModel))
                     else
                         onModelUpdated(diffResult)
                 }, defaultErrorHandler::invoke))
@@ -163,7 +163,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
                             showingPrompt = false
                         }
                     })
-                    .setAction(R.string.okay) { navigator.show(CompetitorsFragment.newInstance(headeredModel)) }
+                    .setAction(R.string.okay) { navigator.push(CompetitorsFragment.newInstance(headeredModel)) }
         }
     }
 
