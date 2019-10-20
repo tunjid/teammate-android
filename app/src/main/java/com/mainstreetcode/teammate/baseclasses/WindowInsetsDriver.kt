@@ -96,7 +96,7 @@ class WindowInsetsDriver(
             true
         }
 
-        adjustInsetForFragment(stackNavigatorSource()?.currentFragment)
+        adjustInsetForFragment(stackNavigatorSource()?.current)
 
         this.insetsApplied = true
         return insets
@@ -116,7 +116,7 @@ class WindowInsetsDriver(
 
         setKeyboardPadding(bottomSystemInset)
 
-        stackNavigatorSource()?.currentFragment?.run {
+        stackNavigatorSource()?.current?.run {
             if (this is InsetProvider) onKeyBoardChanged(bottomSystemInset > bottomInset)
         }
 

@@ -75,7 +75,7 @@ fun FragmentActivity.globalUiDriver(
         fabId: Int = R.id.fab,
         bottomNavId: Int = R.id.bottom_navigation,
         grassId: Int = R.id.grass_background,
-        currentFragmentSource: () -> Fragment?
+        currentSource: () -> Fragment?
 ) = object : ReadWriteProperty<FragmentActivity, UiState> {
 
     private val driver by lazy {
@@ -86,7 +86,7 @@ fun FragmentActivity.globalUiDriver(
                 fabId,
                 bottomNavId,
                 grassId,
-                currentFragmentSource
+                currentSource
         )
     }
 

@@ -152,7 +152,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         get() = activityUiState
         set(value) {
             lastSetUiState.set(value)
-            if (navigator.currentFragment === this) activityUiState = value
+            if (navigator.current === this) activityUiState = value
         }
 
     override val stableTag: String = javaClass.simpleName

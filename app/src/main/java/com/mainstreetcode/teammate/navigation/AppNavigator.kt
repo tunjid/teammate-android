@@ -40,8 +40,8 @@ class AppNavigator(
         val bottomSheetDriver: BottomSheetDriver
 ) : Navigator by delegate {
 
-    override val currentFragment: Fragment?
-        get() = bottomSheetDriver.currentFragment ?: delegate.currentFragment
+    override val current: Fragment?
+        get() = bottomSheetDriver.current ?: delegate.current
 
     override fun push(fragment: Fragment, tag: String): Boolean {
         bottomSheetDriver.hideBottomSheet()

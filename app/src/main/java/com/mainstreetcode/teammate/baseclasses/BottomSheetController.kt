@@ -62,7 +62,7 @@ class BottomSheetDriver(
     val isBottomSheetShowing: Boolean
         get() = bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
 
-    val currentFragment: Fragment?
+    val current: Fragment?
         get() = if (!isEnabled) null
         else host.supportFragmentManager.findFragmentById(R.id.bottom_sheet_view).run {
             if (this is BlankBottomSheetFragment) null else this
@@ -124,7 +124,7 @@ class BottomSheetDriver(
     private fun restoreHiddenViewState() {
         val navigator = (host as? Navigator.Controller)?.navigator ?: return
         val onCommit = {
-            val post = navigator.currentFragment as? TeammatesBaseFragment
+            val post = navigator.current as? TeammatesBaseFragment
             if (post != null && post.view != null) post.togglePersistentUi()
         }
 

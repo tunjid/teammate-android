@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         }
     }
 
-    override var uiState: UiState by globalUiDriver { navigator.currentFragment }
+    override var uiState: UiState by globalUiDriver { navigator.current }
 
     override val transientBarDriver: TransientBarDriver by lazy {
         TransientBarDriver(findViewById(R.id.coordinator), findViewById(R.id.fab))
@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         multiStackNavigator.stackSelectedListener = { bottomNav.highlight(it.toNavId) }
         multiStackNavigator.stackTransactionModifier = { crossFade() }
         multiStackNavigator.transactionModifier = { incomingFragment ->
-            val current = navigator.currentFragment
+            val current = navigator.current
             if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
             else crossFade()
         }
