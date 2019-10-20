@@ -170,11 +170,12 @@ class ImageWorkerFragment : TeammatesBaseFragment() {
             if (count != 0) for (i in 0 until count) uris.add(clip!!.getItemAt(i).uri)
             else if (uri != null) uris.add(uri)
 
-            if (data.hasExtra("uris")) uris.addAll(data.getParcelableArrayListExtra("uris"))
+            if (data.hasExtra("uris"))
+                uris.addAll(data.getParcelableArrayListExtra("uris") ?: listOf())
 
             // For Xiaomi Phones
             if (uris.isEmpty() && data.hasExtra("pick-result-data"))
-                uris.addAll(data.getParcelableArrayListExtra("pick-result-data"))
+                uris.addAll(data.getParcelableArrayListExtra("pick-result-data") ?: listOf())
 
             return uris
         }
