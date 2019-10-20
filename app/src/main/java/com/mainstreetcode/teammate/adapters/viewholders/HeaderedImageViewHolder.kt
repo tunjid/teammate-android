@@ -30,7 +30,8 @@ import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.HeaderedModel
@@ -72,6 +73,7 @@ class HeaderedImageViewHolder(
     fun unBind() = diff.stop()
 
     private fun loadImage(url: String) {
+        fullRes.isVisible = false
         val creator = getCreator(url) ?: return
 
         creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(thumbnail)
@@ -90,14 +92,15 @@ class HeaderedImageViewHolder(
         val endColor = ContextCompat.getColor(itemView.context, R.color.black_50)
         val startColor = Color.TRANSPARENT
 
-        val animator = ValueAnimator.ofObject(ArgbEvaluator(), startColor, endColor)
-        animator.duration = 2000
-        animator.addUpdateListener { animation ->
-            val color = animation.animatedValue as? Int ?: return@addUpdateListener
-            thumbnail.setColorFilter(color)
-            fullRes.setColorFilter(color)
+        ValueAnimator.ofObject(ArgbEvaluator(), startColor, endColor).apply {
+            duration = 2000
+            addUpdateListener { animation ->
+                val color = animation.animatedValue as? Int ?: return@addUpdateListener
+                thumbnail.setColorFilter(color)
+                fullRes.setColorFilter(color)
+            }
+            start()
         }
-        animator.start()
     }
 
     private inner class DeferredImageLoader internal constructor(private val url: String) : Runnable, Callback {
@@ -105,11 +108,11 @@ class HeaderedImageViewHolder(
         override fun run() {
             val delayed = getCreator(url)
             fullRes.visibility = View.VISIBLE
-            fullRes.doOnNextLayout { delayed?.fit()?.centerCrop()?.into(fullRes, this) }
+            fullRes.doOnLayout { delayed?.fit()?.centerCrop()?.into(fullRes, this) }
         }
 
         override fun onSuccess() {
-            fullRes.visibility = View.VISIBLE
+            fullRes.isVisible = true
             animateHeader()
         }
 

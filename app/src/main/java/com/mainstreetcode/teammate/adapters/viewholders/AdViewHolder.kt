@@ -29,14 +29,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnLayout
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.ContentAd
 import com.mainstreetcode.teammate.model.InstallAd
 import com.mainstreetcode.teammate.model.Team
 import com.squareup.picasso.Picasso
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 /**
@@ -58,7 +57,7 @@ abstract class AdViewHolder<T : Ad<*>> internal constructor(
     internal fun bindActual(ad: T) {
         this.ad = ad
         setImageAspectRatio(ad)
-        thumbnail.doOnNextLayout {
+        thumbnail.doOnLayout {
             val imageUrl = imageUrl
             if (!isEmpty(imageUrl)) Picasso.get().load(imageUrl).fit().centerCrop().into(thumbnail)
         }
@@ -72,8 +71,8 @@ abstract class AdViewHolder<T : Ad<*>> internal constructor(
     }
 }
 
-fun AdViewHolder<*>.bind(ad : Ad<*>) {
-    when(this) {
+fun AdViewHolder<*>.bind(ad: Ad<*>) {
+    when (this) {
         is ContentAdViewHolder -> bindActual(ad as ContentAd)
         is InstallAdViewHolder -> bindActual(ad as InstallAd)
     }
