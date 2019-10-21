@@ -157,7 +157,6 @@ class SignUpFragment : TeammatesBaseFragment(R.layout.fragment_sign_up), TextVie
 
         fun newInstance(): SignUpFragment = SignUpFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

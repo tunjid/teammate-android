@@ -40,6 +40,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventEditAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Guest
@@ -226,7 +227,7 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
 
     private fun onEventDeleted() {
         transientBarDriver.showSnackBar(getString(R.string.deleted_team, headeredModel.name))
-        removeEnterExitTransitions()
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 
@@ -262,7 +263,6 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
 
         fun newInstance(event: Event): EventEditFragment = EventEditFragment().apply {
             arguments = bundleOf(ARG_EVENT to event)
-            setEnterExitTransitions()
         }
 
         fun newInstance(game: Game): EventEditFragment = newInstance(game.event).apply {

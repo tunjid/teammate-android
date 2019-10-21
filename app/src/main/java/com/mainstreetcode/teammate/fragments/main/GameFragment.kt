@@ -42,6 +42,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.databinding.FragmentGameBinding
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
@@ -288,7 +289,7 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
 
     private fun onGameDeleted() {
         transientBarDriver.showSnackBar(getString(R.string.game_deleted))
-        removeEnterExitTransitions()
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 

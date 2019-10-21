@@ -46,9 +46,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.navigation.AppNavigator
 import com.mainstreetcode.teammate.activities.MainActivity
-import com.mainstreetcode.teammate.adapters.viewholders.ModelCardViewHolder
+import com.mainstreetcode.teammate.adapters.viewholders.ThumbnailHolder
 import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment
 import com.mainstreetcode.teammate.fragments.main.JoinRequestFragment
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment
@@ -58,6 +57,7 @@ import com.mainstreetcode.teammate.model.Message
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.navigation.AppNavigator
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 import com.mainstreetcode.teammate.util.Logger
@@ -222,20 +222,6 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         lastSetUiState.get()?.apply { uiState = this }
     }
 
-    protected fun setEnterExitTransitions() {
-        if (Config.isStaticVariant) return
-
-        sharedElementEnterTransition = cardTransition()
-        sharedElementReturnTransition = cardTransition()
-    }
-
-    protected fun removeEnterExitTransitions() {
-        enterTransition = Fade()
-        exitTransition = Fade()
-        sharedElementEnterTransition = null
-        sharedElementReturnTransition = null
-    }
-
     protected fun updateFabOnScroll(dx: Int, dy: Int) =
             if (showsFab && abs(dy) > 3) uiState = uiState.copy(fabShows = dy < 0) else Unit
 
@@ -305,13 +291,14 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         val model = args.getParcelable<Parcelable>(key) ?: return
 
         val holder = this@TeammatesBaseFragment.scrollManager
-                .findViewHolderForItemId(model.hashCode().toLong()) as? ModelCardViewHolder<*, *>
+                .findViewHolderForItemId(model.hashCode().toLong())
                 ?: return
 
+        incomingFragment.setSimpleSharedTransitions()
         this@TeammatesBaseFragment.exitTransition = sharedFadeTransition()
 
         addSharedElement(holder.itemView, model.getTransitionName(itemViewId))
-        addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
+        if (holder is ThumbnailHolder) addSharedElement(holder.thumbnail, model.getTransitionName(thumbnailId))
     }
 
     protected fun defaultUi(
@@ -396,15 +383,6 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         )
     }
 
-    private fun sharedFadeTransition() = Fade().apply { duration = FULL_RES_LOAD_DELAY.toLong() }
-
-    private fun cardTransition(): TransitionSet = TransitionSet()
-            .addTransition(ChangeBounds())
-            .addTransition(ChangeTransform())
-            .addTransition(ChangeImageTransform())
-            .setOrdering(TransitionSet.ORDERING_TOGETHER)
-            .apply { startDelay = 25; duration = FULL_RES_LOAD_DELAY.toLong() }
-
     private fun handleErrorMessage(message: Message) {
         transientBarDriver.toggleProgress(false)
 
@@ -428,3 +406,27 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         val NONE: InsetFlags = InsetFlags.NONE
     }
 }
+
+
+fun Fragment.setSimpleSharedTransitions() {
+    if (Config.isStaticVariant) return
+
+    sharedElementEnterTransition = cardTransition()
+    sharedElementReturnTransition = cardTransition()
+}
+
+fun Fragment.removeSharedElementTransitions() {
+    enterTransition = Fade()
+    exitTransition = Fade()
+    sharedElementEnterTransition = null
+    sharedElementReturnTransition = null
+}
+
+private fun sharedFadeTransition() = Fade().apply { duration = FULL_RES_LOAD_DELAY.toLong() }
+
+private fun cardTransition(): TransitionSet = TransitionSet()
+        .addTransition(ChangeBounds())
+        .addTransition(ChangeTransform())
+        .addTransition(ChangeImageTransform())
+        .setOrdering(TransitionSet.ORDERING_TOGETHER)
+        .apply { startDelay = 25; duration = FULL_RES_LOAD_DELAY.toLong() }

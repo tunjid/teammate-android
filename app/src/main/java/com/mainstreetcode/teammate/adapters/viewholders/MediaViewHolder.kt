@@ -51,7 +51,9 @@ import com.tunjid.androidx.view.util.marginLayoutParams
 abstract class MediaViewHolder<T : View> internal constructor(
         itemView: View,
         delegate: MediaAdapter.MediaAdapterListener
-) : InteractiveViewHolder<MediaAdapter.MediaAdapterListener>(itemView, delegate), Callback {
+) : InteractiveViewHolder<MediaAdapter.MediaAdapterListener>(itemView, delegate),
+        ThumbnailHolder,
+        Callback {
 
     lateinit var media: Media
 
@@ -63,7 +65,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     private val border: View
     private val container: ConstraintLayout
-    var thumbnailView: ImageView
+    final override val thumbnail: ImageView
 
     @get:IdRes
     abstract val thumbnailId: Int
@@ -80,7 +82,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
         fullResView = itemView.findViewById(fullViewId)
 
         @Suppress("LeakingThis")
-        thumbnailView = itemView.findViewById(thumbnailId)
+        thumbnail = itemView.findViewById(thumbnailId)
 
         val clickListener = View.OnClickListener { delegate.onMediaClicked(media) }
 
@@ -89,7 +91,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
         if (!delegate.isFullScreen) {
             itemView.setOnLongClickListener { performLongClick() }
-            thumbnailView.scaleType = ImageView.ScaleType.CENTER_CROP
+            thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
             setUnityAspectRatio()
         } else {
             container.layoutParams.height = MATCH_PARENT
@@ -107,9 +109,9 @@ abstract class MediaViewHolder<T : View> internal constructor(
         val delegate = this.delegate ?: return
 
         setTransitionName(itemView, media.getTransitionName(R.id.fragment_media_background))
-        setTransitionName(thumbnailView, media.getTransitionName(R.id.fragment_media_thumbnail))
+        setTransitionName(thumbnail, media.getTransitionName(R.id.fragment_media_thumbnail))
 
-        loadImage(media.thumbnail, false, thumbnailView)
+        loadImage(media.thumbnail, false, thumbnail)
         if (!delegate.isFullScreen) highlightViewHolder(delegate::isSelected)
     }
 
@@ -135,7 +137,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
         creator = creator.centerInside()
 
         val callBack = if (isFullScreen && fitToSize) this
-        else PaletteCallBack(destination) { color -> onFillExtracted(color, if (isFullScreen) itemView else thumbnailView) }
+        else PaletteCallBack(destination) { color -> onFillExtracted(color, if (isFullScreen) itemView else thumbnail) }
 
         creator.into(destination, callBack)
     }
@@ -144,7 +146,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
         val set = ConstraintSet()
 
         set.clone(container)
-        set.setDimensionRatio(thumbnailView.id, UNITY_ASPECT_RATIO)
+        set.setDimensionRatio(thumbnail.id, UNITY_ASPECT_RATIO)
         set.setDimensionRatio(fullResView.id, UNITY_ASPECT_RATIO)
         set.applyTo(container)
     }

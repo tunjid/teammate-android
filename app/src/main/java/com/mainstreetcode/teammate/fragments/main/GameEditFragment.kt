@@ -172,7 +172,6 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
 
         fun newInstance(game: Game): GameEditFragment = GameEditFragment().apply {
             arguments = bundleOf(ARG_GAME to game)
-            setEnterExitTransitions()
         }
     }
 }

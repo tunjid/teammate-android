@@ -211,7 +211,6 @@ class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event
 
         fun newInstance(): EventSearchFragment = EventSearchFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

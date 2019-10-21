@@ -44,7 +44,6 @@ import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.getTransitionName
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
@@ -147,18 +146,8 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
     }
 
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
-        if (incomingFragment is MediaDetailFragment) {
-            val media = incomingFragment.arguments!!.getParcelable<Media>(MediaDetailFragment.ARG_MEDIA)
-                    ?: return
-
-            val holder = scrollManager.findViewHolderForItemId(media.hashCode().toLong()) as? MediaViewHolder<*>
-                    ?: return
-
-            holder.bind(media) // Rebind, to make sure transition names remain.
-            transaction
-                    .addSharedElement(holder.itemView, media.getTransitionName(R.id.fragment_media_background))
-                    .addSharedElement(holder.thumbnailView, media.getTransitionName(R.id.fragment_media_thumbnail))
-        }
+        if (incomingFragment is MediaDetailFragment)
+            transaction.listDetailTransition(MediaDetailFragment.ARG_MEDIA, incomingFragment, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
     }
 
     override fun onMediaClicked(item: Media) {

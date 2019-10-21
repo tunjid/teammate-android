@@ -179,7 +179,6 @@ class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head)
 
         fun newInstance(): HeadToHeadFragment = HeadToHeadFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

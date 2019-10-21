@@ -46,6 +46,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.databinding.FragmentGamesParentBinding
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Team
@@ -171,7 +172,7 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
 
     private fun onTournamentDeleted(deleted: Tournament) {
         transientBarDriver.showSnackBar(getString(R.string.deleted_team, deleted.name))
-        removeEnterExitTransitions()
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 
@@ -218,7 +219,6 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
 
         fun newInstance(tournament: Tournament): TournamentDetailFragment = TournamentDetailFragment().apply {
             arguments = bundleOf(ARG_TOURNAMENT to tournament)
-            setEnterExitTransitions()
         }
     }
 }

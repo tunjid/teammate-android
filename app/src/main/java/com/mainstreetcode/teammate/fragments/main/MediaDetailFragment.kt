@@ -147,7 +147,6 @@ class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapter.MediaAdapterLi
 
         fun newInstance(media: Media): MediaDetailFragment = MediaDetailFragment().apply {
             arguments = bundleOf(ARG_MEDIA to media)
-            setEnterExitTransitions()
         }
     }
 }

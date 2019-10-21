@@ -180,7 +180,6 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
 
         fun newInstance(tournament: Tournament): TournamentEditFragment = TournamentEditFragment().apply {
             arguments = bundleOf(ARG_TOURNAMENT to tournament)
-            setEnterExitTransitions()
         }
     }
 }

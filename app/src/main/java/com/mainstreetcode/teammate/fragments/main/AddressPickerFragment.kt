@@ -218,7 +218,6 @@ class AddressPickerFragment : TeammatesBaseFragment(R.layout.fragment_place_pick
 
         fun newInstance(): AddressPickerFragment = AddressPickerFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

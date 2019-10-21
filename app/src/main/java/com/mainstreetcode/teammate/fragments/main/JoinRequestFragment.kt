@@ -79,7 +79,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_head
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
                 toolbarTitle = gofer.getToolbarTitle(this),
-                toolBarMenu =R.menu.fragment_user_edit,
+                toolBarMenu = R.menu.fragment_user_edit,
                 fabText = gofer.fabTitle,
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabShows = showsFab
@@ -201,30 +201,14 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_head
 
         internal const val ARG_JOIN_REQUEST = "join-request"
 
-        internal fun inviteInstance(team: Team): JoinRequestFragment {
-            val fragment = newInstance(JoinRequest.invite(team))
-            fragment.setEnterExitTransitions()
+        internal fun inviteInstance(team: Team): JoinRequestFragment = newInstance(JoinRequest.invite(team))
 
-            return fragment
-        }
+        fun joinInstance(team: Team, user: User): JoinRequestFragment = newInstance(JoinRequest.join(team, user))
 
-        fun joinInstance(team: Team, user: User): JoinRequestFragment {
-            val fragment = newInstance(JoinRequest.join(team, user))
-            fragment.setEnterExitTransitions()
-
-            return fragment
-        }
-
-        internal fun viewInstance(request: JoinRequest): JoinRequestFragment {
-            val fragment = newInstance(request)
-            fragment.setEnterExitTransitions()
-
-            return fragment
-        }
+        internal fun viewInstance(request: JoinRequest): JoinRequestFragment = newInstance(request)
 
         private fun newInstance(joinRequest: JoinRequest): JoinRequestFragment = JoinRequestFragment().apply {
             arguments = bundleOf(ARG_JOIN_REQUEST to joinRequest)
-            setEnterExitTransitions()
         }
     }
 }

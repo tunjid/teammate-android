@@ -36,6 +36,7 @@ import com.mainstreetcode.teammate.adapters.StatEditAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -163,7 +164,7 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
 
     private fun onStatDeleted() {
         transientBarDriver.showSnackBar(getString(R.string.deleted_team, headeredModel.statType))
-        removeEnterExitTransitions()
+        removeSharedElementTransitions()
 
         activity?.onBackPressed()
     }
@@ -187,7 +188,6 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
 
         fun newInstance(stat: Stat): StatEditFragment = StatEditFragment().apply {
             arguments = bundleOf(ARG_STAT to stat)
-            setEnterExitTransitions()
         }
     }
 }

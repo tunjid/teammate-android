@@ -36,6 +36,7 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.setSimpleSharedTransitions
 import com.mainstreetcode.teammate.databinding.FragmentSplashBinding
 import com.tunjid.androidx.core.text.SpanBuilder
 import com.tunjid.androidx.view.util.InsetFlags
@@ -110,11 +111,13 @@ class SplashFragment : TeammatesBaseFragment(R.layout.fragment_splash), View.OnC
         val root = view
         if (root != null) {
             if (incomingFragment is SignInFragment) {
+                incomingFragment.setSimpleSharedTransitions()
                 transaction
                         .addSharedElement(root.findViewById(R.id.border), TRANSITION_BACKGROUND)
                         .addSharedElement(root.findViewById(R.id.title), TRANSITION_TITLE)
                         .addSharedElement(root.findViewById(R.id.sub_title), TRANSITION_SUBTITLE)
             } else if (incomingFragment is SignUpFragment) {
+                incomingFragment.setSimpleSharedTransitions()
                 transaction
                         .addSharedElement(root.findViewById(R.id.border), TRANSITION_BACKGROUND)
                         .addSharedElement(root.findViewById(R.id.title), TRANSITION_TITLE)

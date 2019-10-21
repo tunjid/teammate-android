@@ -35,6 +35,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.RoleEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
@@ -148,7 +149,7 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
 
     private fun onRoleDropped() {
         transientBarDriver.showSnackBar(getString(R.string.dropped_user, headeredModel.user.firstName))
-        removeEnterExitTransitions()
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 
@@ -158,7 +159,6 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
 
         fun newInstance(role: Role): RoleEditFragment = RoleEditFragment().apply {
             arguments = bundleOf(ARG_ROLE to role)
-            setEnterExitTransitions()
         }
     }
 }

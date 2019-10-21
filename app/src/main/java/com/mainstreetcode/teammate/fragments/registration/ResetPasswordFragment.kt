@@ -115,7 +115,6 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
 
         fun newInstance(token: CharSequence): ResetPasswordFragment = ResetPasswordFragment().apply {
             arguments = bundleOf(ARG_TOKEN to token)
-            setEnterExitTransitions()
         }
     }
 }

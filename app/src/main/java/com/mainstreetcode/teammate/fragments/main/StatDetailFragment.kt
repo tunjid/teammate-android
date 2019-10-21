@@ -67,7 +67,6 @@ class StatDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_parent)
 
         fun newInstance(tournament: Tournament): StatDetailFragment = StatDetailFragment().apply {
             arguments = bundleOf(ARG_TOURNAMENT to tournament)
-            setEnterExitTransitions()
         }
     }
 }

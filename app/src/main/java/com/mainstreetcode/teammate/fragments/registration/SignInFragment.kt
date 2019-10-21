@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.setSimpleSharedTransitions
 import com.mainstreetcode.teammate.databinding.FragmentSignInBinding
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.hasValidEmail
@@ -85,10 +86,12 @@ class SignInFragment : TeammatesBaseFragment(R.layout.fragment_sign_in), TextVie
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
         val binding = this.binding ?: return
 
-        if (view != null && incomingFragment is ForgotPasswordFragment) transaction
-                .addSharedElement(binding.email, SplashFragment.TRANSITION_TITLE)
-                .addSharedElement(binding.cardViewWrapper, SplashFragment.TRANSITION_BACKGROUND)
-        else super.augmentTransaction(transaction, incomingFragment)
+        if (view != null && incomingFragment is ForgotPasswordFragment) {
+            incomingFragment.setSimpleSharedTransitions()
+            transaction
+                    .addSharedElement(binding.email, SplashFragment.TRANSITION_TITLE)
+                    .addSharedElement(binding.cardViewWrapper, SplashFragment.TRANSITION_BACKGROUND)
+        } else super.augmentTransaction(transaction, incomingFragment)
     }
 
     override fun onClick(view: View) {
@@ -129,7 +132,6 @@ class SignInFragment : TeammatesBaseFragment(R.layout.fragment_sign_in), TextVie
 
         fun newInstance(): SignInFragment = SignInFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

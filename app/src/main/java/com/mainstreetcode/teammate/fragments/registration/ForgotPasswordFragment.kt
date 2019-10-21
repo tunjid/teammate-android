@@ -105,7 +105,6 @@ class ForgotPasswordFragment : TeammatesBaseFragment(R.layout.fragment_forgot_pa
 
         fun newInstance(email: CharSequence): ForgotPasswordFragment = ForgotPasswordFragment().apply {
             arguments = bundleOf(ARG_EMAIL to email)
-            setEnterExitTransitions()
         }
     }
 }

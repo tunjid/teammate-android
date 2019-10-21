@@ -139,7 +139,6 @@ class StatAggregateFragment : TeammatesBaseFragment(),
 
         fun newInstance(): StatAggregateFragment = StatAggregateFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 

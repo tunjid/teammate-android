@@ -38,6 +38,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
@@ -188,9 +189,8 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
 
     private fun onTeamDeleted() {
         transientBarDriver.showSnackBar(getString(R.string.deleted_team, team.name))
-        removeEnterExitTransitions()
+        removeSharedElementTransitions()
 
-        val activity = activity
         activity?.onBackPressed()
     }
 

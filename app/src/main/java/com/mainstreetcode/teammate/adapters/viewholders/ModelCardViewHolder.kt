@@ -38,13 +38,13 @@ import com.squareup.picasso.Picasso
 open class ModelCardViewHolder<H : RemoteImage, T : Any> internal constructor(
         itemView: View,
         delegate: T
-) : BaseViewHolder<T>(itemView, delegate) {
+) : BaseViewHolder<T>(itemView, delegate), ThumbnailHolder {
 
     protected lateinit var model: H
 
     internal var title: TextView = itemView.findViewById(R.id.item_title)
     internal var subtitle: TextView = itemView.findViewById(R.id.item_subtitle)
-    var thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
+    override val thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
 
     open val isThumbnail: Boolean
         get() = true
