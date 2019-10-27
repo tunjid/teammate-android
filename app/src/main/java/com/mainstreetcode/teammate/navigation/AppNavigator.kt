@@ -150,11 +150,7 @@ class AppNavigator(private val host: FragmentActivity) :
 
     fun completeSignIn() = delegate.clearAll()
 
-    fun signOut(intent: Intent? = null) {
-        delegate.clearAll()
-
-//        val token: String? = intent?.resetToken()
-    }
+    fun signOut() = delegate.clearAll()
 
     fun showNavOverflow() = NavDialogFragment.newInstance().show(host.supportFragmentManager, "")
 
@@ -181,20 +177,20 @@ class AppNavigator(private val host: FragmentActivity) :
 
     private fun route(it: Int): Pair<Fragment, String> = when (it.toNavId) {
         R.id.action_home -> when (userViewModel.isSignedIn) {
-            true -> FeedFragment.newInstance().run { this to stableTag }
+            true -> FeedFragment.newInstance()
             else -> when (val token = host.intent?.resetToken()) {
-                null -> SplashFragment.newInstance().run { this to stableTag }
-                else -> ResetPasswordFragment.newInstance(token).run { this to stableTag }
+                null -> SplashFragment.newInstance()
+                else -> ResetPasswordFragment.newInstance(token)
             }
         }
-        R.id.action_events -> EventsFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
-        R.id.action_messages -> ChatFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
-        R.id.action_media -> MediaFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
-        R.id.action_tournaments -> TournamentsFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
-        else -> FeedFragment.newInstance().run { this to stableTag }
-    }
+        R.id.action_events -> EventsFragment.newInstance(teamViewModel.defaultTeam)
+        R.id.action_messages -> ChatFragment.newInstance(teamViewModel.defaultTeam)
+        R.id.action_media -> MediaFragment.newInstance(teamViewModel.defaultTeam)
+        R.id.action_tournaments -> TournamentsFragment.newInstance(teamViewModel.defaultTeam)
+        else -> FeedFragment.newInstance()
+    }.run { this to stableTag }
 
-    fun route(intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
+    fun checkDeepLink(intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
         is Game -> GameFragment.newInstance(model)
         is Chat -> ChatFragment.newInstance(model.team)
         is Event -> EventEditFragment.newInstance(model)
@@ -251,7 +247,8 @@ private fun Intent.resetToken(): String? {
     val path = uri.path ?: return null
     val domainMatches = domain1 == uri.host || domain2 == uri.host
 
-    return if (domainMatches && path.contains("forgotPassword")) uri.getQueryParameter(TOKEN)
+    // Clear deep link token after retrieval
+    return if (domainMatches && path.contains("forgotPassword")) uri.getQueryParameter(TOKEN).apply { this@resetToken.data = null }
     else null
 }
 

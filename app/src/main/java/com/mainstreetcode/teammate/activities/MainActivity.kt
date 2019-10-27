@@ -110,13 +110,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
         App.prime()
 
-        if (!userViewModel.isSignedIn) navigator.signOut(intent)
-        else navigator.route(intent)
+        navigator.checkDeepLink(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        navigator.route(intent)
+        navigator.checkDeepLink(intent)
     }
 
     override fun onResume() {
