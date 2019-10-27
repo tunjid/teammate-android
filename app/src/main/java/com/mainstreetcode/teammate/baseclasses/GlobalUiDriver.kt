@@ -132,12 +132,14 @@ class GlobalUiDriver(
         private val getCurrentFragment: () -> Fragment?
 ) : GlobalUiController {
 
+    private var hasHiddenSystemUi = false
+
     init {
         val color = ContextCompat.getColor(host, R.color.transparent)
         host.window.statusBarColor = color
         host.window.navigationBarColor = color
         host.window.decorView.systemUiVisibility = DEFAULT_SYSTEM_UI_FLAGS
-        host.window.decorView.setOnSystemUiVisibilityChangeListener { uiState = uiState.copy(toolbarShows = !host.window.decorView.isDisplayingSystemUI()) }
+        host.window.decorView.setOnSystemUiVisibilityChangeListener { if (hasHiddenSystemUi) uiState = uiState.copy(toolbarShows = !host.window.decorView.isDisplayingSystemUI()) }
     }
 
     private val altToolbar: Toolbar = host.findViewById<Toolbar>(altToolbarId).apply {
@@ -262,9 +264,11 @@ class GlobalUiDriver(
     private fun setFabClickListener(onClickListener: View.OnClickListener?) =
             fabHider.view.setOnClickListener(onClickListener)
 
-    private fun toggleSystemUI(show: Boolean) =
-            if (show) showSystemUI()
-            else hideSystemUI()
+    private fun toggleSystemUI(show: Boolean) {
+        if (!show) hasHiddenSystemUi = true
+        if (show) showSystemUI()
+        else hideSystemUI()
+    }
 
     private fun hideSystemUI() {
         val decorView = host.window.decorView

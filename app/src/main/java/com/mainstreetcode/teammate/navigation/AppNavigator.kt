@@ -190,7 +190,9 @@ class AppNavigator(private val host: FragmentActivity) :
     private fun isInCurrentFragmentContainer(fragment: Fragment): Boolean =
             activeNavigator.containerId == fragment.id
 
-    private fun showNavOverflow() = NavDialogFragment.newInstance().show(host.supportFragmentManager, "")
+    private fun showNavOverflow() {
+        if (userViewModel.isSignedIn) NavDialogFragment.newInstance().show(host.supportFragmentManager, "")
+    }
 
     fun onNavItemSelected(@IdRes id: Int): Boolean = when (id) {
         R.id.action_expand_home_nav -> showNavOverflow().let { true }
@@ -220,7 +222,7 @@ class AppNavigator(private val host: FragmentActivity) :
         is Event -> EventEditFragment.newInstance(model)
         is Tournament -> TournamentDetailFragment.newInstance(model)
         is JoinRequest -> TeamMembersFragment.newInstance(model.team)
-        else -> null
+        else -> intent.resetToken()?.run { ResetPasswordFragment.newInstance(this) }
     }?.let(::push)
 
     private fun route(it: Int): Pair<Fragment, String> = when (it.toNavId) {
