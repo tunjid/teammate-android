@@ -37,6 +37,9 @@ import java.util.regex.Pattern
 
 private val emailPattern = Pattern.compile("^([a-zA-Z0-9_\\-.]+)@([a-zA-Z0-9_\\-]+)\\.([a-zA-Z]{2,5})$")
 
+val EditText?.input: CharSequence
+    get() = if(this == null) "" else text
+
 val EditText?.hasValidPassword: Boolean
     get() = guard("Invalid password", CharSequence::isValidPassword)
 

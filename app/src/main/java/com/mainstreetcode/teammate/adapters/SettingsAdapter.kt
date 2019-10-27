@@ -29,7 +29,7 @@ import android.view.ViewGroup
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
 import com.mainstreetcode.teammate.model.SettingsItem
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
 
 class SettingsAdapter(
@@ -40,7 +40,7 @@ class SettingsAdapter(
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): SettingsViewHolder {
         val context = viewGroup.context
         val itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_settings, viewGroup, false)
-        return SettingsViewHolder(itemView, adapterListener)
+        return SettingsViewHolder(itemView, delegate)
     }
 
     override fun onBindViewHolder(settingsViewHolder: SettingsViewHolder, i: Int) {
@@ -49,7 +49,7 @@ class SettingsAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    interface SettingsAdapterListener : AdapterListener {
+    interface SettingsAdapterListener {
         fun onSettingsItemClicked(item: SettingsItem)
     }
 

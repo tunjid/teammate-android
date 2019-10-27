@@ -58,7 +58,7 @@ open class TournamentEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "tournament_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "tournament_image_url")
     var imageUrl: String
@@ -166,11 +166,9 @@ open class TournamentEntity : Parcelable {
         isSingleFinal = `in`.readByte().toInt() != 0x00
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun hasWinner(): Boolean = !winner.isEmpty
 

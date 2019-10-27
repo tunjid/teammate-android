@@ -25,10 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.StatAggregateAdapter
 import com.mainstreetcode.teammate.adapters.StatAggregateRequestAdapter
@@ -36,27 +33,26 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitive
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 import com.mainstreetcode.teammate.model.StatAggregate
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
-class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListener, TeamAdapter.AdapterListener, StatAggregateRequestAdapter.AdapterListener {
+class StatAggregateFragment : TeammatesBaseFragment(),
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener,
+        StatAggregateRequestAdapter.AdapterListener {
 
     private lateinit var request: StatAggregate.Request
-    private lateinit var searchScrollManager: ScrollManager<*>
     private var expandingToolbar: ExpandingToolbar? = null
+    private var searchScrollManager: ScrollManager<*>? = null
 
     private lateinit var items: List<Differentiable>
-
-    override val showsToolBar: Boolean get() = false
 
     override val showsFab: Boolean get() = false
 
@@ -66,44 +62,43 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
         items = statViewModel.statAggregates
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_stat_aggregate, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(toolbarShows = false)
 
-        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.search_options))
+        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
                 .withAdapter(StatAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.fetchAggregates() }
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.fetchAggregates() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(StatAggregateAdapter(items))
                 .withLinearLayoutManager()
                 .build()
 
-        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper)) { this.fetchAggregates() }
+        expandingToolbar = ExpandingToolbar.create(view.findViewById(R.id.card_view_wrapper)) { this.fetchAggregates() }
         expandingToolbar?.setTitleIcon(false)
         expandingToolbar?.setTitle(R.string.stat_aggregate_get)
 
         scrollManager.notifyDataSetChanged()
 
-        if (!restoredFromBackStack()) expandingToolbar?.changeVisibility(false)
-
-        return root
+        if (!restoredFromBackStack) expandingToolbar?.changeVisibility(false)
     }
 
     override fun onDestroyView() {
         expandingToolbar = null
-        searchScrollManager.clear()
+        searchScrollManager = null
         super.onDestroyView()
     }
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
-        if (!appeared && isBottomSheetShowing) hideBottomSheet()
+        if (!appeared && bottomSheetDriver.isBottomSheetShowing) bottomSheetDriver.hideBottomSheet()
     }
 
     override fun onUserPicked(user: User) = pick(UserSearchFragment.newInstance())
@@ -115,9 +110,9 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
     override fun onUserClicked(item: User) = updateEntity(item)
 
     private fun fetchAggregates() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(statViewModel.aggregate(request).subscribe({ result ->
-            toggleProgress(false)
+            transientBarDriver.toggleProgress(false)
             scrollManager.onDiff(result)
         }, defaultErrorHandler::invoke))
     }
@@ -129,23 +124,20 @@ class StatAggregateFragment : MainActivityFragment(), UserAdapter.AdapterListene
             else -> return
         }
 
-        searchScrollManager.notifyDataSetChanged()
+        searchScrollManager?.notifyDataSetChanged()
+        bottomSheetDriver.hideBottomSheet()
         hideKeyboard()
     }
 
-    private fun pick(fragment: BaseFragment) {
-        fragment.setTargetFragment(this, R.id.request_competitor_pick)
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setFragment(fragment)
-                .build())
-    }
+    private fun pick(caller: TeammatesBaseFragment) = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_competitor_pick,
+            fragment = caller
+    )
 
     companion object {
 
         fun newInstance(): StatAggregateFragment = StatAggregateFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 

@@ -34,8 +34,8 @@ import com.mainstreetcode.teammate.model.Team
  */
 class TeamViewHolder(
         itemView: View,
-        adapterListener: TeamAdapter.AdapterListener
-) : ModelCardViewHolder<Team, TeamAdapter.AdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: TeamAdapter.AdapterListener
+) : ModelCardViewHolder<Team, TeamAdapter.AdapterListener>(itemView, delegate), View.OnClickListener {
 
     init {
         itemView.setOnClickListener(this)
@@ -49,6 +49,6 @@ class TeamViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onTeamClicked(model)
+        delegate?.onTeamClicked(model)
     }
 }

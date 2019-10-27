@@ -34,7 +34,6 @@ import com.mainstreetcode.teammate.persistence.EntityDao
 import com.mainstreetcode.teammate.persistence.EventDao
 import com.mainstreetcode.teammate.rest.TeammateApi
 import com.mainstreetcode.teammate.rest.TeammateService
-import com.tunjid.androidbootstrap.functions.collections.Lists
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -86,7 +85,7 @@ class EventRepo internal constructor() : TeamQueryRepo<Event>() {
         val localDate = date ?: futureDate
 
         val local = AppDatabase.instance.guestDao().getRsvpList(current.id, localDate)
-                .map<List<Event>> { guests -> ArrayList(Lists.transform(guests, Guest::event)) }
+                .map<List<Event>> { guests -> guests.map(Guest::event) }
                 .subscribeOn(io())
 
         val remote = api.eventsAttending(date, DEF_QUERY_LIMIT).map(saveManyFunction).toMaybe()

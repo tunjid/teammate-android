@@ -26,8 +26,7 @@ package com.mainstreetcode.teammate.model.enums
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonObject
-
-import java.util.Objects
+import java.util.*
 
 class StatAttribute internal constructor(code: String, name: String) : MetaData(code, name) {
 

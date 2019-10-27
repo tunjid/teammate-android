@@ -38,9 +38,9 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamMember
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.notifications.FeedItem
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.diff.Diff
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.replace
+import com.tunjid.androidx.recyclerview.diff.Diff
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -72,24 +72,24 @@ object FunctionalDiff {
     val DESCENDING_COMPARATOR = Comparator<Differentiable> { modelA, modelB -> -COMPARATOR.compare(modelA, modelB) }
 
     fun <T : Differentiable> of(sourceFlowable: Flowable<out List<T>>,
-                                original: List<T>,
-                                accumulator: (MutableList<T>, MutableList<T>) -> List<T>): Flowable<DiffUtil.DiffResult> =
+                                original: MutableList<T>,
+                                accumulator: (List<T>, List<T>) -> List<T>): Flowable<DiffUtil.DiffResult> =
             sourceFlowable.concatMapDelayError { list ->
                 Flowable.fromCallable { Diff.calculate(original, list, accumulator) }
                         .subscribeOn(AndroidSchedulers.from(diffThread.looper))
                         .observeOn(mainThread())
-                        .doOnNext { diff -> Lists.replace(original, diff.items) }
+                        .doOnNext { diff -> original.replace(diff.items) }
                         .map { diff -> diff.result }
             }
 
     fun <T : Differentiable> of(sourceSingle: Single<out List<T>>,
-                                original: List<T>,
-                                accumulator: (MutableList<T>, MutableList<T>) -> List<T>): Single<DiffUtil.DiffResult> =
+                                original: MutableList<T>,
+                                accumulator: (List<T>, List<T>) -> List<T>): Single<DiffUtil.DiffResult> =
             sourceSingle.flatMap { list ->
                 Single.fromCallable { Diff.calculate(original, list, accumulator) }
                         .subscribeOn(AndroidSchedulers.from(diffThread.looper))
                         .observeOn(mainThread())
-                        .doOnSuccess { diff -> Lists.replace(original, diff.items) }
+                        .doOnSuccess { diff -> original.replace(diff.items) }
                         .map { diff -> diff.result }
             }
 

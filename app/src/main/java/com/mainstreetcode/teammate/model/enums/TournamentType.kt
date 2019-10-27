@@ -27,9 +27,8 @@ package com.mainstreetcode.teammate.model.enums
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
-import com.mainstreetcode.teammate.util.*
-
-import java.util.Objects
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import java.util.*
 
 class TournamentType private constructor(code: String, name: String, val refPath: String) : MetaData(code, name) {
 

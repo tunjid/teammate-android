@@ -29,20 +29,20 @@ import android.view.View
 
 import com.mainstreetcode.teammate.adapters.StatTypeAdapter
 import com.mainstreetcode.teammate.model.enums.StatAttribute
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 class ChipViewHolder(itemView: View, listener: StatTypeAdapter.AdapterListener) : InteractiveViewHolder<StatTypeAdapter.AdapterListener>(itemView, listener) {
     private val chip: Chip = itemView as Chip
     private lateinit var attribute: StatAttribute
 
     init {
-        chip.setOnClickListener { adapterListener.onAttributeTapped(attribute) }
+        chip.setOnClickListener { delegate?.onAttributeTapped(attribute) }
     }
 
     fun bind(attribute: StatAttribute) {
         this.attribute = attribute
         chip.text = attribute.name
-        chip.isEnabled = adapterListener.isEnabled
-        chip.isChecked = adapterListener.isSelected(attribute)
+        chip.isEnabled = delegate?.isEnabled == true
+        chip.isChecked = delegate?.isSelected(attribute) == true
     }
 }

@@ -42,7 +42,7 @@ import com.mainstreetcode.teammate.util.areNotEmpty
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.isNotNullOrBlank
 import com.mainstreetcode.teammate.util.processEmoji
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 
 class User : UserEntity,
@@ -88,12 +88,12 @@ class User : UserEntity,
     )
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is User) id == other.id else firstName == other.firstName && lastName == other.lastName
+            if (other !is User) diffId == other.diffId else firstName == other.firstName && lastName == other.lastName
                     && imageUrl == other.imageUrl
 
     override fun hasMajorFields(): Boolean = areNotEmpty(id, firstName, lastName)
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun update(updated: User) {
         this.id = updated.id
@@ -118,7 +118,7 @@ class User : UserEntity,
     }
 
     override fun compareTo(other: User): Int =
-            compareValuesBy(this, other, { it.firstName.toString() }, { it.lastName.toString() }, User::getId)
+            compareValuesBy(this, other, { it.firstName.toString() }, { it.lastName.toString() }, User::id)
 
     fun setPassword(password: String) {
         this.password = password

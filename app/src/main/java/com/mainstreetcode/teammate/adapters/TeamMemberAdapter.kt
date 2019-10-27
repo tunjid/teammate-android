@@ -41,9 +41,10 @@ import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.JOIN_REQUEST
 import com.mainstreetcode.teammate.util.ROLE
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -60,10 +61,10 @@ class TeamMemberAdapter(
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> =
             when (viewType) {
-                CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-                INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                ROLE -> RoleViewHolder(getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener)
-                else -> JoinRequestViewHolder(getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener)
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+                ROLE -> RoleViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
+                else -> JoinRequestViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
             }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
@@ -91,7 +92,7 @@ class TeamMemberAdapter(
         return if (wrapped is Role) ROLE else JOIN_REQUEST
     }
 
-    interface UserAdapterListener : AdapterListener {
+    interface UserAdapterListener {
         fun onRoleClicked(role: Role)
 
         fun onJoinRequestClicked(request: JoinRequest)

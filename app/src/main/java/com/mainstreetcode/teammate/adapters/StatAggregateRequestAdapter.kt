@@ -47,7 +47,7 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 
 /**
@@ -65,25 +65,25 @@ class StatAggregateRequestAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
-        ITEM -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        USER -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), UserAdapter.AdapterListener.asSAM(adapterListener::onUserPicked))
+        ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+        USER -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), UserAdapter.AdapterListener.asSAM(delegate::onUserPicked))
                 .withTitle(R.string.pick_user)
-        TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), TeamAdapter.AdapterListener.asSAM(adapterListener::onTeamPicked))
+        TEAM -> TeamViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), TeamAdapter.AdapterListener.asSAM(delegate::onTeamPicked))
                 .withTitle(R.string.pick_team)
-        else -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+        else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S = when {
-        viewHolder.itemViewType == USER -> UserAdapter.AdapterListener.asSAM(adapterListener::onUserPicked) as S
-        viewHolder.itemViewType == TEAM -> TeamAdapter.AdapterListener.asSAM(adapterListener::onTeamPicked) as S
-        else -> adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S = when {
+        viewHolder.itemViewType == USER -> UserAdapter.AdapterListener.asSAM(delegate::onUserPicked) as S
+        viewHolder.itemViewType == TEAM -> TeamAdapter.AdapterListener.asSAM(delegate::onTeamPicked) as S
+        else -> delegate as S
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         when (val identifiable = request.items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
+            is Item -> (holder as InputViewHolder).bind(chooser[identifiable])
             is User -> (holder as UserViewHolder).bind(identifiable)
             is Team -> (holder as TeamViewHolder).bind(identifiable)
         }
@@ -96,7 +96,7 @@ class StatAggregateRequestAdapter(
         return if (identifiable is Item) ITEM else if (identifiable is User) USER else TEAM
     }
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun onUserPicked(user: User)
 
         fun onTeamPicked(team: Team)

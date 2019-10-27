@@ -33,11 +33,10 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.TeammateException
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 class StatGofer(
@@ -116,12 +115,13 @@ class StatGofer(
         return FunctionalDiff.of(swapSource, items) { sourceCopy, fetched ->
             @Suppress("UNCHECKED_CAST") val toSwap = fetched[0] as T
 
-            sourceCopy.remove(swapDestination.invoke())
-            sourceCopy.add(toSwap)
+            val result = sourceCopy.toMutableList()
+            result.remove(swapDestination.invoke())
+            result.add(toSwap)
             cache.set(toSwap)
 
-            Collections.sort(sourceCopy, FunctionalDiff.COMPARATOR)
-            sourceCopy
+            result.sortWith(FunctionalDiff.COMPARATOR)
+            result
         }.doOnSuccess { onSwapComplete.invoke(swapDestination.invoke(), cache.get()) }
     }
 }

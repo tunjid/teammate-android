@@ -38,7 +38,17 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/grass_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/bg_grass"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="H, 1920:756"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_fragment_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -86,6 +96,8 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/single_margin"
             android:elevation="@dimen/half_margin"
+            android:insetTop="0px"
+            android:insetBottom="0px"
             android:textColor="?button_text_color"
             app:iconTint="?button_text_color" />
 
@@ -124,7 +136,7 @@
         android:id="@+id/padding"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_snapshot"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

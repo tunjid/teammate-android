@@ -25,11 +25,9 @@
 package com.mainstreetcode.teammate.model.enums
 
 import android.os.Build
-
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonObject
-
-import java.util.Objects
+import java.util.*
 
 class AndroidVariant internal constructor(code: String, name: String) : MetaData(code, name) {
 

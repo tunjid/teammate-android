@@ -25,13 +25,9 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -51,33 +47,27 @@ import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.I
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.JOINING
 import com.mainstreetcode.teammate.viewmodel.gofers.JoinRequestGofer.Companion.WAITING
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Invites a Team member
  */
 
-class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.AdapterListener {
+class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_headered),
+        JoinRequestAdapter.AdapterListener {
 
     override lateinit var headeredModel: JoinRequest
         private set
 
     private lateinit var gofer: JoinRequestGofer
 
-    override val fabStringResource: Int @StringRes get() = gofer.fabTitle
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_user_edit
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
-
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = gofer.showsFab()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_JOIN_REQUEST)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_JOIN_REQUEST)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,20 +75,24 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
         gofer = teamMemberViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = gofer.getToolbarTitle(this),
+                toolBarMenu = R.menu.fragment_user_edit,
+                fabText = gofer.fabTitle,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = showsFab
+        )
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(JoinRequestAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
-                .build()
-
-        scrollManager.recyclerView.requestFocus()
-        return rootView
+                .build().apply { recyclerView?.requestFocus() }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -125,14 +119,14 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
     override fun gofer(): TeamHostingGofer<JoinRequest> = gofer
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun canEditFields(): Boolean = gofer.canEditFields()
@@ -149,45 +143,45 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
 
         when {
             state == APPROVING || state == ACCEPTING -> saveRequest()
-            headeredModel.position.isInvalid -> showSnackbar(getString(R.string.select_role))
+            headeredModel.position.isInvalid -> transientBarDriver.showSnackBar(getString(R.string.select_role))
             state == JOINING || state == INVITING -> createJoinRequest()
         }
     }
 
     private fun createJoinRequest() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe(this::onJoinRequestSent, defaultErrorHandler::invoke))
     }
 
     private fun saveRequest() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe({ onRequestSaved() }, defaultErrorHandler::invoke))
     }
 
     private fun deleteRequest() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.remove().subscribe(this::onRequestDeleted, defaultErrorHandler::invoke))
     }
 
     private fun onJoinRequestSent(result: DiffUtil.DiffResult) {
+        updateUi(fabShows = showsFab)
         scrollManager.onDiff(result)
-        hideBottomSheet()
-        toggleProgress(false)
-        togglePersistentUi()
-        showSnackbar(getString(
+        bottomSheetDriver.hideBottomSheet()
+        transientBarDriver.toggleProgress(false)
+        transientBarDriver.showSnackBar(getString(
                 if (headeredModel.isTeamApproved) R.string.user_invite_sent
                 else R.string.team_submitted_join_request))
     }
 
     private fun onRequestDeleted() {
         val name = headeredModel.user.firstName
-        if (!gofer.isRequestOwner) showSnackbar(getString(R.string.removed_user, name))
+        if (!gofer.isRequestOwner) transientBarDriver.showSnackBar(getString(R.string.removed_user, name))
         requireActivity().onBackPressed()
     }
 
     private fun onRequestSaved() {
         val name = headeredModel.user.firstName
-        if (!gofer.isRequestOwner) showSnackbar(getString(R.string.added_user, name))
+        if (!gofer.isRequestOwner) transientBarDriver.showSnackBar(getString(R.string.added_user, name))
         requireActivity().onBackPressed()
     }
 
@@ -207,30 +201,14 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(), JoinRequestAdapter.
 
         internal const val ARG_JOIN_REQUEST = "join-request"
 
-        internal fun inviteInstance(team: Team): JoinRequestFragment {
-            val fragment = newInstance(JoinRequest.invite(team))
-            fragment.setEnterExitTransitions()
+        internal fun inviteInstance(team: Team): JoinRequestFragment = newInstance(JoinRequest.invite(team))
 
-            return fragment
-        }
+        fun joinInstance(team: Team, user: User): JoinRequestFragment = newInstance(JoinRequest.join(team, user))
 
-        fun joinInstance(team: Team, user: User): JoinRequestFragment {
-            val fragment = newInstance(JoinRequest.join(team, user))
-            fragment.setEnterExitTransitions()
-
-            return fragment
-        }
-
-        internal fun viewInstance(request: JoinRequest): JoinRequestFragment {
-            val fragment = newInstance(request)
-            fragment.setEnterExitTransitions()
-
-            return fragment
-        }
+        internal fun viewInstance(request: JoinRequest): JoinRequestFragment = newInstance(request)
 
         private fun newInstance(joinRequest: JoinRequest): JoinRequestFragment = JoinRequestFragment().apply {
             arguments = bundleOf(ARG_JOIN_REQUEST to joinRequest)
-            setEnterExitTransitions()
         }
     }
 }

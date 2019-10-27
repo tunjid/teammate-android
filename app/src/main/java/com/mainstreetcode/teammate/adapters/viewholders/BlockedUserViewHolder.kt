@@ -35,8 +35,8 @@ import com.mainstreetcode.teammate.util.getTransitionName
 
 class BlockedUserViewHolder(
         itemView: View,
-        adapterListener: BlockedUserAdapter.UserAdapterListener
-) : ModelCardViewHolder<BlockedUser, BlockedUserAdapter.UserAdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: BlockedUserAdapter.UserAdapterListener
+) : ModelCardViewHolder<BlockedUser, BlockedUserAdapter.UserAdapterListener>(itemView, delegate), View.OnClickListener {
 
     init {
         itemView.setOnClickListener(this)
@@ -55,6 +55,6 @@ class BlockedUserViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onBlockedUserClicked(model)
+        delegate?.onBlockedUserClicked(model)
     }
 }

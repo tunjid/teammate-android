@@ -26,27 +26,28 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.TeamSearchAdapter
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.databinding.FragmentTeamSearchBinding
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamSearchRequest
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Searches for teams
  */
 
-class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchView.OnQueryTextListener, TeamAdapter.AdapterListener {
+class TeamSearchFragment : TeammatesBaseFragment(R.layout.fragment_team_search),
+        SearchView.OnQueryTextListener,
+        TeamAdapter.AdapterListener {
 
     private lateinit var request: TeamSearchRequest
     private lateinit var instantSearch: InstantSearch<TeamSearchRequest, Team>
@@ -54,18 +55,15 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
     private var createTeam: View? = null
     private var searchView: SearchView? = null
 
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
     override val showsFab: Boolean get() = false
 
-    override val showsToolBar: Boolean get() = false
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val sportCode = arguments!!.getString(ARG_SPORT)
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val sportCode = arguments!!.getString(ARG_SPORT)
-
-        return if (sportCode == null) superResult else "$superResult-$sportCode"
-    }
+            return if (sportCode == null) superResult else "$superResult-$sportCode"
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,31 +71,31 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         instantSearch = teamViewModel.instantSearch()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_team_search, container, false)
-        searchView = root.findViewById(R.id.searchView)
-        createTeam = root.findViewById(R.id.create_team)
-
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(TeamSearchAdapter(instantSearch.currentItems, this))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentTeamSearchBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarShows = false
+        )
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withInconsistencyHandler(this@TeamSearchFragment::onInconsistencyDetected)
+                .withAdapter(TeamSearchAdapter(instantSearch.currentItems, this@TeamSearchFragment))
                 .withGridLayoutManager(2)
                 .build()
 
-        searchView?.setOnQueryTextListener(this)
-        searchView?.setIconifiedByDefault(false)
-        searchView?.isIconified = false
-        createTeam?.setOnClickListener(this)
+        searchView.setOnQueryTextListener(this@TeamSearchFragment)
+        searchView.setIconifiedByDefault(false)
+        searchView.isIconified = false
+        createTeam.setOnClickListener(this@TeamSearchFragment)
 
         if (targetRequestCode != 0) {
             val items = instantSearch.currentItems
             items.clear()
             items.addAll(teamViewModel.getModelList(Team::class.java)
                     .filterIsInstance(Team::class.java)
-                    .filter(this::isEligibleTeam))
+                    .filter(this@TeamSearchFragment::isEligibleTeam))
         }
 
-        return root
+        Unit
     }
 
     override fun onResume() {
@@ -117,11 +115,11 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
         val canPick = target is TeamAdapter.AdapterListener
 
         if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
-        else showFragment(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
+        else navigator.push(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.create_team) showFragment(TeamEditFragment.newCreateInstance())
+        if (view.id == R.id.create_team) navigator.push(TeamEditFragment.newCreateInstance())
     }
 
     override fun onQueryTextSubmit(s: String): Boolean = false
@@ -142,7 +140,6 @@ class TeamSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
     companion object {
 
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
         private const val ARG_SPORT = "sport-code"
 
         fun newInstance(): TeamSearchFragment = TeamSearchFragment().apply { arguments = Bundle() }

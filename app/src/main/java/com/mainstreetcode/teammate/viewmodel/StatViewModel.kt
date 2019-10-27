@@ -38,7 +38,7 @@ import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.replaceList
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.gofers.StatGofer
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -52,7 +52,7 @@ class StatViewModel : MappedViewModel<Game, Stat>() {
 
     private val api = TeammateService.getApiInstance()
 
-    private val modelListMap = HashMap<Game, MutableList<Differentiable>>()
+    private val modelListMap = HashMap<String, MutableList<Differentiable>>()
     val statAggregates: MutableList<Differentiable> = ArrayList()
 
     private val repository: StatRepo = RepoProvider.forRepo(StatRepo::class.java)
@@ -77,7 +77,7 @@ class StatViewModel : MappedViewModel<Game, Stat>() {
             repository.modelsBefore(key, getQueryDate(fetchLatest, key) { it.created })
 
     override fun getModelList(key: Game): MutableList<Differentiable> =
-            modelListMap.getOrPut(key) { mutableListOf() }
+            modelListMap.getOrPut(key.id) { mutableListOf() }
 
     override fun onInvalidKey(key: Game) {
         super.onInvalidKey(key)

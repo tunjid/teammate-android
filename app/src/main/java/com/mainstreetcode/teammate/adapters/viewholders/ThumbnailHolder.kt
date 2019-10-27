@@ -22,37 +22,10 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.baseclasses
+package com.mainstreetcode.teammate.adapters.viewholders
 
-import androidx.lifecycle.ViewModelProviders
-import android.os.Bundle
+import android.widget.ImageView
 
-import com.mainstreetcode.teammate.viewmodel.UserViewModel
-
-/**
- * Base Fragment for registration
- *
- *
- * Created by Shemanigans on 6/3/17.
- */
-
-abstract class RegistrationActivityFragment : TeammatesBaseFragment() {
-
-    protected lateinit var viewModel: UserViewModel
-
-    override val navBarColor: Int
-        get() = GRASS_COLOR
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
-    }
-
-    override val hasLightNavBar: Boolean
-        get() = false
-
-    companion object {
-        private const val GRASS_COLOR = -0x6c44af
-    }
+interface ThumbnailHolder {
+    val thumbnail: ImageView
 }

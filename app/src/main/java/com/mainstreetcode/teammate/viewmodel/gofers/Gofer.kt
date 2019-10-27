@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.model.ListableModel
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.preserveAscending
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -76,15 +76,13 @@ abstract class Gofer<T> internal constructor(
         watchForChange().subscribe({ }, ErrorHandler.EMPTY::invoke)
     }
 
-    internal open fun preserveItems(old: MutableList<Differentiable>, fetched: MutableList<Differentiable>): MutableList<Differentiable> {
-         preserveAscending(old, fetched)
-        return old
-    }
+    internal open fun preserveItems(old: List<Differentiable>, fetched: List<Differentiable>): List<Differentiable> =
+            preserveAscending(old, fetched)
 
     companion object {
 
         fun tag(seed: String, model: Model<*>): String {
-            val uuid = if (model.isEmpty) UUID.randomUUID().toString() else model.id
+            val uuid = if (model.isEmpty) UUID.randomUUID().toString() else model.diffId
             return "$seed-$uuid"
         }
     }

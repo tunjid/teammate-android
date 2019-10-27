@@ -36,13 +36,13 @@ import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 
 class StandingRowViewHolder(
         itemView: View,
-        adapterListener: StandingsAdapter.AdapterListener
-) : InteractiveViewHolder<StandingsAdapter.AdapterListener>(itemView, adapterListener) {
+        delegate: StandingsAdapter.AdapterListener
+) : InteractiveViewHolder<StandingsAdapter.AdapterListener>(itemView, delegate) {
 
     private var row: Row? = null
 
@@ -53,13 +53,13 @@ class StandingRowViewHolder(
     private val scrollView: SyncedScrollView = itemView.findViewById(R.id.synced_scrollview)
 
     init {
-        val listener = View.OnClickListener { row?.let { adapterListener.onCompetitorClicked(it.competitor) } }
+        val listener = View.OnClickListener { row?.let { delegate.onCompetitorClicked(it.competitor) } }
 
         title.setOnClickListener(listener)
         position.setOnClickListener(listener)
         thumbnail.setOnClickListener(listener)
 
-        adapterListener.addScrollNotifier(scrollView)
+        delegate.addScrollNotifier(scrollView)
     }
 
     fun bind(model: Row) {

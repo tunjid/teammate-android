@@ -28,17 +28,20 @@ package com.mainstreetcode.teammate.adapters.viewholders
 import android.view.View
 
 import com.mainstreetcode.teammate.model.ContentAd
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
-class ContentAdViewHolder(itemView: View, adapterListener: InteractiveAdapter.AdapterListener) : AdViewHolder<ContentAd>(itemView, adapterListener) {
+class ContentAdViewHolder(
+        itemView: View,
+        delegate: Any
+) : AdViewHolder<ContentAd>(itemView, delegate) {
 
     override val imageUrl: String?
         get() = null
 
     //    private NativeContentAdView adView;
     //
-    //    public ContentAdViewHolder(View itemView, InteractiveAdapter.AdapterListener adapterListener) {
-    //        super(itemView, adapterListener);
+    //    public ContentAdViewHolder(View itemView, InteractiveAdapter.AdapterListener delegate) {
+    //        super(itemView, delegate);
     //        adView = (NativeContentAdView) itemView;
     //
     //        adView.setHeadlineView(title);

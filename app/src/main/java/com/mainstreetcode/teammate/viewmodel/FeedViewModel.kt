@@ -42,7 +42,7 @@ import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.asDifferentiables
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 
@@ -123,9 +123,9 @@ class FeedViewModel : MappedViewModel<Class<FeedItem<*>>, FeedItem<*>>() {
         return FunctionalDiff.of(sourceFlowable, feedItems, onFeedItemProcessed(leaveUnchanged))
     }
 
-    private fun onFeedItemProcessed(leaveUnchanged: Boolean): (MutableList<Differentiable>, MutableList<Differentiable>) -> MutableList<Differentiable> = when {
+    private fun onFeedItemProcessed(leaveUnchanged: Boolean): (List<Differentiable>, List<Differentiable>) -> List<Differentiable> = when {
         leaveUnchanged -> { feedItems, _ -> feedItems }
-        else -> { feedItems, processed -> feedItems.removeAll(processed); feedItems }
+        else -> { feedItems, processed -> feedItems - processed }
     }
 
     private fun removedProcessedRequest(request: JoinRequest) {

@@ -33,19 +33,18 @@ import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.RemoteImage
 import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 
 
-open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterListener> internal constructor(
+open class ModelCardViewHolder<H : RemoteImage, T : Any> internal constructor(
         itemView: View,
-        adapterListener: T
-) : BaseViewHolder<T>(itemView, adapterListener) {
+        delegate: T
+) : BaseViewHolder<T>(itemView, delegate), ThumbnailHolder {
 
     protected lateinit var model: H
 
     internal var title: TextView = itemView.findViewById(R.id.item_title)
     internal var subtitle: TextView = itemView.findViewById(R.id.item_subtitle)
-    var thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
+    override val thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
 
     open val isThumbnail: Boolean
         get() = true

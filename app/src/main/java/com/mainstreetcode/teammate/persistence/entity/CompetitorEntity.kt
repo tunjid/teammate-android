@@ -53,7 +53,7 @@ open class CompetitorEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "competitor_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "competitor_ref_path")
     var refPath: String
@@ -120,11 +120,9 @@ open class CompetitorEntity : Parcelable {
         isDeclined = `in`.readByte().toInt() != 0x00
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun hasNotResponded(): Boolean = !isAccepted && !isDeclined
 

@@ -28,7 +28,6 @@ package com.mainstreetcode.teammate.model
 import android.annotation.SuppressLint
 import android.os.Parcel
 import android.text.TextUtils
-
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -36,16 +35,16 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import com.mainstreetcode.teammate.util.*
-
+import com.mainstreetcode.teammate.util.asStringOrEmpty
 import java.lang.reflect.Type
 
 @SuppressLint("ParcelCreator")
 class Device : Model<Device> {
 
     var fcmToken = ""
-    private var id = ""
     private val operatingSystem = "Android"
+
+    override var id = ""
 
     override val isEmpty: Boolean
         get() = TextUtils.isEmpty(id)
@@ -70,8 +69,6 @@ class Device : Model<Device> {
     }
 
     override fun compareTo(other: Device): Int = id.compareTo(other.id)
-
-    override fun getId(): String = id
 
     override fun describeContents(): Int = 0
 

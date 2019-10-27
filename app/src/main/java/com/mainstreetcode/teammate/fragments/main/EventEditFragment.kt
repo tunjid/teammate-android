@@ -28,13 +28,9 @@ import android.content.Intent
 import android.location.Address
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -43,8 +39,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventEditAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Guest
@@ -53,30 +49,24 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.EventGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Edits a Team member
  */
 
-class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditAdapterListener, AddressPickerFragment.AddressPicker {
+class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
+        EventEditAdapter.EventEditAdapterListener,
+        AddressPickerFragment.AddressPicker {
 
     override lateinit var headeredModel: Event
         private set
 
     private lateinit var gofer: EventGofer
 
-    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_event_edit
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
-
     override val insetFlags: InsetFlags get() = NO_TOP
 
-    override val showsFab: Boolean get() = !isBottomSheetShowing && gofer.hasPrivilegedRole()
+    override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && gofer.hasPrivilegedRole()
 
     private val eventUri: Uri?
         get() = headeredModel.location?.run {
@@ -91,11 +81,12 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
                     .build()
         }
 
-    override fun getStableTag(): String {
-        val args = arguments
-        val model = args!!.getParcelable<Model<*>>(if (args.containsKey(ARG_EVENT)) ARG_EVENT else ARG_GAME)
-        return Gofer.tag(super.getStableTag(), model!!)
-    }
+    override val stableTag: String
+        get() {
+            val args = arguments
+            val model = args!!.getParcelable<Model<*>>(if (args.containsKey(ARG_EVENT)) ARG_EVENT else ARG_GAME)
+            return Gofer.tag(super.stableTag, model!!)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,11 +98,18 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
         gofer = eventViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = gofer.getToolbarTitle(this),
+                toolBarMenu = R.menu.fragment_event_edit,
+                fabShows = showsFab,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
+        )
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), this::refresh)
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), this::refresh)
                 .withAdapter(EventEditAdapter(gofer.items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
@@ -120,8 +118,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
                 .setHasFixedSize()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
-        return rootView
+        scrollManager.recyclerView?.requestFocus()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -136,7 +133,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_navigate -> {
             val uri = eventUri
-            if (uri == null) showSnackbar(getString(R.string.event_no_location))
+            if (uri == null) transientBarDriver.showSnackBar(getString(R.string.event_no_location))
             else startActivity(Intent(Intent.ACTION_VIEW, uri))
             true
         }
@@ -156,14 +153,14 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
     override fun gofer(): Gofer<Event> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
     }
 
     override fun onPrepComplete() {
         scrollManager.notifyDataSetChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 
@@ -172,11 +169,12 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
     override fun onClick(view: View) {
         if (view.id == R.id.fab) {
             val wasEmpty = headeredModel.isEmpty
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
             disposables.add(gofer.save().subscribe({ diffResult ->
                 val stringRes = if (wasEmpty) R.string.added_user else R.string.updated_user
+                updateUi(fabText = R.string.event_update)
                 onModelUpdated(diffResult)
-                showSnackbar(getString(stringRes, headeredModel.name))
+                transientBarDriver.showSnackBar(getString(stringRes, headeredModel.name))
             }, defaultErrorHandler::invoke))
         }
     }
@@ -187,23 +185,23 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
     override fun onTeamClicked(item: Team) {
         eventViewModel.onEventTeamChanged(headeredModel, item)
-        hideBottomSheet()
+        bottomSheetDriver.hideBottomSheet()
 
         val index = gofer.items.indexOf(item)
         if (index > -1) scrollManager.notifyItemChanged(index)
     }
 
     override fun selectTeam() = when {
-        headeredModel.gameId.isNotBlank() -> showSnackbar(getString(R.string.game_event_team_change))
+        headeredModel.gameId.isNotBlank() -> transientBarDriver.showSnackBar(getString(R.string.game_event_team_change))
         gofer.hasPrivilegedRole() -> chooseTeam()
-        !gofer.hasRole() -> showFragment(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser)).let { Unit }
+        !gofer.hasRole() -> navigator.push(JoinRequestFragment.joinInstance(headeredModel.team, userViewModel.currentUser)).let { Unit }
         else -> Unit
     }
 
     override fun onGuestClicked(guest: Guest) {
         val current = userViewModel.currentUser
         if (current == guest.user) rsvpToEvent()
-        else showFragment(GuestViewFragment.newInstance(guest))
+        else navigator.push(GuestViewFragment.newInstance(guest))
     }
 
     override fun canEditEvent(): Boolean = headeredModel.isEmpty || gofer.hasPrivilegedRole()
@@ -219,7 +217,7 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
     }
 
     private fun rsvpEvent(attending: Boolean) {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.rsvpEvent(attending).subscribe(this::onModelUpdated, defaultErrorHandler::invoke))
     }
 
@@ -228,8 +226,8 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
     }
 
     private fun onEventDeleted() {
-        showSnackbar(getString(R.string.deleted_team, headeredModel.name))
-        removeEnterExitTransitions()
+        transientBarDriver.showSnackBar(getString(R.string.deleted_team, headeredModel.name))
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 
@@ -242,16 +240,11 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
                 .show()
     }
 
-    private fun chooseTeam() {
-        val teamsFragment = TeamsFragment.newInstance()
-        teamsFragment.setTargetFragment(this, R.id.request_event_edit_pick)
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setTitle(getString(R.string.pick_team))
-                .setFragment(teamsFragment)
-                .build())
-    }
+    private fun chooseTeam() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_event_edit_pick,
+            title = getString(R.string.pick_team),
+            fragment = TeamsFragment.newInstance()
+    )
 
     private fun setSpanSizeLookUp(layoutManager: RecyclerView.LayoutManager) {
         (layoutManager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -267,7 +260,6 @@ class EventEditFragment : HeaderedFragment<Event>(), EventEditAdapter.EventEditA
 
         fun newInstance(event: Event): EventEditFragment = EventEditFragment().apply {
             arguments = bundleOf(ARG_EVENT to event)
-            setEnterExitTransitions()
         }
 
         fun newInstance(game: Game): EventEditFragment = newInstance(game.event).apply {

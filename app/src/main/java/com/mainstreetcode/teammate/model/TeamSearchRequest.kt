@@ -57,6 +57,6 @@ class TeamSearchRequest private constructor(name: String, screenName: String, sp
     companion object {
 
         fun from(sportCode: String?): TeamSearchRequest =
-                TeamSearchRequest("", "", if(sportCode.isNullOrBlank()) null else sportCode)
+                TeamSearchRequest("", "", if (sportCode.isNullOrBlank()) null else sportCode)
     }
 }

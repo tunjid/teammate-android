@@ -25,13 +25,11 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
-
+import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GuestAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
@@ -40,26 +38,20 @@ import com.mainstreetcode.teammate.model.Guest
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.GuestGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
-import androidx.recyclerview.widget.DiffUtil
+import com.tunjid.androidx.view.util.InsetFlags
 
-class GuestViewFragment : HeaderedFragment<Guest>() {
+class GuestViewFragment : HeaderedFragment<Guest>(R.layout.fragment_headered) {
 
     override lateinit var headeredModel: Guest
         private set
 
     private lateinit var gofer: GuestGofer
 
-    override val toolbarMenu: Int get() = R.menu.fragment_guest_view
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.event_guest)
-
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_GUEST)!!)
+    override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_GUEST)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,11 +59,16 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
         gofer = eventViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.event_guest),
+                toolBarMenu = R.menu.fragment_guest_view,
+                fabShows = showsFab
+        )
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(GuestAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -79,9 +76,7 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager.recyclerView.requestFocus()
-
-        return root
+        scrollManager.recyclerView?.requestFocus()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -94,18 +89,18 @@ class GuestViewFragment : HeaderedFragment<Guest>() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onImageClick() = showSnackbar(getString(R.string.no_permission))
+    override fun onImageClick() = transientBarDriver.showSnackBar(getString(R.string.no_permission))
 
     override fun gofer(): Gofer<Guest> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 

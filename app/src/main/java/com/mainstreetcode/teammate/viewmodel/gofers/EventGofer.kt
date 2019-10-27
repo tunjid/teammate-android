@@ -37,7 +37,7 @@ import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.asDifferentiables
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -107,9 +107,7 @@ constructor(
         val single: Single<List<Differentiable>> = rsvpFunction.invoke(Guest.forEvent(model, attending)).map { listOf(it) }
 
         return FunctionalDiff.of(single, items) { staleCopy, singletonGuestList ->
-            staleCopy.removeAll(singletonGuestList)
-            staleCopy.addAll(singletonGuestList)
-            staleCopy
+            (staleCopy - singletonGuestList) + singletonGuestList
         }
     }
 

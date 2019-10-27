@@ -26,17 +26,22 @@ package com.mainstreetcode.teammate.model
 
 
 import android.os.Parcelable
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Base interface for model interactions
  */
 interface Model<T> : RemoteImage, Differentiable, Parcelable, Comparable<T> {
 
+    val id : String
+
     /**
      * @return whether this object was created locally or exists in the remote.
      */
     val isEmpty: Boolean
+
+    override val diffId: String
+        get() = id
 
     /**
      * Update the current model with values in the model provided, while keeping values in

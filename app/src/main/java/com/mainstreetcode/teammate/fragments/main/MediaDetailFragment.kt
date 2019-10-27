@@ -37,39 +37,25 @@ import com.mainstreetcode.teammate.adapters.MediaAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ImageMediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
-import com.tunjid.androidbootstrap.view.util.InsetFlags
-import java.util.concurrent.atomic.AtomicBoolean
+import com.tunjid.androidx.view.util.InsetFlags
 
 
-class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterListener {
+class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapter.MediaAdapterListener {
 
     private lateinit var media: Media
     private var mediaViewHolder: MediaViewHolder<*>? = null
-    private val systemUiStatus: AtomicBoolean = AtomicBoolean()
 
-    override val toolbarMenu: Int get() = R.menu.fragment_media_detail
+    override val isFullScreen = true
 
-    override val navBarColor: Int get() = Color.TRANSPARENT
+    override val insetFlags = InsetFlags.NONE
 
-    override val isFullScreen: Boolean get() = true
+    override val showsFab = false
 
-    override val insetFlags: InsetFlags get() = NONE
-
-    override val showsFab: Boolean get() = false
-
-    override val showsBottomNav: Boolean get() = false
-
-    override val showsToolBar: Boolean get() = true
-
-    override val showsSystemUI: Boolean get() = systemUiStatus.get()
-
-    override val hasLightNavBar: Boolean get() = false
-
-    override fun getStableTag(): String =
-            super.getStableTag() + "-" + arguments!!.getParcelable(ARG_MEDIA)
+    override val stableTag
+          get() = "${super.stableTag}-${arguments!!.getParcelable<Media>(ARG_MEDIA)}"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +67,18 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
         val resource = if (isImage) R.layout.viewholder_image else R.layout.viewholder_video
 
         return inflater.inflate(resource, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolBarMenu = R.menu.fragment_media_detail,
+                toolbarShows = true,
+                fabShows = showsFab,
+                bottomNavShows = false,
+                hasLightNavBar = false,
+                navBarColor = Color.TRANSPARENT
+        )
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -121,20 +119,16 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
     override fun onMediaClicked(item: Media) {
         val activity = activity ?: return
-
-        systemUiStatus.set(activity.window.decorView.isDisplayingSystemUI())
-        togglePersistentUi()
+        updateUi(systemUiShows = activity.window.decorView.isDisplayingSystemUI())
     }
 
     override fun onMediaLongClicked(media: Media): Boolean = false
 
     override fun isSelected(media: Media): Boolean = false
 
-    override fun onFillLoaded() = togglePersistentUi()
-
     private fun checkMediaFlagged(media: Media) {
         if (!media.isFlagged) return
-        showSnackbar(getString(R.string.media_flagged))
+        transientBarDriver.showSnackBar(getString(R.string.media_flagged))
 
         val activity = activity
         activity?.onBackPressed()
@@ -145,7 +139,6 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
         else VideoMediaViewHolder(root, this)
 
         mediaViewHolder?.fullBind(media)
-        onMediaClicked(media)
     }
 
     companion object {
@@ -154,7 +147,6 @@ class MediaDetailFragment : MainActivityFragment(), MediaAdapter.MediaAdapterLis
 
         fun newInstance(media: Media): MediaDetailFragment = MediaDetailFragment().apply {
             arguments = bundleOf(ARG_MEDIA to media)
-            setEnterExitTransitions()
         }
     }
 }

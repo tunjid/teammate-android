@@ -42,7 +42,8 @@ import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.model.noSpecialCharacters
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -51,22 +52,22 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 class TeamEditAdapter(
         private val items: List<Differentiable>,
         listener: TeamEditAdapterListener
-) : BaseAdapter<InputViewHolder<TeamEditAdapter.TeamEditAdapterListener>, TeamEditAdapter.TeamEditAdapterListener>(listener) {
+) : BaseAdapter<InputViewHolder, TeamEditAdapter.TeamEditAdapterListener>(listener) {
 
     private val chooser: TextInputStyle.InputChooser
 
     init {
-        chooser = Chooser(adapterListener)
+        chooser = Chooser(delegate)
     }// setHasStableIds(true); DO NOT PUT THIS BACK
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<TeamEditAdapterListener> =
-            InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder =
+            InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            delegate as S
 
-    override fun onBindViewHolder(holder: InputViewHolder<TeamEditAdapterListener>, position: Int) {
+    override fun onBindViewHolder(holder: InputViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
         if (item is Item) holder.bind(chooser[item])
@@ -83,10 +84,10 @@ class TeamEditAdapter(
         fun canEditFields(): Boolean
     }
 
-    private class Chooser internal constructor(private val adapterListener: TeamEditAdapterListener) : TextInputStyle.InputChooser() {
+    private class Chooser internal constructor(private val delegate: TeamEditAdapterListener) : TextInputStyle.InputChooser() {
 
         override fun iconGetter(item: Item): Int = when {
-            item.stringRes == R.string.team_name && adapterListener.canEditFields() -> R.drawable.ic_picture_white_24dp
+            item.stringRes == R.string.team_name && delegate.canEditFields() -> R.drawable.ic_picture_white_24dp
             else -> 0
         }
 
@@ -99,7 +100,7 @@ class TeamEditAdapter(
             Item.INPUT,
             Item.SPORT,
             Item.NUMBER,
-            Item.DESCRIPTION -> adapterListener.canEditFields()
+            Item.DESCRIPTION -> delegate.canEditFields()
             else -> item.neverEnabled
         }
 
@@ -124,11 +125,11 @@ class TeamEditAdapter(
             Item.NUMBER,
             Item.DESCRIPTION -> TextInputStyle(
                     or((itemType == Item.CITY || itemType == Item.STATE || itemType == Item.ZIP),
-                            adapterListener::onAddressClicked,
+                            delegate::onAddressClicked,
                             Item.noClicks),
                     or(itemType == Item.INPUT,
-                            adapterListener::onImageClick,
-                            adapterListener::onAddressClicked),
+                            delegate::onImageClick,
+                            delegate::onAddressClicked),
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)
@@ -140,11 +141,11 @@ class TeamEditAdapter(
                     this::enabler)
             else -> TextInputStyle(
                     or((itemType == Item.CITY || itemType == Item.STATE || itemType == Item.ZIP),
-                            adapterListener::onAddressClicked,
+                            delegate::onAddressClicked,
                             Item.noClicks),
                     or(itemType == Item.INPUT,
-                            adapterListener::onImageClick,
-                            adapterListener::onAddressClicked),
+                            delegate::onImageClick,
+                            delegate::onAddressClicked),
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)

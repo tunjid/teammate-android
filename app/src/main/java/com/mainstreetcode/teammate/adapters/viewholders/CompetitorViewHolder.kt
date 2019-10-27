@@ -36,13 +36,15 @@ import com.mainstreetcode.teammate.model.Team
  * Viewholder for a [Team]
  */
 class CompetitorViewHolder @SuppressLint("ClickableViewAccessibility")
-constructor(itemView: View, adapterListener: CompetitorAdapter.AdapterListener) : ModelCardViewHolder<Competitor, CompetitorAdapter.AdapterListener>(itemView, adapterListener) {
+constructor(
+        itemView: View, delegate: CompetitorAdapter.AdapterListener
+) : ModelCardViewHolder<Competitor, CompetitorAdapter.AdapterListener>(itemView, delegate) {
 
     val dragHandle: View
         get() = itemView.findViewById(R.id.drag_handle)
 
     init {
-        itemView.setOnClickListener { adapterListener.onCompetitorClicked(model) }
+        itemView.setOnClickListener { delegate.onCompetitorClicked(model) }
     }
 
     override fun bind(model: Competitor) {

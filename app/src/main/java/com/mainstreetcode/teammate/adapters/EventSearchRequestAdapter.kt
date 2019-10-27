@@ -40,10 +40,12 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 
 class EventSearchRequestAdapter(private val request: EventSearchRequest,
-                                listener: EventSearchAdapterListener) : BaseAdapter<BaseViewHolder<*>, EventSearchRequestAdapter.EventSearchAdapterListener>(listener) {
+                                listener: EventSearchAdapterListener
+) : BaseAdapter<BaseViewHolder<*>, EventSearchRequestAdapter.EventSearchAdapterListener>(listener) {
     private val chooser: TextInputStyle.InputChooser
 
     init {
@@ -52,17 +54,17 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
-        return InputViewHolder<Nothing>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+        return InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            delegate as S
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = request.asItems()[position]
-        (holder as InputViewHolder<*>).bind(chooser[item])
+        (holder as InputViewHolder).bind(chooser[item])
     }
 
     override fun getItemCount(): Int = request.asItems().size
@@ -71,11 +73,11 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
 
     override fun getItemViewType(position: Int): Int = ITEM
 
-    interface EventSearchAdapterListener : AdapterListener {
+    interface EventSearchAdapterListener {
         fun onLocationClicked()
     }
 
-    internal class Chooser internal constructor(private val adapterListener: EventSearchAdapterListener) : TextInputStyle.InputChooser() {
+    internal class Chooser internal constructor(private val delegate: EventSearchAdapterListener) : TextInputStyle.InputChooser() {
 
         private val sports: MutableList<Sport>
 
@@ -105,8 +107,8 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
         override fun invoke(item: Item): TextInputStyle = when (val itemType = item.itemType) {
             Item.INFO,
             Item.LOCATION -> TextInputStyle(
-                    adapterListener::onLocationClicked,
-                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.noClicks),
+                    delegate::onLocationClicked,
+                    or(itemType == Item.LOCATION, delegate::onLocationClicked, Item.noClicks),
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)
@@ -120,7 +122,7 @@ class EventSearchRequestAdapter(private val request: EventSearchRequest,
             Item.DATE -> DateTextInputStyle(this::enabler)
             else -> TextInputStyle(
                     Item.proxyClicks,
-                    or(itemType == Item.LOCATION, adapterListener::onLocationClicked, Item.noClicks),
+                    or(itemType == Item.LOCATION, delegate::onLocationClicked, Item.noClicks),
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)

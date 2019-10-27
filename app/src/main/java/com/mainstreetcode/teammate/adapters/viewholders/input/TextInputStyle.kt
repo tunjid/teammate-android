@@ -24,12 +24,9 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders.input
 
-import android.content.Context
 import android.util.SparseArray
 import android.view.View
-import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
 import com.mainstreetcode.teammate.model.Item
- import com.mainstreetcode.teammate.util.getActivity
 import com.mainstreetcode.teammate.util.get
 
 open class TextInputStyle(
@@ -40,7 +37,7 @@ open class TextInputStyle(
         private val iconVisibilityFunction: (Item) -> Int) {
 
     lateinit var item: Item
-    var viewHolder: InputViewHolder<*>? = null
+    var viewHolder: InputViewHolder? = null
 
     internal open val isSelector: Boolean
         get() = textRunnable != null
@@ -68,11 +65,6 @@ open class TextInputStyle(
     internal open fun onTextClicked(view: View) = textRunnable?.invoke()
 
     internal open fun onButtonClicked(view: View) = buttonRunnable?.invoke()
-
-    internal fun onDialogDismissed(context: Context) {
-        val activity = context.getActivity()
-        if (activity is TeammatesBaseActivity) activity.onDialogDismissed()
-    }
 
     private fun with(item: Item): TextInputStyle = apply { this.item = item }
 

@@ -48,7 +48,7 @@ open class RoleEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "role_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "role_image_url")
     var imageUrl: String
@@ -93,11 +93,9 @@ open class RoleEntity : Parcelable {
         created = Date(`in`.readLong())
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun setPosition(position: String) {
         this.position = Config.positionFromCode(position)

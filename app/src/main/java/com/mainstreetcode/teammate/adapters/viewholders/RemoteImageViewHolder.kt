@@ -31,12 +31,12 @@ import com.mainstreetcode.teammate.model.RemoteImage
 
 class RemoteImageViewHolder<T : RemoteImage>(
         itemView: View,
-        adapterListener: RemoteImageAdapter.AdapterListener<T>
-) : ModelCardViewHolder<T, RemoteImageAdapter.AdapterListener<T>>(itemView, adapterListener) {
+        delegate: RemoteImageAdapter.AdapterListener<T>
+) : ModelCardViewHolder<T, RemoteImageAdapter.AdapterListener<T>>(itemView, delegate) {
 
     init {
         title.visibility = View.GONE
         subtitle.visibility = View.GONE
-        itemView.setOnClickListener { adapterListener.onImageClicked(model) }
+        itemView.setOnClickListener { delegate.onImageClicked(model) }
     }
 }

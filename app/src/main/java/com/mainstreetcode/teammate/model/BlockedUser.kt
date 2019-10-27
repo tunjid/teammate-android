@@ -45,7 +45,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 class BlockedUser private constructor(
-        private var id: String,
+        override var id: String,
         override val user: User,
         override val team: Team,
         val reason: BlockReason,
@@ -64,8 +64,6 @@ class BlockedUser private constructor(
             Config.reasonFromCode(parcel.readString()!!),
             Date(parcel.readLong())
     )
-
-    override fun getId(): String = id
 
     override val isEmpty: Boolean
         get() = id.isBlank()
@@ -115,7 +113,7 @@ class BlockedUser private constructor(
         override fun serialize(src: BlockedUser, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
             val serialized = JsonObject()
 
-            if (!src.isEmpty) serialized.addProperty(UID_KEY, src.getId())
+            if (!src.isEmpty) serialized.addProperty(UID_KEY, src.id)
             serialized.addProperty(REASON_KEY, src.reason.code)
             serialized.addProperty(USER_KEY, src.user.id)
             serialized.addProperty(TEAM_KEY, src.team.id)

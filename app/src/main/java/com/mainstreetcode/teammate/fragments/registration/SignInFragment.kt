@@ -24,90 +24,81 @@
 
 package com.mainstreetcode.teammate.fragments.registration
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.RegistrationActivity
-import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.setSimpleSharedTransitions
+import com.mainstreetcode.teammate.databinding.FragmentSignInBinding
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.hasValidPassword
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
+import com.mainstreetcode.teammate.util.input
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionListener {
+class SignInFragment : TeammatesBaseFragment(R.layout.fragment_sign_in), TextView.OnEditorActionListener {
 
-    private var emailInput: EditText? = null
-    private var passwordInput: EditText? = null
+    private var binding: FragmentSignInBinding? = null
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.submit
+    override val showsFab: Boolean = true
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.sign_in)
+        defaultUi(
+                fabText = R.string.submit,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = true,
+                toolbarShows = false,
+                bottomNavShows = false,
+                grassShows = true,
+                navBarColor = GRASS_COLOR
+        )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_sign_in, container, false)
-        val border = rootView.findViewById<View>(R.id.card_view_wrapper)
-        emailInput = rootView.findViewById(R.id.email)
-        passwordInput = rootView.findViewById(R.id.password)
+        binding = FragmentSignInBinding.bind(view).apply {
+            cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
+            password.transitionName = SplashFragment.TRANSITION_SUBTITLE
+            email.transitionName = SplashFragment.TRANSITION_TITLE
 
-        rootView.findViewById<View>(R.id.forgot_password).setOnClickListener(this)
-        passwordInput!!.setOnEditorActionListener(this)
+            password.setOnEditorActionListener(this@SignInFragment)
+            forgotPassword.setOnClickListener(this@SignInFragment)
 
-        ViewCompat.setTransitionName(emailInput!!, SplashFragment.TRANSITION_TITLE)
-        ViewCompat.setTransitionName(passwordInput!!, SplashFragment.TRANSITION_SUBTITLE)
-        ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND)
-
-        disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
-            rootView.findViewById<View>(R.id.email_wrapper).visibility = View.VISIBLE
-            rootView.findViewById<View>(R.id.password_wrapper).visibility = View.VISIBLE
-        }, ErrorHandler.EMPTY::invoke))
-
-        return rootView
+            disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
+                emailWrapper.visibility = View.VISIBLE
+                passwordWrapper.visibility = View.VISIBLE
+            }, ErrorHandler.EMPTY::invoke))
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        emailInput = null
-        passwordInput = null
+        binding = null
     }
 
-    override val showsFab: Boolean
-        get() {
-            return true
-        }
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) {
+        val binding = this.binding ?: return
 
-    @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? =
-            if (view != null && fragmentTo.stableTag.contains(ForgotPasswordFragment::class.java.simpleName)) beginTransaction()
-                    .addSharedElement(emailInput!!, SplashFragment.TRANSITION_TITLE)
-                    .addSharedElement(view!!.findViewById(R.id.card_view_wrapper), SplashFragment.TRANSITION_BACKGROUND)
-            else super.provideFragmentTransaction(fragmentTo)
+        if (view != null && incomingFragment is ForgotPasswordFragment) {
+            incomingFragment.setSimpleSharedTransitions()
+            transaction
+                    .addSharedElement(binding.email, SplashFragment.TRANSITION_TITLE)
+                    .addSharedElement(binding.cardViewWrapper, SplashFragment.TRANSITION_BACKGROUND)
+        } else super.augmentTransaction(transaction, incomingFragment)
+    }
 
     override fun onClick(view: View) {
+        val binding = this.binding ?: return
         when (view.id) {
             R.id.fab -> signIn()
-            R.id.forgot_password -> showFragment(ForgotPasswordFragment.newInstance(emailInput!!.text))
+            R.id.forgot_password -> navigator.push(ForgotPasswordFragment.newInstance(binding.email.input))
         }
     }
 
@@ -117,29 +108,30 @@ class SignInFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun signIn() {
-        if (emailInput.hasValidEmail && passwordInput.hasValidPassword) {
-            toggleProgress(true)
+        val binding = this.binding ?: return
 
-            val email = emailInput!!.text.toString()
-            val password = passwordInput!!.text.toString()
+        if (binding.email.hasValidEmail && binding.password.hasValidPassword) {
+            transientBarDriver.toggleProgress(true)
 
-            disposables.add(viewModel.signIn(email, password)
+            val email = binding.email.input.toString()
+            val password = binding.password.input.toString()
+
+            disposables.add(userViewModel.signIn(email, password)
                     .subscribe({ onSignIn() }, defaultErrorHandler::invoke)
             )
         }
     }
 
     private fun onSignIn() {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         hideKeyboard()
-        RegistrationActivity.startMainActivity(activity)
+        navigator.completeSignIn()
     }
 
     companion object {
 
         fun newInstance(): SignInFragment = SignInFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

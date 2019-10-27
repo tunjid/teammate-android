@@ -27,11 +27,7 @@ package com.mainstreetcode.teammate.fragments.main
 import android.content.pm.PackageManager
 import android.location.Address
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -40,40 +36,40 @@ import com.google.android.gms.maps.model.Marker
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.baseclasses.TeammatesBaseActivity
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
-class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.AddressPicker {
+class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event), AddressPickerFragment.AddressPicker {
 
     private var leaveMap: Boolean = false
 
     private var mapView: MapView? = null
     private var expandingToolbar: ExpandingToolbar? = null
 
-    override val fabStringResource: Int @StringRes get() = R.string.event_my_location
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_crosshairs_gps_white_24dp
-
-    override val showsToolBar: Boolean get() = false
-
-    override val showsBottomNav: Boolean get() = false
-
     override val showsFab: Boolean get() = locationViewModel.hasPermission(this)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_public_event, container, false)
-        root.findViewById<View>(R.id.status_bar_dimmer).layoutParams.height = TeammatesBaseActivity.topInset
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarShows = false,
+                fabShows = locationViewModel.hasPermission(this),
+                fabIcon = R.drawable.ic_crosshairs_gps_white_24dp,
+                fabText = R.string.event_my_location,
+                bottomNavShows = false
+        )
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.search_options))
+        view.findViewById<View>(R.id.status_bar_dimmer).layoutParams.height = WindowInsetsDriver.topInset
+
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
                 .withAdapter(EventSearchRequestAdapter(eventViewModel.eventRequest, object : EventSearchRequestAdapter.EventSearchAdapterListener {
                     override fun onLocationClicked() = this@EventSearchFragment.pickPlace()
                 }))
@@ -82,15 +78,13 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
                 .withLinearLayoutManager()
                 .build()
 
-        mapView = root.findViewById(R.id.map_view)
+        mapView = view.findViewById(R.id.map_view)
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this::onMapReady)
 
-        expandingToolbar = ExpandingToolbar.create(root.findViewById(R.id.card_view_wrapper)) { mapView?.getMapAsync(this::fetchPublicEvents) }
+        expandingToolbar = ExpandingToolbar.create(view.findViewById(R.id.card_view_wrapper)) { mapView?.getMapAsync(this::fetchPublicEvents) }
         expandingToolbar?.setTitle(R.string.event_public_search)
         expandingToolbar?.setTitleIcon(false)
-
-        return root
     }
 
     override fun onResume() {
@@ -155,6 +149,8 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     }
 
     private fun requestLocation() {
+        updateUi(fabShows = locationViewModel.hasPermission(this))
+
         val lastLocation = eventViewModel.lastPublicSearchLocation
 
         if (lastLocation != null) onLocationFound(lastLocation, false)
@@ -189,7 +185,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
     }
 
     private fun onCameraMoveStarted(reason: Int) {
-        if (scrollManager.recyclerView.visibility == View.VISIBLE)
+        if (scrollManager.recyclerView?.visibility == View.VISIBLE)
             expandingToolbar?.changeVisibility(true)
 
         when (reason) {
@@ -201,7 +197,7 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
     private fun onMarkerInfoWindowClicked(marker: Marker) {
         val tag = marker.tag as? Event ?: return
-        showFragment(EventEditFragment.newInstance(tag))
+        navigator.push(EventEditFragment.newInstance(tag))
     }
 
     private fun onAddressFound(address: Address) {
@@ -215,7 +211,6 @@ class EventSearchFragment : MainActivityFragment(), AddressPickerFragment.Addres
 
         fun newInstance(): EventSearchFragment = EventSearchFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

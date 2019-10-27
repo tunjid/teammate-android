@@ -31,7 +31,7 @@ import androidx.annotation.StringRes
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.util.isValidScreenName
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 
 /**
@@ -65,14 +65,15 @@ class Item internal constructor(
 
     fun textTransformer(textTransformer: (CharSequence?) -> CharSequence): Item = apply { this.textTransformer = textTransformer }
 
-    override fun getId(): String? = id
+    override val diffId: String
+        get() = id
 
     override fun compareTo(other: Item): Int = sortPosition.compareTo(other.sortPosition)
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other is Item) value == other.value else id == other.id
+            if (other is Item) value == other.value else diffId == other.diffId
 
-    override fun getChangePayload(other: Differentiable?): Any? = other
+    override fun getChangePayload(other: Differentiable): Any? = other
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

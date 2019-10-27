@@ -37,9 +37,10 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.TEAM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -55,9 +56,9 @@ open class TeamAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-        INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-        else -> TeamViewHolder(getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener)
+        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+        else -> TeamViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
@@ -78,7 +79,7 @@ open class TeamAdapter(
         else -> (item as Ad<*>).type
     }
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun onTeamClicked(item: Team)
 
         companion object {

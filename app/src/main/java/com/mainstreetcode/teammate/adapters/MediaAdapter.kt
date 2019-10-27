@@ -36,21 +36,22 @@ import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Media
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.MEDIA_IMAGE
 import com.mainstreetcode.teammate.util.MEDIA_VIDEO
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Media]
  */
 
 class MediaAdapter(
-        private val mediaList: List<Differentiable>,
+        private val media: () -> List<Differentiable>,
         listener: MediaAdapterListener
 ) : InteractiveAdapter<InteractiveViewHolder<*>, MediaAdapter.MediaAdapterListener>(listener) {
 
@@ -59,29 +60,29 @@ class MediaAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-                CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-                INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-                MEDIA_IMAGE -> ImageMediaViewHolder(getItemView(R.layout.viewholder_image, viewGroup), adapterListener)
-                else -> VideoMediaViewHolder(getItemView(R.layout.viewholder_video, viewGroup), adapterListener)
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+                MEDIA_IMAGE -> ImageMediaViewHolder(viewGroup.inflate(R.layout.viewholder_image), delegate)
+                else -> VideoMediaViewHolder(viewGroup.inflate(R.layout.viewholder_video), delegate)
             }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = mediaList[position]) {
+        when (val item = media()[position]) {
             is Media -> (viewHolder as MediaViewHolder<*>).bind(item)
             is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
         }
     }
 
-    override fun getItemCount(): Int = mediaList.size
+    override fun getItemCount(): Int = media().size
 
     override fun getItemViewType(position: Int): Int {
-        val identifiable = mediaList[position]
+        val identifiable = media()[position]
         return if (identifiable is Media) if (identifiable.isImage) MEDIA_IMAGE else MEDIA_VIDEO else (identifiable as Ad<*>).type
     }
 
-    override fun getItemId(position: Int): Long = mediaList[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = media()[position].hashCode().toLong()
 
-    interface MediaAdapterListener : AdapterListener {
+    interface MediaAdapterListener {
 
         val isFullScreen: Boolean
 

@@ -26,11 +26,8 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
 import android.util.Pair
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.CompetitorAdapter
@@ -38,56 +35,59 @@ import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.ListManager
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.transform
+import com.tunjid.androidx.recyclerview.ListManager
+import com.tunjid.androidx.recyclerview.SwipeDragOptions
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.*
 import kotlin.math.min
 
-class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener, TeamAdapter.AdapterListener {
+class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors),
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener {
 
     private lateinit var tournament: Tournament
     private lateinit var entities: MutableList<Competitive>
-    private lateinit var competitors: List<Competitor>
+    private lateinit var competitors: MutableList<Competitor>
     private lateinit var competitorDifferentiables: MutableList<Differentiable>
 
-    override val fabStringResource: Int @StringRes get() = R.string.save_tournament_competitors
+    override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && competitors.isNotEmpty()
 
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
-    override val toolbarTitle: CharSequence get() = getString(R.string.add_tournament_competitors)
-
-    override val showsFab: Boolean get() = !isBottomSheetShowing && competitors.isNotEmpty()
-
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
-
-        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
-        else superResult
-    }
+            return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tournament = arguments!!.getParcelable(ARG_TOURNAMENT)!!
         entities = ArrayList()
-        competitors = Lists.transform(entities, Competitor.Companion::empty, Competitor::entity)
-        competitorDifferentiables = Lists.transform(competitors, { identity -> identity as Differentiable }, { i -> i as Competitor })
+        competitors = entities.transform(Competitor.Companion::empty, Competitor::entity)
+        competitorDifferentiables = competitors.transform({ it as Differentiable }, { it as Competitor })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_competitors, container, false)
-        scrollManager = ScrollManager.with<CompetitorViewHolder>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.add_tournament_competitors),
+                fabShows = showsFab,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = R.string.save_tournament_competitors
+        )
+
+        scrollManager = ScrollManager.with<CompetitorViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
                 .withAdapter(object : CompetitorAdapter(competitorDifferentiables, AdapterListener.asSAM {}) {
                     override fun getItemId(position: Int): Long = entities[position].hashCode().toLong()
 
@@ -99,19 +99,17 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
                 })
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
-                .withSwipeDragOptions(ListManager.swipeDragOptionsBuilder<CompetitorViewHolder>()
-                        .setMovementFlagsFunction { ListManager.SWIPE_DRAG_ALL_DIRECTIONS }
-                        .setSwipeConsumer { holder, _ -> removeCompetitor(holder) }
-                        .setDragHandleFunction(CompetitorViewHolder::dragHandle)
-                        .setLongPressDragEnabledSupplier { false }
-                        .setItemViewSwipeSupplier { true }
-                        .setDragConsumer(this::moveCompetitor)
-                        .build())
+                .withSwipeDragOptions(SwipeDragOptions(
+                        movementFlagFunction = { ListManager.SWIPE_DRAG_ALL_DIRECTIONS },
+                        swipeConsumer = { holder, _ -> removeCompetitor(holder) },
+                        dragHandleFunction = CompetitorViewHolder::dragHandle,
+                        longPressDragSupplier = { false },
+                        itemViewSwipeSupplier = { true },
+                        dragConsumer = this::moveCompetitor
+                ))
                 .build()
 
-        rootView.findViewById<View>(R.id.add_competitor).setOnClickListener { findCompetitor() }
-
-        return rootView
+        view.findViewById<View>(R.id.add_competitor).setOnClickListener { findCompetitor() }
     }
 
     override fun onResume() {
@@ -121,15 +119,15 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
 
     override fun onKeyBoardChanged(appeared: Boolean) {
         super.onKeyBoardChanged(appeared)
-        if (!appeared && isBottomSheetShowing) hideBottomSheet()
+        if (!appeared && bottomSheetDriver.isBottomSheetShowing) bottomSheetDriver.hideBottomSheet()
     }
 
     override fun onUserClicked(item: User) =
-            if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
+            if (entities.contains(item)) transientBarDriver.showSnackBar(getString(R.string.competitor_exists))
             else addCompetitor(item)
 
     override fun onTeamClicked(item: Team) =
-            if (entities.contains(item)) showSnackbar(getString(R.string.competitor_exists))
+            if (entities.contains(item)) transientBarDriver.showSnackBar(getString(R.string.competitor_exists))
             else addCompetitor(item)
 
     override fun onClick(view: View) = when (view.id) {
@@ -137,29 +135,22 @@ class CompetitorsFragment : MainActivityFragment(), UserAdapter.AdapterListener,
         else -> Unit
     }
 
-    private fun findCompetitor() {
-        val isBetweenUsers = User.COMPETITOR_TYPE == tournament.refPath
-        var fragment: BaseFragment? = null
-
-        if (isBetweenUsers) fragment = TeamMembersFragment.newInstance(tournament.host)
-        else if (Team.COMPETITOR_TYPE == tournament.refPath) fragment = TeamSearchFragment.newInstance(tournament.sport)
-
-        fragment ?: return
-        fragment.setTargetFragment(this, R.id.request_competitor_pick)
-
-        val builder = BottomSheetController.Args.builder()
-                .setMenuRes(R.menu.empty)
-                .setFragment(fragment)
-
-        if (isBetweenUsers) builder.setTitle(getString(R.string.add_competitor))
-        showBottomSheet(builder.build())
-    }
+    private fun findCompetitor() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_competitor_pick,
+            title = getString(R.string.add_competitor),
+            fragment = when {
+                User.COMPETITOR_TYPE == tournament.refPath -> TeamMembersFragment.newInstance(tournament.host)
+                Team.COMPETITOR_TYPE == tournament.refPath -> TeamSearchFragment.newInstance(tournament.sport)
+                else -> null
+            }
+    )
 
     private fun addCompetitor(item: Competitive) {
         if (tournament.refPath != item.refType) return
 
         entities.add(item)
         scrollManager.notifyDataSetChanged()
+        bottomSheetDriver.hideBottomSheet()
         hideKeyboard()
     }
 

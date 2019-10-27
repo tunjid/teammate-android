@@ -28,7 +28,7 @@ import android.os.Parcelable
 
 interface Competitive : RemoteImage, Parcelable {
 
-    fun getId(): String
+    val id: String
 
     val refType: String
 

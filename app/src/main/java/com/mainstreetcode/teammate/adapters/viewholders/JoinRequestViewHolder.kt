@@ -33,8 +33,8 @@ import com.mainstreetcode.teammate.util.getTransitionName
 
 class JoinRequestViewHolder(
         itemView: View,
-        adapterListener: TeamMemberAdapter.UserAdapterListener
-) : ModelCardViewHolder<JoinRequest, TeamMemberAdapter.UserAdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: TeamMemberAdapter.UserAdapterListener
+) : ModelCardViewHolder<JoinRequest, TeamMemberAdapter.UserAdapterListener>(itemView, delegate), View.OnClickListener {
 
     init {
         itemView.setOnClickListener(this)
@@ -57,6 +57,6 @@ class JoinRequestViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onJoinRequestClicked(model)
+        delegate?.onJoinRequestClicked(model)
     }
 }

@@ -37,9 +37,10 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.BLOCKED_USER
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Team]
@@ -55,9 +56,9 @@ class BlockedUserAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-        INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-        else -> BlockedUserViewHolder(getItemView(R.layout.viewholder_grid_item, viewGroup), adapterListener)
+        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+        else -> BlockedUserViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
@@ -76,7 +77,7 @@ class BlockedUserAdapter(
         return (item as? Ad<*>)?.type ?: BLOCKED_USER
     }
 
-    interface UserAdapterListener : AdapterListener {
+    interface UserAdapterListener {
         fun onBlockedUserClicked(blockedUser: BlockedUser)
     }
 }

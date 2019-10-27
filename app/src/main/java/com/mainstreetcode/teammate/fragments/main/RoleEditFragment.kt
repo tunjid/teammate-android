@@ -25,13 +25,9 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -39,38 +35,32 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.RoleEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.RoleGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Edits a Team member
  */
 
-class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapterListener {
+class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), RoleEditAdapter.RoleEditAdapterListener {
 
     override lateinit var headeredModel: Role
         private set
 
     private lateinit var gofer: RoleGofer
 
-    override val toolbarMenu: Int get() = R.menu.fragment_user_edit
-
-    override val fabStringResource: Int @StringRes get() = R.string.role_update
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.role_edit)
-
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = gofer.canChangeRoleFields()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_ROLE)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_ROLE)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,20 +68,23 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
         gofer = teamMemberViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_headered, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.role_edit),
+                toolBarMenu = R.menu.fragment_user_edit,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = R.string.role_update
+        )
 
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(rootView.findViewById(R.id.model_list))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout)) { this.refresh() }
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(RoleEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
-                .build()
-
-        scrollManager.recyclerView.requestFocus()
-        return rootView
+                .build().apply { recyclerView?.requestFocus() }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -106,23 +99,21 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     override fun gofer(): TeamHostingGofer<Role> = gofer
 
     override fun onPrepComplete() {
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> if (headeredModel.position.isInvalid)
-                showSnackbar(getString(R.string.select_role))
-            else
-                updateRole()
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab ->
+            if (headeredModel.position.isInvalid) transientBarDriver.showSnackBar(getString(R.string.select_role))
+            else updateRole()
+        else -> Unit
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -143,22 +134,22 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
     }
 
     private fun updateRole() {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save().subscribe(this::onRoleUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onRoleUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        updateUi(fabShows = showsFab, toolbarInvalidated = true)
+
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
-        togglePersistentUi()
-        toggleProgress(false)
-        requireActivity().invalidateOptionsMenu()
-        showSnackbar(getString(R.string.updated_user, headeredModel.user.firstName))
+        transientBarDriver.toggleProgress(false)
+        transientBarDriver.showSnackBar(getString(R.string.updated_user, headeredModel.user.firstName))
     }
 
     private fun onRoleDropped() {
-        showSnackbar(getString(R.string.dropped_user, headeredModel.user.firstName))
-        removeEnterExitTransitions()
+        transientBarDriver.showSnackBar(getString(R.string.dropped_user, headeredModel.user.firstName))
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 
@@ -168,7 +159,6 @@ class RoleEditFragment : HeaderedFragment<Role>(), RoleEditAdapter.RoleEditAdapt
 
         fun newInstance(role: Role): RoleEditFragment = RoleEditFragment().apply {
             arguments = bundleOf(ARG_ROLE to role)
-            setEnterExitTransitions()
         }
     }
 }

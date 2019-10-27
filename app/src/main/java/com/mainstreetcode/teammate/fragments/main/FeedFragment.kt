@@ -24,14 +24,10 @@
 
 package com.mainstreetcode.teammate.fragments.main
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -41,7 +37,7 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.FeedAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.JoinRequest
@@ -50,58 +46,47 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import io.reactivex.Single
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Home screen
  */
 
-class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener {
+class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), FeedAdapter.FeedItemAdapterListener {
 
     private var onBoardingIndex: Int = 0
     private var isOnBoarding: Boolean = false
-    private lateinit var bottomBarState: AtomicBoolean
-
-    override val fabStringResource: Int @StringRes get() = R.string.team_search_create
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_search_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName)
 
     override val showsFab: Boolean get() = !teamViewModel.isOnATeam
 
-    override val showsBottomNav: Boolean get() = bottomBarState.get()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.home_greeting, timeOfDay, userViewModel.currentUser.firstName),
+                fabText = R.string.team_search_create,
+                fabIcon = R.drawable.ic_search_white_24dp,
+                fabShows = false,
+                bottomNavShows = true
+        )
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        bottomBarState = AtomicBoolean(true)
-    }
+        val refreshAction = { disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
-
-        val refreshAction = Runnable { disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke)) }
-
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
                 .withAdapter(FeedAdapter(feedViewModel.getModelList(FeedItem::class.java), this))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()
-
-        bottomBarState.set(true)
-        return rootView
     }
 
     override fun onResume() {
         super.onResume()
+        updateUi(fabShows = showsFab)
         scrollManager.setRefreshing()
         disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke))
     }
@@ -111,10 +96,9 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
         onBoard()
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> showFragment(TeamSearchFragment.newInstance())
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> navigator.push(TeamSearchFragment.newInstance()).let { Unit }
+        else -> Unit
     }
 
     override fun onFeedItemClicked(item: FeedItem<*>) {
@@ -125,7 +109,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
             builder.setTitle(getString(R.string.attend_event))
                     .setPositiveButton(R.string.yes) { _, _ -> onFeedItemAction(feedViewModel.rsvpEvent(this, true)) }
                     .setNegativeButton(R.string.no) { _, _ -> onFeedItemAction(feedViewModel.rsvpEvent(this, false)) }
-                    .setNeutralButton(R.string.event_details) { _, _ -> showFragment(EventEditFragment.newInstance(model)) }
+                    .setNeutralButton(R.string.event_details) { _, _ -> navigator.push(EventEditFragment.newInstance(model)) }
                     .show()
             return
         }
@@ -139,7 +123,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
                             !model.game.isEmpty -> GameFragment.newInstance(model.game)
                             !model.tournament.isEmpty -> TournamentDetailFragment.newInstance(model.tournament).pending(model)
                             else -> null
-                        }?.let { showFragment(it) }
+                        }?.let { navigator.push(it) }
                     }
                     .show()
             return
@@ -155,40 +139,38 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
             builder.setTitle(title)
                     .setPositiveButton(R.string.yes) { _, _ -> onFeedItemAction(feedViewModel.processJoinRequest(this, true)) }
                     .setNegativeButton(R.string.no) { _, _ -> onFeedItemAction(feedViewModel.processJoinRequest(this, false)) }
-                    .setNeutralButton(R.string.event_details) { _, _ -> showFragment(JoinRequestFragment.viewInstance(model)) }
+                    .setNeutralButton(R.string.event_details) { _, _ -> navigator.push(JoinRequestFragment.viewInstance(model)) }
                     .show()
             return
         }
 
         item.isOf<Media>()?.apply {
-            bottomBarState.set(false)
-            togglePersistentUi()
-            showFragment(MediaDetailFragment.newInstance(model))
+            updateUi(bottomNavShows = false)
+            navigator.push(MediaDetailFragment.newInstance(model))
         }
     }
 
-    @SuppressLint("CommitTransaction")
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(MediaDetailFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(MediaDetailFragment.ARG_MEDIA, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is MediaDetailFragment ->
+            transaction.listDetailTransition(MediaDetailFragment.ARG_MEDIA, incomingFragment, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
 
-        fragmentTo.stableTag.contains(JoinRequestFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST)
+        is JoinRequestFragment ->
+            transaction.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST, incomingFragment)
 
-        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
+        is EventEditFragment ->
+            transaction.listDetailTransition(EventEditFragment.ARG_EVENT, incomingFragment)
 
-        else -> super.provideFragmentTransaction(fragmentTo)
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun onFeedItemAction(diffResultSingle: Single<DiffUtil.DiffResult>) {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(diffResultSingle.subscribe(this::onFeedUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onFeedUpdated(diffResult: DiffUtil.DiffResult) {
         togglePersistentUi()
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         val isOnATeam = teamViewModel.isOnATeam
         scrollManager.onDiff(diffResult)
         feedViewModel.clearNotifications(FeedItem::class.java)
@@ -198,7 +180,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
     }
 
     private fun onBoard() {
-        if (isOnBoarding || prefsViewModel.isOnBoarded || isBottomSheetShowing) return
+        if (isOnBoarding || prefsViewModel.isOnBoarded || bottomSheetDriver.isBottomSheetShowing) return
         var prompts = listOf(*resources.getStringArray(R.array.on_boarding))
         prompts = prompts.subList(onBoardingIndex, prompts.size)
 
@@ -207,7 +189,7 @@ class FeedFragment : MainActivityFragment(), FeedAdapter.FeedItemAdapterListener
         val ref = AtomicReference<() -> Unit>()
 
         ref.set {
-            showChoices { choiceBar ->
+            transientBarDriver.showChoices { choiceBar ->
                 choiceBar.setText(iterator.next())
                         .setPositiveText(getString(if (iterator.hasNext()) R.string.next else R.string.finish))
                         .setPositiveClickListener(View.OnClickListener {

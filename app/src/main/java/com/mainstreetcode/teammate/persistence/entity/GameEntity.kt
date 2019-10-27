@@ -57,7 +57,7 @@ open class GameEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "game_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "game_name")
     var name: String
@@ -214,11 +214,9 @@ open class GameEntity : Parcelable {
         canDraw = `in`.readByte().toInt() != 0x00
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun betweenUsers(): Boolean = User.COMPETITOR_TYPE == refPath
 

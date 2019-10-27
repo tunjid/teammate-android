@@ -26,77 +26,60 @@ package com.mainstreetcode.teammate.fragments.registration
 
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
+import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.databinding.FragmentResetPasswordBinding
 import com.mainstreetcode.teammate.util.hasValidEmail
+import com.mainstreetcode.teammate.util.input
 
 /**
  * Forgot password screen
  */
 
-class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorActionListener {
+class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_password), TextView.OnEditorActionListener {
 
-    private var emailInput: EditText? = null
-    private var tokenInput: EditText? = null
-    private var passwordInput: EditText? = null
+    private var binding: FragmentResetPasswordBinding? = null
 
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.submit
+    override val stableTag: String
+        get() = arguments!!.getCharSequence(ARG_TOKEN, "").toString()
 
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
+    override val showsFab: Boolean = true
 
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.sign_in_forgot_password)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentResetPasswordBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
+        binding = this
 
-    override fun getStableTag(): String {
-        return arguments!!.getCharSequence(ARG_TOKEN, "").toString()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_reset_password, container, false)
-        val border = rootView.findViewById<View>(R.id.card_view_wrapper)
-
-        emailInput = rootView.findViewById(R.id.email)
-        tokenInput = rootView.findViewById(R.id.token)
-        passwordInput = rootView.findViewById(R.id.password)
+        defaultUi(
+                fabText = R.string.submit,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = true,
+                toolbarShows = false,
+                bottomNavShows = false,
+                grassShows = true,
+                navBarColor = GRASS_COLOR
+        )
 
         val args = arguments
 
-        if (args != null) tokenInput!!.setText(args.getCharSequence(ARG_TOKEN, ""))
-        emailInput!!.setOnEditorActionListener(this)
+        if (args != null) token.setText(args.getCharSequence(ARG_TOKEN, ""))
+        email.setOnEditorActionListener(this@ResetPasswordFragment)
 
-        ViewCompat.setTransitionName(emailInput!!, SplashFragment.TRANSITION_TITLE)
-        ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND)
-
-        return rootView
+        email.transitionName = SplashFragment.TRANSITION_TITLE
+        cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        emailInput = null
+        binding = null
     }
 
-    override val showsFab: Boolean
-        get() {
-            return true
-        }
-
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> resetPassword()
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> resetPassword()
+        else -> Unit
     }
 
     override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean {
@@ -108,18 +91,19 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
     }
 
     private fun resetPassword() {
-        if (emailInput.hasValidEmail) {
-            toggleProgress(true)
+        val binding = this.binding ?: return
+        if (binding.email.hasValidEmail) {
+            transientBarDriver.toggleProgress(true)
 
-            val email = emailInput!!.text.toString()
-            val token = tokenInput!!.text.toString()
-            val password = passwordInput!!.text.toString()
+            val email = binding.email.input.toString()
+            val token = binding.token.input.toString()
+            val password = binding.password.input.toString()
 
-            disposables.add(viewModel.resetPassword(email, token, password)
+            disposables.add(userViewModel.resetPassword(email, token, password)
                     .subscribe({
-                        showSnackbar { snackbar ->
+                        transientBarDriver.showSnackBar { snackbar ->
                             snackbar.setText(it.message)
-                                    .setAction(R.string.sign_in) { showFragment(SignInFragment.newInstance()) }
+                                    .setAction(R.string.sign_in) { navigator.push(SignInFragment.newInstance()) }
                         }
                     }, defaultErrorHandler::invoke))
         }
@@ -129,14 +113,8 @@ class ResetPasswordFragment : RegistrationActivityFragment(), TextView.OnEditorA
 
         private const val ARG_TOKEN = "token"
 
-        fun newInstance(token: CharSequence): ResetPasswordFragment {
-            val fragment = ResetPasswordFragment()
-            val args = Bundle()
-
-            args.putCharSequence(ARG_TOKEN, token)
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(token: CharSequence): ResetPasswordFragment = ResetPasswordFragment().apply {
+            arguments = bundleOf(ARG_TOKEN to token)
         }
     }
 }

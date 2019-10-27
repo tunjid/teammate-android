@@ -30,7 +30,8 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.RemoteImageViewHolder
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.RemoteImage
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Event]
@@ -46,7 +47,7 @@ class RemoteImageAdapter<T : RemoteImage>(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RemoteImageViewHolder<T> =
-            RemoteImageViewHolder(getItemView(R.layout.bottom_nav_item, viewGroup), adapterListener)
+            RemoteImageViewHolder(viewGroup.inflate(R.layout.bottom_nav_item), delegate)
 
     override fun onBindViewHolder(viewHolder: RemoteImageViewHolder<T>, position: Int) {
         viewHolder.bind(items[position])
@@ -56,7 +57,7 @@ class RemoteImageAdapter<T : RemoteImage>(
 
     override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
 
-    interface AdapterListener<T : RemoteImage> : InteractiveAdapter.AdapterListener {
+    interface AdapterListener<T : RemoteImage> {
         fun onImageClicked(item: T)
     }
 

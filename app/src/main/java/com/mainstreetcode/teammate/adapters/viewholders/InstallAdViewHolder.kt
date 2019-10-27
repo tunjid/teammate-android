@@ -26,19 +26,20 @@ package com.mainstreetcode.teammate.adapters.viewholders
 
 
 import android.view.View
-
 import com.mainstreetcode.teammate.model.InstallAd
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 
-class InstallAdViewHolder(itemView: View, adapterListener: InteractiveAdapter.AdapterListener) : AdViewHolder<InstallAd>(itemView, adapterListener) {
+class InstallAdViewHolder(
+        itemView: View,
+        delegate: Any
+) : AdViewHolder<InstallAd>(itemView, delegate) {
 
     override val imageUrl: String?
         get() = null
     //
     //    private NativeAppInstallAdView adView;
     //
-    //    public InstallAdViewHolder(View itemView, InteractiveAdapter.AdapterListener adapterListener) {
-    //        super(itemView, adapterListener);
+    //    public InstallAdViewHolder(View itemView, InteractiveAdapter.AdapterListener delegate) {
+    //        super(itemView, delegate);
     //        adView = (NativeAppInstallAdView) itemView;
     //
     //        adView.setHeadlineView(title);

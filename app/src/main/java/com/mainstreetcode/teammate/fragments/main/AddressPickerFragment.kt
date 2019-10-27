@@ -27,14 +27,9 @@ package com.mainstreetcode.teammate.fragments.main
 import android.content.pm.PackageManager
 import android.location.Address
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -43,7 +38,8 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.AutoCompleteAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.databinding.FragmentPlacePickerBinding
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.ScrollManager
@@ -53,22 +49,14 @@ import com.mainstreetcode.teammate.util.updateTheme
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel.Companion.PERMISSIONS_REQUEST_LOCATION
 import java.util.concurrent.atomic.AtomicReference
 
-class AddressPickerFragment : MainActivityFragment() {
+class AddressPickerFragment : TeammatesBaseFragment(R.layout.fragment_place_picker) {
 
     private var canQueryMap: Boolean = false
 
-    private lateinit var mapView: MapView
-    private lateinit var location: TextView
     private lateinit var instantSearch: InstantSearch<String, AutocompletePrediction>
     private val currentAddress = AtomicReference<Address>()
-
-    override val fabStringResource: Int @StringRes get() = R.string.place_picker_pick
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val showsToolBar: Boolean get() = false
-
-    override val showsBottomNav: Boolean get() = true
+    private var mapView: MapView? = null
+    private var location: TextView? = null
 
     override val showsFab: Boolean get() = currentAddress.get() != null
 
@@ -77,71 +65,71 @@ class AddressPickerFragment : MainActivityFragment() {
         instantSearch = locationViewModel.instantSearch()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_place_picker, container, false)
-        val mapContainer = root.findViewById<ViewGroup>(R.id.map_view_container)
-        val searchView = root.findViewById<SearchView>(R.id.search_field)
-        val recyclerView = root.findViewById<RecyclerView>(R.id.search_predictions)
-        location = root.findViewById(R.id.location)
-        mapView = root.findViewById(R.id.map_view)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentPlacePickerBinding.bind(view).run {
+        this@AddressPickerFragment.mapView = mapView
+        this@AddressPickerFragment.location = location
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(recyclerView)
+        defaultUi(
+                toolbarShows = false,
+                fabText = R.string.place_picker_pick,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = showsFab
+        )
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(searchPredictions)
                 .withAdapter(AutoCompleteAdapter(instantSearch.currentItems, object : AutoCompleteAdapter.AdapterListener {
                     override fun onPredictionClicked(prediction: AutocompletePrediction) {
-                        searchView.setQuery("", false)
-                        searchView.clearFocus()
-                        recyclerView.visibility = View.GONE
-                        mapContainer.visibility = View.VISIBLE
+                        searchField.setQuery("", false)
+                        searchField.clearFocus()
+                        searchPredictions.visibility = View.GONE
+                        mapViewContainer.visibility = View.VISIBLE
                         disposables.add(locationViewModel.fromAutoComplete(prediction)
                                 .subscribe(this@AddressPickerFragment::onMapAddressFound, defaultErrorHandler::invoke))
                     }
                 }))
-                .withInconsistencyHandler(this::onInconsistencyDetected)
+                .withInconsistencyHandler(this@AddressPickerFragment::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()
 
-        searchView.setIconifiedByDefault(false)
-        searchView.isIconified = false
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchField.setIconifiedByDefault(false)
+        searchField.isIconified = false
+        searchField.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean = false
 
             override fun onQueryTextChange(query: String): Boolean {
                 if (query.isBlank()) return true
 
                 instantSearch.postSearch(query)
-                mapContainer.visibility = if (query.isBlank()) View.VISIBLE else View.GONE
-                recyclerView.visibility = if (query.isBlank()) View.GONE else View.VISIBLE
+                mapViewContainer.visibility = if (query.isBlank()) View.VISIBLE else View.GONE
+                searchPredictions.visibility = if (query.isBlank()) View.GONE else View.VISIBLE
                 return true
             }
         })
 
         location.setMaterialOverlay(resources.getDimensionPixelSize(R.dimen.half_margin).toFloat())
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this::onMapReady)
-
-        return root
+        mapView?.onCreate(savedInstanceState)
+        mapView?.getMapAsync(this@AddressPickerFragment::onMapReady) ?: Unit
     }
 
     override fun onResume() {
         disposables.add(instantSearch.subscribe().subscribe(scrollManager::onDiff, defaultErrorHandler::invoke))
-        mapView.onResume()
+        mapView?.onResume()
         super.onResume()
     }
 
     override fun onStart() {
-        mapView.onStart()
+        mapView?.onStart()
         super.onStart()
         requestLocation()
     }
 
     override fun onPause() {
-        mapView.onPause()
+        mapView?.onPause()
         super.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         try {
-            mapView.onSaveInstanceState(outState)
+            mapView?.onSaveInstanceState(outState)
         } catch (e: Exception) {
             Logger.log(stableTag, "Error in mapview onSaveInstanceState", e)
         }
@@ -150,17 +138,17 @@ class AddressPickerFragment : MainActivityFragment() {
     }
 
     override fun onStop() {
-        mapView.onStop()
+        mapView?.onStop()
         super.onStop()
     }
 
     override fun onDestroyView() {
-        mapView.onDestroy()
+        mapView?.onDestroy()
         super.onDestroyView()
     }
 
     override fun onLowMemory() {
-        mapView.onLowMemory()
+        mapView?.onLowMemory()
         super.onLowMemory()
     }
 
@@ -170,7 +158,7 @@ class AddressPickerFragment : MainActivityFragment() {
             val current = currentAddress.get()
 
             if (current != null) (targetFragment as AddressPicker).onAddressPicked(current)
-            hideBottomSheet()
+            bottomSheetDriver.hideBottomSheet()
         }
     }
 
@@ -185,7 +173,8 @@ class AddressPickerFragment : MainActivityFragment() {
     }
 
     private fun onLocationFound(location: LatLng) =
-            mapView.getMapAsync { map -> map.animateCamera(newLatLngZoom(location, MAP_ZOOM.toFloat())) }
+            mapView?.getMapAsync { map -> map.animateCamera(newLatLngZoom(location, MAP_ZOOM.toFloat())) }
+                    ?: Unit
 
     private fun onMapReady(map: GoogleMap) {
         map.updateTheme(requireContext())
@@ -198,21 +187,20 @@ class AddressPickerFragment : MainActivityFragment() {
             disposables.add(locationViewModel.fromMap(map).subscribe(this::onAddressFound, defaultErrorHandler::invoke))
     }
 
-    private fun onCameraMoveStarted(reason: Int) {
-        when (reason) {
-            GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION,
-            GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION -> canQueryMap = false
-            GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE -> canQueryMap = true
-        }
+    private fun onCameraMoveStarted(reason: Int) = when (reason) {
+        GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION,
+        GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION -> canQueryMap = false
+        GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE -> canQueryMap = true
+        else -> Unit
     }
 
     private fun onAddressFound(address: Address) {
-        scrollManager.recyclerView.visibility = View.GONE
-        location.text = address.fullName
-        location.visibility = View.VISIBLE
+        scrollManager.recyclerView?.visibility = View.GONE
+        location?.text = address.fullName
+        location?.visibility = View.VISIBLE
         currentAddress.set(address)
 
-        togglePersistentUi()
+        updateUi(fabShows = showsFab)
     }
 
     private fun onMapAddressFound(address: Address) {
@@ -230,7 +218,6 @@ class AddressPickerFragment : MainActivityFragment() {
 
         fun newInstance(): AddressPickerFragment = AddressPickerFragment().apply {
             arguments = Bundle()
-            setEnterExitTransitions()
         }
     }
 }

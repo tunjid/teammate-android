@@ -36,8 +36,8 @@ import com.mainstreetcode.teammate.util.getTransitionName
 
 class EventViewHolder(
         itemView: View,
-        adapterListener: EventAdapter.EventAdapterListener
-) : ModelCardViewHolder<Event, EventAdapter.EventAdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: EventAdapter.EventAdapterListener
+) : ModelCardViewHolder<Event, EventAdapter.EventAdapterListener>(itemView, delegate), View.OnClickListener {
 
     private val eventLocation: TextView = itemView.findViewById(R.id.location)
 
@@ -59,6 +59,6 @@ class EventViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onEventClicked(model)
+        delegate?.onEventClicked(model)
     }
 }

@@ -31,16 +31,18 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.mainstreetcode.teammate.util.*
-
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
-import java.util.Objects
+import java.util.*
 
 open class MetaData internal constructor(
         code: String,
         internal var name: String
 ) : Differentiable {
+
+    override val diffId: String
+        get() = code
 
     var code: String
         internal set
@@ -51,8 +53,6 @@ open class MetaData internal constructor(
     init {
         this.code = code
     }
-
-    override fun getId(): String = code
 
     open fun getName(): CharSequence = name
 
@@ -69,7 +69,7 @@ open class MetaData internal constructor(
     }
 
     override fun areContentsTheSame(other: Differentiable): Boolean =
-            if (other !is MetaData) id == other.id else this.code == other.code && this.name == other.name
+            if (other !is MetaData) diffId == other.diffId else this.code == other.code && this.name == other.name
 
     override fun hashCode(): Int = Objects.hash(code)
 

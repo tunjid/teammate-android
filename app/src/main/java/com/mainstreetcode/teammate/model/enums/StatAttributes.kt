@@ -24,6 +24,6 @@
 
 package com.mainstreetcode.teammate.model.enums
 
-import java.util.ArrayList
+import java.util.*
 
 class StatAttributes : ArrayList<StatAttribute>()

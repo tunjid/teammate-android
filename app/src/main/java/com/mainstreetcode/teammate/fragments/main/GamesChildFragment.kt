@@ -25,44 +25,40 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Lists [tournaments][Event]
  */
 
-class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
+class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
+        GameAdapter.AdapterListener {
 
     private var round: Int = 0
     private lateinit var tournament: Tournament
     private lateinit var items: List<Differentiable>
 
-    override val showsFab: Boolean get() = false
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
+            val round = arguments!!.getInt(ARG_ROUND)
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
-        val round = arguments!!.getInt(ARG_ROUND)
-
-        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode() + "-" + round
-        else superResult
-    }
+            return if (tempTournament != null) superResult + "-" + tempTournament.hashCode() + "-" + round
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,27 +67,23 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         items = gameViewModel.getGamesForRound(tournament, round)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_games_child, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val fragment = parentFragment
-        val recycledViewPool = if (fragment is TournamentDetailFragment)
-            fragment.gamesRecycledViewPool
-        else
-            RecyclerView.RecycledViewPool()
+        val recycledViewPool =
+                if (fragment is TournamentDetailFragment) fragment.gamesRecycledViewPool
+                else RecyclerView.RecycledViewPool()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.onRefresh() }
+        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.onRefresh() }
                 .withEndlessScroll { fetchTournaments(false) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(GameAdapter(items, this))
+                .withAdapter(GameAdapter(::items, this))
                 .withRecycledViewPool(recycledViewPool)
                 .withLinearLayoutManager()
                 .build()
 
         scrollManager.setViewHolderColor(R.attr.alt_empty_view_holder_tint)
-
-        return root
     }
 
     private fun onRefresh() {
@@ -103,27 +95,22 @@ class GamesChildFragment : MainActivityFragment(), GameAdapter.AdapterListener {
         fetchTournaments(true)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_tournament_team_pick).let { true }
-        else -> super.onOptionsItemSelected(item)
-    }
-
     override fun togglePersistentUi() = Unit /* Do nothing */
 
     override fun onGameClicked(game: Game) {
-        showFragment(GameFragment.newInstance(game))
+        navigator.push(GameFragment.newInstance(game))
     }
 
     private fun fetchTournaments(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         onRefresh()
     }
 
     private fun onGamesUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {

@@ -24,7 +24,7 @@
 
 package com.mainstreetcode.teammate.model
 
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 interface ListableModel<T> {
 

@@ -31,9 +31,10 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AutoCompleteViewHolder
 import com.mainstreetcode.teammate.baseclasses.BaseAdapter
 import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
 import com.mainstreetcode.teammate.util.ITEM
+import com.tunjid.androidx.view.util.inflate
 
 class AutoCompleteAdapter(
         private val predictions: List<AutocompletePrediction>,
@@ -45,7 +46,7 @@ class AutoCompleteAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AutoCompleteViewHolder =
-            AutoCompleteViewHolder(getItemView(R.layout.viewholder_auto_complete, viewGroup), adapterListener)
+            AutoCompleteViewHolder(viewGroup.inflate(R.layout.viewholder_auto_complete), delegate)
 
     override fun onBindViewHolder(holder: AutoCompleteViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
@@ -53,8 +54,8 @@ class AutoCompleteAdapter(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S =
+            delegate as S
 
     override fun getItemCount(): Int = predictions.size
 
@@ -62,7 +63,7 @@ class AutoCompleteAdapter(
 
     override fun getItemViewType(position: Int): Int = ITEM
 
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
+    interface AdapterListener {
         fun onPredictionClicked(prediction: AutocompletePrediction)
     }
 

@@ -26,10 +26,7 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.location.Address
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -42,31 +39,30 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamHostingGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Creates, edits or lets a [com.mainstreetcode.teammate.model.User] join a [Team]
  */
 
-class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.AddressPicker, TeamEditAdapter.TeamEditAdapterListener {
+class TeamEditFragment : HeaderedFragment<Team>(R.layout.fragment_headered),
+        AddressPickerFragment.AddressPicker,
+        TeamEditAdapter.TeamEditAdapterListener {
 
     override lateinit var headeredModel: Team
         private set
 
     private lateinit var gofer: TeamGofer
 
-    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.team_create else R.string.team_update
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
-
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = gofer.canEditTeam()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TEAM)!!)
+    override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TEAM)!!)
+
+    private val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
+
+    private val fabText: Int @StringRes get() = if (headeredModel.isEmpty) R.string.team_create else R.string.team_update
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,46 +71,49 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
         gofer = teamViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_headered, container, false)
-
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = toolbarTitle,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = fabText,
+                fabShows = showsFab
+        )
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(TeamEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
-                .build()
-
-        scrollManager.recyclerView.requestFocus()
-        return root
+                .build().apply { recyclerView?.requestFocus() }
     }
 
     override fun onClick(view: View) {
         if (view.id != R.id.fab) return
 
         val wasEmpty = headeredModel.isEmpty
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(gofer.save()
                 .subscribe({ result ->
                     val message = if (wasEmpty) getString(R.string.created_team, headeredModel.name) else getString(R.string.updated_team)
                     onModelUpdated(result)
-                    showSnackbar(message)
+                    transientBarDriver.showSnackBar(message)
                 }, defaultErrorHandler::invoke))
     }
 
     override fun gofer(): TeamHostingGofer<Team> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        updateUi(toolbarTitle = toolbarTitle, fabText = fabText)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onPrepComplete() {
+        updateUi(toolbarTitle = toolbarTitle, fabText = fabText)
         scrollManager.notifyDataSetChanged()
-        togglePersistentUi()
         super.onPrepComplete()
     }
 
@@ -128,7 +127,7 @@ class TeamEditFragment : HeaderedFragment<Team>(), AddressPickerFragment.Address
     override fun onAddressPicked(address: Address) {
         gofer.isSettingAddress = false
         disposables.add(gofer.setAddress(address).subscribe(this::onModelUpdated, emptyErrorHandler::invoke))
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun canEditFields(): Boolean = gofer.canEditTeam()

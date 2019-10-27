@@ -36,8 +36,8 @@ import com.mainstreetcode.teammate.util.FULL_RES_LOAD_DELAY
 
 class ImageMediaViewHolder(
         itemView: View,
-        adapterListener: MediaAdapter.MediaAdapterListener
-) : MediaViewHolder<ImageView>(itemView, adapterListener) {
+        delegate: MediaAdapter.MediaAdapterListener
+) : MediaViewHolder<ImageView>(itemView, delegate) {
 
     override val thumbnailId: Int
         get() = R.id.image_thumbnail

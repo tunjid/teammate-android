@@ -44,7 +44,7 @@ import com.mainstreetcode.teammate.util.replaceList
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -55,7 +55,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
     val headToHeadMatchUps = mutableListOf<Differentiable>()
 
     private val api = TeammateService.getApiInstance()
-    private val gameRoundMap = HashMap<Tournament, MutableMap<Int, List<Differentiable>>>()
+    private val gameRoundMap = HashMap<String, MutableMap<Int, MutableList<Differentiable>>>()
 
     private val gameRoundRepository = RepoProvider.forRepo(GameRoundRepo::class.java)
     private val gameRepository = RepoProvider.forRepo(GameRepo::class.java)
@@ -86,8 +86,8 @@ class GameViewModel : TeamMappedViewModel<Game>() {
                     .map { games -> filterDeclinedGamed(key, games) }
 
     @SuppressLint("UseSparseArrays")
-    fun getGamesForRound(tournament: Tournament, round: Int): List<Differentiable> =
-            gameRoundMap.getOrPut(tournament) { mutableMapOf() }
+    fun getGamesForRound(tournament: Tournament, round: Int): MutableList<Differentiable> =
+            gameRoundMap.getOrPut(tournament.id) { mutableMapOf() }
                     .getOrPut(round) { mutableListOf() }
 
     fun fetchGamesInRound(tournament: Tournament, round: Int): Flowable<DiffUtil.DiffResult> {
@@ -123,7 +123,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
 
     @SuppressLint("CheckResult")
     private fun onTournamentDeleted(tournament: Tournament) {
-        val tournamentMap = gameRoundMap.getOrPut(tournament) { mutableMapOf() }
+        val tournamentMap = gameRoundMap.getOrPut(tournament.id) { mutableMapOf() }
         (modelListMap.values + tournamentMap.values)
                 .distinct()
                 .filterIsInstance(Game::class.java)

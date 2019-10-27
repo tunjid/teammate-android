@@ -49,10 +49,13 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseActivity
+import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.navigation.activityNavigatorController
 import io.reactivex.disposables.CompositeDisposable
 
 class NavDialogFragment : BottomSheetDialogFragment() {
+
+    private val navigator: Navigator by activityNavigatorController()
 
     private lateinit var teamViewModel: TeamViewModel
     private lateinit var disposables: CompositeDisposable
@@ -94,14 +97,14 @@ class NavDialogFragment : BottomSheetDialogFragment() {
         navigationView.elevation = 0f
         navigationView.setNavigationItemSelectedListener(this::onOptionsItemSelected)
 
-        val cornerSize = resources.getDimensionPixelSize(R.dimen.single_and_half_margin)
+        val cornerSize = resources.getDimensionPixelSize(R.dimen.single_and_half_margin).toFloat()
         val elevation = resources.getDimensionPixelSize(R.dimen.single_margin).toFloat()
 
         root.background = MaterialShapeDrawable.createWithElevationOverlay(itemView.context, elevation).apply {
-            shapeAppearanceModel = ShapeAppearanceModel().apply {
-                setTopLeftCorner(CornerFamily.ROUNDED, cornerSize)
-                setTopRightCorner(CornerFamily.ROUNDED, cornerSize)
-            }
+            shapeAppearanceModel = ShapeAppearanceModel.builder()
+                    .setTopLeftCorner(CornerFamily.ROUNDED, cornerSize)
+                    .setTopRightCorner(CornerFamily.ROUNDED, cornerSize)
+                    .build()
         }
 
         root.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -123,7 +126,7 @@ class NavDialogFragment : BottomSheetDialogFragment() {
 
     private fun viewTeam(team: Team) {
         dismiss()
-        (activity as? BaseActivity)?.showFragment(TeamMembersFragment.newInstance(team))
+        navigator.push(TeamMembersFragment.newInstance(team))
     }
 
     companion object {

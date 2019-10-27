@@ -30,17 +30,19 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamSearchRequest
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.repository.TeamRepo
+import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.replaceList
 import com.mainstreetcode.teammate.viewmodel.events.Alert
 import com.mainstreetcode.teammate.viewmodel.events.matches
 import com.mainstreetcode.teammate.viewmodel.gofers.TeamGofer
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.transform
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.processors.PublishProcessor
 import java.util.concurrent.atomic.AtomicReference
 
@@ -53,20 +55,19 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
 
     private val defaultTeamRef = AtomicReference(Team.empty())
 
+    private val disposable = CompositeDisposable()
     private val repository: TeamRepo = RepoProvider.forRepo(TeamRepo::class.java)
     private val teamChangeProcessor: PublishProcessor<Team> = PublishProcessor.create()
+
+    val teamChangeFlowable: Flowable<Team>
 
     val isOnATeam: Boolean
         get() = teams.isNotEmpty() || !defaultTeamRef.get().isEmpty
 
-    val teamChangeFlowable: Flowable<Team>
-        get() = repository.defaultTeam.flatMapPublisher { team ->
-            updateDefaultTeam(team)
-            Flowable.fromCallable<Team>(defaultTeamRef::get).concatWith(teamChangeProcessor)
-        }.observeOn(mainThread())
-
     val defaultTeam: Team
         get() = defaultTeamRef.get()
+
+    override fun onCleared() = disposable.clear().run { super.onCleared() }
 
     override fun valueClass(): Class<Team> = Team::class.java
 
@@ -75,13 +76,20 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
     override fun fetch(key: Class<Team>, fetchLatest: Boolean): Flowable<List<Team>> =
             Flowable.empty()
 
-    fun gofer(team: Team): TeamGofer {
-        return TeamGofer(team,
-                { throwable -> checkForInvalidObject(throwable, team, Team::class.java) },
-                this::getTeam,
-                this::createOrUpdate,
-                this::deleteTeam)
+    init {
+        teamChangeFlowable = repository.defaultTeam.flatMapPublisher { team ->
+            updateDefaultTeam(team)
+            Flowable.fromCallable<Team>(defaultTeamRef::get).concatWith(teamChangeProcessor)
+        }.observeOn(mainThread())
+
+        disposable.add(teamChangeFlowable.subscribe({}, ErrorHandler.EMPTY::invoke))
     }
+
+    fun gofer(team: Team): TeamGofer = TeamGofer(team,
+            { throwable -> checkForInvalidObject(throwable, team, Team::class.java) },
+            this::getTeam,
+            this::createOrUpdate,
+            this::deleteTeam)
 
     fun instantSearch(): InstantSearch<TeamSearchRequest, Team> =
             InstantSearch(repository::findTeams) { it }
@@ -94,7 +102,7 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
     fun deleteTeam(team: Team): Single<Team> =
             repository.delete(team).doOnSuccess { deleted -> pushModelAlert(Alert.deletion(deleted)) }
 
-    fun nonDefaultTeams(sink: List<Team>): Single<DiffUtil.DiffResult> = FunctionalDiff.of(
+    fun nonDefaultTeams(sink: MutableList<Team>): Single<DiffUtil.DiffResult> = FunctionalDiff.of(
             Flowable.fromIterable(teams)
                     .filter { item -> item is Team && item != defaultTeamRef }
                     .cast(Team::class.java)
@@ -122,6 +130,18 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
     })
 
     companion object {
-        internal val teams: MutableList<Differentiable> = Lists.transform(RoleViewModel.roles) { role -> if (role is Role) role.team else role }
+        internal val teams: MutableList<Differentiable> = RoleViewModel.roles.transform(
+                { item -> if (item is Role) item.team else item },
+                { if (it is Team) RoleViewModel.roles.first { item -> item is Role && item.team == it } else it }
+        )
     }
+}
+
+fun TeamViewModel.swap(old: Team, new: Team, viewModel: TeamMappedViewModel<*>, onSwapped: () -> Unit): Flowable<DiffUtil.DiffResult> {
+    val stale = Team.empty().apply { update(old) }
+    old.update(new)
+    updateDefaultTeam(new)
+
+    onSwapped.invoke()
+    return viewModel.swap(stale, new)
 }

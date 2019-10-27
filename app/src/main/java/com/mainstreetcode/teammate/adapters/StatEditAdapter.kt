@@ -48,43 +48,47 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [com.mainstreetcode.teammate.model.Tournament]
  */
 
-class StatEditAdapter(private val items: List<Differentiable>, listener: AdapterListener) : BaseAdapter<BaseViewHolder<*>, StatEditAdapter.AdapterListener>(listener) {
+class StatEditAdapter(
+        private val items: List<Differentiable>,
+        listener: AdapterListener
+) : BaseAdapter<BaseViewHolder<*>, StatEditAdapter.AdapterListener>(listener) {
+
     private val chooser: TextInputStyle.InputChooser
-    private val userListener = UserAdapter.AdapterListener.asSAM { adapterListener.onUserClicked() }
-    private val teamListener = TeamAdapter.AdapterListener.asSAM { adapterListener.onTeamClicked() }
+    private val userListener = UserAdapter.AdapterListener.asSAM { delegate.onUserClicked() }
+    private val teamListener = TeamAdapter.AdapterListener.asSAM { delegate.onTeamClicked() }
 
     init {
-        chooser = Chooser(adapterListener)
+        chooser = Chooser(delegate)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
-        ITEM -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        STAT_TYPE -> StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup),
-                adapterListener.stat)
-        USER -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), userListener)
-        TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), teamListener)
-        else -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+        ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+        STAT_TYPE -> StatAttributeViewHolder(viewGroup.inflate(R.layout.viewholder_stat_type),
+                delegate.stat)
+        USER -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), userListener)
+        TEAM -> TeamViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), teamListener)
+        else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S = when {
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S = when {
         viewHolder.itemViewType == USER -> userListener as S
         viewHolder.itemViewType == TEAM -> teamListener as S
-        else -> adapterListener as S
+        else -> delegate as S
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         super.onBindViewHolder(holder, position)
 
         when (val item = items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
+            is Item -> (holder as InputViewHolder).bind(chooser[item])
             is User -> (holder as UserViewHolder).bind(item)
             is Team -> (holder as TeamViewHolder).bind(item)
         }
@@ -112,7 +116,7 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
         fun canChangeStat(): Boolean
     }
 
-    internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
+    internal class Chooser internal constructor(private val delegate: AdapterListener) : TextInputStyle.InputChooser() {
 
         override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
             Item.INPUT, Item.NUMBER -> TextInputStyle(
@@ -123,10 +127,10 @@ class StatEditAdapter(private val items: List<Differentiable>, listener: Adapter
                     Item::noIcon)
             STAT_TYPE -> SpinnerTextInputStyle(
                     R.string.choose_stat,
-                    adapterListener.stat.sport.stats,
+                    delegate.stat.sport.stats,
                     StatType::emojiAndName,
                     StatType::code,
-                    { adapterListener.canChangeStat() },
+                    { delegate.canChangeStat() },
                     Item::noInputValidation)
             else -> TextInputStyle(
                     Item.noClicks,

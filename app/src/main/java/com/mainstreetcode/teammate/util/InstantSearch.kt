@@ -25,9 +25,9 @@
 package com.mainstreetcode.teammate.util
 
 import androidx.recyclerview.widget.DiffUtil
-import com.tunjid.androidbootstrap.functions.collections.Lists
-import com.tunjid.androidbootstrap.recyclerview.diff.Diff
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.functions.collections.replace
+import com.tunjid.androidx.recyclerview.diff.Diff
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
@@ -42,16 +42,14 @@ class InstantSearch<T, R>(searcher: (T) -> Single<out List<R>>, diffFunction: (R
             .debounce(SEARCH_DEBOUNCE.toLong(), TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
             .switchMapSingle(searcher::invoke)
-            .map { Diff.calculate(currentItems, cast(it), { _, next -> next }, diffFunction::invoke) }
+            .map { Diff.calculate(currentItems, it, { _, next -> next }, diffFunction::invoke) }
             .observeOn(mainThread())
-            .doOnNext { diff -> Lists.replace(currentItems, diff.items) }
+            .doOnNext { diff -> currentItems.replace(diff.items) }
             .map { diff -> diff.result }
 
     fun postSearch(query: T) = searchProcessor.onNext(query)
 
     fun subscribe(): Flowable<DiffUtil.DiffResult> = searchFlowable
-
-    private fun cast(source: List<R>): List<R> = Lists.transform(source) { item -> item as R }
 
     companion object {
 

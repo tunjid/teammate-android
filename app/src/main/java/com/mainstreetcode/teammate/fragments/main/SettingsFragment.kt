@@ -25,37 +25,30 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.MainActivity
 import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.SettingsItem
 import com.mainstreetcode.teammate.util.ScrollManager
 
-class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapterListener {
+class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings),
+        SettingsAdapter.SettingsAdapterListener {
 
-    override val toolbarMenu: Int get() = R.menu.fragment_settings
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.settings)
-
-    override val showsFab: Boolean get() = false
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_settings, container, false)
-
-        scrollManager = ScrollManager.with<SettingsViewHolder>(rootView.findViewById(R.id.settings_list))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.settings),
+                toolBarMenu = R.menu.fragment_settings
+        )
+        scrollManager = ScrollManager.with<SettingsViewHolder>(view.findViewById(R.id.settings_list))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withAdapter(SettingsAdapter(items, this))
                 .withLinearLayoutManager()
                 .build()
-
-        return rootView
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when {
@@ -69,9 +62,7 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
 
     private fun deleteAccount() {
         disposables.add(userViewModel.deleteAccount().subscribe({
-            val activity = requireActivity()
-            MainActivity.startRegistrationActivity(activity)
-            activity.finish()
+            navigator.signOut()
         }, defaultErrorHandler::invoke))
     }
 
@@ -86,7 +77,7 @@ class SettingsFragment : MainActivityFragment(), SettingsAdapter.SettingsAdapter
                     .show()
             R.string.show_on_boarding -> {
                 prefsViewModel.isOnBoarded = false
-                showFragment(FeedFragment.newInstance())
+                navigator.push(FeedFragment.newInstance())
             }
         }
     }

@@ -30,16 +30,14 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 
-class BlankBottomSheetFragment : MainActivityFragment() {
+class BlankBottomSheetFragment : TeammatesBaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.fragment_blank_bottom, container, false)
 
     override fun togglePersistentUi() = Unit
-
-    override fun toggleProgress(show: Boolean) = Unit
 
     companion object {
 

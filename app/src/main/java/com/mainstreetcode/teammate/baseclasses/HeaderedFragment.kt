@@ -51,8 +51,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.*
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-abstract class HeaderedFragment<T> :
-        MainActivityFragment(),
+abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
+        TeammatesBaseFragment(layoutRes),
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener where T : HeaderedModel<T>, T : ListableModel<T> {
 
@@ -60,7 +60,7 @@ abstract class HeaderedFragment<T> :
 
     private var appBarLayout: AppBarLayout? = null
 
-    protected lateinit var viewHolder: HeaderedImageViewHolder
+    protected var viewHolder: HeaderedImageViewHolder? = null
 
     protected abstract val headeredModel: T
 
@@ -78,14 +78,15 @@ abstract class HeaderedFragment<T> :
 
         val model = headeredModel
 
-        viewHolder = HeaderedImageViewHolder(view, this)
-        viewHolder.bind(model)
+        viewHolder = HeaderedImageViewHolder(view, this).apply {
+            bind(model)
+            setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
+        }
 
         setTransitionName(view, model.getTransitionName(R.id.fragment_header_background))
-        setTransitionName(viewHolder.thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
 
         view.findViewById<View>(R.id.header).visibility = if (canExpandAppBar()) View.VISIBLE else View.GONE
-        view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += TeammatesBaseActivity.topInset
+        view.findViewById<Toolbar>(R.id.header_toolbar).layoutParams.height += WindowInsetsDriver.topInset
 
         appBarLayout = view.findViewById<AppBarLayout>(R.id.app_bar)
                 .apply { AppBarListener(this, this@HeaderedFragment::onAppBarOffset) }
@@ -97,28 +98,28 @@ abstract class HeaderedFragment<T> :
     }
 
     override fun onImageClick() {
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
 
         val errorMessage = gofer().getImageClickMessage(this)
 
         if (errorMessage == null) ImageWorkerFragment.requestCrop(this)
-        else showSnackbar(errorMessage)
+        else transientBarDriver.showSnackBar(errorMessage)
     }
 
     override fun onImageCropped(uri: Uri) {
         val item = headeredModel.headerItem
         uri.path?.apply { item.rawValue = this }
-        viewHolder.bind(headeredModel)
+        viewHolder?.bind(headeredModel)
         imageJustCropped = true
     }
 
     override fun onDestroyView() {
         gofer().clear()
-        viewHolder.unBind()
+        viewHolder?.unBind()
         super.onDestroyView()
     }
 
-    protected open fun onPrepComplete() = togglePersistentUi()
+    protected open fun onPrepComplete() = updateUi(fabShows = showsFab)
 
     protected open fun canExpandAppBar(): Boolean = true
 
@@ -132,19 +133,15 @@ abstract class HeaderedFragment<T> :
         super.onKeyBoardChanged(appeared)
         if (!appeared) return
         if (appBarLayout != null) appBarLayout!!.setExpanded(false)
-        if (showsFab && !isBottomSheetShowing)
+        if (showsFab && !bottomSheetDriver.isBottomSheetShowing)
             disposables.add(timer(FAB_DELAY.toLong(), MILLISECONDS)
                     .observeOn(mainThread())
-                    .subscribe(this::togglePersistentUi, ErrorHandler.EMPTY::invoke))
+                    .subscribe({ updateUi(fabShows = showsFab) }, ErrorHandler.EMPTY::invoke))
     }
 
-    protected fun fetch() {
-        getData(false)
-    }
+    protected fun fetch() = getData(false)
 
-    protected fun refresh() {
-        getData(true)
-    }
+    protected fun refresh() = getData(true)
 
     private fun getData(refresh: Boolean) {
         checkIfChanged()
@@ -180,15 +177,15 @@ abstract class HeaderedFragment<T> :
                     val request = BlockedUser.block(user, team, reason)
 
                     disposables.add(blockedUserViewModel.blockUser(request).subscribe(this::onUserBlocked, defaultErrorHandler::invoke))
-                    toggleProgress(true)
+                    transientBarDriver.toggleProgress(true)
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .show()
     }
 
     private fun onUserBlocked(blockedUser: BlockedUser) {
-        showSnackbar(getString(R.string.user_blocked, blockedUser.user.firstName))
-        toggleProgress(false)
+        transientBarDriver.showSnackBar(getString(R.string.user_blocked, blockedUser.user.firstName))
+        transientBarDriver.toggleProgress(false)
         activity?.onBackPressed()
     }
 

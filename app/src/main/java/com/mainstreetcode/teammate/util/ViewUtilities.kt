@@ -83,7 +83,7 @@ const val FULL_RES_LOAD_DELAY = 375
 const val TOOLBAR_ANIM_DELAY = 200
 
 fun View.isDisplayingSystemUI(): Boolean =
-        systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN != 0
+        systemUiVisibility and View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 
 fun Any.getTransitionName(@IdRes id: Int): String =
         hashCode().toString() + "-" + id

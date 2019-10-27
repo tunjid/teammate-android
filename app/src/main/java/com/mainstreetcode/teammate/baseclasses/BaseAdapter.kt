@@ -24,15 +24,11 @@
 
 package com.mainstreetcode.teammate.baseclasses
 
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
 
-abstract class BaseAdapter<VH : BaseViewHolder<*>, T : InteractiveAdapter.AdapterListener> : InteractiveAdapter<VH, T> {
+abstract class BaseAdapter<VH : BaseViewHolder<*>, T : Any>(adapterListener: T) : InteractiveAdapter<VH, T>(adapterListener) {
 
-    constructor(adapterListener: T) : super(adapterListener)
-
-    protected constructor() : super()
-
-    protected abstract fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S
+    protected abstract fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val listener = updateListener(holder)

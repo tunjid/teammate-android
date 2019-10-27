@@ -33,11 +33,11 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.model.ListState
-import com.tunjid.androidbootstrap.functions.Consumer
-import com.tunjid.androidbootstrap.recyclerview.AbstractListManagerBuilder
-import com.tunjid.androidbootstrap.recyclerview.EndlessScroller
-import com.tunjid.androidbootstrap.recyclerview.ListManager
-import com.tunjid.androidbootstrap.recyclerview.SwipeDragOptions
+import com.tunjid.androidx.recyclerview.AbstractListManagerBuilder
+import com.tunjid.androidx.recyclerview.EndlessScroller
+import com.tunjid.androidx.recyclerview.ListManager
+import com.tunjid.androidx.recyclerview.SwipeDragOptions
+import java.lang.IllegalArgumentException
 
 class ScrollManager<VH : RecyclerView.ViewHolder> constructor(
         scroller: EndlessScroller?,
@@ -51,17 +51,31 @@ class ScrollManager<VH : RecyclerView.ViewHolder> constructor(
         decorations: List<RecyclerView.ItemDecoration>,
         listeners: List<OnScrollListener>,
         hasFixedSize: Boolean
-) : ListManager<VH, ListState>(scroller, viewHolder, refreshLayout, options, recycledViewPool, recyclerView, adapter, layoutManager, decorations, listeners, hasFixedSize) {
+) : ListManager<VH, ListState>(
+        scroller,
+        viewHolder,
+        refreshLayout,
+        options,
+        recycledViewPool,
+        recyclerView,
+        adapter,
+        layoutManager,
+        decorations,
+        listeners,
+        hasFixedSize
+) {
 
     fun setViewHolderColor(@EmptyViewHolder.EmptyTint @AttrRes color: Int) {
-        if (viewHolder == null || adapter == null) return
+        if (viewHolder == null || recyclerView?.adapter == null) return
         viewHolder.setColor(color)
-        viewHolder.toggle(adapter.itemCount == 0)
+        viewHolder.toggle(recyclerView?.adapter?.itemCount == 0)
     }
 
     class Builder<VH : RecyclerView.ViewHolder> : AbstractListManagerBuilder<Builder<VH>, ScrollManager<VH>, VH, ListState>() {
 
         override fun build(): ScrollManager<VH> {
+            val recyclerView = this.recyclerView ?: throw IllegalArgumentException("RecyclerView is required")
+            val adapter = this.adapter ?: throw IllegalArgumentException("RecyclerView is required")
             val viewHolder = placeholder as? EmptyViewHolder
             val layoutManager = buildLayoutManager()
             val scroller = buildEndlessScroller(layoutManager)
@@ -74,7 +88,7 @@ class ScrollManager<VH : RecyclerView.ViewHolder> constructor(
 
         fun withEndlessScroll(runnable: () -> Unit): Builder<VH> {
             this.endlessScrollVisibleThreshold = 5
-            this.endlessScrollConsumer = Consumer { runnable.invoke() }
+            this.endlessScrollConsumer = { runnable.invoke() }
             return thisInstance
         }
 

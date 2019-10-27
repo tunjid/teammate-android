@@ -37,7 +37,7 @@ class CompetitiveTypeConverter {
 
     @TypeConverter
     fun toDbValue(competitive: Competitive?): String =
-            if (competitive == null) "" else competitive.refType + "," + competitive.getId()
+            if (competitive == null) "" else competitive.refType + "," + competitive.id
 
     @TypeConverter
     fun fromId(source: String): Competitive {

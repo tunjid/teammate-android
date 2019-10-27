@@ -35,8 +35,8 @@ import com.mainstreetcode.teammate.util.getTransitionName
 
 class UserViewHolder(
         itemView: View,
-        adapterListener: UserAdapter.AdapterListener
-) : ModelCardViewHolder<User, UserAdapter.AdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: UserAdapter.AdapterListener
+) : ModelCardViewHolder<User, UserAdapter.AdapterListener>(itemView, delegate), View.OnClickListener {
 
     init {
         itemView.setOnClickListener(this)
@@ -53,6 +53,6 @@ class UserViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onUserClicked(model)
+        delegate?.onUserClicked(model)
     }
 }

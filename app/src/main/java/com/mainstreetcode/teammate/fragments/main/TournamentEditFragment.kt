@@ -25,12 +25,9 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
@@ -47,13 +44,14 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.TournamentGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Edits a Team member
  */
 
-class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAdapter.AdapterListener {
+class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_headered),
+        TournamentEditAdapter.AdapterListener {
 
     private var showingPrompt: Boolean = false
     override lateinit var headeredModel: Tournament
@@ -61,24 +59,17 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
 
     private lateinit var gofer: TournamentGofer
 
-    override val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.tournament_create else R.string.tournament_update
+    private val fabStringResource: Int @StringRes get() = if (headeredModel.isEmpty) R.string.tournament_create else R.string.tournament_update
 
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_tournament_edit
-
-    override val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
+    private val toolbarTitle: CharSequence get() = gofer.getToolbarTitle(this)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = gofer.canEditAfterCreation()
 
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
     override val sport: Sport get() = headeredModel.sport
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
+    override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,11 +78,17 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         gofer = tournamentViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_headered, container, false)
-
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(root.findViewById(R.id.model_list))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = toolbarTitle,
+                toolBarMenu = R.menu.fragment_tournament_edit,
+                fabText = fabStringResource,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = showsFab
+        )
+        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
                 .withAdapter(TournamentEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -99,9 +96,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
                 .onLayoutManager(this::setSpanSizeLookUp)
                 .withGridLayoutManager(2)
                 .build()
-                .apply { recyclerView.requestFocus() }
-
-        return root
+                .apply { recyclerView?.requestFocus() }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -110,7 +105,7 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_rounds -> showFragment(TournamentDetailFragment.newInstance(headeredModel))
+        R.id.action_rounds -> navigator.push(TournamentDetailFragment.newInstance(headeredModel))
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -122,16 +117,16 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     override fun gofer(): Gofer<Tournament> = gofer
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        toggleProgress(false)
+        updateUi(toolbarInvalidated = true)
+        transientBarDriver.toggleProgress(false)
         scrollManager.onDiff(result)
-        viewHolder.bind(headeredModel)
-        activity?.invalidateOptionsMenu()
+        viewHolder?.bind(headeredModel)
         if (!headeredModel.isEmpty && headeredModel.numCompetitors == 0) promptForCompetitors()
     }
 
     override fun onPrepComplete() {
         scrollManager.notifyDataSetChanged()
-        requireActivity().invalidateOptionsMenu()
+        updateUi(toolbarInvalidated = true)
         super.onPrepComplete()
     }
 
@@ -139,13 +134,13 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         when (view.id) {
             R.id.fab -> {
                 val wasEmpty = headeredModel.isEmpty
-                toggleProgress(true)
+                transientBarDriver.toggleProgress(true)
                 disposables.add(gofer.save().subscribe({ diffResult ->
                     val stringRes = if (wasEmpty) R.string.added_user else R.string.updated_user
-                    showSnackbar(getString(stringRes, headeredModel.name))
+                    transientBarDriver.showSnackBar(getString(stringRes, headeredModel.name))
 
                     if (wasEmpty)
-                        showFragment(TournamentDetailFragment.newInstance(headeredModel))
+                        navigator.push(TournamentDetailFragment.newInstance(headeredModel))
                     else
                         onModelUpdated(diffResult)
                 }, defaultErrorHandler::invoke))
@@ -161,14 +156,14 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
         if (showingPrompt) return
 
         showingPrompt = true
-        showSnackbar { snackbar ->
+        transientBarDriver.showSnackBar { snackbar ->
             snackbar.setText(getString(R.string.add_tournament_competitors_prompt))
                     .addCallback(object : Snackbar.Callback() {
                         override fun onDismissed(bar: Snackbar?, event: Int) {
                             showingPrompt = false
                         }
                     })
-                    .setAction(R.string.okay) { showFragment(CompetitorsFragment.newInstance(headeredModel)) }
+                    .setAction(R.string.okay) { navigator.push(CompetitorsFragment.newInstance(headeredModel)) }
         }
     }
 
@@ -182,11 +177,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(), TournamentEditAda
     companion object {
 
         internal const val ARG_TOURNAMENT = "tournament"
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.model_list)
 
         fun newInstance(tournament: Tournament): TournamentEditFragment = TournamentEditFragment().apply {
             arguments = bundleOf(ARG_TOURNAMENT to tournament)
-            setEnterExitTransitions()
         }
     }
 }

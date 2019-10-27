@@ -37,43 +37,47 @@ import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.TOURNAMENT
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Event]
  */
 
-class TournamentAdapter(private val items: List<Differentiable>, listener: TournamentAdapterListener) : InteractiveAdapter<InteractiveViewHolder<*>, TournamentAdapter.TournamentAdapterListener>(listener) {
+class TournamentAdapter(
+        private val items: () -> List<Differentiable>,
+        listener: TournamentAdapterListener
+) : InteractiveAdapter<InteractiveViewHolder<*>, TournamentAdapter.TournamentAdapterListener>(listener) {
 
     init {
         setHasStableIds(true)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(getItemView(R.layout.viewholder_grid_content_ad, viewGroup), adapterListener)
-        INSTALL_AD -> InstallAdViewHolder(getItemView(R.layout.viewholder_grid_install_ad, viewGroup), adapterListener)
-        else -> TournamentViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), adapterListener)
+        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
+        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
+        else -> TournamentViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), delegate)
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        val item = items[position]
+        val item = items()[position]
         if (item is Tournament)
             (viewHolder as TournamentViewHolder).bind(item)
         else if (item is Ad<*>) (viewHolder as AdViewHolder<*>).bind(item)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items().size
 
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = items()[position].hashCode().toLong()
 
     override fun getItemViewType(position: Int): Int {
-        val item = items[position]
+        val item = items()[position]
         return if (item is Tournament) TOURNAMENT else (item as Ad<*>).type
     }
 
-    interface TournamentAdapterListener : AdapterListener {
+    interface TournamentAdapterListener {
         fun onTournamentClicked(item: Tournament)
     }
 

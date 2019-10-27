@@ -35,7 +35,7 @@ import com.mainstreetcode.teammate.model.TeamMember
 import com.mainstreetcode.teammate.model.toTeamMember
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

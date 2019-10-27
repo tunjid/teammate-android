@@ -29,111 +29,99 @@ import android.text.Editable
 import android.text.TextUtils.isEmpty
 import android.text.TextWatcher
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING
+import com.google.android.material.chip.Chip
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.TeamChatAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.databinding.FragmentChatBinding
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.Deferrer
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
-import com.tunjid.androidbootstrap.view.animator.ViewHider
-import com.tunjid.androidbootstrap.view.animator.ViewHider.TOP
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.animator.ViewHider
 import io.reactivex.disposables.Disposable
 import kotlin.math.abs
 
-class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, TeamChatAdapter.ChatAdapterListener {
+class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
+        TextView.OnEditorActionListener,
+        TeamAdapter.AdapterListener,
+        TeamChatAdapter.ChatAdapterListener {
 
     private var wasScrolling: Boolean = false
     private var unreadCount: Int = 0
 
-    private lateinit var team: Team
-    private lateinit var items: MutableList<Differentiable>
+    private var team by args<Team>()
+
+    private val items: MutableList<Differentiable>
+        get() = chatViewModel.getModelList(team)
+
     private lateinit var chatDisposable: Disposable
 
-    private var dateView: TextView? = null
-    private var newMessages: TextView? = null
-
+    private var swappedTeam = false
     private var deferrer: Deferrer? = null
-    private var dateHider: ViewHider? = null
-    private var newMessageHider: ViewHider? = null
-
-    override val toolbarMenu: Int get() = R.menu.fragment_chat
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.team_chat_title, team.name)
+    private var dateHider: ViewHider<Chip>? = null
+    private var newMessageHider: ViewHider<Chip>? = null
 
     private val isSubscribedToChat: Boolean get() = ::chatDisposable.isInitialized && !chatDisposable.isDisposed
 
-    override val showsFab: Boolean get() = false
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
     private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
-
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val team = arguments?.getParcelable<Team>(ARG_TEAM)
-
-        return if (team != null) superResult + "-" + team.hashCode()
-        else superResult
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = chatViewModel.getModelList(team)
+        defaultErrorHandler.addAction { swappedTeam = false }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_chat, container, false)
-        val refresh = root.findViewById<SwipeRefreshLayout>(R.id.refresh_layout)
-        val input = root.findViewById<EditText>(R.id.input)
-        val send = root.findViewById<View>(R.id.send)
-        dateView = root.findViewById(R.id.date)
-        newMessages = root.findViewById(R.id.new_messages)
-        root.findViewById<View>(R.id.footer_background)?.setMaterialOverlay()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentChatBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.team_chat_title, team.name),
+                toolBarMenu = R.menu.fragment_chat,
+                fabShows = showsFab
+        )
 
-        dateHider = ViewHider.of(dateView).setDirection(TOP).build()
+        footerBackground.setMaterialOverlay()
+
+        dateHider = ViewHider.of(date).setDirection(ViewHider.TOP).build()
         newMessageHider = ViewHider.of(newMessages).setDirection(ViewHider.BOTTOM).build()
+
         deferrer = Deferrer(2000) { dateHider?.hide() }
 
-        scrollManager = ScrollManager.with<TeamChatViewHolder>(root.findViewById(R.id.chat))
-                .withPlaceholder(EmptyViewHolder(root, R.drawable.ic_message_black_24dp, R.string.no_chats))
+        scrollManager = ScrollManager.with<TeamChatViewHolder>(view.findViewById(R.id.chat))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_message_black_24dp, R.string.no_chats))
                 .onLayoutManager { layoutManager -> (layoutManager as LinearLayoutManager).stackFromEnd = true }
-                .withAdapter(TeamChatAdapter(items, userViewModel.currentUser, this))
+                .withAdapter(TeamChatAdapter(::items, userViewModel.currentUser, this@ChatFragment))
                 .withEndlessScroll { fetchChatsBefore(false) }
-                .withRefreshLayout(refresh) { refresh.isRefreshing = false }
+                .withRefreshLayout(refreshLayout) { refreshLayout.isRefreshing = false }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
-                .withInconsistencyHandler(this::onInconsistencyDetected)
-                .addStateListener(this::onScrollStateChanged)
-                .addScrollListener(this::onScroll)
+                .withInconsistencyHandler(this@ChatFragment::onInconsistencyDetected)
+                .addStateListener(this@ChatFragment::onScrollStateChanged)
+                .addScrollListener(this@ChatFragment::onScroll)
                 .withLinearLayoutManager()
                 .build()
 
-        newMessages?.setOnClickListener { scrollManager.withRecyclerView { rv -> rv.smoothScrollToPosition(items.size - 1) } }
-        dateView?.setOnClickListener { dateHider?.hide() }
+        newMessageHider?.view?.setOnClickListener { scrollManager.withRecyclerView { rv -> rv.smoothScrollToPosition(items.size - 1) } }
+        dateHider?.view?.setOnClickListener { dateHider?.hide() }
         send.setOnClickListener { sendChat(input) }
-        input.setOnEditorActionListener(this)
+        input.setOnEditorActionListener(this@ChatFragment)
         input.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
@@ -146,17 +134,25 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
 
         newMessageHider?.hide()
         dateHider?.hide()
-        return root
+
+        Unit
     }
 
     override fun onResume() {
         super.onResume()
+
         subscribeToChat()
-        fetchChatsBefore(true)
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchChatsBefore(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_chat_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_chat_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -164,11 +160,18 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         super.onDestroyView()
         chatViewModel.updateLastSeen(team)
         newMessageHider = null
-        newMessages = null
         dateHider = null
-        dateView = null
         deferrer = null
     }
+
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, chatViewModel) {
+        swappedTeam = true
+        disposables.clear()
+        bottomSheetDriver.hideBottomSheet()
+
+        subscribeToChat()
+        updateUi(toolbarTitle = getString(R.string.team_chat_title, team.name))
+    }.subscribe(::onChatsUpdated, defaultErrorHandler::invoke) { swappedTeam = false }).let { Unit }
 
     override fun onChatClicked(chat: Chat) {
         if (!chat.isEmpty) return
@@ -201,7 +204,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
             updateUnreadCount()
         }, ErrorHandler.builder()
                 .defaultMessage(getString(R.string.error_default))
-                .add { message -> showSnackbar(message.message) }
+                .add { message -> transientBarDriver.showSnackBar(message.message) }
                 .build()::invoke)
 
         disposables.add(chatDisposable)
@@ -247,12 +250,13 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
     }
 
     private fun onChatsUpdated(result: DiffUtil.DiffResult?) {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         chatViewModel.updateLastSeen(team)
         if (result != null) scrollManager.onDiff(result)
     }
 
     private fun onScroll(dx: Int, dy: Int) {
+        if (swappedTeam) return
         if (abs(dy) > 8) wasScrolling = true
 
         deferrer?.advanceDeadline()
@@ -261,7 +265,7 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         if (date.isBlank()) dateHider?.hide()
         else dateHider?.show()
 
-        val ref = dateView ?: return
+        val ref = dateHider?.view ?: return
         if (date == ref.text.toString()) return
 
         TransitionManager.beginDelayedTransition(
@@ -284,16 +288,13 @@ class ChatFragment : MainActivityFragment(), TextView.OnEditorActionListener, Te
         if (unreadCount == 0)
             newMessageHider?.hide()
         else {
-            newMessages?.text = if (unreadCount == 1) getString(R.string.chat_new_message) else getString(R.string.chat_new_messages, unreadCount)
+            newMessageHider?.view?.text = if (unreadCount == 1) getString(R.string.chat_new_message) else getString(R.string.chat_new_messages, unreadCount)
             newMessageHider?.show()
         }
     }
 
     companion object {
 
-        private const val ARG_TEAM = "team"
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.chat)
-
-        fun newInstance(team: Team): ChatFragment = ChatFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): ChatFragment = ChatFragment().apply { this.team = team }
     }
 }

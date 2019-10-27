@@ -39,7 +39,8 @@ import com.mainstreetcode.teammate.model.enums.Position
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Role]
@@ -48,24 +49,24 @@ import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
 class RoleEditAdapter(
         private val items: List<Differentiable>,
         listener: RoleEditAdapterListener
-) : BaseAdapter<InputViewHolder<RoleEditAdapter.RoleEditAdapterListener>, RoleEditAdapter.RoleEditAdapterListener>(listener) {
+) : BaseAdapter<InputViewHolder, RoleEditAdapter.RoleEditAdapterListener>(listener) {
 
     private val chooser: TextInputStyle.InputChooser
 
     init {
-        chooser = Chooser(adapterListener)
+        chooser = Chooser(delegate)
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<RoleEditAdapterListener> {
-        return InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder {
+        return InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S {
-        return adapterListener as S
+    override fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S {
+        return delegate as S
     }
 
-    override fun onBindViewHolder(holder: InputViewHolder<RoleEditAdapterListener>, position: Int) {
+    override fun onBindViewHolder(holder: InputViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         val item = items[position]
         if (item is Item) holder.bind(chooser[item])
@@ -81,18 +82,18 @@ class RoleEditAdapter(
         fun canChangeRoleFields(): Boolean
     }
 
-    internal class Chooser internal constructor(private val adapterListener: RoleEditAdapterListener) : TextInputStyle.InputChooser() {
+    internal class Chooser internal constructor(private val delegate: RoleEditAdapterListener) : TextInputStyle.InputChooser() {
 
         override fun enabler(item: Item): Boolean = when (item.itemType) {
             Item.INPUT, Item.ABOUT -> false
-            Item.NICKNAME -> adapterListener.canChangeRoleFields()
+            Item.NICKNAME -> delegate.canChangeRoleFields()
             else -> false
         }
 
         override fun iconGetter(item: Item): Int = when (item.itemType) {
             Item.ROLE, Item.ABOUT, Item.NICKNAME -> 0
             Item.INPUT -> when {
-                item.stringRes == R.string.first_name && adapterListener.canChangeRolePosition() -> R.drawable.ic_picture_white_24dp
+                item.stringRes == R.string.first_name && delegate.canChangeRolePosition() -> R.drawable.ic_picture_white_24dp
                 else -> 0
             }
             else -> 0
@@ -110,7 +111,7 @@ class RoleEditAdapter(
             Item.ABOUT,
             Item.NICKNAME -> TextInputStyle(
                     Item.noClicks,
-                    adapterListener::onImageClick,
+                    delegate::onImageClick,
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)
@@ -119,10 +120,10 @@ class RoleEditAdapter(
                     Config.getPositions(),
                     Position::name,
                     Position::code
-            ) { adapterListener.canChangeRolePosition() }
+            ) { delegate.canChangeRolePosition() }
             else -> TextInputStyle(
                     Item.noClicks,
-                    adapterListener::onImageClick,
+                    delegate::onImageClick,
                     this::enabler,
                     this::textChecker,
                     this::iconGetter)

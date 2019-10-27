@@ -37,8 +37,9 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.TournamentType
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.*
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 
@@ -57,10 +58,10 @@ class HeadToHead {
         val items: List<Differentiable>
 
         internal val homeId: String
-            get() = home.entity.getId()
+            get() = home.entity.id
 
         internal val awayId: String
-            get() = away.entity.getId()
+            get() = away.entity.id
 
         val refPath: String
             get() = type.refPath
