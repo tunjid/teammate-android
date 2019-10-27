@@ -76,6 +76,7 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
 
     private lateinit var chatDisposable: Disposable
 
+    private var swappedTeam = false
     private var deferrer: Deferrer? = null
     private var dateHider: ViewHider<Chip>? = null
     private var newMessageHider: ViewHider<Chip>? = null
@@ -159,9 +160,10 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
     }
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, chatViewModel) {
+        swappedTeam = true
         bottomSheetDriver.hideBottomSheet()
         updateUi(toolbarTitle = getString(R.string.team_chat_title, team.name))
-    }.subscribe(::onChatsUpdated, defaultErrorHandler::invoke)).let { Unit }
+    }.subscribe(::onChatsUpdated, defaultErrorHandler::invoke) { swappedTeam = false }).let { Unit }
 
     override fun onChatClicked(chat: Chat) {
         if (!chat.isEmpty) return
@@ -246,6 +248,7 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
     }
 
     private fun onScroll(dx: Int, dy: Int) {
+        if (swappedTeam) return
         if (abs(dy) > 8) wasScrolling = true
 
         deferrer?.advanceDeadline()
