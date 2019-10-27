@@ -44,18 +44,13 @@ import io.reactivex.processors.PublishProcessor
 import io.reactivex.schedulers.Schedulers.io
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.collections.HashMap
 
 class MediaViewModel : TeamMappedViewModel<Media>() {
 
-    private val repository: MediaRepo
-    private val selectionMap: MutableMap<Team, MutableSet<Media>>
-    private val uploadCompletionProcessor: PublishProcessor<DiffUtil.DiffResult>
-
-    init {
-        selectionMap = HashMap()
-        repository = RepoProvider.forRepo(MediaRepo::class.java)
-        uploadCompletionProcessor = PublishProcessor.create()
-    }
+    private val repository = RepoProvider.forRepo(MediaRepo::class.java)
+    private val selectionMap = HashMap<String, MutableSet<Media>>()
+    private val uploadCompletionProcessor = PublishProcessor.create<DiffUtil.DiffResult>()
 
     override fun hasNativeAds(): Boolean = false
 
@@ -89,14 +84,14 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
         val partialDelete = AtomicBoolean()
         val source = getModelList(team)
 
-        val toDelete = selectionMap[team]?.let { ArrayList(it) }
+        val toDelete = selectionMap[team.id]?.let { ArrayList(it) }
 
         if (toDelete == null || toDelete.isEmpty()) return Maybe.empty()
 
         val sourceFlowable = when {
             isAdmin -> repository.privilegedDelete(team, toDelete)
             else -> repository.ownerDelete(toDelete)
-        }.toFlowable().map( ::asDifferentiables)
+        }.toFlowable().map(::asDifferentiables)
 
         return FunctionalDiff.of(sourceFlowable, source) { sourceCopy, deleted ->
             partialDelete.set(deleted.size != toDelete.size)
@@ -108,7 +103,7 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
     }
 
     fun downloadMedia(team: Team): Boolean {
-        val toDownload = selectionMap[team]?.let { ArrayList(it) }
+        val toDownload = selectionMap[team.id]?.let { ArrayList(it) }
         if (toDownload == null || toDownload.isEmpty()) return false
 
         MediaTransferIntentService.startActionDownload(App.instance, toDownload)
@@ -121,16 +116,16 @@ class MediaViewModel : TeamMappedViewModel<Media>() {
                     .firstOrError().cast(Media::class.java).doOnSuccess { getModelList(model.team).remove(it) }
 
     fun clearSelections(team: Team) {
-        selectionMap[team]?.clear()
+        selectionMap[team.id]?.clear()
     }
 
     fun hasSelections(team: Team): Boolean = getNumSelected(team) != 0
 
-    fun getNumSelected(team: Team): Int = selectionMap[team]?.size ?: 0
+    fun getNumSelected(team: Team): Int = selectionMap[team.id]?.size ?: 0
 
-    fun isSelected(media: Media): Boolean = selectionMap[media.team]?.contains(media) ?: false
+    fun isSelected(media: Media): Boolean = selectionMap[media.team.id]?.contains(media) ?: false
 
-    fun select(media: Media): Boolean = selectionMap.getOrPut(media.team) { mutableSetOf() }.let {
+    fun select(media: Media): Boolean = selectionMap.getOrPut(media.team.id) { mutableSetOf() }.let {
         when {
             it.contains(media) -> it.remove(media).not()
             else -> it.add(media)

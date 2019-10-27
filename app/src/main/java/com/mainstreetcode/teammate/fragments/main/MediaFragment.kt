@@ -29,49 +29,42 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.addCallback
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.MediaTransferIntentService
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.MediaAdapter
+import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
+        TeamAdapter.AdapterListener,
         MediaAdapter.MediaAdapterListener,
         ImageWorkerFragment.MediaListener,
         ImageWorkerFragment.DownloadRequester {
 
-    private lateinit var team: Team
-    private lateinit var items: List<Differentiable>
+    private var team by args<Team>()
+
+    private val items: MutableList<Differentiable>
+        get() = mediaViewModel.getModelList(team)
 
     override val isFullScreen: Boolean get() = false
 
     override val showsFab: Boolean get() = true
 
-    override val stableTag: String
-        get() {
-            val superResult = super.stableTag
-            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
-
-            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-            else superResult
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = mediaViewModel.getModelList(team)
 
         ImageWorkerFragment.attach(this)
 
@@ -107,27 +100,27 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
                 .withEndlessScroll { fetchMedia(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(MediaAdapter(items, this))
+                .withAdapter(MediaAdapter(::items, this))
                 .withGridLayoutManager(4)
                 .build()
     }
 
     override fun onResume() {
         super.onResume()
-        fetchMedia(true)
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchMedia(true)
+
         toggleContextMenu(mediaViewModel.hasSelections(team))
         disposables.add(mediaViewModel.listenForUploads().subscribe(this::onMediaUpdated, emptyErrorHandler::invoke))
     }
 
-    private fun fetchMedia(fetchLatest: Boolean) {
-        if (fetchLatest) scrollManager.setRefreshing()
-        else transientBarDriver.toggleProgress(true)
-
-        disposables.add(mediaViewModel.getMany(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke))
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_media_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_media_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
 
         R.id.action_delete -> disposables.add(mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
                 .subscribe(this::onMediaDeleted, defaultErrorHandler::invoke)).let { true }
@@ -149,6 +142,11 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
         if (incomingFragment is MediaDetailFragment)
             transaction.listDetailTransition(MediaDetailFragment.ARG_MEDIA, incomingFragment, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
     }
+
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, mediaViewModel) {
+        bottomSheetDriver.hideBottomSheet()
+        updateUi(toolbarTitle = getString(R.string.media_title, team.name))
+    }.subscribe(::onMediaUpdated, defaultErrorHandler::invoke)).let { Unit }
 
     override fun onMediaClicked(item: Media) {
         if (mediaViewModel.hasSelections(team))
@@ -177,6 +175,13 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
     override fun startedDownLoad(started: Boolean) {
         toggleContextMenu(!started)
         if (started) scrollManager.notifyDataSetChanged()
+    }
+
+    private fun fetchMedia(fetchLatest: Boolean) {
+        if (fetchLatest) scrollManager.setRefreshing()
+        else transientBarDriver.toggleProgress(true)
+
+        disposables.add(mediaViewModel.getMany(team, fetchLatest).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onMediaUpdated(result: DiffUtil.DiffResult) {
@@ -211,8 +216,7 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
     companion object {
 
         private const val MEDIA_DELETE_SNACKBAR_DELAY = 350
-        private const val ARG_TEAM = "team"
 
-        fun newInstance(team: Team): MediaFragment = MediaFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): MediaFragment = MediaFragment().apply { this.team = team }
     }
 }

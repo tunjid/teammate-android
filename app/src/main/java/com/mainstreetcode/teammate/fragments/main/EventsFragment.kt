@@ -27,18 +27,19 @@ package com.mainstreetcode.teammate.fragments.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.EventAdapter
+import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
@@ -46,27 +47,16 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  * Lists [events][com.mainstreetcode.teammate.model.Event]
  */
 
-class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), EventAdapter.EventAdapterListener {
+class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
+        TeamAdapter.AdapterListener,
+        EventAdapter.EventAdapterListener {
 
-    private lateinit var team: Team
-    private lateinit var items: List<Differentiable>
+    private var team by args<Team>()
+
+    private val items: List<Differentiable>
+        get() = eventViewModel.getModelList(team)
 
     override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole()
-
-    override val stableTag: String
-        get() {
-            val superResult = super.stableTag
-            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
-
-            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-            else superResult
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = eventViewModel.getModelList(team)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,21 +77,33 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(EventAdapter(items, this))
+                .withAdapter(EventAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
     }
 
     override fun onResume() {
         super.onResume()
-        fetchEvents(true)
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchEvents(true)
+
         watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_event_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_event_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, eventViewModel) {
+        bottomSheetDriver.hideBottomSheet()
+        updateUi(toolbarTitle = getString(R.string.events_title, team.name))
+    }.subscribe(::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit }
 
     override fun onEventClicked(item: Event) {
         navigator.push(EventEditFragment.newInstance(item))
@@ -136,9 +138,6 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
     }
 
     companion object {
-
-        private const val ARG_TEAM = "team"
-
-        fun newInstance(team: Team): EventsFragment = EventsFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): EventsFragment = EventsFragment().apply { this.team = team }
     }
 }

@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +32,6 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Tournament
@@ -80,7 +78,7 @@ class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.onRefresh() }
                 .withEndlessScroll { fetchTournaments(false) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(GameAdapter(items, this))
+                .withAdapter(GameAdapter(::items, this))
                 .withRecycledViewPool(recycledViewPool)
                 .withLinearLayoutManager()
                 .build()
@@ -95,11 +93,6 @@ class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
     override fun onResume() {
         super.onResume()
         fetchTournaments(true)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_tournament_team_pick).let { true }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun togglePersistentUi() = Unit /* Do nothing */

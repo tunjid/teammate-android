@@ -85,7 +85,6 @@ import com.tunjid.androidx.navigation.activityNavigatorController
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.abs
 
 /**
@@ -124,7 +123,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
 
     private var activityUiState by activityGlobalUiController()
 
-    private val lastSetUiState = AtomicReference<UiState>()
+    private var lastSetUiState = UiState.freshState()
 
     open val showsFab = false
 
@@ -151,7 +150,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     override var uiState: UiState
         get() = activityUiState
         set(value) {
-            lastSetUiState.set(value)
+            lastSetUiState = value.copy()
             if (navigator.current === this) activityUiState = value
         }
 
@@ -169,6 +168,11 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         roleViewModel.apply { }
         teamViewModel
         defaultErrorHandler.addAction { if (::scrollManager.isInitialized) scrollManager.reset() }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lastSetUiState = activityUiState
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -219,7 +223,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     override fun onClick(view: View) = Unit
 
     open fun togglePersistentUi() {
-        lastSetUiState.get()?.apply { uiState = this }
+         uiState = lastSetUiState
     }
 
     protected fun updateFabOnScroll(dx: Int, dy: Int) =
@@ -339,24 +343,24 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     )
 
     protected fun updateUi(
-            @DrawableRes fabIcon: Int = uiState.fabIcon,
-            @StringRes fabText: Int = uiState.fabText,
-            fabShows: Boolean = uiState.fabShows,
-            fabExtended: Boolean = uiState.fabExtended,
-            @MenuRes toolBarMenu: Int = uiState.toolBarMenu,
-            toolbarShows: Boolean = uiState.toolbarShows,
-            toolbarInvalidated: Boolean = uiState.toolbarInvalidated,
-            toolbarTitle: CharSequence = uiState.toolbarTitle,
-            @MenuRes altToolBarMenu: Int = uiState.altToolBarMenu,
-            altToolBarShows: Boolean = uiState.altToolBarShows,
-            altToolbarInvalidated: Boolean = uiState.altToolbarInvalidated,
-            altToolbarTitle: CharSequence = uiState.altToolbarTitle,
-            @ColorInt navBarColor: Int = uiState.navBarColor,
-            bottomNavShows: Boolean = uiState.bottomNavShows,
-            grassShows: Boolean = uiState.grassShows,
-            systemUiShows: Boolean = uiState.systemUiShows,
-            hasLightNavBar: Boolean = uiState.hasLightNavBar,
-            fabClickListener: View.OnClickListener? = uiState.fabClickListener
+            @DrawableRes fabIcon: Int = lastSetUiState.fabIcon,
+            @StringRes fabText: Int = lastSetUiState.fabText,
+            fabShows: Boolean = lastSetUiState.fabShows,
+            fabExtended: Boolean = lastSetUiState.fabExtended,
+            @MenuRes toolBarMenu: Int = lastSetUiState.toolBarMenu,
+            toolbarShows: Boolean = lastSetUiState.toolbarShows,
+            toolbarInvalidated: Boolean = lastSetUiState.toolbarInvalidated,
+            toolbarTitle: CharSequence = lastSetUiState.toolbarTitle,
+            @MenuRes altToolBarMenu: Int = lastSetUiState.altToolBarMenu,
+            altToolBarShows: Boolean = lastSetUiState.altToolBarShows,
+            altToolbarInvalidated: Boolean = lastSetUiState.altToolbarInvalidated,
+            altToolbarTitle: CharSequence = lastSetUiState.altToolbarTitle,
+            @ColorInt navBarColor: Int = lastSetUiState.navBarColor,
+            bottomNavShows: Boolean = lastSetUiState.bottomNavShows,
+            grassShows: Boolean = lastSetUiState.grassShows,
+            systemUiShows: Boolean = lastSetUiState.systemUiShows,
+            hasLightNavBar: Boolean = lastSetUiState.hasLightNavBar,
+            fabClickListener: View.OnClickListener? = lastSetUiState.fabClickListener
     ) {
         uiState = uiState.copy(
                 fabIcon = fabIcon,

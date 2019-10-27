@@ -43,7 +43,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  */
 
 class TeamChatAdapter(
-        private val items: List<Differentiable>, private val signedInUser: User,
+        private val items: () -> List<Differentiable>, private val signedInUser: User,
         listener: ChatAdapterListener
 ) : InteractiveAdapter<TeamChatViewHolder, TeamChatAdapter.ChatAdapterListener>(listener) {
 
@@ -60,11 +60,12 @@ class TeamChatAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: TeamChatViewHolder, i: Int) {
-        val size = items.size
+        val list = items()
+        val size = list.size
 
-        val chat = forceCast(items[i])
-        val prev = if (i == 0) null else forceCast(items[i - 1])
-        val next = if (i < size - 1) forceCast(items[i + 1]) else null
+        val chat = forceCast(list[i])
+        val prev = if (i == 0) null else forceCast(list[i - 1])
+        val next = if (i < size - 1) forceCast(list[i + 1]) else null
 
         val chatUser = chat.user
         val created = chat.created
@@ -76,12 +77,12 @@ class TeamChatAdapter(
         viewHolder.bind(chat, signedInUser == chat.user, !hideDetails, showPicture, isFirstMessageToday)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items().size
 
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = items()[position].hashCode().toLong()
 
     override fun getItemViewType(position: Int): Int =
-            if (items[position] is Chat) CHAT else CONTENT_AD
+            if (items()[position] is Chat) CHAT else CONTENT_AD
 
     interface ChatAdapterListener {
         fun onChatClicked(chat: Chat)

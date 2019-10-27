@@ -27,15 +27,14 @@ package com.mainstreetcode.teammate.fragments.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.GameAdapter
+import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
@@ -43,6 +42,8 @@ import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
@@ -50,30 +51,19 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  * Lists [tournaments][Event]
  */
 
-class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), GameAdapter.AdapterListener {
+class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
+        TeamAdapter.AdapterListener,
+        GameAdapter.AdapterListener {
 
-    private lateinit var team: Team
-    private lateinit var items: List<Differentiable>
+    private var team by args<Team>()
 
-    override val stableTag: String
-        get() {
-            val superResult = super.stableTag
-            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
-
-            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-            else superResult
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = gameViewModel.getModelList(team)
-    }
+    private val items: MutableList<Differentiable>
+        get() = gameViewModel.getModelList(team)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
-                toolbarTitle = getString(R.string.games),
+                toolbarTitle = getString(R.string.games_title, team.name),
                 toolBarMenu = R.menu.fragment_tournaments,
                 fabText = R.string.game_add,
                 fabIcon = R.drawable.ic_add_white_24dp
@@ -88,19 +78,26 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(GameAdapter(items, this))
+                .withAdapter(GameAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
     }
 
     override fun onResume() {
         super.onResume()
-        fetchGames(true)
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchGames(true)
+
         watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_game_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_game_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -110,6 +107,11 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
             val supportsTournaments = sport.supportsCompetitions()
             return if (sport.betweenUsers()) supportsTournaments else supportsTournaments && localRoleViewModel.hasPrivilegedRole()
         }
+
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, gameViewModel) {
+        bottomSheetDriver.hideBottomSheet()
+        updateUi(toolbarTitle = getString(R.string.games_title, team.name))
+    }.subscribe(::onGamesUpdated, defaultErrorHandler::invoke)).let { Unit }
 
     override fun onGameClicked(game: Game) {
         navigator.push(GameFragment.newInstance(game))
@@ -150,9 +152,6 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
     }
 
     companion object {
-
-        private const val ARG_TEAM = "team"
-
-        fun newInstance(team: Team): GamesFragment = GamesFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): GamesFragment = GamesFragment().apply { this.team = team }
     }
 }

@@ -78,7 +78,7 @@ class MyEventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refre
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(EventAdapter(items, this))
+                .withAdapter(EventAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
     }

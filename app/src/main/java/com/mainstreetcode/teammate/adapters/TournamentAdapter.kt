@@ -46,7 +46,10 @@ import com.tunjid.androidx.view.util.inflate
  * Adapter for [Event]
  */
 
-class TournamentAdapter(private val items: List<Differentiable>, listener: TournamentAdapterListener) : InteractiveAdapter<InteractiveViewHolder<*>, TournamentAdapter.TournamentAdapterListener>(listener) {
+class TournamentAdapter(
+        private val items: () -> List<Differentiable>,
+        listener: TournamentAdapterListener
+) : InteractiveAdapter<InteractiveViewHolder<*>, TournamentAdapter.TournamentAdapterListener>(listener) {
 
     init {
         setHasStableIds(true)
@@ -59,18 +62,18 @@ class TournamentAdapter(private val items: List<Differentiable>, listener: Tourn
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        val item = items[position]
+        val item = items()[position]
         if (item is Tournament)
             (viewHolder as TournamentViewHolder).bind(item)
         else if (item is Ad<*>) (viewHolder as AdViewHolder<*>).bind(item)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items().size
 
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = items()[position].hashCode().toLong()
 
     override fun getItemViewType(position: Int): Int {
-        val item = items[position]
+        val item = items()[position]
         return if (item is Tournament) TOURNAMENT else (item as Ad<*>).type
     }
 

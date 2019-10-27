@@ -27,20 +27,21 @@ package com.mainstreetcode.teammate.fragments.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.ListState
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
@@ -50,32 +51,20 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
+        TeamAdapter.AdapterListener,
         TournamentAdapter.TournamentAdapterListener {
 
-    private lateinit var team: Team
-    private lateinit var items: List<Differentiable>
+    private var team by args<Team>()
+
+    private val items: MutableList<Differentiable>
+        get() = tournamentViewModel.getModelList(team)
 
     override val showsFab: Boolean get() = team.sport.supportsCompetitions() && localRoleViewModel.hasPrivilegedRole()
-
-    override val stableTag: String
-        get() {
-            val superResult = super.stableTag
-            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
-
-            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-            else superResult
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = tournamentViewModel.getModelList(team)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
-                toolbarTitle = getString(R.string.tournaments),
+                toolbarTitle = getString(R.string.tournaments_title, team.name),
                 toolBarMenu = R.menu.fragment_tournaments,
                 fabIcon = R.drawable.ic_add_white_24dp,
                 fabText = R.string.tournament_add,
@@ -93,21 +82,33 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(TournamentAdapter(items, this))
+                .withAdapter(TournamentAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
     }
 
     override fun onResume() {
         super.onResume()
-        fetchTournaments(true)
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchTournaments(true)
+
         watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_tournament_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_tournament_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, tournamentViewModel) {
+        bottomSheetDriver.hideBottomSheet()
+        updateUi(toolbarTitle = getString(R.string.tournaments_title, team.name))
+    }.subscribe(::onTournamentsUpdated, defaultErrorHandler::invoke)).let { Unit }
 
     override fun onTournamentClicked(tournament: Tournament) =
             navigator.push(TournamentDetailFragment.newInstance(tournament)).let { Unit }
@@ -142,8 +143,6 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
 
     companion object {
 
-        private const val ARG_TEAM = "team"
-
-        fun newInstance(team: Team): TournamentsFragment = TournamentsFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): TournamentsFragment = TournamentsFragment().apply { this.team = team }
     }
 }

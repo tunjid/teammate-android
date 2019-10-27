@@ -47,7 +47,7 @@ import com.tunjid.androidx.view.util.inflate
  */
 
 class GameAdapter(
-        private val items: List<Differentiable>,
+        private val items: () -> List<Differentiable>,
         listener: AdapterListener
 ) : InteractiveAdapter<InteractiveViewHolder<*>, GameAdapter.AdapterListener>(listener) {
 
@@ -62,18 +62,18 @@ class GameAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = items[position]) {
+        when (val item = items()[position]) {
             is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
             is Game -> (viewHolder as GameViewHolder).bind(item)
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items().size
 
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = items()[position].hashCode().toLong()
 
     override fun getItemViewType(position: Int): Int {
-        val item = items[position]
+        val item = items()[position]
         return if (item is Game) GAME else (item as Ad<*>).type
     }
 

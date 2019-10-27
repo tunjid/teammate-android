@@ -67,22 +67,28 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             if (fetchLatest) getLatest(key) else getMore(key)
 
     fun getMore(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, false).map( ::asDifferentiables),
+            fetch(key, false).map(::asDifferentiables),
             getModelList(key),
             this::preserveList
     )
             .doOnError { throwable -> checkForInvalidKey(throwable, key) }
 
     fun refresh(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, true).map( ::asDifferentiables),
+            fetch(key, true).map(::asDifferentiables),
             getModelList(key),
             this::pullToRefresh
     )
             .doOnError { throwable -> checkForInvalidKey(throwable, key) }
             .doOnTerminate { pullToRefreshCount.set(0) }
 
+    fun swap(from: K, to: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
+            Flowable.fromCallable { getModelList(from) }.map(::asDifferentiables),
+            getModelList(to)
+    ) { _, copiedFrom -> copiedFrom }
+            .concatWith(Flowable.defer { refresh(to) })
+
     private fun getLatest(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, true).map( ::asDifferentiables),
+            fetch(key, true).map(::asDifferentiables),
             getModelList(key),
             this::preserveList
     )
@@ -94,7 +100,7 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             getModelList(key).mapNotNull(this::itemToModel).forEach(this::clearNotification)
 
     private fun pullToRefresh(source: List<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
-      val next =  if (pullToRefreshCount.getAndIncrement() == 0) listOf() else source
+        val next = if (pullToRefreshCount.getAndIncrement() == 0) listOf() else source
 
         return afterPullToRefreshDiff(preserveList(next, additions))
     }

@@ -136,3 +136,12 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
         )
     }
 }
+
+fun TeamViewModel.swap(old: Team, new: Team, viewModel: TeamMappedViewModel<*>, onSwapped: () -> Unit): Flowable<DiffUtil.DiffResult> {
+    val stale = Team.empty().apply { update(old) }
+    old.update(new)
+    updateDefaultTeam(new)
+
+    onSwapped.invoke()
+    return viewModel.swap(stale, new)
+}

@@ -56,8 +56,8 @@ class TournamentViewModel : TeamMappedViewModel<Tournament>() {
 
     private val api: TeammateApi = TeammateService.getApiInstance()
     private val repository: TournamentRepo = RepoProvider.forRepo(TournamentRepo::class.java)
-    private val standingsMap = HashMap<Tournament, Standings>()
-    private val ranksMap = HashMap<Tournament, MutableList<Differentiable>>()
+    private val standingsMap = HashMap<String, Standings>()
+    private val ranksMap = HashMap<String, MutableList<Differentiable>>()
 
     fun gofer(tournament: Tournament): TournamentGofer {
         return TournamentGofer(
@@ -84,10 +84,10 @@ class TournamentViewModel : TeamMappedViewModel<Tournament>() {
     }
 
     fun getStandings(tournament: Tournament): Standings =
-            standingsMap.getOrPut(tournament) { Standings.forTournament(tournament) }
+            standingsMap.getOrPut(tournament.id) { Standings.forTournament(tournament) }
 
     fun getStatRanks(tournament: Tournament): MutableList<Differentiable> =
-            ranksMap.getOrPut(tournament) { mutableListOf() }
+            ranksMap.getOrPut(tournament.id) { mutableListOf() }
 
     fun fetchStandings(tournament: Tournament): Completable = api.getStandings(tournament.id)
             .observeOn(mainThread()).map<Standings>(getStandings(tournament)::update).ignoreElement()

@@ -45,7 +45,10 @@ import com.tunjid.androidx.view.util.inflate
  * Adapter for [com.mainstreetcode.teammate.model.Event]
  */
 
-class EventAdapter(private val items: List<Differentiable>, listener: EventAdapterListener) : InteractiveAdapter<InteractiveViewHolder<*>, EventAdapter.EventAdapterListener>(listener) {
+class EventAdapter(
+        private val items: () -> List<Differentiable>,
+        listener: EventAdapterListener
+) : InteractiveAdapter<InteractiveViewHolder<*>, EventAdapter.EventAdapterListener>(listener) {
 
     init {
         setHasStableIds(true)
@@ -58,17 +61,17 @@ class EventAdapter(private val items: List<Differentiable>, listener: EventAdapt
     }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = items[position]) {
+        when (val item = items()[position]) {
             is Event -> (viewHolder as EventViewHolder).bind(item)
             is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items().size
 
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = items()[position].hashCode().toLong()
 
-    override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
+    override fun getItemViewType(position: Int): Int = when (val item = items()[position]) {
         is Event -> EVENT
         else -> (item as Ad<*>).type
     }

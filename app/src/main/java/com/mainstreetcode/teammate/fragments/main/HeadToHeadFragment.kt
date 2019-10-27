@@ -89,7 +89,7 @@ class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head)
 
         scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
-                .withAdapter(GameAdapter(matchUps, GameAdapter.AdapterListener.asSAM { game -> navigator.push(GameFragment.newInstance(game)) }))
+                .withAdapter(GameAdapter(::matchUps, GameAdapter.AdapterListener.asSAM { game -> navigator.push(GameFragment.newInstance(game)) }))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this@HeadToHeadFragment.fetchMatchUps() }
                 .withInconsistencyHandler(this@HeadToHeadFragment::onInconsistencyDetected)
                 .withLinearLayoutManager()

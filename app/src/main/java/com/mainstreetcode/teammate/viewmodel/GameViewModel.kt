@@ -55,7 +55,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
     val headToHeadMatchUps = mutableListOf<Differentiable>()
 
     private val api = TeammateService.getApiInstance()
-    private val gameRoundMap = HashMap<Tournament, MutableMap<Int, MutableList<Differentiable>>>()
+    private val gameRoundMap = HashMap<String, MutableMap<Int, MutableList<Differentiable>>>()
 
     private val gameRoundRepository = RepoProvider.forRepo(GameRoundRepo::class.java)
     private val gameRepository = RepoProvider.forRepo(GameRepo::class.java)
@@ -87,7 +87,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
 
     @SuppressLint("UseSparseArrays")
     fun getGamesForRound(tournament: Tournament, round: Int): MutableList<Differentiable> =
-            gameRoundMap.getOrPut(tournament) { mutableMapOf() }
+            gameRoundMap.getOrPut(tournament.id) { mutableMapOf() }
                     .getOrPut(round) { mutableListOf() }
 
     fun fetchGamesInRound(tournament: Tournament, round: Int): Flowable<DiffUtil.DiffResult> {
@@ -123,7 +123,7 @@ class GameViewModel : TeamMappedViewModel<Game>() {
 
     @SuppressLint("CheckResult")
     private fun onTournamentDeleted(tournament: Tournament) {
-        val tournamentMap = gameRoundMap.getOrPut(tournament) { mutableMapOf() }
+        val tournamentMap = gameRoundMap.getOrPut(tournament.id) { mutableMapOf() }
         (modelListMap.values + tournamentMap.values)
                 .distinct()
                 .filterIsInstance(Game::class.java)

@@ -35,7 +35,7 @@ import java.util.*
 
 abstract class TeamMappedViewModel<V> : MappedViewModel<Team, V>() where V : Differentiable, V : TeamHost {
 
-    internal val modelListMap: MutableMap<Team, MutableList<Differentiable>> = HashMap()
+    internal val modelListMap: MutableMap<String, MutableList<Differentiable>> = HashMap()
 
     internal val allModels: List<Differentiable>
         get() = modelListMap.values.flatten()
@@ -43,11 +43,11 @@ abstract class TeamMappedViewModel<V> : MappedViewModel<Team, V>() where V : Dif
     override fun onModelAlert(alert: Alert<*>) {
         super.onModelAlert(alert)
 
-        alert.matches(Alert.of(Alert.Deletion::class.java, Team::class.java) { modelListMap.remove(it) })
+        alert.matches(Alert.of(Alert.Deletion::class.java, Team::class.java) { modelListMap.remove(it.id) })
     }
 
     override fun getModelList(key: Team): MutableList<Differentiable> =
-            modelListMap.getOrPut(key) { mutableListOf() }
+            modelListMap.getOrPut(key.id) { mutableListOf() }
 
     override fun onErrorMessage(message: Message, key: Team, invalid: Differentiable) {
         super.onErrorMessage(message, key, invalid)

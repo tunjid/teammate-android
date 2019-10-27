@@ -34,7 +34,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
@@ -43,18 +42,20 @@ import androidx.transition.TransitionManager
 import androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING
 import com.google.android.material.chip.Chip
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.adapters.TeamChatAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentChatBinding
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.Deferrer
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.setMaterialOverlay
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.animator.ViewHider
 import io.reactivex.disposables.Disposable
@@ -62,13 +63,17 @@ import kotlin.math.abs
 
 class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         TextView.OnEditorActionListener,
+        TeamAdapter.AdapterListener,
         TeamChatAdapter.ChatAdapterListener {
 
     private var wasScrolling: Boolean = false
     private var unreadCount: Int = 0
 
-    private lateinit var team: Team
-    private lateinit var items: MutableList<Differentiable>
+    private var team by args<Team>()
+
+    private val items: MutableList<Differentiable>
+        get() = chatViewModel.getModelList(team)
+
     private lateinit var chatDisposable: Disposable
 
     private var deferrer: Deferrer? = null
@@ -78,21 +83,6 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
     private val isSubscribedToChat: Boolean get() = ::chatDisposable.isInitialized && !chatDisposable.isDisposed
 
     private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
-
-    override val stableTag: String
-        get() {
-            val superResult = super.stableTag
-            val team = arguments?.getParcelable<Team>(ARG_TEAM)
-
-            return if (team != null) superResult + "-" + team.hashCode()
-            else superResult
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = chatViewModel.getModelList(team)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentChatBinding.bind(view).run {
         super.onViewCreated(view, savedInstanceState)
@@ -112,7 +102,7 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         scrollManager = ScrollManager.with<TeamChatViewHolder>(view.findViewById(R.id.chat))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_message_black_24dp, R.string.no_chats))
                 .onLayoutManager { layoutManager -> (layoutManager as LinearLayoutManager).stackFromEnd = true }
-                .withAdapter(TeamChatAdapter(items, userViewModel.currentUser, this@ChatFragment))
+                .withAdapter(TeamChatAdapter(::items, userViewModel.currentUser, this@ChatFragment))
                 .withEndlessScroll { fetchChatsBefore(false) }
                 .withRefreshLayout(refreshLayout) { refreshLayout.isRefreshing = false }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
@@ -144,12 +134,19 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
 
     override fun onResume() {
         super.onResume()
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchChatsBefore(true)
+
         subscribeToChat()
-        fetchChatsBefore(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_chat_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_chat_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -160,6 +157,11 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         dateHider = null
         deferrer = null
     }
+
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, chatViewModel) {
+        bottomSheetDriver.hideBottomSheet()
+        updateUi(toolbarTitle = getString(R.string.team_chat_title, team.name))
+    }.subscribe(::onChatsUpdated, defaultErrorHandler::invoke)).let { Unit }
 
     override fun onChatClicked(chat: Chat) {
         if (!chat.isEmpty) return
@@ -282,8 +284,6 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
 
     companion object {
 
-        private const val ARG_TEAM = "team"
-
-        fun newInstance(team: Team): ChatFragment = ChatFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): ChatFragment = ChatFragment().apply { this.team = team }
     }
 }

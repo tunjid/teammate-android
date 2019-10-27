@@ -198,7 +198,8 @@ class AppNavigator(private val host: FragmentActivity) :
         R.id.action_events,
         R.id.action_messages,
         R.id.action_media,
-        R.id.action_tournaments -> TeamPickerFragment.pick(host, id.toRequestId).let { true }
+        R.id.action_tournaments,
+        R.id.action_games -> TeamPickerFragment.pick(host, id.toRequestId).let { true }
         else -> push(when (id) {
             R.id.action_find_teams -> TeamSearchFragment.newInstance()
             R.id.action_team -> TeamsFragment.newInstance()
@@ -277,7 +278,6 @@ val Int.toRequestId
 
 val Int.requestIdToNavIndex
     get() = when (this) {
-        R.id.request_game_team_pick -> R.id.action_games.toNavIndex
         R.id.request_chat_team_pick -> R.id.action_messages.toNavIndex
         R.id.request_event_team_pick -> R.id.action_events.toNavIndex
         R.id.request_media_team_pick -> R.id.action_media.toNavIndex

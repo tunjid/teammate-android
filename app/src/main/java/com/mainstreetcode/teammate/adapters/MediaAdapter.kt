@@ -51,7 +51,7 @@ import com.tunjid.androidx.view.util.inflate
  */
 
 class MediaAdapter(
-        private val mediaList: List<Differentiable>,
+        private val media: () -> List<Differentiable>,
         listener: MediaAdapterListener
 ) : InteractiveAdapter<InteractiveViewHolder<*>, MediaAdapter.MediaAdapterListener>(listener) {
 
@@ -67,20 +67,20 @@ class MediaAdapter(
             }
 
     override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = mediaList[position]) {
+        when (val item = media()[position]) {
             is Media -> (viewHolder as MediaViewHolder<*>).bind(item)
             is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
         }
     }
 
-    override fun getItemCount(): Int = mediaList.size
+    override fun getItemCount(): Int = media().size
 
     override fun getItemViewType(position: Int): Int {
-        val identifiable = mediaList[position]
+        val identifiable = media()[position]
         return if (identifiable is Media) if (identifiable.isImage) MEDIA_IMAGE else MEDIA_VIDEO else (identifiable as Ad<*>).type
     }
 
-    override fun getItemId(position: Int): Long = mediaList[position].hashCode().toLong()
+    override fun getItemId(position: Int): Long = media()[position].hashCode().toLong()
 
     interface MediaAdapterListener {
 
