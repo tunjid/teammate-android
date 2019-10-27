@@ -35,6 +35,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.activities.FEED_DEEP_LINK
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.BottomSheetDriver
 import com.mainstreetcode.teammate.baseclasses.TransientBarController
@@ -42,20 +43,30 @@ import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.fragments.main.ChatFragment
 import com.mainstreetcode.teammate.fragments.main.DeclinedCompetitionsFragment
+import com.mainstreetcode.teammate.fragments.main.EventEditFragment
 import com.mainstreetcode.teammate.fragments.main.EventSearchFragment
 import com.mainstreetcode.teammate.fragments.main.EventsFragment
 import com.mainstreetcode.teammate.fragments.main.FeedFragment
+import com.mainstreetcode.teammate.fragments.main.GameFragment
 import com.mainstreetcode.teammate.fragments.main.HeadToHeadFragment
 import com.mainstreetcode.teammate.fragments.main.MediaFragment
 import com.mainstreetcode.teammate.fragments.main.MyEventsFragment
 import com.mainstreetcode.teammate.fragments.main.SettingsFragment
 import com.mainstreetcode.teammate.fragments.main.StatAggregateFragment
+import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
 import com.mainstreetcode.teammate.fragments.main.TeamSearchFragment
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment
+import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment
 import com.mainstreetcode.teammate.fragments.main.TournamentsFragment
 import com.mainstreetcode.teammate.fragments.main.UserEditFragment
 import com.mainstreetcode.teammate.fragments.registration.ResetPasswordFragment
 import com.mainstreetcode.teammate.fragments.registration.SplashFragment
+import com.mainstreetcode.teammate.model.Chat
+import com.mainstreetcode.teammate.model.Event
+import com.mainstreetcode.teammate.model.Game
+import com.mainstreetcode.teammate.model.JoinRequest
+import com.mainstreetcode.teammate.model.Model
+import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
@@ -182,6 +193,15 @@ class AppNavigator(private val host: FragmentActivity) :
         R.id.action_tournaments -> TournamentsFragment.newInstance(teamViewModel.defaultTeam).run { this to stableTag }
         else -> FeedFragment.newInstance().run { this to stableTag }
     }
+
+    fun route(intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
+        is Game -> GameFragment.newInstance(model)
+        is Chat -> ChatFragment.newInstance(model.team)
+        is Event -> EventEditFragment.newInstance(model)
+        is Tournament -> TournamentDetailFragment.newInstance(model)
+        is JoinRequest -> TeamMembersFragment.newInstance(model.team)
+        else -> null
+    }?.let(::push)
 }
 
 private val bottomNavItems = intArrayOf(

@@ -49,19 +49,7 @@ import com.mainstreetcode.teammate.baseclasses.TransientBarController
 import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
 import com.mainstreetcode.teammate.baseclasses.globalUiDriver
-import com.mainstreetcode.teammate.fragments.main.ChatFragment
-import com.mainstreetcode.teammate.fragments.main.EventEditFragment
-import com.mainstreetcode.teammate.fragments.main.FeedFragment
-import com.mainstreetcode.teammate.fragments.main.GameFragment
-import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
-import com.mainstreetcode.teammate.fragments.main.TournamentDetailFragment
-import com.mainstreetcode.teammate.model.Chat
-import com.mainstreetcode.teammate.model.Event
-import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.JoinRequest
-import com.mainstreetcode.teammate.model.Model
-import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.navigation.AppNavigator
 import com.mainstreetcode.teammate.util.ErrorHandler
@@ -123,12 +111,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         App.prime()
 
         if (!userViewModel.isSignedIn) navigator.signOut(intent)
-        else route(savedInstanceState, intent)
+        else navigator.route(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        route(null, intent)
+        navigator.route(intent)
     }
 
     override fun onResume() {
@@ -161,15 +149,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         toolbar.navigationIcon = updated
         if (current != null) updated.startTransition(HIDER_DURATION)
     }
-
-    private fun route(savedInstanceState: Bundle?, intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
-        is Game -> GameFragment.newInstance(model)
-        is Chat -> ChatFragment.newInstance(model.team)
-        is Event -> EventEditFragment.newInstance(model)
-        is Tournament -> TournamentDetailFragment.newInstance(model)
-        is JoinRequest -> TeamMembersFragment.newInstance(model.team)
-        else -> if (savedInstanceState == null) FeedFragment.newInstance() else null
-    }?.let(navigator::push)
 
     private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
             stackNavigatorSource = this.navigator::activeNavigator,
