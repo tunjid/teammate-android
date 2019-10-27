@@ -101,8 +101,8 @@ android {
 }
 
 dependencies {
-    kapt "androidx.lifecycle:lifecycle-compiler:2.1.0"
-    kapt "androidx.room:room-compiler:2.2.0"
+    kapt "androidx.lifecycle:lifecycle-common-java8:2.1.0"
+    kapt "androidx.room:room-compiler:2.2.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -123,6 +123,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
+    implementation 'androidx.lifecycle:lifecycle-reactivestreams:2.1.0'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.firebase:firebase-messaging:20.0.0'

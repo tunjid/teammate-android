@@ -25,19 +25,26 @@
 package com.mainstreetcode.teammate.navigation
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.TransitionDrawable
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.observe
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.FEED_DEEP_LINK
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.BottomSheetDriver
+import com.mainstreetcode.teammate.baseclasses.HIDER_DURATION
 import com.mainstreetcode.teammate.baseclasses.TransientBarController
 import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
@@ -67,26 +74,38 @@ import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.model.Tournament
+import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
+import com.tunjid.androidx.core.content.drawableAt
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
 import com.tunjid.androidx.savedstate.savedStateFor
+import io.reactivex.Flowable
 
 class AppNavigator(private val host: FragmentActivity) :
         Navigator,
         BottomSheetController,
         TransientBarController {
 
+    private var showingBack = false
+
     private val userViewModel by host.viewModels<UserViewModel>()
 
     private val teamViewModel by host.viewModels<TeamViewModel>()
 
+    private val navIcon = TransitionDrawable(arrayOf(
+            host.drawableAt(R.drawable.ic_supervisor_white_24dp)!!,
+            host.drawableAt(R.drawable.ic_arrow_back_24dp)!!
+    )).apply { setId(0, 0); setId(1, 1); isCrossFadeEnabled = true }
+
     private val bottomNav: BottomNav
+
+    private val toolbar: Toolbar = host.findViewById(R.id.toolbar)
 
     private val delegate: MultiStackNavigator by host.multiStackNavigationController(TAB_COUNT, R.id.main_fragment_container, this::route)
 
@@ -95,6 +114,10 @@ class AppNavigator(private val host: FragmentActivity) :
     val activeNavigator get() = delegate.activeNavigator
 
     init {
+        toolbar.navigationIcon = navIcon
+        toolbar.setNavigationContentDescription(R.string.expand_nav)
+        toolbar.setNavigationOnClickListener { if (activeNavigator.previous == null) showNavOverflow() else pop() }
+
         bottomNav = BottomNav.builder().setContainer(host.findViewById<LinearLayout>(R.id.bottom_navigation)
                 .apply { doOnLayout { bottomNavHeight = height } })
                 .setSwipeRunnable(this::showNavOverflow)
@@ -106,6 +129,12 @@ class AppNavigator(private val host: FragmentActivity) :
                         NavItem.create(R.id.action_tournaments, R.string.tourneys, R.drawable.ic_trophy_white_24dp))
                 .createBottomNav()
 
+        host.supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                if (isInCurrentFragmentContainer(f)) updateToolbarNavIcon()
+            }
+        }, true)
+
         delegate.stackSelectedListener = { bottomNav.highlight(it.toNavId) }
         delegate.stackTransactionModifier = { crossFade() }
         delegate.transactionModifier = { incomingFragment ->
@@ -113,6 +142,12 @@ class AppNavigator(private val host: FragmentActivity) :
             if (current is Navigator.TransactionModifier) current.augmentTransaction(this, incomingFragment)
             else crossFade()
         }
+
+        teamViewModel.teamChangeFlowable.flatMapMaybe { team ->
+            fetchRoundedDrawable(host,
+                    team.imageUrl,
+                    host.resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
+        }.toLiveData().observe(host, this::onTeamBadgeChanged)
     }
 
     override val transientBarDriver: TransientBarDriver by lazy {
@@ -152,7 +187,10 @@ class AppNavigator(private val host: FragmentActivity) :
 
     fun signOut() = delegate.clearAll()
 
-    fun showNavOverflow() = NavDialogFragment.newInstance().show(host.supportFragmentManager, "")
+    private fun isInCurrentFragmentContainer(fragment: Fragment): Boolean =
+            activeNavigator.containerId == fragment.id
+
+    private fun showNavOverflow() = NavDialogFragment.newInstance().show(host.supportFragmentManager, "")
 
     fun onNavItemSelected(@IdRes id: Int): Boolean = when (id) {
         R.id.action_expand_home_nav -> showNavOverflow().let { true }
@@ -175,6 +213,15 @@ class AppNavigator(private val host: FragmentActivity) :
         }).let { true }
     }
 
+    fun checkDeepLink(intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
+        is Game -> GameFragment.newInstance(model)
+        is Chat -> ChatFragment.newInstance(model.team)
+        is Event -> EventEditFragment.newInstance(model)
+        is Tournament -> TournamentDetailFragment.newInstance(model)
+        is JoinRequest -> TeamMembersFragment.newInstance(model.team)
+        else -> null
+    }?.let(::push)
+
     private fun route(it: Int): Pair<Fragment, String> = when (it.toNavId) {
         R.id.action_home -> when (userViewModel.isSignedIn) {
             true -> FeedFragment.newInstance()
@@ -190,14 +237,21 @@ class AppNavigator(private val host: FragmentActivity) :
         else -> FeedFragment.newInstance()
     }.run { this to stableTag }
 
-    fun checkDeepLink(intent: Intent) = when (val model: Model<*>? = intent.getParcelableExtra(FEED_DEEP_LINK)) {
-        is Game -> GameFragment.newInstance(model)
-        is Chat -> ChatFragment.newInstance(model.team)
-        is Event -> EventEditFragment.newInstance(model)
-        is Tournament -> TournamentDetailFragment.newInstance(model)
-        is JoinRequest -> TeamMembersFragment.newInstance(model.team)
-        else -> null
-    }?.let(::push)
+    private fun onTeamBadgeChanged(drawable: Drawable) {
+        navIcon.setDrawableByLayerId(0, drawable)
+        updateToolbarNavIcon()
+    }
+
+    private fun updateToolbarNavIcon() {
+        val willShowBack = activeNavigator.previous != null
+
+        if (willShowBack != showingBack) {
+            if (willShowBack) navIcon.startTransition(HIDER_DURATION)
+            else navIcon.reverseTransition(HIDER_DURATION)
+        }
+
+        showingBack = willShowBack
+    }
 }
 
 private val bottomNavItems = intArrayOf(
@@ -258,3 +312,5 @@ private fun FragmentTransaction.crossFade() = setCustomAnimations(
         android.R.anim.fade_in,
         android.R.anim.fade_out
 )
+
+private fun <T> Flowable<T>.toLiveData() = LiveDataReactiveStreams.fromPublisher(this)

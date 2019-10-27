@@ -25,16 +25,12 @@
 package com.mainstreetcode.teammate.activities
 
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.TransitionDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.addCallback
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
@@ -44,7 +40,6 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.BottomSheetDriver
 import com.mainstreetcode.teammate.baseclasses.GlobalUiController
-import com.mainstreetcode.teammate.baseclasses.HIDER_DURATION
 import com.mainstreetcode.teammate.baseclasses.TransientBarController
 import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
@@ -52,14 +47,9 @@ import com.mainstreetcode.teammate.baseclasses.globalUiDriver
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.navigation.AppNavigator
-import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.isInDarkMode
 import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
-import com.mainstreetcode.teammate.viewmodel.TeamViewModel
-import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidx.navigation.Navigator
-import io.reactivex.disposables.CompositeDisposable
 
 class MainActivity : AppCompatActivity(R.layout.activity_main),
         GlobalUiController,
@@ -69,14 +59,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     lateinit var inputRecycledPool: RecyclerView.RecycledViewPool
         private set
-
-    private lateinit var toolbar: Toolbar
-
-    private val disposables: CompositeDisposable = CompositeDisposable()
-
-    private val userViewModel by viewModels<UserViewModel>()
-
-    private val teamViewModel by viewModels<TeamViewModel>()
 
     override var uiState: UiState by globalUiDriver { navigator.current }
 
@@ -100,11 +82,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
 
-        toolbar = findViewById(R.id.toolbar)
-        toolbar.setNavigationContentDescription(R.string.expand_nav)
-        toolbar.setNavigationIcon(R.drawable.ic_supervisor_white_24dp)
-        toolbar.setNavigationOnClickListener { navigator.showNavOverflow() }
-
         onBackPressedDispatcher.addCallback(this) { navigator.pop() }
         onBackPressedDispatcher.addCallback(this, bottomSheetDriver)
 
@@ -118,35 +95,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         navigator.checkDeepLink(intent)
     }
 
-    override fun onResume() {
-        super.onResume()
-        disposables.add(teamViewModel.teamChangeFlowable.flatMapMaybe { team ->
-            fetchRoundedDrawable(this,
-                    team.imageUrl,
-                    resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
-        }.subscribe(this::updateToolbarIcon, ErrorHandler.EMPTY::invoke))
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean = navigator.onNavItemSelected(item.itemId)
-
-    override fun onStop() {
-        disposables.clear()
-        super.onStop()
-    }
 
     private fun adjustKeyboardPadding(suggestion: Int): Int {
         var padding = suggestion
         if (padding != WindowInsetsDriver.bottomInset && uiState.bottomNavShows) padding -= navigator.bottomNavHeight
         return padding
-    }
-
-    private fun updateToolbarIcon(drawable: Drawable) {
-        val current = toolbar.navigationIcon
-        val updated = TransitionDrawable(if (current == null) arrayOf(drawable)
-        else arrayOf(current.current, drawable))
-
-        toolbar.navigationIcon = updated
-        if (current != null) updated.startTransition(HIDER_DURATION)
     }
 
     private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
