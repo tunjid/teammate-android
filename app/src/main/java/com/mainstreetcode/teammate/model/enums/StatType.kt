@@ -24,6 +24,7 @@
 
 package com.mainstreetcode.teammate.model.enums
 
+import android.text.SpannableStringBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
@@ -31,7 +32,6 @@ import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.deserializeList
 import com.mainstreetcode.teammate.util.processEmoji
 import com.tunjid.androidx.functions.collections.replace
-import com.tunjid.androidx.core.text.SpanBuilder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.*
 
@@ -48,7 +48,7 @@ class StatType private constructor(
         get() = field.processEmoji()
 
     val emojiAndName: CharSequence
-        get() = SpanBuilder.of(emoji).append("   ").append(name).build()
+        get() = SpannableStringBuilder(emoji).append("   ").append(name)
 
     fun fromCode(code: String): StatAttribute {
         for (attr in attributes) if (attr.code == code) return attr

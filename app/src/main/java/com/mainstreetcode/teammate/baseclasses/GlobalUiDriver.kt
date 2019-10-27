@@ -52,6 +52,7 @@ import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.FabInteractor
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
 import com.mainstreetcode.teammate.util.resolveThemeColor
+import com.tunjid.androidx.core.content.drawableAt
 import com.tunjid.androidx.material.animator.FabExtensionAnimator
 import com.tunjid.androidx.view.animator.ViewHider
 import kotlin.properties.ReadWriteProperty
@@ -204,7 +205,7 @@ class GlobalUiDriver(
                     hasLightNavBarConsumer = this::toggleLightNavBar,
                     navBarColorConsumer = this::setNavBarColor,
                     fabStateConsumer = this::setFabState,
-                    fabExtendedConsumer = fabExtensionAnimator::setExtended,
+                    fabExtendedConsumer = fabExtensionAnimator::isExtended::set,
                     toolbarStateConsumer = this::updateMainToolBar,
                     altToolbarStateConsumer = this::updateAltToolBar,
                     fabClickListenerConsumer = this::setFabClickListener
@@ -254,9 +255,8 @@ class GlobalUiDriver(
 
     private fun setFabState(@DrawableRes icon: Int, @StringRes title: Int) = host.runOnUiThread {
         val titleSequence = if (title == 0) "" else host.getString(title)
-        if (icon != 0 && titleSequence.isNotBlank()) fabExtensionAnimator.updateGlyphs(FabExtensionAnimator.newState(
-                titleSequence,
-                ContextCompat.getDrawable(host, icon)))
+        if (icon != 0 && titleSequence.isNotBlank())
+            fabExtensionAnimator.updateGlyphs(FabExtensionAnimator.SimpleGlyphState(titleSequence, host.drawableAt(icon)!!))
     }
 
     private fun setFabClickListener(onClickListener: View.OnClickListener?) =

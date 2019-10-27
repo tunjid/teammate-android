@@ -28,11 +28,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-import android.text.TextPaint
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -46,7 +42,8 @@ import com.mainstreetcode.teammate.util.hasValidEmail
 import com.mainstreetcode.teammate.util.hasValidName
 import com.mainstreetcode.teammate.util.hasValidPassword
 import com.mainstreetcode.teammate.util.input
-import com.tunjid.androidx.core.text.SpanBuilder
+import com.tunjid.androidx.core.text.click
+import com.tunjid.androidx.core.text.formatSpanned
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
@@ -57,9 +54,10 @@ class SignUpFragment : TeammatesBaseFragment(R.layout.fragment_sign_up), TextVie
     private var binding: FragmentSignUpBinding? = null
 
     private val termsCharSequence: CharSequence
-        get() = SpanBuilder.format(getString(R.string.sign_up_terms_phrase),
-                clickableSpan(getString(R.string.sign_up_terms)) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "terms"))) },
-                clickableSpan(getString(R.string.sign_up_privacy_policy)) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "privacy"))) })
+        get() = getString(R.string.sign_up_terms_phrase).formatSpanned(
+                getString(R.string.sign_up_terms).termsSpan { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "terms"))) },
+                getString(R.string.sign_up_privacy_policy).termsSpan { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "privacy"))) }
+        )
 
     override val showsFab: Boolean = true
 
@@ -138,20 +136,13 @@ class SignUpFragment : TeammatesBaseFragment(R.layout.fragment_sign_up), TextVie
         navigator.completeSignIn()
     }
 
-    private fun clickableSpan(text: CharSequence, clickAction: () -> Unit): CharSequence {
-        val spannableString = SpannableString(text)
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) = clickAction.invoke()
-
-            override fun updateDrawState(ds: TextPaint) {
-                ds.color = Color.WHITE
-                ds.isUnderlineText = true
-            }
-        }
-
-        spannableString.setSpan(clickableSpan, 0, spannableString.length, SPAN_EXCLUSIVE_EXCLUSIVE)
-        return spannableString
-    }
+    private fun CharSequence.termsSpan(clickAction: () -> Unit): CharSequence = click(
+                paintConsumer = {
+                    it.color = Color.WHITE
+                    it.isUnderlineText = true
+                },
+                clickAction = clickAction
+        )
 
     companion object {
 

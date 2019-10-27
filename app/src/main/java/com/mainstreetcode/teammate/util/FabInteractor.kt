@@ -26,16 +26,13 @@ package com.mainstreetcode.teammate.util
 
 import android.graphics.drawable.Drawable
 import android.view.View
-
-import com.google.android.material.button.MaterialButton
-import com.tunjid.androidx.material.animator.FabExtensionAnimator
-
-import java.util.Objects
-import java.util.concurrent.atomic.AtomicBoolean
-
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
+import com.tunjid.androidx.core.content.drawableAt
+import com.tunjid.androidx.material.animator.FabExtensionAnimator
+import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 class FabInteractor(private val button: MaterialButton) : FabExtensionAnimator(button) {
 
@@ -43,7 +40,7 @@ class FabInteractor(private val button: MaterialButton) : FabExtensionAnimator(b
             updateGlyphs(State(button, icon, text))
 
     fun setOnClickListener(clickListener: View.OnClickListener?) {
-        if (clickListener == null) return  button.setOnClickListener(null)
+        if (clickListener == null) return button.setOnClickListener(null)
 
         val flag = AtomicBoolean(true)
 
@@ -58,17 +55,17 @@ class FabInteractor(private val button: MaterialButton) : FabExtensionAnimator(b
     private inner class State internal constructor(
             button: MaterialButton,
             @param:DrawableRes @field:DrawableRes
-            private val icon: Int,
+            private val iconRes: Int,
             @param:StringRes @field:StringRes
-            private val text: Int
+            private val textRes: Int
     ) : FabExtensionAnimator.GlyphState() {
 
-        private val charSequence: CharSequence = button.resources.getText(text)
-        private val drawable: Drawable? = ContextCompat.getDrawable(button.context, icon)
+        private val charSequence: CharSequence = button.resources.getText(textRes)
+        private val drawable: Drawable? = button.context.drawableAt(iconRes)
 
-        override fun getIcon(): Drawable? = drawable
+        override val icon: Drawable = drawable!!
 
-        override fun getText(): CharSequence = charSequence
+        override val text: CharSequence = charSequence
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

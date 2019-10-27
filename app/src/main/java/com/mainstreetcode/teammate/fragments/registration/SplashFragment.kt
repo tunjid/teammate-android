@@ -26,6 +26,7 @@ package com.mainstreetcode.teammate.fragments.registration
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -38,7 +39,10 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.baseclasses.setSimpleSharedTransitions
 import com.mainstreetcode.teammate.databinding.FragmentSplashBinding
-import com.tunjid.androidx.core.text.SpanBuilder
+import com.tunjid.androidx.core.content.colorAt
+import com.tunjid.androidx.core.text.appendNewLine
+import com.tunjid.androidx.core.text.color
+import com.tunjid.androidx.core.text.underline
 import com.tunjid.androidx.view.util.InsetFlags
 
 /**
@@ -84,13 +88,9 @@ class SplashFragment : TeammatesBaseFragment(R.layout.fragment_splash), View.OnC
         FragmentSplashBinding.bind(view).apply {
             login.apply {
                 setOnClickListener(this@SplashFragment)
-                text = SpanBuilder.of(getString(R.string.login_have_account))
+                text = SpannableStringBuilder(getString(R.string.login_have_account))
                         .appendNewLine()
-                        .append(SpanBuilder.of(getString(R.string.login_sign_in))
-                                .color(context, R.color.white)
-                                .underline()
-                                .build())
-                        .build()
+                        .append(getString(R.string.login_sign_in).color(context.colorAt(R.color.white)).underline())
             }
 
             facebookLogin.apply { setOnClickListener(this@SplashFragment) }

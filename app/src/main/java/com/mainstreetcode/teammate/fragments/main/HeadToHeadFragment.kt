@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.annotation.StringRes
 import com.mainstreetcode.teammate.R
@@ -44,7 +45,9 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.core.text.SpanBuilder
+import com.tunjid.androidx.core.text.appendNewLine
+import com.tunjid.androidx.core.text.bold
+import com.tunjid.androidx.core.text.scale
 import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
@@ -167,13 +170,10 @@ class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head)
     }
 
     private fun getText(@StringRes stringRes: Int, count: Int): CharSequence =
-            SpanBuilder.of(count.toString())
-                    .resize(1.4f)
-                    .bold()
-                    .append(SpanBuilder.of(getString(stringRes))
-                            .prependNewLine()
-                            .build())
-                    .build()
+            SpannableStringBuilder()
+                    .append(count.toString().scale(1.4f).bold())
+                    .appendNewLine()
+                    .append(getString(stringRes))
 
     companion object {
 

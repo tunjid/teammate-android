@@ -26,6 +26,7 @@ package com.mainstreetcode.teammate.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import android.text.SpannableStringBuilder
 import androidx.room.Ignore
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -42,7 +43,7 @@ import com.mainstreetcode.teammate.util.IdCache
 import com.mainstreetcode.teammate.util.asStringOrEmpty
 import com.mainstreetcode.teammate.util.noOp
 import com.mainstreetcode.teammate.util.parseISO8601Date
-import com.tunjid.androidx.core.text.SpanBuilder
+import com.tunjid.androidx.core.text.appendNewLine
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
@@ -77,9 +78,8 @@ class Role : RoleEntity,
         }
 
     val title: CharSequence
-        get() = if (nickname.isNotBlank()) SpanBuilder.of(user.firstName)
-                .appendNewLine().append("\"" + nickname + "\"")
-                .build() else user.firstName
+        get() = if (nickname.isNotBlank()) SpannableStringBuilder(user.firstName)
+                .appendNewLine().append("\"" + nickname + "\"") else user.firstName
 
     override val isEmpty: Boolean
         get() = id.isBlank()
