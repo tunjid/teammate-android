@@ -67,6 +67,7 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
 
         if (args != null) token.setText(args.getCharSequence(ARG_TOKEN, ""))
         email.setOnEditorActionListener(this@ResetPasswordFragment)
+        backToSplash.setOnClickListener(this@ResetPasswordFragment)
 
         email.transitionName = SplashFragment.TRANSITION_TITLE
         cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
@@ -79,6 +80,7 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
 
     override fun onClick(view: View) = when (view.id) {
         R.id.fab -> resetPassword()
+        R.id.back_to_splash -> navigator.push(SplashFragment.newInstance()).let { Unit }
         else -> Unit
     }
 
