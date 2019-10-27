@@ -78,13 +78,15 @@ class TeamPickerFragment : TeammatesBaseFragment(), TeamAdapter.AdapterListener 
         else showPicker()
     }
 
-    private fun showPicker() = bottomSheetDriver.showBottomSheet {
-        this.menuRes =
-                if (requestCode != R.id.request_event_team_pick || teamViewModel.isOnATeam) R.menu.empty
-                else R.menu.fragment_events_team_pick
-        this.title = getString(R.string.pick_team)
-        this.fragment = TeamsFragment.newInstance().apply { setTargetFragment(this@TeamPickerFragment, requestCode) }
-    }
+    private fun showPicker() = bottomSheetDriver.showBottomSheet(
+            requestCode = requestCode,
+            menuRes =
+            if (requestCode != R.id.request_event_team_pick || teamViewModel.isOnATeam) R.menu.empty
+            else R.menu.fragment_events_team_pick,
+            title = getString(R.string.pick_team),
+            target = this,
+            fragment = TeamsFragment.newInstance()
+    )
 
     companion object {
 

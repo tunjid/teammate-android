@@ -101,7 +101,7 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
-                toolbarTitle =  gofer.getToolbarTitle(this),
+                toolbarTitle = gofer.getToolbarTitle(this),
                 toolBarMenu = R.menu.fragment_event_edit,
                 fabShows = showsFab,
                 fabIcon = R.drawable.ic_check_white_24dp,
@@ -240,14 +240,11 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
                 .show()
     }
 
-    private fun chooseTeam() = bottomSheetDriver.showBottomSheet {
-        val teamsFragment = TeamsFragment.newInstance()
-        teamsFragment.setTargetFragment(this@EventEditFragment, R.id.request_event_edit_pick)
-
-        menuRes = R.menu.empty
-        title = getString(R.string.pick_team)
-        fragment = teamsFragment
-    }
+    private fun chooseTeam() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_event_edit_pick,
+            title = getString(R.string.pick_team),
+            fragment = TeamsFragment.newInstance()
+    )
 
     private fun setSpanSizeLookUp(layoutManager: RecyclerView.LayoutManager) {
         (layoutManager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {

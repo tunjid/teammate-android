@@ -129,11 +129,10 @@ class StatAggregateFragment : TeammatesBaseFragment(),
         hideKeyboard()
     }
 
-    private fun pick(caller: TeammatesBaseFragment) = bottomSheetDriver.showBottomSheet {
-        caller.setTargetFragment(this@StatAggregateFragment, R.id.request_competitor_pick)
-        menuRes = R.menu.empty
-        fragment = caller
-    }
+    private fun pick(caller: TeammatesBaseFragment) = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_competitor_pick,
+            fragment = caller
+    )
 
     companion object {
 

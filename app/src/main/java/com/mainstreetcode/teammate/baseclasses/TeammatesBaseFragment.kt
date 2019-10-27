@@ -265,13 +265,10 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
         else -> null
     }?.let { navigator.push(it) }.run { Unit }
 
-    protected fun pickPlace() = bottomSheetDriver.showBottomSheet {
-        val picker = AddressPickerFragment.newInstance()
-        picker.setTargetFragment(this@TeammatesBaseFragment, R.id.request_place_pick)
-
-        menuRes = R.menu.empty
-        fragment = picker
-    }
+    protected fun pickPlace() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_place_pick,
+            fragment = AddressPickerFragment.newInstance()
+    )
 
     protected fun watchForRoleChanges(team: Team, onChanged: () -> Unit) {
         if (team.isEmpty) return

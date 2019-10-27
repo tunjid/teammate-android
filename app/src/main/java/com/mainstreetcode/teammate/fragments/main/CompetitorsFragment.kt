@@ -135,17 +135,15 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
         else -> Unit
     }
 
-    private fun findCompetitor() = bottomSheetDriver.showBottomSheet {
-        val isBetweenUsers = User.COMPETITOR_TYPE == tournament.refPath
-
-        menuRes = R.menu.empty
-        if (isBetweenUsers) title = getString(R.string.add_competitor)
-
-        if (isBetweenUsers) fragment = TeamMembersFragment.newInstance(tournament.host)
-        else if (Team.COMPETITOR_TYPE == tournament.refPath) fragment = TeamSearchFragment.newInstance(tournament.sport)
-
-        fragment?.setTargetFragment(this@CompetitorsFragment, R.id.request_competitor_pick)
-    }
+    private fun findCompetitor() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_competitor_pick,
+            title = getString(R.string.add_competitor),
+            fragment = when {
+                User.COMPETITOR_TYPE == tournament.refPath -> TeamMembersFragment.newInstance(tournament.host)
+                Team.COMPETITOR_TYPE == tournament.refPath -> TeamSearchFragment.newInstance(tournament.sport)
+                else -> null
+            }
+    )
 
     private fun addCompetitor(item: Competitive) {
         if (tournament.refPath != item.refType) return

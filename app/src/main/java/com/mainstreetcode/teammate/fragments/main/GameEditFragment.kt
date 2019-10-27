@@ -154,17 +154,15 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
         hideKeyboard()
     }
 
-    private fun pickAwaySide() = bottomSheetDriver.showBottomSheet {
-        val refPath = headeredModel.refPath
-        val isBetweenUsers = User.COMPETITOR_TYPE == refPath
-
-        menuRes = R.menu.empty
-
-        if (isBetweenUsers) fragment = UserSearchFragment.newInstance()
-        else if (Team.COMPETITOR_TYPE == refPath) fragment = TeamSearchFragment.newInstance(headeredModel.sport)
-
-        fragment?.setTargetFragment(this@GameEditFragment, R.id.request_competitor_pick)
-    }
+    private fun pickAwaySide() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_competitor_pick,
+            title = getString(R.string.add_competitor),
+            fragment = when {
+                User.COMPETITOR_TYPE == headeredModel.refPath -> UserSearchFragment.newInstance()
+                Team.COMPETITOR_TYPE == headeredModel.refPath -> TeamSearchFragment.newInstance(headeredModel.sport)
+                else -> null
+            }
+    )
 
     companion object {
 

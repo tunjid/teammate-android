@@ -156,18 +156,16 @@ class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head)
         hideKeyboard()
     }
 
-    private fun findCompetitor() = bottomSheetDriver.showBottomSheet {
-        if (request.hasInvalidType()) return@showBottomSheet transientBarDriver.showSnackBar(getString(R.string.game_select_tournament_type))
-
-        val refPath = request.refPath
-        val isBetweenUsers = User.COMPETITOR_TYPE == refPath
-
-
-        if (isBetweenUsers) fragment = UserSearchFragment.newInstance()
-        else if (Team.COMPETITOR_TYPE == refPath) fragment = TeamSearchFragment.newInstance(request.sport)
-
-        fragment?.setTargetFragment(this@HeadToHeadFragment, R.id.request_competitor_pick)
-    }
+    private fun findCompetitor() =
+            if (request.hasInvalidType()) transientBarDriver.showSnackBar(getString(R.string.game_select_tournament_type))
+            else bottomSheetDriver.showBottomSheet(
+                    requestCode = R.id.request_competitor_pick,
+                    fragment = when {
+                        User.COMPETITOR_TYPE == request.refPath -> UserSearchFragment.newInstance()
+                        Team.COMPETITOR_TYPE == request.refPath -> TeamSearchFragment.newInstance(request.sport)
+                        else -> null
+                    }
+            )
 
     private fun getText(@StringRes stringRes: Int, count: Int): CharSequence =
             SpannableStringBuilder()

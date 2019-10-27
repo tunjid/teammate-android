@@ -220,10 +220,10 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
         val hasReferee = !referee.isEmpty
 
         if (hasReferee) navigator.push(UserEditFragment.newInstance(referee))
-        else if (privilegeStatus.get()) bottomSheetDriver.showBottomSheet {
-            menuRes = R.menu.empty
-            fragment = UserSearchFragment.newInstance().apply { setTargetFragment(this@GameFragment, R.id.request_user_pick) }
-        }
+        else if (privilegeStatus.get()) bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_user_pick,
+                fragment = UserSearchFragment.newInstance()
+        )
     }
 
     private fun endGameRequest() {

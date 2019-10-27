@@ -169,14 +169,11 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
         activity?.onBackPressed()
     }
 
-    private fun pickStatUser() = bottomSheetDriver.showBottomSheet {
-        val caller = TeamMembersFragment.newInstance(headeredModel.team)
-        caller.setTargetFragment(this@StatEditFragment, R.id.request_stat_edit_pick)
-
-        menuRes = R.menu.empty
-        title = getString(R.string.pick_user)
-        fragment = caller
-    }
+    private fun pickStatUser() = bottomSheetDriver.showBottomSheet(
+            requestCode = R.id.request_stat_edit_pick,
+            title = getString(R.string.pick_user),
+            fragment = TeamMembersFragment.newInstance(headeredModel.team)
+    )
 
     private fun switchStatTeam() {
         disposables.add(gofer.switchTeams().subscribe(this::onModelUpdated, defaultErrorHandler::invoke))

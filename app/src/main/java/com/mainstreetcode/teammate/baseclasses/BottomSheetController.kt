@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.baseclasses
 
 
+import android.location.Address
 import android.os.Parcel
 import android.os.Parcelable
 import android.transition.Fade
@@ -35,10 +36,19 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.commitNow
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment
 import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment
+import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.User
+import com.mainstreetcode.teammate.navigation.AppNavigator
 import com.tunjid.androidx.navigation.Navigator
+import com.tunjid.androidx.navigation.activityNavigatorController
 import com.tunjid.androidx.savedstate.LifecycleSavedStateContainer
 
 interface BottomSheetController {
@@ -81,6 +91,9 @@ class BottomSheetDriver(
 
         bottomToolbarState = stateContainer.savedState.getParcelable(BOTTOM_TOOLBAR_STATE)
         refreshBottomToolbar()
+
+        if (current == null) hideBottomSheet()
+        else adjustTopPadding()
     }
 
     override fun handleOnBackPressed() = hideBottomSheet()
@@ -92,23 +105,37 @@ class BottomSheetDriver(
         } else isEnabled = false
     }
 
-    fun showBottomSheet(block: Args.() -> Unit) {
-        val args = Args().apply(block)
+    /**
+     * Shows the supplied fragment in a bottom sheet on the Activity's level
+     *
+     * @param requestCode code passed to the [fragment] shown with [Fragment.setTargetFragment]
+     * @param menuRes the menu inflated into the toolbar of this bottom sheet
+     * @param title the title shown in the toolbar of this bottom sheet
+     * @param target The target fragment for the [fragment] shown. It MUST be in the
+     * [FragmentManager] of the [host] activity for this [BottomSheetDriver]!
+     * @param fragment the fragment shown in the bottom sheet
+     */
+    fun showBottomSheet(
+            requestCode: Int,
+            menuRes: Int = R.menu.empty,
+            title: String = "",
+            target: Fragment? = null,
+            fragment: TeammatesBaseFragment? = null) {
 
-        val toShow = args.fragment ?: return
-        toShow.enterTransition = bottomSheetTransition
-        toShow.exitTransition = bottomSheetTransition
+        fragment ?: return
+        fragment.exitTransition = bottomSheetTransition
+        fragment.enterTransition = bottomSheetTransition
+        fragment.setTargetFragment(target ?: RelayFragment.getInstance(host), requestCode)
 
         isEnabled = true
         transientBarDriver.clearTransientBars()
 
-        val topPadding = WindowInsetsDriver.topInset + host.resources.getDimensionPixelSize(R.dimen.single_margin)
-        bottomSheetContainer.setPadding(0, topPadding, 0, 0)
+        adjustTopPadding()
 
         host.supportFragmentManager.beginTransaction()
-                .replace(R.id.bottom_sheet_view, toShow, toShow.stableTag)
+                .replace(R.id.bottom_sheet_view, fragment, fragment.stableTag)
                 .runOnCommit {
-                    bottomToolbarState = args.toolbarState
+                    bottomToolbarState = ToolbarState(menuRes, title)
                     stateContainer.savedState.putParcelable(BOTTOM_TOOLBAR_STATE, bottomToolbarState)
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                     refreshBottomToolbar()
@@ -119,6 +146,11 @@ class BottomSheetDriver(
         bottomSheetToolbar.menu.clear()
         bottomSheetToolbar.inflateMenu(menuRes)
         bottomSheetToolbar.title = title
+    }
+
+    private fun adjustTopPadding() {
+        val topPadding = WindowInsetsDriver.topInset + host.resources.getDimensionPixelSize(R.dimen.single_margin)
+        bottomSheetContainer.setPadding(0, topPadding, 0, 0)
     }
 
     private fun restoreHiddenViewState() {
@@ -139,15 +171,6 @@ class BottomSheetDriver(
     companion object {
         const val BOTTOM_TOOLBAR_STATE = "BOTTOM_TOOLBAR_STATE"
     }
-}
-
-class Args {
-    var menuRes: Int = 0
-    var title: String = ""
-    var fragment: TeammatesBaseFragment? = null
-
-    val toolbarState: ToolbarState
-        get() = ToolbarState(menuRes, title)
 }
 
 class ToolbarState(
@@ -171,6 +194,41 @@ class ToolbarState(
             override fun createFromParcel(`in`: Parcel): ToolbarState = ToolbarState(`in`)
 
             override fun newArray(size: Int): Array<ToolbarState?> = arrayOfNulls(size)
+        }
+    }
+}
+
+/**
+ * Relays callbacks from the fragment in the bottom sheet to the [Fragment] visible behind it
+ */
+class RelayFragment : Fragment(),
+        UserAdapter.AdapterListener,
+        TeamAdapter.AdapterListener,
+        AddressPickerFragment.AddressPicker {
+
+    val navigator by activityNavigatorController<AppNavigator>()
+
+    override fun onUserClicked(item: User) {
+        caller<UserAdapter.AdapterListener>()?.run { this.onUserClicked(item) }
+    }
+
+    override fun onTeamClicked(item: Team) {
+        caller<TeamAdapter.AdapterListener>()?.run { this.onTeamClicked(item) }
+    }
+
+    override fun onAddressPicked(address: Address) {
+        caller<AddressPickerFragment.AddressPicker>()?.run { this.onAddressPicked(address) }
+    }
+
+    private inline fun <reified T : Any> caller(): T? = navigator.activeNavigator.current as? T
+
+    companion object {
+
+        private const val TAG = "relay"
+
+        fun getInstance(host: FragmentActivity): RelayFragment = host.run {
+            supportFragmentManager.findFragmentByTag(TAG) as? RelayFragment
+                    ?: RelayFragment().apply { supportFragmentManager.commitNow { add(this@apply, TAG) } }
         }
     }
 }
