@@ -35,7 +35,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.baseclasses.BottomSheetController
 import com.mainstreetcode.teammate.baseclasses.BottomSheetDriver
+import com.mainstreetcode.teammate.baseclasses.TransientBarController
 import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
 import com.mainstreetcode.teammate.fragments.main.ChatFragment
@@ -64,7 +66,10 @@ import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
 import com.tunjid.androidx.savedstate.savedStateFor
 
-class AppNavigator(private val host: FragmentActivity) : Navigator {
+class AppNavigator(private val host: FragmentActivity) :
+        Navigator,
+        BottomSheetController,
+        TransientBarController {
 
     private val userViewModel by host.viewModels<UserViewModel>()
 
@@ -77,20 +82,6 @@ class AppNavigator(private val host: FragmentActivity) : Navigator {
     var bottomNavHeight: Int = 0
 
     val activeNavigator get() = delegate.activeNavigator
-
-    val transientBarDriver: TransientBarDriver by lazy {
-        TransientBarDriver(host.findViewById(R.id.coordinator), host.findViewById(R.id.fab))
-    }
-
-    val bottomSheetDriver: BottomSheetDriver by lazy {
-        BottomSheetDriver(
-                host,
-                savedStateFor(host, "BottomSheet"),
-                host.findViewById(R.id.bottom_sheet),
-                host.findViewById(R.id.bottom_toolbar),
-                transientBarDriver
-        )
-    }
 
     init {
         bottomNav = BottomNav.builder().setContainer(host.findViewById<LinearLayout>(R.id.bottom_navigation)
@@ -113,6 +104,19 @@ class AppNavigator(private val host: FragmentActivity) : Navigator {
         }
     }
 
+    override val transientBarDriver: TransientBarDriver by lazy {
+        TransientBarDriver(host.findViewById(R.id.coordinator), host.findViewById(R.id.fab))
+    }
+
+    override val bottomSheetDriver: BottomSheetDriver by lazy {
+        BottomSheetDriver(
+                host,
+                savedStateFor(host, "BottomSheet"),
+                host.findViewById(R.id.bottom_sheet),
+                host.findViewById(R.id.bottom_toolbar),
+                transientBarDriver
+        )
+    }
     override val containerId: Int get() = delegate.containerId
 
     override val previous: Fragment? get() = delegate.previous

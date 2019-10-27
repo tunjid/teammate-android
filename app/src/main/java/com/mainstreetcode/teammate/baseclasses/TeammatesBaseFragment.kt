@@ -143,10 +143,10 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     override val navigator: AppNavigator by activityNavigatorController()
 
     override val bottomSheetDriver: BottomSheetDriver
-        get() = requireActivity().run { (this as BottomSheetController).bottomSheetDriver }
+        get() = navigator.bottomSheetDriver
 
     override val transientBarDriver: TransientBarDriver
-        get() = requireActivity().run { (this as TransientBarController).transientBarDriver }
+        get() = navigator.transientBarDriver
 
     override var uiState: UiState
         get() = activityUiState
