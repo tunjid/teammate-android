@@ -50,7 +50,6 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
     override val showsFab: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentResetPasswordBinding.bind(view).run {
-        super.onViewCreated(view, savedInstanceState)
         binding = this
 
         defaultUi(
@@ -71,6 +70,8 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
 
         email.transitionName = SplashFragment.TRANSITION_TITLE
         cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroyView() {

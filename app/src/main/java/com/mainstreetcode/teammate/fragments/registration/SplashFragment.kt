@@ -75,8 +75,6 @@ class SplashFragment : TeammatesBaseFragment(R.layout.fragment_splash), View.OnC
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         defaultUi(
                 fabShows = false,
                 toolbarShows = false,
@@ -100,6 +98,8 @@ class SplashFragment : TeammatesBaseFragment(R.layout.fragment_splash), View.OnC
             subTitle.transitionName = TRANSITION_SUBTITLE
             border.transitionName = TRANSITION_BACKGROUND
         }
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroy() {
