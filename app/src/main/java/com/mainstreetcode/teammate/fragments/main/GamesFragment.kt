@@ -86,10 +86,10 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
     override fun onResume() {
         super.onResume()
 
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
+
         if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
         else fetchGames(true)
-
-        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -109,7 +109,10 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
         }
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, gameViewModel) {
+        disposables.clear()
         bottomSheetDriver.hideBottomSheet()
+
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
         updateUi(toolbarTitle = getString(R.string.games_title, team.name))
     }.subscribe(::onGamesUpdated, defaultErrorHandler::invoke)).let { Unit }
 

@@ -85,10 +85,10 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
     override fun onResume() {
         super.onResume()
 
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
+
         if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
         else fetchEvents(true)
-
-        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -101,7 +101,9 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
     }
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, eventViewModel) {
+        disposables.clear()
         bottomSheetDriver.hideBottomSheet()
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
         updateUi(toolbarTitle = getString(R.string.events_title, team.name))
     }.subscribe(::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit }
 

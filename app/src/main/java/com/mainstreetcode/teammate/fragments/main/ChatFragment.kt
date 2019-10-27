@@ -85,6 +85,11 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
 
     private val isNearBottomOfChat: Boolean get() = abs(items.size - scrollManager.lastVisiblePosition) < 4
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        defaultErrorHandler.addAction { swappedTeam = false }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentChatBinding.bind(view).run {
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
@@ -136,10 +141,10 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
     override fun onResume() {
         super.onResume()
 
+        subscribeToChat()
+
         if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
         else fetchChatsBefore(true)
-
-        subscribeToChat()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -161,7 +166,10 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, chatViewModel) {
         swappedTeam = true
+        disposables.clear()
         bottomSheetDriver.hideBottomSheet()
+
+        subscribeToChat()
         updateUi(toolbarTitle = getString(R.string.team_chat_title, team.name))
     }.subscribe(::onChatsUpdated, defaultErrorHandler::invoke) { swappedTeam = false }).let { Unit }
 

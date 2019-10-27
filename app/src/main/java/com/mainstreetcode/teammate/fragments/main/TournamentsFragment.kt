@@ -90,10 +90,10 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
     override fun onResume() {
         super.onResume()
 
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
+
         if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
         else fetchTournaments(true)
-
-        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -106,7 +106,10 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
     }
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, tournamentViewModel) {
+        disposables.clear()
         bottomSheetDriver.hideBottomSheet()
+
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
         updateUi(toolbarTitle = getString(R.string.tournaments_title, team.name))
     }.subscribe(::onTournamentsUpdated, defaultErrorHandler::invoke)).let { Unit }
 

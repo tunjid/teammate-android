@@ -108,11 +108,12 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
     override fun onResume() {
         super.onResume()
 
+        listenForUploads()
+
         if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
         else fetchMedia(true)
 
         toggleContextMenu(mediaViewModel.hasSelections(team))
-        disposables.add(mediaViewModel.listenForUploads().subscribe(this::onMediaUpdated, emptyErrorHandler::invoke))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -144,7 +145,10 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
     }
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, mediaViewModel) {
+        disposables.clear()
         bottomSheetDriver.hideBottomSheet()
+
+        listenForUploads()
         updateUi(toolbarTitle = getString(R.string.media_title, team.name))
     }.subscribe(::onMediaUpdated, defaultErrorHandler::invoke)).let { Unit }
 
@@ -175,6 +179,10 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
     override fun startedDownLoad(started: Boolean) {
         toggleContextMenu(!started)
         if (started) scrollManager.notifyDataSetChanged()
+    }
+
+    private fun listenForUploads() {
+        disposables.add(mediaViewModel.listenForUploads().subscribe(this::onMediaUpdated, emptyErrorHandler::invoke))
     }
 
     private fun fetchMedia(fetchLatest: Boolean) {
