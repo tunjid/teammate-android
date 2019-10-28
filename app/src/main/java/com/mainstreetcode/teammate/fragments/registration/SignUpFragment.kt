@@ -69,7 +69,8 @@ class SignUpFragment : TeammatesBaseFragment(R.layout.fragment_sign_up), TextVie
                 fabText = R.string.submit,
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabShows = true,
-                toolbarShows = false,
+                toolbarTitle = getString(R.string.sign_up),
+                toolbarShows = true,
                 bottomNavShows = false,
                 grassShows = true,
                 navBarColor = GRASS_COLOR

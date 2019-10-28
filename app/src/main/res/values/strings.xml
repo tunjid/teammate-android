@@ -40,6 +40,7 @@
     <!--SigninFragment-->
     <string name="email">Email</string>
     <string name="reset_token">Reset Token</string>
+    <string name="reset_password">Reset Password</string>
     <string name="new_password">New Password</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>

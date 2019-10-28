@@ -56,7 +56,8 @@ class ResetPasswordFragment : TeammatesBaseFragment(R.layout.fragment_reset_pass
                 fabText = R.string.submit,
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabShows = true,
-                toolbarShows = false,
+                toolbarTitle = getString(R.string.reset_password),
+                toolbarShows = true,
                 bottomNavShows = false,
                 grassShows = true,
                 navBarColor = GRASS_COLOR

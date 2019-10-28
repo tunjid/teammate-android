@@ -54,7 +54,8 @@ class ForgotPasswordFragment : TeammatesBaseFragment(R.layout.fragment_forgot_pa
                 fabText = R.string.submit,
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabShows = true,
-                toolbarShows = false,
+                toolbarTitle = getString(R.string.sign_in_forgot_password),
+                toolbarShows = true,
                 bottomNavShows = false,
                 grassShows = true,
                 navBarColor = GRASS_COLOR

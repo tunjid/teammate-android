@@ -78,9 +78,11 @@ import com.mainstreetcode.teammate.util.fetchRoundedDrawable
 import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
+import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidx.core.content.drawableAt
+import com.tunjid.androidx.core.graphics.drawable.withTint
 import com.tunjid.androidx.navigation.MultiStackNavigator
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.multiStackNavigationController
@@ -99,8 +101,8 @@ class AppNavigator(private val host: FragmentActivity) :
     private val teamViewModel by host.viewModels<TeamViewModel>()
 
     private val navIcon = TransitionDrawable(arrayOf(
-            host.drawableAt(R.drawable.ic_supervisor_white_24dp)!!,
-            host.drawableAt(R.drawable.ic_arrow_back_24dp)!!
+            host.drawableAt(R.drawable.ic_shield_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!,
+            host.drawableAt(R.drawable.ic_arrow_back_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!
     )).apply { setId(0, 0); setId(1, 1); isCrossFadeEnabled = true }
 
     private val bottomNav: BottomNav
@@ -146,7 +148,7 @@ class AppNavigator(private val host: FragmentActivity) :
         teamViewModel.teamChangeFlowable.flatMapMaybe { team ->
             fetchRoundedDrawable(host,
                     team.imageUrl,
-                    host.resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_white_24dp)
+                    host.resources.getDimensionPixelSize(R.dimen.double_margin), R.drawable.ic_supervisor_24dp)
         }.toLiveData().observe(host, this::onTeamBadgeChanged)
     }
 
