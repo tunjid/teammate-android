@@ -110,11 +110,12 @@ class TeamViewModel : MappedViewModel<Class<Team>, Team>() {
 
     fun updateDefaultTeam(newDefault: Team) {
         val copy = Team.empty()
+        val existing = defaultTeamRef.get()
         copy.update(newDefault)
 
         defaultTeamRef.set(copy)
-        repository.saveDefaultTeam(copy)
-        teamChangeProcessor.onNext(copy)
+        if (copy != existing) repository.saveDefaultTeam(copy)
+        if (!copy.areContentsTheSame(existing)) teamChangeProcessor.onNext(copy)
     }
 
     private fun onTeamChanged(updated: Team) {

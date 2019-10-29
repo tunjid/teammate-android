@@ -28,10 +28,14 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.children
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -79,6 +83,7 @@ import com.mainstreetcode.teammate.util.nav.BottomNav
 import com.mainstreetcode.teammate.util.nav.NavDialogFragment
 import com.mainstreetcode.teammate.util.nav.NavItem
 import com.mainstreetcode.teammate.util.resolveThemeColor
+import com.mainstreetcode.teammate.util.springCrossFade
 import com.mainstreetcode.teammate.viewmodel.TeamViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidx.core.content.drawableAt
@@ -101,8 +106,10 @@ class AppNavigator(private val host: FragmentActivity) :
     private val teamViewModel by host.viewModels<TeamViewModel>()
 
     private val navIcon = TransitionDrawable(arrayOf(
-            host.drawableAt(R.drawable.ic_shield_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!,
+            host.drawableAt(R.drawable.ic_shield_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!
+                    .toBitmap().toDrawable(host.resources),
             host.drawableAt(R.drawable.ic_arrow_back_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!
+                    .toBitmap().toDrawable(host.resources)
     )).apply { setId(0, 0); setId(1, 1); isCrossFadeEnabled = true }
 
     private val bottomNav: BottomNav
@@ -243,8 +250,11 @@ class AppNavigator(private val host: FragmentActivity) :
     }.run { this to stableTag }
 
     private fun onTeamBadgeChanged(drawable: Drawable) {
-        navIcon.setDrawableByLayerId(0, drawable)
-        updateToolbarNavIcon()
+        if (activeNavigator.previous == null) toolbar.children.filterIsInstance<ImageView>().firstOrNull()?.springCrossFade {
+            navIcon.setDrawableByLayerId(0, drawable)
+            navIcon.invalidateSelf()
+        }
+        else navIcon.setDrawableByLayerId(0, drawable).let { Unit }
     }
 
     private fun updateToolbarNavIcon() {

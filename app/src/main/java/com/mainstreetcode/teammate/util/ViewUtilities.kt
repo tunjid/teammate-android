@@ -24,9 +24,7 @@
 
 package com.mainstreetcode.teammate.util
 
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -35,18 +33,16 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.IdRes
-import androidx.appcompat.widget.ActionMenuView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toBitmap
+import androidx.dynamicanimation.animation.DynamicAnimation
+import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.palette.graphics.Palette
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -54,6 +50,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.mainstreetcode.teammate.R
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import com.tunjid.androidx.view.util.spring
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -80,7 +77,6 @@ const val JOIN_REQUEST = 300
 const val BLOCKED_USER = 301
 const val THUMBNAIL_SIZE = 250
 const val FULL_RES_LOAD_DELAY = 375
-const val TOOLBAR_ANIM_DELAY = 200
 
 fun View.isDisplayingSystemUI(): Boolean =
         systemUiVisibility and View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -94,15 +90,6 @@ fun Context.resolveThemeColor(@AttrRes colorAttr: Int): Int {
     val theme = theme
     theme.resolveAttribute(colorAttr, typedValue, true)
     return typedValue.data
-}
-
-fun Context.getActivity(): Activity? {
-    var unwrapped = this
-    while (unwrapped is ContextWrapper)
-        if (unwrapped is Activity) return unwrapped
-        else unwrapped = unwrapped.baseContext
-
-    return null
 }
 
 val Context.isInDarkMode: Boolean
@@ -126,33 +113,6 @@ fun View.setMaterialOverlay(elevationOverride: Float = -1F) {
     background = MaterialShapeDrawable.createWithElevationOverlay(context,
             if (elevationOverride < 0) elevation
             else elevationOverride)
-}
-
-fun Toolbar.updateToolBar(menu: Int, title: CharSequence) {
-    val childCount = childCount
-
-    if (id == R.id.alt_toolbar || childCount <= 2) {
-        this.title = title
-        this.replaceMenu(menu)
-    } else for (i in 0 until childCount) {
-        val child = getChildAt(i)
-        if (child is ImageView) continue
-
-        child.animate().alpha(0f).setDuration(TOOLBAR_ANIM_DELAY.toLong()).withEndAction {
-            if (child is TextView) this.title = title
-            else if (child is ActionMenuView) this.replaceMenu(menu)
-
-            child.animate()
-                    .setDuration(TOOLBAR_ANIM_DELAY.toLong())
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .alpha(1f).start()
-        }.start()
-    }
-}
-
-private fun Toolbar.replaceMenu(menu: Int) {
-    this.menu.clear()
-    if (menu != 0) inflateMenu(menu)
 }
 
 @JvmOverloads
@@ -191,4 +151,19 @@ fun extractPalette(imageView: ImageView): Single<Palette> {
             ?: return Single.error(TeammateException("Not a BitmapDrawable"))
 
     return Single.fromCallable { Palette.from(drawable.bitmap).generate() }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+}
+
+fun View.springCrossFade(onFadedOut: () -> Unit) = spring(SpringAnimation.ALPHA, stiffness = 500F)
+        .withOneShotEndListener {
+            onFadedOut()
+            spring(SpringAnimation.ALPHA, stiffness = 500F).animateToFinalPosition(1F)
+        }.animateToFinalPosition(0F)
+
+private fun SpringAnimation.withOneShotEndListener(onEnd: (canceled: Boolean) -> Unit) = apply {
+    addEndListener(object : DynamicAnimation.OnAnimationEndListener {
+        override fun onAnimationEnd(animation: DynamicAnimation<out DynamicAnimation<*>>?, canceled: Boolean, value: Float, velocity: Float) {
+            removeEndListener(this)
+            onEnd(canceled)
+        }
+    })
 }

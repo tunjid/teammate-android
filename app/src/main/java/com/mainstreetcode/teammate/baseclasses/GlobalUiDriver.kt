@@ -31,7 +31,6 @@ import android.os.Build
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -52,6 +51,7 @@ import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.util.FabInteractor
 import com.mainstreetcode.teammate.util.isDisplayingSystemUI
 import com.mainstreetcode.teammate.util.resolveThemeColor
+import com.mainstreetcode.teammate.util.springCrossFade
 import com.tunjid.androidx.core.content.drawableAt
 import com.tunjid.androidx.material.animator.FabExtensionAnimator
 import com.tunjid.androidx.view.animator.ViewHider
@@ -308,21 +308,15 @@ class GlobalUiDriver(
             setTitle(title)
             refreshMenu(menu)
         }
-        else -> for (i in 0 until childCount) {
-            val child = getChildAt(i)
-            if (child is ImageView) continue
-
-            child.animate().alpha(0F).setDuration(TOOLBAR_ANIM_DELAY).withEndAction {
-                if (child is TextView) setTitle(title)
-                else if (child is ActionMenuView) refreshMenu(menu)
-
-                child.animate()
-                        .setDuration(TOOLBAR_ANIM_DELAY)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
-                        .alpha(1F)
-                        .start()
-            }.start()
-        }
+        else -> (0 until childCount)
+                .map(this::getChildAt)
+                .filter { it !is ImageView }
+                .forEach {
+                    it.springCrossFade {
+                        if (it is TextView) setTitle(title)
+                        else if (it is ActionMenuView) refreshMenu(menu)
+                    }
+                }
     }
 
     private fun Toolbar.refreshMenu(menu: Int? = null) {
