@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     private fun transientBarCallback() = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-            if (f.id == navigator.containerId) transientBarDriver.clearTransientBars()
+            if (f.id == navigator.activeNavigator.containerId) transientBarDriver.clearTransientBars()
         }
     }
 }

@@ -93,7 +93,7 @@ class HeaderedImageViewHolder(
         val startColor = Color.TRANSPARENT
 
         ValueAnimator.ofObject(ArgbEvaluator(), startColor, endColor).apply {
-            duration = 2000
+            duration = 1000
             addUpdateListener { animation ->
                 val color = animation.animatedValue as? Int ?: return@addUpdateListener
                 thumbnail.setColorFilter(color)
