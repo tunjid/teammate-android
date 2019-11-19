@@ -50,7 +50,7 @@ fun competitorAdapter(
             when (viewType) {
                 CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
                 INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
-                else -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_event), listener)
+                else -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), listener)
             }
         },
         viewHolderBinder = { holder, item, _ ->

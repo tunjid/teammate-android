@@ -29,15 +29,14 @@ import android.util.Pair
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.Shell
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
-import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
-import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
@@ -46,7 +45,6 @@ import com.tunjid.androidx.functions.collections.transform
 import com.tunjid.androidx.recyclerview.ListManager
 import com.tunjid.androidx.recyclerview.SwipeDragOptions
 import com.tunjid.androidx.recyclerview.adapterOf
-import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 import java.util.*
 import kotlin.math.min
@@ -58,7 +56,6 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
     private lateinit var tournament: Tournament
     private lateinit var entities: MutableList<Competitive>
     private lateinit var competitors: MutableList<Competitor>
-    private lateinit var competitorDifferentiables: MutableList<Differentiable>
 
     override val showsFab: Boolean get() = !bottomSheetDriver.isBottomSheetShowing && competitors.isNotEmpty()
 
@@ -76,7 +73,6 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
         tournament = arguments!!.getParcelable(ARG_TOURNAMENT)!!
         entities = ArrayList()
         competitors = entities.transform(Competitor.Companion::empty, Competitor::entity)
-        competitorDifferentiables = competitors.transform({ it as Differentiable }, { it as Competitor })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,20 +87,12 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
         scrollManager = ScrollManager.with<CompetitorViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
                 .withAdapter(adapterOf(
-                        itemsSource = ::competitorDifferentiables,
+                        itemsSource = ::competitors,
                         viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
-                            CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_event)) {}.apply {
-                                dragHandle.visibility = View.VISIBLE
-                            }
+                            CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor)) {}.apply { dragHandle.isVisible = true }
                         },
-                        viewHolderBinder = { holder, item, _ ->
-                            if (item is Competitor) holder.bind(item)
-                        },
-                        itemIdFunction = {
-                            entities.getOrNull(competitorDifferentiables.indexOf(it))?.hashCode()?.toLong()
-                                    ?: 0L
-                        },
-                        viewTypeFunction = { (it as? Ad<*>)?.type ?: Item.COMPETITOR }
+                        viewHolderBinder = { holder, item, _ -> holder.bind(item) },
+                        itemIdFunction = { it.entity.id.hashCode().toLong() }
                 )
                 )
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -188,14 +176,14 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
     }
 
     private fun swap(from: Int, to: Int) {
-        if (from < to) for (i in from until to) Collections.swap(competitorDifferentiables, i, i + 1)
-        else for (i in from downTo to + 1) Collections.swap(competitorDifferentiables, i, i - 1)
+        if (from < to) for (i in from until to) Collections.swap(competitors, i, i + 1)
+        else for (i in from downTo to + 1) Collections.swap(competitors, i, i - 1)
     }
 
     private fun remove(position: Int): Pair<Int, Int> {
-        competitorDifferentiables.removeAt(position)
+        competitors.removeAt(position)
 
-        val lastIndex = competitorDifferentiables.size - 1
+        val lastIndex = competitors.size - 1
         return Pair(min(position, lastIndex), lastIndex)
     }
 
