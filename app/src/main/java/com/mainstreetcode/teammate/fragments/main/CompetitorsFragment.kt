@@ -135,8 +135,7 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
 
     private fun findCompetitor() = bottomSheetDriver.showBottomSheet(
             requestCode = R.id.request_competitor_pick,
-            title = getString(R.string.add_competitor),
-            fragment = when {
+              fragment = when {
                 User.COMPETITOR_TYPE == tournament.refPath -> TeamMembersFragment.newInstance(tournament.host)
                 Team.COMPETITOR_TYPE == tournament.refPath -> TeamSearchFragment.newInstance(tournament.sport)
                 else -> null
