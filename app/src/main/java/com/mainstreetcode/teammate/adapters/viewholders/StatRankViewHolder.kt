@@ -29,12 +29,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.StatRank
-import com.mainstreetcode.teammate.util.SimpleAdapterListener
 
 class StatRankViewHolder(
         itemView: View,
-        delegate: SimpleAdapterListener<StatRank>
-) : ModelCardViewHolder<StatRank, SimpleAdapterListener<StatRank>>(itemView, delegate), View.OnClickListener {
+        delegate: (StatRank) -> Unit
+) : ModelCardViewHolder<StatRank>(itemView) {
 
     private val count: TextView
     private val inset: ImageView
@@ -43,7 +42,7 @@ class StatRankViewHolder(
         get() = false
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { delegate.invoke(model) }
         count = itemView.findViewById(R.id.item_position)
         inset = itemView.findViewById(R.id.inset)
     }
@@ -60,7 +59,4 @@ class StatRankViewHolder(
         if (imageUrl.isNotBlank()) load(imageUrl, inset)
     }
 
-    override fun onClick(view: View) {
-        delegate?.onItemClicked(model)
-    }
 }

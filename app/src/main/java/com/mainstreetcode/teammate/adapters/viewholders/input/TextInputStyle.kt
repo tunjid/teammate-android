@@ -72,7 +72,7 @@ open class TextInputStyle(
 
         private val behaviors = SparseArray<TextInputStyle>()
 
-        operator fun get(item: Item): TextInputStyle =  get(
+        operator fun get(item: Item): TextInputStyle = get(
                 item.stringRes,
                 behaviors::get,
                 behaviors::put,

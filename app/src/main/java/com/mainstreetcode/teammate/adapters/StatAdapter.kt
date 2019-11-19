@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
@@ -33,48 +34,31 @@ import com.mainstreetcode.teammate.adapters.viewholders.StatViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Stat
-import com.mainstreetcode.teammate.model.Team
-import com.mainstreetcode.teammate.util.SimpleAdapterListener
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.STAT
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [Team]
- */
-
-class StatAdapter(
-        private val items: List<Differentiable>,
-        listener: SimpleAdapterListener<Stat>
-) : InteractiveAdapter<InteractiveViewHolder<*>, SimpleAdapterListener<Stat>>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
-        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
-        else -> StatViewHolder(viewGroup.inflate(R.layout.viewholder_stat), delegate)
-    }
-
-    override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = items[position]) {
-            is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
-            is Stat -> (viewHolder as StatViewHolder).bind(item)
-        }
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-    override fun getItemViewType(position: Int): Int {
-        val item = items[position]
-        return if (item is Stat) STAT else (item as Ad<*>).type
-    }
-}
+fun statAdapter(
+        modelSource: () -> List<Differentiable>,
+        listener: (Stat) -> Unit
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+            when (viewType) {
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                else -> StatViewHolder(viewGroup.inflate(R.layout.viewholder_stat), listener)
+            }
+        },
+        viewHolderBinder = { holder, item, _ ->
+            when {
+                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
+                item is Stat && holder is StatViewHolder -> holder.bind(item)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = { (it as? Ad<*>)?.type ?: STAT }
+)

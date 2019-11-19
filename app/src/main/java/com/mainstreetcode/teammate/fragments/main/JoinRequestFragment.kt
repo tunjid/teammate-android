@@ -32,7 +32,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.JoinRequestAdapter
+import com.mainstreetcode.teammate.adapters.JoinRequestAdapterListener
+import com.mainstreetcode.teammate.adapters.joinRequestAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.JoinRequest
@@ -54,7 +55,7 @@ import com.tunjid.androidx.view.util.InsetFlags
  */
 
 class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_headered),
-        JoinRequestAdapter.AdapterListener {
+        JoinRequestAdapterListener {
 
     override lateinit var headeredModel: JoinRequest
         private set
@@ -87,7 +88,7 @@ class JoinRequestFragment : HeaderedFragment<JoinRequest>(R.layout.fragment_head
 
         scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(JoinRequestAdapter(gofer.items, this))
+                .withAdapter(joinRequestAdapter(gofer::items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

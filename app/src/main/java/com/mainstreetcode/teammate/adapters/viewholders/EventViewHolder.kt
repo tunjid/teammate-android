@@ -29,15 +29,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventAdapter
+import com.mainstreetcode.teammate.adapters.EventAdapterListener
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.getTransitionName
 
 
 class EventViewHolder(
         itemView: View,
-        delegate: EventAdapter.EventAdapterListener
-) : ModelCardViewHolder<Event, EventAdapter.EventAdapterListener>(itemView, delegate), View.OnClickListener {
+        delegate: EventAdapterListener
+) : ModelCardViewHolder<Event>(itemView) {
 
     private val eventLocation: TextView = itemView.findViewById(R.id.location)
 
@@ -45,7 +45,7 @@ class EventViewHolder(
         get() = thumbnail
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { delegate.onEventClicked(model) }
     }
 
     override fun bind(model: Event) {
@@ -58,7 +58,4 @@ class EventViewHolder(
         ViewCompat.setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
-    override fun onClick(view: View) {
-        delegate?.onEventClicked(model)
-    }
 }

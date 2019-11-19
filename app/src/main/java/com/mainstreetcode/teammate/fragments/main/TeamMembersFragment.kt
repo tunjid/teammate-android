@@ -34,9 +34,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.UserHostListener
+import com.mainstreetcode.teammate.adapters.teamMemberAdapter
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.JoinRequest
@@ -44,7 +46,6 @@ import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -52,7 +53,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  */
 
 class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        TeamMemberAdapter.UserAdapterListener {
+        UserHostListener {
 
     private lateinit var team: Team
     private lateinit var teamModels: List<Differentiable>
@@ -90,9 +91,9 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
                     .subscribe(this::onTeamMembersUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
-                .withAdapter(TeamMemberAdapter(teamModels, this))
+                .withAdapter(teamMemberAdapter(::teamModels, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -139,15 +140,15 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
 
     override fun onRoleClicked(role: Role) {
         val target = targetFragment
-        val canPick = target is UserAdapter.AdapterListener
+        val canPick = target is Shell.UserAdapterListener
 
-        if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(role.user)
+        if (canPick) (target as Shell.UserAdapterListener).onUserClicked(role.user)
         else navigator.push(RoleEditFragment.newInstance(role))
     }
 
     override fun onJoinRequestClicked(request: JoinRequest) {
         val target = targetFragment
-        val canPick = target is UserAdapter.AdapterListener
+        val canPick = target is Shell.UserAdapterListener
 
         if (canPick) transientBarDriver.showSnackBar(getString(R.string.stat_user_not_on_team))
         else navigator.push(JoinRequestFragment.viewInstance(request))

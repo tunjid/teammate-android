@@ -26,13 +26,13 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StatAggregateAdapter
-import com.mainstreetcode.teammate.adapters.StatAggregateRequestAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.StatAggregateAdapterListener
+import com.mainstreetcode.teammate.adapters.statAggregateAdapter
+import com.mainstreetcode.teammate.adapters.statAggregateRequestAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.StatAggregate
@@ -40,13 +40,12 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ExpandingToolbar
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class StatAggregateFragment : TeammatesBaseFragment(),
-        UserAdapter.AdapterListener,
-        TeamAdapter.AdapterListener,
-        StatAggregateRequestAdapter.AdapterListener {
+        Shell.UserAdapterListener,
+        Shell.TeamAdapterListener,
+        StatAggregateAdapterListener {
 
     private lateinit var request: StatAggregate.Request
     private var expandingToolbar: ExpandingToolbar? = null
@@ -66,18 +65,18 @@ class StatAggregateFragment : TeammatesBaseFragment(),
         super.onViewCreated(view, savedInstanceState)
         defaultUi(toolbarShows = false)
 
-        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
-                .withAdapter(StatAggregateRequestAdapter(request, this))
+        searchScrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.search_options))
+                .withAdapter(statAggregateRequestAdapter(request, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_stat_white_24dp, R.string.stat_aggregate_empty))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.fetchAggregates() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(StatAggregateAdapter(items))
+                .withAdapter(statAggregateAdapter(::items))
                 .withLinearLayoutManager()
                 .build()
 

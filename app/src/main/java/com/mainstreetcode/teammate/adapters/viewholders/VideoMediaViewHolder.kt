@@ -36,14 +36,14 @@ import androidx.transition.Fade
 import androidx.transition.TransitionManager
 import com.devbrackets.android.exomedia.ui.widget.VideoView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.MediaAdapter
+import com.mainstreetcode.teammate.adapters.MediaAdapterListener
 import com.mainstreetcode.teammate.model.Media
 
 
 class VideoMediaViewHolder @SuppressLint("ClickableViewAccessibility")
 constructor(
         itemView: View,
-        delegate: MediaAdapter.MediaAdapterListener
+        delegate: MediaAdapterListener
 ) : MediaViewHolder<VideoView>(itemView, delegate) {
 
     override val thumbnailId: Int
@@ -117,7 +117,7 @@ constructor(
             if (videoControls != null && videoControls.isVisible) videoControls.hide(false)
             else fullResView.showControls()
 
-            delegate?.onMediaClicked(media)
+            delegate.onMediaClicked(media)
             return true
         }
     }

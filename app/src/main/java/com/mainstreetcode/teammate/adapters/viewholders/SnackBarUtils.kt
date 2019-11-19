@@ -25,12 +25,12 @@
 package com.mainstreetcode.teammate.adapters.viewholders
 
 
-import com.google.android.material.snackbar.ContentViewCallback
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.ViewCompat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import com.google.android.material.snackbar.ContentViewCallback
 
 internal object SnackBarUtils {
 

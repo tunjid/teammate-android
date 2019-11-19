@@ -24,27 +24,24 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders
 
-import androidx.core.view.ViewCompat
 import android.view.View
 import android.widget.ImageView
-
+import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TournamentAdapter
 import com.mainstreetcode.teammate.model.Tournament
-
 import com.mainstreetcode.teammate.util.getTransitionName
 
 
 class TournamentViewHolder(
         itemView: View,
-        delegate: TournamentAdapter.TournamentAdapterListener
-) : ModelCardViewHolder<Tournament, TournamentAdapter.TournamentAdapterListener>(itemView, delegate), View.OnClickListener {
+        delegate: (Tournament) -> Unit
+) : ModelCardViewHolder<Tournament>(itemView) {
 
     val image: ImageView
         get() = thumbnail
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { delegate.invoke(model) }
     }
 
     override fun bind(model: Tournament) {
@@ -54,9 +51,5 @@ class TournamentViewHolder(
 
         ViewCompat.setTransitionName(itemView, model.getTransitionName(R.id.fragment_header_background))
         ViewCompat.setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
-    }
-
-    override fun onClick(view: View) {
-        delegate?.onTournamentClicked(model)
     }
 }

@@ -37,8 +37,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventEditAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.adapters.EventEditAdapterListener
+import com.mainstreetcode.teammate.adapters.eventEditAdapter
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Event
@@ -56,8 +56,8 @@ import com.tunjid.androidx.view.util.InsetFlags
  */
 
 class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
-        EventEditAdapter.EventEditAdapterListener,
-        AddressPickerFragment.AddressPicker {
+        AddressPickerFragment.AddressPicker,
+        EventEditAdapterListener {
 
     override lateinit var headeredModel: Event
         private set
@@ -108,9 +108,9 @@ class EventEditFragment : HeaderedFragment<Event>(R.layout.fragment_headered),
                 fabText = if (headeredModel.isEmpty) R.string.event_create else R.string.event_update
         )
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), this::refresh)
-                .withAdapter(EventEditAdapter(gofer.items, this))
+                .withAdapter(eventEditAdapter(gofer::items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .onLayoutManager(this::setSpanSizeLookUp)

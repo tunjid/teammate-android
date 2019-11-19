@@ -29,7 +29,8 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.UserEditAdapter
+import com.mainstreetcode.teammate.adapters.UserEditAdapterListener
+import com.mainstreetcode.teammate.adapters.userEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.User
@@ -43,7 +44,7 @@ import com.tunjid.androidx.view.util.InsetFlags
  */
 
 class UserEditFragment : HeaderedFragment<User>(R.layout.fragment_headered),
-        UserEditAdapter.AdapterListener {
+        UserEditAdapterListener {
 
     override lateinit var headeredModel: User
         private set
@@ -74,7 +75,7 @@ class UserEditFragment : HeaderedFragment<User>(R.layout.fragment_headered),
         )
         scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(UserEditAdapter(gofer.items, this))
+                .withAdapter(userEditAdapter(gofer::items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

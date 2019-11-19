@@ -31,7 +31,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GuestAdapter
+import com.mainstreetcode.teammate.adapters.guestAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.Guest
@@ -69,7 +69,7 @@ class GuestViewFragment : HeaderedFragment<Guest>(R.layout.fragment_headered) {
 
         scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(GuestAdapter(gofer.items, this))
+                .withAdapter(guestAdapter(gofer::items))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

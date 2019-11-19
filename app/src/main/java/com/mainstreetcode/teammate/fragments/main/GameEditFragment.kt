@@ -29,11 +29,11 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GameEditAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.adapters.GameEditAdapterListener
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.gameEditAdapter
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
@@ -50,9 +50,9 @@ import com.tunjid.androidx.view.util.InsetFlags
  */
 
 class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
-        UserAdapter.AdapterListener,
-        TeamAdapter.AdapterListener,
-        GameEditAdapter.AdapterListener {
+        Shell.UserAdapterListener,
+        Shell.TeamAdapterListener,
+        GameEditAdapterListener {
 
     override lateinit var headeredModel: Game
         private set
@@ -80,9 +80,9 @@ class GameEditFragment : HeaderedFragment<Game>(R.layout.fragment_headered),
                 fabShows = showsFab
         )
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(GameEditAdapter(gofer.items, this))
+                .withAdapter(gameEditAdapter(gofer::items, this))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()

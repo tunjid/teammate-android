@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.BlockedUserViewHolder
@@ -33,51 +34,31 @@ import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.BlockedUser
-import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.BLOCKED_USER
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [Team]
- */
-
-class BlockedUserAdapter(
-        private val teamModels: List<Differentiable>,
-        listener: UserAdapterListener
-) : InteractiveAdapter<InteractiveViewHolder<*>, BlockedUserAdapter.UserAdapterListener>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
-        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
-        else -> BlockedUserViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
-    }
-
-    override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = teamModels[position]) {
-            is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
-            is BlockedUser -> (viewHolder as BlockedUserViewHolder).bind(item)
-        }
-    }
-
-    override fun getItemId(position: Int): Long = teamModels[position].hashCode().toLong()
-
-    override fun getItemCount(): Int = teamModels.size
-
-    override fun getItemViewType(position: Int): Int {
-        val item = teamModels[position]
-        return (item as? Ad<*>)?.type ?: BLOCKED_USER
-    }
-
-    interface UserAdapterListener {
-        fun onBlockedUserClicked(blockedUser: BlockedUser)
-    }
-}
+fun blockedUserAdapter(
+        teamModels: List<Differentiable>,
+        listener: (BlockedUser) -> Unit
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = { teamModels },
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+            when (viewType) {
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                else -> BlockedUserViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), listener)
+            }
+        },
+        viewHolderBinder = { holder, item, _ ->
+            when {
+                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
+                item is BlockedUser && holder is BlockedUserViewHolder -> holder.bind(item)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = { (it as? Ad<*>)?.type ?: BLOCKED_USER }
+)

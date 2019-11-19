@@ -82,7 +82,6 @@ import com.mainstreetcode.teammate.viewmodel.TournamentViewModel
 import com.mainstreetcode.teammate.viewmodel.UserViewModel
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.navigation.activityNavigatorController
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.view.util.InsetFlags
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
@@ -135,7 +134,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
 
     protected lateinit var defaultErrorHandler: ErrorHandler
 
-    protected lateinit var scrollManager: ScrollManager<out InteractiveViewHolder<*>>
+    protected lateinit var scrollManager: ScrollManager<out RecyclerView.ViewHolder>
 
     override val insetFlags = InsetFlags.ALL
 

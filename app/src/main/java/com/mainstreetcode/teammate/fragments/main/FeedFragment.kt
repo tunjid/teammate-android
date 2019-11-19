@@ -30,11 +30,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar.Callback.DISMISS_EVENT_MANUAL
 import com.google.android.material.snackbar.Snackbar.Callback.DISMISS_EVENT_SWIPE
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.FeedAdapter
+import com.mainstreetcode.teammate.adapters.feedAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
@@ -46,7 +47,6 @@ import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.notifications.isOf
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import io.reactivex.Single
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Home screen
  */
 
-class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), FeedAdapter.FeedItemAdapterListener {
+class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh) {
 
     private var onBoardingIndex: Int = 0
     private var isOnBoarding: Boolean = false
@@ -74,9 +74,9 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
 
         val refreshAction = { disposables.add(feedViewModel.refresh(FeedItem::class.java).subscribe(this::onFeedUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_notifications_white_24dp, R.string.no_feed))
-                .withAdapter(FeedAdapter(feedViewModel.getModelList(FeedItem::class.java), this))
+                .withAdapter(feedAdapter({ feedViewModel.getModelList(FeedItem::class.java) }, this::onFeedItemClicked))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
@@ -101,7 +101,20 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         else -> Unit
     }
 
-    override fun onFeedItemClicked(item: FeedItem<*>) {
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is MediaDetailFragment ->
+            transaction.listDetailTransition(MediaDetailFragment.ARG_MEDIA, incomingFragment, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
+
+        is JoinRequestFragment ->
+            transaction.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST, incomingFragment)
+
+        is EventEditFragment ->
+            transaction.listDetailTransition(EventEditFragment.ARG_EVENT, incomingFragment)
+
+        else -> super.augmentTransaction(transaction, incomingFragment)
+    }
+
+    private fun onFeedItemClicked(item: FeedItem<*>) {
         val context = context ?: return
         val builder = AlertDialog.Builder(context)
 
@@ -148,19 +161,6 @@ class FeedFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
             updateUi(bottomNavShows = false)
             navigator.push(MediaDetailFragment.newInstance(model))
         }
-    }
-
-    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
-        is MediaDetailFragment ->
-            transaction.listDetailTransition(MediaDetailFragment.ARG_MEDIA, incomingFragment, R.id.fragment_media_background, R.id.fragment_media_thumbnail)
-
-        is JoinRequestFragment ->
-            transaction.listDetailTransition(JoinRequestFragment.ARG_JOIN_REQUEST, incomingFragment)
-
-        is EventEditFragment ->
-            transaction.listDetailTransition(EventEditFragment.ARG_EVENT, incomingFragment)
-
-        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun onFeedItemAction(diffResultSingle: Single<DiffUtil.DiffResult>) {

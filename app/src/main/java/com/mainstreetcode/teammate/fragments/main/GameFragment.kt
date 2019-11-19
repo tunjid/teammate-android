@@ -33,11 +33,11 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GameAdapter
-import com.mainstreetcode.teammate.adapters.StatAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.statAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.ChoiceBar
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.GameViewHolder
@@ -54,9 +54,7 @@ import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.util.fetchRoundedDrawable
-import com.mainstreetcode.teammate.util.simpleAdapterListener
 import com.mainstreetcode.teammate.viewmodel.gofers.GameGofer
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -64,7 +62,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Lists [games][Event]
  */
 
-class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.AdapterListener {
+class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), Shell.UserAdapterListener {
 
     private lateinit var game: Game
     private lateinit var items: List<Differentiable>
@@ -106,12 +104,12 @@ class GameFragment : TeammatesBaseFragment(R.layout.fragment_game), UserAdapter.
                 fabIcon = R.drawable.ic_add_white_24dp
         )
 
-        gameViewHolder = GameViewHolder(appBar, GameAdapter.AdapterListener.asSAM { })
+        gameViewHolder = GameViewHolder(appBar) {}
         gameViewHolder?.bind(game)
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.model_list))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_stat_white_24dp, R.string.no_stats))
-                .withAdapter(StatAdapter(items, simpleAdapterListener { navigator.push(StatEditFragment.newInstance(it)) }))
+                .withAdapter(statAdapter(::items) { navigator.push(StatEditFragment.newInstance(it)) })
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this@GameFragment.refresh() }
                 .withEndlessScroll { fetchStats(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }

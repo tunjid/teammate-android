@@ -39,9 +39,8 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout.MODE_FIXED
 import com.google.android.material.tabs.TabLayout.MODE_SCROLLABLE
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
 import com.mainstreetcode.teammate.adapters.TournamentRoundAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
@@ -201,8 +200,8 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
         if (winner.isEmpty) return
 
         when (val competitive = winner.entity) {
-            is User -> UserViewHolder(winnerView, UserAdapter.AdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
-            is Team -> TeamViewHolder(winnerView, TeamAdapter.AdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
+            is User -> UserViewHolder(winnerView, Shell.UserAdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
+            is Team -> TeamViewHolder(winnerView, Shell.TeamAdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
             else -> return
         }
 

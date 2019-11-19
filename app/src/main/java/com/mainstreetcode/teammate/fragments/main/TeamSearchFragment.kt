@@ -28,9 +28,10 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.TeamSearchAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.teamSearchAdapter
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentTeamSearchBinding
 import com.mainstreetcode.teammate.model.Team
@@ -38,7 +39,6 @@ import com.mainstreetcode.teammate.model.TeamSearchRequest
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -47,7 +47,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class TeamSearchFragment : TeammatesBaseFragment(R.layout.fragment_team_search),
         SearchView.OnQueryTextListener,
-        TeamAdapter.AdapterListener {
+        Shell.TeamAdapterListener {
 
     private lateinit var request: TeamSearchRequest
     private lateinit var instantSearch: InstantSearch<TeamSearchRequest, Team>
@@ -76,9 +76,9 @@ class TeamSearchFragment : TeammatesBaseFragment(R.layout.fragment_team_search),
         defaultUi(
                 toolbarShows = false
         )
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this@TeamSearchFragment::onInconsistencyDetected)
-                .withAdapter(TeamSearchAdapter(instantSearch.currentItems, this@TeamSearchFragment))
+                .withAdapter(teamSearchAdapter(instantSearch::currentItems, this@TeamSearchFragment))
                 .withGridLayoutManager(2)
                 .build()
 
@@ -112,9 +112,9 @@ class TeamSearchFragment : TeammatesBaseFragment(R.layout.fragment_team_search),
 
     override fun onTeamClicked(item: Team) {
         val target = targetFragment
-        val canPick = target is TeamAdapter.AdapterListener
+        val canPick = target is Shell.TeamAdapterListener
 
-        if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
+        if (canPick) (target as Shell.TeamAdapterListener).onTeamClicked(item)
         else navigator.push(JoinRequestFragment.joinInstance(item, userViewModel.currentUser))
     }
 

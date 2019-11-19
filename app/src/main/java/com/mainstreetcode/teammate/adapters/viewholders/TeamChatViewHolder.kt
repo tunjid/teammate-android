@@ -30,17 +30,16 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamChatAdapter
 import com.mainstreetcode.teammate.model.Chat
 import com.squareup.picasso.Picasso
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.view.util.marginLayoutParams
 
 /**
  * Viewholder for a [Chat]
  */
-class TeamChatViewHolder(itemView: View, listener: TeamChatAdapter.ChatAdapterListener) : InteractiveViewHolder<TeamChatAdapter.ChatAdapterListener>(itemView, listener) {
+class TeamChatViewHolder(itemView: View, listener: (Chat) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     private lateinit var item: Chat
 
@@ -51,7 +50,7 @@ class TeamChatViewHolder(itemView: View, listener: TeamChatAdapter.ChatAdapterLi
     private val details: TextView = itemView.findViewById(R.id.details)
 
     init {
-        content.setOnClickListener { delegate?.onChatClicked(item) }
+        content.setOnClickListener { listener(item) }
     }
 
     fun bind(item: Chat, isSignedInUser: Boolean, showDetails: Boolean, showPicture: Boolean,

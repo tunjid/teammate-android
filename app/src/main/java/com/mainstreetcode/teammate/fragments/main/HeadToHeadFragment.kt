@@ -28,13 +28,13 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.annotation.StringRes
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GameAdapter
-import com.mainstreetcode.teammate.adapters.HeadToHeadRequestAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.HeadToHeadAdapterListener
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.gameAdapter
+import com.mainstreetcode.teammate.adapters.headToHeadRequestAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentHeadToHeadBinding
 import com.mainstreetcode.teammate.model.Competitive
@@ -48,13 +48,12 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidx.core.text.appendNewLine
 import com.tunjid.androidx.core.text.bold
 import com.tunjid.androidx.core.text.scale
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head),
-        UserAdapter.AdapterListener,
-        TeamAdapter.AdapterListener,
-        HeadToHeadRequestAdapter.AdapterListener {
+        Shell.UserAdapterListener,
+        Shell.TeamAdapterListener,
+        HeadToHeadAdapterListener {
 
     private var isHome = true
     private lateinit var request: HeadToHead.Request
@@ -80,16 +79,16 @@ class HeadToHeadFragment : TeammatesBaseFragment(R.layout.fragment_head_to_head)
                 fabShows = showsFab
         )
 
-        searchScrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
-                .withAdapter(HeadToHeadRequestAdapter(request, this@HeadToHeadFragment))
+        searchScrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.search_options))
+                .withAdapter(headToHeadRequestAdapter(request, this@HeadToHeadFragment))
                 .withInconsistencyHandler(this@HeadToHeadFragment::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
                 .build()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_head_to_head_24dp, R.string.game_head_to_head_prompt))
-                .withAdapter(GameAdapter(::matchUps, GameAdapter.AdapterListener.asSAM { game -> navigator.push(GameFragment.newInstance(game)) }))
+                .withAdapter(gameAdapter(::matchUps) { game -> navigator.push(GameFragment.newInstance(game)) })
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this@HeadToHeadFragment.fetchMatchUps() }
                 .withInconsistencyHandler(this@HeadToHeadFragment::onInconsistencyDetected)
                 .withLinearLayoutManager()

@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder
@@ -32,39 +33,30 @@ import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Event]
  */
 
-class StandingsAdapter(
-        private val items: List<Row>,
-        listener: AdapterListener
-) : InteractiveAdapter<StandingRowViewHolder, StandingsAdapter.AdapterListener>(listener) {
+fun standingsAdapter(
+        modelSource: () -> List<Row>,
+        listener: StandingsAdapterListener
+): RecyclerView.Adapter<StandingRowViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+            StandingRowViewHolder(viewGroup.inflate(R.layout.viewholder_standings_row), listener)
+        },
+        viewHolderBinder = { holder, item, _ ->
+            holder.bind(item)
+            holder.bindColumns(item.columns)
+        },
+        itemIdFunction = {it.hashCode().toLong()}
+)
 
-    init {
-        setHasStableIds(true)
-    }
+interface StandingsAdapterListener {
+    fun addScrollNotifier(notifier: SyncedScrollView)
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): StandingRowViewHolder =
-            StandingRowViewHolder(viewGroup.inflate(R.layout.viewholder_standings_row), delegate)
-
-    override fun onBindViewHolder(viewHolder: StandingRowViewHolder, position: Int) {
-        val row = items[position]
-        viewHolder.bind(row)
-        viewHolder.bindColumns(row.columns)
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-    interface AdapterListener {
-        fun addScrollNotifier(notifier: SyncedScrollView)
-
-        fun onCompetitorClicked(competitor: Competitor)
-    }
-
+    fun onCompetitorClicked(competitor: Competitor)
 }

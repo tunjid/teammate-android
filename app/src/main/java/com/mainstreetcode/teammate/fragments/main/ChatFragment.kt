@@ -42,8 +42,8 @@ import androidx.transition.TransitionManager
 import androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING
 import com.google.android.material.chip.Chip
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.TeamChatAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.chatAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
@@ -63,8 +63,7 @@ import kotlin.math.abs
 
 class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         TextView.OnEditorActionListener,
-        TeamAdapter.AdapterListener,
-        TeamChatAdapter.ChatAdapterListener {
+        Shell.TeamAdapterListener {
 
     private var wasScrolling: Boolean = false
     private var unreadCount: Int = 0
@@ -108,7 +107,7 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         scrollManager = ScrollManager.with<TeamChatViewHolder>(view.findViewById(R.id.chat))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_message_black_24dp, R.string.no_chats))
                 .onLayoutManager { layoutManager -> (layoutManager as LinearLayoutManager).stackFromEnd = true }
-                .withAdapter(TeamChatAdapter(::items, userViewModel.currentUser, this@ChatFragment))
+                .withAdapter(chatAdapter(::items, userViewModel.currentUser, this@ChatFragment::onChatClicked))
                 .withEndlessScroll { fetchChatsBefore(false) }
                 .withRefreshLayout(refreshLayout) { refreshLayout.isRefreshing = false }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
@@ -173,7 +172,12 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         updateUi(toolbarTitle = getString(R.string.team_chat_title, team.name))
     }.subscribe(::onChatsUpdated, defaultErrorHandler::invoke) { swappedTeam = false }).let { Unit }
 
-    override fun onChatClicked(chat: Chat) {
+    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean = when {
+        actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN -> sendChat(textView).let { true }
+        else -> false
+    }
+
+    private fun onChatClicked(chat: Chat) {
         if (!chat.isEmpty) return
 
         val index = items.indexOf(chat)
@@ -183,11 +187,6 @@ class ChatFragment : TeammatesBaseFragment(R.layout.fragment_chat),
         scrollManager.notifyItemRemoved(index)
 
         postChat(chat)
-    }
-
-    override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean = when {
-        actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN -> sendChat(textView).let { true }
-        else -> false
     }
 
     private fun fetchChatsBefore(fetchLatest: Boolean) {

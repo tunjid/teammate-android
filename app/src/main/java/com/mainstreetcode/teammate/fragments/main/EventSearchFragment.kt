@@ -28,14 +28,15 @@ import android.content.pm.PackageManager
 import android.location.Address
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventSearchRequestAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.adapters.EventSearchAdapterListener
+import com.mainstreetcode.teammate.adapters.eventSearchRequestAdapter
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
 import com.mainstreetcode.teammate.model.Event
@@ -69,8 +70,8 @@ class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event
 
         view.findViewById<View>(R.id.status_bar_dimmer).layoutParams.height = WindowInsetsDriver.topInset
 
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.search_options))
-                .withAdapter(EventSearchRequestAdapter(eventViewModel.eventRequest, object : EventSearchRequestAdapter.EventSearchAdapterListener {
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.search_options))
+                .withAdapter(eventSearchRequestAdapter(eventViewModel.eventRequest, object : EventSearchAdapterListener {
                     override fun onLocationClicked() = this@EventSearchFragment.pickPlace()
                 }))
                 .withInconsistencyHandler(this::onInconsistencyDetected)

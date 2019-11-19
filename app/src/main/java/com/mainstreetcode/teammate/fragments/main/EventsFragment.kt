@@ -30,9 +30,11 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.EventAdapterListener
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.eventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
@@ -40,7 +42,6 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.swap
 import com.tunjid.androidx.core.components.args
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -48,8 +49,8 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  */
 
 class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        TeamAdapter.AdapterListener,
-        EventAdapter.EventAdapterListener {
+        Shell.TeamAdapterListener,
+        EventAdapterListener {
 
     private var team by args<Team>()
 
@@ -70,14 +71,14 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
 
         val refreshAction = { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_event_white_24dp, R.string.no_events))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(EventAdapter(::items, this))
+                .withAdapter(eventAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
     }

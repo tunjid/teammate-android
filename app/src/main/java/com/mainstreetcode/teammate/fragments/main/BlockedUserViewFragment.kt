@@ -29,7 +29,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.BlockedUserViewAdapter
+import com.mainstreetcode.teammate.adapters.blockedUserViewAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.BlockedUser
@@ -68,7 +68,7 @@ class BlockedUserViewFragment : HeaderedFragment<BlockedUser>(R.layout.fragment_
         )
 
         scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
-                .withAdapter(BlockedUserViewAdapter(gofer.items))
+                .withAdapter(blockedUserViewAdapter(gofer::items))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()

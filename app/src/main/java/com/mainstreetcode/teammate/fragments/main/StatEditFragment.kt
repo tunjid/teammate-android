@@ -31,10 +31,11 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StatEditAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.StatEditListener
+import com.mainstreetcode.teammate.adapters.statEditAdapter
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
 import com.mainstreetcode.teammate.model.Stat
@@ -49,8 +50,8 @@ import com.tunjid.androidx.view.util.InsetFlags
  */
 
 class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
-        UserAdapter.AdapterListener,
-        StatEditAdapter.AdapterListener {
+        Shell.UserAdapterListener,
+        StatEditListener {
 
     override lateinit var headeredModel: Stat
         private set
@@ -84,9 +85,9 @@ class StatEditFragment : HeaderedFragment<Stat>(R.layout.fragment_headered),
                 fabText = fabText,
                 fabShows = showsFab
         )
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(StatEditAdapter(gofer.items, this))
+                .withAdapter(statEditAdapter(gofer.items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

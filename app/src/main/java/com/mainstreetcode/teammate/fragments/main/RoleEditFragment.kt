@@ -32,7 +32,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.RoleEditAdapter
+import com.mainstreetcode.teammate.adapters.RoleEditAdapterListener
+import com.mainstreetcode.teammate.adapters.roleEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
@@ -47,7 +48,7 @@ import com.tunjid.androidx.view.util.InsetFlags
  * Edits a Team member
  */
 
-class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), RoleEditAdapter.RoleEditAdapterListener {
+class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), RoleEditAdapterListener {
 
     override lateinit var headeredModel: Role
         private set
@@ -79,7 +80,7 @@ class RoleEditFragment : HeaderedFragment<Role>(R.layout.fragment_headered), Rol
 
         scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(RoleEditAdapter(gofer.items, this))
+                .withAdapter(roleEditAdapter(gofer::items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

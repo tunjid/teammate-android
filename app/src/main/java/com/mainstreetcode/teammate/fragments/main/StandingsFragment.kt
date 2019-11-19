@@ -28,7 +28,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StandingsAdapter
+import com.mainstreetcode.teammate.adapters.StandingsAdapterListener
+import com.mainstreetcode.teammate.adapters.standingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
@@ -45,7 +46,7 @@ import com.mainstreetcode.teammate.util.SyncedScrollView
  */
 
 class StandingsFragment : TeammatesBaseFragment(R.layout.fragment_standings),
-        StandingsAdapter.AdapterListener {
+        StandingsAdapterListener {
 
     private lateinit var tournament: Tournament
     private lateinit var standings: Standings
@@ -79,7 +80,7 @@ class StandingsFragment : TeammatesBaseFragment(R.layout.fragment_standings),
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchStandings(false) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(StandingsAdapter(standings.table, this))
+                .withAdapter(standingsAdapter(standings::table, this))
                 .withLinearLayoutManager()
                 .build()
 

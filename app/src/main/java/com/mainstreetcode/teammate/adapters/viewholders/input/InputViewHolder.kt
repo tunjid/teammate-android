@@ -38,23 +38,25 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.view.doOnLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 open class InputViewHolder(
         itemView: View
-) : BaseViewHolder<Unit>(itemView, Unit), TextWatcher {
+) : RecyclerView.ViewHolder(itemView), TextWatcher {
+
+    private val disposables = CompositeDisposable()
 
     private var lastLineCount = 1
 
     protected val hint: TextView = itemView.findViewById(R.id.hint)
-    protected val textField: EditText = itemView.findViewById(R.id.input)
+    private val textField: EditText = itemView.findViewById(R.id.input)
     private val button: ImageButton = itemView.findViewById(R.id.button)
 
     internal var textInputStyle: TextInputStyle? = null
@@ -75,7 +77,7 @@ open class InputViewHolder(
         }
     }
 
-    override fun clear() {
+    fun clear() {
         button.setOnClickListener(null)
         textField.setOnClickListener(null)
         textField.removeTextChangedListener(this)
@@ -83,12 +85,11 @@ open class InputViewHolder(
         textInputStyle?.viewHolder = null
         textInputStyle = null
 
-        super.clear()
+        disposables.clear()
     }
 
-    override fun onDetached() {
+    fun onDetached() {
         button.visibility = GONE
-        super.onDetached()
     }
 
     open fun bind(inputStyle: TextInputStyle) {

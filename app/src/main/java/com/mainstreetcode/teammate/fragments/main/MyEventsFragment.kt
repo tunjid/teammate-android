@@ -31,14 +31,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventAdapter
+import com.mainstreetcode.teammate.adapters.EventAdapterListener
+import com.mainstreetcode.teammate.adapters.eventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.MyEventsViewModel
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -46,7 +47,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  */
 
 class MyEventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        EventAdapter.EventAdapterListener {
+        EventAdapterListener {
 
     private lateinit var items: List<Differentiable>
     private lateinit var myEventsViewModel: MyEventsViewModel
@@ -72,13 +73,13 @@ class MyEventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refre
                     .subscribe(this::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_event_white_24dp, R.string.no_rsvp))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(EventAdapter(::items, this))
+                .withAdapter(eventAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
     }

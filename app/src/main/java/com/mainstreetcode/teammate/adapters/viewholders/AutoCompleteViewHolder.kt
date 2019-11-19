@@ -29,13 +29,15 @@ import android.graphics.Typeface
 import android.text.style.StyleSpan
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.AutoCompleteAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 
 class AutoCompleteViewHolder @SuppressLint("ClickableViewAccessibility")
-constructor(itemView: View, delegate: AutoCompleteAdapter.AdapterListener) : BaseViewHolder<AutoCompleteAdapter.AdapterListener>(itemView, delegate) {
+constructor(
+        itemView: View,
+        delegate: (AutocompletePrediction) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
 
     private lateinit var prediction: AutocompletePrediction
 
@@ -43,7 +45,7 @@ constructor(itemView: View, delegate: AutoCompleteAdapter.AdapterListener) : Bas
     private val subTitle: TextView = itemView.findViewById(R.id.sub_title)
 
     init {
-        itemView.setOnClickListener { delegate.onPredictionClicked(prediction) }
+        itemView.setOnClickListener { delegate.invoke(prediction) }
     }
 
     fun bind(prediction: AutocompletePrediction) {

@@ -30,19 +30,19 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StandingsAdapter
+import com.mainstreetcode.teammate.adapters.StandingsAdapterListener
 import com.mainstreetcode.teammate.model.Row
 import com.mainstreetcode.teammate.util.SyncedScrollView
 import com.mainstreetcode.teammate.util.resolveThemeColor
 import com.squareup.picasso.Picasso
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 
 class StandingRowViewHolder(
         itemView: View,
-        delegate: StandingsAdapter.AdapterListener
-) : InteractiveViewHolder<StandingsAdapter.AdapterListener>(itemView, delegate) {
+        val delegate: StandingsAdapterListener
+) : RecyclerView.ViewHolder(itemView) {
 
     private var row: Row? = null
 

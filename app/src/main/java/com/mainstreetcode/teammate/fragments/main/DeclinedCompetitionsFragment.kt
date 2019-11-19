@@ -26,28 +26,24 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.CompetitorAdapter
-import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
+import com.mainstreetcode.teammate.adapters.competitorAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
-import com.mainstreetcode.teammate.model.Item.Companion.COMPETITOR
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidx.recyclerview.diff.Differentiable
-import com.tunjid.androidx.view.util.inflate
 
 /**
  * Lists [tournaments][Event]
  */
 
-class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        CompetitorAdapter.AdapterListener {
+class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh) {
 
     private lateinit var items: List<Differentiable>
 
@@ -59,7 +55,7 @@ class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_lis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         defaultUi(
-                toolbarTitle =  getString(R.string.competitors_declined),
+                toolbarTitle = getString(R.string.competitors_declined),
                 fabShows = showsFab
         )
 
@@ -68,18 +64,14 @@ class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_lis
                     .subscribe(this@DeclinedCompetitionsFragment::onCompetitorsUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<CompetitorViewHolder>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_thumb_down_24dp, R.string.no_competitors_declined))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchCompetitions(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(object : CompetitorAdapter(items, this) {
-                    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder =
-                            if (viewType != COMPETITOR) super.onCreateViewHolder(viewGroup, viewType)
-                            else CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), delegate)
-                })
+                .withAdapter(competitorAdapter(::items, this::onCompetitorClicked))
                 .withLinearLayoutManager()
                 .build()
     }
@@ -89,7 +81,7 @@ class DeclinedCompetitionsFragment : TeammatesBaseFragment(R.layout.fragment_lis
         fetchCompetitions(true)
     }
 
-    override fun onCompetitorClicked(competitor: Competitor) {
+    private fun onCompetitorClicked(competitor: Competitor) {
         AlertDialog.Builder(requireActivity()).setTitle(getString(R.string.accept_competition))
                 .setPositiveButton(R.string.yes) { _, _ -> accept(competitor) }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }

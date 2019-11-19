@@ -28,13 +28,14 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.userAdapter
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 /**
  * Searches for users
@@ -42,7 +43,7 @@ import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 class UserSearchFragment : TeammatesBaseFragment(R.layout.fragment_user_search),
         SearchView.OnQueryTextListener,
-        UserAdapter.AdapterListener {
+        Shell.UserAdapterListener {
 
     private var searchView: SearchView? = null
     private lateinit var instantSearch: InstantSearch<String, User>
@@ -59,9 +60,9 @@ class UserSearchFragment : TeammatesBaseFragment(R.layout.fragment_user_search),
         )
         searchView = view.findViewById(R.id.searchView)
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(UserAdapter(instantSearch.currentItems, this))
+                .withAdapter(userAdapter(instantSearch::currentItems, this))
                 .withGridLayoutManager(2)
                 .build()
 
@@ -92,9 +93,9 @@ class UserSearchFragment : TeammatesBaseFragment(R.layout.fragment_user_search),
 
     override fun onUserClicked(item: User) {
         val target = targetFragment
-        val canPick = target is UserAdapter.AdapterListener
+        val canPick = target is Shell.UserAdapterListener
 
-        if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(item)
+        if (canPick) (target as Shell.UserAdapterListener).onUserClicked(item)
         else navigator.push(UserEditFragment.newInstance(item))
     }
 

@@ -36,22 +36,22 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat.setTransitionName
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.MediaAdapter
+import com.mainstreetcode.teammate.adapters.MediaAdapterListener
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
 import com.mainstreetcode.teammate.util.extractPalette
 import com.mainstreetcode.teammate.util.getTransitionName
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.view.util.marginLayoutParams
 
 
 abstract class MediaViewHolder<T : View> internal constructor(
         itemView: View,
-        delegate: MediaAdapter.MediaAdapterListener
-) : InteractiveViewHolder<MediaAdapter.MediaAdapterListener>(itemView, delegate),
+        val delegate: MediaAdapterListener
+) : RecyclerView.ViewHolder(itemView),
         ThumbnailHolder,
         Callback {
 
@@ -106,7 +106,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     fun bind(media: Media) {
         this.media = media
-        val delegate = this.delegate ?: return
+        val delegate = this.delegate
 
         setTransitionName(itemView, media.getTransitionName(R.id.fragment_media_background))
         setTransitionName(thumbnail, media.getTransitionName(R.id.fragment_media_thumbnail))
@@ -120,13 +120,13 @@ abstract class MediaViewHolder<T : View> internal constructor(
     open fun unBind() {}
 
     fun performLongClick(): Boolean {
-        val delegate = this.delegate ?: return true
+        val delegate = this.delegate
         highlightViewHolder(delegate::onMediaLongClicked)
         return true
     }
 
     internal fun loadImage(url: String, fitToSize: Boolean, destination: ImageView) {
-        val isFullScreen = delegate?.isFullScreen ?: return
+        val isFullScreen = delegate.isFullScreen
         if (url.isBlank()) return
 
         var creator = Picasso.get().load(url)
@@ -170,7 +170,7 @@ abstract class MediaViewHolder<T : View> internal constructor(
 
     private fun onFillExtracted(@ColorInt colorFill: Int, destination: View) {
         destination.setBackgroundColor(colorFill)
-        delegate?.onFillLoaded()
+        delegate.onFillLoaded()
     }
 
     private fun animateProperty(property: String, start: Float, end: Float): ObjectAnimator =

@@ -31,7 +31,8 @@ import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamEditAdapter
+import com.mainstreetcode.teammate.adapters.TeamEditAdapterListener
+import com.mainstreetcode.teammate.adapters.teamEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.Team
@@ -47,7 +48,7 @@ import com.tunjid.androidx.view.util.InsetFlags
 
 class TeamEditFragment : HeaderedFragment<Team>(R.layout.fragment_headered),
         AddressPickerFragment.AddressPicker,
-        TeamEditAdapter.TeamEditAdapterListener {
+        TeamEditAdapterListener {
 
     override lateinit var headeredModel: Team
         private set
@@ -81,7 +82,7 @@ class TeamEditFragment : HeaderedFragment<Team>(R.layout.fragment_headered),
         )
         scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(TeamEditAdapter(gofer.items, this))
+                .withAdapter(teamEditAdapter(gofer::items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

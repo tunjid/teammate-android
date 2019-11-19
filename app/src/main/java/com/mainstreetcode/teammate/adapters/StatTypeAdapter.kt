@@ -25,32 +25,28 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.ChipViewHolder
 import com.mainstreetcode.teammate.model.enums.StatAttribute
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.view.util.inflate
 
-class StatTypeAdapter(delegate: AdapterListener) : InteractiveAdapter<ChipViewHolder, StatTypeAdapter.AdapterListener>(delegate) {
+fun statTypeAdapter(listener: StatTypeAdapterListener): RecyclerView.Adapter<ChipViewHolder> = adapterOf(
+        itemsSource = { listener.attributes },
+        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+            ChipViewHolder(viewGroup.inflate(R.layout.viewholder_stat_attribute), listener)
+        },
+        viewHolderBinder = { holder, item, _ -> holder.bind(item) }
+)
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ChipViewHolder =
-            ChipViewHolder(viewGroup.inflate(R.layout.viewholder_stat_attribute), delegate)
+interface StatTypeAdapterListener {
 
-    override fun onBindViewHolder(chipViewHolder: ChipViewHolder, i: Int) {
-        chipViewHolder.bind(delegate.attributes[i])
-    }
+    val attributes: List<StatAttribute>
 
-    override fun getItemCount(): Int = delegate.attributes.size
+    val isEnabled: Boolean
 
-    interface AdapterListener {
+    fun isSelected(attribute: StatAttribute): Boolean
 
-        val attributes: List<StatAttribute>
-
-        val isEnabled: Boolean
-
-        fun isSelected(attribute: StatAttribute): Boolean
-
-        fun onAttributeTapped(attribute: StatAttribute)
-    }
+    fun onAttributeTapped(attribute: StatAttribute)
 }

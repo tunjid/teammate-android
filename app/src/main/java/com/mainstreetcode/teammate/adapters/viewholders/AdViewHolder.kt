@@ -30,21 +30,21 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.ContentAd
 import com.mainstreetcode.teammate.model.InstallAd
 import com.mainstreetcode.teammate.model.Team
 import com.squareup.picasso.Picasso
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
 /**
  * Viewholder for a [Team]
  */
 abstract class AdViewHolder<T : Ad<*>> internal constructor(
         itemView: View,
-        delegate: Any
-) : InteractiveViewHolder<Any>(itemView, delegate) {
+        protected val delegate: Any
+) : RecyclerView.ViewHolder(itemView) {
 
     internal lateinit var ad: T
 

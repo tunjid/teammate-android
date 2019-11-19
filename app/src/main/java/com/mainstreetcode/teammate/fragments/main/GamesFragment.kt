@@ -30,9 +30,10 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GameAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.gameAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitive
@@ -44,7 +45,6 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.swap
 import com.tunjid.androidx.core.components.args
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -52,8 +52,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  */
 
 class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        TeamAdapter.AdapterListener,
-        GameAdapter.AdapterListener {
+        Shell.TeamAdapterListener {
 
     private var team by args<Team>()
 
@@ -71,14 +70,14 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
 
         val refreshAction = { disposables.add(gameViewModel.refresh(team).subscribe(this::onGamesUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_score_white_24dp, R.string.no_games))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchGames(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(GameAdapter(::items, this))
+                .withAdapter(gameAdapter(::items, this::onGameClicked))
                 .withLinearLayoutManager()
                 .build()
     }
@@ -116,10 +115,6 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
         updateUi(toolbarTitle = getString(R.string.games_title, team.name))
     }.subscribe(::onGamesUpdated, defaultErrorHandler::invoke)).let { Unit }
 
-    override fun onGameClicked(game: Game) {
-        navigator.push(GameFragment.newInstance(game))
-    }
-
     override fun onClick(view: View) = when (view.id) {
         R.id.fab -> {
             val game = Game.empty(team)
@@ -136,6 +131,10 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
         is TournamentEditFragment -> transaction.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT, incomingFragment)
         else -> super.augmentTransaction(transaction, incomingFragment)
+    }
+
+    private fun onGameClicked(game: Game) {
+        navigator.push(GameFragment.newInstance(game))
     }
 
     private fun fetchGames(fetchLatest: Boolean) {

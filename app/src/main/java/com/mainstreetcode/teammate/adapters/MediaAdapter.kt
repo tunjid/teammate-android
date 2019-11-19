@@ -25,7 +25,7 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
@@ -36,62 +36,50 @@ import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Media
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
-import com.tunjid.androidx.recyclerview.diff.Differentiable
-
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.MEDIA_IMAGE
 import com.mainstreetcode.teammate.util.MEDIA_VIDEO
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Media]
  */
 
-class MediaAdapter(
-        private val media: () -> List<Differentiable>,
+fun mediaAdapter(
+        modelSource: () -> List<Differentiable>,
         listener: MediaAdapterListener
-) : InteractiveAdapter<InteractiveViewHolder<*>, MediaAdapter.MediaAdapterListener>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
-                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
-                MEDIA_IMAGE -> ImageMediaViewHolder(viewGroup.inflate(R.layout.viewholder_image), delegate)
-                else -> VideoMediaViewHolder(viewGroup.inflate(R.layout.viewholder_video), delegate)
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+            when (viewType) {
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                MEDIA_IMAGE -> ImageMediaViewHolder(viewGroup.inflate(R.layout.viewholder_image), listener)
+                else -> VideoMediaViewHolder(viewGroup.inflate(R.layout.viewholder_video), listener)
             }
+        },
+        viewHolderBinder = { holder, item, _ ->
+            when {
+                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
+                item is Media && holder is MediaViewHolder<*> -> holder.bind(item)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = { if (it is Media) if (it.isImage) MEDIA_IMAGE else MEDIA_VIDEO else (it as Ad<*>).type }
+)
 
-    override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = media()[position]) {
-            is Media -> (viewHolder as MediaViewHolder<*>).bind(item)
-            is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
-        }
-    }
+interface MediaAdapterListener {
 
-    override fun getItemCount(): Int = media().size
+    val isFullScreen: Boolean
 
-    override fun getItemViewType(position: Int): Int {
-        val identifiable = media()[position]
-        return if (identifiable is Media) if (identifiable.isImage) MEDIA_IMAGE else MEDIA_VIDEO else (identifiable as Ad<*>).type
-    }
+    fun onFillLoaded() {}
 
-    override fun getItemId(position: Int): Long = media()[position].hashCode().toLong()
+    fun onMediaClicked(item: Media)
 
-    interface MediaAdapterListener {
+    fun onMediaLongClicked(media: Media): Boolean
 
-        val isFullScreen: Boolean
-
-        fun onFillLoaded() {}
-
-        fun onMediaClicked(item: Media)
-
-        fun onMediaLongClicked(media: Media): Boolean
-
-        fun isSelected(media: Media): Boolean
-    }
+    fun isSelected(media: Media): Boolean
 }

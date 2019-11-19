@@ -29,14 +29,13 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.SettingsAdapter
+import com.mainstreetcode.teammate.adapters.settingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.SettingsItem
 import com.mainstreetcode.teammate.util.ScrollManager
 
-class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings),
-        SettingsAdapter.SettingsAdapterListener {
+class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,10 +45,11 @@ class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings),
         )
         scrollManager = ScrollManager.with<SettingsViewHolder>(view.findViewById(R.id.settings_list))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(SettingsAdapter(items, this))
+                .withAdapter(settingsAdapter(::items, this::onSettingsItemClicked))
                 .withLinearLayoutManager()
                 .build()
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when {
         item.itemId != R.id.action_delete_account -> super.onOptionsItemSelected(item)
@@ -66,20 +66,19 @@ class SettingsFragment : TeammatesBaseFragment(R.layout.fragment_settings),
         }, defaultErrorHandler::invoke))
     }
 
-    override fun onSettingsItemClicked(item: SettingsItem) {
-        when (item.stringRes) {
-            R.string.sign_out -> signOut()
-            R.string.settings_set_theme -> AlertDialog.Builder(requireContext())
-                    .setSingleChoiceItems(prefsViewModel.themeOptions, prefsViewModel.checkedIndex) { dialog, index ->
-                        prefsViewModel.onThemeSelected(index)
-                        dialog.dismiss()
-                    }
-                    .show()
-            R.string.show_on_boarding -> {
-                prefsViewModel.isOnBoarded = false
-                navigator.push(FeedFragment.newInstance())
-            }
+    private fun onSettingsItemClicked(item: SettingsItem) = when (item.stringRes) {
+        R.string.sign_out -> signOut()
+        R.string.settings_set_theme -> AlertDialog.Builder(requireContext())
+                .setSingleChoiceItems(prefsViewModel.themeOptions, prefsViewModel.checkedIndex) { dialog, index ->
+                    prefsViewModel.onThemeSelected(index)
+                    dialog.dismiss()
+                }
+                .show().let { Unit }
+        R.string.show_on_boarding -> {
+            prefsViewModel.isOnBoarded = false
+            navigator.push(FeedFragment.newInstance()).let { Unit }
         }
+        else -> Unit
     }
 
     companion object {

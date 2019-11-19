@@ -24,25 +24,27 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders
 
-import com.google.android.material.chip.Chip
 import android.view.View
-
-import com.mainstreetcode.teammate.adapters.StatTypeAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import com.mainstreetcode.teammate.adapters.StatTypeAdapterListener
 import com.mainstreetcode.teammate.model.enums.StatAttribute
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
-class ChipViewHolder(itemView: View, listener: StatTypeAdapter.AdapterListener) : InteractiveViewHolder<StatTypeAdapter.AdapterListener>(itemView, listener) {
+class ChipViewHolder(
+        itemView: View,
+        private val delegate: StatTypeAdapterListener
+) : RecyclerView.ViewHolder(itemView) {
     private val chip: Chip = itemView as Chip
     private lateinit var attribute: StatAttribute
 
     init {
-        chip.setOnClickListener { delegate?.onAttributeTapped(attribute) }
+        chip.setOnClickListener { delegate.onAttributeTapped(attribute) }
     }
 
     fun bind(attribute: StatAttribute) {
         this.attribute = attribute
         chip.text = attribute.name
-        chip.isEnabled = delegate?.isEnabled == true
-        chip.isChecked = delegate?.isSelected(attribute) == true
+        chip.isEnabled = delegate.isEnabled == true
+        chip.isChecked = delegate.isSelected(attribute) == true
     }
 }

@@ -29,14 +29,14 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.FragmentActivity
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.fragments.main.GamesFragment
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.navigation.requestIdToNavIndex
 
-class TeamPickerFragment : TeammatesBaseFragment(), TeamAdapter.AdapterListener {
+class TeamPickerFragment : TeammatesBaseFragment(), Shell.TeamAdapterListener {
 
     @IdRes
     private var requestCode: Int = 0

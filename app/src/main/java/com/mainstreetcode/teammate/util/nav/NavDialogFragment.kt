@@ -40,8 +40,8 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.RemoteImageAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.remoteImageAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.RemoteImageViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
@@ -75,7 +75,7 @@ class NavDialogFragment : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_bottom_nav, container, false)
         val itemView = root.findViewById<View>(R.id.item_container)
-        val teamViewHolder = TeamViewHolder(itemView, TeamAdapter.AdapterListener.asSAM(this::viewTeam))
+        val teamViewHolder = TeamViewHolder(itemView, Shell.TeamAdapterListener.asSAM(this::viewTeam))
         val navigationView = root.findViewById<NavigationView>(R.id.bottom_nav_view)
 
         val current = teamViewModel.defaultTeam
@@ -85,12 +85,10 @@ class NavDialogFragment : BottomSheetDialogFragment() {
 
         val scrollManager = ScrollManager.with<RemoteImageViewHolder<Team>>(root.findViewById(R.id.horizontal_list))
                 .withCustomLayoutManager(LinearLayoutManager(root.context, RecyclerView.HORIZONTAL, false))
-                .withAdapter(RemoteImageAdapter(list, object : RemoteImageAdapter.AdapterListener<Team> {
-                    override fun onImageClicked(item: Team) {
-                        teamViewModel.updateDefaultTeam(item)
-                        viewTeam(item)
-                    }
-                }))
+                .withAdapter(remoteImageAdapter({ list }) {
+                    teamViewModel.updateDefaultTeam(it)
+                    viewTeam(it)
+                })
                 .build()
 
         itemView.elevation = 0f

@@ -33,7 +33,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.MediaAdapter
+import com.mainstreetcode.teammate.adapters.MediaAdapterListener
 import com.mainstreetcode.teammate.adapters.viewholders.ImageMediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.VideoMediaViewHolder
@@ -43,7 +43,7 @@ import com.mainstreetcode.teammate.util.isDisplayingSystemUI
 import com.tunjid.androidx.view.util.InsetFlags
 
 
-class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapter.MediaAdapterListener {
+class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapterListener {
 
     private lateinit var media: Media
     private var mediaViewHolder: MediaViewHolder<*>? = null
@@ -55,7 +55,7 @@ class MediaDetailFragment : TeammatesBaseFragment(), MediaAdapter.MediaAdapterLi
     override val showsFab = false
 
     override val stableTag
-          get() = "${super.stableTag}-${arguments!!.getParcelable<Media>(ARG_MEDIA)}"
+        get() = "${super.stableTag}-${arguments!!.getParcelable<Media>(ARG_MEDIA)}"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -30,14 +30,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.CompetitorAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.Shell
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Competitive
 import com.mainstreetcode.teammate.model.Competitor
+import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.User
@@ -45,13 +45,15 @@ import com.mainstreetcode.teammate.util.ScrollManager
 import com.tunjid.androidx.functions.collections.transform
 import com.tunjid.androidx.recyclerview.ListManager
 import com.tunjid.androidx.recyclerview.SwipeDragOptions
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 import kotlin.math.min
 
 class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors),
-        UserAdapter.AdapterListener,
-        TeamAdapter.AdapterListener {
+        Shell.UserAdapterListener,
+        Shell.TeamAdapterListener {
 
     private lateinit var tournament: Tournament
     private lateinit var entities: MutableList<Competitive>
@@ -88,15 +90,23 @@ class CompetitorsFragment : TeammatesBaseFragment(R.layout.fragment_competitors)
 
         scrollManager = ScrollManager.with<CompetitorViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_bracket_white_24dp, R.string.add_tournament_competitors_detail))
-                .withAdapter(object : CompetitorAdapter(competitorDifferentiables, AdapterListener.asSAM {}) {
-                    override fun getItemId(position: Int): Long = entities[position].hashCode().toLong()
-
-                    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder {
-                        val holder = super.onCreateViewHolder(viewGroup, viewType)
-                        holder.dragHandle.visibility = View.VISIBLE
-                        return holder
-                    }
-                })
+                .withAdapter(adapterOf(
+                        itemsSource = ::competitorDifferentiables,
+                        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+                            CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_event)) {}.apply {
+                                dragHandle.visibility = View.VISIBLE
+                            }
+                        },
+                        viewHolderBinder = { holder, item, _ ->
+                            if (item is Competitor) holder.bind(item)
+                        },
+                        itemIdFunction = {
+                            entities.getOrNull(competitorDifferentiables.indexOf(it))?.hashCode()?.toLong()
+                                    ?: 0L
+                        },
+                        viewTypeFunction = { (it as? Ad<*>)?.type ?: Item.COMPETITOR }
+                )
+                )
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .withSwipeDragOptions(SwipeDragOptions(

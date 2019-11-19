@@ -35,8 +35,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TournamentEditAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.adapters.TournamentAdapterListener
+import com.mainstreetcode.teammate.adapters.tournamentEditAdapter
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Tournament
@@ -51,7 +51,7 @@ import com.tunjid.androidx.view.util.InsetFlags
  */
 
 class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_headered),
-        TournamentEditAdapter.AdapterListener {
+        TournamentAdapterListener {
 
     private var showingPrompt: Boolean = false
     override lateinit var headeredModel: Tournament
@@ -87,9 +87,9 @@ class TournamentEditFragment : HeaderedFragment<Tournament>(R.layout.fragment_he
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabShows = showsFab
         )
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(view.findViewById(R.id.model_list))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.model_list))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(TournamentEditAdapter(gofer.items, this))
+                .withAdapter(tournamentEditAdapter(gofer::items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())

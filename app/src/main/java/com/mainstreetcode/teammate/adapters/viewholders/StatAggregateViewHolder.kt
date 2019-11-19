@@ -26,11 +26,11 @@ package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.StatAggregate
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 
-class StatAggregateViewHolder(itemView: View) : InteractiveViewHolder<Unit>(itemView, Unit) {
+class StatAggregateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val count: TextView = itemView.findViewById(R.id.item_position)
     private val statType: TextView = itemView.findViewById(R.id.item_title)

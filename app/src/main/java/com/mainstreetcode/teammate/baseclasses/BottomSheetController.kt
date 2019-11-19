@@ -40,8 +40,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commitNow
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
+import com.mainstreetcode.teammate.adapters.Shell
 import com.mainstreetcode.teammate.fragments.main.AddressPickerFragment
 import com.mainstreetcode.teammate.fragments.main.BlankBottomSheetFragment
 import com.mainstreetcode.teammate.model.Team
@@ -202,18 +201,18 @@ class ToolbarState(
  * Relays callbacks from the fragment in the bottom sheet to the [Fragment] visible behind it
  */
 class RelayFragment : Fragment(),
-        UserAdapter.AdapterListener,
-        TeamAdapter.AdapterListener,
+        Shell.UserAdapterListener,
+        Shell.TeamAdapterListener,
         AddressPickerFragment.AddressPicker {
 
     val navigator by activityNavigatorController<AppNavigator>()
 
     override fun onUserClicked(item: User) {
-        caller<UserAdapter.AdapterListener>()?.run { this.onUserClicked(item) }
+        caller<Shell.UserAdapterListener>()?.run { this.onUserClicked(item) }
     }
 
     override fun onTeamClicked(item: Team) {
-        caller<TeamAdapter.AdapterListener>()?.run { this.onTeamClicked(item) }
+        caller<Shell.TeamAdapterListener>()?.run { this.onTeamClicked(item) }
     }
 
     override fun onAddressPicked(address: Address) {

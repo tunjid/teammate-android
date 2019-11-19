@@ -30,14 +30,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.AutoCompleteAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
+import com.mainstreetcode.teammate.adapters.autoCompleteAdapter
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.databinding.FragmentPlacePickerBinding
 import com.mainstreetcode.teammate.util.InstantSearch
@@ -75,17 +75,15 @@ class AddressPickerFragment : TeammatesBaseFragment(R.layout.fragment_place_pick
                 fabIcon = R.drawable.ic_check_white_24dp,
                 fabShows = showsFab
         )
-        scrollManager = ScrollManager.with<BaseViewHolder<*>>(searchPredictions)
-                .withAdapter(AutoCompleteAdapter(instantSearch.currentItems, object : AutoCompleteAdapter.AdapterListener {
-                    override fun onPredictionClicked(prediction: AutocompletePrediction) {
-                        searchField.setQuery("", false)
-                        searchField.clearFocus()
-                        searchPredictions.visibility = View.GONE
-                        mapViewContainer.visibility = View.VISIBLE
-                        disposables.add(locationViewModel.fromAutoComplete(prediction)
-                                .subscribe(this@AddressPickerFragment::onMapAddressFound, defaultErrorHandler::invoke))
-                    }
-                }))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(searchPredictions)
+                .withAdapter(autoCompleteAdapter(instantSearch::currentItems) {
+                    searchField.setQuery("", false)
+                    searchField.clearFocus()
+                    searchPredictions.visibility = View.GONE
+                    mapViewContainer.visibility = View.VISIBLE
+                    disposables.add(locationViewModel.fromAutoComplete(it)
+                            .subscribe(this@AddressPickerFragment::onMapAddressFound, defaultErrorHandler::invoke))
+                })
                 .withInconsistencyHandler(this@AddressPickerFragment::onInconsistencyDetected)
                 .withLinearLayoutManager()
                 .build()

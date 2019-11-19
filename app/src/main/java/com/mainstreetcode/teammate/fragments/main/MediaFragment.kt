@@ -32,10 +32,12 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.MediaTransferIntentService
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.MediaAdapter
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.MediaAdapterListener
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.mediaAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.MediaViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
@@ -45,12 +47,11 @@ import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.swap
 import com.tunjid.androidx.core.components.args
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
-        TeamAdapter.AdapterListener,
-        MediaAdapter.MediaAdapterListener,
+        MediaAdapterListener,
+        Shell.TeamAdapterListener,
         ImageWorkerFragment.MediaListener,
         ImageWorkerFragment.DownloadRequester {
 
@@ -94,13 +95,13 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
 
         val refreshAction = { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.team_media))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.team_media))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_video_library_black_24dp, R.string.no_media))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchMedia(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(MediaAdapter(::items, this))
+                .withAdapter(mediaAdapter(::items, this))
                 .withGridLayoutManager(4)
                 .build()
     }

@@ -24,33 +24,21 @@
 
 package com.mainstreetcode.teammate.adapters
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.SettingsViewHolder
 import com.mainstreetcode.teammate.model.SettingsItem
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.view.util.inflate
 
-
-class SettingsAdapter(
-        private val items: List<SettingsItem>,
-        listener: SettingsAdapterListener
-) : InteractiveAdapter<SettingsViewHolder, SettingsAdapter.SettingsAdapterListener>(listener) {
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): SettingsViewHolder {
-        val context = viewGroup.context
-        val itemView = LayoutInflater.from(context).inflate(R.layout.viewholder_settings, viewGroup, false)
-        return SettingsViewHolder(itemView, delegate)
-    }
-
-    override fun onBindViewHolder(settingsViewHolder: SettingsViewHolder, i: Int) {
-        settingsViewHolder.bind(items[i])
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    interface SettingsAdapterListener {
-        fun onSettingsItemClicked(item: SettingsItem)
-    }
-
-}
+fun settingsAdapter(
+        modelSource: () -> List<SettingsItem>,
+        listener: (SettingsItem) -> Unit
+): RecyclerView.Adapter<SettingsViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+            SettingsViewHolder(viewGroup.inflate(R.layout.viewholder_settings), listener)
+        },
+        viewHolderBinder = { holder, item, _ -> holder.bind(item) }
+)

@@ -28,17 +28,16 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.RemoteImage
 import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
 import com.squareup.picasso.Picasso
 
 
-open class ModelCardViewHolder<H : RemoteImage, T : Any> internal constructor(
-        itemView: View,
-        delegate: T
-) : BaseViewHolder<T>(itemView, delegate), ThumbnailHolder {
+open class ModelCardViewHolder<H : RemoteImage> internal constructor(
+        itemView: View
+) : RecyclerView.ViewHolder(itemView), ThumbnailHolder {
 
     protected lateinit var model: H
 
@@ -62,12 +61,12 @@ open class ModelCardViewHolder<H : RemoteImage, T : Any> internal constructor(
         else load(imageUrl, thumbnail)
     }
 
-    fun withTitle(@StringRes titleRes: Int): ModelCardViewHolder<H, T> {
+    fun withTitle(@StringRes titleRes: Int): ModelCardViewHolder<H> {
         title.setText(titleRes)
         return this
     }
 
-    fun withSubTitle(@StringRes subTitleRes: Int): ModelCardViewHolder<H, T> {
+    fun withSubTitle(@StringRes subTitleRes: Int): ModelCardViewHolder<H> {
         subtitle.setText(subTitleRes)
         return this
     }

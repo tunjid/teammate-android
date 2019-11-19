@@ -25,31 +25,58 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
+import com.mainstreetcode.teammate.adapters.viewholders.bind
+import com.mainstreetcode.teammate.model.Ad
+import com.mainstreetcode.teammate.model.Role
+import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.mainstreetcode.teammate.util.TEAM
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 import com.tunjid.androidx.view.util.marginLayoutParams
 
-class TeamSearchAdapter(items: List<Differentiable>, listener: AdapterListener) : TeamAdapter(items, listener) {
+fun teamSearchAdapter(
+        modelSource: () -> List<Differentiable>,
+        listener: Shell.TeamAdapterListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+            when (viewType) {
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                else -> getTeamViewHolder(viewGroup, listener)
+            }
+        },
+        viewHolderBinder = { holder, item, _ ->
+            when {
+                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
+                item is Team && holder is TeamViewHolder -> holder.bind(item)
+                item is Role && holder is TeamViewHolder -> holder.bind(item.team)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = {
+            when (it) {
+                is Team -> TEAM
+                is Role -> TEAM
+                else -> (it as Ad<*>).type
+            }
+        }
+)
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
-        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
-        else -> getTeamViewHolder(viewGroup)
-    }
-
-    private fun getTeamViewHolder(viewGroup: ViewGroup): TeamViewHolder {
-        val itemView = viewGroup.inflate(R.layout.viewholder_list_item)
-        val resources = itemView.resources
-        val params = itemView.marginLayoutParams
-        params.rightMargin = resources.getDimensionPixelSize(R.dimen.half_margin)
-        params.leftMargin = params.rightMargin
-        return TeamViewHolder(itemView, delegate)
-    }
+private fun getTeamViewHolder(viewGroup: ViewGroup, listener: Shell.TeamAdapterListener): TeamViewHolder {
+    val itemView = viewGroup.inflate(R.layout.viewholder_list_item)
+    val resources = itemView.resources
+    val params = itemView.marginLayoutParams
+    params.rightMargin = resources.getDimensionPixelSize(R.dimen.half_margin)
+    params.leftMargin = params.rightMargin
+    return TeamViewHolder(itemView, listener)
 }

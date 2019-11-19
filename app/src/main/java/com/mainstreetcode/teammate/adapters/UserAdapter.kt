@@ -25,66 +25,43 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
+import com.mainstreetcode.teammate.adapters.viewholders.RoleViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Role
-import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.USER
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [Team]
- */
-
-class UserAdapter(private val items: List<Differentiable>, listener: AdapterListener) : InteractiveAdapter<InteractiveViewHolder<*>, UserAdapter.AdapterListener>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> = when (viewType) {
-        CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
-        INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
-        else -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), delegate)
-    }
-
-    override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        when (val item = items[position]) {
-            is Ad<*> -> (viewHolder as AdViewHolder<*>).bind(item)
-            is User -> (viewHolder as UserViewHolder).bind(item)
-            is Role -> (viewHolder as TeamViewHolder).bind(item.team)
-        }
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-    override fun getItemViewType(position: Int): Int {
-        val item = items[position]
-        return if (item is User) USER else (item as Ad<*>).type
-    }
-
-    interface AdapterListener {
-        fun onUserClicked(item: User)
-
-        companion object {
-            fun asSAM(function: (User) -> Unit) = object : AdapterListener {
-                override fun onUserClicked(item: User) = function.invoke(item)
+fun userAdapter(
+        modelSource: () -> List<Differentiable>,
+        listener: Shell.UserAdapterListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+            when (viewType) {
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                else -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), listener)
             }
-        }
-    }
-
-}
+        },
+        viewHolderBinder = { holder, item, _ ->
+            when {
+                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
+                item is User && holder is UserViewHolder -> holder.bind(item)
+                item is Role && holder is RoleViewHolder -> holder.bind(item)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = { (it as? Ad<*>)?.type ?: USER }
+)

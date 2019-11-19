@@ -27,17 +27,17 @@ package com.mainstreetcode.teammate.adapters.viewholders
 import android.view.View
 import androidx.core.view.ViewCompat.setTransitionName
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
+import com.mainstreetcode.teammate.adapters.UserHostListener
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.util.getTransitionName
 
 class JoinRequestViewHolder(
         itemView: View,
-        delegate: TeamMemberAdapter.UserAdapterListener
-) : ModelCardViewHolder<JoinRequest, TeamMemberAdapter.UserAdapterListener>(itemView, delegate), View.OnClickListener {
+        delegate: UserHostListener
+) : ModelCardViewHolder<JoinRequest>(itemView) {
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { delegate.onJoinRequestClicked(model) }
     }
 
     override fun bind(model: JoinRequest) {
@@ -56,7 +56,4 @@ class JoinRequestViewHolder(
         setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
-    override fun onClick(view: View) {
-        delegate?.onJoinRequestClicked(model)
-    }
 }

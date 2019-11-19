@@ -29,14 +29,15 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.teamAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -44,7 +45,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
  */
 
 class TeamsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        TeamAdapter.AdapterListener {
+        Shell.TeamAdapterListener {
 
     private lateinit var roles: List<Differentiable>
 
@@ -99,13 +100,13 @@ class TeamsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
                     .subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, emptyDrawable, emptyText))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(TeamAdapter(roles, this))
+                .withAdapter(teamAdapter(::roles, this))
                 .withStaggeredGridLayoutManager(2)
                 .build()
     }
@@ -117,9 +118,9 @@ class TeamsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
 
     override fun onTeamClicked(item: Team) {
         val target = targetFragment
-        val canPick = target is TeamAdapter.AdapterListener
+        val canPick = target is Shell.TeamAdapterListener
 
-        if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
+        if (canPick) (target as Shell.TeamAdapterListener).onTeamClicked(item)
         else {
             teamViewModel.updateDefaultTeam(item)
             navigator.push(TeamMembersFragment.newInstance(item))

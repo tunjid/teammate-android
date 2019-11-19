@@ -30,21 +30,21 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.BlockedUserAdapter
+import com.mainstreetcode.teammate.adapters.blockedUserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Lists [events][BlockedUser]
  */
 
-class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh), BlockedUserAdapter.UserAdapterListener {
+class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh) {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
@@ -77,12 +77,12 @@ class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_r
                     .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchBlockedUsers(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
-                .withAdapter(BlockedUserAdapter(items, this))
+                .withAdapter(blockedUserAdapter(items, this::onBlockedUserClicked))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withGridLayoutManager(2)
                 .build()
@@ -93,15 +93,15 @@ class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_r
         fetchBlockedUsers(true)
     }
 
-    override fun onBlockedUserClicked(blockedUser: BlockedUser) {
-        navigator.push(BlockedUserViewFragment.newInstance(blockedUser))
-    }
-
     override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
         is BlockedUserViewFragment ->
             transaction.listDetailTransition(BlockedUserViewFragment.ARG_BLOCKED_USER, incomingFragment)
 
         else -> super.augmentTransaction(transaction, incomingFragment)
+    }
+
+    private fun onBlockedUserClicked(blockedUser: BlockedUser) {
+        navigator.push(BlockedUserViewFragment.newInstance(blockedUser))
     }
 
     private fun fetchBlockedUsers(fetchLatest: Boolean) {

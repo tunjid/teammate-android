@@ -29,22 +29,20 @@ import android.view.View
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GameAdapter
+import com.mainstreetcode.teammate.adapters.gameAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Lists [tournaments][Event]
  */
 
-class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
-        GameAdapter.AdapterListener {
+class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child) {
 
     private var round: Int = 0
     private lateinit var tournament: Tournament
@@ -73,12 +71,12 @@ class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
                 if (fragment is TournamentDetailFragment) fragment.gamesRecycledViewPool
                 else RecyclerView.RecycledViewPool()
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.onRefresh() }
                 .withEndlessScroll { fetchTournaments(false) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(GameAdapter(::items, this))
+                .withAdapter(gameAdapter(::items, this::onGameClicked))
                 .withRecycledViewPool(recycledViewPool)
                 .withLinearLayoutManager()
                 .build()
@@ -97,7 +95,7 @@ class GamesChildFragment : TeammatesBaseFragment(R.layout.fragment_games_child),
 
     override fun togglePersistentUi() = Unit /* Do nothing */
 
-    override fun onGameClicked(game: Game) {
+    private fun onGameClicked(game: Game) {
         navigator.push(GameFragment.newInstance(game))
     }
 

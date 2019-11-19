@@ -22,31 +22,29 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.baseclasses
+package com.mainstreetcode.teammate.adapters
 
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
+import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.User
 
-abstract class BaseAdapter<VH : BaseViewHolder<*>, T : Any>(adapterListener: T) : InteractiveAdapter<VH, T>(adapterListener) {
+class Shell {
+    interface TeamAdapterListener {
+        fun onTeamClicked(item: Team)
 
-    protected abstract fun <S : Any> updateListener(viewHolder: BaseViewHolder<S>): S
-
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        val listener = updateListener(holder)
-        holder.updateAdapterListener(listener)
+        companion object {
+            fun asSAM(function: (Team) -> Unit) = object : TeamAdapterListener {
+                override fun onTeamClicked(item: Team) = function.invoke(item)
+            }
+        }
     }
 
-    override fun onViewRecycled(holder: VH) {
-        holder.clear()
-        super.onViewRecycled(holder)
-    }
+    interface UserAdapterListener {
+        fun onUserClicked(item: User)
 
-    override fun onViewDetachedFromWindow(holder: VH) {
-        holder.onDetached()
-        super.onViewDetachedFromWindow(holder)
-    }
-
-    override fun onFailedToRecycleView(holder: VH): Boolean {
-        holder.clear()
-        return super.onFailedToRecycleView(holder)
+        companion object {
+            fun asSAM(function: (User) -> Unit) = object : UserAdapterListener {
+                override fun onUserClicked(item: User) = function.invoke(item)
+            }
+        }
     }
 }

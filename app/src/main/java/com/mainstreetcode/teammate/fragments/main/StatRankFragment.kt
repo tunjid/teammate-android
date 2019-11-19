@@ -31,15 +31,14 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StatRankAdapter
+import com.mainstreetcode.teammate.adapters.statRankAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.mainstreetcode.teammate.util.simpleAdapterListener
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 class StatRankFragment : TeammatesBaseFragment(R.layout.fragment_stat_rank) {
@@ -67,12 +66,12 @@ class StatRankFragment : TeammatesBaseFragment(R.layout.fragment_stat_rank) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val spinner = view.findViewById<Spinner>(R.id.spinner)
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_medal_24dp, R.string.no_stat_ranks))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(StatRankAdapter(
-                        statRanks,
-                        simpleAdapterListener { statRank -> navigator.push(UserEditFragment.newInstance(statRank.user)) }))
+                .withAdapter(statRankAdapter(
+                        ::statRanks
+                ) { statRank -> navigator.push(UserEditFragment.newInstance(statRank.user)) })
                 .withLinearLayoutManager()
                 .build()
 

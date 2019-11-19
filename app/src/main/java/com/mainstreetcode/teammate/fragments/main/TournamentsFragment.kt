@@ -30,9 +30,10 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.adapters.TournamentAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.tournamentAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
@@ -42,7 +43,6 @@ import com.mainstreetcode.teammate.model.Tournament
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.swap
 import com.tunjid.androidx.core.components.args
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
@@ -51,8 +51,7 @@ import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
-        TeamAdapter.AdapterListener,
-        TournamentAdapter.TournamentAdapterListener {
+        Shell.TeamAdapterListener {
 
     private var team by args<Team>()
 
@@ -75,14 +74,14 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
                     .subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(view.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_trophy_white_24dp, R.string.no_tournaments))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchTournaments(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(TournamentAdapter(::items, this))
+                .withAdapter(tournamentAdapter(::items, this::onTournamentClicked))
                 .withLinearLayoutManager()
                 .build()
     }
@@ -113,9 +112,6 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
         updateUi(toolbarTitle = getString(R.string.tournaments_title, team.name))
     }.subscribe(::onTournamentsUpdated, defaultErrorHandler::invoke)).let { Unit }
 
-    override fun onTournamentClicked(tournament: Tournament) =
-            navigator.push(TournamentDetailFragment.newInstance(tournament)).let { Unit }
-
     override fun onClick(view: View) = when {
         view.id == R.id.fab -> navigator.push(TournamentEditFragment.newInstance(Tournament.empty(team))).let { Unit }
         else -> Unit
@@ -126,6 +122,9 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
             transaction.listDetailTransition(TournamentEditFragment.ARG_TOURNAMENT, incomingFragment)
         else -> super.augmentTransaction(transaction, incomingFragment)
     }
+
+    private fun onTournamentClicked(tournament: Tournament) =
+            navigator.push(TournamentDetailFragment.newInstance(tournament)).let { Unit }
 
     private fun fetchTournaments(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()

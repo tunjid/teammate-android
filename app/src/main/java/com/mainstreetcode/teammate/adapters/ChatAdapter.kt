@@ -24,49 +24,52 @@
 
 package com.mainstreetcode.teammate.adapters
 
+import android.text.format.DateUtils
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.EventViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
-import com.mainstreetcode.teammate.adapters.viewholders.bind
+import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.model.Ad
-import com.mainstreetcode.teammate.model.Event
-import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.model.Chat
+import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.EVENT
-import com.mainstreetcode.teammate.util.INSTALL_AD
+import com.mainstreetcode.teammate.util.areDifferentDays
 import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 
 /**
- * Adapter for [com.mainstreetcode.teammate.model.Event]
+ * Adapter for [Chat]
  */
 
-fun eventAdapter(
+fun chatAdapter(
         modelSource: () -> List<Differentiable>,
-        listener: EventAdapterListener
-): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        signedInUser: User,
+        listener: (Chat) -> Unit
+): RecyclerView.Adapter<TeamChatViewHolder> = adapterOf(
         itemsSource = modelSource,
-        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
-            when (viewType) {
-                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
-                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
-                else -> EventViewHolder(viewGroup.inflate(R.layout.viewholder_event), listener)
-            }
+        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+            TeamChatViewHolder(viewGroup.inflate(R.layout.viewholder_chat), listener)
         },
-        viewHolderBinder = { holder, item, _ ->
-            when {
-                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
-                item is Event && holder is EventViewHolder -> holder.bind(item)
-            }
+        viewHolderBinder = { holder, item, i ->
+            val list = modelSource()
+            val size = list.size
+
+            val chat = forceCast(item)
+            val prev = if (i == 0) null else forceCast(list[i - 1])
+            val next = if (i < size - 1) forceCast(list[i + 1]) else null
+
+            val chatUser = chat.user
+            val created = chat.created
+
+            val hideDetails = next != null && chatUser == next.user
+            val showPicture = signedInUser != chatUser && (prev == null || chatUser != prev.user)
+            val isFirstMessageToday = DateUtils.isToday(created.time) && areDifferentDays(prev?.created, created)
+
+            holder.bind(chat, signedInUser == chat.user, !hideDetails, showPicture, isFirstMessageToday)
         },
         itemIdFunction = { it.hashCode().toLong() },
         viewTypeFunction = { (it as? Ad<*>)?.type ?: EVENT }
 )
 
-interface EventAdapterListener {
-    fun onEventClicked(item: Event)
-}
+private fun forceCast(identifiable: Differentiable): Chat = identifiable as Chat

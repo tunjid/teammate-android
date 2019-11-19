@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
@@ -35,67 +36,51 @@ import com.mainstreetcode.teammate.adapters.viewholders.bind
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Role
-import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.TeamMember
 import com.mainstreetcode.teammate.util.CONTENT_AD
 import com.mainstreetcode.teammate.util.INSTALL_AD
 import com.mainstreetcode.teammate.util.JOIN_REQUEST
 import com.mainstreetcode.teammate.util.ROLE
-import com.tunjid.androidx.recyclerview.InteractiveAdapter
-import com.tunjid.androidx.recyclerview.InteractiveViewHolder
+import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [Team]
- */
-
-class TeamMemberAdapter(
-        private val teamModels: List<Differentiable>,
-        listener: UserAdapterListener
-) : InteractiveAdapter<InteractiveViewHolder<*>, TeamMemberAdapter.UserAdapterListener>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InteractiveViewHolder<*> =
+fun teamMemberAdapter(
+        modelSource: () -> List<Differentiable>,
+        listener: UserHostListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
             when (viewType) {
-                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), delegate)
-                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), delegate)
-                ROLE -> RoleViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
-                else -> JoinRequestViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), delegate)
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                ROLE -> RoleViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), listener)
+                else -> JoinRequestViewHolder(viewGroup.inflate(R.layout.viewholder_grid_item), listener)
             }
+        },
+        viewHolderBinder = bind@{ holder, item, _ ->
+            if (item is Ad<*> && holder is AdViewHolder<*>) holder.bind(item)
+            if (item !is TeamMember) return@bind
 
-    override fun onBindViewHolder(viewHolder: InteractiveViewHolder<*>, position: Int) {
-        val item = teamModels[position]
+            val wrapped = item.wrappedModel
 
-        if (item is Ad<*>) (viewHolder as AdViewHolder<*>).bind(item)
-        if (item !is TeamMember) return
-
-        when (val wrapped = item.wrappedModel) {
-            is Role -> (viewHolder as RoleViewHolder).bind(wrapped)
-            is JoinRequest -> (viewHolder as JoinRequestViewHolder).bind(wrapped)
+            when {
+                wrapped is Role && holder is RoleViewHolder -> holder.bind(wrapped)
+                wrapped is JoinRequest && holder is JoinRequestViewHolder -> holder.bind(wrapped)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = {
+            when (it) {
+                is Ad<*> -> it.type
+                !is TeamMember -> JOIN_REQUEST
+                else -> if (it.wrappedModel is Role) ROLE else JOIN_REQUEST
+            }
         }
-    }
+)
 
-    override fun getItemId(position: Int): Long = teamModels[position].hashCode().toLong()
+interface UserHostListener {
+    fun onRoleClicked(role: Role)
 
-    override fun getItemCount(): Int = teamModels.size
-
-    override fun getItemViewType(position: Int): Int {
-        val item = teamModels[position]
-        if (item is Ad<*>) return item.type
-        if (item !is TeamMember) return JOIN_REQUEST
-
-        val wrapped = item.wrappedModel
-        return if (wrapped is Role) ROLE else JOIN_REQUEST
-    }
-
-    interface UserAdapterListener {
-        fun onRoleClicked(role: Role)
-
-        fun onJoinRequestClicked(request: JoinRequest)
-    }
-
+    fun onJoinRequestClicked(request: JoinRequest)
 }
