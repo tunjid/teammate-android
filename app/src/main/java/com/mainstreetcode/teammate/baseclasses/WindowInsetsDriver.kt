@@ -140,7 +140,6 @@ class WindowInsetsDriver(
         keyboardPadding.layoutParams.height = if (keyboardPad != 0) keyboardPad else 1 // 0 breaks animations
     }
 
-
     private fun adjustInsetForFragment(fragment: Fragment?) {
         if (fragment !is InsetProvider || isNotInCurrentFragmentContainer(fragment)) return
 
