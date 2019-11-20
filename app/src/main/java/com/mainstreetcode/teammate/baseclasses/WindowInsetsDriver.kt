@@ -24,8 +24,6 @@
 
 package com.mainstreetcode.teammate.baseclasses
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -71,7 +69,7 @@ class WindowInsetsDriver(
         ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> consumeSystemInsets(insets) }
     }
 
-    override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) = adjustInsetForFragment(f)
+//    override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) = adjustInsetForFragment(f)
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) =
             onFragmentViewCreated(v, f)
@@ -127,7 +125,7 @@ class WindowInsetsDriver(
 
     private fun setKeyboardPadding(bottomSystemInset: Int) {
         val old = contentContainer.paddingBottom
-        val new = max(insetAdjuster(bottomSystemInset - bottomInset), 0)
+        val new = bottomSystemInset - bottomInset
 
         if (old != new) TransitionManager.beginDelayedTransition(parentContainer, AutoTransition().apply {
             duration = ANIMATION_DURATION.toLong()
@@ -136,16 +134,17 @@ class WindowInsetsDriver(
             excludeTarget(RecyclerView::class.java, true)
         })
 
+        val keyboardPad = max(insetAdjuster(bottomSystemInset - bottomInset), 0)
+
         contentContainer.updatePadding(bottom = new)
-        keyboardPadding.layoutParams.height = if (new != 0) new else 1 // 0 breaks animations
+        keyboardPadding.layoutParams.height = if (keyboardPad != 0) keyboardPad else 1 // 0 breaks animations
     }
 
 
-    @SuppressLint("InlinedApi")
     private fun adjustInsetForFragment(fragment: Fragment?) {
         if (fragment !is InsetProvider || isNotInCurrentFragmentContainer(fragment)) return
 
-        fragment.insetFlags.dispatch {
+        fragment.insetFlags.dispatch(fragment.tag) {
             if (insetFlags == null || lastSystemInsetDispatch == this) return
 
             toolbar.marginLayoutParams.topMargin = if (insetFlags.hasTopInset) 0 else topInset
@@ -167,12 +166,17 @@ class WindowInsetsDriver(
                     if (insetFlags.hasRightInset) this.rightInset else 0,
                     0)
 
+            val topPadding = if (insetFlags.hasTopInset) topInset else 0
+            val bottomPadding = if (insetFlags.hasBottomInset) bottomInset else 0
+
+            fragment.view?.updatePadding(top = topPadding, bottom = bottomPadding)
+
             lastSystemInsetDispatch = this
         }
     }
 
-    private inline fun InsetFlags.dispatch(receiver: InsetDispatch.() -> Unit) =
-            receiver.invoke(InsetDispatch(leftInset, topInset, rightInset, bottomInset, this))
+    private inline fun InsetFlags.dispatch(tag: String?, receiver: InsetDispatch.() -> Unit) =
+            receiver.invoke(InsetDispatch(tag, leftInset, topInset, rightInset, bottomInset, this))
 
     companion object {
         const val ANIMATION_DURATION = 300
@@ -182,6 +186,7 @@ class WindowInsetsDriver(
     }
 
     private data class InsetDispatch(
+            val tag: String? = null,
             val leftInset: Int = 0,
             val topInset: Int = 0,
             val rightInset: Int = 0,
