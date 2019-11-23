@@ -31,6 +31,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProviders
@@ -44,6 +45,7 @@ import com.mainstreetcode.teammate.baseclasses.TransientBarController
 import com.mainstreetcode.teammate.baseclasses.TransientBarDriver
 import com.mainstreetcode.teammate.baseclasses.WindowInsetsDriver
 import com.mainstreetcode.teammate.baseclasses.globalUiDriver
+import com.mainstreetcode.teammate.databinding.ActivityMainBinding
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.navigation.AppNavigator
@@ -76,8 +78,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
         super.onCreate(savedInstanceState)
 
-        supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(), true)
+        val bottomNav = findViewById<View>(R.id.bottom_navigation)
+
         supportFragmentManager.registerFragmentLifecycleCallbacks(transientBarCallback(), true)
+        supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver {
+            if (uiState.bottomNavShows) bottomNav.height else 0 }, true)
 
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
@@ -97,13 +102,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = navigator.onNavItemSelected(item.itemId)
 
-    private fun adjustKeyboardPadding(suggestion: Int): Int {
-        var padding = suggestion
-        if (padding != WindowInsetsDriver.bottomInset && uiState.bottomNavShows) padding -= navigator.bottomNavHeight
-        return padding
-    }
-
-    private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
+    private fun windowInsetsDriver(bottomNavHeightSource: () -> Int): WindowInsetsDriver = WindowInsetsDriver(
             stackNavigatorSource = this.navigator::activeNavigator,
             parentContainer = findViewById(R.id.content_view),
             contentContainer = findViewById(R.id.main_fragment_container),
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
             topInsetView = findViewById(R.id.top_inset),
             bottomInsetView = findViewById(R.id.bottom_inset),
             keyboardPadding = findViewById(R.id.padding),
-            insetAdjuster = this::adjustKeyboardPadding
+            bottomNavHeight = bottomNavHeightSource
     )
 
     private fun transientBarCallback() = object : FragmentManager.FragmentLifecycleCallbacks() {

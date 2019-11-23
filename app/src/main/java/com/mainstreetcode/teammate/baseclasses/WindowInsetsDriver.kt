@@ -56,20 +56,18 @@ class WindowInsetsDriver(
         private val topInsetView: View,
         private val bottomInsetView: View,
         private val keyboardPadding: View,
-        private val insetAdjuster: (Int) -> Int
+        private val bottomNavHeight: () -> Int
 ) : FragmentManager.FragmentLifecycleCallbacks() {
 
     private var leftInset: Int = 0
     private var rightInset: Int = 0
-    private var insetsApplied: Boolean = false
+    private var insetsMeasured: Boolean = false
     private var lastFragmentBottomInset: Int = Int.MIN_VALUE
     private var lastSystemInsetDispatch: InsetDispatch? = InsetDispatch()
 
     init {
-        ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> consumeSystemInsets(insets) }
+        ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> onInsetsMeasured(insets) }
     }
-
-//    override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) = adjustInsetForFragment(f)
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) =
             onFragmentViewCreated(v, f)
@@ -77,8 +75,8 @@ class WindowInsetsDriver(
     private fun isNotInCurrentFragmentContainer(fragment: Fragment): Boolean =
             stackNavigatorSource()?.run { fragment.id != containerId } ?: true
 
-    private fun consumeSystemInsets(insets: WindowInsetsCompat): WindowInsetsCompat {
-        if (this.insetsApplied) return insets
+    private fun onInsetsMeasured(insets: WindowInsetsCompat): WindowInsetsCompat {
+        if (this.insetsMeasured) return insets
 
         topInset = insets.systemWindowInsetTop
         leftInset = insets.systemWindowInsetLeft
@@ -96,7 +94,7 @@ class WindowInsetsDriver(
 
         adjustInsetForFragment(stackNavigatorSource()?.current)
 
-        this.insetsApplied = true
+        this.insetsMeasured = true
         return insets
     }
 
@@ -125,7 +123,7 @@ class WindowInsetsDriver(
 
     private fun setKeyboardPadding(bottomSystemInset: Int) {
         val old = contentContainer.paddingBottom
-        val new = bottomSystemInset - bottomInset
+        val new = max(bottomSystemInset - bottomInset - bottomNavHeight(), 0)
 
         if (old != new) TransitionManager.beginDelayedTransition(parentContainer, AutoTransition().apply {
             duration = ANIMATION_DURATION.toLong()
@@ -134,10 +132,8 @@ class WindowInsetsDriver(
             excludeTarget(RecyclerView::class.java, true)
         })
 
-        val keyboardPad = max(insetAdjuster(bottomSystemInset - bottomInset), 0)
-
         contentContainer.updatePadding(bottom = new)
-        keyboardPadding.layoutParams.height = if (keyboardPad != 0) keyboardPad else 1 // 0 breaks animations
+        keyboardPadding.layoutParams.height = if (new != 0) new else 1 // 0 breaks animations
     }
 
     private fun adjustInsetForFragment(fragment: Fragment?) {
@@ -166,7 +162,7 @@ class WindowInsetsDriver(
                     0)
 
             val topPadding = if (insetFlags.hasTopInset) topInset else 0
-            val bottomPadding = if (insetFlags.hasBottomInset) bottomInset else 0
+            val bottomPadding = bottomNavHeight() + if (insetFlags.hasBottomInset) bottomInset else 0
 
             fragment.view?.updatePadding(top = topPadding, bottom = bottomPadding)
 

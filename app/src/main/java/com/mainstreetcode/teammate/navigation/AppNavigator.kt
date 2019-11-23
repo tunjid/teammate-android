@@ -29,14 +29,12 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.children
-import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -118,8 +116,6 @@ class AppNavigator(private val host: FragmentActivity) :
 
     private val delegate: MultiStackNavigator by host.multiStackNavigationController(TAB_COUNT, R.id.main_fragment_container, this::route)
 
-    var bottomNavHeight: Int = 0
-
     val activeNavigator get() = delegate.activeNavigator
 
     init {
@@ -127,8 +123,7 @@ class AppNavigator(private val host: FragmentActivity) :
         toolbar.setNavigationContentDescription(R.string.expand_nav)
         toolbar.setNavigationOnClickListener { if (activeNavigator.previous == null) showNavOverflow() else pop() }
 
-        bottomNav = BottomNav.builder().setContainer(host.findViewById<LinearLayout>(R.id.bottom_navigation)
-                .apply { doOnLayout { bottomNavHeight = height } })
+        bottomNav = BottomNav.builder().setContainer(host.findViewById(R.id.bottom_navigation))
                 .setSwipeRunnable(this::showNavOverflow)
                 .setListener(View.OnClickListener { view -> onNavItemSelected(view.id) })
                 .setNavItems(NavItem.create(R.id.action_home, R.string.home, R.drawable.ic_home_black_24dp),
