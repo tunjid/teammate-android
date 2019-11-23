@@ -104,7 +104,7 @@ class GamesFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh)
         get() {
             val sport = team.sport
             val supportsTournaments = sport.supportsCompetitions()
-            return if (sport.betweenUsers()) supportsTournaments else supportsTournaments && localRoleViewModel.hasPrivilegedRole()
+            return if (sport.betweenUsers()) supportsTournaments else supportsTournaments && roleScopeViewModel.hasPrivilegedRole(team)
         }
 
     override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, gameViewModel) {

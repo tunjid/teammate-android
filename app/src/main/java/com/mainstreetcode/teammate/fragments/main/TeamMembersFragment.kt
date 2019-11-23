@@ -58,7 +58,7 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
     private lateinit var team: Team
     private lateinit var teamModels: List<Differentiable>
 
-    override val showsFab: Boolean get() = targetRequestCode == 0 && localRoleViewModel.hasPrivilegedRole()
+    override val showsFab: Boolean get() = targetRequestCode == 0 && roleScopeViewModel.hasPrivilegedRole(team)
 
     private val toolbarTitle: CharSequence get() = if (targetFragment != null) "" else getString(R.string.team_name_prefix, team.name)
 
@@ -156,7 +156,7 @@ class TeamMembersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.fab -> if (localRoleViewModel.hasPrivilegedRole())
+            R.id.fab -> if (roleScopeViewModel.hasPrivilegedRole(team))
                 navigator.push(JoinRequestFragment.inviteInstance(team))
         }
     }

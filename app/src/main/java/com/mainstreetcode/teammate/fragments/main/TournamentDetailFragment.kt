@@ -66,7 +66,7 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
     internal var gamesRecycledViewPool: RecyclerView.RecycledViewPool = RecyclerView.RecycledViewPool()
         private set
 
-    override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors()
+    override val showsFab: Boolean get() = roleScopeViewModel.hasPrivilegedRole(tournament.host) && !tournament.hasCompetitors()
 
     internal fun pending(competitor: Competitor): TournamentDetailFragment = apply {
         arguments!!.putParcelable(ARG_COMPETITOR, competitor)
@@ -104,7 +104,7 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val hasPrivilegedRole = localRoleViewModel.hasPrivilegedRole()
+        val hasPrivilegedRole = roleScopeViewModel.hasPrivilegedRole(tournament.host)
         menu.findItem(R.id.action_edit)?.isVisible = hasPrivilegedRole
         menu.findItem(R.id.action_delete)?.isVisible = hasPrivilegedRole
     }

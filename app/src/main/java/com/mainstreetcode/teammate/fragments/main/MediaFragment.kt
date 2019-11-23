@@ -124,7 +124,7 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
                 fragment = TeamsFragment.newInstance()
         ).let { true }
 
-        R.id.action_delete -> disposables.add(mediaViewModel.deleteMedia(team, localRoleViewModel.hasPrivilegedRole())
+        R.id.action_delete -> disposables.add(mediaViewModel.deleteMedia(team, roleScopeViewModel.hasPrivilegedRole(team))
                 .subscribe(this::onMediaDeleted, defaultErrorHandler::invoke)).let { true }
 
         R.id.action_download ->

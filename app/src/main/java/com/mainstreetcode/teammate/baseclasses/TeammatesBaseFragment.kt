@@ -43,7 +43,6 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.activities.MainActivity
@@ -70,7 +69,7 @@ import com.mainstreetcode.teammate.viewmodel.CompetitorViewModel
 import com.mainstreetcode.teammate.viewmodel.EventViewModel
 import com.mainstreetcode.teammate.viewmodel.FeedViewModel
 import com.mainstreetcode.teammate.viewmodel.GameViewModel
-import com.mainstreetcode.teammate.viewmodel.LocalRoleViewModel
+import com.mainstreetcode.teammate.viewmodel.RoleScopeViewModel
 import com.mainstreetcode.teammate.viewmodel.LocationViewModel
 import com.mainstreetcode.teammate.viewmodel.MediaViewModel
 import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
@@ -111,12 +110,11 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     protected val eventViewModel by activityViewModels<EventViewModel>()
     protected val mediaViewModel by activityViewModels<MediaViewModel>()
     protected val locationViewModel by activityViewModels<LocationViewModel>()
+    protected val roleScopeViewModel by activityViewModels<RoleScopeViewModel>()
     protected val teamMemberViewModel by activityViewModels<TeamMemberViewModel>()
     protected val competitorViewModel by activityViewModels<CompetitorViewModel>()
     protected val tournamentViewModel by activityViewModels<TournamentViewModel>()
     protected val blockedUserViewModel by activityViewModels<BlockedUserViewModel>()
-
-    protected val localRoleViewModel by viewModels<LocalRoleViewModel>()
 
     private var spacer: View? = null
 
@@ -276,7 +274,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     protected fun watchForRoleChanges(team: Team, onChanged: () -> Unit) {
         if (team.isEmpty) return
         val user = userViewModel.currentUser
-        disposables.add(localRoleViewModel.watchRoleChanges(user, team).subscribe({ onChanged.invoke() }, emptyErrorHandler::invoke))
+        disposables.add(roleScopeViewModel.watchRoleChanges(user, team).subscribe({ onChanged.invoke() }, emptyErrorHandler::invoke))
     }
 
     protected fun FragmentTransaction.listDetailTransition(

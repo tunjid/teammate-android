@@ -57,7 +57,7 @@ class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh
     private val items: List<Differentiable>
         get() = eventViewModel.getModelList(team)
 
-    override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole()
+    override val showsFab: Boolean get() = roleScopeViewModel.hasPrivilegedRole(team)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

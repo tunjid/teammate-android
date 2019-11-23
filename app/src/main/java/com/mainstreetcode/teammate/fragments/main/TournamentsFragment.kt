@@ -58,7 +58,7 @@ class TournamentsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_re
     private val items: MutableList<Differentiable>
         get() = tournamentViewModel.getModelList(team)
 
-    override val showsFab: Boolean get() = team.sport.supportsCompetitions() && localRoleViewModel.hasPrivilegedRole()
+    override val showsFab: Boolean get() = team.sport.supportsCompetitions() && roleScopeViewModel.hasPrivilegedRole(team)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
