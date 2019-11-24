@@ -26,7 +26,6 @@ package com.mainstreetcode.teammate.baseclasses
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.os.Build
 import android.view.MenuItem
 import android.view.View
@@ -40,9 +39,6 @@ import androidx.appcompat.widget.ActionMenuView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.doOnLayout
-import androidx.core.view.drawToBitmap
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.button.MaterialButton
@@ -159,25 +155,8 @@ class GlobalUiDriver(
         ViewHider.of(this).setDirection(ViewHider.BOTTOM).build()
     }
 
-    private val bottomNavHider: ViewHider<ImageView> = host.findViewById<View>(bottomNavId).run {
-        val bottomNavSnapshot = host.findViewById<ImageView>(R.id.bottom_nav_snapshot)
-        doOnLayout { bottomNavSnapshot.layoutParams.height = height }
-
-        ViewHider.of(bottomNavSnapshot)
-                .setDirection(ViewHider.BOTTOM)
-                .addStartAction {
-                    if (getCurrentFragment() == null) return@addStartAction
-                    if (isVisible && isLaidOut && width != 0 && height != 0)
-                        bottomNavSnapshot.setImageBitmap(drawToBitmap(Bitmap.Config.ARGB_8888))
-
-                    // Invisible so the snapshot can  be seen to animate in
-                    visibility = if (uiState.bottomNavShows) View.INVISIBLE else View.GONE
-                }
-                .addEndAction {
-                    // Finally show or hide the actual bottom bar
-                    isVisible = uiState.bottomNavShows
-                }
-                .build()
+    private val bottomNavHider: ViewHider<View> = host.findViewById<View>(bottomNavId).run {
+        ViewHider.of(this).setDirection(ViewHider.BOTTOM).build()
     }
 
     private val grassHider: ViewHider<ImageView> = host.findViewById<ImageView>(grassId).run {

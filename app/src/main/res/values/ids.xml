@@ -51,4 +51,5 @@
     <item name="fragment_header_thumbnail" type="id"/>
     <item name="fragment_media_background" type="id"/>
     <item name="fragment_media_thumbnail" type="id"/>
+    <item name="bottom_padding" type="id" />
 </resources>
