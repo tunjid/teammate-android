@@ -61,6 +61,8 @@ class WindowInsetsDriver(
     private var insetsApplied: Boolean = false
     private var lastInsetDispatch: InsetDispatch? = InsetDispatch()
 
+    private val bottomNavHeight get() = bottomNavView.height
+
     init {
         ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> onInsetsDispatched(insets) }
         fragmentContainer.bottomInsetSpring {
@@ -115,7 +117,7 @@ class WindowInsetsDriver(
         if (isNotInCurrentFragmentContainer(current)) return@apply
         if (current !is InsetProvider) return@apply
 
-        val large = systemWindowInsetBottom > bottomInset + bottomNavView.height given uiState.bottomNavShows
+        val large = systemWindowInsetBottom > bottomInset + bottomNavHeight given uiState.bottomNavShows
         val bottom = if (large) bottomInset else fragmentInsetReducer(current.insetFlags)
 
         current.view?.apply { ifBottomInsetChanged(bottom) { marginLayoutParams.bottomMargin = it } }
@@ -149,10 +151,10 @@ class WindowInsetsDriver(
 
     private fun coordinatorInsetReducer(systemBottomInset: Int) =
             if (systemBottomInset > bottomInset) systemBottomInset
-            else bottomInset + (bottomNavView.height given uiState.bottomNavShows)
+            else bottomInset + (bottomNavHeight given uiState.bottomNavShows)
 
     private fun fragmentInsetReducer(insetFlags: InsetFlags): Int {
-        return bottomNavView.height.given(uiState.bottomNavShows) + bottomInset.given(insetFlags.hasBottomInset)
+        return bottomNavHeight.given(uiState.bottomNavShows) + bottomInset.given(insetFlags.hasBottomInset)
     }
 
     companion object {
