@@ -58,12 +58,12 @@ class WindowInsetsDriver(
 
     private var leftInset: Int = 0
     private var rightInset: Int = 0
-    private var insetsMeasured: Boolean = false
+    private var insetsApplied: Boolean = false
     private var lastInsetDispatch: InsetDispatch? = InsetDispatch()
 
     init {
-        ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> onInsetsMeasured(insets) }
-        fragmentContainer.bottomPaddingSpring {
+        ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> onInsetsDispatched(insets) }
+        fragmentContainer.bottomInsetSpring {
             addEndListener { _, _, _, _ ->
                 val input = fragmentContainer.innermostFocusedChild as? EditText
                         ?: return@addEndListener
@@ -78,8 +78,8 @@ class WindowInsetsDriver(
     private fun isNotInCurrentFragmentContainer(fragment: Fragment): Boolean =
             stackNavigatorSource()?.run { fragment.id != containerId } ?: true
 
-    private fun onInsetsMeasured(insets: WindowInsetsCompat): WindowInsetsCompat {
-        if (this.insetsMeasured) return insets
+    private fun onInsetsDispatched(insets: WindowInsetsCompat): WindowInsetsCompat {
+        if (this.insetsApplied) return insets
 
         topInset = insets.systemWindowInsetTop
         leftInset = insets.systemWindowInsetLeft
@@ -92,7 +92,7 @@ class WindowInsetsDriver(
 
         adjustInsetForFragment(stackNavigatorSource()?.current)
 
-        this.insetsMeasured = true
+        this.insetsApplied = true
         return insets
     }
 
@@ -104,11 +104,11 @@ class WindowInsetsDriver(
     }
 
     private fun consumeFragmentInsets(insets: WindowInsetsCompat): WindowInsetsCompat = insets.apply {
-        coordinatorLayout.testBottomPadding(coordinatorInsetReducer(systemWindowInsetBottom)) {
-            bottomPaddingSpring().animateToFinalPosition(it.toFloat())
+        coordinatorLayout.ifBottomInsetChanged(coordinatorInsetReducer(systemWindowInsetBottom)) {
+            bottomInsetSpring().animateToFinalPosition(it.toFloat())
         }
-        fragmentContainer.testBottomPadding(contentInsetReducer(systemWindowInsetBottom)) {
-            bottomPaddingSpring().animateToFinalPosition(it.toFloat())
+        fragmentContainer.ifBottomInsetChanged(contentInsetReducer(systemWindowInsetBottom)) {
+            bottomInsetSpring().animateToFinalPosition(it.toFloat())
         }
 
         val current = stackNavigatorSource()?.current ?: return@apply
@@ -118,7 +118,7 @@ class WindowInsetsDriver(
         val large = systemWindowInsetBottom > bottomInset + bottomNavView.height given uiState.bottomNavShows
         val bottom = if (large) bottomInset else fragmentInsetReducer(current.insetFlags)
 
-        current.view?.apply { testBottomPadding(bottom) { updatePadding(bottom = it) } }
+        current.view?.apply { ifBottomInsetChanged(bottom) { marginLayoutParams.bottomMargin = it } }
     }
 
     private fun adjustInsetForFragment(fragment: Fragment?) {
@@ -132,10 +132,10 @@ class WindowInsetsDriver(
                     right = this.rightInset given insetFlags.hasRightInset
             )
 
-            fragment.view?.updatePadding(
-                    top = topInset given insetFlags.hasTopInset,
-                    bottom = fragmentInsetReducer(insetFlags)
-            )
+            fragment.view?.marginLayoutParams?.apply {
+                topMargin = topInset given insetFlags.hasTopInset
+                bottomMargin = fragmentInsetReducer(insetFlags)
+            }
 
             lastInsetDispatch = this
         }
@@ -172,17 +172,17 @@ class WindowInsetsDriver(
 
 private infix fun Int.given(flag: Boolean) = if (flag) this else 0
 
-private fun View.testBottomPadding(bottomPadding: Int, action: View.(Int) -> Unit) {
-    if (paddingBottom != bottomPadding) action(bottomPadding)
+private fun View.ifBottomInsetChanged(newInset: Int, action: View.(Int) -> Unit) {
+    if (marginLayoutParams.bottomMargin != newInset) action(newInset)
 }
 
-private fun View.bottomPaddingSpring(modifier: SpringAnimation.() -> Unit = {}): SpringAnimation =
-        getTag(R.id.bottom_padding) as? SpringAnimation ?: springAnimationOf(
-                { updatePadding(bottom = it.toInt()); invalidate() },
-                { paddingBottom.toFloat() },
+private fun View.bottomInsetSpring(modifier: SpringAnimation.() -> Unit = {}): SpringAnimation =
+        getTag(R.id.bottom_inset_spring) as? SpringAnimation ?: springAnimationOf(
+                { marginLayoutParams.bottomMargin = it.toInt(); invalidate(); requestLayout() },
+                { marginLayoutParams.bottomMargin.toFloat() },
                 0F
         ).apply {
-            setTag(R.id.bottom_padding, this@apply)
+            setTag(R.id.bottom_inset_spring, this@apply)
             spring.dampingRatio = SpringForce.DAMPING_RATIO_NO_BOUNCY
             spring.stiffness = SpringForce.STIFFNESS_MEDIUM
             modifier(this)
