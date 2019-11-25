@@ -25,51 +25,57 @@
 package com.mainstreetcode.teammate.baseclasses
 
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.forEach
-import androidx.core.view.isVisible
+import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
+import androidx.dynamicanimation.animation.springAnimationOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionManager
-import com.mainstreetcode.teammate.util.setMaterialOverlay
+import com.mainstreetcode.teammate.R
 import com.tunjid.androidx.navigation.Navigator
 import com.tunjid.androidx.view.util.InsetFlags
+import com.tunjid.androidx.view.util.innermostFocusedChild
 import com.tunjid.androidx.view.util.marginLayoutParams
-import kotlin.math.max
 
 class WindowInsetsDriver(
-        private val stackNavigatorSource: () -> Navigator?,
+        globalUiController: GlobalUiController,
         private val parentContainer: ViewGroup,
-        private val contentContainer: FragmentContainerView,
+        private val fragmentContainer: FragmentContainerView,
         private val coordinatorLayout: CoordinatorLayout,
         private val toolbar: Toolbar,
-        private val topInsetView: View,
-        private val bottomInsetView: View,
-        private val keyboardPadding: View,
-        private val insetAdjuster: (Int) -> Int
-) : FragmentManager.FragmentLifecycleCallbacks() {
+        private val altToolbar: Toolbar,
+        private val bottomNavView: View,
+        private val stackNavigatorSource: () -> Navigator?
+) : FragmentManager.FragmentLifecycleCallbacks(), GlobalUiController by globalUiController {
 
     private var leftInset: Int = 0
     private var rightInset: Int = 0
     private var insetsApplied: Boolean = false
-    private var lastFragmentBottomInset: Int = Int.MIN_VALUE
-    private var lastSystemInsetDispatch: InsetDispatch? = InsetDispatch()
+    private var lastWindowInsets: WindowInsetsCompat? = null
+    private var lastInsetDispatch: InsetDispatch? = InsetDispatch()
+
+    private val bottomNavHeight get() = bottomNavView.height
 
     init {
-        ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> consumeSystemInsets(insets) }
+        ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> onInsetsDispatched(insets) }
+        bottomNavView.doOnLayout { lastWindowInsets?.let(this::consumeFragmentInsets) }
+        fragmentContainer.bottomInsetSpring {
+            addEndListener { _, _, _, _ ->
+                val input = fragmentContainer.innermostFocusedChild as? EditText
+                        ?: return@addEndListener
+                input.text = input.text // Scroll to text that has focus
+            }
+        }
     }
-
-//    override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) = adjustInsetForFragment(f)
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) =
             onFragmentViewCreated(v, f)
@@ -77,7 +83,7 @@ class WindowInsetsDriver(
     private fun isNotInCurrentFragmentContainer(fragment: Fragment): Boolean =
             stackNavigatorSource()?.run { fragment.id != containerId } ?: true
 
-    private fun consumeSystemInsets(insets: WindowInsetsCompat): WindowInsetsCompat {
+    private fun onInsetsDispatched(insets: WindowInsetsCompat): WindowInsetsCompat {
         if (this.insetsApplied) return insets
 
         topInset = insets.systemWindowInsetTop
@@ -85,14 +91,9 @@ class WindowInsetsDriver(
         rightInset = insets.systemWindowInsetRight
         bottomInset = insets.systemWindowInsetBottom
 
-        topInsetView.layoutParams.height = topInset
-        bottomInsetView.layoutParams.height = bottomInset
-
-        bottomInsetView.setMaterialOverlay()
-        keyboardPadding.setOnTouchListener { _, event ->
-            if (event.action == KeyEvent.ACTION_UP) setKeyboardPadding(bottomInset)
-            true
-        }
+        toolbar.marginLayoutParams.topMargin = topInset
+        altToolbar.marginLayoutParams.topMargin = topInset
+        bottomNavView.marginLayoutParams.bottomMargin = bottomInset
 
         adjustInsetForFragment(stackNavigatorSource()?.current)
 
@@ -107,79 +108,61 @@ class WindowInsetsDriver(
         ViewCompat.setOnApplyWindowInsetsListener(v) { _, insets -> consumeFragmentInsets(insets) }
     }
 
-    private fun consumeFragmentInsets(insets: WindowInsetsCompat): WindowInsetsCompat {
-        val bottomSystemInset = insets.systemWindowInsetBottom
+    private fun consumeFragmentInsets(insets: WindowInsetsCompat): WindowInsetsCompat = insets.apply {
+        lastWindowInsets = this
 
-        if (lastFragmentBottomInset == bottomSystemInset) return insets
-
-        setKeyboardPadding(bottomSystemInset)
-
-        stackNavigatorSource()?.current?.run {
-            if (this is InsetProvider) onKeyBoardChanged(bottomSystemInset > bottomInset)
+        coordinatorLayout.ifBottomInsetChanged(coordinatorInsetReducer(systemWindowInsetBottom)) {
+            bottomInsetSpring().animateToFinalPosition(it.toFloat())
+        }
+        fragmentContainer.ifBottomInsetChanged(contentInsetReducer(systemWindowInsetBottom)) {
+            bottomInsetSpring().animateToFinalPosition(it.toFloat())
         }
 
-        lastFragmentBottomInset = bottomSystemInset
+        val current = stackNavigatorSource()?.current ?: return@apply
+        if (isNotInCurrentFragmentContainer(current)) return@apply
+        if (current !is InsetProvider) return@apply
 
-        return insets
-    }
+        val large = systemWindowInsetBottom > bottomInset + bottomNavHeight given uiState.bottomNavShows
+        val bottom = if (large) bottomInset else fragmentInsetReducer(current.insetFlags)
 
-    private fun setKeyboardPadding(bottomSystemInset: Int) {
-        val old = contentContainer.paddingBottom
-        val new = bottomSystemInset - bottomInset
-
-        if (old != new) TransitionManager.beginDelayedTransition(parentContainer, AutoTransition().apply {
-            duration = ANIMATION_DURATION.toLong()
-            coordinatorLayout.forEach { addTarget(it) }
-            addTarget(coordinatorLayout) // Animate coordinator and its children, mainly the FAB
-            excludeTarget(RecyclerView::class.java, true)
-        })
-
-        val keyboardPad = max(insetAdjuster(bottomSystemInset - bottomInset), 0)
-
-        contentContainer.updatePadding(bottom = new)
-        keyboardPadding.layoutParams.height = if (keyboardPad != 0) keyboardPad else 1 // 0 breaks animations
+        current.view?.apply { ifBottomInsetChanged(bottom) { marginLayoutParams.bottomMargin = it } }
     }
 
     private fun adjustInsetForFragment(fragment: Fragment?) {
         if (fragment !is InsetProvider || isNotInCurrentFragmentContainer(fragment)) return
 
         fragment.insetFlags.dispatch(fragment.tag) {
-            if (insetFlags == null || lastSystemInsetDispatch == this) return
+            if (insetFlags == null || lastInsetDispatch == this) return
 
-            toolbar.marginLayoutParams.topMargin = if (insetFlags.hasTopInset) 0 else topInset
-            coordinatorLayout.marginLayoutParams.bottomMargin = if (insetFlags.hasBottomInset) 0 else bottomInset
+            parentContainer.updatePadding(
+                    left = this.leftInset given insetFlags.hasLeftInset,
+                    right = this.rightInset given insetFlags.hasRightInset
+            )
 
-            TransitionManager.beginDelayedTransition(parentContainer, AutoTransition().apply {
-                duration = ANIMATION_DURATION.toLong()
-                contentContainer.forEach { addTarget(it) }
-                addTarget(contentContainer)
-                excludeTarget(RecyclerView::class.java, true)
-            })
+            fragment.view?.apply {
+                updatePadding(top = topInset given insetFlags.hasTopInset)
+                marginLayoutParams.bottomMargin = fragmentInsetReducer(insetFlags)
+            }
 
-            topInsetView.isVisible = insetFlags.hasTopInset
-            bottomInsetView.isVisible = insetFlags.hasBottomInset
-
-            parentContainer.setPadding(
-                    if (insetFlags.hasLeftInset) this.leftInset else 0,
-                    0,
-                    if (insetFlags.hasRightInset) this.rightInset else 0,
-                    0)
-
-            val topPadding = if (insetFlags.hasTopInset) topInset else 0
-            val bottomPadding = if (insetFlags.hasBottomInset) bottomInset else 0
-
-            fragment.view?.updatePadding(top = topPadding, bottom = bottomPadding)
-
-            lastSystemInsetDispatch = this
+            lastInsetDispatch = this
         }
     }
 
     private inline fun InsetFlags.dispatch(tag: String?, receiver: InsetDispatch.() -> Unit) =
-            receiver.invoke(InsetDispatch(tag, leftInset, topInset, rightInset, bottomInset, this))
+            receiver.invoke(InsetDispatch(tag, leftInset, topInset, rightInset, bottomInset, bottomNavHeight, this))
+
+    private fun contentInsetReducer(systemBottomInset: Int) =
+            systemBottomInset - bottomInset
+
+    private fun coordinatorInsetReducer(systemBottomInset: Int) =
+            if (systemBottomInset > bottomInset) systemBottomInset
+            else bottomInset + (bottomNavHeight given uiState.bottomNavShows)
+
+    private fun fragmentInsetReducer(insetFlags: InsetFlags): Int {
+        return bottomNavHeight.given(uiState.bottomNavShows) + bottomInset.given(insetFlags.hasBottomInset)
+    }
 
     companion object {
-        const val ANIMATION_DURATION = 300
-
         var topInset: Int = 0
         var bottomInset: Int = 0
     }
@@ -190,6 +173,25 @@ class WindowInsetsDriver(
             val topInset: Int = 0,
             val rightInset: Int = 0,
             val bottomInset: Int = 0,
+            val bottomNavHeight: Int = 0,
             val insetFlags: InsetFlags? = null
     )
 }
+
+private infix fun Int.given(flag: Boolean) = if (flag) this else 0
+
+private fun View.ifBottomInsetChanged(newInset: Int, action: View.(Int) -> Unit) {
+    if (marginLayoutParams.bottomMargin != newInset) action(newInset)
+}
+
+private fun View.bottomInsetSpring(modifier: SpringAnimation.() -> Unit = {}): SpringAnimation =
+        getTag(R.id.bottom_inset_spring) as? SpringAnimation ?: springAnimationOf(
+                { marginLayoutParams.bottomMargin = it.toInt(); invalidate(); requestLayout() },
+                { marginLayoutParams.bottomMargin.toFloat() },
+                0F
+        ).apply {
+            setTag(R.id.bottom_inset_spring, this@apply)
+            spring.dampingRatio = SpringForce.DAMPING_RATIO_NO_BOUNCY
+            spring.stiffness = SpringForce.STIFFNESS_MEDIUM
+            modifier(this)
+        }

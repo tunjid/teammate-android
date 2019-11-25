@@ -76,8 +76,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
         super.onCreate(savedInstanceState)
 
-        supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(), true)
+        val bottomNav = findViewById<View>(R.id.bottom_navigation)
+
         supportFragmentManager.registerFragmentLifecycleCallbacks(transientBarCallback(), true)
+        supportFragmentManager.registerFragmentLifecycleCallbacks(windowInsetsDriver(bottomNav), true)
 
         inputRecycledPool = RecyclerView.RecycledViewPool()
         inputRecycledPool.setMaxRecycledViews(Item.INPUT, 10)
@@ -97,22 +99,15 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = navigator.onNavItemSelected(item.itemId)
 
-    private fun adjustKeyboardPadding(suggestion: Int): Int {
-        var padding = suggestion
-        if (padding != WindowInsetsDriver.bottomInset && uiState.bottomNavShows) padding -= navigator.bottomNavHeight
-        return padding
-    }
-
-    private fun windowInsetsDriver(): WindowInsetsDriver = WindowInsetsDriver(
-            stackNavigatorSource = this.navigator::activeNavigator,
+    private fun windowInsetsDriver(bottomNav: View): WindowInsetsDriver = WindowInsetsDriver(
+            this,
             parentContainer = findViewById(R.id.content_view),
-            contentContainer = findViewById(R.id.main_fragment_container),
+            fragmentContainer = findViewById(R.id.main_fragment_container),
             coordinatorLayout = findViewById(R.id.coordinator),
             toolbar = findViewById(R.id.toolbar),
-            topInsetView = findViewById(R.id.top_inset),
-            bottomInsetView = findViewById(R.id.bottom_inset),
-            keyboardPadding = findViewById(R.id.padding),
-            insetAdjuster = this::adjustKeyboardPadding
+            altToolbar = findViewById(R.id.alt_toolbar),
+            bottomNavView = bottomNav,
+            stackNavigatorSource = this.navigator::activeNavigator
     )
 
     private fun transientBarCallback() = object : FragmentManager.FragmentLifecycleCallbacks() {
