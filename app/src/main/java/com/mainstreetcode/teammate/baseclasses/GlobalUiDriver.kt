@@ -39,6 +39,7 @@ import androidx.appcompat.widget.ActionMenuView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.button.MaterialButton
@@ -51,6 +52,7 @@ import com.mainstreetcode.teammate.util.springCrossFade
 import com.tunjid.androidx.core.content.drawableAt
 import com.tunjid.androidx.material.animator.FabExtensionAnimator
 import com.tunjid.androidx.view.animator.ViewHider
+import com.tunjid.androidx.view.util.spring
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -152,7 +154,9 @@ class GlobalUiDriver(
 
     private val fabHider: ViewHider<MaterialButton> = host.findViewById<MaterialButton>(fabId).run {
         backgroundTintList = ColorStateList.valueOf(host.resolveThemeColor(R.attr.colorSecondary))
-        ViewHider.of(this).setDirection(ViewHider.BOTTOM).build()
+        ViewHider.of(this).setDirection(ViewHider.BOTTOM)
+                .addOptions { addEndListener { _, _, _, _ -> setFabState(uiState.fabIcon, uiState.fabText) } }
+                .build()
     }
 
     private val bottomNavHider: ViewHider<View> = host.findViewById<View>(bottomNavId).run {
@@ -235,6 +239,8 @@ class GlobalUiDriver(
     }
 
     private fun setFabState(@DrawableRes icon: Int, @StringRes title: Int) = host.runOnUiThread {
+        // Don't animate the fab when it's hiding, it's distracting.
+        if (fabHider.view.spring(SpringAnimation.TRANSLATION_Y).isRunning && !uiState.fabShows) return@runOnUiThread
         val titleSequence = if (title == 0) "" else host.getString(title)
         if (icon != 0 && titleSequence.isNotBlank())
             fabExtensionAnimator.updateGlyphs(FabExtensionAnimator.SimpleGlyphState(titleSequence, host.drawableAt(icon)!!))
@@ -307,8 +313,6 @@ class GlobalUiDriver(
     }
 
     companion object {
-        private const val TOOLBAR_ANIM_DELAY = 200L
-
         private const val DEFAULT_SYSTEM_UI_FLAGS = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
