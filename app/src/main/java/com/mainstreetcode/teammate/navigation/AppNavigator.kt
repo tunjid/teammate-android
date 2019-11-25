@@ -139,7 +139,7 @@ class AppNavigator(private val host: FragmentActivity) :
             }
         }, true)
 
-        delegate.stackSelectedListener = { bottomNav.highlight(it.toNavId) }
+        delegate.stackSelectedListener = { bottomNav.select(it.toNavId) }
         delegate.stackTransactionModifier = { crossFade() }
         delegate.transactionModifier = { incomingFragment ->
             val current = delegate.current
@@ -204,7 +204,10 @@ class AppNavigator(private val host: FragmentActivity) :
         R.id.action_events,
         R.id.action_messages,
         R.id.action_media,
-        R.id.action_tournaments,
+        R.id.action_tournaments -> when {
+            bottomNav.isSelected(id) -> clear()
+            else -> TeamPickerFragment.pick(host, id.toRequestId)
+        }.let { true }
         R.id.action_games -> TeamPickerFragment.pick(host, id.toRequestId).let { true }
         else -> push(when (id) {
             R.id.action_find_teams -> TeamSearchFragment.newInstance()
