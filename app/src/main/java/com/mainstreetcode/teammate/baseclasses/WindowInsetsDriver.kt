@@ -32,6 +32,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
@@ -59,12 +60,14 @@ class WindowInsetsDriver(
     private var leftInset: Int = 0
     private var rightInset: Int = 0
     private var insetsApplied: Boolean = false
+    private var lastWindowInsets: WindowInsetsCompat? = null
     private var lastInsetDispatch: InsetDispatch? = InsetDispatch()
 
     private val bottomNavHeight get() = bottomNavView.height
 
     init {
         ViewCompat.setOnApplyWindowInsetsListener(parentContainer) { _, insets -> onInsetsDispatched(insets) }
+        bottomNavView.doOnLayout { lastWindowInsets?.let(this::consumeFragmentInsets) }
         fragmentContainer.bottomInsetSpring {
             addEndListener { _, _, _, _ ->
                 val input = fragmentContainer.innermostFocusedChild as? EditText
@@ -106,6 +109,8 @@ class WindowInsetsDriver(
     }
 
     private fun consumeFragmentInsets(insets: WindowInsetsCompat): WindowInsetsCompat = insets.apply {
+        lastWindowInsets = this
+
         coordinatorLayout.ifBottomInsetChanged(coordinatorInsetReducer(systemWindowInsetBottom)) {
             bottomInsetSpring().animateToFinalPosition(it.toFloat())
         }
@@ -144,7 +149,7 @@ class WindowInsetsDriver(
     }
 
     private inline fun InsetFlags.dispatch(tag: String?, receiver: InsetDispatch.() -> Unit) =
-            receiver.invoke(InsetDispatch(tag, leftInset, topInset, rightInset, bottomInset, this))
+            receiver.invoke(InsetDispatch(tag, leftInset, topInset, rightInset, bottomInset, bottomNavHeight, this))
 
     private fun contentInsetReducer(systemBottomInset: Int) =
             systemBottomInset - bottomInset
@@ -168,6 +173,7 @@ class WindowInsetsDriver(
             val topInset: Int = 0,
             val rightInset: Int = 0,
             val bottomInset: Int = 0,
+            val bottomNavHeight: Int = 0,
             val insetFlags: InsetFlags? = null
     )
 }
