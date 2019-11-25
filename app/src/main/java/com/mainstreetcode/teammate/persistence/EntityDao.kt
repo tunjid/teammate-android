@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.persistence
 
 import androidx.room.Delete
+import androidx.room.Transaction
 
 import io.reactivex.Single
 
@@ -43,7 +44,8 @@ abstract class EntityDao<T> {
     @Delete
     abstract fun delete(models: List<T>)
 
-    fun upsert(models: List<T>) {
+    @Transaction
+    open fun upsert(models: List<T>) {
         insert(models)
         update(models)
     }
