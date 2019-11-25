@@ -220,7 +220,7 @@ open class TeammatesBaseFragment(layoutRes: Int = 0) : Fragment(layoutRes),
     override fun onClick(view: View) = Unit
 
     open fun togglePersistentUi() {
-         uiState = lastSetUiState
+         uiState = lastSetUiState.copy(fabShows = showsFab)
     }
 
     protected fun updateFabOnScroll(dx: Int, dy: Int) =
