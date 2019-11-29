@@ -27,8 +27,18 @@
     android:id="@+id/inner_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/triple_and_half_margin"
     android:background="?alt_background">
+
+    <View
+        android:id="@+id/spacer_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/action_bar_height"
+        android:background="?colorPrimary"
+        android:elevation="0dp"
+        android:stateListAnimator="@animator/elevation_animator"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
@@ -38,7 +48,7 @@
         android:background="?colorPrimary"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spacer_toolbar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:tabIndicatorColor="?alt_text_color"
         app:tabSelectedTextColor="?alt_text_color"

@@ -49,7 +49,7 @@ import com.mainstreetcode.teammate.viewmodel.swap
 import com.tunjid.androidx.core.components.args
 import com.tunjid.androidx.recyclerview.diff.Differentiable
 
-class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
+class MediaFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
         MediaAdapterListener,
         Shell.TeamAdapterListener,
         ImageWorkerFragment.MediaListener,
@@ -95,7 +95,7 @@ class MediaFragment : TeammatesBaseFragment(R.layout.fragment_media),
 
         val refreshAction = { disposables.add(mediaViewModel.refresh(team).subscribe(this::onMediaUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.team_media))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_video_library_black_24dp, R.string.no_media))
                 .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchMedia(false) }
