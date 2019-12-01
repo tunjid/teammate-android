@@ -122,7 +122,7 @@ class WindowInsetsDriver(
         if (isNotInCurrentFragmentContainer(current)) return@apply
         if (current !is InsetProvider) return@apply
 
-        val large = systemWindowInsetBottom > bottomInset + bottomNavHeight given uiState.bottomNavShows
+        val large = systemWindowInsetBottom > bottomInset + bottomNavHeight.given(uiState.bottomNavShows)
         val bottom = if (large) bottomInset else fragmentInsetReducer(current.insetFlags)
 
         current.view?.apply { ifBottomInsetChanged(bottom) { marginLayoutParams.bottomMargin = it } }
