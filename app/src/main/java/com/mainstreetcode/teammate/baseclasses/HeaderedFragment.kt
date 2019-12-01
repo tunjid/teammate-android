@@ -25,6 +25,9 @@
 package com.mainstreetcode.teammate.baseclasses
 
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -46,6 +49,7 @@ import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.getTransitionName
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
+import com.tunjid.androidx.core.content.colorAt
 import io.reactivex.Completable.timer
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.*
@@ -56,9 +60,13 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
         ImageWorkerFragment.CropListener,
         ImageWorkerFragment.ImagePickerListener where T : HeaderedModel<T>, T : ListableModel<T> {
 
+    private var headerColorFilter = Color.TRANSPARENT
+
     private var imageJustCropped: Boolean = false
 
     private var appBarLayout: AppBarLayout? = null
+
+    private val headerAnimator = ValueAnimator.ofObject(ArgbEvaluator()).apply { duration = 1000 }
 
     protected var viewHolder: HeaderedImageViewHolder? = null
 
@@ -78,8 +86,9 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
 
         val model = headeredModel
 
-        viewHolder = HeaderedImageViewHolder(view, this).apply {
+        viewHolder = HeaderedImageViewHolder(view, this, this::animateHeader).apply {
             bind(model)
+            onHeaderColorFilterChanged(headerColorFilter)
             setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
         }
 
@@ -116,6 +125,7 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
     override fun onDestroyView() {
         gofer().clear()
         viewHolder?.unBind()
+        headerAnimator.removeAllUpdateListeners()
         super.onDestroyView()
     }
 
@@ -187,6 +197,20 @@ abstract class HeaderedFragment<T>(layoutRes: Int = 0) :
         transientBarDriver.showSnackBar(getString(R.string.user_blocked, blockedUser.user.firstName))
         transientBarDriver.toggleProgress(false)
         activity?.onBackPressed()
+    }
+
+    private fun animateHeader() = headerAnimator.run {
+        if (isRunning) return
+        val start = headerColorFilter
+        val end = requireContext().colorAt(R.color.black_50)
+        removeAllUpdateListeners()
+        setObjectValues(start, end)
+        setEvaluator(ArgbEvaluator())
+        addUpdateListener { animation ->
+            headerColorFilter = animation.animatedValue as? Int ?: return@addUpdateListener
+            viewHolder?.onHeaderColorFilterChanged(headerColorFilter)
+        }
+        start()
     }
 
     companion object {
