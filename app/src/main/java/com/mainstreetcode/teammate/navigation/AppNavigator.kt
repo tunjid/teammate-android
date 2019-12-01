@@ -24,6 +24,7 @@
 
 package com.mainstreetcode.teammate.navigation
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.TransitionDrawable
@@ -104,10 +105,8 @@ class AppNavigator(private val host: FragmentActivity) :
     private val teamViewModel by host.viewModels<TeamViewModel>()
 
     private val navIcon = TransitionDrawable(arrayOf(
-            host.drawableAt(R.drawable.ic_shield_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!
-                    .toBitmap().toDrawable(host.resources),
-            host.drawableAt(R.drawable.ic_arrow_back_24dp).withTint(host.resolveThemeColor(R.attr.toolbar_text_color))!!
-                    .toBitmap().toDrawable(host.resources)
+            host.drawableAt(R.drawable.ic_shield_24dp).toTintedBitmap(host),
+            host.drawableAt(R.drawable.ic_arrow_back_24dp).toTintedBitmap(host)
     )).apply { setId(0, 0); setId(1, 1); isCrossFadeEnabled = true }
 
     private val bottomNav: BottomNav
@@ -326,3 +325,9 @@ private fun FragmentTransaction.crossFade() = setCustomAnimations(
 )
 
 private fun <T> Flowable<T>.toLiveData() = LiveDataReactiveStreams.fromPublisher(this)
+
+private fun Drawable?.toTintedBitmap(host: Context) = this!!.apply {
+    withTint(host.resolveThemeColor(R.attr.toolbar_text_color))
+            .toBitmap()
+            .toDrawable(host.resources)
+}
