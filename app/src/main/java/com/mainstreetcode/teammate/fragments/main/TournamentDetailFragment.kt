@@ -92,10 +92,13 @@ class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_p
                 fabText = R.string.add_tournament_competitors,
                 fabShows = showsFab
         )
+
         viewHolder = EmptyViewHolder(view, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc)
 
-        viewPager?.adapter = TournamentRoundAdapter(tournament, childFragmentManager)
-        viewPager?.currentItem = tournament.currentRound
+        viewPager?.apply {
+            adapter = TournamentRoundAdapter(tournament, childFragmentManager)
+            setCurrentItem(tournament.currentRound, false)
+        }
 
         binding = this
 
