@@ -32,7 +32,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.TeamChatViewHolder
 import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Chat
 import com.mainstreetcode.teammate.model.User
-import com.mainstreetcode.teammate.util.EVENT
+import com.mainstreetcode.teammate.util.CHAT
 import com.mainstreetcode.teammate.util.areDifferentDays
 import com.tunjid.androidx.recyclerview.adapterOf
 import com.tunjid.androidx.recyclerview.diff.Differentiable
@@ -69,7 +69,7 @@ fun chatAdapter(
             holder.bind(chat, signedInUser == chat.user, !hideDetails, showPicture, isFirstMessageToday)
         },
         itemIdFunction = { it.hashCode().toLong() },
-        viewTypeFunction = { (it as? Ad<*>)?.type ?: EVENT }
+        viewTypeFunction = { (it as? Ad<*>)?.type ?: CHAT }
 )
 
 private fun forceCast(identifiable: Differentiable): Chat = identifiable as Chat
