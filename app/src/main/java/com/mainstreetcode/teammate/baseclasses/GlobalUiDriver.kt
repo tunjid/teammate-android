@@ -26,6 +26,7 @@ package com.mainstreetcode.teammate.baseclasses
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.view.MenuItem
 import android.view.View
@@ -167,7 +168,10 @@ class GlobalUiDriver(
         ViewHider.of(this).setDirection(ViewHider.BOTTOM).build()
     }
 
-    private val fabExtensionAnimator: FabInteractor = FabInteractor(fabHider.view).apply { isExtended = true }
+    private val fabExtensionAnimator: FabInteractor = FabInteractor(fabHider.view).apply {
+        isExtended = true
+        fabHider.view.strokeColor = ColorStateList.valueOf(Color.WHITE)
+    }
 
     private var state: UiState = UiState.freshState()
 
