@@ -47,7 +47,6 @@ import com.mainstreetcode.teammate.baseclasses.globalUiDriver
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.UiState
 import com.mainstreetcode.teammate.navigation.AppNavigator
-import com.mainstreetcode.teammate.util.isInDarkMode
 import com.mainstreetcode.teammate.viewmodel.PrefsViewModel
 import com.tunjid.androidx.navigation.Navigator
 
@@ -71,8 +70,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         get() = navigator.bottomSheetDriver
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppCompatDelegate.setDefaultNightMode(ViewModelProviders.of(this).get(PrefsViewModel::class.java).nightUiMode)
-        setTheme(if (isInDarkMode) R.style.AppDarkTheme else R.style.AppTheme)
+        val prefsViewModel = ViewModelProviders.of(this).get(PrefsViewModel::class.java)
+        AppCompatDelegate.setDefaultNightMode(prefsViewModel.nightUiMode)
+        setTheme(if (prefsViewModel.isInDarkMode) R.style.AppDarkTheme else R.style.AppTheme)
 
         super.onCreate(savedInstanceState)
 
