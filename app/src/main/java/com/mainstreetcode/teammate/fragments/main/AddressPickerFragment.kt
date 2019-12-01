@@ -175,7 +175,7 @@ class AddressPickerFragment : TeammatesBaseFragment(R.layout.fragment_place_pick
                     ?: Unit
 
     private fun onMapReady(map: GoogleMap) {
-        map.updateTheme(requireContext())
+        map.updateTheme(prefsViewModel.isInDarkMode)
         map.setOnCameraIdleListener { onMapIdle(map) }
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted)
     }

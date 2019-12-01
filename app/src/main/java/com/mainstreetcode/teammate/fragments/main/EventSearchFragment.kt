@@ -167,7 +167,7 @@ class EventSearchFragment : TeammatesBaseFragment(R.layout.fragment_public_event
     }
 
     private fun onMapReady(map: GoogleMap) {
-        map.updateTheme(requireContext())
+        map.updateTheme(prefsViewModel.isInDarkMode)
         map.setOnCameraIdleListener { onMapIdle(map) }
         map.setOnCameraMoveStartedListener(this::onCameraMoveStarted)
         map.setOnInfoWindowClickListener(this::onMarkerInfoWindowClicked)

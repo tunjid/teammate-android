@@ -25,7 +25,6 @@
 package com.mainstreetcode.teammate.util
 
 import android.content.Context
-import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -47,6 +46,7 @@ import androidx.palette.graphics.Palette
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -92,17 +92,10 @@ fun Context.resolveThemeColor(@AttrRes colorAttr: Int): Int {
     return typedValue.data
 }
 
-val Context.isInDarkMode: Boolean
-    get() = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-        Configuration.UI_MODE_NIGHT_NO,
-        Configuration.UI_MODE_NIGHT_UNDEFINED -> false
-        else -> true
-    }
-
-fun GoogleMap.updateTheme(context: Context) {
+fun GoogleMap.updateTheme(isInDarkMode: Boolean) {
     try {
-        setMapStyle(MapStyleOptions.loadRawResourceStyle(context, when {
-            context.isInDarkMode -> R.raw.map_dark
+        setMapStyle(MapStyleOptions.loadRawResourceStyle(App.instance, when {
+            isInDarkMode -> R.raw.map_dark
             else -> R.raw.map_light
         }))
     } catch (e: Resources.NotFoundException) {

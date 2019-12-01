@@ -23,14 +23,26 @@
   -->
 
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/action_bar_height">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
+        <View
+            android:id="@+id/spacer_toolbar"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/action_bar_height"
+            android:background="?colorPrimary"
+            android:elevation="0dp"
+            android:stateListAnimator="@animator/elevation_animator"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/card_view_wrapper"
@@ -40,7 +52,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/password_wrapper"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/spacer_toolbar">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"

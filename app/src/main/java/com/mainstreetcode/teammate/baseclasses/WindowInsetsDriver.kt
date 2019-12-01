@@ -139,9 +139,9 @@ class WindowInsetsDriver(
                     right = this.rightInset given insetFlags.hasRightInset
             )
 
-            fragment.view?.apply {
-                updatePadding(top = topInset given insetFlags.hasTopInset)
-                marginLayoutParams.bottomMargin = fragmentInsetReducer(insetFlags)
+            fragment.view?.marginLayoutParams?.apply {
+                topMargin = topInset given insetFlags.hasTopInset
+                bottomMargin = fragmentInsetReducer(insetFlags)
             }
 
             lastInsetDispatch = this
